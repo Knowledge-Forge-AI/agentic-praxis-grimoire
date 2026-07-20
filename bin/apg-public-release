@@ -1,0 +1,16 @@
+#!/usr/bin/env python3
+"""Build and validate deterministic local APG public release candidates."""
+
+from pathlib import Path
+import runpy
+import sys
+
+
+command = Path(__file__).resolve(strict=True)
+root = command.parent.parent
+helper = root / "libexec"
+if command.parent.name != "bin" or not helper.is_dir():
+    print("apg-public-release: installed command layout is invalid", file=sys.stderr)
+    raise SystemExit(1)
+sys.path.insert(0, str(helper))
+runpy.run_module("apg_public_release", run_name="__main__")

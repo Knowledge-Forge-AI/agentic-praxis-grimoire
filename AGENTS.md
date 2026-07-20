@@ -22,7 +22,9 @@ explicit authority states otherwise.
 
 ## External workflow plugin policy
 
-For work in this repository, Superpowers is reference evidence only.
+Superpowers is retired from the maintainer's workflow. Preserved source is
+historical external evidence only; its presence in a reference corpus does not
+make it installed, authoritative, or eligible for restoration.
 
 Do not invoke or follow any `superpowers:*` skill, including its session-start
 bootstrap, brainstorming, planning, TDD, subagent-development, worktree, review,
@@ -33,8 +35,10 @@ Do not treat Superpowers' instruction to check for or invoke skills before every
 action as applicable in this repository.
 
 APG repository instructions, accepted APG decisions, and the current authorized
-phase define the workflow. Superpowers may remain installed globally for use in
-other repositories.
+phase define the workflow. Agents must not invoke, depend on, reinstall, enable,
+or restore Superpowers even if it is present elsewhere, unless a human task
+explicitly names a bounded source inspection or comparison. Such authority does
+not authorize installation or workflow use.
 
 ## Working rules
 
@@ -75,6 +79,10 @@ other repositories.
 - [Architecture decisions](docs/adr/README.md): accepted and superseded project
   decisions.
 - [Exit records](docs/status/README.md): phase outcomes and next authorization.
-- [Skill library](skills/README.md): provisional skill shape and current scope.
-- [Roadmap](docs/roadmap.md): completed phases, next decision, and candidate
-  themes.
+- [Skill library](skills/README.md): six stable skill owners and current scope.
+- [Roadmap](docs/roadmap.md): completed phases and future authorization
+  boundary.
+- [Public release process](docs/public-release-process.md): exact projection,
+  local candidate construction, validation, and publication boundary.
+- [User-scoped skill integration](docs/user-scoped-skill-integration.md):
+  public-sourced direct links, ownership, update, rollback, and migration.

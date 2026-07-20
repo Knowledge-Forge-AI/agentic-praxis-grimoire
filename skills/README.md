@@ -2,10 +2,32 @@
 
 ## Current status
 
-APG v0.1 contains six direct-child skills. Every skill is `provisional`: it has
-passed structural validation, one positive scenario, one non-trigger scenario,
-one edge or stop scenario, and independent review within APG4's recorded limits.
-No skill is `evaluated`, `stable`, production-proven, or comparatively superior.
+APG contains six direct-child skills. APG13 individually reviewed and promoted
+all six current catalog entries to `stable` after repeated real use,
+representative non-triggers, edge or stop behavior, post-Superpowers evidence,
+complete regression, and fresh non-author review. Stability means suitability
+for routine bounded use within each recorded trigger and project boundary; it
+does not mean production warranty, universal applicability, automatic
+invocation, or comparative superiority.
+
+Public v0.2.0 appends one intentionally squashed release commit and annotated
+tag to the preserved public v0.1.0 history and supplies the maintainer's
+separately managed user-global Codex source. Superpowers was
+subsequently decommissioned, and a bounded fresh RepoMap smoke discovered all
+six skills, successfully applied the review skill, passed managed checks, and
+preserved the target repository. These are distribution and post-transition
+evidence; they do not promote any skill.
+
+[APG10](../docs/evaluations/apg10-karpathy-guidelines-evaluation.md) evaluated
+one experimental source under frozen concealed-source scenarios. Existing
+owners already handled assumptions, alternatives, traceability, speculative
+scope, necessary consistency work, and proportional escalation. Two independent
+positive scenarios supported one correction to
+`implementing-with-test-discipline`: when policy and removal authority are
+clear, its coherent slice now includes locally owned code or test artifacts
+whose sole purpose ended because of the authorized change. Unrelated cleanup
+and project-owned lifecycle decisions remain outside that rule. No other leaf
+changed, no seventh skill was added, and all six remain `provisional`.
 
 APG3 remains a truthful blocked experiment. It stopped before its clean
 comparison could begin and authored no candidate. APG4 uses a separately
@@ -61,6 +83,12 @@ non-triggers. Six existing RepoMap links, user-owned exclusion bytes, and the
 tracked repository were preserved. This evidence adds no maturity transition;
 every skill remains `provisional`.
 
+[APG13](../docs/evaluations/apg13-six-skill-post-superpowers-stability-review.md)
+separately inventories the complete evidence for each leaf and applies one
+frozen positive, non-trigger, and edge or stop family per skill. All six current
+leaves passed without a procedure correction and remain byte-identical to the
+APG12A baseline. Six fresh final per-skill reviews returned `accept-stable`.
+
 ## Canonical leaf and discovery shape
 
 Each canonical APG skill source is a direct child of `skills/`:
@@ -105,12 +133,12 @@ snapshot rather than silently changing the APG0 basis.
 
 | Skill | Trigger boundary | Maturity |
 | --- | --- | --- |
-| [`composing-bounded-worker-assignments`](composing-bounded-worker-assignments/SKILL.md) | Delegation is already authorized and selected, and one non-trivial worker assignment needs explicit boundaries | `provisional` |
-| [`designing-significant-changes`](designing-significant-changes/SKILL.md) | Consequential behavior, architecture, ownership, contracts, safety, or irreversible choices remain unresolved | `provisional` |
-| [`planning-repository-work`](planning-repository-work/SKILL.md) | An accepted objective needs dependent steps, cross-file coordination, staged risk reduction, or durable handoff | `provisional` |
-| [`implementing-with-test-discipline`](implementing-with-test-discipline/SKILL.md) | A code change benefits from executable behavioral evidence | `provisional` |
-| [`debugging-systematically`](debugging-systematically/SKILL.md) | Behavior is failing, inconsistent, flaky, unexplained, or has multiple plausible causes | `provisional` |
-| [`reviewing-and-verifying-repository-work`](reviewing-and-verifying-repository-work/SKILL.md) | A bounded repository artifact, change, phase, commit, or worker result needs evidence-backed acceptance, correction, disposition, or a completion claim | `provisional` |
+| [`composing-bounded-worker-assignments`](composing-bounded-worker-assignments/SKILL.md) | Delegation is already authorized and selected, and one non-trivial worker assignment needs explicit boundaries | `stable` |
+| [`designing-significant-changes`](designing-significant-changes/SKILL.md) | Consequential behavior, architecture, ownership, contracts, safety, or irreversible choices remain unresolved | `stable` |
+| [`planning-repository-work`](planning-repository-work/SKILL.md) | An accepted objective needs dependent steps, cross-file coordination, staged risk reduction, or durable handoff | `stable` |
+| [`implementing-with-test-discipline`](implementing-with-test-discipline/SKILL.md) | A code change benefits from executable behavioral evidence | `stable` |
+| [`debugging-systematically`](debugging-systematically/SKILL.md) | Behavior is failing, inconsistent, flaky, unexplained, or has multiple plausible causes | `stable` |
+| [`reviewing-and-verifying-repository-work`](reviewing-and-verifying-repository-work/SKILL.md) | A bounded repository artifact, change, phase, commit, or worker result needs evidence-backed acceptance, correction, disposition, or a completion claim | `stable` |
 
 These functional groupings do not adopt a category-directory taxonomy. A skill
 retains one canonical leaf and may be discovered through more than one concept.
@@ -130,36 +158,38 @@ harness rather than managed report commands.
 
 ## Acceptance and maintenance
 
-A retained skill must continue to:
+The [skill authoring and maintenance guide](../docs/skill-authoring-and-maintenance.md)
+is the normative owner for new skills, frontmatter and behavior-bearing
+corrections, support additions, maturity-only dispositions, deprecation, and
+removal. Retained leaves continue to require a coherent reusable problem,
+precise trigger and non-trigger boundaries, project-owned authority, observable
+evidence or stop behavior, appropriate provenance, representative scenarios,
+independent review, structural validation, and a removal path. This catalog
+summarizes current state; it does not redefine that procedure.
 
-1. solve one coherent reusable problem;
-2. state precise trigger and non-trigger boundaries;
-3. preserve authority and project-owned parameters;
-4. produce observable evidence, completion, or stop expectations;
-5. avoid private conventions and copied external expression;
-6. pass representative positive, non-trigger, and edge scenarios;
-7. survive independent review and fresh structural validation; and
-8. remain removable with its index, provenance, and evaluation references.
+`bin/apg-check-skill-library` validates the adopted mechanical leaf, catalog,
+link-containment, and checked-in projection subset. A pass does not establish
+semantic usefulness, rights, privacy, discovery, maturity, or stability.
 
-Scenario equivalence, over-triggering, authority drift, private leakage,
-unsupported machinery, or repeated correction need is evidence to narrow,
-deprecate, or remove a skill. Presence in this directory is not permanent
-acceptance.
-
-## Evidence and next maturity step
+## Current maturity evidence and release boundary
 
 The [APG4 public evaluation summary](../docs/evaluations/apg4-bootstrap-v0.1.md)
 records the bounded scenario and review result. The
 [Superpowers transition map](../docs/superpowers-transition.md) records coverage
 and remaining gaps.
 
-The next evidence step begins with a full restart and fresh RepoMap session
-discovery smoke, then broader repeated real-project dogfooding across the six
-skills, including positive and material non-trigger decisions, followed by
-external review. The sampled RepoMap environment required a full Codex
-application restart before newly linked cross-repository skills appeared; this
-is an observed bootstrap fact rather than a universal refresh guarantee. No
-additional synthetic activation gate is currently required. APG7's executable
-observation and projection-tool tests add regression evidence but do not promote
-a skill. No skill can become `stable` until it has survived repeated
-real-project use and an explicit post-Superpowers review.
+The fresh RepoMap discovery smoke, APG10 source-disposition review, APG11
+maintenance formalization, APG12 distribution validation, APG12A correction,
+and APG13 individual maturity review are complete. ADR 0010 records positive,
+representative non-trigger, edge or stop, real-use, correction, regression,
+authority, privacy, and rollback evidence for each skill. All six current
+leaves passed their frozen applications and final non-author reviews without an
+APG13 procedure correction.
+
+Clean A/B superiority and a positive use in a second repository are valuable
+evidence but are not independent stability blockers under ADR 0006. A concrete
+unresolved material authority, privacy, safety, or procedure defect may block an
+individual skill. The current catalog is `stable`. Public v0.1.0 retains its
+historical provisional catalog; public v0.2.0 contains the six stable leaves.
+APG14 changes no skill procedure or maturity row. No successor phase begins
+automatically.

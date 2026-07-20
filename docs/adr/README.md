@@ -40,3 +40,17 @@ than erasing the earlier decision.
   — Accepted
 - [`0005 — Public License and Contribution Governance`](2026/07/0005-public-license-and-contribution-governance.md)
   — Accepted
+- [`0006 — v0.2 Objectives, Roadmap, and Maturity Promotion`](2026/07/0006-v0-2-objectives-roadmap-and-maturity-promotion.md)
+  — Accepted
+- [`0007 — Experimental Karpathy Guidelines Disposition`](2026/07/0007-experimental-karpathy-guidelines-disposition.md)
+  — Accepted
+- [`0008 — Skill Authoring, Maintenance, and Mechanical Validation`](2026/07/0008-skill-authoring-maintenance-and-mechanical-validation.md)
+  — Accepted
+- [`0009 — Public Distribution and Reproducible Release Validation`](2026/07/0009-public-distribution-and-reproducible-release-validation.md)
+  — Accepted
+- [`0010 — Six-Skill Post-Superpowers Stability Dispositions`](2026/07/0010-six-skill-post-superpowers-stability-dispositions.md)
+  — Accepted
+
+APG14 adds no ADR. The v0.2.0 release applies the accepted licensing, roadmap,
+distribution, lineage, and maturity decisions in ADRs 0005, 0006, 0009, and
+0010 without changing their architecture.

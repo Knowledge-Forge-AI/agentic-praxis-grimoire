@@ -1,0 +1,30 @@
+#!/usr/bin/env python3
+"""Validate the adopted mechanical APG skill-library contract."""
+
+from pathlib import Path
+import runpy
+import sys
+
+
+sys.dont_write_bytecode = True
+
+command = Path(__file__).resolve(strict=True)
+apg_root = command.parent.parent
+helper_directory = apg_root / "libexec"
+helper = helper_directory / "apg_skill_library_check.py"
+if (
+    command.parent.name != "bin"
+    or not helper_directory.is_dir()
+    or helper_directory.is_symlink()
+    or not helper.is_file()
+    or helper.is_symlink()
+):
+    print(
+        "apg-check-skill-library: installed APG command layout is invalid; "
+        "restore the APG checkout",
+        file=sys.stderr,
+    )
+    raise SystemExit(2)
+
+sys.path.insert(0, str(helper_directory))
+runpy.run_module("apg_skill_library_check", run_name="__main__")

@@ -2,14 +2,81 @@
 
 ## Purpose
 
-APG v0.1 is a small engineering-loop skill bundle designed for bounded
-dogfooding while Superpowers remains installed globally. It provides six
-independently removable procedures for worker assignments, significant-change
-design, repository planning, implementation evidence, debugging, and review
-and verification.
+APG v0.1 is the historical bootstrap model for a small engineering-loop skill
+bundle. It was designed for bounded dogfooding during Superpowers coexistence
+and provides six independently removable procedures for worker assignments,
+significant-change design, repository planning, implementation evidence,
+debugging, and review and verification.
 
-APG v0.1 is not a public release, a final taxonomy, a compatibility framework,
-or evidence that APG is superior to ordinary Codex or Superpowers.
+The bootstrap phase did not itself publish a release, establish a final
+taxonomy or compatibility framework, or prove APG superior to ordinary Codex
+or Superpowers. Public v0.1.0 was subsequently published with intentionally
+squashed history. The maintainer later decommissioned Superpowers and accepted
+a bounded post-decommission RepoMap smoke. Those later facts do not rewrite the
+bootstrap evidence. APG13 subsequently promoted the current six leaves under a
+separate individual review.
+
+## APG13 subsequent disposition
+
+APG13 accepts ADR 0010 and promotes all six current catalog entries to
+`stable`. Each leaf has repeated positive real use, representative
+non-triggers, edge or stop evidence, post-Superpowers suitability, a supported
+rollback owner, current mechanical regression, and a fresh non-author final
+review. No APG13 procedure correction was required, so all six `SKILL.md` files
+remain byte-identical to the APG12A baseline. Historical provisional statements
+below retain their phase meaning; public v0.1.0 and active public-backed
+integration remained unchanged until APG14. APG14 publishes the six stable
+leaves as public v0.2.0 and fast-forwards the existing public-backed source
+without rewriting this historical bootstrap model.
+
+## APG9 subsequent disposition
+
+APG0 through APG8 are the closed v0.1 epic, with APG3's blocked terminal
+outcome preserved. APG-TEST0 is the first
+post-release development foundation. All six skills remain `provisional` until
+the individual APG13 post-Superpowers review defined by ADR 0006. The public
+release and user-global integration are distribution evidence, not maturity by
+themselves.
+
+## APG10 subsequent disposition
+
+APG10 retained the six-skill bootstrap shape and all six `provisional`
+maturity states. Concealed-source scenarios found the existing design,
+planning, and review boundaries adequate for assumptions, alternatives,
+traceability, speculative scope, proportional reversible progress, and
+project-owned policy. Two independent scenarios demonstrated one implementation
+completion gap for locally owned code or test artifacts made unnecessary solely
+by the authorized change. One bounded implementation-leaf correction closed the
+gap without changing its trigger, test proportionality, unrelated-cleanup
+boundary, or project-owned removal policy.
+
+This evidence remains bounded textual validation. It does not promote the
+implementation skill, alter the APG13 stability gate, add a seventh skill, or
+establish clean comparative improvement.
+
+## APG11 subsequent disposition
+
+APG11 formalizes skill-specific authoring and maintenance in the
+[maintainer guide](skill-authoring-and-maintenance.md), accepts ADR 0008, adds a
+read-only dependency-free mechanical skill-library checker, and closes the
+legacy candidate-theme queue. The checker passed the six-skill development and
+public v0.1.0 library shapes, but that structural result does not prove semantic
+quality, client discovery, publication completeness, maturity, or stability.
+
+The acceptance requirements below remain the historical v0.1 bootstrap basis.
+The maintainer guide now owns future proportional application, correction,
+deprecation, and removal. APG11 changes no skill leaf or maturity state; all six
+remain `provisional`, and APG13 remains the only individual maturity phase.
+
+## APG12 subsequent disposition
+
+APG12 accepts ADR 0009 and adds exact public projection, reproducible local
+candidate validation, and a verified public-sourced user-link lifecycle. Its
+tests and disposable dogfood add distribution and rollback evidence without
+changing any canonical leaf or checked-in projection. Release-tool success,
+user-scope lifecycle success, and public availability are not semantic skill
+evaluation or maturity evidence by themselves. All six remain `provisional`,
+and APG13 retains all individual stability authority.
 
 ## Maturity states
 
@@ -18,11 +85,17 @@ or evidence that APG is superior to ordinary Codex or Superpowers.
 | `bootstrap` | The procedure is being authored or corrected and is not yet accepted for routine use. | Coherent draft, known owner, and bounded evaluation plan. |
 | `provisional` | The procedure may be used within recorded limits. | Valid leaf structure, positive and non-trigger scenarios, edge or escalation coverage, independent review, provenance, and a removal path. |
 | `evaluated` | The procedure has completed an explicit evaluation under recorded conditions. | Accepted evaluation contract, reproducible evidence, stated limitations, and a recorded disposition. |
-| `stable` | The procedure has survived repeated real-project use and transition review. | Successful use in more than one real repository, no unresolved material regression, and explicit post-Superpowers review. |
+| `stable` | The procedure has survived repeated real use and transition review. | Repeated real use, representative non-triggers, no unresolved material authority, privacy, safety, or procedure defect, supported removal or rollback, and explicit post-Superpowers review. |
 | `deprecated` | New use should stop while migration or removal completes. | Successor or removal guidance, affected references, and retained historical evidence. |
 
 Maturity does not grant action authority. A stable skill still cannot exceed
 the current human-authorized task or repository policy.
+
+ADR 0006 refines the bootstrap table for v0.2. Cross-repository breadth remains
+valuable evidence and must be reviewed per skill, but absence of a positive use
+in a second repository or of clean A/B superiority is not by itself a material
+defect. APG13 must record the actual evidence distribution and may block a skill
+only on an unresolved material defect under the accepted v0.2 policy.
 
 ## Provisional evidence boundary
 
@@ -101,6 +174,10 @@ assignment owns concrete values such as:
 A skill must elicit or consume these parameters, not invent them.
 
 ## Rollback expectations
+
+The [skill authoring and maintenance guide](skill-authoring-and-maintenance.md)
+is the normative owner for future skill rollback and removal. The historical
+v0.1 expectations below remain accurate context.
 
 Each skill is one direct-child leaf. Removal requires:
 
@@ -212,15 +289,22 @@ true:
 7. the human maintainer explicitly decides to decommission; and
 8. post-decommission smoke validation passes.
 
-Current evidence supports material workflow mapping, successful use in APG,
-successful use in one additional real repository, preservation of the
-Superpowers source and provenance snapshot, tested project-local install,
-adopt, check, and uninstall behavior, one real-project managed adoption and
-check, and a human Superpowers rollback runbook. The gate remains incomplete.
-Broader repeated workflow use across active projects, explicit confirmation of
-each dependent project's migration disposition, an explicit human decommission
-decision, actual Superpowers disable or removal, and post-decommission smoke and
-rollback evidence remain unresolved. No decommission occurred.
+At APG8 close, evidence supported material workflow mapping, successful use in
+APG and RepoMap, source preservation, tested project-local lifecycle behavior,
+one real-project managed adoption and check, and the rollback runbook. The
+maintainer subsequently supplied the explicit decommission decision and
+completed the action. A bounded fresh RepoMap smoke then discovered all six
+skills, successfully applied the review skill, passed managed checks, preserved
+the tracked repository, and did not use Superpowers as workflow authority.
+
+APG9 accepts decommission closeout through the explicit human decision,
+completed action, and bounded smoke rather than retroactively claiming that
+every historical readiness dimension was exhaustively proven. Active-project
+inventory completeness, universal workflow coverage, automatic selection,
+comparative superiority, and successful restoration remain unverified. These
+limits do not reverse the human decommission disposition or promote a skill.
+Preserved Superpowers source remains reference evidence. APG13 completed the
+individual post-Superpowers skill review without restoring or depending on it.
 
 ## Later clean-evaluation gate
 

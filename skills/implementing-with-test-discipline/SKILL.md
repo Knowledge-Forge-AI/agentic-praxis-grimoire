@@ -29,8 +29,10 @@ different evidence form is more appropriate.
 4. Select the smallest useful evidence layer: focused unit behavior, connected
    integration behavior, contract or migration checks, or another project-
    accepted executable signal.
-5. Implement the narrowest coherent change. Keep unrelated cleanup and new
-   abstractions outside the slice.
+5. Implement the narrowest coherent change. Remove locally owned code or test
+   artifacts whose only purpose ended because of the authorized change when
+   repository policy and removal authority are clear. Keep unrelated cleanup
+   and new abstractions outside the slice.
 6. Run focused feedback while iterating, then execute the proportional final
    gate from the integrated resulting state.
 7. Treat exploratory spikes explicitly: bound them, avoid completion claims,

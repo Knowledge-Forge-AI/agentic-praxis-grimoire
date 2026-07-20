@@ -59,6 +59,7 @@ Public artifacts remain complete without that record and do not link to it.
 | Maintainer-authored agent and engineering practices | Generalize the source family publicly; retain exact unpublished identity and paths only in publication-excluded provenance. Ownership supplies adoption authority, not a public license grant. |
 | RepoMap | Use the canonical public identity `repo-map`; cite public-intended architecture and contributor practices without exposing its private development lineage. Do not infer a license from an ADR or ownership alone. |
 | Superpowers | External source under the MIT License. Preserve the included copyright and license notice for copied or adapted material. Synthesized or inspired use still records provenance. |
+| Experimental Karpathy Guidelines | Reference evidence whose inspected frontmatter declares MIT. Treat that declaration separately from verified upstream identity, immutable version, copyright, full license text, and notice obligations. APG10 must complete that review before copied or adapted use. |
 | Agent Skills specification | Genuinely public compatibility evidence. Retain a verified public immutable pin when it materially defines the supported leaf shape. |
 | Official Codex skill documentation | Genuinely public harness evidence. Record the inspection date when current discovery behavior materially defines a projection. |
 | APG's own tools and documents | Project-authored material distributed under AGPL-3.0-or-later, with separate commercial licensing available from the Project Steward. |
@@ -139,9 +140,17 @@ private_evidence_retained: <yes|no>
 
 The Agent Skills compatibility basis remains pinned to the public
 [`agentskills/agentskills` specification](https://github.com/agentskills/agentskills/blob/38a2ff82958afee88dadf4831509e6f7e9d8ef4e/docs/specification.mdx).
-APG1 retained the pin but did not re-evaluate that source's license. Exact
-maintainer-source snapshots and path mappings are retained only in
-publication-excluded provenance.
+APG11 re-evaluated the immutable source's rights boundary. The specification is
+documentation under the repository's
+[`docs/LICENSE`](https://github.com/agentskills/agentskills/blob/38a2ff82958afee88dadf4831509e6f7e9d8ef4e/docs/LICENSE),
+which contains Creative Commons Attribution 4.0 International; repository code
+is separately Apache-2.0. APG copies or adapts no specification expression or
+upstream code. It independently implements compatible format facts and
+project-authored constraints, with the pin providing source and license
+attribution. No bundled third-party notice is required for that synthesized
+use. Future copied or adapted use must separately satisfy the applicable
+license and attribution duties. Exact maintainer-source snapshots and path
+mappings remain publication excluded.
 
 ## APG2 public disposition summary
 
@@ -273,7 +282,7 @@ Superpowers expression and performs no global plugin action.
 | --- | --- | --- | --- | --- | --- |
 | Project-local APG skill projection ownership and rollback | APG4A projection architecture; APG5 and APG6 discovery observations; APG project policy; Git worktree and local-exclude behavior | Project-authored implementation | ADR 0004; `bin/apg-project-skills`; non-executable helpers; `docs/project-skill-projection.md` | Adopted after behavioral tests, disposable dogfood, and independent review | None; all six skills remain `provisional` |
 | Executable implementation test discipline | Existing provisional implementation skill; APG7 accepted command contract and behavioral suite | Project-authored evidence | `docs/evaluations/apg7-project-local-projection-tooling.md` | Adopted as one real APG executable observation | None; the implementation skill remains `provisional` |
-| Human Superpowers decommission and rollback procedure | Accepted bootstrap decommission gate; transition map; APG6 restart observation; tested APG projection uninstall | Project-authored operational synthesis | `docs/superpowers-decommission-runbook.md` | Adopted as rollback-plan documentation only | None; decommission readiness remains false |
+| Human Superpowers decommission and rollback procedure | Accepted bootstrap decommission gate; transition map; APG6 restart observation; tested APG projection uninstall | Project-authored operational synthesis | `docs/superpowers-decommission-runbook.md` | Adopted as rollback-plan documentation only | None at APG7 close; later action and smoke are recorded by APG9 |
 
 The command uses Python 3.10+ standard-library and Git behavior rather than external
 source expression. Public artifacts contain placeholder paths and bounded
@@ -289,7 +298,7 @@ adopting external expression or changing the accepted APG7 architecture.
 
 | Practice | Public source families | Mode | Destination | Lifecycle status | Maturity effect |
 | --- | --- | --- | --- | --- | --- |
-| Semantic compliance before idempotent projection success | Accepted ADR 0004; APG7 implementation and behavioral contract; reproduced Git local-exclude behavior | Project-authored correction | `libexec/apg_project_skills_commands.py`; `tests/test_apg_project_skills.py`; APG7 evaluation and projection guide | Adopted after failing baseline evidence, corrected behavioral tests, disposable recovery control, and independent review | None; all six skills remain `provisional` |
+| Semantic compliance before idempotent projection success | Accepted ADR 0004; APG7 implementation and behavioral contract; reproduced Git local-exclude behavior | Project-authored correction | `libexec/apg_project_skills_commands.py`; `src/test/int/python/apg_project_skills.int.test.py`; APG7 evaluation and projection guide | Adopted after failing baseline evidence, corrected behavioral tests, disposable recovery control, and independent review | None; all six skills remain `provisional` |
 
 The correction reuses the existing managed-status query and changes no command,
 state schema, exclusion grammar, ownership model, dependency, source expression,
@@ -313,6 +322,133 @@ exclusion bytes, and reviewer snapshots remain publication excluded. It makes
 no invocation, automatic-selection, comparative, stable, production-ready,
 publication-ready, license, or decommission-ready claim.
 
+## APG9 public disposition summary
+
+APG9 adopts no external procedure or copied expression. It reconciles the
+maintainer-authorized release, global integration, decommission, and smoke
+facts; records one release-process limitation; and accepts a bounded v0.2
+roadmap through ADR 0006.
+
+| Practice | Public source families | Mode | Destination | Lifecycle status | Maturity effect |
+| --- | --- | --- | --- | --- | --- |
+| v0.1 publication and squashed-history closeout | Public APG v0.1.0; private development release evidence | Project-authored reconciliation | README; roadmap; APG9 evaluation and exit | Adopted as current state with the omitted public command wrapper assigned to APG12 | None; all six skills remain `provisional` |
+| Public-sourced maintainer global integration | Maintainer-authorized operation; public APG checkout; current discovery observation | Project-authored operational synthesis | APG9 evaluation; project-skill projection guide | Adopted as generalized current state; formalization assigned to APG12 | None |
+| Superpowers decommission and bounded smoke | Maintainer-authorized decision and smoke; preserved transition and rollback evidence | Project-authored operational synthesis | Transition map; decommission runbook; APG9 evaluation | Adopted for v0.1 closeout; preserved source remains external evidence | Post-Superpowers evidence only; no promotion |
+| v0.2 objectives, maturity policy, and APG10–APG14 sequence | APG evidence through APG-TEST0; six-skill review; legacy-theme audit; experimental Karpathy source | Synthesized | ADR 0006; roadmap | Accepted | Promotion remains deferred to APG13 |
+
+The experimental Karpathy source informed roadmap scope only. APG9 copies or
+adapts none of its headings, slogans, examples, templates, or heuristics. Its
+declared MIT frontmatter is not treated as complete upstream provenance or
+notice evidence. APG10 must verify those facts before copied or adapted use and
+should prefer independently written synthesis.
+
+Exact repository identities, commits, local paths, link targets, object
+comparisons, plugin observations, smoke evidence, worker findings, and report
+identities remain publication excluded. The public APG9 evaluation is complete
+without those records.
+
+## APG10 public disposition summary
+
+APG10 resolves the experimental Karpathy Guidelines source as public external
+evidence with incomplete copied-or-adapted reuse evidence. The captured file is
+byte-identical to
+[`multica-ai/andrej-karpathy-skills`](https://github.com/multica-ai/andrej-karpathy-skills)
+at immutable commit
+[`64723a49ea6117894304eb491f0d32a60570bf45`](https://github.com/multica-ai/andrej-karpathy-skills/commit/64723a49ea6117894304eb491f0d32a60570bf45).
+The leaf and README declare MIT, but that tree contains no complete license
+text, explicit copyright notice, or notice file.
+
+| Practice | Public source families | Mode | Destination | Lifecycle status | Maturity effect |
+| --- | --- | --- | --- | --- | --- |
+| Experimental guideline overlap and idea dispositions | Experimental Karpathy Guidelines; existing APG owners | Synthesized evaluation | ADR 0007; APG10 evaluation | Already covered, project-owned, rejected, or adopted as recorded | None |
+| Current-change cleanup completion boundary | Experimental Karpathy Guidelines as material influence; frozen APG10 scenarios; current implementation owner | Synthesized | `skills/implementing-with-test-discipline/SKILL.md` | Adopted after two baseline gaps, positive/non-trigger/edge rerun, and non-author review | None; the skill remains `provisional` |
+
+APG10 copies or adapts none of the source's headings, slogans, examples,
+heuristics, template, fixed sequence, or recognizable structure. The one
+correction is independently written from current APG ownership and frozen
+scenario evidence. Because no copied or adapted material enters APG and the
+source supplies no complete notice payload, APG10 adds no third-party notice.
+Copied or adapted future use remains blocked pending a new complete rights and
+notice review.
+
+Exact captured repository, path, blob, contributor history, worker returns,
+hashes, and review evidence remain publication excluded. The public evaluation
+and ADR are complete without them.
+
+## APG11 public disposition summary
+
+APG11 synthesizes repeated project-authored practice from APG4 through APG10.
+It copies or adapts no external skill-authoring methodology. The pinned Agent
+Skills specification informs only compatible metadata, name, directory, and
+relative-reference constraints; APG's additional leaf headings, catalog, and
+projection rules are project-authored requirements.
+
+The specification path is CC BY 4.0 documentation, while upstream repository
+code is Apache-2.0. APG11 imports neither expressive documentation nor code;
+the public immutable pin and license link identify the influence. No bundled
+license or notice text is added for the independently written compatibility
+implementation.
+
+| Practice | Public source families | Mode | Destination | Lifecycle status | Maturity effect |
+| --- | --- | --- | --- | --- | --- |
+| Skill-specific authoring and maintenance lifecycle | APG4 bootstrap; APG6 frontmatter correction; APG7/APG7A executable work; APG9 reconciliation; APG10 behavior correction; project model and provenance policy | Synthesized project procedure | ADR 0008; `docs/skill-authoring-and-maintenance.md` | Adopted after independent lifecycle, invariant, ledger, design, and resulting-state review | None; all six skills remain `provisional` |
+| Mechanical APG skill-library validation | Repeated canonical shape, metadata, headings, catalog, link-containment, and checked-in projection checks; pinned Agent Skills specification | Project-authored implementation | `bin/apg-check-skill-library`; standard-library helper; focused unit and integration tests | Adopted for mechanical invariants after failing-first evidence, correction, and development/public dogfood | None |
+| Legacy roadmap terminal ledger | Pre-APG9 candidate and deferred themes; ADR 0006 owners and terminal conditions; APG9/APG10 outcomes | Synthesized reconciliation | `docs/legacy-roadmap-closure.md`; APG11 evaluation and exit | Adopted with 24 stable identities and explicit composite sub-dispositions | None |
+
+The checker does not establish source rights, provenance truth, semantic
+quality, authority, privacy, scenario adequacy, discovery, maturity, release
+completeness, or stable behavior. Its parser is an explicitly narrow APG lexical
+subset, not a general YAML, Markdown, Agent Skills, or publication validator.
+Exact checkout paths, snapshots, hashes, failing-first output, worker returns,
+and reviewer evidence remain publication excluded.
+
+## APG11A public disposition summary
+
+APG11A is a project-authored forward correction to APG11's mechanical checker.
+It uses no new external expression, parser, dependency, or source family.
+
+| Practice | Public source families | Mode | Destination | Lifecycle status | Maturity effect |
+| --- | --- | --- | --- | --- | --- |
+| Top-level frontmatter-key and fenced-code lexical correction | Accepted ADR 0008; reproduced APG11 behavior; project-authored tests and helper | Project-authored correction | `libexec/apg_skill_library_check.py`; checker unit and integration tests; reconciled APG11 records | Adopted after failing-first evidence, full regression, generated dogfood, and independent review | None; all six skills remain `provisional` |
+
+The correction retains APG's independently written lexical subset. It copies
+or adapts no YAML, Markdown, or Agent Skills parser expression and creates no
+new license or notice requirement. Exact reproductions, tree fingerprints,
+test chronology, and reviewer returns remain publication excluded.
+
+## APG12 public disposition summary
+
+APG12 synthesizes project-owned release and user-lifecycle mechanics from the
+accepted APG publication boundary, public v0.1.0 history, the reproduced wrapper
+omission, the existing project-local ownership model, and current official
+Codex discovery documentation inspected on 2026-07-20.
+
+| Practice | Public source families | Mode | Destination | Lifecycle status | Maturity effect |
+| --- | --- | --- | --- | --- | --- |
+| Exact non-private public projection and one-commit candidate validation | ADRs 0001, 0005, and 0006; public v0.1.0; reproduced omitted-wrapper behavior | Project-authored architecture and implementation | ADR 0009; public-surface policy; `apg-public-release`; release guide and tests | Adopted after failing-first evidence, deterministic candidate dogfood, omission regression, and independent review | None |
+| Public-sourced user-scope link lifecycle | Official Codex skill discovery documentation; accepted project-local ownership principles; read-only active integration observation | Synthesized compatibility boundary with project-authored implementation | ADR 0009; `apg-user-skills`; user integration guide and tests | Adopted for six direct user links and strict local state; active migration remains separately authorized | None; all six skills remain `provisional` |
+
+The official documentation supplies current location, symlink, duplicate-name,
+refresh, restart, and plugin-distribution facts. APG copies or adapts no OpenAI
+documentation expression or implementation. Exact local paths, private commits,
+candidate identities, state, link targets, command output, and reviewer returns
+remain publication excluded. No third-party code, runtime dependency, or notice
+payload enters APG12.
+
+## APG13 maturity disposition summary
+
+APG13 synthesizes no new procedure text. It classifies project-authored APG4
+through APG12A evidence, applies the unchanged current leaves to frozen cases,
+and records independent maturity dispositions under ADRs 0006 and 0010.
+
+| Practice | Public source families | Mode | Destination | Lifecycle status | Maturity effect |
+| --- | --- | --- | --- | --- | --- |
+| Six individual post-Superpowers maturity dispositions | APG4-APG12A scenario, real-use, non-trigger, correction, review, rollback, distribution, and regression records | Synthesized evidence disposition; no copied or adapted expression | ADR 0010; APG13 evaluation; catalog | Accepted after six current applications, zero procedure corrections, complete regression, and six final non-author reviews | All six current catalog rows become `stable` |
+
+Exact hashes, repository identities, worker returns, and detailed evidence
+classifications remain publication excluded. APG13 adds no external source,
+dependency, code, notice duty, or license obligation.
+
 ## APG license boundary
 
 APG is licensed under the GNU Affero General Public License v3.0 or later, with
@@ -324,3 +460,29 @@ The MIT License for Superpowers applies to Superpowers material, not
 automatically to APG. Third-party material remains subject to its own license
 and notice requirements. Future contributions are governed by
 [`CONTRIBUTING.md`](../CONTRIBUTING.md) and [`CLA.md`](../CLA.md).
+
+## APG12A correction provenance
+
+APG12A is a forward correction based on externally reported behavior and
+independent local reproduction of the committed APG12 tools. It introduces no
+third-party source, copied expression, dependency, or license obligation. The
+accepted public v0.1.0 commit, tree, and tag remain the local mechanical trust
+anchor; this establishes lineage integrity but does not add cryptographic
+publisher authentication. The original APG12 evidence remains historical and
+is not rewritten to claim that it contained the correction.
+
+## APG14 release disposition summary
+
+APG14 adds no external source, copied expression, dependency, or notice duty.
+It applies the project-authored release, lineage, user-lifecycle, licensing,
+and maturity decisions already accepted in ADRs 0005, 0006, 0009, and 0010.
+
+| Practice | Public source families | Mode | Destination | Lifecycle status | Maturity effect |
+| --- | --- | --- | --- | --- | --- |
+| Deterministic public v0.2.0 publication and active-source fast-forward | Accepted public v0.1.0 lineage; APG12/APG12A release and user validation; APG13 stable dispositions | Application of accepted project procedure | APG14 evaluation and exit; public v0.2.0 release commit and annotated tag | Adopted after deterministic rebuild, independent review, atomic publication, fresh-checkout validation, and unchanged integration ownership | None; all six skills remain `stable` |
+
+The APG13 evidence-classification correction changes project records only and
+copies no expression. Exact private source, public object, link, command, and
+report identities remain publication excluded. The full-restart fresh-session
+smoke is an external application observation and is not inferred from
+shell-level release evidence.

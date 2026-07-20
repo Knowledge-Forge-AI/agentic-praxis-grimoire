@@ -2,26 +2,30 @@
 
 ## Status and authority
 
-This is a human-owned operational runbook. It documents a future controlled
-decision and rollback sequence; it does not authorize or perform Superpowers
-decommissioning.
+This is a human-owned operational runbook. The maintainer completed the
+controlled decommission operation and bounded post-decommission smoke before
+APG9. The sequence remains historical operational and rollback guidance; it
+does not authorize restoration or another plugin mutation.
 
-Superpowers remains globally installed and reference-only for APG. The
-`apg-project-skills` command manages only opted-in repository projections and
-must never install, disable, remove, restore, or configure a global plugin.
+Superpowers is retired from the maintainer's workflow. Preserved source remains
+reference evidence. The `apg-project-skills` command manages only opted-in
+repository projections and must never install, disable, remove, restore, or
+configure a global plugin.
 
 The human maintainer owns readiness acceptance, the decommission decision,
 global plugin controls, rollback authority, and final disposition. Stop if the
 current Codex product does not expose a supported control for the intended
 global action.
 
-## Preconditions
+## Completed-operation disposition
 
-Do not begin the operational sequence until the maintainer has reviewed the
-[bootstrap decommission gate](bootstrap-v0.1.md#superpowers-decommission-gate)
-and recorded each component as supported or unresolved.
+The maintainer's explicit decision, completed decommission, and accepted fresh
+RepoMap smoke supply the authorized v0.1 closeout facts. The smoke discovered all six APG
+skills, explicitly applied the review skill, passed default and explicit
+managed checks, preserved the tracked repository, and did not use Superpowers
+as workflow authority.
 
-APG8 supports these components:
+Before the operation, APG8 supported these components:
 
 - materially used workflow mapping;
 - successful APG use in its own repository;
@@ -31,12 +35,10 @@ APG8 supports these components:
 - real-project managed adoption and check; and
 - this human rollback runbook.
 
-The gate remains incomplete. Broader repeated workflow use across active
-projects, explicit confirmation that every dependent project is migrated or
-intentionally retained on Superpowers, an explicit human decommission decision,
-actual global disable or removal, and post-decommission smoke and rollback
-evidence remain unresolved. This record does not invent an active-project
-inventory.
+APG9 reconciles the later outcome rather than rewriting APG8's contemporaneous
+record. No rollback was required, and successful restoration remains untested.
+The operation does not establish an exhaustive active-project inventory,
+automatic skill selection, comparative superiority, or stable maturity.
 
 ## Controlled decommission sequence
 
@@ -172,6 +174,9 @@ control categories, before-and-after state, smoke results, failure or rollback
 trigger, and terminal human disposition. Do not retain credentials, raw private
 payloads, private source content, or local paths in public records.
 
-This runbook's existence satisfies only the rollback-plan documentation
-component of the gate. Decommission readiness remains false until the remaining
-gate components are explicitly satisfied and reviewed.
+This runbook originally satisfied the rollback-plan documentation component of
+the gate. APG9 accepts the subsequent human action and bounded smoke as the v0.1
+decommission closeout while retaining the unverified inventory, universal-
+coverage, and restoration dimensions as limitations. The preserved rollback
+sequence remains available only under a new explicit human authorization; APG9
+does not restore or test restoration.

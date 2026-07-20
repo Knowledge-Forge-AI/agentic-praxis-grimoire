@@ -2,15 +2,18 @@
 
 ## Purpose and current state
 
-This map records how APG v0.1 preserves useful engineering behavior while
-Superpowers remains globally installed. It is a coverage and disposition
-record, not a claim that Superpowers is unloaded or ready for decommissioning.
+This map records how APG v0.1 preserved useful engineering behavior during the
+transition away from Superpowers. It remains coverage and disposition evidence
+after the maintainer's completed decommission; it is not active Superpowers
+workflow policy.
 
 Superpowers is external MIT-licensed evidence. APG uses independently written
 synthesis and does not copy its templates, slogans, diagrams, mandatory skill
-chains, or project-specific mechanics. APG's six skills are `provisional`.
-APG7 adds project-local projection rollback and a human decommission runbook;
-neither changes global plugin state.
+chains, or project-specific mechanics. APG's six skills remain `provisional`.
+APG7 added project-local projection rollback and a human decommission runbook.
+The maintainer subsequently decommissioned Superpowers and completed bounded
+post-decommission smoke; preserved source remains reference evidence rather
+than installation or workflow authority.
 
 ## Disposition categories
 
@@ -29,7 +32,7 @@ neither changes global plugin state.
 
 | Superpowers skill | Primary APG disposition | Value preserved | Ceremony removed or rejected | Project-owned or native behavior | Maturity and remaining gap |
 | --- | --- | --- | --- | --- | --- |
-| `using-superpowers` | Repository instruction; universal bootstrap intentionally rejected | Explicit awareness that focused procedures may exist | Mandatory skill invocation before every response or action, fixed priority, rationalization policing, and compulsory skill chaining | Current task instructions and APG repository policy select the workflow; Codex discovers and loads applicable skills through its native environment | Policy is active. The plugin remains installed and may remain visible; no mechanical isolation claim is made. |
+| `using-superpowers` | Repository instruction; universal bootstrap intentionally rejected | Explicit awareness that focused procedures may exist | Mandatory skill invocation before every response or action, fixed priority, rationalization policing, and compulsory skill chaining | Current task instructions and APG repository policy select the workflow; Codex discovers and loads applicable skills through its native environment | Repository policy is active. Superpowers was subsequently decommissioned; preserved source has no workflow authority. |
 | `brainstorming` | APG v0.1 replacement: `designing-significant-changes` | Resolve consequential uncertainty, compare alternatives, record decisions and non-goals | Universal design gate, fixed question cadence, required option counts, approval loops, fixed artifact locations, and mandatory transition to planning | Decision authority, artifact form, approval, architecture, compatibility, and implementation handoff | `provisional`; needs real-project trigger and non-trigger evidence. |
 | `writing-plans` | APG v0.1 replacement: `planning-repository-work` | Executable sequencing, affected surfaces, dependencies, evidence, acceptance, and handoff | Fixed minute-sized tasks, complete code in each step, universal TDD and commit cadence, fixed template/path, and execution menu | Plan destination, task size, Git workflow, test commands, ownership, and stop conditions | `provisional`; needs dogfooding across code and mixed-artifact plans. |
 | `executing-plans` | Native Codex capability plus repository policy; dedicated skill deferred | Review a plan before action, track progress, verify units, and stop on real blockers | Required Superpowers chain, forced branch-finishing transition, universal worktree assumptions, and literal execution of every plan step | Codex executes authorized plans; repositories own checkpoints, branch policy, replanning authority, and completion gates | No APG execution-controller skill. Reconsider only after repeated execution-specific failure not covered by plans and project policy. |
@@ -63,13 +66,16 @@ through one focused command with Git-local ownership. This coverage removes no
 plugin and creates no skill runtime, scheduler, registry, adapter, or
 generalized execution controller.
 
-## Decommission readiness
+## Decommission disposition
 
-Decommission readiness is **not met**. The map covers the identified workflows;
-APG has successful use in its own repository and one additional real repository;
-the source snapshot is preserved; and APG7 documents and tests project-local
-projection uninstall plus a human Superpowers rollback runbook. Every APG v0.1
-skill remains provisional. Broader repeated real-use and regression evidence,
-an explicit human decision, actual global disable or removal, and
-post-decommission smoke remain unresolved. The full gate is defined in
-[APG v0.1 Bootstrap Model](bootstrap-v0.1.md).
+The maintainer has decommissioned Superpowers. The preserved workflow map,
+successful APG and RepoMap use, source snapshot, tested project-local rollback,
+human runbook, explicit human decision, completed action, and bounded fresh
+RepoMap smoke satisfy the v0.1 closeout gate. The smoke discovered six skills,
+successfully applied the review skill, passed managed checks, preserved the
+target repository, and did not use Superpowers as authority.
+
+This disposition does not delete the historical source, authorize restoration,
+prove automatic selection or comparative superiority, or promote a skill.
+Every skill remains `provisional`; ADR 0006 assigns individual post-Superpowers
+review to APG13.

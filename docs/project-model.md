@@ -28,7 +28,7 @@ they do not grant an actor authority beyond the human-approved envelope.
 | Canonical skill leaf | Triggerable procedure | Reusable work requiring judgment or specialized knowledge; the leaf owns its procedure after it triggers. |
 | Skill supporting file | Skill-local support | Heavy references, examples, templates, scripts, or assets needed only by one skill. |
 | Harness discovery projection | Client-specific discovery layout | Links or metadata that expose canonical content to one supported harness without copying or redefining the procedure. |
-| Core documentation | Focused policy and rationale | Project model, provenance, coordination, evaluation, and roadmap guidance. |
+| Core documentation | Focused policy and rationale | Project model, skill maintenance, provenance, coordination, evaluation, and roadmap guidance. |
 | ADR | Durable architecture decision | Context, decision, alternatives, consequences, and later supersession. |
 | Exit record | Bounded phase history | Truthful disposition, scope, outcome, validation, deferrals, and next authorization. |
 | Deterministic tooling | Mechanical enforcement or transformation | Stable invariants with executable acceptance evidence. |
@@ -53,8 +53,9 @@ APG distinguishes five domains:
 4. **Public external sources.** Third-party projects and specifications whose
    identity, version, license, and attribution requirements can be stated
    publicly.
-5. **Future public projections.** Filtered, squashed releases of the public APG
-   surface that exclude development-only evidence.
+5. **Public projections.** Filtered, squashed releases of the public APG
+   surface that exclude development-only evidence. Public v0.1.0 is the first
+   such release; future projections retain the same independence contract.
 
 Evidence location, source ownership, publication eligibility, and license are
 independent facts. Public files do not link to publication-excluded material;
@@ -100,6 +101,12 @@ combination was adopted.
 Observation and decision remain separate throughout this lifecycle. A source
 can be described accurately and still be rejected as APG policy.
 
+The [skill authoring and maintenance guide](skill-authoring-and-maintenance.md)
+is the normative owner for applying this general lifecycle to new skills,
+frontmatter or procedure corrections, support additions, maturity-only
+dispositions, deprecation, and removal. The guide does not redefine the general
+destination model or grant action authority.
+
 ## Modularity and skill categories
 
 An APG skill is the smallest independently triggerable procedure with a coherent
@@ -130,11 +137,34 @@ files or global Codex state. [ADR 0004](adr/2026/07/0004-project-local-skill-pro
 owns that command and rollback boundary. Other harness projections require
 their own evidence and explicit authority.
 
-Likewise, a future publication adapter may filter and package the public
-surface. It must preserve public-file independence and exclude development-only
-evidence. A publication adapter is not justified until an accepted decision and
-executable validation define its actual need.
+Public v0.1.0 was produced as a squashed filtered projection, but its tracked
+surface omitted one documented executable wrapper. Accepted ADR 0009 now owns
+the correction: every tracked path outside `private/` is projected exactly,
+while a strict critical policy detects removal of public owners from source.
+`apg-public-release` builds and checks one local squashed candidate over the
+previous public base without network, push, or publication. It is a bounded
+release adapter, not a general packaging framework. APG14 used that accepted
+boundary to publish v0.2.0 as one appended release commit and annotated tag.
+
+User-scoped distribution is separate from both release construction and
+project-local projection. `apg-user-skills` validates a tagged public checkout,
+manages six direct links under the documented user root, and records exact
+user-local ownership and previous-source state. It does not write repository
+exclusions, target repositories, Codex configuration, or plugin state.
 
 Record mechanics are owned by the [ADR index](adr/README.md) and
 [exit-record index](status/README.md). The direct-child skill shape is documented
-in [`skills/README.md`](../skills/README.md).
+in [`skills/README.md`](../skills/README.md); the proportional maintenance
+procedure is owned by the
+[skill authoring and maintenance guide](skill-authoring-and-maintenance.md).
+
+`apg-check-skill-library` enforces only the adopted mechanical leaf, catalog,
+link-containment, and checked-in projection invariants. It does not assess
+semantic quality, authority, privacy, provenance, discovery, maturity, release
+completeness, or stability. ADR 0008 owns that boundary.
+
+ADR 0010 separately records the semantic maturity disposition for the six
+current leaves. All are `stable` for routine bounded use under their triggers;
+that disposition grants no action, publication, destructive, or successor
+authority. APG14 separately exercised the authorized v0.2.0 publication; no
+successor roadmap epic is implied.

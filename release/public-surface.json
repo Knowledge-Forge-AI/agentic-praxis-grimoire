@@ -1,0 +1,100 @@
+{
+  "canonical_public_identity": "agentic-praxis-grimoire",
+  "critical_files": [
+    ".github/pull_request_template.md",
+    ".gitignore",
+    "AGENTS.md",
+    "README.md",
+    "docs/adr/2026/07/0005-public-license-and-contribution-governance.md",
+    "docs/adr/2026/07/0009-public-distribution-and-reproducible-release-validation.md",
+    "docs/adr/2026/07/0010-six-skill-post-superpowers-stability-dispositions.md",
+    "docs/adr/README.md",
+    "docs/bootstrap-v0.1.md",
+    "docs/evaluations/apg12-public-distribution-and-release-validation.md",
+    "docs/evaluations/apg12a-public-lineage-and-read-only-validation-correction.md",
+    "docs/evaluations/apg13-six-skill-post-superpowers-stability-review.md",
+    "docs/evaluations/apg14-v0-2-release-candidate-and-publication.md",
+    "docs/legacy-roadmap-closure.md",
+    "docs/manager-worker-protocol.md",
+    "docs/project-model.md",
+    "docs/project-skill-projection.md",
+    "docs/provenance.md",
+    "docs/public-release-process.md",
+    "docs/roadmap.md",
+    "docs/skill-authoring-and-maintenance.md",
+    "docs/status/2026/07/20/00018-apg12-public-distribution-and-release-validation-exit.md",
+    "docs/status/2026/07/20/00019-apg12a-public-lineage-and-read-only-validation-correction-exit.md",
+    "docs/status/2026/07/20/00020-apg13-six-skill-post-superpowers-stability-review-exit.md",
+    "docs/status/2026/07/20/00021-apg14-v0-2-release-candidate-and-publication-exit.md",
+    "docs/status/README.md",
+    "docs/user-scoped-skill-integration.md",
+    "release/public-surface.json",
+    "skills/README.md"
+  ],
+  "excluded_prefix": "private/",
+  "required_helpers": [
+    "libexec/agent-report/common.sh",
+    "libexec/apg_project_skills_commands.py",
+    "libexec/apg_project_skills_core.py",
+    "libexec/apg_public_release.py",
+    "libexec/apg_skill_library_check.py",
+    "libexec/apg_user_skills.py"
+  ],
+  "required_licensing_files": [
+    "CLA.md",
+    "COMMERCIAL-LICENSE.md",
+    "CONTRIBUTING.md",
+    "LICENSE",
+    "NOTICE"
+  ],
+  "required_projections": [
+    ".agents/skills/composing-bounded-worker-assignments",
+    ".agents/skills/debugging-systematically",
+    ".agents/skills/designing-significant-changes",
+    ".agents/skills/implementing-with-test-discipline",
+    ".agents/skills/planning-repository-work",
+    ".agents/skills/reviewing-and-verifying-repository-work"
+  ],
+  "required_skills": [
+    "skills/composing-bounded-worker-assignments/SKILL.md",
+    "skills/debugging-systematically/SKILL.md",
+    "skills/designing-significant-changes/SKILL.md",
+    "skills/implementing-with-test-discipline/SKILL.md",
+    "skills/planning-repository-work/SKILL.md",
+    "skills/reviewing-and-verifying-repository-work/SKILL.md"
+  ],
+  "required_test_entrypoints": [
+    "src/test/int/python/apg_check_skill_library.int.test.py",
+    "src/test/int/python/apg_project_skills.int.test.py",
+    "src/test/int/python/apg_public_release.int.test.py",
+    "src/test/int/python/apg_user_skills.int.test.py",
+    "src/test/unit/bash/append-operational-report.unit.test.bats",
+    "src/test/unit/bash/git-show-report.unit.test.bats",
+    "src/test/unit/python/apg_public_release.unit.test.py",
+    "src/test/unit/python/apg_skill_library.unit.test.py",
+    "src/test/unit/python/apg_user_skills.unit.test.py"
+  ],
+  "required_wrappers": [
+    "bin/apg-check-skill-library",
+    "bin/apg-project-skills",
+    "bin/apg-public-release",
+    "bin/apg-user-skills",
+    "bin/append-operational-report",
+    "bin/git-show-report"
+  ],
+  "schema_version": 1,
+  "validation_categories": [
+    "bash-syntax",
+    "command-help",
+    "confidentiality",
+    "configured-tests",
+    "critical-paths",
+    "history",
+    "licensing",
+    "local-links",
+    "markdown",
+    "projection",
+    "python-compile",
+    "skill-library"
+  ]
+}

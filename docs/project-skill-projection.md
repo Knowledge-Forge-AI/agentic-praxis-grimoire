@@ -10,6 +10,20 @@ target files, or modifying user-level Codex or Superpowers state.
 [ADR 0004](adr/2026/07/0004-project-local-skill-projection-and-rollback.md)
 defines the normative ownership, conflict, and rollback design.
 
+## Distribution scopes
+
+Public v0.2.0 is the canonical source for the maintainer's separately managed
+user-global Codex integration. That integration projects the public checkout's
+skill directory into the user discovery root. It is distinct from this
+repository-local command: `apg-project-skills` owns only opted-in target
+worktrees and their Git-local state, does not install globally, and does not
+retarget an existing project-local projection when the global source changes.
+
+A repository may therefore expose the same canonical skill name through its
+project scope and the user-global scope. Discovery clients own precedence and
+deduplication behavior. APG must keep the sources and ownership boundaries
+explicit rather than infer which instance produced an invocation.
+
 ## Canonical and projected skills
 
 Canonical procedure content remains in the APG checkout:
@@ -238,13 +252,21 @@ Codex or Superpowers state unchanged.
 
 ## Limitations
 
+- The public v0.1.0 tracked surface omitted the documented
+  `bin/apg-project-skills` wrapper while retaining this guide and the
+  implementation modules. APG12 preserves that historical fact and adds an
+  executable exact-projection regression. Public v0.2.0 corrects the omission
+  without rewriting v0.1.0.
+- User-scoped integration from a public release is separately owned by
+  [the user integration guide](user-scoped-skill-integration.md) and
+  `apg-user-skills`. Project-local state and exclusions do not authorize
+  user-scope link mutation or adoption.
 - Current portability evidence covers macOS, Python 3.10+, Git, POSIX symbolic links,
   and advisory locking.
 - Advisory locks coordinate command instances, not a hostile same-user writer.
 - Abrupt process loss can leave conservative disagreement requiring inspection;
   the command favors refusing uncertain cleanup over guessing ownership.
 - Project projection success does not prove Codex invocation, automatic trigger
-  selection, skill maturity, production readiness, or Superpowers decommission
-  readiness.
+  selection, user-global integration, skill maturity, or production readiness.
 - The command manages exactly the accepted six APG v0.1 skills and is not a
   general skill installer or package manager.
