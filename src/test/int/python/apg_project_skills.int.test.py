@@ -18,13 +18,33 @@ import unittest
 REPOSITORY_ROOT = Path(__file__).resolve().parents[4]
 COMMAND = REPOSITORY_ROOT / "bin" / "apg-project-skills"
 CANONICAL_ROOT = REPOSITORY_ROOT / "skills"
-SKILLS = (
+V0_2_SKILLS = (
     "composing-bounded-worker-assignments",
     "debugging-systematically",
     "designing-significant-changes",
     "implementing-with-test-discipline",
     "planning-repository-work",
     "reviewing-and-verifying-repository-work",
+)
+SKILLS = tuple(
+    sorted(
+        (
+            *V0_2_SKILLS,
+            "agentic-praxis-grimoire-workflow",
+            "bash-language-profile",
+            "bats-test-profile",
+            "composing-approved-roadmap-assignments",
+            "go-language-profile",
+            "nix-language-profile",
+            "postgresql-database-profile",
+            "python-language-profile",
+            "ruby-language-profile",
+            "sqlite-database-profile",
+            "synthesizing-repository-guidance",
+            "zsh-language-profile",
+            "zunit-test-profile",
+        )
+    )
 )
 BEGIN_MARKER = "# BEGIN APG PROJECT SKILLS V1"
 END_MARKER = "# END APG PROJECT SKILLS V1"
@@ -239,14 +259,14 @@ class APGProjectSkillsTests(unittest.TestCase):
         self.assertIn(f"?? .agents/skills/{skill}", status)
         return original
 
-    def test_01_lists_all_canonical_skills_without_a_repository(self) -> None:
+    def test_01_lists_the_current_release_set_without_a_repository(self) -> None:
         non_repository = self.base / "not-a-repository"
         non_repository.mkdir()
         result = self.run_command("list", cwd=non_repository)
         self.assert_success(result)
         self.assertEqual(result.stdout.splitlines(), list(SKILLS))
 
-    def test_02_installs_all_six_into_an_empty_worktree(self) -> None:
+    def test_02_installs_all_nineteen_into_an_empty_worktree(self) -> None:
         result = self.run_command("install")
         self.assert_success(result)
         state = self.read_state()
@@ -299,7 +319,7 @@ class APGProjectSkillsTests(unittest.TestCase):
         result = self.run_command("check")
         self.assert_success(result)
         self.assertIn("compliant", result.stdout.lower())
-        self.assertIn("6 managed", result.stdout.lower())
+        self.assertIn("19 managed", result.stdout.lower())
 
     def test_06_adopts_compatible_manual_links_without_retargeting(self) -> None:
         links = [self.create_manual_link(skill) for skill in SKILLS]
@@ -650,6 +670,37 @@ class APGProjectSkillsTests(unittest.TestCase):
         self.assertEqual(unrelated.read_bytes(), b"preserve me\n")
         check = self.run_command("check")
         self.assert_safety_failure(check, "not clean in normal git status")
+
+    def test_29_mixed_process_and_profile_subset_is_supported(self) -> None:
+        selected = ("debugging-systematically", "python-language-profile")
+        result = self.run_command(
+            "install", "--skill", selected[0], "--skill", selected[1]
+        )
+        self.assert_success(result)
+        self.assertEqual(self.read_state()["managed_skills"], list(selected))
+        self.assert_success(self.run_command("check"))
+
+    def test_30_existing_six_skill_state_remains_valid_without_expansion(
+        self,
+    ) -> None:
+        arguments = [item for skill in V0_2_SKILLS for item in ("--skill", skill)]
+        self.assert_success(self.run_command("install", *arguments))
+        inodes = {
+            skill: self.projection(skill).lstat().st_ino for skill in V0_2_SKILLS
+        }
+
+        self.assert_success(self.run_command("check"))
+        self.assert_success(self.run_command("install"))
+        self.assert_success(self.run_command("adopt"))
+
+        self.assertEqual(self.read_state()["managed_skills"], list(V0_2_SKILLS))
+        self.assertEqual(
+            inodes,
+            {
+                skill: self.projection(skill).lstat().st_ino
+                for skill in V0_2_SKILLS
+            },
+        )
 
     def test_28_idempotent_adopt_refuses_visible_managed_projection(
         self,

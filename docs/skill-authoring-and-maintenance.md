@@ -190,7 +190,37 @@ the strict public-surface policy under ADR 0009. That release gate composes the
 skill-library checker but does not change this lifecycle, validate semantic
 skill quality, or authorize maturity promotion.
 
+## Phase records and identity checks
+
+Skill work follows the
+[phase and record identity guide](phase-and-record-identity.md). Assign the
+canonical phase ID before implementation. Finalize the leaf, tests, catalog,
+capability map, integration owners, provenance, evaluation, exit, and applicable
+indexes before commit. Use semantic source versions and phase-local evidence
+IDs as durable identities. Exact Git identities ordinarily belong in
+post-commit managed reports or transient verification evidence; an explicitly
+authorized publication-excluded reproducibility record may retain them without
+becoming public or canonical identity.
+
+Run the standard-library record checker when a phase changes records or current
+owners:
+
+```text
+bin/apg-check-record-identity [--root <path>] [--format text|json]
+  [--expect-available <phase>] [--expect-allocated <phase>]
+```
+
+It validates the adopted mechanical phase, ADR, exit, and index subset. A
+focused changed-file and current-owner scan separately checks whether an
+internal or maintainer-project hash is being used as a durable identity. Do not
+replace that semantic review with a repository-wide hexadecimal ban.
+
 Public v0.2.0 carries the six ADR 0010 `stable` dispositions without changing a
 skill procedure. APG14 publication evidence is distribution evidence; future
 skill correction, maturity rollback, deprecation, or removal continues to
 require this lifecycle and separate authority.
+
+Public v0.3.0 carries all nineteen ADR 0018 release-included skills: fourteen
+stable and five provisional. APG24 distribution and lifecycle evidence does not
+promote a provisional row, change a trigger, or substitute projection success
+for this maintenance procedure. No `SKILL.md` changes in APG24.

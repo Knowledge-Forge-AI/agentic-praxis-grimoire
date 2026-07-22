@@ -15,7 +15,11 @@ from typing import Sequence
 
 
 COMMAND_NAME = "apg-check-skill-library"
-CATALOG_HEADING = "## APG v0.1 catalog"
+CURRENT_CATALOG_HEADING = "## Current development catalog"
+LEGACY_CATALOG_HEADING = "## APG v0.1 catalog"
+CATALOG_HEADINGS = frozenset(
+    {CURRENT_CATALOG_HEADING, LEGACY_CATALOG_HEADING}
+)
 CATALOG_HEADER = "| Skill | Trigger boundary | Maturity |"
 CATALOG_SEPARATOR = "| --- | --- | --- |"
 MATURITY_VALUES = frozenset(
@@ -274,7 +278,7 @@ def parse_catalog(text: str) -> CatalogResult:
 
     lines = visible_lines(text)
     heading_indexes = [
-        index for index, (_, line) in enumerate(lines) if line == CATALOG_HEADING
+        index for index, (_, line) in enumerate(lines) if line in CATALOG_HEADINGS
     ]
     if len(heading_indexes) != 1:
         return CatalogResult(len(heading_indexes), False, (), ())
@@ -713,7 +717,8 @@ def _check_catalog(
             relative,
             "single-catalog-heading",
             f"exact APG catalog heading occurs {parsed.heading_count} times",
-            f"retain one exact '{CATALOG_HEADING}' heading outside fenced code",
+            "retain one exact current or legacy APG catalog heading outside "
+            "fenced code",
         )
     if not parsed.header_valid or parsed.malformed_lines:
         _diagnostic(

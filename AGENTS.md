@@ -55,6 +55,13 @@ not authorize installation or workflow use.
   source topology, development commit identities, local paths, and private
   operational details. Put exact non-public evidence only in the
   publication-excluded area, and never create a public dependency on it.
+- Use the canonical semantic phase ID assigned before implementation. Keep ADR
+  and exit sequences independent and finalize current documentation and phase
+  records before commit. Exact Git identities belong in managed reports,
+  transient verification evidence, or explicitly authorized publication-
+  excluded reproducibility records; they never replace durable public semantic
+  identity or create a public dependency on `private/`. Follow the
+  [phase and record identity guide](docs/phase-and-record-identity.md).
 - Prefer deterministic checks for stable mechanical constraints. Do not call a
   prose requirement or one-time inspection tool-enforced.
 - Validate instruction, skill, documentation, and tool changes in proportion to
@@ -79,7 +86,10 @@ not authorize installation or workflow use.
 - [Architecture decisions](docs/adr/README.md): accepted and superseded project
   decisions.
 - [Exit records](docs/status/README.md): phase outcomes and next authorization.
-- [Skill library](skills/README.md): six stable skill owners and current scope.
+- [Phase and record identity](docs/phase-and-record-identity.md): semantic phase
+  IDs, independent sequences, durable references, and precommit finalization.
+- [Skill library](skills/README.md): nineteen skill owners, fourteen stable and
+  five provisional, and current scope.
 - [Roadmap](docs/roadmap.md): completed phases and future authorization
   boundary.
 - [Public release process](docs/public-release-process.md): exact projection,

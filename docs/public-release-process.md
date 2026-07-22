@@ -10,9 +10,9 @@ release. The build and check command is local-only: it does not contact a
 remote, push, publish, or mutate its source or base.
 
 APG12 establishes this process and validates disposable candidates. APG13 owns
-individual skill maturity decisions. APG14 applies the accepted process to the
-real v0.2.0 candidate, public repository mutation, tag publication, active
-integration source update, and release closeout.
+individual skill maturity decisions. APG14 applies the accepted process to
+v0.2.0. APG24 applies it to the nineteen-skill v0.3.0 release and the
+source-specific lifecycle contract accepted by ADR 0019.
 
 ## Roles
 
@@ -37,8 +37,8 @@ omission; the critical-path lists do not replace it.
 
 [`release/public-surface.json`](../release/public-surface.json) is the strict
 schema-version-1 policy. It fixes the canonical identity, sole exclusion,
-critical owners, wrappers, helpers, licensing files, six skills, six discovery
-links, test entrypoints, and validation categories. Code owns the accepted
+critical owners, wrappers, helpers, licensing files, nineteen skills, nineteen
+discovery links, test entrypoints, and validation categories. Code owns the accepted
 schema and executable test commands. The policy cannot execute commands or
 remove a projected path.
 
@@ -84,6 +84,76 @@ manifest, critical owners, skill-library structure, wrapper help and syntax,
 configured unit and integration tests, Python compilation, Markdown and local
 links, public-to-private independence, generic confidentiality, and licensing,
 notice, contribution, and CLA presence.
+
+APG16 through APG19 add the provisional router, synthesis, Python, Bash, Bats,
+and Zsh profiles to private development without authorizing a v0.3 release;
+ZUnit remains deferred. APG20A adds corrected Go and Ruby profiles to private
+development without adding a public leaf. APG21 likewise adds provisional
+PostgreSQL and SQLite profiles only to private development and defers Nix. The
+schema-version-1 policy's six critical skill and projection entries remain the
+accepted v0.2 release contract; exact projection would still include every
+committed public path, but a future v0.3 release phase must make an explicit
+distribution, critical-policy, user-lifecycle, and rollback disposition before
+publication. Those phases do not weaken the existing lists or silently treat
+repository consistency as release readiness.
+
+APG19A adds semantic record-identity validation to the exact projected public
+surface and corrects the private-development Bats counting guidance. It does
+not broaden the six critical v0.2 skills, authorize a v0.3 candidate, or mutate
+the published repository. Candidate validation composes both the skill-library
+and record-identity checkers.
+
+APG20A likewise leaves the six-skill schema-version-1 public contract unchanged.
+Its retained provisional candidates do not authorize a candidate, publication,
+or active-integration mutation.
+
+APG21 also leaves the six-skill schema-version-1 public contract unchanged. Its
+two retained profiles do not authorize a candidate, publication, or active-
+integration mutation.
+
+APG21A retains corrected Nix only in private development and applies one
+bounded PostgreSQL correction. It does not add a critical public skill, change
+schema version 1, authorize a candidate, or mutate public or active integration.
+
+APG22 leaves the same release contract unchanged. Its 35-case explicit-use
+dogfood is not fresh-session application discovery, release readiness, or
+publication authority. The recorded migration and scope proposals do not add a
+critical skill, widen schema version 1, build a candidate, modify public or
+active integration, or authorize private-router replacement. A manager-
+assignment candidate evaluation and an explicit ZUnit scope decision remain
+pre-APG23 work; APG24 remains the earliest public-candidate owner.
+
+APG22A retains the approved-roadmap manager-assignment leaf only in private
+development. It adds no critical public skill, changes no schema-version-1
+policy, and authorizes no candidate, publication, or active-integration
+mutation.
+
+APG22B retains one provisional ZUnit profile only for exact ZUnit v0.8.2 with
+Zsh 5.9.2 in the tested environment; the exact Zsh 5.3.1 pair is unsupported.
+It adds no critical public skill and changes no candidate, public checkout,
+active integration, or six-skill schema-version-1 contract. The pre-APG23
+manager-assignment and ZUnit objectives are terminal. APG23 still requires
+separate authorization, and APG24 remains the earliest public-candidate owner.
+
+APG22C corrects the ZUnit harness's selected user-startup evidence and retains
+the same exact support disposition. It changes no critical public skill,
+candidate, public checkout, active integration, release policy, or schema-
+version-1 contract.
+
+APG23 completes the fresh-session readiness gate. All thirteen v0.3 skills are
+`include-v0.3`; eight are stable and five remain truthfully provisional. The
+phase builds no candidate and changes no critical v0.2 list, public checkout,
+active integration, release policy, or schema-version-1 contract. APG24 remains
+the earliest public-candidate and publication owner.
+
+APG24 accepts ADR 0019 and updates the current schema-version-1 policy to the
+exact nineteen APG23-included skills and projections. Retaining the schema
+number is supported by explicit variable-set validation; it does not make the
+old six-name current policy valid. Historical v0.2.0 remains validated against
+its source-declared six-skill policy and immutable release identity, while a
+current v0.3.0 source or candidate must satisfy the nineteen-skill policy.
+Release inclusion remains independent of the fourteen-stable/five-provisional
+catalog maturity split.
 
 ## Candidate sequence
 
@@ -161,8 +231,26 @@ tree.
 The existing public-backed integration updates only by fast-forwarding its
 clean source checkout. Its aggregate link objects and raw targets remain
 unchanged; no user-state migration or Codex configuration change occurs. Shell
-validation cannot establish application discovery after the content update, so
-a full restart and fresh-session smoke remain an external observation.
+validation cannot establish application discovery after the content update.
+The maintainer subsequently completed the requested full restart and
+fresh-session smoke and reported that it passed.
+
+## v0.3.0 publication
+
+APG24 builds v0.3.0 twice from one reviewed private release-source commit,
+exact public v0.2.0 base, one frozen RFC3339 timestamp, and verified maintainer
+identity. Identical manifests, trees, commits, annotated tags, refs, and
+metadata are required before an atomic dry-run and one normal atomic push of
+only public `main` and `v0.3.0`. A fresh checkout repeats the complete lineage,
+policy, test, lifecycle, licensing, confidentiality, link, catalog, map, and
+projection gates.
+
+The release contains nineteen skills, fourteen stable rows, five provisional
+rows, and eighteen non-router routes. Public v0.1.0 and v0.2.0 remain unchanged.
+The active public-backed source advances only by exact fast-forward, preserving
+its aggregate links and ownership. The personal router remains installed for
+an external source-qualified shadow smoke; publication does not authorize its
+decommission or a successor phase.
 
 ## Limitations
 

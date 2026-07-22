@@ -15,6 +15,43 @@ sys.path.insert(0, str(REPOSITORY_ROOT / "libexec"))
 import apg_public_release as release  # noqa: E402
 
 
+EXPECTED_V03_SKILLS = tuple(
+    f"skills/{name}/SKILL.md"
+    for name in (
+        "agentic-praxis-grimoire-workflow",
+        "bash-language-profile",
+        "bats-test-profile",
+        "composing-approved-roadmap-assignments",
+        "composing-bounded-worker-assignments",
+        "debugging-systematically",
+        "designing-significant-changes",
+        "go-language-profile",
+        "implementing-with-test-discipline",
+        "nix-language-profile",
+        "planning-repository-work",
+        "postgresql-database-profile",
+        "python-language-profile",
+        "reviewing-and-verifying-repository-work",
+        "ruby-language-profile",
+        "sqlite-database-profile",
+        "synthesizing-repository-guidance",
+        "zsh-language-profile",
+        "zunit-test-profile",
+    )
+)
+HISTORICAL_V02_SKILLS = tuple(
+    f"skills/{name}/SKILL.md"
+    for name in (
+        "composing-bounded-worker-assignments",
+        "debugging-systematically",
+        "designing-significant-changes",
+        "implementing-with-test-discipline",
+        "planning-repository-work",
+        "reviewing-and-verifying-repository-work",
+    )
+)
+
+
 class APGPublicReleaseUnitTests(unittest.TestCase):
     def test_semver_accepts_release_and_prerelease(self) -> None:
         for value in ("0.2.0", "0.2.0-apg12.1", "2.3.4-rc.1+build.7"):
@@ -73,6 +110,24 @@ class APGPublicReleaseUnitTests(unittest.TestCase):
     def test_tagger_timestamp_is_deterministic(self) -> None:
         parsed = release.validate_date("2026-07-20T12:00:00-04:00")
         self.assertEqual(release.deterministic_tagger(parsed), "1784563200 -0400")
+
+    def test_v0_3_audited_surface_requires_all_19_skills(self) -> None:
+        self.assertEqual(release.AUDITED_SKILLS, EXPECTED_V03_SKILLS)
+        self.assertEqual(
+            release.AUDITED_PROJECTIONS,
+            tuple(
+                path.replace("skills/", ".agents/skills/", 1).removesuffix("/SKILL.md")
+                for path in EXPECTED_V03_SKILLS
+            ),
+        )
+
+    def test_v0_2_lineage_retains_only_the_exact_historical_exception(self) -> None:
+        historical = release.audited_policy_surfaces("0.2.0")
+        current = release.audited_policy_surfaces("0.3.0")
+        self.assertEqual(historical[0]["required_skills"], HISTORICAL_V02_SKILLS)
+        self.assertEqual(len(historical), 1)
+        self.assertEqual(current[0]["required_skills"], EXPECTED_V03_SKILLS)
+        self.assertEqual(len(current), 1)
 
 
 if __name__ == "__main__":

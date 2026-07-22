@@ -16,6 +16,9 @@ import unittest
 
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[4]
+sys.path.insert(0, str(REPOSITORY_ROOT / "libexec"))
+import apg_public_release as public_release
+
 COMMAND = REPOSITORY_ROOT / "bin" / "apg-user-skills"
 SKILLS = (
     "composing-bounded-worker-assignments",
@@ -95,6 +98,8 @@ class APGUserSkillsTests(unittest.TestCase):
         (path / "README.md").write_text(f"# Public {version}\n")
         (path / "LICENSE").write_text("license\n")
         policy = json.loads((REPOSITORY_ROOT / "release" / "public-surface.json").read_text())
+        for key, values in public_release.audited_policy_surfaces("0.2.0")[-1].items():
+            policy[key] = list(values)
         policy_path = path / "release" / "public-surface.json"
         policy_path.parent.mkdir(parents=True)
         policy_path.write_text(json.dumps(policy, indent=2, sort_keys=True) + "\n")
@@ -607,8 +612,15 @@ class APGUserSkillsTests(unittest.TestCase):
             f"# {SKILLS[0]}\n"
         )
         self.git(self.second, "add", "-A")
-        self.git(self.second, "commit", "-q", "-m", "Release v0.3.0")
-        self.git(self.second, "tag", "-a", "v0.3.0", "-m", "Release v0.3.0")
+        self.git(self.second, "commit", "-q", "-m", "Release v0.2.0-apg12.2")
+        self.git(
+            self.second,
+            "tag",
+            "-a",
+            "v0.2.0-apg12.2",
+            "-m",
+            "Release v0.2.0-apg12.2",
+        )
         result = self.invoke("list", source=self.second)
         self.assertEqual(result.returncode, 1)
         self.assertIn("skill library", result.stderr)

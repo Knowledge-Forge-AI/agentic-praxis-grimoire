@@ -53,9 +53,11 @@ ALLOWED_CATEGORIES = {
     "markdown",
     "projection",
     "python-compile",
+    "record-identity",
     "skill-library",
 }
 AUDITED_WRAPPERS = (
+    "bin/apg-check-record-identity",
     "bin/apg-check-skill-library",
     "bin/apg-project-skills",
     "bin/apg-public-release",
@@ -68,6 +70,7 @@ AUDITED_HELPERS = (
     "libexec/apg_project_skills_commands.py",
     "libexec/apg_project_skills_core.py",
     "libexec/apg_public_release.py",
+    "libexec/apg_record_identity.py",
     "libexec/apg_skill_library_check.py",
     "libexec/apg_user_skills.py",
 )
@@ -75,7 +78,10 @@ AUDITED_TESTS = (
     "src/test/int/python/apg_check_skill_library.int.test.py",
     "src/test/int/python/apg_project_skills.int.test.py",
     "src/test/int/python/apg_public_release.int.test.py",
+    "src/test/int/python/apg_public_release_v03_policy.int.test.py",
+    "src/test/int/python/apg_record_identity.int.test.py",
     "src/test/int/python/apg_user_skills.int.test.py",
+    "src/test/int/python/apg_user_skills_variable_sets.int.test.py",
     "src/test/unit/bash/append-operational-report.unit.test.bats",
     "src/test/unit/bash/git-show-report.unit.test.bats",
     "src/test/unit/python/apg_public_release.unit.test.py",
@@ -90,16 +96,159 @@ AUDITED_LICENSING = (
     "NOTICE",
 )
 AUDITED_SKILLS = tuple(f"skills/{name}/SKILL.md" for name in (
+    "agentic-praxis-grimoire-workflow",
+    "bash-language-profile",
+    "bats-test-profile",
+    "composing-approved-roadmap-assignments",
     "composing-bounded-worker-assignments",
     "debugging-systematically",
     "designing-significant-changes",
+    "go-language-profile",
     "implementing-with-test-discipline",
+    "nix-language-profile",
     "planning-repository-work",
+    "postgresql-database-profile",
+    "python-language-profile",
     "reviewing-and-verifying-repository-work",
+    "ruby-language-profile",
+    "sqlite-database-profile",
+    "synthesizing-repository-guidance",
+    "zsh-language-profile",
+    "zunit-test-profile",
 ))
 AUDITED_PROJECTIONS = tuple(path.replace("skills/", ".agents/skills/", 1).removesuffix("/SKILL.md") for path in AUDITED_SKILLS)
 LOCAL_PATH_MARKERS = ("/" + "Users" + "/", "file:" + "///")
 AUDITED_CRITICAL = (
+    ".github/pull_request_template.md",
+    ".gitignore",
+    "AGENTS.md",
+    "README.md",
+    "docs/adr/2026/07/0005-public-license-and-contribution-governance.md",
+    "docs/adr/2026/07/0009-public-distribution-and-reproducible-release-validation.md",
+    "docs/adr/2026/07/0010-six-skill-post-superpowers-stability-dispositions.md",
+    "docs/adr/2026/07/0011-v0-3-workflow-synthesis-and-modular-guidance-architecture.md",
+    "docs/adr/2026/07/0012-language-profile-contract-and-warning-levels.md",
+    "docs/adr/2026/07/0013-repository-guidance-synthesis-and-migration-dispositions.md",
+    "docs/adr/2026/07/0014-shell-language-and-shell-test-profile-ownership.md",
+    "docs/adr/2026/07/0015-semantic-phase-identity-and-record-finalization.md",
+    "docs/adr/2026/07/0016-nix-and-relational-engine-profile-ownership.md",
+    "docs/adr/2026/07/0017-approved-roadmap-manager-assignment-ownership.md",
+    "docs/adr/2026/07/0018-v0-3-readiness-maturity-and-release-inclusion.md",
+    "docs/adr/2026/07/0019-v0-3-release-distribution-and-variable-skill-set-lifecycle.md",
+    "docs/adr/README.md",
+    "docs/bootstrap-v0.1.md",
+    "docs/evaluations/apg12-public-distribution-and-release-validation.md",
+    "docs/evaluations/apg12a-public-lineage-and-read-only-validation-correction.md",
+    "docs/evaluations/apg13-six-skill-post-superpowers-stability-review.md",
+    "docs/evaluations/apg14-v0-2-release-candidate-and-publication.md",
+    "docs/evaluations/apg15-v0-3-foundation-design.md",
+    "docs/evaluations/apg16-public-workflow-router.md",
+    "docs/evaluations/apg17-repository-guidance-synthesis.md",
+    "docs/evaluations/apg18-python-language-profile.md",
+    "docs/evaluations/apg19-shell-and-shell-test-profiles.md",
+    "docs/evaluations/apg19a-semantic-phase-identity-and-apg19-reconciliation.md",
+    "docs/evaluations/apg20-go-and-ruby-language-profiles.md",
+    "docs/evaluations/apg20a-go-and-ruby-profile-corrections.md",
+    "docs/evaluations/apg21-nix-postgresql-and-sqlite-profiles.md",
+    "docs/evaluations/apg21a-nix-profile-correction.md",
+    "docs/evaluations/apg22-cross-repository-dogfood-and-guidance-migration.md",
+    "docs/evaluations/apg22a-approved-roadmap-manager-assignments.md",
+    "docs/evaluations/apg22b-version-bounded-zunit-profile.md",
+    "docs/evaluations/apg22c-zunit-startup-isolation-evidence-correction.md",
+    "docs/evaluations/apg23-v0-3-readiness-maturity-and-application-smoke.md",
+    "docs/evaluations/apg24-v0-3-release-candidate-and-publication.md",
+    "docs/language-profile-contract.md",
+    "docs/legacy-roadmap-closure.md",
+    "docs/manager-worker-protocol.md",
+    "docs/phase-and-record-identity.md",
+    "docs/project-model.md",
+    "docs/project-skill-projection.md",
+    "docs/provenance.md",
+    "docs/public-release-process.md",
+    "docs/roadmap.md",
+    "docs/skill-authoring-and-maintenance.md",
+    "docs/status/2026/07/20/00018-apg12-public-distribution-and-release-validation-exit.md",
+    "docs/status/2026/07/20/00019-apg12a-public-lineage-and-read-only-validation-correction-exit.md",
+    "docs/status/2026/07/20/00020-apg13-six-skill-post-superpowers-stability-review-exit.md",
+    "docs/status/2026/07/20/00021-apg14-v0-2-release-candidate-and-publication-exit.md",
+    "docs/status/2026/07/20/00022-apg15-v0-3-foundation-design-exit.md",
+    "docs/status/2026/07/20/00023-apg16-public-workflow-router-exit.md",
+    "docs/status/2026/07/20/00024-apg17-repository-guidance-synthesis-exit.md",
+    "docs/status/2026/07/21/00025-apg17a-public-release-identity-evidence-correction-exit.md",
+    "docs/status/2026/07/21/00026-apg18-language-profile-contract-and-python-vertical-slice-exit.md",
+    "docs/status/2026/07/21/00027-apg18a-python-profile-current-state-documentation-correction-exit.md",
+    "docs/status/2026/07/21/00028-apg19-shell-and-shell-test-profiles-exit.md",
+    "docs/status/2026/07/21/00029-apg19a-semantic-phase-identity-and-apg19-reconciliation-exit.md",
+    "docs/status/2026/07/21/00030-apg20-go-and-ruby-language-profiles-exit.md",
+    "docs/status/2026/07/21/00031-apg20a-go-and-ruby-profile-corrections-exit.md",
+    "docs/status/2026/07/21/00032-apg21-nix-postgresql-and-sqlite-profiles-exit.md",
+    "docs/status/2026/07/21/00033-apg21a-nix-profile-correction-exit.md",
+    "docs/status/2026/07/21/00034-apg22-cross-repository-dogfood-and-guidance-migration-exit.md",
+    "docs/status/2026/07/21/00035-apg22a-approved-roadmap-manager-assignments-exit.md",
+    "docs/status/2026/07/21/00036-apg22b-version-bounded-zunit-profile-exit.md",
+    "docs/status/2026/07/21/00037-apg22c-zunit-startup-isolation-evidence-correction-exit.md",
+    "docs/status/2026/07/21/00038-apg23-v0-3-readiness-maturity-and-application-smoke-exit.md",
+    "docs/status/2026/07/22/00039-apg24-v0-3-release-candidate-and-publication-exit.md",
+    "docs/status/README.md",
+    "docs/user-scoped-skill-integration.md",
+    "docs/v0-3-guidance-migration-proposal.md",
+    "docs/v0-3-readiness-matrix.md",
+    "docs/v0-3-release-scope-closure.md",
+    "release/public-surface.json",
+    "skills/README.md",
+    "skills/agentic-praxis-grimoire-workflow/references/capability-map.json",
+)
+
+HISTORICAL_V02_WRAPPERS = (
+    "bin/apg-check-skill-library",
+    "bin/apg-project-skills",
+    "bin/apg-public-release",
+    "bin/apg-user-skills",
+    "bin/append-operational-report",
+    "bin/git-show-report",
+)
+HISTORICAL_V02_HELPERS = (
+    "libexec/agent-report/common.sh",
+    "libexec/apg_project_skills_commands.py",
+    "libexec/apg_project_skills_core.py",
+    "libexec/apg_public_release.py",
+    "libexec/apg_skill_library_check.py",
+    "libexec/apg_user_skills.py",
+)
+HISTORICAL_V02_TESTS = (
+    "src/test/int/python/apg_check_skill_library.int.test.py",
+    "src/test/int/python/apg_project_skills.int.test.py",
+    "src/test/int/python/apg_public_release.int.test.py",
+    "src/test/int/python/apg_user_skills.int.test.py",
+    "src/test/unit/bash/append-operational-report.unit.test.bats",
+    "src/test/unit/bash/git-show-report.unit.test.bats",
+    "src/test/unit/python/apg_public_release.unit.test.py",
+    "src/test/unit/python/apg_skill_library.unit.test.py",
+    "src/test/unit/python/apg_user_skills.unit.test.py",
+)
+HISTORICAL_V02_LICENSING = (
+    "CLA.md",
+    "COMMERCIAL-LICENSE.md",
+    "CONTRIBUTING.md",
+    "LICENSE",
+    "NOTICE",
+)
+HISTORICAL_V02_SKILLS = tuple(
+    f"skills/{name}/SKILL.md"
+    for name in (
+        "composing-bounded-worker-assignments",
+        "debugging-systematically",
+        "designing-significant-changes",
+        "implementing-with-test-discipline",
+        "planning-repository-work",
+        "reviewing-and-verifying-repository-work",
+    )
+)
+HISTORICAL_V02_PROJECTIONS = tuple(
+    path.replace("skills/", ".agents/skills/", 1).removesuffix("/SKILL.md")
+    for path in HISTORICAL_V02_SKILLS
+)
+HISTORICAL_V02_CRITICAL = (
     ".github/pull_request_template.md",
     ".gitignore",
     "AGENTS.md",
@@ -318,7 +467,43 @@ def safe_policy_path(value: str) -> bool:
     return not path.is_absolute() and not any(part in {"", ".", ".."} for part in path.parts)
 
 
-def load_policy(repository: Repository) -> dict[str, object]:
+def audited_policy_surfaces(version: str) -> tuple[dict[str, tuple[str, ...]], ...]:
+    """Return exact policy surfaces allowed for one public release version."""
+
+    current = {
+        "required_helpers": AUDITED_HELPERS,
+        "required_licensing_files": AUDITED_LICENSING,
+        "required_projections": AUDITED_PROJECTIONS,
+        "required_skills": AUDITED_SKILLS,
+        "required_test_entrypoints": AUDITED_TESTS,
+        "required_wrappers": AUDITED_WRAPPERS,
+        "critical_files": AUDITED_CRITICAL,
+        "validation_categories": tuple(sorted(ALLOWED_CATEGORIES)),
+    }
+    core = version.split("+", 1)[0].split("-", 1)[0]
+    major, minor, _patch = core.split(".")
+    if (major, minor) != ("0", "2"):
+        return (current,)
+    historical = {
+        "required_helpers": HISTORICAL_V02_HELPERS,
+        "required_licensing_files": HISTORICAL_V02_LICENSING,
+        "required_projections": HISTORICAL_V02_PROJECTIONS,
+        "required_skills": HISTORICAL_V02_SKILLS,
+        "required_test_entrypoints": HISTORICAL_V02_TESTS,
+        "required_wrappers": HISTORICAL_V02_WRAPPERS,
+        "critical_files": HISTORICAL_V02_CRITICAL,
+        "validation_categories": tuple(
+            sorted(ALLOWED_CATEGORIES - {"record-identity"})
+        ),
+    }
+    return (historical,)
+
+
+def load_policy(
+    repository: Repository,
+    *,
+    expected_surfaces: Sequence[dict[str, tuple[str, ...]]] | None = None,
+) -> dict[str, object]:
     raw = committed_bytes(repository, POLICY_PATH)
     if len(raw) > 256 * 1024:
         fail("public release policy is oversized")
@@ -346,19 +531,16 @@ def load_policy(repository: Repository) -> dict[str, object]:
             fail(f"public release policy {key} may not name private paths")
     if not set(value["validation_categories"]).issubset(ALLOWED_CATEGORIES):
         fail("public release policy contains an unknown validation category")
-    exact_surfaces = {
-        "required_helpers": AUDITED_HELPERS,
-        "required_licensing_files": AUDITED_LICENSING,
-        "required_projections": AUDITED_PROJECTIONS,
-        "required_skills": AUDITED_SKILLS,
-        "required_test_entrypoints": AUDITED_TESTS,
-        "required_wrappers": AUDITED_WRAPPERS,
-        "critical_files": AUDITED_CRITICAL,
-        "validation_categories": tuple(sorted(ALLOWED_CATEGORIES)),
-    }
-    for key, expected in exact_surfaces.items():
-        if tuple(value[key]) != expected:
-            fail(f"public release policy {key} differs from the audited schema-1 surface")
+    allowed_surfaces = tuple(expected_surfaces or audited_policy_surfaces("0.3.0"))
+    if not any(
+        all(tuple(value[key]) == expected for key, expected in surface.items())
+        for surface in allowed_surfaces
+    ):
+        for key in next(iter(allowed_surfaces)):
+            if all(tuple(value[key]) != surface[key] for surface in allowed_surfaces):
+                fail(f"public release policy {key} differs from the audited schema-1 surface")
+        else:
+            fail("public release policy combines incompatible audited schema-1 surfaces")
     return value
 
 
@@ -493,10 +675,13 @@ def build_manifest(repository: Repository) -> dict[str, object]:
     }
 
 
-def validate_public_release_surface(repository: Repository) -> None:
+def validate_public_release_surface(repository: Repository, version: str) -> None:
     """Validate the strict policy and complete tree of a later public release."""
 
-    policy = load_policy(repository)
+    policy = load_policy(
+        repository,
+        expected_surfaces=audited_policy_surfaces(version),
+    )
     entries = tree_entries(repository)
     if any(entry.path == b"private" or entry.path.startswith(b"private/") for entry in entries):
         fail("public release must not track private/")
@@ -751,7 +936,7 @@ def verify_public_release_lineage(
         fail("public release history is truncated or does not reach HEAD")
     if set(tags_by_commit) != accepted_commits:
         fail("public release tags include history outside the accepted release chain")
-    validate_public_release_surface(repository)
+    validate_public_release_surface(repository, identities[-1].version)
     return tuple(identities)
 
 
@@ -826,7 +1011,10 @@ def build_candidate(
         accepted_commit=PUBLIC_V01_COMMIT,
         accepted_tree=PUBLIC_V01_TREE,
     )
-    policy = load_policy(source)
+    policy = load_policy(
+        source,
+        expected_surfaces=audited_policy_surfaces(version),
+    )
     entries = tree_entries(source, excluded_prefix=b"private/")
     validate_critical(entries, policy)
     validate_public_symlinks(source, entries)
@@ -983,6 +1171,8 @@ def validate_categories(
     categories = set(policy["validation_categories"])  # type: ignore[arg-type]
     if "skill-library" in categories:
         run_checked_command([str(candidate.root / "bin" / "apg-check-skill-library"), "--root", str(candidate.root), "--format", "json"], candidate.root, environment)
+    if "record-identity" in categories:
+        run_checked_command([str(candidate.root / "bin" / "apg-check-record-identity"), "--root", str(candidate.root), "--format", "json"], candidate.root, environment)
     if "command-help" in categories:
         for wrapper in AUDITED_WRAPPERS:
             run_checked_command([str(candidate.root / wrapper), "--help"], candidate.root, environment)
@@ -1086,7 +1276,10 @@ def check_candidate(
         accepted_commit=PUBLIC_V01_COMMIT,
         accepted_tree=PUBLIC_V01_TREE,
     )
-    policy = load_policy(source)
+    policy = load_policy(
+        source,
+        expected_surfaces=audited_policy_surfaces(version),
+    )
     source_entries = tree_entries(source, excluded_prefix=b"private/")
     candidate_entries = tree_entries(candidate)
     validate_critical(source_entries, policy)

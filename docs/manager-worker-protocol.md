@@ -137,10 +137,28 @@ Internal results may be ephemeral. Preserve their useful substance in an
 authorized project artifact only when the phase requires durable evidence, and
 sanitize it before publication.
 
+## Phase identity and precommit finalization
+
+Every phase uses the canonical semantic phase ID assigned before implementation
+through its evaluation, exit, managed reports, and final response. ADR and exit
+numbers are independent record sequences and do not define the phase. Follow
+the [phase and record identity guide](phase-and-record-identity.md).
+
+Before the top-level manager commits a phase, the implementation, current-owner
+documentation, roadmap, provenance, integration documents, evaluation, exit,
+applicable ADR, and indexes must describe the actual resulting tree. The
+manager obtains fresh non-author review, resolves material findings, stages the
+complete phase, and inspects and validates the staged diff. A worker result or
+planned post-commit report does not excuse stale tracked documentation.
+
 ## Current executable reporting contract
 
 The report scripts are the executable contract for final record construction.
 They do not make caller-supplied claims true and do not assign actor roles.
+Exact Git identities are valid within these generated reports and transient
+verification output. Do not copy them into tracked public or private documents
+as phase, baseline, current-state, migration, rollback, or cross-document
+identities.
 
 ### Commit-message construction
 

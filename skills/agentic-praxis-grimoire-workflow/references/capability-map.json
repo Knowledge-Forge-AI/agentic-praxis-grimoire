@@ -1,0 +1,96 @@
+{
+  "capabilities": [
+    {
+      "capability_class": "Bash language profile",
+      "name": "bash-language-profile",
+      "trigger": "Bash-specific judgment is material to quoting, expansion, arrays, pipelines, traps, subprocesses, files, portability, or warning and crisis thresholds beyond repository policy."
+    },
+    {
+      "capability_class": "Bats test profile",
+      "name": "bats-test-profile",
+      "trigger": "Bats-specific test judgment is material to evaluation, run status and output, hooks, fixtures, TAP, file descriptors, parallelism, background cleanup, or warning and crisis thresholds beyond repository policy."
+    },
+    {
+      "capability_class": "approved-roadmap manager-assignment composition",
+      "name": "composing-approved-roadmap-assignments",
+      "trigger": "A human-approved roadmap phase or explicitly approved bounded phase sequence needs a reviewable top-level coding-agent manager assignment with authority, scope, evidence, acceptance, stop, reporting, and handoff boundaries."
+    },
+    {
+      "capability_class": "worker-assignment composition",
+      "name": "composing-bounded-worker-assignments",
+      "trigger": "Delegation is already authorized and selected, and one non-trivial worker assignment needs explicit boundaries."
+    },
+    {
+      "capability_class": "systematic debugging",
+      "name": "debugging-systematically",
+      "trigger": "Behavior is failing, inconsistent, flaky, unexplained, or has multiple plausible causes."
+    },
+    {
+      "capability_class": "significant-change design",
+      "name": "designing-significant-changes",
+      "trigger": "Consequential behavior, architecture, ownership, contracts, safety, or irreversible choices remain unresolved."
+    },
+    {
+      "capability_class": "Go language profile",
+      "name": "go-language-profile",
+      "trigger": "Go-specific judgment is material to structure, errors, context, interfaces, generics, concurrency, public APIs, reflection, unsafe, cgo, subprocesses, compatibility, or warning and crisis thresholds beyond repository policy."
+    },
+    {
+      "capability_class": "test-disciplined implementation",
+      "name": "implementing-with-test-discipline",
+      "trigger": "An authorized behavior change benefits from executable behavioral evidence proportional to risk."
+    },
+    {
+      "capability_class": "Nix language profile",
+      "name": "nix-language-profile",
+      "trigger": "Nix-specific judgment is material to expressions, attribute sets, modules, derivations, flakes, overlays, purity, evaluation, store exposure, activation, remote builders, or warning and crisis thresholds beyond repository policy."
+    },
+    {
+      "capability_class": "repository planning",
+      "name": "planning-repository-work",
+      "trigger": "An accepted objective needs dependent steps, cross-file coordination, staged risk reduction, or durable handoff."
+    },
+    {
+      "capability_class": "PostgreSQL database profile",
+      "name": "postgresql-database-profile",
+      "trigger": "PostgreSQL-specific judgment is material to SQL, schemas, MVCC, transactions, locks, DDL, migrations, routines, triggers, security, backup and restore, replication, maintenance, or warning and crisis thresholds beyond repository policy."
+    },
+    {
+      "capability_class": "Python language profile",
+      "name": "python-language-profile",
+      "trigger": "Python-specific judgment is material to structure, complexity, public APIs, typing, concurrency, serialization, packaging, or warning and crisis thresholds beyond repository policy."
+    },
+    {
+      "capability_class": "repository review and verification",
+      "name": "reviewing-and-verifying-repository-work",
+      "trigger": "A bounded artifact or resulting repository state needs evidence-backed acceptance, correction, disposition, or a completion claim."
+    },
+    {
+      "capability_class": "Ruby language profile",
+      "name": "ruby-language-profile",
+      "trigger": "Ruby-specific judgment is material to structure, exceptions, blocks, shared state, dynamic dispatch, metaprogramming, callbacks, concurrency, gems, public compatibility, serialization, subprocesses, or warning and crisis thresholds beyond repository policy."
+    },
+    {
+      "capability_class": "SQLite database profile",
+      "name": "sqlite-database-profile",
+      "trigger": "SQLite-specific judgment is material to SQL, transaction modes, single-writer concurrency, busy handling, journal or WAL behavior, schema rebuilds, pragmas, affinity, file ownership, backup and integrity, extensions, or warning and crisis thresholds beyond repository policy."
+    },
+    {
+      "capability_class": "repository guidance synthesis",
+      "name": "synthesizing-repository-guidance",
+      "trigger": "A dense, duplicated, mixed-scope, private, or source-derived guidance corpus needs ownership and migration dispositions before rewrite."
+    },
+    {
+      "capability_class": "Zsh language profile",
+      "name": "zsh-language-profile",
+      "trigger": "Zsh-specific judgment is material to option state, arrays, expansion, globbing, autoloading, startup or interactive behavior, hooks, modules, processes, or warning and crisis thresholds beyond repository policy."
+    },
+    {
+      "capability_class": "ZUnit test profile",
+      "name": "zunit-test-profile",
+      "trigger": "An exact APG-verified ZUnit v0.8.2 and Zsh 5.9.2 pair needs ZUnit-specific judgment about runner invocation, discovery, assertions, hooks, configuration, output, isolation, process cleanup, compatibility, or warning and crisis thresholds beyond repository policy."
+    }
+  ],
+  "router_name": "agentic-praxis-grimoire-workflow",
+  "schema_version": 1
+}

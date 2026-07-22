@@ -70,3 +70,11 @@ published-pending-fresh-session-smoke
 The smallest next external action is to restart Codex, open a fresh task,
 confirm discovery of all six public v0.2.0 skills, and explicitly invoke a
 representative skill. No automatic successor phase begins.
+
+## Subsequent external application disposition
+
+The maintainer later completed the requested full application restart and
+fresh-session smoke and reported that it passed. This closes the pending
+current-state observation while preserving the historical terminal outcome
+above. No exact user-interface log, timestamp, invocation telemetry, or
+duplicate-source evidence was supplied or inferred.

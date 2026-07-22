@@ -13,6 +13,7 @@ from apg_project_skills_core import (
     AUTHORIZED_CONTAINERS,
     COMMAND_NAME,
     EXPECTED_SKILLS,
+    KNOWN_UNMANAGED_SKILLS,
     MAX_EXCLUDE_BYTES,
     RESTART_REMINDER,
     FileSnapshot,
@@ -53,9 +54,9 @@ def selected_skills(
     values = requested or []
     unknown = [name for name in values if name not in EXPECTED_SKILLS]
     if unknown:
-        parser.error(f"unknown canonical skill: {unknown[0]}")
+        parser.error(f"unknown or unmanaged release skill: {unknown[0]}")
     if len(values) != len(set(values)):
-        parser.error("a canonical skill may be selected only once")
+        parser.error("a managed release skill may be selected only once")
     return tuple(sorted(values))
 
 
@@ -138,6 +139,9 @@ def install(
         validate_projection_parents(repository)
         if state is not None:
             validate_owned_projections(repository, canonical, state)
+
+        if not requested:
+            requested = state.managed_skills if state else EXPECTED_SKILLS
 
         already_managed = set(state.managed_skills if state else ())
         for skill in requested:
@@ -278,6 +282,9 @@ def adopt(
         if state is not None:
             validate_owned_projections(repository, canonical, state)
 
+        if not requested:
+            requested = state.managed_skills if state else EXPECTED_SKILLS
+
         already_managed = set(state.managed_skills if state else ())
         for skill in requested:
             if is_tracked(repository, skill):
@@ -358,7 +365,7 @@ def check(
             )
         unmanaged_present = any(
             os.path.lexists(projection_path(repository, skill))
-            for skill in EXPECTED_SKILLS
+            for skill in (*EXPECTED_SKILLS, *KNOWN_UNMANAGED_SKILLS)
         )
         if unmanaged_present:
             print(
@@ -577,14 +584,14 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog=COMMAND_NAME,
         description=(
-            "Manage local symbolic-link projections of the six canonical APG "
-            "skills in an opted-in Git worktree."
+            "Manage local symbolic-link projections of the current APG "
+            "release skills in an opted-in Git worktree."
         ),
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
     subparsers.add_parser(
         "list",
-        help="list canonical APG skill names without requiring a target",
+        help="list managed current-release skill names without a target",
     )
     for command, help_text in (
         ("install", "create missing local projections and ownership state"),
@@ -603,7 +610,10 @@ def build_parser() -> argparse.ArgumentParser:
             "--skill",
             action="append",
             metavar="NAME",
-            help="limit the operation to one canonical skill; repeat as needed",
+            help=(
+                "limit the operation to one managed current-release skill; "
+                "repeat as needed"
+            ),
         )
     return parser
 
@@ -621,8 +631,6 @@ def main(arguments: Sequence[str] | None = None) -> int:
     if namespace.repo and len(namespace.repo) > 1:
         parser.error("--repo may be specified only once")
     requested = selected_skills(parser, namespace.skill)
-    if namespace.command in {"install", "adopt"} and not requested:
-        requested = EXPECTED_SKILLS
     repository = resolve_target(namespace.repo[0] if namespace.repo else ".")
     if namespace.command == "install":
         install_signal_handlers()

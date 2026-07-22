@@ -3,21 +3,29 @@
 ## Purpose
 
 `apg-project-skills` manages opt-in Codex project discovery links from a target
-Git worktree to the six canonical APG skills. It installs, adopts, checks, and
-removes local symbolic links without copying skill content, changing tracked
-target files, or modifying user-level Codex or Superpowers state.
+Git worktree to the nineteen APG v0.3 release skills. It installs, adopts,
+checks, and removes local symbolic links without copying skill content,
+changing tracked target files, or modifying user-level Codex or Superpowers
+state.
 
 [ADR 0004](adr/2026/07/0004-project-local-skill-projection-and-rollback.md)
 defines the normative ownership, conflict, and rollback design.
 
+ADR 0019 broadens the accepted current release set while retaining version-1
+state. New install and adopt default to nineteen; explicit subsets and existing
+state continue to own only their recorded names. No existing six-skill state is
+expanded implicitly.
+
 ## Distribution scopes
 
-Public v0.2.0 is the canonical source for the maintainer's separately managed
-user-global Codex integration. That integration projects the public checkout's
-skill directory into the user discovery root. It is distinct from this
-repository-local command: `apg-project-skills` owns only opted-in target
-worktrees and their Git-local state, does not install globally, and does not
-retarget an existing project-local projection when the global source changes.
+Public v0.3.0 is the resulting canonical source for the maintainer's separately
+managed user-global Codex integration. Historical v0.2.0 remains a verified
+six-skill release and compatibility source. The active integration projects
+the public checkout's skill directory into the user discovery root. It is
+distinct from this repository-local command: `apg-project-skills` owns only
+opted-in target worktrees and their Git-local state, does not install globally,
+and does not retarget an existing project-local projection when the global
+source changes.
 
 A repository may therefore expose the same canonical skill name through its
 project scope and the user-global scope. Discovery clients own precedence and
@@ -44,8 +52,8 @@ and must not be copied into public documentation, fixtures, or reports.
 
 ## Prerequisites
 
-- a readable APG checkout containing `bin/apg-project-skills` and the six
-  canonical skill leaves;
+- a readable APG checkout containing `bin/apg-project-skills`, the nineteen
+  managed v0.3 release leaves, and the recognized development catalog;
 - Python 3.10+ with the standard library;
 - Git and a non-bare target worktree;
 - local symbolic-link support and POSIX advisory locking; and
@@ -57,7 +65,7 @@ Homebrew package, Nix-only tool, or third-party Python package.
 
 ## Commands
 
-List the canonical names without a target repository:
+List the nineteen managed v0.3 release names without a target repository:
 
 ```sh
 <apg-root>/bin/apg-project-skills list
@@ -101,8 +109,63 @@ Remove selected or all locally managed skills:
 ```
 
 When `--repo` is omitted, Git resolves the worktree containing the current
-directory. Install and adopt default to all six canonical skills. Check and
-uninstall default to the valid locally managed set.
+directory. Install and adopt default to all nineteen v0.3 release skills.
+Check and uninstall default to the valid locally managed set, so an existing
+six-skill or other explicit subset does not expand implicitly. Unknown names
+outside the current release set are rejected.
+
+APG19A preserves this exact managed/unmanaged boundary. Its semantic-identity
+policy and Bats counting correction add no project-lifecycle owner, state field,
+or managed skill.
+
+APG20A preserves the boundary while adding Go and Ruby as canonical
+development skills and known-unmanaged names. It changes no managed name, state
+field, or lifecycle operation.
+
+APG21 preserves the same boundary while adding PostgreSQL and SQLite as
+canonical development skills and known-unmanaged names. Nix is deferred and is
+not added. The phase changes no managed name, state field, or lifecycle
+operation.
+
+APG21A preserves the boundary while adding corrected Nix as one canonical
+development skill and known-unmanaged name. It changes no managed name, state
+field, or lifecycle operation.
+
+APG22 preserves the same 17-skill development catalog and six-skill managed
+project contract. Its read-only RepoMap dogfood and migration proposal do not
+install, adopt, update, retarget, or remove any target projection. A future
+target-authorized shadow or cutover must wait for public v0.3 distribution and
+must prove discovery, non-trigger, project-override, and byte-restorable
+rollback behavior; APG22 grants no such authority.
+
+APG22A expands private development to 18 skills by adding the provisional
+approved-roadmap manager-assignment leaf as known unmanaged. The six-skill
+project lifecycle, version-1 state, target effects, and rollback behavior are
+unchanged.
+
+APG22B expands private development to 19 skills by adding the provisional,
+version-bounded ZUnit test profile as known unmanaged. The six-skill managed
+project contract, version-1 state, target effects, and rollback behavior remain
+unchanged.
+
+APG22C corrects only the publication-excluded ZUnit compatibility harness and
+its evidence records. The 19-skill development catalog, six managed project
+skills, known-unmanaged set, version-1 state, target effects, and rollback
+behavior remain unchanged. No external target projection is installed,
+checked, or mutated by the correction.
+
+APG23 changes maturity and readiness records only. The development projection
+remains nineteen relative links and the managed project contract remains the
+six stable v0.2 process skills under state version 1. All thirteen v0.3 skills
+are release-ready, but APG23 installs, checks, or mutates no external target.
+APG24 owns any future public projection and target-authorized shadow evidence.
+
+APG24 makes all nineteen release-included names available to this lifecycle and
+retains state version 1. New default installation and adoption use all
+nineteen. Explicit six-skill and mixed process/profile subsets remain valid.
+Existing six-skill managed state checks and uninstalls only those six owned
+links. APG24 performs no implicit real-project expansion and mutates no target
+repository.
 
 ## Target effects
 
@@ -268,5 +331,5 @@ Codex or Superpowers state unchanged.
   the command favors refusing uncertain cleanup over guessing ownership.
 - Project projection success does not prove Codex invocation, automatic trigger
   selection, user-global integration, skill maturity, or production readiness.
-- The command manages exactly the accepted six APG v0.1 skills and is not a
-  general skill installer or package manager.
+- The command manages exactly the current nineteen APG v0.3 release skills and
+  is not a general skill installer or package manager.

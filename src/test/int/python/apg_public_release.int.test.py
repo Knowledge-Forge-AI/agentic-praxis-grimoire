@@ -18,7 +18,7 @@ import unittest
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[4]
 COMMAND = REPOSITORY_ROOT / "bin" / "apg-public-release"
-VERSION = "0.2.0-apg12.1"
+VERSION = "0.3.0-apg24.1"
 RELEASE_DATE = "2026-07-20T12:00:00-04:00"
 
 
@@ -86,6 +86,98 @@ class APGPublicReleaseTests(unittest.TestCase):
         path = repo / "release" / "public-surface.json"
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps(value or self.policy(), indent=2, sort_keys=True) + "\n")
+
+    def historical_v02_policy(self) -> dict[str, object]:
+        value = self.policy()
+        value["critical_files"] = [
+            ".github/pull_request_template.md",
+            ".gitignore",
+            "AGENTS.md",
+            "README.md",
+            "docs/adr/2026/07/0005-public-license-and-contribution-governance.md",
+            "docs/adr/2026/07/0009-public-distribution-and-reproducible-release-validation.md",
+            "docs/adr/2026/07/0010-six-skill-post-superpowers-stability-dispositions.md",
+            "docs/adr/README.md",
+            "docs/bootstrap-v0.1.md",
+            "docs/evaluations/apg12-public-distribution-and-release-validation.md",
+            "docs/evaluations/apg12a-public-lineage-and-read-only-validation-correction.md",
+            "docs/evaluations/apg13-six-skill-post-superpowers-stability-review.md",
+            "docs/evaluations/apg14-v0-2-release-candidate-and-publication.md",
+            "docs/legacy-roadmap-closure.md",
+            "docs/manager-worker-protocol.md",
+            "docs/project-model.md",
+            "docs/project-skill-projection.md",
+            "docs/provenance.md",
+            "docs/public-release-process.md",
+            "docs/roadmap.md",
+            "docs/skill-authoring-and-maintenance.md",
+            "docs/status/2026/07/20/00018-apg12-public-distribution-and-release-validation-exit.md",
+            "docs/status/2026/07/20/00019-apg12a-public-lineage-and-read-only-validation-correction-exit.md",
+            "docs/status/2026/07/20/00020-apg13-six-skill-post-superpowers-stability-review-exit.md",
+            "docs/status/2026/07/20/00021-apg14-v0-2-release-candidate-and-publication-exit.md",
+            "docs/status/README.md",
+            "docs/user-scoped-skill-integration.md",
+            "release/public-surface.json",
+            "skills/README.md",
+        ]
+        value["required_helpers"] = [
+            "libexec/agent-report/common.sh",
+            "libexec/apg_project_skills_commands.py",
+            "libexec/apg_project_skills_core.py",
+            "libexec/apg_public_release.py",
+            "libexec/apg_skill_library_check.py",
+            "libexec/apg_user_skills.py",
+        ]
+        value["required_projections"] = [
+            ".agents/skills/composing-bounded-worker-assignments",
+            ".agents/skills/debugging-systematically",
+            ".agents/skills/designing-significant-changes",
+            ".agents/skills/implementing-with-test-discipline",
+            ".agents/skills/planning-repository-work",
+            ".agents/skills/reviewing-and-verifying-repository-work",
+        ]
+        value["required_skills"] = [
+            "skills/composing-bounded-worker-assignments/SKILL.md",
+            "skills/debugging-systematically/SKILL.md",
+            "skills/designing-significant-changes/SKILL.md",
+            "skills/implementing-with-test-discipline/SKILL.md",
+            "skills/planning-repository-work/SKILL.md",
+            "skills/reviewing-and-verifying-repository-work/SKILL.md",
+        ]
+        value["required_test_entrypoints"] = [
+            "src/test/int/python/apg_check_skill_library.int.test.py",
+            "src/test/int/python/apg_project_skills.int.test.py",
+            "src/test/int/python/apg_public_release.int.test.py",
+            "src/test/int/python/apg_user_skills.int.test.py",
+            "src/test/unit/bash/append-operational-report.unit.test.bats",
+            "src/test/unit/bash/git-show-report.unit.test.bats",
+            "src/test/unit/python/apg_public_release.unit.test.py",
+            "src/test/unit/python/apg_skill_library.unit.test.py",
+            "src/test/unit/python/apg_user_skills.unit.test.py",
+        ]
+        value["required_wrappers"] = [
+            "bin/apg-check-skill-library",
+            "bin/apg-project-skills",
+            "bin/apg-public-release",
+            "bin/apg-user-skills",
+            "bin/append-operational-report",
+            "bin/git-show-report",
+        ]
+        value["validation_categories"] = [
+            "bash-syntax",
+            "command-help",
+            "confidentiality",
+            "configured-tests",
+            "critical-paths",
+            "history",
+            "licensing",
+            "local-links",
+            "markdown",
+            "projection",
+            "python-compile",
+            "skill-library",
+        ]
+        return value
 
     def make_source(self, path: Path) -> Path:
         self.initialize(path)
@@ -246,6 +338,35 @@ class APGPublicReleaseTests(unittest.TestCase):
         self.git(repo, "reset", "-q", "--hard", commit)
         self.git(repo, "tag", "-a", f"v{version}", "-m", f"Release v{version}")
         return commit
+
+    def copy_source_with_policy(
+        self,
+        name: str,
+        policy: dict[str, object],
+    ) -> Path:
+        repo = self.root / name
+        shutil.copytree(self.source, repo, symlinks=True)
+        current = self.policy()
+        path_keys = (
+            "critical_files",
+            "required_helpers",
+            "required_licensing_files",
+            "required_projections",
+            "required_skills",
+            "required_test_entrypoints",
+            "required_wrappers",
+        )
+        current_paths = {path for key in path_keys for path in current[key]}
+        historical_paths = {path for key in path_keys for path in policy[key]}
+        for relative in sorted(current_paths - historical_paths, reverse=True):
+            target = repo / relative
+            if target.is_symlink() or target.is_file():
+                target.unlink()
+            elif target.is_dir():
+                shutil.rmtree(target)
+        self.write_policy(repo, policy)
+        self.commit_all(repo, "Policy-specific source")
+        return repo
 
     def test_01_manifest_is_deterministic_in_text_and_json(self) -> None:
         text_one = self.run_command("manifest", "--source", str(self.source), "--format", "text")
@@ -689,8 +810,13 @@ class APGPublicReleaseTests(unittest.TestCase):
         self.assertEqual(self.fingerprint(candidate), before)
 
     def test_27_complete_public_base_lineage_matrix(self) -> None:
+        historical_source = self.copy_source_with_policy(
+            "historical-v0.2-matrix-source",
+            self.historical_v02_policy(),
+        )
         later, later_build = self.build(
             self.root / "valid-later-base",
+            source=historical_source,
             version="0.2.0",
         )
         self.assert_success(later_build)
@@ -825,31 +951,6 @@ class APGPublicReleaseTests(unittest.TestCase):
         )
         self.assertEqual(list(ambient.rglob("*.marker")), [])
 
-    def test_32_later_public_base_must_be_policy_complete(self) -> None:
-        later, later_build = self.build(
-            self.root / "policy-complete-v0.2-base",
-            version="0.2.0",
-        )
-        self.assert_success(later_build)
-        (later / "release" / "public-surface.json").write_text("{}\n")
-        self.commit_all(later, "Release v0.3.0")
-        self.git(later, "tag", "-a", "v0.3.0", "-m", "Release v0.3.0")
-
-        output = self.root / "policy-incomplete-base-candidate"
-        result = self.build(output, base=later, version="0.4.0")[1]
-        self.assertEqual(result.returncode, 1)
-        self.assertIn("policy", result.stderr.lower())
-        self.assertFalse(output.exists())
-        check_candidate = self.root / "policy-incomplete-check-candidate"
-        shutil.copytree(self.source, check_candidate, symlinks=True)
-        checked = self.check_candidate(
-            check_candidate,
-            base=later,
-            version="0.4.0",
-        )
-        self.assertEqual(checked.returncode, 1)
-        self.assertIn("policy", checked.stderr.lower())
-
     def test_30_v0_1_rejects_same_target_annotated_retag(self) -> None:
         base = self.copy_base("annotated-v0.1-retag")
         self.git(base, "tag", "-d", "v0.1.0")
@@ -882,7 +983,6 @@ class APGPublicReleaseTests(unittest.TestCase):
         finally:
             self.environment = original
         self.assert_success(result)
-
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

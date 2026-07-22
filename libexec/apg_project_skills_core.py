@@ -40,13 +40,27 @@ MAX_STATE_BYTES = 64 * 1024
 MAX_EXCLUDE_BYTES = 4 * 1024 * 1024
 SKILL_NAME = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 EXPECTED_SKILLS = (
+    "agentic-praxis-grimoire-workflow",
+    "bash-language-profile",
+    "bats-test-profile",
+    "composing-approved-roadmap-assignments",
     "composing-bounded-worker-assignments",
     "debugging-systematically",
     "designing-significant-changes",
+    "go-language-profile",
     "implementing-with-test-discipline",
+    "nix-language-profile",
     "planning-repository-work",
+    "postgresql-database-profile",
+    "python-language-profile",
     "reviewing-and-verifying-repository-work",
+    "ruby-language-profile",
+    "sqlite-database-profile",
+    "synthesizing-repository-guidance",
+    "zsh-language-profile",
+    "zunit-test-profile",
 )
+KNOWN_UNMANAGED_SKILLS: tuple[str, ...] = ()
 AUTHORIZED_CONTAINERS = (".agents", ".agents/skills")
 RESTART_REMINDER = (
     "A full Codex application restart may be needed before added or removed "
@@ -210,9 +224,13 @@ def canonical_skills(root: Path) -> dict[str, Path]:
         for entry in skills_root.iterdir()
         if entry.is_dir() or entry.is_symlink()
     )
-    if tuple(directory_names) != EXPECTED_SKILLS:
+    expected_source_names = tuple(
+        sorted((*EXPECTED_SKILLS, *KNOWN_UNMANAGED_SKILLS))
+    )
+    if tuple(directory_names) != expected_source_names:
         fail(
-            "canonical skill set differs from the accepted six leaves; "
+            "canonical skill set differs from the accepted development "
+            "catalog and release distribution boundary; "
             "reconcile APG before managing a target"
         )
 

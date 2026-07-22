@@ -384,8 +384,9 @@ publication sequence. No successor roadmap epic is authorized.
   Two independent current-change-cleanup positives were materially partial and
   supported one APG-native correction to
   `implementing-with-test-discipline`.
-- **Provenance:** the captured source matches a public immutable upstream blob.
-  Its MIT declaration lacks a complete license and notice payload, so APG10
+- **Provenance:** `APG10-KARPATHY-SOURCE-01` identifies the unversioned public
+  source inspected for APG10. Its mutable locator and MIT declaration do not
+  supply a semantic revision, complete license, or notice payload, so APG10
   copies or adapts no expression and adds no guessed third-party notice.
 - **Scope:** one current leaf changes once. No root universal, other leaf,
   seventh skill, support directory, dependency, test policy, or maturity state
@@ -456,14 +457,211 @@ Completed. APG14 prepares the exact public-safe source, independently verifies
 two deterministic candidates and the isolated user lifecycle, atomically
 publishes one squashed v0.2.0 release commit and annotated tag over v0.1.0, and
 fast-forwards the existing public-backed integration source without changing
-its link ownership shape. Shell-level validation is complete; a full restart
-and fresh-session discovery smoke remain an external application observation.
+its link ownership shape. The maintainer subsequently completed the requested
+full restart and fresh-session discovery smoke and reported that it passed.
+
+## Accepted v0.3 architecture and bounded sequence
+
+APG15 proposed a synthesis-oriented capability architecture rather than
+one-to-one Codex VC migration. The maintainer accepted APG15 and
+[ADR 0011](adr/2026/07/0011-v0-3-workflow-synthesis-and-modular-guidance-architecture.md)
+through APG16. APG18 accepts
+[ADR 0012](adr/2026/07/0012-language-profile-contract-and-warning-levels.md)
+after bounded contract correction and one Python vertical slice. APG17 accepts
+[ADR 0013](adr/2026/07/0013-repository-guidance-synthesis-and-migration-dispositions.md)
+for bounded pre-rewrite guidance classification.
+
+### APG15 — v0.3 foundation design
+
+Completed and externally accepted as `Complete — v0.3 foundation architecture
+proposed`. The phase designed the public workflow router, guidance-synthesis
+candidate, ten language profiles, shared warning proposal, root-guidance
+migration, private-overlay boundary, ownership matrix, risks, and successor
+roadmap without implementing a skill or beginning release work.
+
+### APG16 — Public APG workflow router
+
+Completed in private development. The maintainer subsequently confirmed the
+requested duplicate-name discovery result: both same-name routers were visible
+and selectable in the APG repository, while only the private router was visible
+and selectable globally.
+One provisional `agentic-praxis-grimoire-workflow` router selects among the six
+stable process leaves for ambiguity, routing audit, or capability-health
+diagnosis. Twenty-one frozen scenario families passed without candidate
+correction initially; after semantic review required one bounded non-trigger
+inspection correction, 21 fresh applications reran and passed the complete
+contract. A checked skill-local map enforces future catalog disposition.
+The phase does not modify the six leaves, replace private integration,
+implement profiles or synthesis, change stable maturity, or publish.
+
+### APG17 — Repository-guidance synthesis
+
+Completed in private development. Its historical terminal outcome retained a
+pending fresh-session application smoke.
+One provisional `synthesizing-repository-guidance` leaf owns decomposition and
+bounded owner, provenance, privacy, migration, and rollback dispositions before
+rewrite. Sixteen frozen families passed with zero candidate corrections, and a
+34-unit dogfood ledger exercised every authorized source class without changing
+or removing source guidance. The router map now covers seven routable leaves;
+the six-skill v0.2 distribution contracts remain unchanged. No language profile,
+root migration, private cutover, manager-prompt skill, release, or APG18 work
+occurred.
+
+APG17A subsequently corrected two publication-excluded public-release identity
+fields without changing public state or any APG17 result. The maintainer
+deferred APG17 and APG18 application smoke to the aggregate APG23 readiness and
+APG24 release-preparation gates; that deferral does not reverse APG17
+repository acceptance.
+
+### APG18 — Language-profile foundation and Python vertical slice
+
+Completed in private development. ADR 0012 and the normative language-profile
+contract establish accessible Green/Yellow/Orange/Red responses, project-policy
+precedence, artifact classification, exception evidence, and rollback. One
+provisional `python-language-profile` passed twenty-four frozen scenarios with
+one bounded candidate correction and a seven-case read-only dogfood ledger. Private
+development contains six stable process skills and three provisional skills;
+the router map contains eight routable non-router capabilities. Public v0.2.0
+and its project, user, and release lifecycle remain six-skill contracts.
+Application smoke remains deferred to APG23/APG24. Retention of one profile
+does not authorize the remaining nine or APG19.
+
+### APG19 — Shell and shell-test profiles
+
+Completed in private development. ADR 0014 accepts separate language and
+test-harness ownership. Bash, Bats, and Zsh are `retained-provisional`; ZUnit is
+`deferred-source-or-version`. The corrected candidates use concrete monotonic
+thresholds, combined-signal crisis handling, frozen scenarios, and read-only
+dogfood. Private development contains six stable and six provisional skills,
+twelve canonical leaves and projections, and eleven routable non-router map
+entries. Public v0.2.0 and its six-skill lifecycle remain unchanged.
+
+### APG19A — Semantic phase identity and APG19 reconciliation
+
+Completed under the maintainer's two-phase authorization. ADR 0015 adopts
+globally unique semantic phase IDs, independent ADR and exit sequences,
+semantic durable references, precommit record finalization, and deterministic
+identity validation. APG19's substantive dispositions remain accepted. One
+reproduced Bats fallback-count defect is corrected for the supported comment
+function form; Bash and Zsh remain byte-identical, ZUnit remains deferred, and
+catalog, maturity, distribution, and application-smoke boundaries are
+unchanged.
+
+### APG20 — Go and Ruby profiles
+
+Completed under the maintainer's APG19A-to-APG20 assignment. Independent Go and
+Ruby candidates completed current-source research, concrete threshold design,
+frozen scenarios, and one bounded design correction each. Fresh review found
+additional material semantic, measurement, source-license, dogfood, and
+classification defects. The one-correction limit required both candidates to
+be `deferred-material-defect`; no candidate leaf or integration is retained.
+Private development remains six stable and six provisional skills, twelve
+canonical leaves and projections, and eleven routable non-router map entries.
+Public v0.2.0 and its six-skill lifecycle remain unchanged.
+
+### APG20A — Go and Ruby profile corrections
+
+Completed under the maintainer's APG20A-to-APG21 assignment. APG20A uses the
+complete APG20 defect ledger as its corrected baseline, reproduces and fixes
+the report append-lock release race, and retains corrected Go and Ruby profiles
+as provisional development skills. Both profiles pass frozen and defect-
+specific scenarios, read-only calibration, and fresh non-author review. Private
+development contains six stable and eight provisional skills, fourteen
+canonical leaves and projections, and thirteen routable non-router map entries.
+Public v0.2.0, schema version 1, and active integration remain unchanged.
+
+### APG21 — Nix and relational-engine profiles
+
+Completed under the maintainer's APG20A-to-APG21 assignment. APG21 accepts ADR
+0016, retains separate provisional PostgreSQL and SQLite profiles, and adopts
+no generic SQL owner. Nix is `deferred-material-defect` after one bounded
+correction and a second material scenario contradiction. PostgreSQL and SQLite
+pass frozen scenarios, read-only dogfood, and fresh non-author review. Private
+development contains six stable and ten provisional skills, sixteen canonical
+leaves and projections, and fifteen routable non-router map entries.
+No profile grants evaluation, build, live database, migration, activation, or
+destructive authority. Public v0.2.0, schema version 1, and active integration
+remain unchanged.
+
+### APG21A — Nix profile correction
+
+Completed under the maintainer's APG21A-to-APG22 assignment. APG21A uses the
+complete APG21 Nix defect ledger as its corrected baseline, separates structural
+merge-family breadth from semantic merge behavior, and retains the corrected
+Nix profile provisionally. One newly discovered PostgreSQL false-escalation
+contradiction is corrected with failing evidence and focused re-review; SQLite
+and router behavior remain accepted. Private development contains six stable
+and eleven provisional skills, seventeen canonical leaves and projections, and
+sixteen routable non-router map entries. Public v0.2.0, schema version 1, and
+active integration remain unchanged.
+
+### APG22 — Cross-repository dogfood and guidance migration proposal
+
+Completed under the maintainer's APG21A-to-APG22 assignment. APG22 applies the
+router, synthesis procedure, and nine retained profiles to 35 frozen read-only
+APG, RepoMap, private-classification, and public-safe synthetic cases. All
+expected dispositions match, with no behavior-bearing APG defect. Application
+discovery remains unavailable and is not inferred from explicit reading. The
+phase records bounded root and private transition proposals without performing
+a cutover, decommission, public release, active-integration mutation, or
+application smoke.
+
+### APG22A — Approved-roadmap manager assignments
+
+Completed under the maintainer's APG22A-to-APG22B assignment. APG22A retains
+`composing-approved-roadmap-assignments` provisionally after an exhaustive
+historic-corpus inventory, current native-capability review, strong ordinary-
+prompting baseline, and 30/30 frozen candidate cases. The leaf translates
+approved authority without approving, dispatching, executing, accepting, or
+continuing work. Development becomes 18/18/18 with 17 routes; the six-skill
+public v0.2 boundary remains unchanged.
+
+### APG22B — Version-bounded ZUnit profile
+
+Completed under the maintainer's APG22A-to-APG22B assignment. APG22B retains a
+provisional `zunit-test-profile` for exact ZUnit v0.8.2 with Zsh 5.9.2 in the
+tested environment. The exact ZUnit v0.8.2 with Zsh 5.3.1 pair is unsupported
+because its dependency probe does not complete. The retained leaf owns ZUnit
+runner, discovery, assertion, output, fixture, hook, isolation, and lifecycle
+judgment while pairing with the Zsh profile for shell semantics. It passes
+48/48 frozen cases with zero candidate corrections. Development becomes
+19/19/19 with 18 routes; the six-skill public v0.2 boundary remains unchanged.
+
+### APG22C — ZUnit startup-isolation evidence correction
+
+Completed under the maintainer's APG22C-to-APG23 assignment. APG22C reproduces
+that the APG22B startup sentinel was outside the path selected by `ZDOTDIR`,
+then corrects the disposable harness to require a loading positive control, a
+suppressing negative control, and sentinel absence inside the focused ZUnit
+test process. The corrected exact matrix retains ZUnit v0.8.2 with Zsh 5.9.2,
+preserves Zsh 5.3.1 as unsupported because its runner dependency probe times
+out, and leaves the ZUnit skill bytes and zero-correction count unchanged.
+Development remains 19/19/19 with 18 routes; public v0.2 remains 6/6/6.
+Application smoke and APG23 do not occur in the APG22C session.
+
+### APG23 — Individual readiness and maturity review
+
+Completed after the required full restart in a new APG-rooted session. All
+nineteen repository skills were directly discoverable and selectable, the
+duplicate workflow router was source-qualified with client path evidence, and
+all required router, synthesis, profile, and process/domain applications
+passed. Eight v0.3 rows are promoted to stable, five remain provisional, all
+thirteen are `include-v0.3`, and no behavior correction is required.
+
+### APG24 — v0.3 release candidate and publication
+
+Completed under the maintainer's explicit APG24 publication authority. ADR
+0019 expands the release, user, and project distribution contracts to the exact
+nineteen-skill v0.3.0 set while retaining schema version 1, source-specific
+user rollback, and existing project-subset ownership. Two deterministic
+candidates precede one appended public commit and annotated tag. The active
+public-backed source fast-forwards without changing aggregate-link ownership.
+The personal router remains installed, and source-qualified fresh-session
+shadow smoke remains the external terminal observation.
 
 ## Next action
 
-The accepted APG10 through APG14 v0.2 sequence is complete. No v0.3 epic,
-successor implementation, release cadence, new skill, or automatic follow-on
-phase is authorized. The smallest remaining external action is a full Codex
-restart followed by fresh-session discovery and explicit-invocation smoke; it
-is application evidence, not a new repository phase unless separately
-authorized for durable closeout.
+APG24 closes the authorized v0.3 release sequence with terminal outcome
+`published-pending-fresh-session-shadow-smoke`. The next action is only the
+explicitly requested external restart and source-qualified shadow observation.
+It does not authorize personal-router decommission or a successor phase.

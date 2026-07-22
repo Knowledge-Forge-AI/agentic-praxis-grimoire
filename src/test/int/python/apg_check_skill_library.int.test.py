@@ -145,7 +145,7 @@ class APGCheckSkillLibraryTests(unittest.TestCase):
         result = self.run_checker(None)
         self.assertEqual(result.returncode, 0, result)
         self.assertIn(
-            "6 canonical skills, 6 catalog rows, 6 projections", result.stdout
+            "19 canonical skills, 19 catalog rows, 19 projections", result.stdout
         )
 
     def test_public_v010_library_passes_when_supplied(self) -> None:

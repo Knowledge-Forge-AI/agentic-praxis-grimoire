@@ -398,10 +398,17 @@ sha256_file_for_test() {
     GIT_SHOW_REPORT_ROOT="$report_root" "$command_file" CONCURRENT "$second" status passed gate > "$output_two" 2>&1
   ) &
   pid_two=$!
-  wait "$pid_one"
-  status_one=$?
-  wait "$pid_two"
-  status_two=$?
+  status_one=0
+  wait "$pid_one" || status_one=$?
+  status_two=0
+  wait "$pid_two" || status_two=$?
+
+  if [ "$status_one" -ne 0 ]; then
+    cat "$output_one" >&3
+  fi
+  if [ "$status_two" -ne 0 ]; then
+    cat "$output_two" >&3
+  fi
 
   [ "$status_one" -eq 0 ]
   [ "$status_two" -eq 0 ]
@@ -409,6 +416,67 @@ sha256_file_for_test() {
   [ "$(grep -c '^BEGIN AGENT-REPORT-RECORD$' "$report_file")" -eq 2 ]
   [ "$(grep -c '^END AGENT-REPORT-RECORD$' "$report_file")" -eq 2 ]
   [ "$(grep -c '^RECORD-COMPLETE: true$' "$report_file")" -eq 2 ]
+  [ ! -e "$report_file.lock" ]
+}
+
+@test "git-show-report retries when a released append lock disappears" {
+  work_repo="$BATS_TEST_TMPDIR/released-lock-repo"
+  commit_hash="$(init_report_repo "$work_repo")"
+  fake_bin="$BATS_TEST_TMPDIR/fake-bin"
+  attempt_state="$BATS_TEST_TMPDIR/released-lock-attempt"
+  release_state="$BATS_TEST_TMPDIR/released-lock-observed"
+  hook_file="$BATS_TEST_TMPDIR/released-lock-hook.bash"
+  real_mkdir="$(command -v mkdir)"
+  mkdir -p "$fake_bin"
+  cat > "$fake_bin/mkdir" <<'SH'
+#!/bin/sh
+for argument do
+  case "$argument" in
+    *.report.txt.lock)
+      if [ ! -e "$AGENT_REPORT_MKDIR_ATTEMPT_STATE" ]; then
+        : > "$AGENT_REPORT_MKDIR_ATTEMPT_STATE"
+        "$AGENT_REPORT_REAL_MKDIR" "$@" || exit $?
+        exit 1
+      fi
+      ;;
+  esac
+done
+exec "$AGENT_REPORT_REAL_MKDIR" "$@"
+SH
+  chmod 700 "$fake_bin/mkdir"
+  cat > "$hook_file" <<'SH'
+APG_REPORT_LOCK_HOOK_STATE=waiting
+apg_report_release_hook() {
+  if [[ "$APG_REPORT_LOCK_HOOK_STATE" == waiting \
+    && "${BASH_COMMAND:-}" == '[ -e "$agent_report_lock_dir" ]' ]]; then
+    APG_REPORT_LOCK_HOOK_STATE=observed
+  elif [[ "$APG_REPORT_LOCK_HOOK_STATE" == observed \
+    && "${BASH_COMMAND:-}" == '[ -d "$agent_report_lock_dir" ]' ]]; then
+    APG_REPORT_LOCK_HOOK_STATE=released
+    trap - DEBUG
+    rmdir "$agent_report_lock_dir"
+    : > "$AGENT_REPORT_RELEASE_STATE"
+  fi
+}
+set -T
+trap apg_report_release_hook DEBUG
+SH
+  chmod 600 "$hook_file"
+
+  run env PATH="$fake_bin:$PATH" \
+    BASH_ENV="$hook_file" \
+    AGENT_REPORT_MKDIR_ATTEMPT_STATE="$attempt_state" \
+    AGENT_REPORT_RELEASE_STATE="$release_state" \
+    AGENT_REPORT_REAL_MKDIR="$real_mkdir" \
+    GIT_SHOW_REPORT_ROOT="$report_root" \
+    bash -c 'cd "$1" && exec "$2" RELEASED "$3" status passed gate' \
+    _ "$work_repo" "$command_file" "$commit_hash"
+
+  [ "$status" -eq 0 ]
+  [ -e "$attempt_state" ]
+  [ -e "$release_state" ]
+  report_file="$report_root/released-lock-repo/RELEASED.report.txt"
+  [ "$(grep -c '^RECORD-COMPLETE: true$' "$report_file")" -eq 1 ]
   [ ! -e "$report_file.lock" ]
 }
 

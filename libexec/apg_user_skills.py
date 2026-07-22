@@ -77,6 +77,10 @@ class SourceIdentity:
     tree: str
     skill_hashes: tuple[tuple[str, str], ...]
 
+    @property
+    def skill_names(self) -> tuple[str, ...]:
+        return tuple(name for name, _digest in self.skill_hashes)
+
     def as_dict(self) -> dict[str, object]:
         return {
             "commit": self.commit,
@@ -189,6 +193,22 @@ def frontmatter_name(path: Path) -> str:
     return names[0]
 
 
+def policy_skill_names(policy: dict[str, object]) -> tuple[str, ...]:
+    def parse_paths(key: str, pattern: str) -> tuple[str, ...]:
+        values = policy.get(key)
+        if not isinstance(values, list) or not values or values != sorted(set(values)):
+            fail(f"source public release policy {key} is malformed")
+        matches = [re.fullmatch(pattern, value) if isinstance(value, str) else None for value in values]
+        if any(match is None for match in matches):
+            fail(f"source public release policy {key} is malformed")
+        return tuple(match.group(1) for match in matches if match is not None)
+    skills = parse_paths("required_skills", r"skills/([a-z0-9]+(?:-[a-z0-9]+)*)/SKILL\.md")
+    projections = parse_paths("required_projections", r"\.agents/skills/([a-z0-9]+(?:-[a-z0-9]+)*)")
+    if skills != projections:
+        fail("source public release policy skill and projection sets disagree")
+    return skills
+
+
 def verify_source(requested: str | Path) -> SourceIdentity:
     candidate = Path(requested)
     result = run_git(candidate, ["rev-parse", "--show-toplevel"], allow_failure=True)
@@ -224,9 +244,13 @@ def verify_source(requested: str | Path) -> SourceIdentity:
     if not library_result.passed:
         diagnostic = library_result.diagnostics[0]
         fail(f"source APG skill library is invalid: {diagnostic.code} {diagnostic.path}")
+    policy_names = SKILLS
     if commit != PUBLIC_V01_COMMIT:
         try:
-            policy = public_release.load_policy(release_repository)
+            policy = public_release.load_policy(
+                release_repository,
+                expected_surfaces=public_release.audited_policy_surfaces(current_release.version),
+            )
             release_entries = public_release.tree_entries(
                 release_repository, excluded_prefix=b"private/"
             )
@@ -234,6 +258,7 @@ def verify_source(requested: str | Path) -> SourceIdentity:
             public_release.validate_public_symlinks(release_repository, release_entries)
         except public_release.ToolError as error:
             fail(f"source public release policy is invalid: {error}")
+        policy_names = policy_skill_names(policy)
     directory_names: list[str] = []
     skills_root = root / "skills"
     if skills_root.is_symlink() or not skills_root.is_dir():
@@ -241,10 +266,13 @@ def verify_source(requested: str | Path) -> SourceIdentity:
     for entry in skills_root.iterdir():
         if entry.is_dir() or entry.is_symlink():
             directory_names.append(entry.name)
-    if tuple(sorted(directory_names)) != SKILLS:
-        fail("source does not contain exactly the six canonical skills")
+    names = tuple(sorted(directory_names))
+    if not names or any(not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*", name) for name in names):
+        fail("source canonical skill set is empty or malformed")
+    if names != policy_names:
+        fail("source canonical skill set disagrees with its public release policy")
     hashes: list[tuple[str, str]] = []
-    for name in SKILLS:
+    for name in names:
         leaf = skills_root / name
         skill_file = leaf / "SKILL.md"
         if leaf.is_symlink() or not leaf.is_dir() or skill_file.is_symlink() or not skill_file.is_file():
@@ -435,7 +463,9 @@ def parse_source(value: object) -> SourceIdentity:
     if any(not isinstance(value[key], str) for key in ("commit", "path", "tag", "tree", "version")):
         fail("user state source identity types are malformed")
     hashes = value["skill_hashes"]
-    if not isinstance(hashes, dict) or tuple(sorted(hashes)) != SKILLS:
+    if not isinstance(hashes, dict) or not hashes:
+        fail("user state source skill hashes are malformed")
+    if any(not isinstance(name, str) or not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*", name) for name in hashes):
         fail("user state source skill hashes are malformed")
     if any(not isinstance(member, str) or not re.fullmatch(r"[0-9a-f]{64}", member) for member in hashes.values()):
         fail("user state source skill hashes are malformed")
@@ -482,8 +512,9 @@ def read_state(path: Path) -> State | None:
         fail("user state skills root is malformed")
     if os.path.normpath(value["skills_root"]) != value["skills_root"]:
         fail("user state skills root is not canonical")
+    current = parse_source(value["current_source"])
     managed = value["managed_skills"]
-    if managed != list(SKILLS):
+    if managed != list(current.skill_names):
         fail("user state managed skill list is malformed")
     containers = value["created_containers"]
     if not isinstance(containers, list):
@@ -502,7 +533,7 @@ def read_state(path: Path) -> State | None:
     previous = None if value["previous_source"] is None else parse_source(value["previous_source"])
     return State(
         value["skills_root"],
-        parse_source(value["current_source"]),
+        current,
         previous,
         tuple(managed),
         parsed_containers,
@@ -550,7 +581,7 @@ def exact_links(root: Path, source: SourceIdentity) -> None:
     verify_existing_ancestors(root)
     if not root.is_dir() or root.is_symlink():
         fail("managed user skill root is missing or unsafe")
-    for name in SKILLS:
+    for name in source.skill_names:
         link = root / name
         if not os.path.lexists(link):
             fail(f"managed user skill link is missing: {name}")
@@ -591,8 +622,8 @@ def create_containers(root: Path) -> tuple[ContainerIdentity, ...]:
     return tuple(created)
 
 
-def preflight_absent(root: Path) -> None:
-    for name in SKILLS:
+def preflight_absent(root: Path, names: Sequence[str]) -> None:
+    for name in names:
         path = root / name
         if os.path.lexists(path):
             fail(f"unmanaged or conflicting user skill path exists: {name}; use adopt only for exact links")
@@ -601,7 +632,7 @@ def preflight_absent(root: Path) -> None:
 def create_links(root: Path, source: SourceIdentity) -> None:
     created: list[Path] = []
     try:
-        for name in SKILLS:
+        for name in source.skill_names:
             link = root / name
             link.symlink_to(Path(source.path) / "skills" / name, target_is_directory=True)
             created.append(link)
@@ -615,7 +646,7 @@ def verify_adoptable(root: Path, source: SourceIdentity) -> None:
     verify_existing_ancestors(root)
     if not root.is_dir() or root.is_symlink():
         fail("user skill root is missing or unsafe for adoption")
-    for name in SKILLS:
+    for name in source.skill_names:
         link = root / name
         if not link.is_symlink():
             fail(f"adoption requires an exact existing symbolic link: {name}")
@@ -631,31 +662,74 @@ def verify_adoptable(root: Path, source: SourceIdentity) -> None:
 
 def replace_links(root: Path, old: SourceIdentity, new: SourceIdentity) -> None:
     exact_links(root, old)
-    for name in SKILLS:
+    old_names = set(old.skill_names)
+    new_names = set(new.skill_names)
+    common = tuple(sorted(old_names & new_names))
+    added = tuple(sorted(new_names - old_names))
+    removed = tuple(sorted(old_names - new_names))
+    for name in added:
+        if os.path.lexists(root / name):
+            fail(f"unmanaged or conflicting user skill path exists: {name}")
+    for name in sorted(old_names | new_names):
         for suffix in ("new", "rollback"):
             temporary = root / f".{name}.apg-user-skills-{suffix}"
             if os.path.lexists(temporary):
                 fail(f"interrupted temporary link requires inspection: {temporary.name}")
+    staged: list[Path] = []
     replaced: list[str] = []
+    installed: list[str] = []
+    unlinked: list[str] = []
     try:
-        for name in SKILLS:
-            link = root / name
+        for name in (*common, *added):
             temporary = root / f".{name}.apg-user-skills-new"
             temporary.symlink_to(Path(new.path) / "skills" / name, target_is_directory=True)
-            os.replace(temporary, link)
+            staged.append(temporary)
+        for name in common:
+            os.replace(root / f".{name}.apg-user-skills-new", root / name)
             replaced.append(name)
+        for name in added:
+            os.replace(root / f".{name}.apg-user-skills-new", root / name)
+            installed.append(name)
+        for name in removed:
+            (root / name).unlink()
+            unlinked.append(name)
     except (OSError, ToolError) as error:
-        for name in reversed(replaced):
+        rollback_errors: list[str] = []
+        for name in reversed(unlinked):
             link = root / name
+            try:
+                if os.path.lexists(link):
+                    rollback_errors.append(f"removed link changed concurrently: {name}")
+                else:
+                    link.symlink_to(Path(old.path) / "skills" / name, target_is_directory=True)
+            except OSError as rollback_error:
+                rollback_errors.append(f"removed link restore failed for {name}: {rollback_error}")
+        for name in reversed(installed):
+            link = root / name
+            try:
+                if link.is_symlink() and os.readlink(link) == str(Path(new.path) / "skills" / name):
+                    link.unlink()
+                else:
+                    rollback_errors.append(f"added link changed concurrently: {name}")
+            except OSError as rollback_error:
+                rollback_errors.append(f"added link cleanup failed for {name}: {rollback_error}")
+        for name in reversed(replaced):
             temporary = root / f".{name}.apg-user-skills-rollback"
-            temporary.symlink_to(Path(old.path) / "skills" / name, target_is_directory=True)
-            os.replace(temporary, link)
-        if isinstance(error, ToolError):
-            raise
-        fail(f"user skill update failed and prior links were restored: {error.strerror}")
+            try:
+                temporary.symlink_to(Path(old.path) / "skills" / name, target_is_directory=True)
+                os.replace(temporary, root / name)
+            except OSError as rollback_error:
+                rollback_errors.append(f"link restore failed for {name}: {rollback_error}")
+        if rollback_errors:
+            fail("user skill transition failed and rollback was incomplete: " + "; ".join(rollback_errors))
+        detail = str(error) if isinstance(error, ToolError) else error.strerror
+        fail(f"user skill transition failed and prior links were restored: {detail}")
+    finally:
+        for temporary in staged:
+            temporary.unlink(missing_ok=True)
 
 
-def repository_duplicates(requested: str | None) -> tuple[str, ...]:
+def repository_duplicates(requested: str | None, names: Sequence[str]) -> tuple[str, ...]:
     if not requested:
         return ()
     path = Path(requested)
@@ -676,7 +750,7 @@ def repository_duplicates(requested: str | None) -> tuple[str, ...]:
     for scope in scopes:
         if not scope.is_dir() or scope.is_symlink():
             continue
-        for name in SKILLS:
+        for name in names:
             skill_file = scope / name / "SKILL.md"
             if skill_file.is_file():
                 try:
@@ -690,11 +764,11 @@ def repository_duplicates(requested: str | None) -> tuple[str, ...]:
 def render_source(identity: SourceIdentity, output_format: str) -> str:
     if output_format == "json":
         return json.dumps(
-            {"schema_version": 1, "skills": list(SKILLS), "source": identity.as_dict()},
+            {"schema_version": 1, "skills": list(identity.skill_names), "source": identity.as_dict()},
             separators=(",", ":"),
             sort_keys=True,
         ) + "\n"
-    return "\n".join(SKILLS) + "\n"
+    return "\n".join(identity.skill_names) + "\n"
 
 
 def do_install(source: SourceIdentity, root: Path, state_path: Path) -> str:
@@ -708,13 +782,13 @@ def do_install(source: SourceIdentity, root: Path, state_path: Path) -> str:
     created = create_containers(root)
     links_created = False
     try:
-        preflight_absent(root)
+        preflight_absent(root, source.skill_names)
         create_links(root, source)
         links_created = True
-        atomic_state_write(state_path, State(str(root), source, None, SKILLS, created))
+        atomic_state_write(state_path, State(str(root), source, None, source.skill_names, created))
     except Exception:
         if links_created:
-            for name in SKILLS:
+            for name in source.skill_names:
                 link = root / name
                 if link.is_symlink() and os.readlink(link) == str(Path(source.path) / "skills" / name):
                     link.unlink()
@@ -724,7 +798,7 @@ def do_install(source: SourceIdentity, root: Path, state_path: Path) -> str:
             except OSError:
                 pass
         raise
-    return f"PASS installed six user skills. {RESTART_REMINDER}"
+    return f"PASS installed {len(source.skill_names)} user skills. {RESTART_REMINDER}"
 
 
 def do_adopt(source: SourceIdentity, root: Path, state_path: Path) -> str:
@@ -735,8 +809,8 @@ def do_adopt(source: SourceIdentity, root: Path, state_path: Path) -> str:
             return "PASS user skills already adopted; no discovery state changed."
         fail("existing user state belongs to another root or source")
     verify_adoptable(root, source)
-    atomic_state_write(state_path, State(str(root), source, None, SKILLS, ()))
-    return f"PASS adopted six exact user skill links. {RESTART_REMINDER}"
+    atomic_state_write(state_path, State(str(root), source, None, source.skill_names, ()))
+    return f"PASS adopted {len(source.skill_names)} exact user skill links. {RESTART_REMINDER}"
 
 
 def do_check(root: Path, state_path: Path, repo: str | None, output_format: str) -> str:
@@ -747,7 +821,7 @@ def do_check(root: Path, state_path: Path, repo: str | None, output_format: str)
         fail("user state belongs to another skill root")
     source_matches(state.current_source)
     exact_links(root, state.current_source)
-    duplicates = repository_duplicates(repo)
+    duplicates = repository_duplicates(repo, state.managed_skills)
     if output_format == "json":
         return json.dumps(
             {
@@ -779,11 +853,12 @@ def do_update(source: SourceIdentity, root: Path, state_path: Path) -> str:
         fail("update requires a distinct public release source")
     replace_links(root, state.current_source, source)
     try:
-        atomic_state_write(state_path, State(str(root), source, state.current_source, SKILLS, state.created_containers))
+        desired = State(str(root), source, state.current_source, source.skill_names, state.created_containers)
+        atomic_state_write(state_path, desired)
     except Exception:
         replace_links(root, source, state.current_source)
         raise
-    return f"PASS updated six user skills to {source.tag}. {RESTART_REMINDER}"
+    return f"PASS updated {len(source.skill_names)} user skills to {source.tag}. {RESTART_REMINDER}"
 
 
 def do_rollback(source_argument: str | None, root: Path, state_path: Path) -> str:
@@ -811,11 +886,12 @@ def do_rollback(source_argument: str | None, root: Path, state_path: Path) -> st
         fail("rollback source does not match the recorded previous release")
     replace_links(root, state.current_source, desired)
     try:
-        atomic_state_write(state_path, State(str(root), desired, state.current_source, SKILLS, state.created_containers))
+        next_state = State(str(root), desired, state.current_source, desired.skill_names, state.created_containers)
+        atomic_state_write(state_path, next_state)
     except Exception:
         replace_links(root, desired, state.current_source)
         raise
-    return f"PASS rolled back six user skills to {desired.tag}. {RESTART_REMINDER}"
+    return f"PASS rolled back {len(desired.skill_names)} user skills to {desired.tag}. {RESTART_REMINDER}"
 
 
 def do_uninstall(root: Path, state_path: Path) -> str:
@@ -828,14 +904,14 @@ def do_uninstall(root: Path, state_path: Path) -> str:
     exact_links(root, state.current_source)
     removed: list[str] = []
     try:
-        for name in SKILLS:
+        for name in state.managed_skills:
             (root / name).unlink()
             removed.append(name)
+        state_path.unlink()
     except OSError as error:
         for name in removed:
             (root / name).symlink_to(Path(state.current_source.path) / "skills" / name, target_is_directory=True)
         fail(f"uninstall failed and removed links were restored: {error.strerror}")
-    state_path.unlink()
     for identity in sorted(state.created_containers, key=lambda item: len(Path(item.path).parts), reverse=True):
         container = Path(identity.path)
         try:
@@ -851,16 +927,16 @@ def do_uninstall(root: Path, state_path: Path) -> str:
                 container.rmdir()
         except OSError:
             pass
-    return f"PASS uninstalled six owned user skills. {RESTART_REMINDER}"
+    return f"PASS uninstalled {len(state.managed_skills)} owned user skills. {RESTART_REMINDER}"
 
 
 def parser() -> argparse.ArgumentParser:
     root = argparse.ArgumentParser(
         prog=COMMAND,
-        description="Manage six direct user-scoped APG skill links from a verified public release.",
+        description="Manage direct user-scoped APG skill links from a verified public release.",
     )
     subcommands = root.add_subparsers(dest="operation", required=True)
-    list_parser = subcommands.add_parser("list", help="list six skills from a verified public source")
+    list_parser = subcommands.add_parser("list", help="list skills from a verified public source")
     list_parser.add_argument("--source", required=True)
     list_parser.add_argument("--skills-root")
     list_parser.add_argument("--format", choices=("text", "json"), default="text")

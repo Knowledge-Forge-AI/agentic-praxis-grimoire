@@ -56,11 +56,11 @@ Public artifacts remain complete without that record and do not link to it.
 
 | Source class | Public treatment |
 | --- | --- |
-| Maintainer-authored agent and engineering practices | Generalize the source family publicly; retain exact unpublished identity and paths only in publication-excluded provenance. Ownership supplies adoption authority, not a public license grant. |
+| Maintainer-authored agent and engineering practices | Generalize the source family publicly; use semantic source classes and phase-local evidence IDs in tracked publication-excluded provenance. Exact Git identities remain report or transient evidence. Ownership supplies adoption authority, not a public license grant. |
 | RepoMap | Use the canonical public identity `repo-map`; cite public-intended architecture and contributor practices without exposing its private development lineage. Do not infer a license from an ADR or ownership alone. |
 | Superpowers | External source under the MIT License. Preserve the included copyright and license notice for copied or adapted material. Synthesized or inspired use still records provenance. |
-| Experimental Karpathy Guidelines | Reference evidence whose inspected frontmatter declares MIT. Treat that declaration separately from verified upstream identity, immutable version, copyright, full license text, and notice obligations. APG10 must complete that review before copied or adapted use. |
-| Agent Skills specification | Genuinely public compatibility evidence. Retain a verified public immutable pin when it materially defines the supported leaf shape. |
+| Experimental Karpathy Guidelines | Reference evidence whose inspected frontmatter declares MIT. Treat that declaration separately from verified upstream identity, semantic revision, copyright, full license text, and notice obligations. APG10 must complete that review before copied or adapted use. |
+| Agent Skills specification | Genuinely public compatibility evidence. Record a semantic revision when published; otherwise use a phase-local source ID, public locator, inspection date, and mutability limitation. |
 | Official Codex skill documentation | Genuinely public harness evidence. Record the inspection date when current discovery behavior materially defines a projection. |
 | APG's own tools and documents | Project-authored material distributed under AGPL-3.0-or-later, with separate commercial licensing available from the Project Steward. |
 
@@ -112,7 +112,10 @@ derived section. Use additional records when licenses or derivation modes differ
 practice_id: <stable-semantic-id>
 source_family: <public-source-or-generalized-maintainer-family>
 public_source_identity: <owner/repository-or-not-public>
-public_source_version: <immutable-public-version-or-not-applicable>
+public_source_version: <semantic-public-version-or-not-applicable>
+phase_local_source_id: <stable-phase-local-id-or-not-applicable>
+inspection_date: <YYYY-MM-DD>
+revision_limitations: <mutability-or-unversioned-limitation-or-none>
 public_source_paths:
   - <publicly-resolvable-path-or-not-applicable>
 source_ownership: <maintainer-authored|external>
@@ -138,16 +141,19 @@ private_evidence_retained: <yes|no>
 | Manager-worker coordination | Maintainer-authored orchestration examples; RepoMap bounded work orders | Synthesized | `docs/manager-worker-protocol.md` | Adopted and corrected by ADR 0001 |
 | Agent skill leaf compatibility | Agent Skills specification | Synthesized | `skills/README.md` | Adopted |
 
-The Agent Skills compatibility basis remains pinned to the public
-[`agentskills/agentskills` specification](https://github.com/agentskills/agentskills/blob/38a2ff82958afee88dadf4831509e6f7e9d8ef4e/docs/specification.mdx).
-APG11 re-evaluated the immutable source's rights boundary. The specification is
-documentation under the repository's
-[`docs/LICENSE`](https://github.com/agentskills/agentskills/blob/38a2ff82958afee88dadf4831509e6f7e9d8ef4e/docs/LICENSE),
+The Agent Skills compatibility basis is `APG0-AGENT-SKILLS-SOURCE-01`, the
+public [Agent Skills specification](https://agentskills.io/specification),
+inspected on 2026-07-18. The source publishes no semantic specification
+revision, so the phase-local ID and inspection date identify APG's evidence
+without claiming that the public page is immutable. APG11 re-evaluated its
+rights boundary. The specification is documentation under the repository's
+[`docs/LICENSE`](https://github.com/agentskills/agentskills/blob/main/docs/LICENSE),
 which contains Creative Commons Attribution 4.0 International; repository code
 is separately Apache-2.0. APG copies or adapts no specification expression or
 upstream code. It independently implements compatible format facts and
-project-authored constraints, with the pin providing source and license
-attribution. No bundled third-party notice is required for that synthesized
+project-authored constraints, with the phase-local source ID, locator, date,
+and license link providing source and rights attribution. No bundled
+third-party notice is required for that synthesized
 use. Future copied or adapted use must separately satisfy the applicable
 license and attribution duties. Exact maintainer-source snapshots and path
 mappings remain publication excluded.
@@ -350,13 +356,14 @@ without those records.
 ## APG10 public disposition summary
 
 APG10 resolves the experimental Karpathy Guidelines source as public external
-evidence with incomplete copied-or-adapted reuse evidence. The captured file is
-byte-identical to
+evidence with incomplete copied-or-adapted reuse evidence.
+`APG10-KARPATHY-SOURCE-01` identifies the captured source inspected on
+2026-07-19 at the public
 [`multica-ai/andrej-karpathy-skills`](https://github.com/multica-ai/andrej-karpathy-skills)
-at immutable commit
-[`64723a49ea6117894304eb491f0d32a60570bf45`](https://github.com/multica-ai/andrej-karpathy-skills/commit/64723a49ea6117894304eb491f0d32a60570bf45).
-The leaf and README declare MIT, but that tree contains no complete license
-text, explicit copyright notice, or notice file.
+repository. That source had no semantic release or stable specification
+revision, so the repository locator is mutable and the phase-local ID does not
+claim immutability. The inspected leaf and README declared MIT, but the source
+contained no complete license text, explicit copyright notice, or notice file.
 
 | Practice | Public source families | Mode | Destination | Lifecycle status | Maturity effect |
 | --- | --- | --- | --- | --- | --- |
@@ -378,21 +385,22 @@ and ADR are complete without them.
 ## APG11 public disposition summary
 
 APG11 synthesizes repeated project-authored practice from APG4 through APG10.
-It copies or adapts no external skill-authoring methodology. The pinned Agent
-Skills specification informs only compatible metadata, name, directory, and
+It copies or adapts no external skill-authoring methodology.
+`APG0-AGENT-SKILLS-SOURCE-01`, its public locator, inspection date, and stated
+revision limitation inform only compatible metadata, name, directory, and
 relative-reference constraints; APG's additional leaf headings, catalog, and
 projection rules are project-authored requirements.
 
 The specification path is CC BY 4.0 documentation, while upstream repository
 code is Apache-2.0. APG11 imports neither expressive documentation nor code;
-the public immutable pin and license link identify the influence. No bundled
-license or notice text is added for the independently written compatibility
-implementation.
+the phase-local source ID, public locator, inspection date, limitation, and
+license link identify the influence. No bundled license or notice text is added
+for the independently written compatibility implementation.
 
 | Practice | Public source families | Mode | Destination | Lifecycle status | Maturity effect |
 | --- | --- | --- | --- | --- | --- |
 | Skill-specific authoring and maintenance lifecycle | APG4 bootstrap; APG6 frontmatter correction; APG7/APG7A executable work; APG9 reconciliation; APG10 behavior correction; project model and provenance policy | Synthesized project procedure | ADR 0008; `docs/skill-authoring-and-maintenance.md` | Adopted after independent lifecycle, invariant, ledger, design, and resulting-state review | None; all six skills remain `provisional` |
-| Mechanical APG skill-library validation | Repeated canonical shape, metadata, headings, catalog, link-containment, and checked-in projection checks; pinned Agent Skills specification | Project-authored implementation | `bin/apg-check-skill-library`; standard-library helper; focused unit and integration tests | Adopted for mechanical invariants after failing-first evidence, correction, and development/public dogfood | None |
+| Mechanical APG skill-library validation | Repeated canonical shape, metadata, headings, catalog, link-containment, and checked-in projection checks; `APG0-AGENT-SKILLS-SOURCE-01` compatibility evidence | Project-authored implementation | `bin/apg-check-skill-library`; standard-library helper; focused unit and integration tests | Adopted for mechanical invariants after failing-first evidence, correction, and development/public dogfood | None |
 | Legacy roadmap terminal ledger | Pre-APG9 candidate and deferred themes; ADR 0006 owners and terminal conditions; APG9/APG10 outcomes | Synthesized reconciliation | `docs/legacy-roadmap-closure.md`; APG11 evaluation and exit | Adopted with 24 stable identities and explicit composite sub-dispositions | None |
 
 The checker does not establish source rights, provenance truth, semantic
@@ -486,3 +494,384 @@ copies no expression. Exact private source, public object, link, command, and
 report identities remain publication excluded. The full-restart fresh-session
 smoke is an external application observation and is not inferred from
 shell-level release evidence.
+
+## APG15 proposal provenance
+
+APG15 proposes architecture and candidate owners without implementing or
+adopting source-derived procedure. It synthesizes from accepted APG policy and
+history, a private maintainer-authored APG router and engineering guidance,
+representative multi-language repository practice, and primary upstream
+language, framework, and database documentation inspected on 2026-07-20.
+
+| Practice | Public source families | Mode | Destination | Lifecycle status | Maturity effect |
+| --- | --- | --- | --- | --- | --- |
+| Public APG routing and synthesis-first guidance migration | Accepted APG leaf, ownership, lifecycle, and provenance policy; generalized private integration behavior | Independently written proposal synthesis | ADR 0011 and APG15 evaluation | ADR 0011 accepted; router and synthesis later adopted separately through APG16 and APG17 | None |
+| Shared profile contract and Green, Yellow, Orange, and Red warning semantics | Maintainer-authored guidance; representative real repository practice; primary upstream documentation | Independently written proposal synthesis | Proposed ADR 0012 and APG15 evaluation | Proposed; no profile implemented | None |
+| Ten language and framework profile candidates | Python, Bash, Bats, Go, Ruby, Zsh, ZUnit, Nix, PostgreSQL, and SQLite primary documentation plus generalized local practice | Candidate inventory; no retained procedure text | Proposed ADRs 0011 and 0012 | Inventory only; each needs separate evaluation | None |
+
+Exact private paths, repository identities, machine policy, and source topology
+remain publication excluded. APG15 copies or adapts no external or private
+expression, introduces no code or dependency, and creates no notice payload.
+Future implementation phases must record relevant semantic source versions or
+dated phase-local source IDs with explicit limitations and complete rights
+review for their actual derivation mode.
+
+## APG16 public-router disposition summary
+
+APG16 uses independently written public expression. Generalized
+maintainer-authored private routing practice informed the problem statement and
+candidate requirements, but no private wording, path, repository identity,
+topology, installed-tool state, or personal guidance is copied or exposed.
+
+Current official Codex skill documentation was inspected on 2026-07-20 at
+[`learn.chatgpt.com/docs/build-skills.md`](https://learn.chatgpt.com/docs/build-skills.md).
+It informs repository- and user-scoped discovery, explicit and model-selected
+skill use, symlink support, duplicate-name non-merging, and refresh or restart
+behavior. APG copies or adapts no OpenAI documentation expression or
+implementation.
+
+| Practice | Public source families | Mode | Destination | Lifecycle status | Maturity effect |
+| --- | --- | --- | --- | --- | --- |
+| Optional APG ambiguity, routing-audit, and capability-health selection | Accepted ADR 0011; six stable APG trigger boundaries; frozen APG16 native and private capability baselines | Independently written synthesis | `skills/agentic-praxis-grimoire-workflow/SKILL.md`; APG16 evaluation | Adopted after 21 frozen applications, exact-map validation, and independent review | New router begins `provisional`; six stable leaves unchanged |
+| Schema-version-1 skill-local capability map | Current public APG catalog and accepted support-file ownership | Project-authored deterministic metadata | Router `references/capability-map.json`; focused standard-library unit test | Adopted with exact current routable-catalog coverage and self-exclusion | None |
+
+Exact private source identity, hashes, source topology, worker returns, and
+duplicate-name observations remain publication excluded. The public skill has
+no third-party code, dependency, runtime, notice payload, or private evidence
+dependency.
+
+## APG17 guidance-synthesis disposition summary
+
+APG17 uses independently written public expression. A bounded sample of
+maintainer-authored private guidance and historic prompts supplied problem,
+privacy, ownership, and migration evidence without contributing copied wording
+or a public dependency on private topology. Raw sensitive guidance was neither
+inspected for content nor retained.
+
+Current official Codex skill documentation was inspected on 2026-07-20 at
+[`learn.chatgpt.com/docs/build-skills.md`](https://learn.chatgpt.com/docs/build-skills.md).
+It informs the technical authoring, repository discovery, symlink, explicit
+selection, refresh, and focused-skill boundary. Native technical skill
+authoring and APG lifecycle governance remain distinct from pre-rewrite corpus
+classification. APG copies or adapts no OpenAI documentation expression or
+implementation.
+
+| Practice | Public source families | Mode | Destination | Lifecycle status | Maturity effect |
+| --- | --- | --- | --- | --- | --- |
+| Mixed-guidance decomposition and bounded disposition before rewrite | Accepted APG project model, provenance policy, authoring lifecycle, sixteen frozen APG17 families, and sanitized maintainer-authored source classifications | Independently written synthesis | `skills/synthesizing-repository-guidance/SKILL.md`; ADR 0013; APG17 evaluation | Adopted after frozen applications, bounded 34-unit dogfood, exact-map validation, and independent review | New synthesis leaf begins `provisional`; existing maturities unchanged |
+| Seven-entry routable capability map | Current eight-row development catalog and accepted router support-file ownership | Project-authored deterministic metadata | Router `references/capability-map.json`; focused standard-library tests | Adopted with exact routable-catalog coverage, self-exclusion, and a mixed-guidance route | None |
+
+The historic manager-prompt corpus supports only a future-candidate
+recommendation; no final skill name, prompt, or implementation is derived from
+it. Language-specific units remain profile candidates while ADR 0012 is
+`Proposed`. Exact private source identities, hashes, unit ledgers, and worker
+returns remain publication excluded. APG17 adds no third-party code,
+dependency, runtime, notice payload, source migration, or private cutover.
+
+## APG17A record-correction provenance
+
+APG17A corrects two publication-excluded public-release identity fields from
+APG17 using the accepted APG14 record, live public refs, a fresh checkout, and
+the unchanged active public-backed checkout. The public release is unchanged,
+and the correction introduces no source expression, dependency, notice duty,
+skill change, maturity change, migration, or external mutation.
+
+The corresponding publishable notes contain no private object identities. The
+maintainer's smoke deferral is recorded as a subsequent external disposition,
+not as new technical evidence or a reversal of APG17 acceptance.
+
+## APG18 Python-profile disposition summary
+
+APG18 uses independently written public expression. Current Python 3.14.6
+language and standard-library documentation, PEPs, the Python Packaging User
+Guide, Pylint 4.0.6, current Ruff settings, Radon 6.0.1, generalized
+maintainer-authored guidance, and read-only code distributions supplied
+semantic and calibration evidence. No external or private wording, table
+structure, or code was copied or adapted.
+
+Python documentation is available under the PSF License Version 2, with
+documentation examples additionally available under 0BSD. The inspected PEPs
+state public-domain or current PEP reuse terms. The Python Packaging User Guide
+is CC BY-SA 3.0. Pylint is GPL-2.0, Ruff is MIT, and Radon is MIT. APG cites
+facts and produces independent synthesis; it incorporates no third-party code,
+runtime dependency, or notice payload.
+
+| Practice | Public source families | Mode | Destination | Lifecycle status | Maturity effect |
+| --- | --- | --- | --- | --- | --- |
+| Accessible language-profile warning and project-precedence contract | Accepted APG architecture; generalized maintainer evidence; false-escalation review | Independently written synthesis | ADR 0012; `docs/language-profile-contract.md` | Accepted after bounded correction, frozen scenarios, and independent review | None |
+| Python structural thresholds and semantic response procedure | Python 3.14.6 documentation and PEPs; Pylint 4.0.6; current Ruff settings; Radon 6.0.1; generalized real-code distributions | Independently written synthesis | `skills/python-language-profile/SKILL.md`; APG18 evaluation | Adopted after 24/24 corrected-candidate scenarios, seven-case read-only dogfood, focused tests, and independent review | New Python profile begins `provisional`; existing maturities unchanged |
+| Eight-entry routable capability map | Current nine-row development catalog and accepted router support-file ownership | Project-authored deterministic metadata | Router `references/capability-map.json`; focused standard-library tests | Adopted with exact routable-catalog coverage, self-exclusion, Python route, and process/domain pairing | None |
+
+Exact private source identities, local paths, private preference values,
+distribution hashes, file-level dogfood, and worker returns remain publication
+excluded. Framework, formatter, linter, type checker, test runner, Python
+version, package manager, deployment, dependencies, and accepted exceptions
+remain target-repository policy. APG18 performs no source migration, root
+cutover, private skill removal, public release, or fresh-session application
+smoke.
+
+## APG19 Shell-profile disposition summary
+
+APG19 uses independently written expression. GNU Bash 5.3 documentation and
+patches, ShellCheck 0.11.0 factual rule evidence, bats-core 1.13.0 documentation
+and source, the official Zsh 5.9.2 release and manual, ZUnit v0.8.2 historical
+source and documentation, generalized private guidance classifications, and
+read-only code/test distributions supplied semantic and calibration evidence.
+No external or private wording, code, table structure, project command, or
+machine state was copied or adapted.
+
+Bash is GPL-3.0-or-later and its manual is GFDL-1.3-or-later without invariant
+sections or cover texts. ShellCheck is GPL-3.0. bats-core and ZUnit are MIT.
+Zsh uses its permissive distribution notice with file-specific terms for some
+contributions. These sources are factual evidence, not dependencies or
+mandated project tools.
+
+| Practice | Public source families | Mode | Destination | Lifecycle status | Maturity effect |
+| --- | --- | --- | --- | --- | --- |
+| Separate shell-language and test-harness ownership | Current Bash, Bats, Zsh, and historical ZUnit semantics; APG warning contract; private-guidance classification | Independently written synthesis | ADR 0014; APG19 evaluation | Bash, Bats, and Zsh retained; ZUnit deferred on source/version evidence | Three new profiles begin `provisional` |
+| Bash structural and semantic response procedure | GNU Bash 5.3; current patches; ShellCheck 0.11.0 facts; read-only distributions | Independently written synthesis | `skills/bash-language-profile/SKILL.md` | Adopted after frozen scenarios, one correction, dogfood, focused tests, and review | Existing maturities unchanged |
+| Bats structural and harness response procedure | bats-core 1.13.0 documentation/source; read-only suites | Independently written synthesis | `skills/bats-test-profile/SKILL.md` | Adopted after frozen scenarios, one correction, dogfood, focused tests, and review | Existing maturities unchanged |
+| Zsh structural and semantic response procedure | Official Zsh 5.9.2 manual/release; read-only distributions | Independently written synthesis | `skills/zsh-language-profile/SKILL.md` | Adopted after tightened thresholds, frozen scenarios, one correction, dogfood, focused tests, and review | Existing maturities unchanged |
+| ZUnit ownership reservation and re-entry condition | Canonical v0.8.2 and historical Zsh support evidence | Factual disposition only | ADR 0014; APG19 evaluation | `deferred-source-or-version`; no skill artifact | None |
+| Eleven-entry routable capability map | Current twelve-row development catalog and accepted router support-file ownership | Project-authored deterministic metadata | Router `references/capability-map.json`; focused standard-library tests | Exact routable-catalog coverage and self-exclusion | None |
+
+Exact private paths, hashes, worker returns, local version state, and file-level
+dogfood remain publication excluded. Exact interpreters, runners, tools,
+commands, platforms, CI, coverage, and accepted exceptions remain repository
+policy. APG19 performs no private-source migration, root reduction, public
+release, active-integration change, dependency addition, or application smoke.
+
+## APG19A semantic-identity reconciliation summary
+
+APG19A accepts APG19's substantive dispositions and adopts ADR 0015. Tracked
+public and publication-excluded records now use semantic phase, ADR, exit,
+release, source-version, and phase-local evidence identities. Exact Git objects
+remain owned by managed reports and transient verification output.
+
+One reproduced Bats defect required a forward correction: the structural test
+count now includes the supported comment function form as runner-recognized
+tests without authorizing target evaluation merely to count them. Bash and Zsh
+remain byte-identical; ZUnit remains `deferred-source-or-version`. The
+correction uses independently written expression based on bats-core v1.13.0
+documentation and changes no license, dependency, maturity, catalog shape,
+distribution contract, or application-smoke boundary.
+
+The public source basis for APG's identity policy is project-authored governance
+and historical APG record practice. The policy, guide, standard-library checker,
+tests, evaluation, and exit copy or adapt no third-party expression.
+
+| Practice | Public source families | Mode | Destination | Lifecycle status | Maturity effect |
+| --- | --- | --- | --- | --- | --- |
+| Semantic phase identity, independent record sequences, durable references, and precommit finalization | APG governance and historical record practice | Project-authored policy synthesis | ADR 0015; phase and record identity guide; instructions and current owners | Adopted by APG19A after identity audit and non-author review | None |
+| Deterministic phase and record identity validation | ADR 0015 mechanical invariants; existing standard-library command conventions | Project-authored implementation | `apg-check-record-identity`; helper; focused integration tests; public-release validation | Adopted after failing-first evidence and resulting-tree validation | None |
+| Supported Bats comment-form test counting | bats-core v1.13.0 documentation; APG19 Bats profile and frozen evidence | Independently written correction | `skills/bats-test-profile/SKILL.md`; APG19A evaluation | One forward correction after reproduced undercount and focused review | Existing `provisional` maturity unchanged |
+
+## APG20 Go and Ruby profile disposition summary
+
+APG20 uses independently written expression. Go 1.26.5, the Go 1.26 language
+specification, compatibility and memory-model documents, standard-library and
+module documentation, and first-party parser, vet, testing, and diagnostics
+supplied Go facts. Ruby 4.0.6, Ruby 4.0 language/core/standard-library/security
+documentation, maintenance and compatibility material, and RubyGems/Bundler
+4.0.16 supplied Ruby facts. golangci-lint v2.12.2 and RuboCop 1.87 were factual
+threshold-calibration evidence only. Generalized private guidance and read-only
+Go 1.26.5 and Ruby 4.0.6 distributions supplied false-escalation and semantic
+evidence. No external or private wording, code, or table structure was copied
+or adapted.
+
+Ordinary Go website prose is generally available under CC BY 4.0 except where
+noted; displayed code and Go source-distribution content use BSD terms;
+third-party modules retain their own licenses. golangci-lint code is GPL-3.0.
+Ruby is available under the Ruby License or 2-clause BSD subject to
+file-specific `LEGAL` exceptions; RubyGems/Bundler source is available under
+MIT or its Ruby-like terms; RuboCop documentation is CC BY-SA 4.0. These are
+evidence sources, not runtime dependencies or mandated project tools.
+
+| Practice | Public source families | Mode | Destination | Lifecycle status | Maturity effect |
+| --- | --- | --- | --- | --- | --- |
+| Proposed Go language-profile ownership | Go 1.26.5 semantics, compatibility, memory model, modules, standard library, diagnostics, and calibrated real-code distributions | Independently written evaluation evidence | APG20 evaluation and publication-excluded calibration | `deferred-material-defect` after one correction and additional material final-review findings; no leaf retained | None |
+| Proposed Ruby language-profile ownership | Ruby 4.0.6 semantics, compatibility, RubyGems/Bundler, security guidance, and calibrated real-code distributions | Independently written evaluation evidence | APG20 evaluation and publication-excluded calibration | `deferred-material-defect` after one correction and additional material final-review findings; no leaf retained | None |
+| Unchanged eleven-entry routable capability map | Current twelve-row development catalog and accepted router support-file ownership | Project-authored deterministic metadata | Existing router capability map and focused standard-library tests | Temporary candidate entries removed; resulting map remains exact | None |
+
+Exact private paths, source hashes, worker returns, local runtime state, and
+file-level dogfood remain publication excluded. Exact formatters, analyzers,
+test runners, commands, versions, engines, frameworks, platforms, CI,
+coverage, and accepted exceptions remain repository policy. APG20 performs no
+private-source migration, root reduction, public release, active-integration
+change, dependency addition, schema change, or application smoke.
+
+## APG20A Go and Ruby correction summary
+
+APG20A uses independently written synthesis and the same semantic Go 1.26.5,
+Ruby 4.0.6, and RubyGems/Bundler 4.0.16 source families after refreshing their
+current status and license boundaries. It copies no external code, prose, or
+table structure. Read-only maintained sources provide factual line, API,
+ownership, and classification evidence; public-safe synthetic cases provide
+truthful legacy-minimal-fix evidence where no owner-classified real source is
+available.
+
+| Practice | Public source families | Mode | Destination | Lifecycle status | Maturity effect |
+| --- | --- | --- | --- | --- | --- |
+| Corrected Go language-profile ownership | Go 1.26.5 specification, compatibility, memory model, packages, source and site rights, and maintained calibration sources | Independently written synthesis | `go-language-profile`; APG20A evaluation | `retained-provisional` after one APG20A correction and fresh acceptance | New provisional leaf |
+| Corrected Ruby language-profile ownership | Ruby 4.0.6 language, core, maintenance, security, RubyGems/Bundler 4.0.16, distribution `LEGAL`, and maintained calibration sources | Independently written synthesis | `ruby-language-profile`; APG20A evaluation | `retained-provisional` after one APG20A correction and fresh acceptance | New provisional leaf |
+| Report append-lock release-race correction | POSIX filesystem behavior and project-authored report contract | Project-authored implementation and deterministic regression | report helper and Bats test | Reproduced defect corrected and independently accepted | None |
+
+APG20A performs no source migration, dependency addition, public release,
+active-integration mutation, schema change, or application smoke.
+
+## APG21 Nix and relational-engine profile summary
+
+APG21 uses independently written synthesis from current official sources and
+read-only maintained or documentation-derived examples. Private guidance
+contributes only generalized problem and false-escalation evidence; exact
+commands, topology, machine state, frameworks, preferences, credentials, and
+protected data remain private or project-owned.
+
+| Practice | Public source families | Mode | Destination | Lifecycle status | Maturity effect |
+| --- | --- | --- | --- | --- | --- |
+| Nix language-profile ownership | Nix 2.35.2 manual, separately versioned Nix 2.35.1 source calibration, NixOS/Nixpkgs 26.05 modules and maintained source | Independently written evaluation evidence | APG21 evaluation and publication-excluded calibration | `deferred-material-defect` after one correction and a second material scenario contradiction; no leaf retained | None |
+| PostgreSQL database-profile ownership | PostgreSQL 18.4 SQL, MVCC, transaction, lock, DDL, routine, security, backup, replication, and maintenance documentation and maintained source | Independently written synthesis | `postgresql-database-profile`; APG21 evaluation | `retained-provisional` after fresh acceptance | New provisional leaf |
+| SQLite database-profile ownership | SQLite 3.53.3 SQL, transaction, lock, WAL, migration, pragma, backup, integrity, extension, path, and filesystem documentation and maintained tests | Independently written synthesis | `sqlite-database-profile`; APG21 evaluation | `retained-provisional` after one APG21 correction and fresh acceptance | New provisional leaf |
+| Separate relational-engine ownership | Current PostgreSQL and SQLite engine semantics | Project-authored decision | ADR 0016 | Accepted; no generic SQL profile | None |
+
+Nix source/reference material uses LGPL-2.1-or-later, Nixpkgs/NixOS code uses MIT with
+component-specific exceptions, PostgreSQL source/documentation uses the
+PostgreSQL License, and SQLite core source/documentation is dedicated to the
+public domain with adjacent-component exceptions. APG21 copies no external
+code or prose and adds no runtime dependency.
+
+APG21 performs no source migration, root reduction, private decommission,
+public release, active-integration mutation, schema change, Nix evaluation,
+database operation, or application smoke.
+
+## APG21A Nix correction summary
+
+APG21A uses independently written synthesis from the same semantic Nix source
+families after a current source and rights refresh. The mutable Nix 2.35.2
+manual remains distinct from the public Nix 2.35.1 source tag and the mutable
+NixOS/Nixpkgs 26.05 series. Nix and its bundled manual use
+LGPL-2.1-or-later; Nixpkgs/NixOS source uses MIT with component-specific
+exceptions; independently authored nix.dev site material uses CC BY-SA 4.0.
+APG copies no source expression or code.
+
+| Practice | Public source families | Mode | Destination | Lifecycle status | Maturity effect |
+| --- | --- | --- | --- | --- | --- |
+| Corrected Nix language-profile ownership | Nix 2.35.2 manual; Nix 2.35.1 source; NixOS/Nixpkgs 26.05 merge, module, purity, store, and activation semantics | Independently written synthesis | `nix-language-profile`; APG21A evaluation | `retained-provisional` after all prior and ten focused merge scenarios, read-only dogfood, and non-author review | New provisional leaf |
+| PostgreSQL restore-scope correction | PostgreSQL 18.4 recovery and operation-specific forward-correction semantics | Independently written correction | `postgresql-database-profile`; APG21A evaluation | Corrected after failing evidence and focused re-review | Existing provisional maturity unchanged |
+
+Exact source paths, worker returns, environment details, and operational
+identities remain publication excluded. APG21A adds no runtime dependency,
+notice payload, source migration, root cutover, public release, active-
+integration mutation, schema change, Nix or database operation, or application
+smoke.
+
+## APG22 dogfood and migration-design summary
+
+APG22 uses project-authored APG artifacts, bounded read-only APG and RepoMap
+guidance, classified private guidance, historic manager prompts, current
+official ZUnit source metadata, and public-safe synthetic cases. Private and
+historic sources supply evidence only. No private prose, prompt, path,
+topology, or personal guidance is copied into public APG.
+
+| Practice | Source families | Mode | Destination | Lifecycle status | Maturity effect |
+| --- | --- | --- | --- | --- | --- |
+| Cross-repository router/profile/synthesis dogfood | Current APG owners; bounded APG and RepoMap artifacts; classified private guidance; public-safe synthetic boundaries | Project-authored evaluation | APG22 public evaluation and publication-excluded matrix | 35/35 expected dispositions matched after one evidence-record correction; no behavior correction | None |
+| Guidance-migration design | APG and RepoMap root/scoped guidance; classified private global and skill guidance | Independently written synthesis | v0.3 guidance-migration proposal and private ledgers | Proposal complete; no cutover or decommission | None |
+| Native authoring coexistence | Current Codex native authoring boundary and APG lifecycle owners | Project-authored disposition | APG22 evaluation | No separate public writing skill justified | None |
+| Manager-assignment candidate | Historic publication-excluded prompts; current planning, worker, router, and protocol owners | Independently written candidate analysis | `APG22-MANAGER-ASSIGNMENT-CANDIDATE-01` evidence | Superseded by terminal APG22A evaluation | None |
+| Legacy ZUnit scope | ZUnit v0.8.2 release and canonical repository history; historical Zsh support claims; current Zsh 5.9.2 release | Independently written source/runtime disposition | APG22 scope evidence | Legacy-only version-bounded profile may be evaluated only after maintainer authorization | None |
+
+ZUnit is MIT-licensed. APG22 copies no ZUnit or target source and establishes no
+current ZUnit compatibility. It adds no dependency, notice payload, skill,
+fixture, schema, migration, root change, target mutation, public release,
+active-integration mutation, application smoke, Nix operation, database
+operation, or graph operation.
+
+## APG22A approved-roadmap assignment summary
+
+APG22A uses current official OpenAI documentation for Codex skills,
+`AGENTS.md`, subagents, long-running work, and projects; current APG governance
+and procedure owners; an exhaustive publication-excluded 63-artifact historic
+prompt inventory; and independently written public-safe scenarios. Official
+documentation was inspected on 2026-07-21 and is treated as mutable current
+capability evidence rather than an immutable product contract.
+
+| Practice | Source families | Mode | Destination | Lifecycle status | Maturity effect |
+| --- | --- | --- | --- | --- | --- |
+| Approved-roadmap manager-assignment composition | Official current Codex capability documentation; APG manager-worker, identity, planning, worker-assignment, routing, and review owners; generalized functional observations from publication-excluded historic prompts | Independently written clean-room synthesis | `composing-approved-roadmap-assignments`; ADR 0017; APG22A evaluation | `retained-provisional` after ordinary baseline, 30/30 frozen cases, focused tests, and non-author review | New provisional leaf |
+
+No historic prompt expression, private path, private identity, target detail,
+or notice payload is copied. APG22A adds no dependency, public release,
+user-managed name, active-integration mutation, schema change, source cutover,
+application smoke, or successor-phase authority.
+
+## APG22B version-bounded ZUnit summary
+
+APG22B uses the ZUnit v0.8.2 release, tagged source, documentation, runner,
+assertions, hooks, configuration, output, tests, historical CI, and MIT license;
+Revolver v0.2.4 under MIT; and official Zsh 5.3.1 and 5.9.2 release sources,
+notes, manuals, and distribution terms. APG copies no upstream expression and
+adds no runtime dependency.
+
+| Practice | Source families | Mode | Destination | Lifecycle status | Maturity effect |
+| --- | --- | --- | --- | --- | --- |
+| Exact version-bounded ZUnit test profile | ZUnit v0.8.2; Revolver v0.2.4; official Zsh 5.3.1 and 5.9.2 | Independently written synthesis and disposable compatibility evidence | `zunit-test-profile`; ADR 0014; APG22B evaluation | Exact 5.9.2 pair retained; 5.3.1 unsupported on tested environment; no range claim | New provisional leaf |
+| ZUnit compatibility fixtures | Tagged upstream tests and project-authored public-safe cases | Project-authored harness and fixtures | Publication-excluded APG22B evidence | 98 upstream and 7 focused tests pass for 5.9.2; adverse and cleanup cases pass | None |
+
+The harness uses canonical public sources, unprivileged temporary prefixes, a
+credential-free environment, startup isolation, bounded execution, and exact
+cleanup. Official signatures were present, but no OpenPGP verifier was
+available, so signature validation is not claimed. No root/private migration,
+public release, active-integration mutation, schema change, Nix operation,
+application smoke, or APG23 work occurs.
+
+## APG22C ZUnit startup-isolation evidence correction
+
+APG22C uses the same official ZUnit v0.8.2, Revolver v0.2.4, and Zsh 5.3.1 and
+5.9.2 source families. It copies no external expression and adds no dependency.
+
+| Practice | Source families | Mode | Destination | Lifecycle status | Maturity effect |
+| --- | --- | --- | --- | --- | --- |
+| Selected user-startup positive and negative controls | Official Zsh startup semantics; project-authored APG22B fixture | Project-authored harness correction and executable evidence | Publication-excluded APG22C evidence; APG22B harness | Corrected after reproduced path mismatch; exact 5.9.2 support retained | None |
+| Corrected exact ZUnit compatibility disposition | ZUnit v0.8.2; Revolver v0.2.4; official Zsh 5.3.1 and 5.9.2 | Forward evaluation disposition | APG22C evaluation; ADR 0014 subsequent disposition | 5.9.2 retained; 5.3.1 unsupported; no range claim | None |
+
+The correction proves isolation only from the selected user `.zshenv` under
+the recorded runner invocations. It claims no control over unavoidable global
+or platform startup behavior. No skill expression, source identity, rights
+classification, notice payload, root/private migration, public release,
+active-integration mutation, schema, Nix operation, application smoke, or
+APG23 work changed during APG22C.
+
+## APG23 readiness and maturity disposition
+
+APG23 adds no external expression and no runtime dependency. It reuses the
+accepted phase-local source records for each current leaf, checks their refresh
+boundaries, and records fresh application and non-author review evidence.
+
+| Practice | Source families | Mode | Destination | Lifecycle status | Maturity effect |
+| --- | --- | --- | --- | --- | --- |
+| Fresh selector and explicit-use smoke | Client-supplied repository skill inventory; current APG leaves and map | Direct application evidence | APG23 public-safe evaluation and publication-excluded ledger | Passed for all 13 v0.3 skills | Supports individual dispositions only |
+| Individual maturity and release inclusion | APG16 through APG22C evidence; current source/version boundaries | Independent review and manager disposition | ADR 0018; readiness matrix; APG23 records | No material defect; all 13 included | Eight promotions; five retained provisional |
+
+Exact current byte identity was transient verification only. APG23 does not
+copy private source expression, refresh external source code, publish, migrate
+guidance, or change public/reference/target repositories or active integration.
+
+## APG24 v0.3.0 distribution summary
+
+APG24 adds no external expression and no runtime dependency. It applies the
+project-authored release and lifecycle architecture to the APG23-included
+nineteen-skill set.
+
+| Practice | Source families | Mode | Destination | Lifecycle status | Maturity effect |
+| --- | --- | --- | --- | --- | --- |
+| Nineteen-skill public distribution | ADRs 0009, 0018, and 0019; current APG catalog and projections | Project-authored release mechanics | Public policy; v0.3.0 candidate and records | Exact non-private projection with nineteen critical skills and projections | None |
+| Variable user release transitions | Existing version-1 source identity and state; ADR 0019 | Project-authored lifecycle correction | `apg-user-skills`; integration guide | Exact source-specific update, rollback, and recovery | None |
+| Current project release set with legacy subsets | Existing version-1 managed-subset state; ADR 0019 | Project-authored lifecycle correction | `apg-project-skills`; projection guide | New default nineteen; existing subsets preserved | None |
+
+Release inclusion remains independent of the fourteen-stable/five-provisional
+maturity split. Exact ZUnit support remains limited to v0.8.2 with Zsh 5.9.2
+under the recorded startup boundary. APG24 copies no private evidence into the
+public surface, adds no source notice, and grants no Nix or database operational
+authority. Exact Git, manifest, remote, link, and report evidence remains
+publication excluded.

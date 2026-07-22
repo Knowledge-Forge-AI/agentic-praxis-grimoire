@@ -242,8 +242,13 @@ agent_report_append_record() {
       agent_report_lock_acquired=true
       break
     fi
-    [ -d "$agent_report_lock_dir" ] && [ ! -L "$agent_report_lock_dir" ] \
-      || agent_report_fail 1 "report append lock is unsafe"
+    if [ -e "$agent_report_lock_dir" ] || [ -L "$agent_report_lock_dir" ]; then
+      if [ -d "$agent_report_lock_dir" ] && [ ! -L "$agent_report_lock_dir" ]; then
+        :
+      elif [ -e "$agent_report_lock_dir" ] || [ -L "$agent_report_lock_dir" ]; then
+        agent_report_fail 1 "report append lock is unsafe"
+      fi
+    fi
     sleep 0.01
   done
   [ "$agent_report_lock_acquired" = "true" ] || agent_report_fail 1 "report append is already active"

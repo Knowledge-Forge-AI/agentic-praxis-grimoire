@@ -78,3 +78,11 @@ release cadence. Candidate tests execute trusted project code rather than a
 hostile-code sandbox. The terminal repository outcome is
 `published-pending-fresh-session-smoke`; no successor phase begins
 automatically.
+
+## Subsequent external application disposition
+
+The maintainer later completed the requested full Codex restart and
+fresh-session smoke and reported that it passed. This closes the current
+application-observation dependency without changing APG14's historical
+terminal result. No exact user-interface log, timestamp, invocation telemetry,
+or duplicate-source observation was supplied or inferred.
