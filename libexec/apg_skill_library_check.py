@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 from collections import Counter
 from dataclasses import dataclass
+from functools import partial
 import json
 import os
 from pathlib import Path
@@ -12,6 +13,8 @@ import re
 import stat
 import sys
 from typing import Sequence
+
+import apg_skill_topology
 
 
 COMMAND_NAME = "apg-check-skill-library"
@@ -692,9 +695,15 @@ def _check_leaf(
 def _check_catalog(
     root: Path,
     readme: Path,
-    canonical_names: set[str],
+    canonical: dict[str, Path] | set[str],
     diagnostics: list[Diagnostic],
 ) -> tuple[CatalogRow, ...]:
+    canonical_paths = (
+        canonical
+        if isinstance(canonical, dict)
+        else {name: readme.parent / name for name in canonical}
+    )
+    canonical_names = set(canonical_paths)
     relative = _relative(readme, root)
     if not _ordinary_file(readme):
         _diagnostic(
@@ -752,7 +761,12 @@ def _check_catalog(
             "add missing rows and remove unknown rows until the sets match",
         )
     for row in parsed.rows:
-        expected = f"{row.name}/SKILL.md"
+        leaf = canonical_paths.get(row.name)
+        expected = (
+            f"{_relative(leaf, readme.parent)}/SKILL.md"
+            if leaf is not None
+            else f"{row.name}/SKILL.md"
+        )
         target = readme.parent / row.target
         if row.target != expected or not _ordinary_file(target):
             _diagnostic(
@@ -842,7 +856,9 @@ def _check_projection(
             raw_target = os.readlink(link)
         except OSError:
             raw_target = ""
-        expected_raw = f"../../skills/{name}"
+        expected_raw = Path(
+            os.path.relpath(canonical[name], start=link.parent)
+        ).as_posix()
         if raw_target != expected_raw:
             _diagnostic(
                 diagnostics,
@@ -910,6 +926,7 @@ def check_library(root: Path) -> CheckResult:
     root = Path(root)
     skills = root / "skills"
     canonical: dict[str, Path] = {}
+    canonical_leaves: tuple[Path, ...] = ()
     if not _ordinary_directory(skills):
         _diagnostic(
             diagnostics,
@@ -920,36 +937,20 @@ def check_library(root: Path) -> CheckResult:
             "restore the repository-owned ordinary skills directory",
         )
     else:
-        try:
-            entries = sorted(skills.iterdir(), key=lambda item: item.name)
-        except OSError:
-            entries = []
-        for entry in entries:
-            if entry.name == "README.md":
-                continue
-            if entry.is_dir():
-                canonical[entry.name] = entry
-                if entry.is_symlink():
-                    _diagnostic(
-                        diagnostics,
-                        "APG004",
-                        _relative(entry, root),
-                        "canonical-directory-real",
-                        "canonical skill directory is a symbolic link",
-                        "restore an ordinary direct-child canonical directory",
-                    )
-                continue
-            _diagnostic(
-                diagnostics,
-                "APG003",
-                _relative(entry, root),
-                "skills-root-entry",
-                "unexpected non-directory entry exists under skills",
-                "remove it or move its content into an authorized owner",
-            )
+        canonical_leaves = apg_skill_topology.discover_canonical_leaves(
+            root,
+            skills,
+            partial(_diagnostic, diagnostics),
+        )
+        leaf_name_counts = Counter(leaf.name for leaf in canonical_leaves)
+        canonical = {
+            leaf.name: leaf
+            for leaf in canonical_leaves
+            if leaf_name_counts[leaf.name] == 1
+        }
 
     declared: list[tuple[str, str]] = []
-    for name, leaf in sorted(canonical.items()):
+    for leaf in sorted(canonical_leaves, key=lambda item: item.as_posix()):
         if not leaf.is_symlink():
             _check_leaf(root, leaf, diagnostics, declared)
     for name, count in sorted(Counter(value for value, _ in declared).items()):
@@ -966,9 +967,15 @@ def check_library(root: Path) -> CheckResult:
                     )
 
     rows = _check_catalog(
-        root, skills / "README.md", set(canonical), diagnostics
+        root, skills / "README.md", canonical, diagnostics
     )
     projections = _check_projection(root, canonical, diagnostics)
+    apg_skill_topology.check_router_maps(
+        root,
+        canonical,
+        valid_skill_name,
+        partial(_diagnostic, diagnostics),
+    )
     ordered = tuple(
         sorted(
             diagnostics,
@@ -981,7 +988,7 @@ def check_library(root: Path) -> CheckResult:
             ),
         )
     )
-    return CheckResult(ordered, len(canonical), len(rows), projections)
+    return CheckResult(ordered, len(canonical_leaves), len(rows), projections)
 
 
 def _summary(result: CheckResult) -> dict[str, int]:

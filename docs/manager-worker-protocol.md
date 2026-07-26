@@ -120,6 +120,20 @@ material. Do not repeat repository-wide policy when a precise reference is
 enough. Write ownership is exclusive by default, and nearby cleanup is outside
 scope unless authorized.
 
+For a formal project phase, the ChatGPT manager first loads the target
+repository's structured defaults. Under APG's
+[structured project phase defaults](structured-project-phase-defaults.md), the
+assignment references that owner and states only deviations, unusual authority,
+phase-specific evidence, expanded tests, nonstandard commit/report behavior,
+release or destructive boundaries, hard gates, acceptance, stops, and the
+no-successor boundary. It does not repeat default commit, status/exit, ADR,
+docs-only, scoped-test, or report procedure. Missing, conflicting, or high-risk
+defaults require expanded detail.
+
+An expanded test gate is a deviation and includes its justification. Neither a
+formal phase nor manager-assignment compression implies combined, full, smoke,
+readiness, or release testing.
+
 ## Internal harness result
 
 The normal internal result contains:
@@ -168,12 +182,25 @@ with `git commit -F`, standard input passed with `git commit -F -`, or separate
 `-m` arguments whose values contain actual multiline text. Do not serialize a
 multiline value and interpolate its escaped representation into a shell command.
 
+For an APG formal phase, use the exact `Scope`, `Result`, `Verification`, and
+`Not run` form owned by the
+[structured project phase defaults](structured-project-phase-defaults.md).
+Write it to a private file, validate that file with
+`bin/apg-check-phase-commit-message --phase <PHASE-ID> --message-file <path>`,
+and commit with `git commit -F <path>`. After commit, validate the resulting
+revision with `--commit <revision>` before generating either managed report.
+The checker enforces form only and does not grant commit or report authority.
+
 Before generating a managed Git report, inspect `git log -1 --format=%B` and
 confirm that the committed message has the intended line structure. The report
 preserves commit-message bytes as evidence; it does not repair malformed
 historical messages.
 
 ### Git report
+
+The following Python Git-diff and association behavior describes ADR 0023 and
+the APG27A-adopted reporting procedure. APG27 remains its truthful partial
+precursor.
 
 `bin/git-show-report` accepts exactly five arguments:
 
@@ -198,6 +225,23 @@ shape, and its newly constructed record. It does not establish that:
 - the actor was authorized; or
 - the record is unique.
 
+`bin/git-diff-report` accepts:
+
+```text
+git-diff-report <phase-id> <result> <final-gate> [--status-doc <repository-relative-path>]
+```
+
+It records one version-1, drift-checked uncommitted snapshot relative to
+`HEAD`. NUL-delimited porcelain-v2 status, staged and unstaged summaries, and a
+complete full-index patch are captured while intent-to-add exists only in a
+private temporary index. An omitted status document renders as `NONE`.
+
+The command rejects an inherited custom index, unborn `HEAD`, split or sparse
+index, unmerged entries, clean state, unsafe destination, or any pre/post
+disagreement. It does not stage, reset, clean, restore, or replace the real
+index or worktree. Its deterministic `GIT-DIFF-REPORT-<state-digest>` identity
+names state evidence and is not a commit identity.
+
 ### Operational report
 
 `bin/append-operational-report` accepts:
@@ -212,21 +256,31 @@ caller-owned, mode-0600, single-link file between 1 byte and 8 MiB. The command
 copies and hashes the body, detects a limited body format, extracts selected
 fields, and places the exact caller text in a version-1 framed record.
 
-The command shape-checks related identifiers and requires them to agree when
-both are supplied. It does not establish body semantics, truth, privacy,
-authorship, authorization, acceptance, related-record existence, source
-stability, or uniqueness.
+`--related-git-report-id` accepts a Git-show or Git-diff record ID. A supplied
+ID must identify a complete Git record already present in the same canonical
+phase report. Show association requires a matching resolved related commit and
+body `primary_commit`; diff association has no related commit and requires a
+matching body `primary_git_report_id`. In both cases the body must declare
+`operational-report-v1`, the command phase, and the command outcome.
+
+If the phase report contains any Git show or diff record, omission or mismatch
+of the exact relation is rejected. A standalone legacy, free-form, or validated
+version-1 operational record remains allowed only when the phase report
+contains no Git record. The command does not establish the broader truth,
+privacy, authorship, authorization, acceptance, source stability, or uniqueness
+of caller evidence.
 
 ### Shared storage behavior
 
-Both commands derive a project key from the current Git-root basename and write
+All three commands derive a project key from the current Git-root basename and write
 under a configurable report root. They build one complete record, acquire a
 bounded lock, copy any existing destination plus the new record into a private
 replacement, and atomically replace the destination. This is logical append by
 replacement, not immutable append-only storage.
 
-The helper validates ownership and modes for an existing destination but does
-not fully revalidate every earlier record. Checkout-derived project keys and
+The adopted shared Python core validates the canonical common envelopes before append,
+holds the destination lock across association lookup and replacement, and
+rejects incomplete trailing records. Checkout-derived project keys and
 configured destinations are executable details, not canonical public identity.
 
 ## Final report selection
@@ -234,15 +288,20 @@ configured destinations are executable details, not canonical public identity.
 - Internal worker assignment: normal harness result; no managed report command.
 - Top-level read-only phase: an operational record only if external authority
   requires a durable final artifact.
-- Top-level commit-producing phase: an exact Git report when required, plus a
-  linked operational record when the external contract requests execution
-  context.
+- Top-level commit-producing phase: an exact Git-show report when required,
+  plus an explicitly associated operational record when the external contract
+  requests execution context.
+- Top-level phase that stops with accepted uncommitted state: a Git-diff report
+  only when the assignment authorizes it and the focused diff gate has passed,
+  plus an explicitly associated operational record when required.
 - Push state: verify separately. Neither report command proves it.
 
-When both final records are required, the phase contract selects the order. A
-common sequence is Git record first, then a related operational record after
-remote parity and final state checks. That sequence is policy, not a script
-guarantee.
+When both final records are required, generate the Git record first and append
+the exact related operational record afterward. ADR 0023 specifies, and the
+APG27A-adopted implementation enforces, same-report association and standalone-append
+rejection once a Git record exists. The complete format, identity, safety, and platform boundary is
+maintained in the
+[agent reporting architecture](agent-reporting-architecture.md).
 
 ## Internal worker evidence and disposition
 
@@ -275,9 +334,11 @@ report evidence.
 
 ## Deferred executable improvements
 
-Candidate tool improvements include an operational-body validator,
-persisted-record verifier, related-record existence checks, idempotency and
-source-stability rules, stale-lock handling, an explicit public project-key
-mapping, enumerated result fields, and publication-surface linting. A later
-phase must define executable acceptance tests before documentation describes any
-candidate as enforced.
+Remaining candidate improvements include broader operational-body semantic
+validation, an independent persisted-record verifier, idempotency and source-
+stability rules, authorized stale-lock recovery, an explicit public project-key
+mapping, enumerated result fields, and expanded publication-surface linting. A
+later phase must define executable acceptance tests before documentation calls
+one enforced. ADR 0023 implements record existence, exact show/diff association,
+Git-show parity, and temporary-index Git-diff behavior; it does not imply the
+remaining candidates.

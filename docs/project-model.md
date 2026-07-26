@@ -109,6 +109,31 @@ frontmatter or procedure corrections, support additions, maturity-only
 dispositions, deprecation, and removal. The guide does not redefine the general
 destination model or grant action authority.
 
+## Structured project and executable defaults
+
+The [structured project phase defaults](structured-project-phase-defaults.md)
+own APG's ordinary formal and non-phase commit, status, ADR, docs-only, scoped-
+test, managed-report, and manager-assignment compression conventions. They are
+project parameters rather than reusable action authority and yield to a target
+repository's more specific owner.
+
+The [testing and coverage policy](testing-and-coverage-policy.md) owns APG's
+scoped-test default, coverage-remediation design, real-boundary rule, and
+adopted pytest architecture. Accepted ADR 0024 records the APG test runner,
+mirrored paths, source inventory, exact gates, and retained Bats boundary. The
+[agent reporting architecture](agent-reporting-architecture.md) owns the
+Python-first executable decision and the accepted Git show, Git diff, and
+operational-report component design. ADR 0023 owns the proposed formats,
+state-evidence identity, canonical association, supported POSIX write boundary,
+and rollback. APG27 remains a partial precursor; APG27A corrects and adopts its
+Python reporting implementation. APG28 stops Partial; APG28A preserves that
+result and adopts the corrected pytest path and runner migration. APG29 aligns
+the existing planning, implementation, review, and roadmap-assignment leaves
+with those project defaults without adding a duplicate skill or changing
+maturity, routing, or release state. APG30 implements the accepted
+ChatGPT-manager namespace and subrouter while preserving flat Codex discovery
+and historical direct-child release policy.
+
 ## Modularity and skill categories
 
 An APG skill is the smallest independently triggerable procedure with a coherent
@@ -116,10 +141,14 @@ purpose and validation surface. Skills do not repeat repository rules or embed
 unrelated project standards. Shared behavior becomes a separate skill or helper
 only after repeated use demonstrates a stable boundary.
 
-No category taxonomy is adopted. Catalog labels may help discovery later, but
-real skills must test those boundaries before labels become directories or
-routing rules. A cross-cutting skill retains one canonical implementation and
-may receive several catalog labels if evaluation supports them.
+A broad category taxonomy is not adopted. Catalog labels may help discovery,
+but real skills must test those boundaries before labels become directories or
+routing rules. ADR 0022 and APG30 implement one actor-qualified
+`skills/chatgpt/` owner and dedicated subrouter for ChatGPT-manager leaves; the
+topology does not classify
+ordinary process or technical skills by category. A cross-cutting skill retains
+one canonical implementation and may receive several catalog labels if
+evaluation supports them.
 
 ## Harness and projection boundaries
 
@@ -234,13 +263,143 @@ to nineteen while existing explicit subsets remain authoritative. The active
 integration advances by source fast-forward without aggregate-link or ownership
 migration, and the personal router remains for external shadow observation.
 
+APG24A records the human-reported successful external shadow and the separately
+authorized personal-router decommission. The public-backed aggregate remains
+the active owner with nineteen skills, the former personal router remains
+exactly restorable from private history, and no other personal skill changes.
+This closes v0.3 semantically without changing a skill, release, lifecycle,
+active source, or target repository.
+
+APG25 accepts structured defaults, Python-first report and pytest architecture,
+the future ChatGPT-manager namespace/subrouter, and evidence-gated personal
+hygiene transition. One bounded assignment-composition correction consumes the
+new defaults. The direct-child 19/19/19 development shape, fourteen-stable/
+five-provisional maturity split, public v0.3.0, active integration, report
+executables, tests, and personal sources remain unchanged.
+
+APG26 retains two provisional direct-child capabilities:
+`pytest-test-profile` for pytest-specific collection, fixture, mock, xdist,
+coverage, and structural judgment, and
+`converting-bash-scripts-to-python` for compatible migration of an existing
+Bash executable or script family. The private-development shape becomes
+21/21/21 with fourteen stable rows, seven provisional rows, and twenty routable
+non-router entries. Public and active v0.3.0 remain 19/19/19; no report
+executable, test tree, managed default, release schema, ChatGPT owner, or
+personal skill changes.
+
+APG30 implements the accepted nested owner and subrouter. Canonical discovery
+supports exactly direct leaves and `skills/chatgpt/<name>` leaves, with global
+frontmatter-name uniqueness and flat projections. The general router owns
+nineteen ordinary non-ChatGPT edges plus one subrouter edge; the
+ChatGPT-local map owns the manager-assignment edge. Development is 22/22/22
+with fourteen stable and eight provisional rows. Public and active v0.3.0
+remain 19/19/19, and no personal skill changes.
+
+APG31 verifies that topology through direct fresh-session client evidence and
+applies the evidence-gated personal transition model independently. The
+personal docs-only capability is decommissioned because current APG and
+repository owners replace every coherent unit and exact restoration remains
+available. Git-history and RepoMap phase-hygiene transitions defer because
+their current private caller boundaries cannot be corrected within the
+authorized target-only scope. APG skills, catalog, projections, maturity,
+router maps, public and active v0.3.0, and target repositories remain
+unchanged.
+
+APG31A records the later application smoke as passed while preserving APG31's
+historical Partial disposition. Publication-excluded transition review supports
+scope reduction of `git-history-hygiene` after generalized behavior returns to
+APG and repository owners, and decommission of `repomap-phase-hygiene` after
+generalized behavior returns to current RepoMap owners. APG topology, maturity,
+catalog, projections, router maps, and immutable release surfaces remain
+unchanged.
+
+APG32 applies the new-skill lifecycle to one direct-child
+`minitest-test-profile`. The provisional owner supplies Minitest-specific test
+and spec organization, lifecycle, assertion, mock and stub, isolation,
+parallel, filter, runner, plugin, reporter, fixture-alternative, boundary-effect,
+and structural judgment while preserving general implementation, review,
+Ruby-language, project-test, repository-isolation, and authority owners.
+Development becomes 23/23/23 with fourteen stable and nine provisional rows.
+The general router contains twenty-one edges, the ChatGPT-local router remains
+one edge, and public and active v0.3.0 remain 19/19/19.
+
+APG33 applies the same lifecycle to one direct-child `dockerfile-profile`. The
+provisional owner supplies Dockerfile-specific parser-directive, stage,
+instruction-form, variable-scope, context, ignore, copy, add, mount, cache,
+ownership, runtime-default, and platform judgment while preserving base-image,
+dependency, shell-language, runtime, release, and live-operation owners.
+Development becomes 24/24/24 with fourteen stable and ten provisional rows.
+The general router contains twenty-two edges, the ChatGPT-local router remains
+one edge, and public and active v0.3.0 remain 19/19/19.
+
+APG34 applies the same lifecycle to one direct-child `vagrantfile-profile`.
+The provisional owner supplies Vagrantfile-specific configuration-version,
+load-order, machine, box, provider, network, synced-folder, provisioner,
+trigger, state, host-dependent, and structural judgment while preserving
+general Ruby and shell, provider, host, dependency, network, filesystem,
+lifecycle, release, and live-operation owners. One bounded source-semantics and
+machine-measurement correction qualifies forwarded-port behavior and prevents
+implicit-default overcount. Development becomes 25/25/25 with fourteen stable
+and eleven provisional rows. The general router contains twenty-three edges,
+the ChatGPT-local router remains one edge, and public and active v0.3.0 remain
+19/19/19.
+
+APG38 applies the lifecycle to the APG37 replacement candidates. Independent
+review and isolated compatibility evidence retain `go-test-profile` and
+`go-cmp-test-profile` provisionally, with one coherent correction cycle
+each. Corrected-state review finds new material defects in
+`matryer-is-test-profile` and `nix-test-profile`; the one-cycle rule defers both
+candidates and removes their current-tree surfaces. ADR 0026 accepts two
+independently triggerable Go component owners and no stack owner. Development
+becomes 27/27/27 with fourteen stable and thirteen provisional rows. The
+general router contains twenty-five edges, the
+ChatGPT-local router remains one edge, and public and active v0.3.0 remain
+19/19/19.
+
+APG39 authors final replacement candidates for the two APG38-deferred
+profiles on a Claude authoring branch, closing the registered-wrapper,
+relaxed-mode, and sandbox-platform corrected-state defects from reverified
+exact sources, proposing ADR 0027 conditionally, and handing integration to
+a later separately authorized Codex phase. Nothing is integrated: development
+remains 27/27/27 with the same maturity, router, and edge counts, and public
+and active v0.3.0 remain 19/19/19.
+
+APG40 preserves the exact APG39 authoring object and independently reviews,
+corrects, and dispositions both candidates. `nix-test-profile` is
+`retained-provisional` after exact-source and rights review, forty corrected
+public-safe scenarios, source-corpus calibration, one coherent correction
+cycle, and fresh non-author review. `matryer-is-test-profile` is
+`deferred-material-defect` after corrected-state review finds its equality
+mechanism still inaccurate, so its current surfaces are forward removed. ADR
+0027 is Rejected, ADR 0026 remains Accepted and controlling, and the stack
+remains absent. Development becomes 28/28/28 with fourteen stable and fourteen
+provisional rows, twenty-six general-router entries, one ChatGPT-local entry,
+and twenty-seven checked edges. Public and active v0.3.0 remain 19/19/19.
+
+APG41 reviews every retained provisional owner without changing maturity,
+preserves direct cross-profile selection without a mandatory chain, and
+corrects only candidate-independent removal wording for the Minitest,
+Dockerfile, and Vagrantfile profiles. Repository-owned disposable v0.4.0
+candidate construction and isolated lifecycle smoke pass on the current host.
+The result is `ready-for-publication-with-provisional-limitations`: release
+fitness evidence for a separate maintainer decision, not publication,
+deployment, promotion, or successor authority.
+
+APG42 applies that accepted release decision. It projects the exact committed
+non-private source into one squashed public v0.4.0 commit whose sole parent is
+v0.3.0, adds one annotated tag, verifies a fresh public checkout, and advances
+the aggregate-owned active public source by exact fast-forward. The result
+remains 28/28/28, fourteen stable and fourteen provisional, with twenty-six
+general routes, one ChatGPT-local route, and no mandatory chain. APG42 changes
+no skill procedure or maturity row and authorizes no successor phase.
+
 Record mechanics are owned by the
 [phase and record identity guide](phase-and-record-identity.md),
 [ADR index](adr/README.md), and [exit-record index](status/README.md). Phase IDs
 are semantic and globally unique; ADR and exit sequences are independently
 allocated. Current owners, evaluations, exits, and indexes are finalized before
 commit, while exact Git evidence remains in post-commit managed reports. The
-direct-child skill shape is documented
+direct-and-ChatGPT-nested skill shape is documented
 in [`skills/README.md`](../skills/README.md); the proportional maintenance
 procedure is owned by the
 [skill authoring and maintenance guide](skill-authoring-and-maintenance.md).

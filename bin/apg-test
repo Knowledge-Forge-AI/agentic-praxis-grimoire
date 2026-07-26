@@ -1,0 +1,13 @@
+#!/usr/bin/env python3
+"""Run the APG pytest, xdist, and exact coverage policy."""
+
+from pathlib import Path
+import sys
+
+command = Path(__file__).resolve(strict=True)
+root = command.parent.parent
+sys.path.insert(0, str(root))
+
+from libexec.apg_test import main
+
+raise SystemExit(main())

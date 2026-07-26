@@ -36,11 +36,13 @@ bytes, and raw symbolic-link target. This exact bijection prevents silent
 omission; the critical-path lists do not replace it.
 
 [`release/public-surface.json`](../release/public-surface.json) is the strict
-schema-version-1 policy. It fixes the canonical identity, sole exclusion,
-critical owners, wrappers, helpers, licensing files, nineteen skills, nineteen
-discovery links, test entrypoints, and validation categories. Code owns the accepted
-schema and executable test commands. The policy cannot execute commands or
-remove a projected path.
+schema-version-1 current-development policy. It fixes the canonical identity,
+sole exclusion, critical owners, wrappers, helpers, licensing files,
+twenty-eight skills, twenty-eight discovery links, test entrypoints, and
+validation categories for v0.4.0. Code separately owns the immutable
+historical v0.1.0 through v0.3.0 surfaces; v0.3.0 remains nineteen skills and
+nineteen discovery links. The policy cannot execute commands or remove a
+projected path.
 
 An optional publication-excluded check policy may add only sorted literal
 confidentiality patterns. It cannot weaken another check and never enters the
@@ -150,8 +152,10 @@ APG24 accepts ADR 0019 and updates the current schema-version-1 policy to the
 exact nineteen APG23-included skills and projections. Retaining the schema
 number is supported by explicit variable-set validation; it does not make the
 old six-name current policy valid. Historical v0.2.0 remains validated against
-its source-declared six-skill policy and immutable release identity, while a
-current v0.3.0 source or candidate must satisfy the nineteen-skill policy.
+its source-declared six-skill policy and immutable release identity. Historical
+v0.3.0 has an independently frozen nineteen-skill policy, while v0.4.0 is the
+current development surface. Malformed or unsupported public identities fail
+closed rather than inheriting the current inventory.
 Release inclusion remains independent of the fourteen-stable/five-provisional
 catalog maturity split.
 
@@ -251,6 +255,70 @@ The active public-backed source advances only by exact fast-forward, preserving
 its aggregate links and ownership. The personal router remains installed for
 an external source-qualified shadow smoke; publication does not authorize its
 decommission or a successor phase.
+
+APG24A subsequently records the maintainer-reported successful fresh-session
+shadow and the personal-router decommission performed under separate human
+authority. Focused live inspection confirms that public and active v0.3.0 and
+all three public release tags remain unchanged. This later disposition closes
+the external observation; it does not alter the APG24 publication record or
+release procedure.
+
+## v0.4 architecture boundary
+
+ADR 0022 and APG30 support nested canonical ownership for ChatGPT-manager
+leaves with flat Codex projections in current-development candidates.
+Recursive allowed-owner, catalog-path, lifecycle, manifest,
+projection-target, and historical-release tests preserve nested leaf bytes,
+modes, support files, and raw link targets. Immutable v0.1.0 through v0.3.0
+policy remains direct-child and version-bounded. APG30 validates only a
+disposable local current-development candidate; it does not authorize or
+perform v0.4.0 publication.
+
+ADR 0021 also requires a later public projection to include the shared Python
+reporting core and thin adapters only after report conversion and cross-platform
+parity are accepted. Architecture documentation is not a critical-path or
+release-policy mutation.
+
+APG27A satisfies the report-core adoption condition. APG28 remains Partial.
+APG28A adopts the corrected current-development pytest runner, dependency
+declaration, coverage configuration, strict inventory, shared helpers, and
+mirrored test owners. Configured current tests include required unit and
+integration owners. Validation directly invokes the required Bats and mirrored
+pytest paths in a sanitized environment, without trusting a caller-controlled
+recursion guard. Nested release fixtures remain bounded by their explicit test
+policy. Immutable v0.2.0 and v0.3.0 policy arrays retain their historical Bats
+and flat-Python identities.
+
+APG41 exercises the current-development v0.4.0 projection twice in disposable
+local Git candidates and smokes one candidate through isolated user and
+project lifecycle roots. The reproducible fields, current public inventory,
+historical policy, privacy, licensing, provenance, relative projections, and
+cleanup pass. Its terminal
+`ready-for-publication-with-provisional-limitations` disposition is a
+pre-release gate only. It creates no public tag, release, push, signing event,
+announcement, active installation, or publication authority.
+
+## v0.4.0 publication
+
+APG42 builds v0.4.0 twice from one formal release-source commit, exact public
+v0.3.0 base, one frozen RFC3339 timestamp, and the maintainer identity verified
+from prior public commit and annotated-tag evidence. Identical manifests,
+trees, commits, annotated tags, refs, metadata, modes, and raw symbolic-link
+targets are required before one atomic dry-run and one normal atomic push of
+only public `main` and `v0.4.0`.
+
+The release contains twenty-eight skills, fourteen stable rows, fourteen
+provisional rows, twenty-six general routes, one ChatGPT-local direct route,
+and no mandatory chain. APG42 publishes no private development history and
+changes no skill procedure or maturity row. Public v0.1.0 through v0.3.0
+commits and tags remain unchanged.
+
+A distinct live-remote context and fresh public clone verify the reviewed
+objects and complete release gates before the aggregate-owned active source
+advances by exact fast-forward. No schema-version-1 direct-link state, aggregate
+link recreation, or Codex configuration change occurs. Mechanical discovery
+does not establish refreshed client invocation; that observation remains
+truthfully pending when no safe fresh client is available.
 
 ## Limitations
 

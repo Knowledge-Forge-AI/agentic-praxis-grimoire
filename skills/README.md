@@ -2,10 +2,14 @@
 
 ## Current status
 
-The development catalog contains nineteen direct-child skills: fourteen stable
-rows and five provisional rows after APG23's individual readiness review. The
-provisional rows are the approved-roadmap manager-assignment leaf, Go and Ruby
-profiles, and PostgreSQL and SQLite profiles. APG13
+The development catalog contains twenty-eight canonical skills: fourteen
+stable rows and fourteen provisional rows. The provisional rows are the
+ChatGPT-manager subrouter, approved-roadmap manager-assignment leaf, Go and
+Ruby language profiles, PostgreSQL and SQLite profiles, pytest and Minitest
+test profiles, Dockerfile and Vagrantfile profiles, the Bash-to-Python
+conversion skill, the native Go and go-cmp test profiles, and the Nix test
+profile.
+APG13
 individually reviewed and promoted the six v0.2 catalog entries to `stable`
 after repeated real use,
 representative non-triggers, edge or stop behavior, post-Superpowers evidence,
@@ -201,6 +205,72 @@ schema version 1 with source-specific release sets and explicit subset
 ownership. The active source advances without changing aggregate-link ownership,
 and the personal router remains for external source-qualified shadow smoke.
 
+APG24A records that the external shadow passed and that separate human authority
+then decommissioned the personal router. Public and active v0.3.0 remain
+unchanged.
+
+[APG25](../docs/evaluations/apg25-v0-4-structured-project-work-foundation.md)
+applies one bounded correction to `composing-approved-roadmap-assignments`.
+Three frozen assignment pairs and a failing-first focused test support loading
+repository structured defaults, omitting repeated ordinary procedure, and
+retaining authority, acceptance, stop, and successor boundaries. The trigger,
+catalog row, route, projection, and provisional maturity remain unchanged.
+ADRs 0020-0022 accept future testing, reporting, and ChatGPT-manager topology
+work without adding or moving a skill in APG25.
+
+[APG26](../docs/evaluations/apg26-pytest-and-bash-to-python-capabilities.md)
+adds provisional `pytest-test-profile` and
+`converting-bash-scripts-to-python` leaves after sixty frozen scenario families,
+current-source calibration, failing-first focused contracts, read-only report-
+tool dogfood, and fresh non-author review. The pytest candidate requires no
+behavior-bearing correction; the conversion candidate uses one bounded option-
+injection correction. Public and active v0.3.0 remain nineteen-skill surfaces;
+no report tool is converted and no test is migrated.
+
+[APG32](../docs/evaluations/apg32-minitest-test-profile.md) adds the provisional
+`minitest-test-profile` after current primary-source and rights calibration,
+thirty-six frozen scenario families, a failing-first mirrored contract,
+Minitest-specific structural thresholds, and fresh non-author review. The
+candidate uses one bounded trigger and ownership correction. Public and active v0.3.0
+remain nineteen-skill surfaces, and APG32 selects no dependency, command,
+coverage target, readiness action, release, or successor.
+
+[APG33](../docs/evaluations/apg33-dockerfile-profile.md) adds the provisional
+`dockerfile-profile` after current primary-source and rights calibration, forty
+frozen scenario families, a failing-first mirrored contract,
+Dockerfile-specific structural thresholds, one bounded context, ownership, and
+measurement correction, and fresh non-author review. Public and active v0.3.0
+remain nineteen-skill surfaces, and APG33 selects no image, dependency,
+platform, project command, runtime policy, readiness action, release, or
+successor.
+
+[APG34](../docs/evaluations/apg34-vagrantfile-profile.md) adds the provisional
+`vagrantfile-profile` after current primary-source and rights calibration,
+forty frozen scenario families, a failing-first mirrored contract,
+Vagrantfile-specific structural thresholds, and fresh non-author review. The
+candidate uses one bounded source-semantics and machine-measurement correction.
+Public and active v0.3.0 remain nineteen-skill surfaces, and APG34 selects no
+provider, box, plugin, host platform, network, synced folder, provisioner,
+project command, lifecycle action, readiness action, release, or successor.
+
+[APG38](../docs/evaluations/apg38-apg37-go-and-nix-integration.md) integrates
+two corrected APG37 Go component profiles as provisional owners after 66
+public-safe scenario families, isolated compatibility probes, independent
+source and structural review, and one coherent correction cycle per candidate.
+`matryer-is-test-profile` and `nix-test-profile` are deferred after
+corrected-state review found new behavior defects, so their current-tree
+integration surfaces are absent. ADR 0026 accepts the two-component, no-stack
+Go architecture. Public and active v0.3.0 remain nineteen-skill surfaces.
+
+[APG40](../docs/evaluations/apg40-apg39-matryer-nix-integration.md) retains
+`nix-test-profile` provisionally after exact-source review, forty corrected
+public-safe scenarios, source-corpus calibration, one coherent correction
+cycle, and fresh non-author review. The exact-version matryer/is candidate is
+`deferred-material-defect` after its corrected equality contract still
+invented a source branch; its current surfaces are absent. ADR 0027 is
+Rejected, ADR 0026 remains Accepted, and no Go stack exists. Public and active
+v0.3.0 remain nineteen-skill surfaces.
+
 ## Canonical leaf and discovery shape
 
 Each canonical APG skill source is a direct child of `skills/`:
@@ -236,6 +306,11 @@ and exclusion. [The projection guide](../docs/project-skill-projection.md)
 defines that installation and rollback boundary. Other harness projections
 require separate evidence and authorization.
 
+APG30 implements ADR 0022's `skills/chatgpt/<name>/` canonical owner for
+actor-qualified ChatGPT-manager leaves while retaining flat `.agents/skills/`
+discovery. The current 28/28/28 library contains twenty-six direct children and
+two nested ChatGPT-manager leaves. The namespace directory is not a skill.
+
 This shape follows `APG0-AGENT-SKILLS-SOURCE-01`, the public
 [Agent Skills specification](https://agentskills.io/specification) inspected on
 2026-07-18. The specification publishes no semantic revision, so this
@@ -249,19 +324,28 @@ APG0 basis.
 | Skill | Trigger boundary | Maturity |
 | --- | --- | --- |
 | [`composing-bounded-worker-assignments`](composing-bounded-worker-assignments/SKILL.md) | Delegation is already authorized and selected, and one non-trivial worker assignment needs explicit boundaries | `stable` |
-| [`composing-approved-roadmap-assignments`](composing-approved-roadmap-assignments/SKILL.md) | A human-approved roadmap phase or explicitly approved bounded phase sequence needs a reviewable top-level manager assignment without added authority | `provisional` |
+| [`composing-approved-roadmap-assignments`](chatgpt/composing-approved-roadmap-assignments/SKILL.md) | A human-approved roadmap phase or explicitly approved bounded phase sequence needs a reviewable top-level manager assignment without added authority | `provisional` |
 | [`designing-significant-changes`](designing-significant-changes/SKILL.md) | Consequential behavior, architecture, ownership, contracts, safety, or irreversible choices remain unresolved | `stable` |
 | [`planning-repository-work`](planning-repository-work/SKILL.md) | An accepted objective needs dependent steps, cross-file coordination, staged risk reduction, or durable handoff | `stable` |
 | [`implementing-with-test-discipline`](implementing-with-test-discipline/SKILL.md) | A code change benefits from executable behavioral evidence | `stable` |
+| [`converting-bash-scripts-to-python`](converting-bash-scripts-to-python/SKILL.md) | An existing Bash executable or script family needs a bounded conversion to Python that preserves or deliberately migrates its observable contract | `provisional` |
 | [`debugging-systematically`](debugging-systematically/SKILL.md) | Behavior is failing, inconsistent, flaky, unexplained, or has multiple plausible causes | `stable` |
 | [`reviewing-and-verifying-repository-work`](reviewing-and-verifying-repository-work/SKILL.md) | A bounded repository artifact, change, phase, commit, or worker result needs evidence-backed acceptance, correction, disposition, or a completion claim | `stable` |
 | [`agentic-praxis-grimoire-workflow`](agentic-praxis-grimoire-workflow/SKILL.md) | Multiple APG skills are plausible, a routing decision needs audit, or APG capability metadata may be missing or stale | `stable` |
+| [`chatgpt-manager-workflow`](chatgpt/chatgpt-manager-workflow/SKILL.md) | Selection among multiple plausible ChatGPT top-level-manager capabilities is ambiguous or a ChatGPT-manager routing decision requires audit | `provisional` |
 | [`synthesizing-repository-guidance`](synthesizing-repository-guidance/SKILL.md) | A dense, duplicated, mixed-scope, private, or source-derived guidance corpus needs bounded ownership and migration dispositions before rewrite | `stable` |
 | [`python-language-profile`](python-language-profile/SKILL.md) | Python-specific judgment is material to structure, complexity, public APIs, typing, concurrency, serialization, packaging, or warning and crisis thresholds beyond repository policy | `stable` |
 | [`bash-language-profile`](bash-language-profile/SKILL.md) | Bash-specific judgment is material to quoting, expansion, arrays, pipelines, traps, subprocesses, files, portability, or warning and crisis thresholds beyond repository policy | `stable` |
 | [`bats-test-profile`](bats-test-profile/SKILL.md) | Bats-specific test judgment is material to evaluation, run status and output, hooks, fixtures, TAP, file descriptors, parallelism, background cleanup, or warning and crisis thresholds beyond repository policy | `stable` |
+| [`dockerfile-profile`](dockerfile-profile/SKILL.md) | Dockerfile-specific judgment is material to parser directives, build stages, instruction forms, variable scope, build context, copies, mounts, cache behavior, file ownership, runtime metadata, platform behavior, or warning and crisis thresholds beyond repository policy | `provisional` |
+| [`vagrantfile-profile`](vagrantfile-profile/SKILL.md) | Vagrantfile-specific judgment is material to configuration versions and loading, machines, boxes, provider blocks, networks, synced folders, provisioners, triggers, Vagrant state, host-dependent behavior, or warning and crisis thresholds beyond repository policy | `provisional` |
+| [`minitest-test-profile`](minitest-test-profile/SKILL.md) | Minitest-specific judgment is material to test or spec organization, assertions, lifecycle, mocks, stubs, fixture alternatives, isolation, parallelism, filtering, runners, plugins, reporters, subprocess, filesystem, or database test boundaries, or warning and crisis thresholds beyond repository policy | `provisional` |
+| [`pytest-test-profile`](pytest-test-profile/SKILL.md) | pytest-specific judgment is material to discovery, collection, assertions, fixtures, parametrization, mocks, isolation, xdist, coverage, or warning and crisis thresholds beyond repository policy | `provisional` |
+| [`go-cmp-test-profile`](go-cmp-test-profile/SKILL.md) | A repository has already selected google/go-cmp v0.7.0 and comparison judgment is material to equality versus diff, option composition and filters, comparers and transformers, ignores and unexported fields, sorting, approximation, panics, diagnostic exposure, or thresholds beyond repository policy | `provisional` |
 | [`go-language-profile`](go-language-profile/SKILL.md) | Go-specific judgment is material to structure, errors, context, interfaces, generics, concurrency, public APIs, reflection, unsafe, cgo, subprocesses, compatibility, or warning and crisis thresholds beyond repository policy | `provisional` |
+| [`go-test-profile`](go-test-profile/SKILL.md) | Native Go test judgment is material to package placement, subtests, helper attribution, cleanup and isolation, TestMain, parallelism, goroutine reporting, examples, benchmarks, fuzzing, caching, effective language version, or warning and crisis thresholds beyond repository policy | `provisional` |
 | [`nix-language-profile`](nix-language-profile/SKILL.md) | Nix-specific judgment is material to expressions, attribute sets, modules, derivations, flakes, overlays, purity, evaluation, store exposure, activation, remote builders, or warning and crisis thresholds beyond repository policy | `stable` |
+| [`nix-test-profile`](nix-test-profile/SKILL.md) | Nix test judgment is material to selecting which already-selected testing surface proves an exact claim, package phases, flake checks, Nixpkgs or NixOS test ownership, test-evidence qualification across sandbox, store, builder, or cache boundaries, or Nix-test-specific structural review | `provisional` |
 | [`postgresql-database-profile`](postgresql-database-profile/SKILL.md) | PostgreSQL-specific judgment is material to SQL, schemas, MVCC, transactions, locks, DDL, migrations, routines, triggers, security, backup and restore, replication, maintenance, or warning and crisis thresholds beyond repository policy | `provisional` |
 | [`ruby-language-profile`](ruby-language-profile/SKILL.md) | Ruby-specific judgment is material to structure, exceptions, blocks, shared state, dynamic dispatch, metaprogramming, callbacks, concurrency, gems, public compatibility, serialization, subprocesses, or warning and crisis thresholds beyond repository policy | `provisional` |
 | [`sqlite-database-profile`](sqlite-database-profile/SKILL.md) | SQLite-specific judgment is material to SQL, transaction modes, single-writer concurrency, busy handling, journal or WAL behavior, schema rebuilds, pragmas, affinity, file ownership, backup and integrity, extensions, or warning and crisis thresholds beyond repository policy | `provisional` |
@@ -317,8 +401,9 @@ APG13 procedure correction.
 Clean A/B superiority and a positive use in a second repository are valuable
 evidence but are not independent stability blockers under ADR 0006. A concrete
 unresolved material authority, privacy, safety, or procedure defect may block an
-individual skill. The current catalog contains fourteen `stable` rows and five
-`provisional` manager-assignment, language, or database-profile rows. Public
+individual skill. The current catalog contains fourteen `stable` rows and
+fourteen `provisional` manager-assignment, language, database, test-profile, or
+conversion rows. Public
 v0.1.0 retains its historical provisional catalog; public v0.2.0 contains the
 six stable leaves. APG14 changes no skill procedure or maturity row. APG16,
 APG17, APG18, APG19, APG20A, APG21, and APG21A add only provisional development
@@ -333,4 +418,11 @@ one exact version pair. APG22C corrects the startup-isolation evidence without
 changing that result. APG23 completes the new-session application gate,
 promotes eight rows, retains five provisional rows, and accepts all thirteen
 v0.3 skills for release scope. APG24 distributes that exact set as v0.3.0
-without changing maturity or any skill procedure.
+without changing maturity or any skill procedure. APG26 later adds two
+provisional private-development candidates without changing that public
+release, its active integration, or any preexisting maturity row. APG30 adds
+one provisional subrouter and APG32 adds one provisional Minitest profile under
+the same immutable public and active v0.3.0 boundary. APG33 adds one provisional
+Dockerfile profile, APG34 adds one provisional Vagrantfile profile, APG38 adds
+two provisional Go test-component profiles, and APG40 adds one provisional Nix
+test profile without changing that boundary.

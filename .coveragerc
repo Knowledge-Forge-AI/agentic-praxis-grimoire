@@ -1,0 +1,19 @@
+[run]
+branch = True
+parallel = True
+patch = subprocess
+relative_files = True
+source =
+    libexec
+
+[paths]
+source =
+    libexec
+    */public-source/libexec
+
+[report]
+show_missing = True
+skip_empty = False
+
+[json]
+pretty_print = True

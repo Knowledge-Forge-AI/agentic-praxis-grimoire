@@ -113,8 +113,11 @@ sequence before commit:
 7. resolve material findings;
 8. stage the complete implementation and documentation together;
 9. inspect the complete staged diff and rerun staged identity and whitespace
-   checks; and
-10. commit only after the staged tree is internally consistent.
+   checks;
+10. write the formal-phase commit message to a private file and validate that
+    file for the canonical phase with `apg-check-phase-commit-message`; and
+11. commit with `git commit -F` only after the staged tree and message are
+    internally consistent.
 
 The focused hash review examines changed files and current-state owners. It is
 not a naive repository-wide ban on forty hexadecimal characters: licenses,
@@ -126,6 +129,11 @@ Git and operational reports are generated only after commit. Their required
 post-commit timing does not defer any tracked-document finalization step.
 Authorized publication-excluded records mark genuinely postcommit facts as
 pending rather than fabricating them in the release-source tree.
+
+After commit, run `apg-check-phase-commit-message` again with the canonical
+phase and `--commit <revision>`. Generate managed Git and operational reports
+only after that check passes. This validates form rather than phase truth,
+authority, repository state, push state, report association, or acceptance.
 
 ## Subsequent corrections
 
@@ -160,6 +168,21 @@ new-record path/index/H1/field agreement, explicit allocation expectations,
 and independently computed next ADR and exit values. Passing does not establish
 authority, semantic accuracy, provenance truth, evaluation quality, review
 quality, report validity, or phase acceptance.
+
+Formal-phase commit messages have a separate read-only checker:
+
+```text
+bin/apg-check-phase-commit-message --phase <PHASE-ID>
+  (--message-file <path> | --commit <revision>) [--format text|json]
+```
+
+Exit `0` means the message form passed, `1` reports noncompliance, `2` reports
+invalid usage, and `3` reports an unreadable message source or repository
+failure. The checker requires the exact canonical phase subject, one blank
+line, and one ordered nonempty `Scope`, `Result`, `Verification`, and `Not run`
+section. It reads commits through fixed Git argument vectors and emits no
+message, revision, or source path in diagnostics. It does not mechanically
+judge imperative mood, grant commit authority, or apply to non-phase commits.
 
 ## Examples and non-examples
 

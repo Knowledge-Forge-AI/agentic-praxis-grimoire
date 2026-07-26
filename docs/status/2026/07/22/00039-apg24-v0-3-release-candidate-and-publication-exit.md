@@ -74,3 +74,12 @@ published-pending-fresh-session-shadow-smoke
 
 That observation does not authorize personal-router decommission. APG24 removes
 no root or private guidance and begins no successor phase.
+
+## Subsequent APG24A disposition
+
+APG24A records the maintainer's later report that the fresh-session public
+shadow smoke passed and that the personal same-name router was subsequently
+decommissioned under separate human authority. Focused resulting-state
+verification confirms unchanged public and active v0.3.0 state and an exact
+private restoration source. APG24's original disposition remains the truthful
+outcome at this exit; APG24A closes the later external condition forward.

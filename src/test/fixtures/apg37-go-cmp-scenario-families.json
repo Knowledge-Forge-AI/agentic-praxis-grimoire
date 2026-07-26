@@ -1,0 +1,182 @@
+{
+  "schema_version": 1,
+  "source_phase": "APG37",
+  "apg38_outcome_corrections": [
+    {
+      "id": "APG37-CMP-19",
+      "reason": "APG38 corrected the terminal outcome after independent source or structural review."
+    },
+    {
+      "id": "APG37-CMP-23",
+      "reason": "APG38 corrected the terminal outcome after independent source or structural review."
+    },
+    {
+      "id": "APG37-CMP-27",
+      "reason": "APG38 corrected the terminal outcome after independent source or structural review."
+    },
+    {
+      "id": "APG37-CMP-28",
+      "reason": "APG38 corrected the terminal outcome after independent source or structural review."
+    },
+    {
+      "id": "APG37-CMP-29",
+      "reason": "APG38 corrected the terminal outcome after independent source or structural review."
+    },
+    {
+      "id": "APG37-CMP-30",
+      "reason": "APG38 corrected the terminal outcome after independent source or structural review."
+    }
+  ],
+  "go_cmp": [
+    {
+      "id": "APG37-CMP-01",
+      "scenario": "The repository already depends on go-cmp at the calibrated release and a task materially depends on semantic comparison",
+      "expected": "Trigger; establish the release, option set, and project policy"
+    },
+    {
+      "id": "APG37-CMP-02",
+      "scenario": "A task asks whether to add go-cmp",
+      "expected": "Non-trigger; dependency selection is project-owned"
+    },
+    {
+      "id": "APG37-CMP-03",
+      "scenario": "A task concerns native lifecycle only",
+      "expected": "Non-trigger; route to `go-test-profile`"
+    },
+    {
+      "id": "APG37-CMP-04",
+      "scenario": "The selected release differs from the calibration, or an option or behavior absent from it is claimed",
+      "expected": "Stop and reverify against the selected release; representing calibrated behavior as verified for another release is Red"
+    },
+    {
+      "id": "APG37-CMP-05",
+      "scenario": "A boolean equality answer is required over a deeply nested structure",
+      "expected": "Green; traversal descends through struct fields, slice indexes, map entries, pointer indirection, and interface assertions"
+    },
+    {
+      "id": "APG37-CMP-06",
+      "scenario": "A human-readable difference is required for a failure message",
+      "expected": "Green; expect no rendered difference exactly when comparison of the same inputs under the same options reports equality"
+    },
+    {
+      "id": "APG37-CMP-07",
+      "scenario": "Both the boolean and the diff are computed for one comparison",
+      "expected": "Yellow on redundancy; compute one and derive the reporting path rather than duplicating the contract"
+    },
+    {
+      "id": "APG37-CMP-08",
+      "scenario": "A test asserts on diff text, or a tool parses it",
+      "expected": "Red; standard diff formatting carries no stability promise, so a project that needs machine-consumable output must own an explicit reporting implementation"
+    },
+    {
+      "id": "APG37-CMP-09",
+      "scenario": "A native comparison would be sufficient, or a terse expectation is already owned by a selected assertion library",
+      "expected": "Yellow on proportionality; give semantic comparison to this owner and the terse expectation to the assertion owner, and never assert one contract twice"
+    },
+    {
+      "id": "APG37-CMP-10",
+      "scenario": "A comparison result or option set is used inside parallel subtests",
+      "expected": "Yellow; options must be immutable and shared safely, and native parallel restrictions still apply"
+    },
+    {
+      "id": "APG37-CMP-11",
+      "scenario": "A nil slice or map must compare equal to an empty one",
+      "expected": "Yellow; this requires the explicit empty-equating option and is not default behavior"
+    },
+    {
+      "id": "APG37-CMP-12",
+      "scenario": "The nil versus empty distinction is semantically required",
+      "expected": "Green without the empty-equating option; adding it here hides required behavior and is Red"
+    },
+    {
+      "id": "APG37-CMP-13",
+      "scenario": "A custom comparer expresses a domain equality rule",
+      "expected": "Yellow only after argument reversal preserves the judgment, repeated calls stay stable, and neither operands nor observable state change"
+    },
+    {
+      "id": "APG37-CMP-14",
+      "scenario": "A comparer is asymmetric, order-dependent, time-dependent, or mutates its operands",
+      "expected": "Red; the required properties are violated and results are not trustworthy"
+    },
+    {
+      "id": "APG37-CMP-15",
+      "scenario": "A transformer normalizes a value before comparison",
+      "expected": "Yellow; state the input and output domains and treat self-application protection as branch-local rather than proof that a graph of several transforms terminates"
+    },
+    {
+      "id": "APG37-CMP-16",
+      "scenario": "A transformation could apply to its own output more broadly",
+      "expected": "Red until the output-to-input cycle is explicitly blocked and the domains are stated; one constructor's local guard does not prove that every transformation graph terminates"
+    },
+    {
+      "id": "APG37-CMP-17",
+      "scenario": "An option must apply only at a specific path or to specific values",
+      "expected": "Green or Yellow with a path or value predicate whose decision survives operand reversal and repeated calls, including structural positions present on only one side"
+    },
+    {
+      "id": "APG37-CMP-18",
+      "scenario": "Several comparer or transformer options can apply to one value",
+      "expected": "Red; comparison panics on an ambiguous option set, so composition must be disambiguated by filters"
+    },
+    {
+      "id": "APG37-CMP-19",
+      "scenario": "An unfiltered ignore option is passed to a comparison",
+      "expected": "An unfiltered Ignore option panics; stop and add a path or value filter that states the intended exclusion."
+    },
+    {
+      "id": "APG37-CMP-20",
+      "scenario": "Slice ordering is not semantically meaningful",
+      "expected": "Yellow; use a consistent relation with no self-precedence or broken chains, while recognizing that distinct values may still occupy the same rank"
+    },
+    {
+      "id": "APG37-CMP-21",
+      "scenario": "Map ordering must be normalized",
+      "expected": "Yellow; map sorting must distinguish every unequal key through its ordering relation and panics when the relation cannot do so"
+    },
+    {
+      "id": "APG37-CMP-22",
+      "scenario": "Slice sorting is relied on to make a comparison order-independent, but the ordering treats distinct elements as equivalent",
+      "expected": "Red when order independence is required; elements assigned the same rank keep their prior order, so the result can still vary with the input sequence"
+    },
+    {
+      "id": "APG37-CMP-23",
+      "scenario": "Floating-point values must compare approximately",
+      "expected": "Yellow; the option takes a relative fraction and absolute margin and panics when either parameter is negative or NaN."
+    },
+    {
+      "id": "APG37-CMP-24",
+      "scenario": "NaN or infinite operands are present in an approximate comparison",
+      "expected": "Yellow; approximate comparison does not apply when an operand is NaN or infinite, and equating NaN values requires the separate explicit option"
+    },
+    {
+      "id": "APG37-CMP-25",
+      "scenario": "Time values must compare within a tolerance",
+      "expected": "Yellow; the option applies to non-zero time values and panics on a negative margin"
+    },
+    {
+      "id": "APG37-CMP-26",
+      "scenario": "An approximate comparison would hide a consequential difference",
+      "expected": "Red; tolerance must be justified by the domain rather than chosen to make a test pass, and advice-level wording is never an API rule"
+    },
+    {
+      "id": "APG37-CMP-27",
+      "scenario": "Errors must be compared by identity, or a specific error must be distinguished",
+      "expected": "Separate exact identity from errors.Is matching. Use the error-equating option only for the standard matching relation; use an exact project-owned comparison when identity is required. Any-error matching is Red when a specific error is required."
+    },
+    {
+      "id": "APG37-CMP-28",
+      "scenario": "Named fields or types are ignored to stabilize a test",
+      "expected": "Classify each exclusion by whether it hides required behavior. A narrow ignore with an explicit stable contract may be Green or Yellow; hiding required behavior is Red."
+    },
+    {
+      "id": "APG37-CMP-29",
+      "scenario": "Unexported struct fields are present in a compared type",
+      "expected": "Comparison panics on unexported fields unless an explicit response applies. Classify ignore or access by concrete ownership and compatibility risk; externally owned representation across an unaccepted boundary is Orange or Red, not every unexported field."
+    },
+    {
+      "id": "APG37-CMP-30",
+      "scenario": "Protected values could enter a comparison or its diff, or option count is used to judge an owner",
+      "expected": "Separate boolean comparison from value-rendering Diff output. Classify protected data before rendering or user option side effects; filtering alone does not redact, and ignore or transform must not hide required equality. Withhold diagnostics truthfully. Option count alone is not a finding."
+    }
+  ]
+}

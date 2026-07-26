@@ -1,6 +1,7 @@
 #!/usr/bin/env bats
 # apg-test-source-target: bin/append-operational-report
-# apg-test-source-target: libexec/agent-report/common.sh
+# apg-test-source-target: libexec/agent_report/operational.py
+# apg-test-source-target: libexec/agent_report/safety.py
 
 bats_require_minimum_version 1.5.0
 
@@ -55,10 +56,19 @@ run_operational() {
 
 @test "append-operational-report writes a deterministic exact common-envelope record" {
   source_file="$BATS_TEST_TMPDIR/phase-operational-report.txt"
-  source_content=$'REPORT\nreport_schema: operational-report-v1\nphase: PHASE-1\noutcome: passed\nproject: work-repo'
+  source_content="REPORT
+report_schema: operational-report-v1
+phase: PHASE-1
+outcome: passed
+project: work-repo
+primary_commit: $commit_hash"
   write_source "$source_file" "$source_content"
   source_hash="$(sha256_file_for_test "$source_file")"
   git_report_id="GIT-SHOW-REPORT-$commit_hash"
+
+  env GIT_SHOW_REPORT_ROOT="$report_root" bash -c \
+    'cd "$1" && exec "$2" PHASE-1 "$3" status passed full-gate' \
+    _ "$work_repo" "$git_command_file" "$commit_hash"
 
   run_operational PHASE-1 "$source_file" passed full-gate \
     --related-commit "${commit_hash:0:10}" --related-git-report-id "$git_report_id"
@@ -82,13 +92,13 @@ run_operational() {
   [ "$(field_value BODY-SCHEMA-DETECTED "$report_file")" = "operational-report-v1" ]
   [ "$(field_value SOURCE-DECLARED-PHASE "$report_file")" = "PHASE-1" ]
   [ "$(field_value SOURCE-DECLARED-OUTCOME "$report_file")" = "passed" ]
-  [ "$(field_value SOURCE-PRIMARY-COMMIT "$report_file")" = "UNKNOWN" ]
-  [ "$(grep -c '^BEGIN AGENT-REPORT-RECORD$' "$report_file")" -eq 1 ]
-  [ "$(grep -c '^END AGENT-REPORT-RECORD$' "$report_file")" -eq 1 ]
+  [ "$(field_value SOURCE-PRIMARY-COMMIT "$report_file")" = "$commit_hash" ]
+  [ "$(grep -c '^BEGIN AGENT-REPORT-RECORD$' "$report_file")" -eq 2 ]
+  [ "$(grep -c '^END AGENT-REPORT-RECORD$' "$report_file")" -eq 2 ]
   [ "$(grep -c '^BEGIN OPERATIONAL REPORT BODY$' "$report_file")" -eq 1 ]
   [ "$(grep -c '^END OPERATIONAL REPORT BODY$' "$report_file")" -eq 1 ]
   [ "$(field_value END-OF-OPERATIONAL-BODY-REACHED "$report_file")" = "true" ]
-  [ "$(field_value RECORD-COMPLETE "$report_file")" = "true" ]
+  [ "$(grep -c '^RECORD-COMPLETE: true$' "$report_file")" -eq 2 ]
   [[ "$(field_value PAYLOAD-SHA256 "$report_file")" =~ ^[0-9a-f]{64}$ ]]
   [[ "$(field_value PAYLOAD-SIZE-BYTES "$report_file")" =~ ^[0-9]+$ ]]
   [ "$(mode_of "$report_root/work-repo")" = "700" ]
@@ -197,33 +207,52 @@ run_operational() {
 
 @test "git and operational commands serialize complete same-ticket records" {
   source_file="$BATS_TEST_TMPDIR/ops.txt"
-  write_source "$source_file" $'REPORT\nreport_schema: operational-report-v1\nphase: MIXED'
+  write_source "$source_file" "REPORT
+report_schema: operational-report-v1
+phase: MIXED
+outcome: passed
+primary_commit: $commit_hash"
   output_git="$BATS_TEST_TMPDIR/git.out"
-  output_ops="$BATS_TEST_TMPDIR/ops.out"
+  output_ops_one="$BATS_TEST_TMPDIR/ops-one.out"
+  output_ops_two="$BATS_TEST_TMPDIR/ops-two.out"
 
   (
     cd "$work_repo"
-    GIT_SHOW_REPORT_ROOT="$report_root" "$git_command_file" MIXED "$commit_hash" status passed gate > "$output_git" 2>&1
-  ) &
-  git_pid=$!
+    GIT_SHOW_REPORT_ROOT="$report_root" "$git_command_file" \
+      MIXED "$commit_hash" status passed gate > "$output_git" 2>&1
+  )
+  git_status=$?
+
   (
     cd "$work_repo"
-    GIT_SHOW_REPORT_ROOT="$report_root" "$command_file" MIXED "$source_file" passed gate > "$output_ops" 2>&1
+    GIT_SHOW_REPORT_ROOT="$report_root" "$command_file" \
+      MIXED "$source_file" passed gate \
+      --related-commit "$commit_hash" \
+      --related-git-report-id "GIT-SHOW-REPORT-$commit_hash" > "$output_ops_one" 2>&1
   ) &
-  ops_pid=$!
-  wait "$git_pid"
-  git_status=$?
-  wait "$ops_pid"
-  ops_status=$?
+  ops_one_pid=$!
+  (
+    cd "$work_repo"
+    GIT_SHOW_REPORT_ROOT="$report_root" "$command_file" \
+      MIXED "$source_file" passed gate \
+      --related-commit "$commit_hash" \
+      --related-git-report-id "GIT-SHOW-REPORT-$commit_hash" > "$output_ops_two" 2>&1
+  ) &
+  ops_two_pid=$!
+  wait "$ops_one_pid"
+  ops_one_status=$?
+  wait "$ops_two_pid"
+  ops_two_status=$?
 
   [ "$git_status" -eq 0 ]
-  [ "$ops_status" -eq 0 ]
+  [ "$ops_one_status" -eq 0 ]
+  [ "$ops_two_status" -eq 0 ]
   report_file="$report_root/work-repo/MIXED.report.txt"
-  [ "$(grep -c '^BEGIN AGENT-REPORT-RECORD$' "$report_file")" -eq 2 ]
-  [ "$(grep -c '^END AGENT-REPORT-RECORD$' "$report_file")" -eq 2 ]
+  [ "$(grep -c '^BEGIN AGENT-REPORT-RECORD$' "$report_file")" -eq 3 ]
+  [ "$(grep -c '^END AGENT-REPORT-RECORD$' "$report_file")" -eq 3 ]
   [ "$(grep -c '^RECORD-TYPE: git-show-report$' "$report_file")" -eq 2 ]
-  [ "$(grep -c '^RECORD-TYPE: operational-report$' "$report_file")" -eq 2 ]
-  [ "$(grep -c '^RECORD-COMPLETE: true$' "$report_file")" -eq 2 ]
+  [ "$(grep -c '^RECORD-TYPE: operational-report$' "$report_file")" -eq 4 ]
+  [ "$(grep -c '^RECORD-COMPLETE: true$' "$report_file")" -eq 3 ]
   [ ! -e "$report_file.lock" ]
 }
 
@@ -267,8 +296,10 @@ run_operational() {
 
 @test "omnibus concatenation preserves typed complete records across projects" {
   source_file="$BATS_TEST_TMPDIR/omnibus-ops.txt"
+  other_source_file="$BATS_TEST_TMPDIR/other-ops.txt"
   marker_file="$BATS_TEST_TMPDIR/omnibus-markers.txt"
-  write_source "$source_file" $'REPORT\nreport_schema: operational-report-v1\nphase: OMNIBUS'
+  write_source "$source_file" $'REPORT\nreport_schema: operational-report-v1\nphase: OMNI-OPS\noutcome: passed'
+  write_source "$other_source_file" $'REPORT\nreport_schema: operational-report-v1\nphase: OTHER\noutcome: passed'
   write_source "$marker_file" $'BEGIN AGENT-REPORT-RECORD\nEND AGENT-REPORT-RECORD'
 
   env GIT_SHOW_REPORT_ROOT="$report_root" bash -c \
@@ -287,7 +318,7 @@ run_operational() {
   git -C "$other_repo" add file.txt
   git -C "$other_repo" commit -qm "other"
   run env GIT_SHOW_REPORT_ROOT="$report_root" bash -c \
-    'cd "$1" && exec "$2" OTHER "$3" passed gate' _ "$other_repo" "$command_file" "$source_file"
+    'cd "$1" && exec "$2" OTHER "$3" passed gate' _ "$other_repo" "$command_file" "$other_source_file"
   [ "$status" -eq 0 ]
 
   omnibus="$BATS_TEST_TMPDIR/omnibus.txt"

@@ -422,59 +422,25 @@ sha256_file_for_test() {
 @test "git-show-report retries when a released append lock disappears" {
   work_repo="$BATS_TEST_TMPDIR/released-lock-repo"
   commit_hash="$(init_report_repo "$work_repo")"
-  fake_bin="$BATS_TEST_TMPDIR/fake-bin"
-  attempt_state="$BATS_TEST_TMPDIR/released-lock-attempt"
-  release_state="$BATS_TEST_TMPDIR/released-lock-observed"
-  hook_file="$BATS_TEST_TMPDIR/released-lock-hook.bash"
-  real_mkdir="$(command -v mkdir)"
-  mkdir -p "$fake_bin"
-  cat > "$fake_bin/mkdir" <<'SH'
-#!/bin/sh
-for argument do
-  case "$argument" in
-    *.report.txt.lock)
-      if [ ! -e "$AGENT_REPORT_MKDIR_ATTEMPT_STATE" ]; then
-        : > "$AGENT_REPORT_MKDIR_ATTEMPT_STATE"
-        "$AGENT_REPORT_REAL_MKDIR" "$@" || exit $?
-        exit 1
-      fi
-      ;;
-  esac
-done
-exec "$AGENT_REPORT_REAL_MKDIR" "$@"
-SH
-  chmod 700 "$fake_bin/mkdir"
-  cat > "$hook_file" <<'SH'
-APG_REPORT_LOCK_HOOK_STATE=waiting
-apg_report_release_hook() {
-  if [[ "$APG_REPORT_LOCK_HOOK_STATE" == waiting \
-    && "${BASH_COMMAND:-}" == '[ -e "$agent_report_lock_dir" ]' ]]; then
-    APG_REPORT_LOCK_HOOK_STATE=observed
-  elif [[ "$APG_REPORT_LOCK_HOOK_STATE" == observed \
-    && "${BASH_COMMAND:-}" == '[ -d "$agent_report_lock_dir" ]' ]]; then
-    APG_REPORT_LOCK_HOOK_STATE=released
-    trap - DEBUG
-    rmdir "$agent_report_lock_dir"
-    : > "$AGENT_REPORT_RELEASE_STATE"
-  fi
-}
-set -T
-trap apg_report_release_hook DEBUG
-SH
-  chmod 600 "$hook_file"
+  report_dir="$report_root/released-lock-repo"
+  lock_dir="$report_dir/RELEASED.report.txt.lock"
+  output_file="$BATS_TEST_TMPDIR/released-lock.out"
+  mkdir -p "$lock_dir"
+  chmod 700 "$report_dir" "$lock_dir"
 
-  run env PATH="$fake_bin:$PATH" \
-    BASH_ENV="$hook_file" \
-    AGENT_REPORT_MKDIR_ATTEMPT_STATE="$attempt_state" \
-    AGENT_REPORT_RELEASE_STATE="$release_state" \
-    AGENT_REPORT_REAL_MKDIR="$real_mkdir" \
+  (
+    cd "$work_repo"
     GIT_SHOW_REPORT_ROOT="$report_root" \
-    bash -c 'cd "$1" && exec "$2" RELEASED "$3" status passed gate' \
-    _ "$work_repo" "$command_file" "$commit_hash"
+      "$command_file" RELEASED "$commit_hash" status passed gate > "$output_file" 2>&1
+  ) &
+  command_pid=$!
+  sleep 0.05
+  kill -0 "$command_pid"
+  rmdir "$lock_dir"
+  wait "$command_pid"
+  command_status=$?
 
-  [ "$status" -eq 0 ]
-  [ -e "$attempt_state" ]
-  [ -e "$release_state" ]
+  [ "$command_status" -eq 0 ]
   report_file="$report_root/released-lock-repo/RELEASED.report.txt"
   [ "$(grep -c '^RECORD-COMPLETE: true$' "$report_file")" -eq 1 ]
   [ ! -e "$report_file.lock" ]

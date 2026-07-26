@@ -61,32 +61,79 @@ AUDITED_WRAPPERS = (
     "bin/apg-check-skill-library",
     "bin/apg-project-skills",
     "bin/apg-public-release",
+    "bin/apg-test",
     "bin/apg-user-skills",
     "bin/append-operational-report",
+    "bin/git-diff-report",
     "bin/git-show-report",
 )
 AUDITED_HELPERS = (
-    "libexec/agent-report/common.sh",
+    "libexec/agent_report/__init__.py",
+    "libexec/agent_report/cli.py",
+    "libexec/agent_report/diff.py",
+    "libexec/agent_report/git_adapter.py",
+    "libexec/agent_report/models.py",
+    "libexec/agent_report/operational.py",
+    "libexec/agent_report/rendering.py",
+    "libexec/agent_report/safety.py",
+    "libexec/agent_report/show.py",
     "libexec/apg_project_skills_commands.py",
     "libexec/apg_project_skills_core.py",
     "libexec/apg_public_release.py",
     "libexec/apg_record_identity.py",
     "libexec/apg_skill_library_check.py",
+    "libexec/apg_skill_topology.py",
+    "libexec/apg_test.py",
     "libexec/apg_user_skills.py",
 )
 AUDITED_TESTS = (
-    "src/test/int/python/apg_check_skill_library.int.test.py",
-    "src/test/int/python/apg_project_skills.int.test.py",
-    "src/test/int/python/apg_public_release.int.test.py",
-    "src/test/int/python/apg_public_release_v03_policy.int.test.py",
-    "src/test/int/python/apg_record_identity.int.test.py",
-    "src/test/int/python/apg_user_skills.int.test.py",
-    "src/test/int/python/apg_user_skills_variable_sets.int.test.py",
+    "src/test/int/python/agentic-praxis-grimoire/bin/apg-check-phase-commit-message.int.test.py",
+    "src/test/int/python/agentic-praxis-grimoire/bin/apg-check-record-identity.int.test.py",
+    "src/test/int/python/agentic-praxis-grimoire/bin/apg-check-skill-library.int.test.py",
+    "src/test/int/python/agentic-praxis-grimoire/bin/apg-project-skills.int.test.py",
+    "src/test/int/python/agentic-praxis-grimoire/bin/apg-public-release.int.test.py",
+    "src/test/int/python/agentic-praxis-grimoire/bin/apg-test.int.test.py",
+    "src/test/int/python/agentic-praxis-grimoire/bin/apg-user-skills.int.test.py",
+    "src/test/int/python/agentic-praxis-grimoire/bin/append-operational-report.int.test.py",
+    "src/test/int/python/agentic-praxis-grimoire/bin/git-diff-report.int.test.py",
+    "src/test/int/python/agentic-praxis-grimoire/bin/git-show-report.int.test.py",
+    "src/test/int/python/agentic-praxis-grimoire/libexec/apg_project_skills_commands.int.test.py",
+    "src/test/int/python/agentic-praxis-grimoire/libexec/apg_project_skills_core.int.test.py",
+    "src/test/int/python/agentic-praxis-grimoire/libexec/apg_public_release.int.test.py",
+    "src/test/int/python/agentic-praxis-grimoire/libexec/apg_skill_topology.int.test.py",
+    "src/test/int/python/agentic-praxis-grimoire/libexec/apg_test.int.test.py",
+    "src/test/int/python/agentic-praxis-grimoire/libexec/apg_user_skills.int.test.py",
     "src/test/unit/bash/append-operational-report.unit.test.bats",
     "src/test/unit/bash/git-show-report.unit.test.bats",
-    "src/test/unit/python/apg_public_release.unit.test.py",
-    "src/test/unit/python/apg_skill_library.unit.test.py",
-    "src/test/unit/python/apg_user_skills.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/docs/evaluations/apg41-v0-4-readiness-and-pre-release-smoke.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/docs/evaluations/apg42-v0-4-release-publication-and-active-deployment.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/docs/specs/go-testing-component-profiles.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/libexec/agent_report/cli.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/libexec/agent_report/operational.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/libexec/agent_report/rendering.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/libexec/agent_report/safety.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/libexec/agent_report/show.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_phase_commit_message.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_project_skills_commands.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_project_skills_core.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_public_release.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_record_identity.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_skill_library_check.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_skill_topology.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_test.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_user_skills.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/skills/chatgpt/chatgpt-manager-workflow/SKILL.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/skills/chatgpt/composing-approved-roadmap-assignments/SKILL.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/skills/dockerfile-profile/SKILL.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/skills/go-cmp-test-profile/SKILL.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/skills/go-test-profile/SKILL.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/skills/implementing-with-test-discipline/SKILL.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/skills/minitest-test-profile/SKILL.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/skills/nix-test-profile/SKILL.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/skills/planning-repository-work/SKILL.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/skills/pytest-test-profile/SKILL.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/skills/reviewing-and-verifying-repository-work/SKILL.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/skills/vagrantfile-profile/SKILL.unit.test.py",
 )
 AUDITED_LICENSING = (
     "CLA.md",
@@ -95,34 +142,62 @@ AUDITED_LICENSING = (
     "LICENSE",
     "NOTICE",
 )
-AUDITED_SKILLS = tuple(f"skills/{name}/SKILL.md" for name in (
-    "agentic-praxis-grimoire-workflow",
-    "bash-language-profile",
-    "bats-test-profile",
-    "composing-approved-roadmap-assignments",
-    "composing-bounded-worker-assignments",
-    "debugging-systematically",
-    "designing-significant-changes",
-    "go-language-profile",
-    "implementing-with-test-discipline",
-    "nix-language-profile",
-    "planning-repository-work",
-    "postgresql-database-profile",
-    "python-language-profile",
-    "reviewing-and-verifying-repository-work",
-    "ruby-language-profile",
-    "sqlite-database-profile",
-    "synthesizing-repository-guidance",
-    "zsh-language-profile",
-    "zunit-test-profile",
+AUDITED_SKILLS = tuple(sorted((
+    "skills/agentic-praxis-grimoire-workflow/SKILL.md",
+    "skills/bash-language-profile/SKILL.md",
+    "skills/bats-test-profile/SKILL.md",
+    "skills/chatgpt/chatgpt-manager-workflow/SKILL.md",
+    "skills/chatgpt/composing-approved-roadmap-assignments/SKILL.md",
+    "skills/composing-bounded-worker-assignments/SKILL.md",
+    "skills/converting-bash-scripts-to-python/SKILL.md",
+    "skills/debugging-systematically/SKILL.md",
+    "skills/designing-significant-changes/SKILL.md",
+    "skills/dockerfile-profile/SKILL.md",
+    "skills/go-cmp-test-profile/SKILL.md",
+    "skills/go-language-profile/SKILL.md",
+    "skills/go-test-profile/SKILL.md",
+    "skills/implementing-with-test-discipline/SKILL.md",
+    "skills/minitest-test-profile/SKILL.md",
+    "skills/nix-language-profile/SKILL.md",
+    "skills/nix-test-profile/SKILL.md",
+    "skills/planning-repository-work/SKILL.md",
+    "skills/postgresql-database-profile/SKILL.md",
+    "skills/pytest-test-profile/SKILL.md",
+    "skills/python-language-profile/SKILL.md",
+    "skills/reviewing-and-verifying-repository-work/SKILL.md",
+    "skills/ruby-language-profile/SKILL.md",
+    "skills/sqlite-database-profile/SKILL.md",
+    "skills/synthesizing-repository-guidance/SKILL.md",
+    "skills/vagrantfile-profile/SKILL.md",
+    "skills/zsh-language-profile/SKILL.md",
+    "skills/zunit-test-profile/SKILL.md",
+)))
+AUDITED_PROJECTIONS = tuple(sorted(
+    f".agents/skills/{PurePosixPath(path).parent.name}"
+    for path in AUDITED_SKILLS
 ))
-AUDITED_PROJECTIONS = tuple(path.replace("skills/", ".agents/skills/", 1).removesuffix("/SKILL.md") for path in AUDITED_SKILLS)
 LOCAL_PATH_MARKERS = ("/" + "Users" + "/", "file:" + "///")
-AUDITED_CRITICAL = (
+AUDITED_CRITICAL = tuple(sorted((
+    ".coveragerc",
     ".github/pull_request_template.md",
     ".gitignore",
     "AGENTS.md",
     "README.md",
+    "pytest.ini",
+    "requirements/test.txt",
+    "src/test/apg_public_release_cases.py",
+    "src/test/apg_skill_library_cases.py",
+    "src/test/apg_test_support.py",
+    "src/test/apg_user_skills_cases.py",
+    "src/test/fixtures/apg26-scenario-families.json",
+    "src/test/fixtures/apg32-minitest-scenario-families.json",
+    "src/test/fixtures/apg33-dockerfile-scenario-families.json",
+    "src/test/fixtures/apg34-vagrantfile-scenario-families.json",
+    "src/test/fixtures/apg37-go-cmp-scenario-families.json",
+    "src/test/fixtures/apg37-go-test-scenario-families.json",
+    "src/test/fixtures/apg39-nix-test-scenario-families.json",
+    "src/test/fixtures/apg41-provisional-readiness-cases.json",
+    "testing/apg-test-inventory.json",
     "docs/adr/2026/07/0005-public-license-and-contribution-governance.md",
     "docs/adr/2026/07/0009-public-distribution-and-reproducible-release-validation.md",
     "docs/adr/2026/07/0010-six-skill-post-superpowers-stability-dispositions.md",
@@ -157,6 +232,8 @@ AUDITED_CRITICAL = (
     "docs/evaluations/apg22c-zunit-startup-isolation-evidence-correction.md",
     "docs/evaluations/apg23-v0-3-readiness-maturity-and-application-smoke.md",
     "docs/evaluations/apg24-v0-3-release-candidate-and-publication.md",
+    "docs/evaluations/apg41-v0-4-readiness-and-pre-release-smoke.md",
+    "docs/evaluations/apg42-v0-4-release-publication-and-active-deployment.md",
     "docs/language-profile-contract.md",
     "docs/legacy-roadmap-closure.md",
     "docs/manager-worker-protocol.md",
@@ -189,6 +266,7 @@ AUDITED_CRITICAL = (
     "docs/status/2026/07/21/00037-apg22c-zunit-startup-isolation-evidence-correction-exit.md",
     "docs/status/2026/07/21/00038-apg23-v0-3-readiness-maturity-and-application-smoke-exit.md",
     "docs/status/2026/07/22/00039-apg24-v0-3-release-candidate-and-publication-exit.md",
+    "docs/status/2026/07/26/00062-apg42-v0-4-release-publication-and-active-deployment-exit.md",
     "docs/status/README.md",
     "docs/user-scoped-skill-integration.md",
     "docs/v0-3-guidance-migration-proposal.md",
@@ -197,7 +275,8 @@ AUDITED_CRITICAL = (
     "release/public-surface.json",
     "skills/README.md",
     "skills/agentic-praxis-grimoire-workflow/references/capability-map.json",
-)
+    "skills/chatgpt/chatgpt-manager-workflow/references/capability-map.json",
+)))
 
 HISTORICAL_V02_WRAPPERS = (
     "bin/apg-check-skill-library",
@@ -278,6 +357,168 @@ HISTORICAL_V02_CRITICAL = (
     "docs/user-scoped-skill-integration.md",
     "release/public-surface.json",
     "skills/README.md",
+)
+HISTORICAL_V03_WRAPPERS = (
+    "bin/apg-check-record-identity",
+    "bin/apg-check-skill-library",
+    "bin/apg-project-skills",
+    "bin/apg-public-release",
+    "bin/apg-user-skills",
+    "bin/append-operational-report",
+    "bin/git-show-report",
+)
+HISTORICAL_V03_HELPERS = (
+    "libexec/agent-report/common.sh",
+    "libexec/apg_project_skills_commands.py",
+    "libexec/apg_project_skills_core.py",
+    "libexec/apg_public_release.py",
+    "libexec/apg_record_identity.py",
+    "libexec/apg_skill_library_check.py",
+    "libexec/apg_user_skills.py",
+)
+HISTORICAL_V03_TESTS = (
+    "src/test/int/python/apg_check_skill_library.int.test.py",
+    "src/test/int/python/apg_project_skills.int.test.py",
+    "src/test/int/python/apg_public_release.int.test.py",
+    "src/test/int/python/apg_public_release_v03_policy.int.test.py",
+    "src/test/int/python/apg_record_identity.int.test.py",
+    "src/test/int/python/apg_user_skills.int.test.py",
+    "src/test/int/python/apg_user_skills_variable_sets.int.test.py",
+    "src/test/unit/bash/append-operational-report.unit.test.bats",
+    "src/test/unit/bash/git-show-report.unit.test.bats",
+    "src/test/unit/python/apg_public_release.unit.test.py",
+    "src/test/unit/python/apg_skill_library.unit.test.py",
+    "src/test/unit/python/apg_user_skills.unit.test.py",
+)
+HISTORICAL_V03_LICENSING = (
+    "CLA.md",
+    "COMMERCIAL-LICENSE.md",
+    "CONTRIBUTING.md",
+    "LICENSE",
+    "NOTICE",
+)
+HISTORICAL_V03_SKILLS = tuple(
+    f"skills/{name}/SKILL.md"
+    for name in (
+        "agentic-praxis-grimoire-workflow",
+        "bash-language-profile",
+        "bats-test-profile",
+        "composing-approved-roadmap-assignments",
+        "composing-bounded-worker-assignments",
+        "debugging-systematically",
+        "designing-significant-changes",
+        "go-language-profile",
+        "implementing-with-test-discipline",
+        "nix-language-profile",
+        "planning-repository-work",
+        "postgresql-database-profile",
+        "python-language-profile",
+        "reviewing-and-verifying-repository-work",
+        "ruby-language-profile",
+        "sqlite-database-profile",
+        "synthesizing-repository-guidance",
+        "zsh-language-profile",
+        "zunit-test-profile",
+    )
+)
+HISTORICAL_V03_PROJECTIONS = tuple(
+    path.replace("skills/", ".agents/skills/", 1).removesuffix("/SKILL.md")
+    for path in HISTORICAL_V03_SKILLS
+)
+HISTORICAL_V03_CRITICAL = (
+    ".github/pull_request_template.md",
+    ".gitignore",
+    "AGENTS.md",
+    "README.md",
+    "docs/adr/2026/07/0005-public-license-and-contribution-governance.md",
+    "docs/adr/2026/07/0009-public-distribution-and-reproducible-release-validation.md",
+    "docs/adr/2026/07/0010-six-skill-post-superpowers-stability-dispositions.md",
+    "docs/adr/2026/07/0011-v0-3-workflow-synthesis-and-modular-guidance-architecture.md",
+    "docs/adr/2026/07/0012-language-profile-contract-and-warning-levels.md",
+    "docs/adr/2026/07/0013-repository-guidance-synthesis-and-migration-dispositions.md",
+    "docs/adr/2026/07/0014-shell-language-and-shell-test-profile-ownership.md",
+    "docs/adr/2026/07/0015-semantic-phase-identity-and-record-finalization.md",
+    "docs/adr/2026/07/0016-nix-and-relational-engine-profile-ownership.md",
+    "docs/adr/2026/07/0017-approved-roadmap-manager-assignment-ownership.md",
+    "docs/adr/2026/07/0018-v0-3-readiness-maturity-and-release-inclusion.md",
+    "docs/adr/2026/07/0019-v0-3-release-distribution-and-variable-skill-set-lifecycle.md",
+    "docs/adr/README.md",
+    "docs/bootstrap-v0.1.md",
+    "docs/evaluations/apg12-public-distribution-and-release-validation.md",
+    "docs/evaluations/apg12a-public-lineage-and-read-only-validation-correction.md",
+    "docs/evaluations/apg13-six-skill-post-superpowers-stability-review.md",
+    "docs/evaluations/apg14-v0-2-release-candidate-and-publication.md",
+    "docs/evaluations/apg15-v0-3-foundation-design.md",
+    "docs/evaluations/apg16-public-workflow-router.md",
+    "docs/evaluations/apg17-repository-guidance-synthesis.md",
+    "docs/evaluations/apg18-python-language-profile.md",
+    "docs/evaluations/apg19-shell-and-shell-test-profiles.md",
+    "docs/evaluations/apg19a-semantic-phase-identity-and-apg19-reconciliation.md",
+    "docs/evaluations/apg20-go-and-ruby-language-profiles.md",
+    "docs/evaluations/apg20a-go-and-ruby-profile-corrections.md",
+    "docs/evaluations/apg21-nix-postgresql-and-sqlite-profiles.md",
+    "docs/evaluations/apg21a-nix-profile-correction.md",
+    "docs/evaluations/apg22-cross-repository-dogfood-and-guidance-migration.md",
+    "docs/evaluations/apg22a-approved-roadmap-manager-assignments.md",
+    "docs/evaluations/apg22b-version-bounded-zunit-profile.md",
+    "docs/evaluations/apg22c-zunit-startup-isolation-evidence-correction.md",
+    "docs/evaluations/apg23-v0-3-readiness-maturity-and-application-smoke.md",
+    "docs/evaluations/apg24-v0-3-release-candidate-and-publication.md",
+    "docs/language-profile-contract.md",
+    "docs/legacy-roadmap-closure.md",
+    "docs/manager-worker-protocol.md",
+    "docs/phase-and-record-identity.md",
+    "docs/project-model.md",
+    "docs/project-skill-projection.md",
+    "docs/provenance.md",
+    "docs/public-release-process.md",
+    "docs/roadmap.md",
+    "docs/skill-authoring-and-maintenance.md",
+    "docs/status/2026/07/20/00018-apg12-public-distribution-and-release-validation-exit.md",
+    "docs/status/2026/07/20/00019-apg12a-public-lineage-and-read-only-validation-correction-exit.md",
+    "docs/status/2026/07/20/00020-apg13-six-skill-post-superpowers-stability-review-exit.md",
+    "docs/status/2026/07/20/00021-apg14-v0-2-release-candidate-and-publication-exit.md",
+    "docs/status/2026/07/20/00022-apg15-v0-3-foundation-design-exit.md",
+    "docs/status/2026/07/20/00023-apg16-public-workflow-router-exit.md",
+    "docs/status/2026/07/20/00024-apg17-repository-guidance-synthesis-exit.md",
+    "docs/status/2026/07/21/00025-apg17a-public-release-identity-evidence-correction-exit.md",
+    "docs/status/2026/07/21/00026-apg18-language-profile-contract-and-python-vertical-slice-exit.md",
+    "docs/status/2026/07/21/00027-apg18a-python-profile-current-state-documentation-correction-exit.md",
+    "docs/status/2026/07/21/00028-apg19-shell-and-shell-test-profiles-exit.md",
+    "docs/status/2026/07/21/00029-apg19a-semantic-phase-identity-and-apg19-reconciliation-exit.md",
+    "docs/status/2026/07/21/00030-apg20-go-and-ruby-language-profiles-exit.md",
+    "docs/status/2026/07/21/00031-apg20a-go-and-ruby-profile-corrections-exit.md",
+    "docs/status/2026/07/21/00032-apg21-nix-postgresql-and-sqlite-profiles-exit.md",
+    "docs/status/2026/07/21/00033-apg21a-nix-profile-correction-exit.md",
+    "docs/status/2026/07/21/00034-apg22-cross-repository-dogfood-and-guidance-migration-exit.md",
+    "docs/status/2026/07/21/00035-apg22a-approved-roadmap-manager-assignments-exit.md",
+    "docs/status/2026/07/21/00036-apg22b-version-bounded-zunit-profile-exit.md",
+    "docs/status/2026/07/21/00037-apg22c-zunit-startup-isolation-evidence-correction-exit.md",
+    "docs/status/2026/07/21/00038-apg23-v0-3-readiness-maturity-and-application-smoke-exit.md",
+    "docs/status/2026/07/22/00039-apg24-v0-3-release-candidate-and-publication-exit.md",
+    "docs/status/README.md",
+    "docs/user-scoped-skill-integration.md",
+    "docs/v0-3-guidance-migration-proposal.md",
+    "docs/v0-3-readiness-matrix.md",
+    "docs/v0-3-release-scope-closure.md",
+    "release/public-surface.json",
+    "skills/README.md",
+    "skills/agentic-praxis-grimoire-workflow/references/capability-map.json",
+)
+HISTORICAL_V03_FORBIDDEN_REPORT_OWNERS = (
+    "bin/git-diff-report",
+    "libexec/agent_report/__init__.py",
+    "libexec/agent_report/cli.py",
+    "libexec/agent_report/diff.py",
+    "libexec/agent_report/git_adapter.py",
+    "libexec/agent_report/models.py",
+    "libexec/agent_report/operational.py",
+    "libexec/agent_report/rendering.py",
+    "libexec/agent_report/safety.py",
+    "libexec/agent_report/show.py",
+    "src/test/int/python/agent_report.int.test.py",
+    "src/test/int/python/agent_report_parity.int.test.py",
+    "src/test/unit/python/agent_report.unit.test.py",
 )
 SEMVER = re.compile(
     r"^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)"
@@ -480,11 +721,26 @@ def audited_policy_surfaces(version: str) -> tuple[dict[str, tuple[str, ...]], .
         "critical_files": AUDITED_CRITICAL,
         "validation_categories": tuple(sorted(ALLOWED_CATEGORIES)),
     }
+    if not SEMVER.fullmatch(version):
+        fail("public release policy identity is malformed or unsupported")
     core = version.split("+", 1)[0].split("-", 1)[0]
-    major, minor, _patch = core.split(".")
-    if (major, minor) != ("0", "2"):
+    if core == "0.4.0":
         return (current,)
-    historical = {
+    if core == "0.3.0":
+        historical_v03 = {
+            "required_helpers": HISTORICAL_V03_HELPERS,
+            "required_licensing_files": HISTORICAL_V03_LICENSING,
+            "required_projections": HISTORICAL_V03_PROJECTIONS,
+            "required_skills": HISTORICAL_V03_SKILLS,
+            "required_test_entrypoints": HISTORICAL_V03_TESTS,
+            "required_wrappers": HISTORICAL_V03_WRAPPERS,
+            "critical_files": HISTORICAL_V03_CRITICAL,
+            "validation_categories": tuple(sorted(ALLOWED_CATEGORIES)),
+        }
+        return (historical_v03,)
+    if core != "0.2.0":
+        fail("public release policy identity is malformed or unsupported")
+    historical_v02 = {
         "required_helpers": HISTORICAL_V02_HELPERS,
         "required_licensing_files": HISTORICAL_V02_LICENSING,
         "required_projections": HISTORICAL_V02_PROJECTIONS,
@@ -496,7 +752,7 @@ def audited_policy_surfaces(version: str) -> tuple[dict[str, tuple[str, ...]], .
             sorted(ALLOWED_CATEGORIES - {"record-identity"})
         ),
     }
-    return (historical,)
+    return (historical_v02,)
 
 
 def load_policy(
@@ -531,7 +787,7 @@ def load_policy(
             fail(f"public release policy {key} may not name private paths")
     if not set(value["validation_categories"]).issubset(ALLOWED_CATEGORIES):
         fail("public release policy contains an unknown validation category")
-    allowed_surfaces = tuple(expected_surfaces or audited_policy_surfaces("0.3.0"))
+    allowed_surfaces = tuple(expected_surfaces or audited_policy_surfaces("0.4.0"))
     if not any(
         all(tuple(value[key]) == expected for key, expected in surface.items())
         for surface in allowed_surfaces
@@ -683,10 +939,26 @@ def validate_public_release_surface(repository: Repository, version: str) -> Non
         expected_surfaces=audited_policy_surfaces(version),
     )
     entries = tree_entries(repository)
+    validate_versioned_policy_exclusions(entries, version)
     if any(entry.path == b"private" or entry.path.startswith(b"private/") for entry in entries):
         fail("public release must not track private/")
     validate_critical(entries, policy)
     validate_public_symlinks(repository, entries)
+
+
+def validate_versioned_policy_exclusions(
+    entries: Sequence[Entry],
+    version: str,
+) -> None:
+    """Reject future report owners from the immutable public v0.3.0 tree."""
+
+    core = version.split("+", 1)[0].split("-", 1)[0]
+    if core != "0.3.0":
+        return
+    paths = {entry.display_path for entry in entries}
+    for path in HISTORICAL_V03_FORBIDDEN_REPORT_OWNERS:
+        if path in paths:
+            fail(f"public v0.3.0 contains unsupported future owner: {path}")
 
 
 def render_manifest(manifest: dict[str, object], output_format: str) -> str:
@@ -1016,6 +1288,7 @@ def build_candidate(
         expected_surfaces=audited_policy_surfaces(version),
     )
     entries = tree_entries(source, excluded_prefix=b"private/")
+    validate_versioned_policy_exclusions(entries, version)
     validate_critical(entries, policy)
     validate_public_symlinks(source, entries)
     validate_output_path(output, source.root, base.root)
@@ -1158,7 +1431,7 @@ def run_checked_command(arguments: Sequence[str], cwd: Path, environment: dict[s
     except OSError as error:
         fail(f"configured validation could not run: {error.strerror}")
     if result.returncode:
-        detail = result.stderr.decode("utf-8", "replace").strip()
+        detail = (result.stderr + result.stdout)[-8192:].decode("utf-8", "replace").strip()
         fail(f"configured validation failed: {' '.join(arguments)}: {detail}")
 
 
@@ -1169,15 +1442,18 @@ def validate_categories(
     environment: dict[str, str],
 ) -> None:
     categories = set(policy["validation_categories"])  # type: ignore[arg-type]
+    wrappers = tuple(policy["required_wrappers"])  # type: ignore[arg-type]
+    helpers = tuple(policy["required_helpers"])  # type: ignore[arg-type]
+    tests = tuple(policy["required_test_entrypoints"])  # type: ignore[arg-type]
     if "skill-library" in categories:
         run_checked_command([str(candidate.root / "bin" / "apg-check-skill-library"), "--root", str(candidate.root), "--format", "json"], candidate.root, environment)
     if "record-identity" in categories:
         run_checked_command([str(candidate.root / "bin" / "apg-check-record-identity"), "--root", str(candidate.root), "--format", "json"], candidate.root, environment)
     if "command-help" in categories:
-        for wrapper in AUDITED_WRAPPERS:
+        for wrapper in wrappers:
             run_checked_command([str(candidate.root / wrapper), "--help"], candidate.root, environment)
     if "bash-syntax" in categories:
-        paths = [*AUDITED_WRAPPERS, *AUDITED_HELPERS]
+        paths = [*wrappers, *helpers]
         for path in paths:
             entry = next(item for item in tree_entries(candidate) if item.display_path == path)
             first_line = entry_bytes(candidate, entry).splitlines()[:1]
@@ -1186,13 +1462,30 @@ def validate_categories(
     if "python-compile" in categories:
         run_checked_command([sys.executable, "-m", "compileall", "-q", "libexec", "src/test"], candidate.root, environment)
     if "configured-tests" in categories:
-        tests = AUDITED_TESTS
         bash_tests = [path for path in tests if path.endswith(".bats")]
         python_tests = [path for path in tests if path.endswith(".py")]
         if bash_tests:
             run_checked_command(["bats", *bash_tests], candidate.root, environment)
-        for path in python_tests:
-            run_checked_command([sys.executable, path], candidate.root, environment)
+        if python_tests and all(
+            "/agentic-praxis-grimoire/" in path for path in python_tests
+        ):
+            run_checked_command(
+                [
+                    sys.executable,
+                    "-m",
+                    "pytest",
+                    "-q",
+                    "--import-mode=importlib",
+                    "-o",
+                    "python_files=*.test.py",
+                    *python_tests,
+                ],
+                candidate.root,
+                environment,
+            )
+        else:
+            for path in python_tests:
+                run_checked_command([sys.executable, path], candidate.root, environment)
     if "confidentiality" in categories:
         for entry in tree_entries(candidate):
             try:
@@ -1221,6 +1514,17 @@ def isolated_validation_environment(
     for path in locations.values():
         path.mkdir(parents=True)
     environment = git_environment({name: str(path) for name, path in locations.items()})
+    for name in tuple(environment):
+        if (
+            name.startswith("PYTHON")
+            or name.startswith("APG_TEST_")
+            or name.startswith("COVERAGE_")
+            or name.startswith("COV_CORE_")
+            or name.startswith("PYTEST_")
+        ):
+            environment.pop(name)
+    environment["PYTEST_DISABLE_PLUGIN_AUTOLOAD"] = "1"
+    environment["PYTHONPYCACHEPREFIX"] = str(locations["PYTHONPYCACHEPREFIX"])
     environment["PWD"] = str(candidate.root)
     environment.pop("OLDPWD", None)
     environment["APG12_PUBLIC_V01_ROOT"] = str(base.root)
@@ -1282,6 +1586,8 @@ def check_candidate(
     )
     source_entries = tree_entries(source, excluded_prefix=b"private/")
     candidate_entries = tree_entries(candidate)
+    validate_versioned_policy_exclusions(source_entries, version)
+    validate_versioned_policy_exclusions(candidate_entries, version)
     validate_critical(source_entries, policy)
     validate_critical(candidate_entries, policy)
     validate_public_symlinks(source, source_entries)

@@ -313,6 +313,16 @@ The ordinary rollback is `apg-project-skills uninstall`. It removes only proven
 local ownership and leaves canonical skills, history, evaluations, and global
 Codex or Superpowers state unchanged.
 
+## v0.4 nested-canonical boundary
+
+ADR 0022 and APG30 support source-declared canonical paths for ChatGPT-manager
+leaves while keeping target discovery names flat. Current-development sources
+resolve either `skills/<name>` or `skills/chatgpt/<name>` from verified source
+metadata; the command no longer reconstructs a source path from the flat name.
+Schema-version-1 historical v0.1.0 through v0.3.0 sources retain their
+direct-child declarations. Focused install, explicit-subset, check, and
+rollback tests cover both path classes without changing target state format.
+
 ## Limitations
 
 - The public v0.1.0 tracked surface omitted the documented
@@ -331,5 +341,15 @@ Codex or Superpowers state unchanged.
   the command favors refusing uncertain cleanup over guessing ownership.
 - Project projection success does not prove Codex invocation, automatic trigger
   selection, user-global integration, skill maturity, or production readiness.
-- The command manages exactly the current nineteen APG v0.3 release skills and
+- The default managed set follows the verified source identity: nineteen
+  skills for public v0.3.0 and twenty-eight for current development. The command
   is not a general skill installer or package manager.
+
+## APG28A adopted test ownership
+
+The project-projection integration owner is mirrored under
+`src/test/int/python/agentic-praxis-grimoire/bin/`. It exercises an exact
+nineteen-skill disposable public-shaped source and real disposable Git targets.
+The adopted implementation measures copied helpers through direct parallel
+coverage collection and canonical path equivalence. APG28A adopts this test
+infrastructure without changing project-skill command or schema behavior.

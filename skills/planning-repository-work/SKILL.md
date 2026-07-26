@@ -36,6 +36,23 @@ existing plan. Do not use planning to reopen accepted design decisions.
 8. End with the integrated verification and handoff needed to judge the whole
    objective, plus intentional deferrals.
 
+### Evidence scope and escalation
+
+For behavior-bearing units, name the scoped unit evidence and changed-boundary
+integration evidence that match the claim. Separate unit replacement seams
+from integration real boundaries so the plan cannot describe a mocked boundary
+as integrated. Do not schedule combined, full, smoke, readiness, or release
+suites automatically; state the specific justification for the smallest
+expanded gate. Place readiness and release suites at their authorized
+checkpoints rather than treating them as ordinary completion tests.
+
+Represent a coverage shortfall as a bounded coverage-remediation escalation:
+repair behavior and completeness first, inspect exact source ownership, expand
+through useful contracts in the project-owned order, and stop for disposition
+when that surface is exhausted. Do not create an open-ended task to "raise
+coverage" or pre-authorize denominator, threshold, rounding, or exclusion
+changes.
+
 ## Project-owned parameters
 
 The repository owns its file layout, phase model, task size, branch and commit

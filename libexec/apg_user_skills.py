@@ -19,6 +19,7 @@ from typing import Iterator, NoReturn, Sequence
 
 from apg_skill_library_check import check_library
 import apg_public_release as public_release
+import apg_skill_topology
 
 
 COMMAND = "apg-user-skills"
@@ -178,35 +179,43 @@ def text_git(repository: Path, arguments: Sequence[str], *, allow_failure: bool 
 
 def frontmatter_name(path: Path) -> str:
     try:
-        lines = path.read_text(encoding="utf-8").splitlines()
-    except (OSError, UnicodeError):
-        fail(f"source skill is unreadable: {path.parent.name}")
-    if not lines or lines[0] != "---":
-        fail(f"source skill frontmatter is malformed: {path.parent.name}")
+        return apg_skill_topology.frontmatter_name(path)
+    except ValueError as error:
+        fail(f"source {error}")
+
+
+def policy_skill_paths(policy: dict[str, object]) -> dict[str, Path]:
     try:
-        end = lines.index("---", 1)
-    except ValueError:
-        fail(f"source skill frontmatter is unterminated: {path.parent.name}")
-    names = [line.removeprefix("name:").strip() for line in lines[1:end] if line.startswith("name:")]
-    if names != [path.parent.name]:
-        fail(f"source skill name is malformed or mismatched: {path.parent.name}")
-    return names[0]
+        return apg_skill_topology.policy_skill_paths(policy)
+    except ValueError as error:
+        fail(f"source public release policy {error}")
 
 
 def policy_skill_names(policy: dict[str, object]) -> tuple[str, ...]:
-    def parse_paths(key: str, pattern: str) -> tuple[str, ...]:
-        values = policy.get(key)
-        if not isinstance(values, list) or not values or values != sorted(set(values)):
-            fail(f"source public release policy {key} is malformed")
-        matches = [re.fullmatch(pattern, value) if isinstance(value, str) else None for value in values]
-        if any(match is None for match in matches):
-            fail(f"source public release policy {key} is malformed")
-        return tuple(match.group(1) for match in matches if match is not None)
-    skills = parse_paths("required_skills", r"skills/([a-z0-9]+(?:-[a-z0-9]+)*)/SKILL\.md")
-    projections = parse_paths("required_projections", r"\.agents/skills/([a-z0-9]+(?:-[a-z0-9]+)*)")
-    if skills != projections:
-        fail("source public release policy skill and projection sets disagree")
-    return skills
+    return tuple(policy_skill_paths(policy))
+
+
+def canonical_source_paths(root: Path, skills_root: Path) -> dict[str, Path]:
+    try:
+        return apg_skill_topology.canonical_skill_paths(root, skills_root)
+    except ValueError as error:
+        fail(f"source {error}")
+
+
+def source_skill_paths(source: SourceIdentity) -> dict[str, Path]:
+    core_version = source.version.split("+", 1)[0].split("-", 1)[0]
+    if core_version != "0.4.0":
+        return {name: Path("skills") / name for name in source.skill_names}
+    repository = public_release.Repository(Path(source.path), source.commit, source.tree)
+    try:
+        surfaces = public_release.audited_policy_surfaces(source.version)
+        policy = public_release.load_policy(repository, expected_surfaces=surfaces)
+    except public_release.ToolError as error:
+        fail(f"source public release policy is invalid: {error}")
+    paths = policy_skill_paths(policy)
+    if tuple(paths) != source.skill_names:
+        fail("source skill paths disagree with the recorded source identity")
+    return paths
 
 
 def verify_source(requested: str | Path) -> SourceIdentity:
@@ -244,7 +253,7 @@ def verify_source(requested: str | Path) -> SourceIdentity:
     if not library_result.passed:
         diagnostic = library_result.diagnostics[0]
         fail(f"source APG skill library is invalid: {diagnostic.code} {diagnostic.path}")
-    policy_names = SKILLS
+    policy_paths = {name: Path("skills") / name for name in SKILLS}
     if commit != PUBLIC_V01_COMMIT:
         try:
             policy = public_release.load_policy(
@@ -258,27 +267,25 @@ def verify_source(requested: str | Path) -> SourceIdentity:
             public_release.validate_public_symlinks(release_repository, release_entries)
         except public_release.ToolError as error:
             fail(f"source public release policy is invalid: {error}")
-        policy_names = policy_skill_names(policy)
-    directory_names: list[str] = []
+        policy_paths = policy_skill_paths(policy)
     skills_root = root / "skills"
     if skills_root.is_symlink() or not skills_root.is_dir():
         fail("source skills directory is missing or unsafe")
-    for entry in skills_root.iterdir():
-        if entry.is_dir() or entry.is_symlink():
-            directory_names.append(entry.name)
-    names = tuple(sorted(directory_names))
+    canonical_paths = canonical_source_paths(root, skills_root)
+    if canonical_paths != policy_paths:
+        fail("source canonical skill set disagrees with its public release policy")
+    names = tuple(canonical_paths)
     if not names or any(not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*", name) for name in names):
         fail("source canonical skill set is empty or malformed")
-    if names != policy_names:
-        fail("source canonical skill set disagrees with its public release policy")
     hashes: list[tuple[str, str]] = []
     for name in names:
-        leaf = skills_root / name
+        relative_leaf = canonical_paths[name]
+        leaf = root / relative_leaf
         skill_file = leaf / "SKILL.md"
         if leaf.is_symlink() or not leaf.is_dir() or skill_file.is_symlink() or not skill_file.is_file():
             fail(f"source canonical skill path is unsafe: {name}")
         frontmatter_name(skill_file)
-        content = run_git(root, ["show", f"{commit}:skills/{name}/SKILL.md"], allow_failure=True)
+        content = run_git(root, ["show", f"{commit}:{relative_leaf.as_posix()}/SKILL.md"], allow_failure=True)
         if content.returncode:
             fail(f"source canonical skill is not committed: {name}")
         if content.stdout != skill_file.read_bytes():
@@ -581,13 +588,14 @@ def exact_links(root: Path, source: SourceIdentity) -> None:
     verify_existing_ancestors(root)
     if not root.is_dir() or root.is_symlink():
         fail("managed user skill root is missing or unsafe")
+    source_paths = source_skill_paths(source)
     for name in source.skill_names:
         link = root / name
         if not os.path.lexists(link):
             fail(f"managed user skill link is missing: {name}")
         if not link.is_symlink():
             fail(f"managed user skill path is not a symbolic link: {name}")
-        expected = Path(source.path) / "skills" / name
+        expected = Path(source.path) / source_paths[name]
         if os.readlink(link) != str(expected):
             fail(f"managed user skill raw link target changed: {name}")
         try:
@@ -631,10 +639,11 @@ def preflight_absent(root: Path, names: Sequence[str]) -> None:
 
 def create_links(root: Path, source: SourceIdentity) -> None:
     created: list[Path] = []
+    source_paths = source_skill_paths(source)
     try:
         for name in source.skill_names:
             link = root / name
-            link.symlink_to(Path(source.path) / "skills" / name, target_is_directory=True)
+            link.symlink_to(Path(source.path) / source_paths[name], target_is_directory=True)
             created.append(link)
     except OSError as error:
         for link in reversed(created):
@@ -646,6 +655,7 @@ def verify_adoptable(root: Path, source: SourceIdentity) -> None:
     verify_existing_ancestors(root)
     if not root.is_dir() or root.is_symlink():
         fail("user skill root is missing or unsafe for adoption")
+    source_paths = source_skill_paths(source)
     for name in source.skill_names:
         link = root / name
         if not link.is_symlink():
@@ -654,14 +664,17 @@ def verify_adoptable(root: Path, source: SourceIdentity) -> None:
             resolved = link.resolve(strict=True)
         except OSError:
             fail(f"adoption link is broken: {name}")
-        if resolved != (Path(source.path) / "skills" / name).resolve(strict=True):
+        expected = Path(source.path) / source_paths[name]
+        if resolved != expected.resolve(strict=True):
             fail(f"adoption link target is mismatched: {name}")
-        if os.readlink(link) != str(Path(source.path) / "skills" / name):
+        if os.readlink(link) != str(expected):
             fail(f"adoption requires the exact canonical raw link target: {name}")
 
 
 def replace_links(root: Path, old: SourceIdentity, new: SourceIdentity) -> None:
     exact_links(root, old)
+    old_paths = source_skill_paths(old)
+    new_paths = source_skill_paths(new)
     old_names = set(old.skill_names)
     new_names = set(new.skill_names)
     common = tuple(sorted(old_names & new_names))
@@ -682,7 +695,7 @@ def replace_links(root: Path, old: SourceIdentity, new: SourceIdentity) -> None:
     try:
         for name in (*common, *added):
             temporary = root / f".{name}.apg-user-skills-new"
-            temporary.symlink_to(Path(new.path) / "skills" / name, target_is_directory=True)
+            temporary.symlink_to(Path(new.path) / new_paths[name], target_is_directory=True)
             staged.append(temporary)
         for name in common:
             os.replace(root / f".{name}.apg-user-skills-new", root / name)
@@ -701,13 +714,13 @@ def replace_links(root: Path, old: SourceIdentity, new: SourceIdentity) -> None:
                 if os.path.lexists(link):
                     rollback_errors.append(f"removed link changed concurrently: {name}")
                 else:
-                    link.symlink_to(Path(old.path) / "skills" / name, target_is_directory=True)
+                    link.symlink_to(Path(old.path) / old_paths[name], target_is_directory=True)
             except OSError as rollback_error:
                 rollback_errors.append(f"removed link restore failed for {name}: {rollback_error}")
         for name in reversed(installed):
             link = root / name
             try:
-                if link.is_symlink() and os.readlink(link) == str(Path(new.path) / "skills" / name):
+                if link.is_symlink() and os.readlink(link) == str(Path(new.path) / new_paths[name]):
                     link.unlink()
                 else:
                     rollback_errors.append(f"added link changed concurrently: {name}")
@@ -716,7 +729,7 @@ def replace_links(root: Path, old: SourceIdentity, new: SourceIdentity) -> None:
         for name in reversed(replaced):
             temporary = root / f".{name}.apg-user-skills-rollback"
             try:
-                temporary.symlink_to(Path(old.path) / "skills" / name, target_is_directory=True)
+                temporary.symlink_to(Path(old.path) / old_paths[name], target_is_directory=True)
                 os.replace(temporary, root / name)
             except OSError as rollback_error:
                 rollback_errors.append(f"link restore failed for {name}: {rollback_error}")
@@ -781,6 +794,7 @@ def do_install(source: SourceIdentity, root: Path, state_path: Path) -> str:
         return "PASS user skills already installed; no discovery state changed."
     created = create_containers(root)
     links_created = False
+    source_paths = source_skill_paths(source)
     try:
         preflight_absent(root, source.skill_names)
         create_links(root, source)
@@ -790,7 +804,7 @@ def do_install(source: SourceIdentity, root: Path, state_path: Path) -> str:
         if links_created:
             for name in source.skill_names:
                 link = root / name
-                if link.is_symlink() and os.readlink(link) == str(Path(source.path) / "skills" / name):
+                if link.is_symlink() and os.readlink(link) == str(Path(source.path) / source_paths[name]):
                     link.unlink()
         for container in sorted((Path(item.path) for item in created), key=lambda item: len(item.parts), reverse=True):
             try:
@@ -902,6 +916,7 @@ def do_uninstall(root: Path, state_path: Path) -> str:
         fail("user state belongs to another skill root")
     source_matches(state.current_source)
     exact_links(root, state.current_source)
+    source_paths = source_skill_paths(state.current_source)
     removed: list[str] = []
     try:
         for name in state.managed_skills:
@@ -910,7 +925,7 @@ def do_uninstall(root: Path, state_path: Path) -> str:
         state_path.unlink()
     except OSError as error:
         for name in removed:
-            (root / name).symlink_to(Path(state.current_source.path) / "skills" / name, target_is_directory=True)
+            (root / name).symlink_to(Path(state.current_source.path) / source_paths[name], target_is_directory=True)
         fail(f"uninstall failed and removed links were restored: {error.strerror}")
     for identity in sorted(state.created_containers, key=lambda item: len(Path(item.path).parts), reverse=True):
         container = Path(identity.path)

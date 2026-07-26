@@ -92,3 +92,15 @@ The release-source record targets
 `published-pending-fresh-session-shadow-smoke`. Exact postcommit Git objects,
 remote observations, link identities, report identifiers, and reviewer returns
 are retained only in publication-excluded or managed operational evidence.
+
+## Subsequent APG24A disposition
+
+APG24A records the maintainer's later report that the public-v0.3
+fresh-session shadow smoke passed and that the personal same-name router was
+then decommissioned under separate authority. Focused resulting-state checks
+confirm unchanged public and active v0.3.0 state, nineteen aggregate skills,
+preserved other personal skills, and an exact private restoration source.
+
+This later evidence satisfies APG24's external observation without changing
+the truth of its original terminal state or retroactively expanding APG24's
+authority.

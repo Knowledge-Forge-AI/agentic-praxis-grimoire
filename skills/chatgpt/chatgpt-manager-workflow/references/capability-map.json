@@ -1,0 +1,11 @@
+{
+  "capabilities": [
+    {
+      "capability_class": "approved-roadmap manager-assignment composition",
+      "name": "composing-approved-roadmap-assignments",
+      "trigger": "A human-approved roadmap phase or explicitly approved bounded phase sequence needs a reviewable top-level coding-agent manager assignment with authority, scope, evidence, acceptance, stop, reporting, and handoff boundaries."
+    }
+  ],
+  "router_name": "chatgpt-manager-workflow",
+  "schema_version": 1
+}

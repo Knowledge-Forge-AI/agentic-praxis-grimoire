@@ -1,0 +1,184 @@
+{
+  "minitest": [
+    {
+      "id": "APG32-MINITEST-01",
+      "scenario": "Minitest::Test organization or behavior is material",
+      "expected": "Trigger the profile"
+    },
+    {
+      "id": "APG32-MINITEST-02",
+      "scenario": "Minitest describe or it behavior is material",
+      "expected": "Trigger the profile"
+    },
+    {
+      "id": "APG32-MINITEST-03",
+      "scenario": "Ordinary Ruby implementation has no material harness question",
+      "expected": "Non-trigger"
+    },
+    {
+      "id": "APG32-MINITEST-04",
+      "scenario": "Work is exclusively RSpec-specific",
+      "expected": "Non-trigger"
+    },
+    {
+      "id": "APG32-MINITEST-05",
+      "scenario": "One direct assertion proves the required observable outcome",
+      "expected": "Green when the assertion can fail for the defect"
+    },
+    {
+      "id": "APG32-MINITEST-06",
+      "scenario": "Assertion or refutation polarity obscures or cannot prove the outcome",
+      "expected": "Select a direct required predicate; false-passing evidence is Red"
+    },
+    {
+      "id": "APG32-MINITEST-07",
+      "scenario": "Per-test setup and teardown own a bounded resource",
+      "expected": "Green or Yellow according to lifecycle and cleanup"
+    },
+    {
+      "id": "APG32-MINITEST-08",
+      "scenario": "Inherited hooks or lifecycle extensions change ordering or cleanup",
+      "expected": "Inspect super, effective hooks, and versions; hidden or broken ordering is Orange or Red"
+    },
+    {
+      "id": "APG32-MINITEST-09",
+      "scenario": "Setup or test failure occurs before cleanup",
+      "expected": "Verify teardown attempts and real restoration; consequential residue is Red"
+    },
+    {
+      "id": "APG32-MINITEST-10",
+      "scenario": "Tests share mutable process, class, global, environment, cache, or service state",
+      "expected": "At least Yellow; uncontrolled contamination or order dependence is Red"
+    },
+    {
+      "id": "APG32-MINITEST-11",
+      "scenario": "A test outcome depends on another test's execution order",
+      "expected": "Red isolation stop"
+    },
+    {
+      "id": "APG32-MINITEST-12",
+      "scenario": "A randomized-order failure is reproducible with its reported seed",
+      "expected": "Preserve the seed and repair the leak; sorted order is not isolation proof"
+    },
+    {
+      "id": "APG32-MINITEST-13",
+      "scenario": "parallelize_me! is enabled for an otherwise isolated owner",
+      "expected": "Verify executor, thread safety, complete results, and cleanup"
+    },
+    {
+      "id": "APG32-MINITEST-14",
+      "scenario": "Parallel tests can write one shared path, database, port, account, cache, or environment",
+      "expected": "Red collision stop unless isolated before execution"
+    },
+    {
+      "id": "APG32-MINITEST-15",
+      "scenario": "Subject, plugin, mock, reporter, or helper is not thread-safe",
+      "expected": "Red for parallel execution until confined, synchronized, serialized, or removed"
+    },
+    {
+      "id": "APG32-MINITEST-16",
+      "scenario": "Test claims process or subprocess integration",
+      "expected": "Exercise the real process boundary with explicit status, output, timeout, cleanup, and platform assumptions"
+    },
+    {
+      "id": "APG32-MINITEST-17",
+      "scenario": "Test claims filesystem integration",
+      "expected": "Exercise real filesystem semantics in an owned disposable root"
+    },
+    {
+      "id": "APG32-MINITEST-18",
+      "scenario": "Test claims database integration",
+      "expected": "Exercise the real database boundary under project-owned disposable isolation and cleanup"
+    },
+    {
+      "id": "APG32-MINITEST-19",
+      "scenario": "A mocked process, filesystem, database, or service boundary is called integration",
+      "expected": "Red false-integration stop"
+    },
+    {
+      "id": "APG32-MINITEST-20",
+      "scenario": "Minitest mock expectations are material",
+      "expected": "Establish core or separate-gem ownership and verify meaningful expectations"
+    },
+    {
+      "id": "APG32-MINITEST-21",
+      "scenario": "Object#stub replaces one method for a bounded block",
+      "expected": "Verify the target, existence, restoration, and concurrency boundary"
+    },
+    {
+      "id": "APG32-MINITEST-22",
+      "scenario": "A test replaces many collaborators or internal calls",
+      "expected": "Structural warning; prefer a focused boundary, fake, or decomposition"
+    },
+    {
+      "id": "APG32-MINITEST-23",
+      "scenario": "A bounded skip records unsupported or unavailable behavior",
+      "expected": "No passing evidence; a required claim depending on the skip is Red"
+    },
+    {
+      "id": "APG32-MINITEST-24",
+      "scenario": "Name filtering is used for a focused run",
+      "expected": "Establish version semantics and verify that intended tests ran"
+    },
+    {
+      "id": "APG32-MINITEST-25",
+      "scenario": "minitest/autorun controls process-exit execution",
+      "expected": "Inspect at-exit, fork, prior-exception, after-run, and exit-status ownership"
+    },
+    {
+      "id": "APG32-MINITEST-26",
+      "scenario": "A custom reporter changes result or output handling",
+      "expected": "Verify lifecycle, complete results, failures, output safety, and compatibility"
+    },
+    {
+      "id": "APG32-MINITEST-27",
+      "scenario": "A plugin changes options, loading, reporters, or execution",
+      "expected": "Establish explicit loading and exact compatibility; unsupported claims are Red"
+    },
+    {
+      "id": "APG32-MINITEST-28",
+      "scenario": "Expected tests are silently omitted or an unfiltered run collects zero tests",
+      "expected": "Red truthfulness stop even when the runner returns success"
+    },
+    {
+      "id": "APG32-MINITEST-29",
+      "scenario": "Ruby, Minitest, mock, or plugin behavior is outside verified versions",
+      "expected": "Red until current source and project evidence establish support"
+    },
+    {
+      "id": "APG32-MINITEST-30",
+      "scenario": "Failure output, reporter data, seed, paths, or payloads expose protected data",
+      "expected": "Red; sanitize at the source and reverify artifacts"
+    },
+    {
+      "id": "APG32-MINITEST-31",
+      "scenario": "Exact command, file pattern, or worker count must be chosen",
+      "expected": "Repository-owned; the profile may inspect but not select it"
+    },
+    {
+      "id": "APG32-MINITEST-32",
+      "scenario": "Repository policy is stricter than the profile fallback",
+      "expected": "Stricter repository policy controls"
+    },
+    {
+      "id": "APG32-MINITEST-33",
+      "scenario": "A maintained test owner crosses warning or crisis thresholds",
+      "expected": "Apply classification, decomposition, and bounded-exception rules"
+    },
+    {
+      "id": "APG32-MINITEST-34",
+      "scenario": "A test can mutate destructive or consequential external state without authority",
+      "expected": "Red authority stop"
+    },
+    {
+      "id": "APG32-MINITEST-35",
+      "scenario": "The decision materially needs Minitest and Ruby semantics",
+      "expected": "Pair both profiles independently under the applicable process owner"
+    },
+    {
+      "id": "APG32-MINITEST-36",
+      "scenario": "A repository is choosing between Minitest and another framework",
+      "expected": "Non-trigger; framework selection remains project-owned"
+    }
+  ]
+}

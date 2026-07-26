@@ -44,6 +44,41 @@ Mechanical or documentation-only portions of a mixed change use their
 applicable checks; they do not justify skipping evidence for the behavioral
 portion.
 
+### Coverage remediation and test scope
+
+Distinguish a behavior or test failure from a coverage-only failure. Repair
+behavior, collection, completeness, and source-target defects before expanding
+tests for coverage. When correct tests pass but a project-owned gate fails,
+inspect exact per-file statement and branch counts and the complete maintained-
+source inventory rather than displayed rounding or aggregate percentages.
+
+Expand only while a useful observable contract exists, in this order:
+
+1. current-task behavior;
+2. adjacent behavior affected by the change;
+3. the same maintained module;
+4. its package and subpackages; and
+5. a justified parent package.
+
+At each layer, keep unit isolation proportional and exercise the real boundary
+for any integration claim. Stop and request project disposition when the
+complete suite-owned surface is exhausted, the gate still fails, and no useful
+observable contract remains. Record the exact deficit and the layers examined.
+
+Do not add tests only to execute lines, assert private implementation order,
+duplicate an existing contract, or replace subject behavior with mocks. Inspect
+an incomplete source target, dead or unreachable code, and any proposed
+exclusion. Remove dead code only within authority. Exclude generated,
+platform-inapplicable, intentionally unreachable, or defensive code only when
+the project accepts an explicit rationale and owner. Never change denominators,
+thresholds, branch mode, source inventory, exclusions, or rounding merely to
+make the gate pass.
+
+Preserve the scoped-test default: run focused unit evidence and changed-
+boundary integration evidence first. Do not broaden to combined, full, smoke,
+readiness, or release suites unless a focused result, project checkpoint, or
+explicit manager requirement justifies that smallest broader gate.
+
 ## Project-owned parameters
 
 The project owns test levels, commands, coverage policy, mock and fixture

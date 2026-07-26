@@ -1,0 +1,204 @@
+{
+  "vagrantfile": [
+    {
+      "id": "APG34-VAGRANTFILE-01",
+      "scenario": "A single-machine Vagrantfile has a material DSL question",
+      "expected": "Trigger the profile and establish Vagrant and configuration version, host, provider, file ownership, and project policy"
+    },
+    {
+      "id": "APG34-VAGRANTFILE-02",
+      "scenario": "An ordinary Ruby task has no Vagrant behavior",
+      "expected": "Non-trigger; use the Ruby or project owner when independently material"
+    },
+    {
+      "id": "APG34-VAGRANTFILE-03",
+      "scenario": "A task changes only Terraform or Docker behavior",
+      "expected": "Non-trigger; route to the applicable infrastructure or project owner"
+    },
+    {
+      "id": "APG34-VAGRANTFILE-04",
+      "scenario": "The configuration version is unsupported or unknown",
+      "expected": "Red until the supported configuration API and selected Vagrant behavior are established"
+    },
+    {
+      "id": "APG34-VAGRANTFILE-05",
+      "scenario": "Configuration is loaded conditionally from uncontrolled host state",
+      "expected": "Orange while bounding branches and inputs; protected, unbounded, or falsely portable behavior is Red"
+    },
+    {
+      "id": "APG34-VAGRANTFILE-06",
+      "scenario": "Plugin behavior is assumed without version evidence",
+      "expected": "Orange until exact plugin and Vagrant compatibility are established; a consequential support claim without evidence is Red"
+    },
+    {
+      "id": "APG34-VAGRANTFILE-07",
+      "scenario": "A box version floats",
+      "expected": "Yellow or Orange under project update policy; a consequential immutable or supported claim without evidence is Red"
+    },
+    {
+      "id": "APG34-VAGRANTFILE-08",
+      "scenario": "A project-approved exact box version has checksum or metadata evidence",
+      "expected": "Green or Yellow after source, provider, architecture, update, provenance, and rollback boundaries are verified; do not infer boot success"
+    },
+    {
+      "id": "APG34-VAGRANTFILE-09",
+      "scenario": "A private box URL or credential is involved",
+      "expected": "Red if protected data can enter source, environment, URL, logs, state, or artifacts; use only a project-approved protected transport"
+    },
+    {
+      "id": "APG34-VAGRANTFILE-10",
+      "scenario": "A provider-specific block targets an approved provider",
+      "expected": "Green or Yellow after exact provider version, availability, override, capability, host, and rollback boundaries are established"
+    },
+    {
+      "id": "APG34-VAGRANTFILE-11",
+      "scenario": "Provider-specific behavior is assumed to be portable",
+      "expected": "Red until each claimed provider and host variant is established"
+    },
+    {
+      "id": "APG34-VAGRANTFILE-12",
+      "scenario": "A required plugin is missing",
+      "expected": "Red until the exact name, version requirement, source, and compatibility are resolved; do not install it"
+    },
+    {
+      "id": "APG34-VAGRANTFILE-13",
+      "scenario": "Plugin installation is requested without authority",
+      "expected": "Red authority and global-state stop"
+    },
+    {
+      "id": "APG34-VAGRANTFILE-14",
+      "scenario": "One simple machine has bounded configuration",
+      "expected": "Green when its effective box, provider, network, folder, provisioner, state, and policy boundaries are explicit"
+    },
+    {
+      "id": "APG34-VAGRANTFILE-15",
+      "scenario": "A coherent multi-machine environment shares one topology and lifecycle",
+      "expected": "Green or Yellow while concrete fan-out, dependencies, command breadth, and rollback remain bounded"
+    },
+    {
+      "id": "APG34-VAGRANTFILE-16",
+      "scenario": "Dynamic machine generation obscures ownership",
+      "expected": "Orange until every concrete machine and attached declaration is bounded; representing an unbounded result as verified is Red"
+    },
+    {
+      "id": "APG34-VAGRANTFILE-17",
+      "scenario": "Forwarded ports can collide",
+      "expected": "Red until exact machine, host address, host and guest port, protocol, allocation, consumer, and rollback are collision-free"
+    },
+    {
+      "id": "APG34-VAGRANTFILE-18",
+      "scenario": "A forwarded port is privileged or publicly exposed",
+      "expected": "Red until explicit exposure and privilege authority, host binding, firewall, validation, and rollback are accepted"
+    },
+    {
+      "id": "APG34-VAGRANTFILE-19",
+      "scenario": "A private-network static address conflicts",
+      "expected": "Red until address ownership, subnet, provider, host routes, peer allocation, and rollback are reconciled"
+    },
+    {
+      "id": "APG34-VAGRANTFILE-20",
+      "scenario": "A public network exposes a guest",
+      "expected": "Red until exact intended exposure, provider meaning, host interface, guest hardening, firewall, validation, and rollback are accepted"
+    },
+    {
+      "id": "APG34-VAGRANTFILE-21",
+      "scenario": "Host-only network assumptions differ by provider or platform",
+      "expected": "Orange pending exact provider, host, address, route, and capability evidence; a portable claim is Red"
+    },
+    {
+      "id": "APG34-VAGRANTFILE-22",
+      "scenario": "A narrow project-owned host folder is synced to an exact guest path",
+      "expected": "Green or Yellow after effective layers, type, provider, ownership, permissions, symlinks, direction, and rollback are established"
+    },
+    {
+      "id": "APG34-VAGRANTFILE-23",
+      "scenario": "A host home directory or broad sensitive path is mounted",
+      "expected": "Red host-data exposure stop"
+    },
+    {
+      "id": "APG34-VAGRANTFILE-24",
+      "scenario": "Synced-folder ownership, permissions, or symlink behavior is unclear",
+      "expected": "Orange until the host, guest, provider, type, ownership, mode, and link contract is explicit; unsafe exposure is Red"
+    },
+    {
+      "id": "APG34-VAGRANTFILE-25",
+      "scenario": "A provider-specific synced-folder implementation is selected",
+      "expected": "Green or Yellow only under approved provider and plugin policy with exact version, capability, path, and rollback evidence"
+    },
+    {
+      "id": "APG34-VAGRANTFILE-26",
+      "scenario": "Project policy disables the default folder",
+      "expected": "Green or Yellow after confirming the effective layered configuration, dependent guest paths, provisioning assumptions, and rollback"
+    },
+    {
+      "id": "APG34-VAGRANTFILE-27",
+      "scenario": "A project-approved provisioner is designed to be idempotent",
+      "expected": "Green or Yellow after repeat, failure, privilege, input, output, validation, and rollback evidence; the declaration alone is not proof"
+    },
+    {
+      "id": "APG34-VAGRANTFILE-28",
+      "scenario": "A shell provisioner uses a fixed argument vector",
+      "expected": "Yellow after guest OS, transport, interpreter, privilege, quoting, environment, repeatability, and rollback are established; pair a shell profile only when independently material"
+    },
+    {
+      "id": "APG34-VAGRANTFILE-29",
+      "scenario": "An untrusted value reaches shell interpretation",
+      "expected": "Red source-to-shell stop"
+    },
+    {
+      "id": "APG34-VAGRANTFILE-30",
+      "scenario": "A non-idempotent provisioner can repeat destructive effects",
+      "expected": "Red until authority, repetition control, adverse-case validation, and rollback are established"
+    },
+    {
+      "id": "APG34-VAGRANTFILE-31",
+      "scenario": "A destroy or halt trigger mutates external state",
+      "expected": "Red without exact lifecycle authority; an authorized design remains Orange until ordering, failure, idempotency, validation, and rollback are accepted"
+    },
+    {
+      "id": "APG34-VAGRANTFILE-32",
+      "scenario": "Trigger ordering or failure behavior is unclear",
+      "expected": "Orange until scope, order, host or guest execution, failure mode, and partial-effect recovery are explicit; destructive ambiguity is Red"
+    },
+    {
+      "id": "APG34-VAGRANTFILE-33",
+      "scenario": "Secrets appear in inline provisioning or logs",
+      "expected": "Red protected-data stop"
+    },
+    {
+      "id": "APG34-VAGRANTFILE-34",
+      "scenario": ".vagrant state is treated as source",
+      "expected": "Red truthfulness and state-ownership stop; classify it as generated machine/provider identity"
+    },
+    {
+      "id": "APG34-VAGRANTFILE-35",
+      "scenario": "Machine identity or provider state is stale or shared incorrectly",
+      "expected": "Red until source, local state, global index, provider identity, ownership, backup, and recovery are reconciled without manual mutation"
+    },
+    {
+      "id": "APG34-VAGRANTFILE-36",
+      "scenario": "A task requests vagrant up, reload, provision, or destroy without authority",
+      "expected": "Red lifecycle-authority stop"
+    },
+    {
+      "id": "APG34-VAGRANTFILE-37",
+      "scenario": "A Vagrantfile branches on host platform",
+      "expected": "Yellow or Orange while exact branches, supported hosts, provider capabilities, inputs, and tests are bounded; uncontrolled or falsely portable behavior is Red"
+    },
+    {
+      "id": "APG34-VAGRANTFILE-38",
+      "scenario": "The Vagrantfile is generated or vendor-owned",
+      "expected": "Classify and change the authorized generator or owner; semantic Red stops still control"
+    },
+    {
+      "id": "APG34-VAGRANTFILE-39",
+      "scenario": "Repository policy is stricter than the profile fallback",
+      "expected": "Stricter repository policy controls"
+    },
+    {
+      "id": "APG34-VAGRANTFILE-40",
+      "scenario": "Vagrantfile structure crosses a warning or crisis threshold",
+      "expected": "Apply classification, concrete expansion, coupling, decomposition, bounded-exception, and rollback rules"
+    }
+  ]
+}

@@ -48,6 +48,27 @@ that requests no disposition may use a lighter review.
 
 A no-finding review does not create a reason to modify the artifact.
 
+### Test, coverage, and report review
+
+Verify that tests assert useful observable behavior and can fail for the stated
+contract. Confirm that unit replacements do not erase the subject behavior and
+that integration claims exercise the real boundary they name. A deliberately
+mocked unsafe external service remains a unit or bounded-adapter claim, not
+evidence that the service was integrated.
+
+For a coverage claim, inspect exact coverage arithmetic, the complete
+maintained-source inventory, worker and subprocess completeness when material,
+and whether exclusions have an explicit owner and rationale. Reject tests added
+only to execute lines, private-order assertions, duplicated contracts,
+denominator or rounding manipulation, and unowned exclusions.
+
+Broader test gates require a recorded justification tied to risk, a focused
+failure, a project checkpoint, or an explicit requirement. Report deliberately
+unrun comprehensive suites truthfully. Verify the project's actual status and
+delivery convention: use Git-diff evidence for a dirty stopped result, Git-show
+evidence for a committed result, and associated operational evidence when the
+project requires it. Do not infer completion from any report's existence.
+
 ## Project-owned parameters
 
 The project owns reviewer independence, severity labels, required tests,

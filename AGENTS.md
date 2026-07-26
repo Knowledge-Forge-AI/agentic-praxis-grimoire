@@ -62,15 +62,30 @@ not authorize installation or workflow use.
   excluded reproducibility records; they never replace durable public semantic
   identity or create a public dependency on `private/`. Follow the
   [phase and record identity guide](docs/phase-and-record-identity.md).
+- For an APG formal-phase commit, write the complete message to a private file,
+  validate it with `bin/apg-check-phase-commit-message --phase <PHASE-ID>
+  --message-file <path>`, commit with `git commit -F <path>`, and validate the
+  resulting commit with the same checker and `--commit <revision>` before
+  generating reports. The checker validates message form; it grants no commit
+  or continuation authority.
 - Prefer deterministic checks for stable mechanical constraints. Do not call a
   prose requirement or one-time inspection tool-enforced.
 - Validate instruction, skill, documentation, and tool changes in proportion to
   affected behavior. Keep documentation, tests, provenance, and implementation
   consistent.
+- For ordinary implementation, start with scoped unit evidence and changed-
+  boundary integration evidence. Broaden only for a recorded risk, focused
+  failure, project checkpoint, or explicit requirement. Coverage remediation
+  follows the useful-contract hierarchy and stop owned by
+  `implementing-with-test-discipline` and the testing policy.
 - For delegated work, follow the
   [manager-worker protocol](docs/manager-worker-protocol.md). Internal workers
   return through the agent harness; top-level phase reports follow the external
   assignment contract.
+- When a phase requires managed Git and operational evidence, generate the Git
+  show or Git diff record first and append the operational record to the same
+  canonical phase report with its exact existing Git record ID. A standalone
+  operational append is valid only when that report contains no Git record.
 - A completion claim requires fresh evidence from the resulting repository
   state. A worker result, commit, or report is evidence, not automatic
   acceptance.
@@ -83,15 +98,32 @@ not authorize installation or workflow use.
   records.
 - [Manager-worker protocol](docs/manager-worker-protocol.md): delegation,
   reporting, review, and disposition.
+- [Structured project defaults](docs/structured-project-phase-defaults.md):
+  formal/non-phase procedure and manager-assignment compression.
+- [Testing and coverage policy](docs/testing-and-coverage-policy.md): scoped
+  tests, remediation, real boundaries, and the adopted pytest architecture.
+- [Agent reporting architecture](docs/agent-reporting-architecture.md):
+  adopted Python Git show/diff and operational-report implementation, safety
+  boundary, and rollback.
+- [ChatGPT manager topology](docs/chatgpt-manager-skill-topology.md): implemented
+  nested ownership and subrouting, plus personal transition gates.
 - [Architecture decisions](docs/adr/README.md): accepted and superseded project
   decisions.
 - [Exit records](docs/status/README.md): phase outcomes and next authorization.
 - [Phase and record identity](docs/phase-and-record-identity.md): semantic phase
   IDs, independent sequences, durable references, and precommit finalization.
-- [Skill library](skills/README.md): nineteen skill owners, fourteen stable and
-  five provisional, and current scope.
+- [Skill library](skills/README.md): twenty-eight skill owners, fourteen stable
+  and fourteen provisional, and current scope.
 - [Roadmap](docs/roadmap.md): completed phases and future authorization
   boundary.
+- [v0.4 roadmap](docs/v0-4-roadmap.md): dependency-ordered implementation,
+  transition, readiness, and release slices without automatic authority.
+- [APG41 readiness evaluation](docs/evaluations/apg41-v0-4-readiness-and-pre-release-smoke.md):
+  retained provisional dispositions, candidate smoke, limitations, and the
+  publication boundary.
+- [APG42 release evaluation](docs/evaluations/apg42-v0-4-release-publication-and-active-deployment.md):
+  v0.4.0 publication, aggregate-owned active deployment, grouped limitations,
+  and rollback boundary.
 - [Public release process](docs/public-release-process.md): exact projection,
   local candidate construction, validation, and publication boundary.
 - [User-scoped skill integration](docs/user-scoped-skill-integration.md):

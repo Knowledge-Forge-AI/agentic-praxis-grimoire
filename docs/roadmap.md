@@ -659,9 +659,372 @@ public-backed source fast-forwards without changing aggregate-link ownership.
 The personal router remains installed, and source-qualified fresh-session
 shadow smoke remains the external terminal observation.
 
+### APG24A — v0.3 external smoke and router transition closeout
+
+Completed under the maintainer's explicit APG24A authority. The human-reported
+fresh-session public-v0.3 shadow passed, and the personal same-name router was
+subsequently decommissioned under separate authority. Focused verification
+confirms unchanged public and active v0.3.0 state, nineteen aggregate skills,
+preserved personal transition targets, and an exact private restoration source.
+No behavior-bearing skill, release, active source, or target repository changes.
+
+### APG25 — v0.4 structured project work foundation
+
+Completed under the maintainer's APG24A-to-APG26 assignment. ADRs 0020-0022
+accept structured formal/non-phase defaults, prompt compression, scoped tests,
+coverage remediation and mock boundaries, Python-first reporting, pytest/xdist
+coverage architecture, nested ChatGPT-manager ownership, and evidence-gated
+personal hygiene transitions. One bounded correction makes the approved-roadmap
+assignment skill consume repository defaults without dropping authority or stop
+boundaries. Development remains 19/19/19 with fourteen stable and five
+provisional rows; no dependency, executable conversion, test migration,
+canonical move, private-skill change, or release occurs.
+
+The complete dependency order and unallocated slices are maintained in the
+[v0.4 roadmap](v0-4-roadmap.md) rather than duplicated here.
+
+### APG26 — pytest and Bash-to-Python capabilities
+
+Completed under the maintainer's bounded sequence. APG26 retains provisional
+`pytest-test-profile` and `converting-bash-scripts-to-python` after current-
+source calibration, sixty frozen scenario families, failing-first focused
+contracts, read-only report-tool dogfood, and fresh non-author review. Pytest
+uses no behavior-bearing correction; conversion uses one bounded option-
+injection correction. Development becomes 21/21/21
+with fourteen stable rows, seven provisional rows, and twenty routes. Public
+and active v0.3.0 remain unchanged; no report executable or test is migrated.
+
+### APG26A — formal-phase commit-message enforcement
+
+APG26A records that APG26's formal-phase commit has only its subject. APG26 is
+not rewritten, and its substantive capability, scenario, routing, and maturity
+decisions remain accepted. A dependency-free Python checker enforces the
+canonical phase subject, one blank separator, and ordered nonempty `Scope`,
+`Result`, `Verification`, and `Not run` sections before and after future APG
+formal-phase commits. The correction changes no skill, report format or
+executable, public or active v0.3.0 state, target repository, or personal skill.
+
+### APG27 — Python agent-reporting core and Git-record association
+
+APG27 accepts ADR 0023 and produces an uncommitted candidate for the first
+report slice. The candidate implements the importable standard-library core,
+fixed-vector Git access, exact Git-show compatibility, temporary-index Git-diff
+evidence, operational association, and safety corrections. It is not adopted.
+
+Git-show format version 2 and compatible standalone operational format version
+1 remain byte-compatible on the characterized POSIX platform. Git-diff format
+version 1 records deterministic state evidence without mutating the real index
+or worktree. Operational records name an existing complete show or diff record
+in the same canonical phase report whenever Git evidence exists. APG27 stops
+partial after the release-policy component needs a second material correction:
+historical v0.2 configured validation is repaired, but immutable v0.3.0 policy
+lacks a version-bounded historical surface. The candidate also retains a Red
+Python branch-count stop. No commit or push occurs.
+
+### APG27A — Python reporting correction and adoption
+
+APG27A preserves APG27's partial records and stopped worktree, then corrects
+both recorded acceptance defects. Immutable v0.3.0 policy is independently
+frozen from the current v0.4 development inventory, malformed and unsupported
+identities fail closed, and the Red source-path validator is decomposed without
+changing diagnostics. The resulting dependency-free Python report core,
+Git-diff evidence, and Git/operational association are adopted after focused
+parity, safety, historical-release, and independent review gates.
+
+### APG28 — pytest, xdist, coverage, and mirrored paths
+
+APG28 closes Partial. Its uncommitted candidate includes an exact dependency
+stack, eight-worker runner, mirrored paths, strict source inventory, and
+coverage-data union. Fresh review rejected the first narrowed denominator; the
+corrected full-source gates then exposed material unit, integration, and union
+branch deficits, four release-policy failures, incomplete process accounting,
+and missing unconditional Git-show Bats equivalence. ADR 0024 remains Proposed.
+Public and active v0.3.0 remain unchanged.
+
+### APG28A — pytest migration correction and adoption
+
+APG28A preserves APG28's stopped worktree and Partial result, corrects runner
+aggregation, release policy, process completeness, artifact lifecycle, and
+coverage quality, and satisfies exact 80/80 component and 85/85 union gates.
+Both Bats owners remain. ADR 0024 is Accepted. Public and active v0.3.0 remain
+unchanged.
+
+### APG29 — process-skill alignment
+
+APG29 aligns four existing owners with the adopted structured-project and test
+defaults. `implementing-with-test-discipline` owns bounded useful-contract
+coverage remediation; `planning-repository-work` owns scoped evidence and
+justified expansion; `reviewing-and-verifying-repository-work` checks honest
+coverage, mock and real-boundary claims, and Git/operational evidence; and
+`composing-approved-roadmap-assignments` never assumes a broad suite while
+compressing ordinary procedure. All four receive one bounded correction after
+fifty-one frozen cases. No trigger, maturity row, route, catalog description,
+release object, ChatGPT path, personal skill, or target repository changes.
+
+### APG30 — ChatGPT-manager topology and subrouter
+
+APG30 implements ADR 0022's accepted actor-qualified topology. Canonical
+discovery now supports direct leaves and exactly one `skills/chatgpt/<name>`
+class, while flat Codex projections remain globally named. The new provisional
+`chatgpt-manager-workflow` owns one local manager-leaf route; the general
+router owns the subrouter route and no manager leaf. Project, user, and
+current-development release owners resolve source-declared canonical paths,
+while immutable v0.1.0 through v0.3.0 policy remains direct-child.
+
+Development is 22/22/22 with fourteen stable rows, eight provisional rows,
+twenty general-map entries, one ChatGPT-local entry, and twenty-one route
+edges. Public and active v0.3.0 remain 19/19/19. No personal skill is changed
+and no post-restart application-discovery evidence is claimed.
+
+### APG31 — personal-hygiene shadow and conditional transition
+
+APG31 passes APG30's fresh-session source-qualified topology, routing,
+semantic-identity, and managed-report gates without correction. Current APG,
+private, and RepoMap owners replace the three targeted general procedures, but
+the independent transition gates produce a partial result.
+
+The personal docs-only capability is decommissioned after source-qualified
+shadow, exact restoration, and non-author review. Git-history scope reduction
+remains deferred because current private routing and destructive-stop ownership
+do not yet satisfy the narrowed contract. RepoMap phase-hygiene
+decommissioning remains deferred because a current private caller route is
+outside APG31 write authority. APG development stays 22/22/22, public and
+active v0.3.0 remain 19/19/19, and no target repository changes.
+
+#### APG31 subsequent gate
+
+At APG31 exit, the maintainer still had to restart Codex and run the required
+post-transition discovery smoke. Any later assignment had to record or correct
+that result before a remaining v0.4 profile slice could begin.
+
+APG31A later supplies the bounded smoke-closeout and caller-correction authority
+without altering that historical stop.
+
+### APG31A — personal-hygiene transition completion
+
+APG31A records the maintainer-reported APG31 external smoke as passed while
+preserving APG31's historical Partial result. Publication-excluded review
+supports two independent results: `git-history-hygiene` is scope-reduced after
+generalized behavior returns to APG and repository owners, and
+`repomap-phase-hygiene` is decommissioned after generalized behavior returns to
+current RepoMap owners.
+
+APG development remains 22/22/22 with fourteen stable and eight provisional
+rows. The general and ChatGPT-local maps remain twenty and one. Public and
+active v0.3.0 remain 19/19/19, and no target repository changes.
+
+### APG32 — Minitest test profile
+
+APG32 retains `minitest-test-profile` provisionally after current official
+Minitest 6.0.6, `minitest-mock` 5.27.0, and Ruby 4.0.6 calibration; source and
+rights review; ownership analysis; thirty-six frozen scenarios; a failing-first
+mirrored contract; structural classification; integration; and fresh
+non-author review. The candidate uses one bounded trigger and ownership
+correction.
+
+Development becomes 23/23/23 with fourteen stable and nine provisional rows.
+The general map becomes twenty-one edges, the ChatGPT-local map remains one
+edge, and public and active v0.3.0 remain 19/19/19. APG32 adds no dependency,
+selects no framework or project command, runs no readiness or smoke gate, and
+does not construct or publish a release.
+
+### APG33 — Dockerfile profile
+
+APG33 retains `dockerfile-profile` provisionally after current official Docker
+documentation, stable Dockerfile frontend 1.25.0, BuildKit 0.31.2, and OCI
+Image Spec 1.1.1 calibration; source and rights review; ownership analysis;
+forty frozen scenarios; a failing-first mirrored contract; structural
+classification; integration; and fresh non-author review.
+
+Development becomes 24/24/24 with fourteen stable and ten provisional rows.
+The general map becomes twenty-two edges, the ChatGPT-local map remains one
+edge, and public and active v0.3.0 remain 19/19/19. APG33 adds no dependency,
+selects no image, builder, platform, project command, or runtime policy,
+performs no Docker operation, runs no readiness or smoke gate, and does not
+construct or publish a release.
+
+### APG34 — Vagrantfile profile
+
+APG34 retains `vagrantfile-profile` provisionally after current official
+Vagrant 2.4.9 and development-source calibration, current Vagrant
+documentation, Vagrant's declared Ruby compatibility boundary, source and
+rights review, ownership analysis, forty frozen scenarios, a failing-first
+mirrored contract, structural classification, integration, and fresh
+non-author review. One bounded source-semantics and machine-measurement
+correction scopes forwarded-port behavior by provider and prevents an implicit
+default machine from being added to named multi-machine counts.
+
+Development becomes 25/25/25 with fourteen stable and eleven provisional rows.
+The general map becomes twenty-three edges, the ChatGPT-local map remains one
+edge, and public and active v0.3.0 remain 19/19/19. APG34 adds no dependency,
+selects no provider, box, plugin, host platform, network, synced folder,
+provisioner, project command, or lifecycle action, performs no Vagrantfile
+evaluation or Vagrant operation, runs no readiness or smoke gate, and does not
+construct or publish a release.
+
+### APG35 — v0.4 remaining-skill authoring
+
+APG35 authors, on the dedicated branch
+`claude/apg35-v0.4-remaining-skill-authoring`, the five remaining v0.4
+candidates: `go-test-profile`, `matryer-is-test-profile`,
+`go-cmp-test-profile`, `go-testing-stack`, and `nix-test-profile`. It also
+proposes ADR 0025 and two specifications, freezes one hundred fifty-four
+scenario families, and produces a complete Codex integration handoff.
+
+APG35 integrates nothing. It adds no flat projection, catalog row, router
+entry, release-policy entry, strict inventory entry, executable fixture, or
+test, and it changes no Python or shell code. It runs no project test, no
+`go test`, and no Nix evaluation, build, flake check, or virtual-machine or
+container test. Development therefore remains 25/25/25 with fourteen stable and
+eleven provisional rows, the general map remains twenty-three edges, the
+ChatGPT-local map remains one edge, and public and active v0.3.0 remain
+19/19/19. ADR 0025 remains Proposed.
+
+The phase's fresh non-author review requirement was not satisfied as specified:
+independent reviewers could not be spawned, so the eight lanes were executed by
+the author as separate adversarial passes with primary-source re-checks. That
+limitation is recorded in the evaluation, the exit, and the handoff, and Codex
+must re-run the affected lanes independently before accepting ADR 0025.
+
+### APG36 — Claude-authored skill integration
+
+APG36 preserves and adopts the exact APG35 authoring commit, reruns six fresh
+independent review lanes, converts all 154 frozen families into transient
+public-safe fixtures, establishes failing-first mirrored contracts, and runs a
+disposable pinned Go compatibility harness.
+
+Independent review finds more than one material behavior correction in
+`go-test-profile`, `matryer-is-test-profile`, `go-cmp-test-profile`, and
+`nix-test-profile`; each is `deferred-material-defect`.
+`go-testing-stack` is `rejected-no-independent-value` because its required
+native owner is not retained and its trigger, duplicate-owner response,
+thinness, and removal semantics need multiple corrections. ADR 0025 is
+Rejected.
+
+All five candidates and both proposed specifications are removed through the
+APG36 forward commit. Development remains 25/25/25 with fourteen stable and
+eleven provisional rows, the general map remains twenty-three entries, the
+ChatGPT-local map remains one entry, and checked route edges remain twenty-four.
+Public and active v0.3.0 remain 19/19/19.
+
+The Claude/Codex division-of-labor trial is supported for another bounded trial
+only with immutable author history, independent Codex review, executable
+fixtures, a one-correction allowance, forward-only corrections, and Codex-owned
+final status, tests, reports, publication, and deployment.
+
+### APG37 — Go and Nix test-profile redesign
+
+APG37 redesigns the four APG36-deferred candidates on the authoring branch
+`claude/apg37-v0.4-go-nix-redesign`, working from the APG36 defect dossier and
+reverified current primary sources. It authors four replacement leaves,
+proposes ADR 0026 and two specifications, freezes 130 scenario families mapped
+to their APG35 predecessors, measures structural calibration against the
+complete Go 1.25.10 standard-library and toolchain test corpus, and produces a
+publication-excluded Codex integration handoff.
+
+All twenty-four APG36 material findings received a terminal authoring
+disposition: twenty-two closed in redesign and two removed as invalid
+requirements. Measurement falsified the APG35 numeric structural bands, which
+escalate 9.7% of maintained upstream Go test files to crisis on line count
+alone, so every numeric crisis cutoff was removed in favour of categorical
+conditions.
+
+ADR 0026 proposes three independent component owners and no composition owner.
+`go-testing-stack` remains `rejected-no-independent-value` and absent, and ADR
+0025 remains Rejected and unreopened.
+
+APG37 integrates nothing. It adds no flat projection, catalog row, router
+entry, maturity row, release policy, inventory entry, executable fixture, or
+test, and runs no project test, `go test`, or Nix operation. Its review was an
+author self-review, not an independent review, and it makes no retention
+prediction. Development remains 25/25/25 with fourteen stable and eleven
+provisional rows, twenty-three general-map entries, one ChatGPT-local entry,
+and twenty-four checked route edges. Public and active v0.3.0 remain 19/19/19.
+
+### APG38 — APG37 Go and Nix integration
+
+APG38 preserves the exact APG37 authoring object and performs independent
+source, rights, privacy, owner-graph, structural, fixture, and compatibility
+review. It retains provisional `go-test-profile` and `go-cmp-test-profile`;
+accepts ADR 0026's two-component no-stack
+architecture; and keeps ADR 0025 Rejected.
+
+`matryer-is-test-profile` and `nix-test-profile` are
+`deferred-material-defect` after fresh corrected-state review finds new
+attribution/false-escalation and FreeBSD sandbox-default behavior defects.
+Each candidate has already used its coherent correction cycle, so its leaf and
+integration surfaces are forward removed rather than corrected again.
+
+Development becomes 27/27/27 with fourteen stable and thirteen provisional
+rows, twenty-five general-map entries, one ChatGPT-local entry, and twenty-six
+checked route edges. Public and active v0.3.0 remain 19/19/19.
+
+### APG39 — matryer/is and Nix final redesign
+
+APG39 authors final replacement candidates for the two APG38-deferred
+profiles on a Claude authoring branch. It reverifies matryer/is `v1.4.1`,
+Nix 2.35.1, and Nixpkgs/NixOS 26.05 as exact current sources; closes the
+registered-wrapper attribution, relaxed-mode count-escalation, and sandbox
+platform-default defects; freezes 24 and 40 replacement scenario families
+with complete predecessor mapping; proposes ADR 0027 conditionally for a
+version-bounded third Go component; and hands independent review, fixtures,
+compatibility probes, the ADR decision, and atomic integration to a later
+separately authorized Codex phase.
+
+Both candidates are `authored-pending-independent-review`. Development
+remains 27/27/27 with unchanged maturity, router, and edge counts. Public
+and active v0.3.0 remain 19/19/19.
+
+### APG40 — APG39 matryer/is and Nix integration
+
+APG40 preserves and adopts the exact APG39 authoring object, converts both
+frozen scenario sets into corrected manager evidence, runs exact-version
+matryer/is probes and mandatory Nix source/corpus review, and applies one
+coherent correction pass per candidate. Corrected-state review retains
+`nix-test-profile` provisionally and defers `matryer-is-test-profile` after its
+equality correction remains materially inaccurate. ADR 0027 is Rejected; ADR
+0026 remains Accepted; ADR 0025 remains Rejected; `go-testing-stack` remains
+absent.
+
+Development becomes 28/28/28 with fourteen stable and fourteen provisional
+rows, twenty-six general-map entries, one ChatGPT-local entry, and twenty-seven
+checked route edges. Public and active v0.3.0 remain 19/19/19. No Nix execution,
+target-repository testing, readiness, smoke, release, publication, deployment,
+or successor phase is included.
+
+### APG41 — v0.4 readiness and pre-release smoke
+
+APG41 retains all fourteen provisional rows without maturity promotion after
+complete trigger, non-trigger, owner-boundary, adverse, limitation, and
+removal review. Cross-profile dogfood preserves direct selection and no
+mandatory chain. One bounded wording correction makes Minitest, Dockerfile,
+and Vagrantfile removal candidate-independent; fresh corrected-state review
+passes.
+
+Complete repository gates, two repository-owned disposable v0.4.0 candidates,
+and isolated user/project lifecycle smoke pass on the current host. The
+terminal result is `ready-for-publication-with-provisional-limitations`.
+Public and active v0.3.0 remain 19/19/19. APG41 publishes and deploys nothing
+and authorizes no successor phase.
+
+### APG42 — v0.4 publication and active deployment
+
+APG42 reproduces the exact APG41 candidate, retains the canonical Agentic Praxis
+Grimoire NOTICE bytes, freezes the release source, builds and independently reviews two
+deterministic final candidates, and atomically publishes only public `main` and
+the annotated `v0.4.0` tag. A live remote and fresh clone verify the append-only
+lineage before the aggregate-owned active public source advances by exact
+fast-forward.
+
+Public and active v0.4.0 contain 28/28/28 with fourteen stable and fourteen
+provisional rows. ADR 0025 and ADR 0027 remain Rejected; ADR 0026 remains
+Accepted; matryer/is and the stack remain absent. No procedure or maturity
+changes, GitHub Release, signing, announcement, plugin distribution, target
+mutation, or successor phase are included.
+
 ## Next action
 
-APG24 closes the authorized v0.3 release sequence with terminal outcome
-`published-pending-fresh-session-shadow-smoke`. The next action is only the
-explicitly requested external restart and source-qualified shadow observation.
-It does not authorize personal-router decommission or a successor phase.
+No phase after APG42 is authorized. Signing, announcement, GitHub Release,
+plugin publication, target mutation, rollback, and any successor work require
+separate explicit maintainer authority. APG42 does not allocate a successor
+phase.

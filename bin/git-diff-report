@@ -1,0 +1,16 @@
+#!/usr/bin/env python3
+"""Append one stable uncommitted Git snapshot report."""
+
+from __future__ import annotations
+
+from pathlib import Path
+import sys
+
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "libexec"))
+
+from agent_report.cli import git_diff_main  # noqa: E402
+
+
+if __name__ == "__main__":
+    raise SystemExit(git_diff_main())
