@@ -5,12 +5,12 @@ model for coding agents. It curates practices that improve planning,
 implementation, testing, debugging, review, delivery, and coordination without
 turning one source methodology into a universal workflow.
 
-Public APG v0.3.0 contains nineteen skills, projection and reporting
+Public APG v0.4.0 contains twenty-eight skills, projection and reporting
 components, source-specific release and user-lifecycle validation, governance,
-and licensing terms. Fourteen catalog rows are stable and five remain
-provisional; release inclusion does not change maturity. v0.3.0 appends one
+and licensing terms. Fourteen catalog rows are stable and fourteen remain
+provisional; release inclusion does not change maturity. v0.4.0 appends one
 intentionally squashed release commit and an annotated tag to the preserved
-v0.1.0 and v0.2.0 history. Its canonical public
+v0.1.0 through v0.3.0 history. Its canonical public
 checkout supplies the maintainer's separately managed user-global Codex
 integration. Private development history remains distinct.
 
@@ -144,6 +144,163 @@ link ownership. Public v0.2.0 remains unchanged. The personal same-name router
 remains installed for a source-qualified fresh-session shadow; no root/private
 cutover, router decommission, or successor phase is authorized.
 
+APG24A records the maintainer-reported successful public-v0.3 fresh-session
+shadow and the later personal-router decommission performed under separate
+human authority. Focused verification confirms unchanged public and active
+v0.3.0 state, nineteen aggregate skills, preserved personal transition targets,
+and an exact private restoration source. v0.3 is terminal; APG24A changes only
+documentation and publication-excluded evidence.
+
+APG25 accepts [structured project defaults](docs/structured-project-phase-defaults.md),
+[testing and coverage policy](docs/testing-and-coverage-policy.md), a
+[Python-first reporting architecture](docs/agent-reporting-architecture.md),
+[ChatGPT-manager topology](docs/chatgpt-manager-skill-topology.md), and the
+[v0.4 roadmap](docs/v0-4-roadmap.md) through ADRs 0020-0022. One bounded
+correction makes approved-roadmap assignments consume repository defaults and
+state deviations rather than repeat ordinary procedure. No skill is added,
+tool is converted, test is migrated, ChatGPT leaf is moved, personal skill is
+changed, or release is begun.
+
+APG26 adds provisional `pytest-test-profile` and
+`converting-bash-scripts-to-python` private-development capabilities after
+current-source calibration, sixty frozen scenario families, failing-first
+focused tests, read-only report-tool dogfood, and fresh review. Development is
+now 21 canonical skills, 21 catalog rows, 21 relative projections, 14 stable
+rows, 7 provisional rows, and 20 routable non-router capabilities. Public and
+active v0.3.0 remain unchanged at nineteen skills; no report tool is converted,
+no `git-diff-report` is implemented, and no test is migrated.
+
+APG26A records that APG26's formal-phase commit contains only its subject and
+corrects forward without rewriting APG26. The dependency-free Python
+`apg-check-phase-commit-message` command rejects that regression and validates
+the required phase subject plus ordered `Scope`, `Result`, `Verification`, and
+`Not run` sections before and after new APG formal-phase commits. No skill,
+maturity, release, active integration, report executable, or report format
+changes in APG26A.
+
+APG27 accepts the design in
+[ADR 0023](docs/adr/2026/07/0023-python-agent-report-formats-and-git-record-association.md)
+and produces a partial, uncommitted standard-library `libexec/agent_report`
+candidate. The Python
+`git-show-report` preserves version-2 bytes on the characterized POSIX
+platform, `git-diff-report` adds deterministic drift-checked uncommitted state
+evidence through a private index, and `append-operational-report` enforces exact
+same-report Git show/diff association. The phase stops partial before commit
+because the development release checker does not retain immutable v0.3.0
+policy as a historical surface and the Python profile retains a Red branch
+signal. GitPython is not selected, the pytest migration remains deferred, and
+the published and active v0.3.0 objects remain unchanged.
+
+APG27A preserves that partial result, freezes immutable v0.3.0 policy
+independently from the current development inventory, decomposes the Red path-
+safety owner without changing diagnostics, and adopts the corrected report
+core. Focused parity, safety, association, historical-release, and independent
+review gates pass. APG27A does not begin the pytest migration or change public
+or active v0.3.0.
+
+APG28A subsequently adopts the corrected pytest migration after preserving
+APG28's Partial result, and APG29 aligns the affected process owners with the
+adopted structured-project and test defaults.
+
+APG30 implements ADR 0022's first actor-qualified namespace. The new
+provisional `chatgpt-manager-workflow` subrouter and the unchanged
+`composing-approved-roadmap-assignments` leaf are canonical under
+`skills/chatgpt/`, while both retain flat `.agents/skills/<name>` discovery
+links. Development is 22/22/22 with fourteen stable and eight provisional
+rows. The general map has nineteen ordinary non-ChatGPT leaves plus the
+subrouter; the ChatGPT-local map has the one manager leaf. Public and active
+v0.3.0 remain immutable at 19/19/19. Application discovery and every personal
+skill transition remain behind APG31's mandatory restart gate.
+
+APG31 passes that fresh-session topology gate and independently shadows three
+personal hygiene capabilities against current APG and repository owners. The
+personal docs-only capability is decommissioned after replacement,
+restoration, and non-author review. Git-history scope reduction and RepoMap
+phase-hygiene decommissioning remain deferred because their current private
+routing boundaries cannot be corrected within APG31 authority. Development
+remains 22/22/22, router maps remain exact, and public and active v0.3.0 remain
+unchanged. A fresh-session post-transition discovery smoke is still required.
+
+APG31A records that later smoke as passed while preserving APG31's historical
+Partial result. It completes the two deferred dispositions:
+`git-history-hygiene` is scope-reduced after generalized behavior returns to
+APG and repository owners, and `repomap-phase-hygiene` is decommissioned after
+generalized behavior returns to current RepoMap owners. APG development and
+public/active v0.3.0 remain unchanged.
+
+APG32 retains the provisional `minitest-test-profile` after current Minitest,
+Ruby, and extracted mock calibration; thirty-six frozen trigger, non-trigger,
+semantic, structural, and stop families; a failing-first mirrored contract; and
+fresh non-author review. One bounded correction makes fixture alternatives and
+Minitest-specific boundary effects explicit while preserving existing general,
+Ruby, and repository owners. Development becomes 23/23/23 with fourteen stable
+and nine provisional rows. The general map has twenty-one edges; the
+ChatGPT-local map remains one edge. Public and active v0.3.0 remain immutable
+at 19/19/19. No dependency, framework selection, readiness, smoke, release,
+publication, or successor phase is included.
+
+APG33 retains the provisional `dockerfile-profile` after current Dockerfile
+frontend, BuildKit, Docker documentation, and OCI image-configuration
+calibration; forty frozen trigger, non-trigger, semantic, structural, and stop
+families; a failing-first mirrored contract; and fresh non-author review. The
+profile owns Dockerfile-specific parser, stage, instruction, context, copy,
+mount, cache, user, metadata, and platform judgment while preserving image,
+dependency, runtime, release, and live-operation authority. Development becomes
+24/24/24 with fourteen stable and ten provisional rows. The general map has
+twenty-two edges; the ChatGPT-local map remains one edge. Public and active
+v0.3.0 remain immutable at 19/19/19. No Docker build, container, daemon,
+registry, readiness, smoke, release, or publication action is included.
+
+APG34 retains the provisional `vagrantfile-profile` after current Vagrant
+source and documentation, configuration-load, Ruby-compatibility, box,
+provider, plugin, network, synced-folder, provisioner, trigger, and state
+calibration; forty frozen trigger, non-trigger, semantic, structural, and stop
+families; a failing-first mirrored contract; one bounded source-semantics and
+machine-measurement correction; and fresh non-author review. The profile owns
+Vagrantfile-specific configuration judgment while preserving provider, box,
+plugin, host, network, filesystem, command, lifecycle, release, and
+live-operation authority. Development becomes 25/25/25 with fourteen stable
+and eleven provisional rows. The general map has twenty-three edges; the
+ChatGPT-local map remains one edge. Public and active v0.3.0 remain immutable
+at 19/19/19. No Vagrantfile evaluation, box or plugin mutation, provider
+contact, machine lifecycle, readiness, smoke, release, or publication action
+is included.
+
+APG38 retains provisional `go-test-profile` and `go-cmp-test-profile` after
+independent current-source review, 66 public-safe
+scenario families, categorical corpus calibration, isolated Go 1.25.10
+compatibility probes, and fresh corrected-state review. ADR 0026 accepts two
+directly triggerable Go component owners without a stack owner.
+`matryer-is-test-profile` and `nix-test-profile` are deferred and absent after
+new post-correction attribution/false-escalation and FreeBSD sandbox-default
+defects. Development becomes 27/27/27 with fourteen stable and thirteen
+provisional rows. The general map has twenty-five edges; the
+ChatGPT-local map remains one edge. Public and active v0.3.0 remain immutable
+at 19/19/19. No Nix execution, target-repository test, readiness, smoke,
+release, publication, deployment, or successor phase is included.
+
+APG40 independently integrates the APG39 replacements. `nix-test-profile`
+passes exact Nix 2.35.1 and pinned Nixpkgs/NixOS 26.05 source review, forty
+corrected public-safe scenarios, source-only structural calibration, one
+coherent correction cycle, and fresh non-author review, then begins
+`provisional`. `matryer-is-test-profile` is `deferred-material-defect` after
+corrected-state review finds its equality mechanism still inaccurate. ADR
+0027 is Rejected; ADR 0026 remains Accepted and controlling; no
+`go-testing-stack` exists. Development becomes 28/28/28 with fourteen stable
+and fourteen provisional rows, twenty-six general-map entries, one
+ChatGPT-local entry, and twenty-seven checked route edges. Public and active
+v0.3.0 remain immutable at 19/19/19.
+
+APG41 closes the v0.4 development surface with all fourteen provisional rows
+retained and unpromoted. Cross-profile dogfood preserves direct owner
+selection and no mandatory chain; one bounded correction makes the Minitest,
+Dockerfile, and Vagrantfile removal descriptions candidate-independent. Two
+disposable exact v0.4.0 candidates and isolated lifecycle smoke pass on the
+current host. The terminal result is
+`ready-for-publication-with-provisional-limitations`; it publishes and deploys
+nothing, and it authorizes no successor phase. Public and active v0.3.0 remain
+19/19/19.
+
 ## Authority
 
 The human maintainer retains ultimate project, roadmap, publication, license,
@@ -175,15 +332,27 @@ cost.
 - [`docs/manager-worker-protocol.md`](docs/manager-worker-protocol.md) defines
   external authority, top-level management, internal delegation, evidence, and
   final reporting.
+- [`docs/structured-project-phase-defaults.md`](docs/structured-project-phase-defaults.md)
+  defines formal and non-phase commit, status, ADR, docs-only, scoped-test, and
+  manager-assignment compression defaults.
+- [`docs/testing-and-coverage-policy.md`](docs/testing-and-coverage-policy.md)
+  defines scoped tests, coverage remediation, mock boundaries, and the adopted
+  APG pytest architecture.
+- [`docs/agent-reporting-architecture.md`](docs/agent-reporting-architecture.md)
+  defines the Python-first Git-show, Git-diff, and operational-report
+  ownership and format boundaries.
+- [`docs/chatgpt-manager-skill-topology.md`](docs/chatgpt-manager-skill-topology.md)
+  defines implemented nested ChatGPT canonical owners, flat discovery,
+  subrouting, and personal transition gates.
 - [`docs/adr/`](docs/adr/README.md) records durable architecture decisions under
   an independent four-digit sequence.
 - [`docs/status/`](docs/status/README.md) records truthful phase exits under an
   independent five-digit sequence.
-- [`skills/`](skills/README.md) contains and indexes nineteen canonical skills:
-  fourteen stable rows and five provisional manager-assignment, language, or
-  database-profile rows.
+- [`skills/`](skills/README.md) contains and indexes twenty-eight canonical
+  skills: fourteen stable rows and fourteen provisional manager-assignment,
+  language, database, test-profile, or conversion rows.
 - [`.agents/skills/`](.agents/skills/) is the checked-in Codex repository
-  discovery projection; its nineteen relative symbolic links contain no
+  discovery projection; its twenty-eight relative symbolic links contain no
   independent skill content.
 - [`docs/bootstrap-v0.1.md`](docs/bootstrap-v0.1.md) defines maturity,
   provisional evidence, rollback, dogfooding, and decommission gates.
@@ -208,20 +377,21 @@ cost.
   [APG10 evaluation](docs/evaluations/apg10-karpathy-guidelines-evaluation.md)
   records the experimental-source dispositions.
 - [`docs/roadmap.md`](docs/roadmap.md) records the closed v0.1 and v0.2
-  sequences, accepted APG15 architecture, completed APG16 router, APG17
-  synthesis, APG18 Python, APG19 shell, APG19A identity, APG20 evaluation, and
-  APG20A Go/Ruby correction, APG21 Nix/relational evaluation, APG21A Nix
-  correction, and APG22 dogfood/guidance-migration slices. Future v0.3
-  decisions remain separately authorized.
+  sequences, the completed v0.3 sequence, APG25's v0.4 foundation, APG26's
+  initial enabling capabilities, and APG26A's formal-commit correction. The
+  [detailed v0.4 roadmap](docs/v0-4-roadmap.md) owns the dependency-ordered
+  future slices without allocating phase IDs.
 - [`docs/legacy-roadmap-closure.md`](docs/legacy-roadmap-closure.md) gives every
   former candidate or deferred theme a terminal owner or condition.
 - `bin/` and `libexec/` contain deterministic reporting tools, the
   dependency-free project-local and user-scoped projection commands, the
-  read-only skill-library and record-identity checkers, and the local-only
-  public candidate builder/checker with non-executable helpers.
-- `src/test/unit/<language>/` and `src/test/int/<language>/` contain isolated
-  unit tests and connected integration tests, respectively. Test filenames use
-  `.unit.test.<ext>` or `.int.test.<ext>` suffixes.
+  read-only skill-library, record-identity, and formal-phase commit-message
+  checkers, and the local-only public candidate builder/checker with
+  non-executable helpers.
+- `src/test/unit/python/agentic-praxis-grimoire/` and
+  `src/test/int/python/agentic-praxis-grimoire/` mirror production owners for
+  isolated unit tests and real-boundary integration tests. Test filenames use
+  `.unit.test.py` or `.int.test.py` suffixes.
 
 ## Testing
 
@@ -232,21 +402,19 @@ src/test/unit/<language>/
 src/test/int/<language>/
 ```
 
-The report-tool unit suite requires Bats 1.5.0 or newer. The Python unit and
-integration suites use the standard-library `unittest` runner. Run the current
-suites from the repository root:
+APG28A adopts the corrected pytest migration. The repository interfaces are:
 
 ```sh
-bats src/test/unit/bash/*.unit.test.bats
-python3 src/test/unit/python/apg_skill_library.unit.test.py
-python3 src/test/unit/python/apg_public_release.unit.test.py
-python3 src/test/unit/python/apg_user_skills.unit.test.py
-python3 src/test/int/python/apg_project_skills.int.test.py
-python3 src/test/int/python/apg_check_skill_library.int.test.py
-python3 src/test/int/python/apg_public_release.int.test.py
-python3 src/test/int/python/apg_record_identity.int.test.py
-python3 src/test/int/python/apg_user_skills.int.test.py
+bin/apg-test unit
+bin/apg-test integration
+bin/apg-test unit-integration
 ```
+
+Each command defaults to eight xdist workers. The strict source and mirror
+inventory is recorded in `testing/apg-test-inventory.json`; exact integer
+statement and branch counts enforce 80/80 component and 85/85 union gates.
+Run-scoped manifests account for xdist workers, collection, terminal results,
+and required Python-child coverage. Both report-tool Bats files remain.
 
 Validate the current canonical skill library and checked-in Codex projection
 without mutation:
@@ -255,11 +423,29 @@ without mutation:
 bin/apg-check-skill-library [--root <path>] [--format text|json]
 bin/apg-check-record-identity [--root <path>] [--format text|json] \
   [--expect-available <phase>] [--expect-allocated <phase>]
+bin/apg-check-phase-commit-message --phase <PHASE-ID> \
+  (--message-file <path> | --commit <revision>) [--format text|json]
 ```
 
 These commands validate only their adopted mechanical APG subsets. They do not
-prove semantic quality, authority, privacy, provenance, client discovery,
-maturity, release completeness, record truth, or stable behavior.
+prove semantic quality, imperative mood, authority, privacy, provenance,
+client discovery, maturity, release completeness, record truth, or stable
+behavior.
+
+The adopted Python reporting interfaces are:
+
+```text
+bin/git-show-report <phase-id> <commit> <status-doc> <result> <final-gate>
+bin/git-diff-report <phase-id> <result> <final-gate> [--status-doc <path>]
+bin/append-operational-report <phase-id> <absolute-body-path> <result> <final-gate> [options]
+```
+
+On Windows invoke the entry point through an interpreter, for example
+`python bin/git-diff-report --help`. Report replacement fails closed there
+until native sharing, reparse, and replacement safety is characterized. A Git
+record must exist before its associated operational append. Standalone
+operational records are accepted only when the canonical phase report contains
+no Git show or diff record.
 
 ## From source to APG practice
 
@@ -292,10 +478,13 @@ The canonical public identity is `agentic-praxis-grimoire`. Public v0.1.0 was
 published as a filtered projection with one intentionally squashed commit and
 historically omitted the documented `bin/apg-project-skills` wrapper. ADR 0009
 replaces manual selection with an exact projection of every tracked path except
-`private/`, plus critical-owner checks that detect deletion from source. Public
-v0.2.0 appends one deterministic squashed release commit and annotated tag,
-includes the omitted wrapper, and preserves v0.1.0 as its sole parent. Future
-publication remains a separately authorized human decision.
+`private/`, plus critical-owner checks that detect deletion from source.
+Public v0.2.0, v0.3.0, and v0.4.0 each append one deterministic squashed
+release commit and annotated tag while preserving the preceding public release
+as sole parent. v0.4.0 publishes twenty-eight skill owners with fourteen stable
+and fourteen provisional rows, then advances the aggregate-owned active source
+by exact fast-forward. Future publication remains a separately authorized
+human decision.
 
 ## License
 

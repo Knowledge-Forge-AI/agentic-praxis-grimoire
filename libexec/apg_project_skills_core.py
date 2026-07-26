@@ -39,24 +39,37 @@ PROJECTION_PREFIX = "/.agents/skills/"
 MAX_STATE_BYTES = 64 * 1024
 MAX_EXCLUDE_BYTES = 4 * 1024 * 1024
 SKILL_NAME = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
+CANONICAL_NAMESPACES = frozenset({"chatgpt"})
+SKILL_SUPPORT_DIRECTORIES = frozenset(
+    {"agents", "assets", "references", "scripts"}
+)
 EXPECTED_SKILLS = (
     "agentic-praxis-grimoire-workflow",
     "bash-language-profile",
     "bats-test-profile",
+    "chatgpt-manager-workflow",
     "composing-approved-roadmap-assignments",
     "composing-bounded-worker-assignments",
+    "converting-bash-scripts-to-python",
     "debugging-systematically",
     "designing-significant-changes",
+    "dockerfile-profile",
+    "go-cmp-test-profile",
     "go-language-profile",
+    "go-test-profile",
     "implementing-with-test-discipline",
+    "minitest-test-profile",
     "nix-language-profile",
+    "nix-test-profile",
     "planning-repository-work",
     "postgresql-database-profile",
+    "pytest-test-profile",
     "python-language-profile",
     "reviewing-and-verifying-repository-work",
     "ruby-language-profile",
     "sqlite-database-profile",
     "synthesizing-repository-guidance",
+    "vagrantfile-profile",
     "zsh-language-profile",
     "zunit-test-profile",
 )
@@ -215,19 +228,113 @@ def frontmatter_name(path: Path) -> str:
     return names[0]
 
 
+def _canonical_leaf_paths(skills_root: Path) -> tuple[Path, ...]:
+    leaf_paths: list[Path] = []
+    for entry in sorted(skills_root.iterdir(), key=lambda item: item.name):
+        if entry.name == "README.md":
+            continue
+        if entry.name not in CANONICAL_NAMESPACES:
+            if (
+                entry.is_symlink()
+                or not entry.is_dir()
+                or not _supported_leaf_shape(entry)
+            ):
+                fail(
+                    "canonical skill tree contains an unsupported owner or depth; "
+                    "restore the accepted development source"
+                )
+            leaf_paths.append(entry)
+            continue
+        if entry.is_symlink() or not entry.is_dir():
+            fail(
+                "canonical skill namespace is unsafe; restore the accepted "
+                "development source"
+            )
+        for nested in sorted(entry.iterdir(), key=lambda item: item.name):
+            if (
+                nested.name == "SKILL.md"
+                or nested.is_symlink()
+                or not nested.is_dir()
+                or not (nested / "SKILL.md").is_file()
+                or (nested / "SKILL.md").is_symlink()
+                or not _supported_leaf_shape(nested)
+            ):
+                fail(
+                    "canonical skill namespace contains an unsupported owner "
+                    "or depth; restore the accepted development source"
+                )
+            leaf_paths.append(nested)
+    return tuple(leaf_paths)
+
+
+def _supported_leaf_shape(leaf: Path) -> bool:
+    try:
+        entries = tuple(leaf.iterdir())
+    except OSError:
+        return False
+    for entry in entries:
+        if entry.name == "SKILL.md":
+            if entry.is_symlink() or not entry.is_file():
+                return False
+            continue
+        if (
+            entry.name not in SKILL_SUPPORT_DIRECTORIES
+            or entry.is_symlink()
+            or not entry.is_dir()
+        ):
+            return False
+    return True
+
+
+def _declared_canonical_paths(
+    leaf_paths: Sequence[Path],
+) -> dict[str, Path]:
+    declared_paths: dict[str, Path] = {}
+    for leaf in leaf_paths:
+        skill_file = leaf / "SKILL.md"
+        if skill_file.is_symlink() or not skill_file.is_file():
+            fail(
+                "canonical skill tree contains an unsupported owner or depth; "
+                "restore the accepted development source"
+            )
+        name = frontmatter_name(skill_file)
+        if name != leaf.name or name in declared_paths:
+            fail(
+                "canonical skill identity is duplicated or disagrees with its "
+                "source path; restore globally unique frontmatter names"
+            )
+        declared_paths[name] = leaf
+    return declared_paths
+
+
+def _validated_canonical_leaf(name: str, leaf: Path) -> Path:
+    if not SKILL_NAME.fullmatch(name):
+        fail(f"canonical skill name is invalid: {name}")
+    skill_file = leaf / "SKILL.md"
+    if leaf.is_symlink() or not leaf.is_dir():
+        fail(f"canonical skill leaf is unsafe for {name}; restore it")
+    if skill_file.is_symlink() or not skill_file.is_file():
+        fail(f"canonical SKILL.md is unsafe for {name}; restore it")
+    if not os.access(skill_file, os.R_OK):
+        fail(f"canonical SKILL.md is unreadable for {name}; restore access")
+    if frontmatter_name(skill_file) != name:
+        fail(
+            f"canonical frontmatter name disagrees for {name}; "
+            "restore the accepted leaf"
+        )
+    return leaf.resolve(strict=True)
+
+
 def canonical_skills(root: Path) -> dict[str, Path]:
     skills_root = root / "skills"
     if skills_root.is_symlink() or not skills_root.is_dir():
         fail("canonical skills directory is unsafe; restore the APG checkout")
-    directory_names = sorted(
-        entry.name
-        for entry in skills_root.iterdir()
-        if entry.is_dir() or entry.is_symlink()
-    )
+    leaf_paths = _canonical_leaf_paths(skills_root)
+    declared_paths = _declared_canonical_paths(leaf_paths)
     expected_source_names = tuple(
         sorted((*EXPECTED_SKILLS, *KNOWN_UNMANAGED_SKILLS))
     )
-    if tuple(directory_names) != expected_source_names:
+    if tuple(sorted(declared_paths)) != expected_source_names:
         fail(
             "canonical skill set differs from the accepted development "
             "catalog and release distribution boundary; "
@@ -236,22 +343,7 @@ def canonical_skills(root: Path) -> dict[str, Path]:
 
     leaves: dict[str, Path] = {}
     for name in EXPECTED_SKILLS:
-        if not SKILL_NAME.fullmatch(name):
-            fail(f"canonical skill name is invalid: {name}")
-        leaf = skills_root / name
-        skill_file = leaf / "SKILL.md"
-        if leaf.is_symlink() or not leaf.is_dir():
-            fail(f"canonical skill leaf is unsafe for {name}; restore it")
-        if skill_file.is_symlink() or not skill_file.is_file():
-            fail(f"canonical SKILL.md is unsafe for {name}; restore it")
-        if not os.access(skill_file, os.R_OK):
-            fail(f"canonical SKILL.md is unreadable for {name}; restore access")
-        if frontmatter_name(skill_file) != name:
-            fail(
-                f"canonical frontmatter name disagrees for {name}; "
-                "restore the accepted leaf"
-            )
-        leaves[name] = leaf.resolve(strict=True)
+        leaves[name] = _validated_canonical_leaf(name, declared_paths[name])
     return leaves
 
 

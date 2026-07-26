@@ -875,3 +875,417 @@ under the recorded startup boundary. APG24 copies no private evidence into the
 public surface, adds no source notice, and grants no Nix or database operational
 authority. Exact Git, manifest, remote, link, and report evidence remains
 publication excluded.
+
+## APG24A external closeout summary
+
+APG24A adds no external expression, dependency, or skill content. It records
+the human maintainer's successful public-v0.3 fresh-session smoke observation
+and separately authorized personal-router decommission, then verifies the
+resulting state through project-authored Git, link, catalog, and byte checks.
+
+| Practice | Source families | Mode | Destination | Lifecycle status | Maturity effect |
+| --- | --- | --- | --- | --- | --- |
+| External public-router smoke disposition | Human maintainer observation; current public and active release state | Recorded observation plus focused resulting-state verification | APG24A evaluation and exit | Passed; public v0.3.0 unchanged | None |
+| Personal-router transition closeout | Separate human authority; private tracked restoration source | Read-only private-skill diff and recovery inspection | Publication-excluded APG24A evidence | Decommissioned; exact restoration owner retained | None |
+
+No private skill expression, configuration body, credential, or unrelated
+worktree payload enters the public surface. APG24A does not claim provenance
+for the external action beyond the supplied human authority and directly
+observed resulting state.
+
+## APG25 structured-work architecture summary
+
+APG25 uses current project-authored APG procedures and tools, a designated
+read-only RepoMap prototype, current official pytest/pytest-xdist/pytest-cov,
+coverage.py, Python, and Git documentation, and bounded classifications of
+three private personal skills. Private and RepoMap wording is not copied.
+
+| Practice | Source families | Mode | Destination | Lifecycle status | Maturity effect |
+| --- | --- | --- | --- | --- | --- |
+| Structured formal/non-phase defaults and prompt compression | Current APG manager-worker, identity, assignment-composition, planning, implementation, and review owners; public-safe frozen assignments | Independently written project convention and one bounded correction | Structured defaults; ADR 0020; assignment-composition leaf | Accepted after failing-first focused evidence and non-author review | Existing provisional maturity unchanged |
+| Scoped testing, coverage remediation, and real-boundary policy | Current APG test owners; designated RepoMap prototype; official pytest guidance | Independently written synthesis | Testing and coverage policy; ADR 0021 | Architecture accepted; process correction and migration deferred | None |
+| xdist coverage architecture | Official pytest-cov, coverage.py, pytest-xdist, and pytest sources inspected 2026-07-22 | Independently written synthesis | Testing and coverage policy; v0.4 roadmap | pytest-cov selected as future default; no dependency added | None |
+| Python-first Git show/diff/operational architecture | Current APG report scripts and tests; official Python subprocess/os and Git add/diff documentation | Independently written design | Reporting architecture; ADR 0021 | Accepted; implementation deferred | None |
+| ChatGPT-manager namespace and subrouting | Current APG actor/trigger evidence, catalog, checker, lifecycle, projection, and router owners | Project-authored topology design | ChatGPT topology; ADR 0022 | Accepted by APG25; implemented by APG30 | One new provisional subrouter |
+| Personal hygiene transition ledger | Three classified private personal skills; current APG and RepoMap owners | Publication-excluded coherent-unit synthesis | Private APG25 ledger and public bounded summary | Two decommission candidates and one scope-reduction candidate; no private edit | None |
+
+Mutable external documentation records its inspection date and must be refreshed
+before dependency/version selection or implementation. APG25 adds no copied
+expression, notice payload, runtime dependency, package metadata, executable,
+test framework, test move, public candidate, active-integration mutation, or
+personal-skill change. Exact private source locations and restoration evidence
+remain publication excluded.
+
+## APG26 pytest and Bash-to-Python capability summary
+
+APG26 uses current official pytest, pytest-xdist, pytest-cov, coverage.py,
+Python, Git, and GitPython sources inspected on 2026-07-22 together with
+project-authored APG lifecycle, language profiles, reporting architecture,
+report executables, and tests. The two leaves and their scenario/threshold
+contracts are independently written synthesis. No external code, source
+expression, notice payload, private skill wording, or report payload is copied.
+
+| Practice | Source families | Mode | Destination | Lifecycle status | Maturity effect |
+| --- | --- | --- | --- | --- | --- |
+| Pytest collection, fixture, assertion, mock, xdist, coverage, and warning judgment | pytest 9.1.1 (MIT); pytest-xdist 3.8.0 (MIT); pytest-cov 7.1.0 (MIT); coverage.py 7.15.2 (Apache-2.0); Python 3.14.6 docs (PSF-2.0, examples also 0BSD) | Independently written synthesis | `pytest-test-profile`; APG26 evaluation and private calibration | Retained after thirty frozen scenarios, failing-first focused contracts, and fresh review | New row begins `provisional` |
+| Existing Bash-to-Python compatibility migration | Python 3.14.6 docs; current Git CLI docs and GPL-2.0-only source boundary; GitPython 3.1.54 security release (BSD-3-Clause); APG Bash/Python profiles; current project-owned report family | Independently written synthesis | `converting-bash-scripts-to-python`; APG26 evaluation and private calibration | Retained after thirty frozen scenarios, one option-injection correction, read-only dogfood, focused contracts, and fresh review | New row begins `provisional` |
+| Report-family migration map | Current APG report scripts, shared Bash owner, Bats tests, and accepted Python-first architecture | Project-authored read-only classification | Publication-excluded APG26 dogfood record | Future core/adapters mapped; no source or test conversion | None |
+
+The source versions are calibration evidence, not project requirements or
+adopted dependencies. GitPython 3.1.54 hardens unsafe Git option validation;
+the delta reinforces the fixed-vector baseline. GitPython is permitted for
+later bounded evaluation but is not selected or added. Refresh an affected source boundary before a later
+behavior-bearing correction, maturity review, or publication when upstream
+semantics or rights materially change. Public and active v0.3.0 remain
+unchanged.
+
+## APG27 and APG27A Python agent-reporting implementation summary
+
+The APG27 candidate and APG27A adoption apply project-authored ADR 0021, the current APG report executables and
+tests, the retained conversion procedure, and the Python and Git source
+boundaries already evaluated by APG25 and APG26. The implementation is
+independently written project code. It copies no external code or expression
+and adds no third-party package, notice payload, or runtime dependency.
+
+| Practice | Source families | Mode | Destination | Lifecycle status | Maturity effect |
+| --- | --- | --- | --- | --- | --- |
+| Importable Python report core and exact Git-show conversion | Project-authored Bash report family and Bats contracts; ADR 0021; Python standard library; fixed-vector Git CLI | Compatible project-authored conversion | `libexec/agent_report`; Python entry points; ADR 0023 | Adopted by APG27A after APG27 partial | None |
+| Temporary-index Git-diff state evidence | ADR 0021; official Git add/diff/status semantics; Python subprocess, temporary-file, hashing, and replacement primitives | Independently written implementation | `git-diff-report` format version 1; reporting architecture | Adopted for characterized POSIX local filesystems | None |
+| Existing-record operational association | Existing common envelope and operational format; project-authored canonical phase-report convention | Independently written compatible extension | Operational validator and association owner; ADR 0023 | Adopted by APG27A | None |
+| GitPython disposition | APG26 GitPython 3.1.54 calibration and fixed-vector comparison | Re-evaluated dependency disposition | ADR 0023; APG27 evaluation | Not selected; no measured advantage or dependency authority | None |
+
+The prior Bash implementation remains available through Git history as the
+rollback source. Windows report replacement and network-filesystem semantics
+remain unsupported rather than inferred from Python portability. Public and
+active v0.3.0 release artifacts remain unchanged. APG27A independently freezes
+historical v0.3.0 policy and adopts the corrected development checker; it does
+not publish v0.4.0.
+
+## APG28 and APG28A pytest migration
+
+APG28 refreshes official pytest 9.1.1, pytest-xdist 3.8.0, pytest-cov 7.1.0,
+and coverage.py 7.15.2 documentation and independently implements the APG
+runner and inventory candidate. Pytest, pytest-xdist, and pytest-cov are MIT-licensed;
+coverage.py is Apache-2.0 licensed. The exact pins are development-only and add
+no runtime dependency. Project-authored tests, configuration, and documentation
+copy no external expression. The dependency declaration remains uncommitted
+because APG28 stopped Partial. Public and active v0.3.0 remain unchanged.
+
+APG28A preserves that partial result and adopts the same exact dependency set
+after runner, release-policy, process-accounting, artifact, Bats-disposition,
+and coverage corrections pass review. The dependencies remain development-only;
+no external expression is copied. Public and active v0.3.0 remain unchanged.
+
+## APG29 process-skill alignment
+
+APG29 uses project-authored ADRs 0020, 0021, 0023, and 0024; the adopted APG28A
+runner and evidence; existing APG process leaves; and fifty-one public-safe
+project scenarios. It copies no external expression and adds no source,
+dependency, license, notice, or private-skill wording.
+
+| Practice | Source families | Mode | Destination | Lifecycle status | Maturity effect |
+| --- | --- | --- | --- | --- | --- |
+| Useful-contract coverage remediation and scoped evidence | APG testing policy, APG28A runner evidence, existing implementation and planning leaves | Project-authored bounded correction | `implementing-with-test-discipline`; `planning-repository-work` | Accepted after frozen cases, focused tests, and fresh review | None |
+| Mock, real-boundary, coverage, and report verification | APG testing policy, reporting architecture, existing review leaf | Project-authored bounded correction | `reviewing-and-verifying-repository-work` | Accepted after frozen cases, focused tests, and fresh review | None |
+| Structured manager-assignment compression | Structured defaults, manager-worker protocol, existing roadmap-assignment leaf | Project-authored bounded correction | `composing-approved-roadmap-assignments` | Accepted after frozen cases, focused tests, and fresh review | Existing provisional maturity unchanged |
+
+Names, triggers, catalog descriptions, capability-map entries, projections,
+and maturity rows remain unchanged. Public and active v0.3.0, personal skills,
+target repositories, and future ChatGPT topology remain unchanged.
+
+## APG30 ChatGPT-manager topology and subrouter
+
+APG30 uses project-authored ADR 0022, the APG25 topology design, current APG
+checker and lifecycle owners, the unchanged manager-assignment leaf, and
+thirty public-safe topology scenarios. It copies no external or private skill
+expression and adds no third-party dependency, license, or notice payload.
+
+| Practice | Source families | Mode | Destination | Lifecycle status | Maturity effect |
+| --- | --- | --- | --- | --- | --- |
+| Nested ChatGPT-manager canonical ownership with flat discovery | ADR 0022; APG checker, catalog, project/user lifecycle, and release owners | Project-authored implementation | `skills/chatgpt/`; lifecycle and release modules | Accepted after failing-first direct/nested and historical-source evidence | None |
+| ChatGPT-manager capability selection | ADR 0022; general router contract; manager-assignment trigger evidence | Independently written project skill and local map | `chatgpt-manager-workflow` | Retained provisional after thirty frozen cases and focused review | New row begins `provisional` |
+| Manager-assignment canonical move | Existing project-authored leaf and exact pre-move bytes | Pure canonical relocation with source-declared path updates | `skills/chatgpt/composing-approved-roadmap-assignments` | Procedure and provisional maturity unchanged | None |
+
+Historical v0.1.0 through v0.3.0 direct-child policy remains version-bounded.
+Public and active v0.3.0, personal skills, target repositories, and application
+configuration remain unchanged. Post-restart discovery evidence is deferred to
+APG31.
+
+## APG31 personal-hygiene shadow and conditional transition
+
+APG31 uses project-authored ADR 0022, current APG structured defaults and
+review owners, current source-qualified repository policies, direct
+post-restart client discovery, and publication-excluded private coherent-unit
+and restoration evidence. It copies no private skill expression into public
+APG and adds no external source, dependency, license, or notice payload.
+
+| Practice | Source families | Mode | Destination | Lifecycle status | Maturity effect |
+| --- | --- | --- | --- | --- | --- |
+| Fresh-session ChatGPT-manager discovery and routing | Current APG catalog, flat projections, canonical router owners, and client-supplied source paths | Read-only project verification | APG31 evaluation and exit | Passed; no APG30 correction | None |
+| Personal docs-only replacement and transition | APG structured defaults, repository-owned docs-only policy, and private exact restoration evidence | Publication-excluded classification and independently authorized private decommission | Public aggregate records and private exact ledger | Decommissioned; external discovery smoke pending | None |
+| Git-history retained-private boundary | APG structured Git defaults, repository conventions, and private source-qualified routing evidence | Publication-excluded classification | Public aggregate records and private exact ledger | Scope reduction deferred unchanged | None |
+| RepoMap phase replacement | Current RepoMap contributor owners, APG structured defaults, and private source-qualified routing evidence | Read-only cross-repository shadow | Public aggregate records and private exact ledger | Decommission deferred unchanged | None |
+
+APG development, catalog, projections, maturity, routing, public and active
+v0.3.0, reference evidence, and target repositories remain unchanged.
+
+## APG31A personal-hygiene transition completion
+
+APG31A uses the maintainer-reported external smoke result, current APG and
+repository owners, fresh private caller classification, and
+publication-excluded restoration evidence. It copies no private expression
+into public APG and adds no external source, dependency, license, or notice
+payload.
+
+| Practice | Source families | Mode | Destination | Lifecycle status | Maturity effect |
+| --- | --- | --- | --- | --- | --- |
+| APG31 external-smoke closeout | Maintainer report plus current client catalog | Subsequent observation with bounded corroboration | APG31 evaluation and exit; APG31A records | Passed without rewriting APG31 Partial | None |
+| Git-history scope reduction | APG structured defaults, repository Git owners, and publication-excluded transition evidence | Private transition with public aggregate disposition | Current generalized owners and scope-reduced target | Scope-reduced after non-author review | None |
+| RepoMap phase decommission | Current RepoMap instructions and contributor owners plus publication-excluded transition evidence | Private transition with public aggregate disposition | Current RepoMap owners | Decommissioned after non-author review | None |
+
+APG development and public/active v0.3.0 remain unchanged. Exact private
+delivery, restoration, caller, and machine evidence remains
+publication-excluded.
+
+## APG32 Minitest test profile
+
+APG32 uses current official Minitest, `minitest-mock`, RubyGems, and Ruby
+sources inspected on 2026-07-23 together with project-authored APG lifecycle,
+test, Ruby-language, router, catalog, projection, release-policy, and inventory
+owners. The leaf, thresholds, scenarios, evaluation, and tests are
+independently written synthesis. No external code, source expression, example,
+table, notice payload, or private skill wording is copied or adapted.
+
+| Practice | Source families | Mode | Destination | Lifecycle status | Maturity effect |
+| --- | --- | --- | --- | --- | --- |
+| Minitest test/spec, assertion, lifecycle, fixture-alternative, isolation, parallel, filter, runner, plugin, reporter, boundary-effect, and structural judgment | Minitest 6.0.6 tagged source and documentation (MIT); RubyGems release metadata | Independently written synthesis | `minitest-test-profile`; APG32 evaluation and private calibration | Retained after thirty-six frozen scenarios, failing-first focused evidence, one bounded ownership correction, and fresh review | New row begins `provisional` |
+| Versioned mock and stub boundary | `minitest-mock` 5.27.0 tagged source and documentation (MIT); Minitest 6.0.0 removal record | Independently written synthesis | Minitest profile mock/stub procedure and stops | Retained as version-sensitive guidance; no dependency selected | None |
+| Ruby calibration and rights boundary | Ruby 4.0.6 official release facts; Ruby License or two-clause BSD subject to file-specific `LEGAL` terms | Independently summarized facts and rights calibration | APG32 source record and profile maintenance boundary | Calibration only; no compatibility matrix or project version selected | None |
+
+Minitest 6.0.6, `minitest-mock` 5.27.0, and Ruby 4.0.6 are calibration
+evidence, not project requirements or a verified universal combination.
+Refresh affected sources before a later behavior-bearing correction, maturity
+review, or publication when discovery, lifecycle, empty-run, parallel, plugin,
+reporter, mock, stub, or supported-Ruby semantics materially change. Public and
+active v0.3.0 remain unchanged.
+
+## APG33 Dockerfile profile
+
+APG33 uses current official Docker documentation, Dockerfile frontend,
+BuildKit, and OCI Image Spec sources inspected on 2026-07-24 together with
+project-authored APG lifecycle, language, router, catalog, projection,
+release-policy, and inventory owners. The leaf, thresholds, scenarios,
+evaluation, and tests are independently written synthesis. No external code,
+source expression, example, table, notice payload, or private skill wording is
+copied or adapted.
+
+| Practice | Source families | Mode | Destination | Lifecycle status | Maturity effect |
+| --- | --- | --- | --- | --- | --- |
+| Dockerfile parser, stage, instruction-form, variable-scope, context, copy, add, mount, cache, user, runtime-default, platform, and structural judgment | Docker documentation and Dockerfile frontend 1.25.0 sources (Apache-2.0); BuildKit 0.31.2 sources (Apache-2.0) | Independently written synthesis | `dockerfile-profile`; APG33 evaluation and private calibration | Retained after forty frozen scenarios, failing-first focused evidence, one bounded boundary and measurement correction, and fresh review | New row begins `provisional` |
+| Image-configuration boundary | OCI Image Spec 1.1.1 (Apache-2.0) | Independently summarized facts and boundary calibration | Dockerfile profile runtime-default procedure and stops | Calibration only; Docker-specific health, downstream-build, exporter, and runtime behavior remains separately owned | None |
+| Shell and live-operation boundary | Official Dockerfile shell, exec, builder, and platform semantics; existing APG language and authority owners | Project-authored ownership synthesis | Dockerfile profile pairing and authority stops | Retained without selecting a shell, build command, image, platform, builder, runtime, or live operation | None |
+
+Dockerfile frontend 1.25.0, BuildKit 0.31.2, and OCI Image Spec 1.1.1 are
+calibration evidence, not project requirements or a verified universal
+combination. Refresh affected sources before a later behavior-bearing
+correction, maturity review, or publication when parser, instruction, context,
+cache, mount, Windows, platform, provenance, or image-configuration semantics
+materially change. Public and active v0.3.0 remain unchanged.
+
+## APG34 Vagrantfile profile
+
+APG34 uses current official Vagrant source and documentation and current
+official Ruby release and licensing sources inspected on 2026-07-24 together
+with project-authored APG lifecycle, language, router, catalog, projection,
+release-policy, and inventory owners. The leaf, thresholds, scenarios,
+evaluation, and tests are independently written synthesis. No external code,
+source expression, example, table, notice payload, or private skill wording is
+copied or adapted.
+
+| Practice | Source families | Mode | Destination | Lifecycle status | Maturity effect |
+| --- | --- | --- | --- | --- | --- |
+| Vagrantfile configuration-version, load-order, machine, box, provider, plugin, network, synced-folder, provisioner, trigger, state, host-dependent, and structural judgment | Vagrant 2.4.9 tagged source and current official documentation; current development source | Independently written synthesis | `vagrantfile-profile`; APG34 evaluation and private calibration | Retained after forty frozen scenarios, failing-first focused evidence, one bounded source-semantics and machine-measurement correction, and fresh review | New row begins `provisional` |
+| Vagrant and documentation rights boundary | Vagrant and current official documentation source under Business Source License 1.1 with MPL 2.0 as the change license | Independently summarized facts and rights calibration | APG34 source record and profile maintenance boundary | Calibration only; no upstream expression or notice payload copied | None |
+| Ruby and live-operation boundary | Ruby 4.0.6 official release and licensing sources; Vagrant 2.4.9 declared Ruby `>= 3.0` and `< 3.5`; existing APG language and authority owners | Project-authored ownership synthesis | Vagrantfile profile Ruby, shell, state, and authority stops | Retained without selecting a Ruby runtime, provider, box, plugin, host, command, or live operation | None |
+
+Vagrant 2.4.9, current development source, current documentation, and Ruby
+4.0.6 are calibration evidence, not project requirements or a verified
+universal combination. Refresh affected sources before a later
+behavior-bearing correction, maturity review, or publication when
+configuration loading, box metadata, provider or plugin behavior, network,
+synced-folder, provisioner, trigger, state, Ruby compatibility, licensing, or
+representative false-escalation evidence materially changes. Public and active
+v0.3.0 remain unchanged.
+
+## APG35 remaining v0.4 skill authoring
+
+APG35 uses current official Go `testing` and release documentation, the
+canonical matryer/is repository source and license read at its release tag,
+official google/go-cmp package documentation and repository release metadata,
+and current Nix, Nixpkgs, and NixOS manual sources, all inspected on 2026-07-25,
+together with project-authored APG lifecycle, language, ownership, and
+structural owners. The five candidate leaves, thresholds, scenarios,
+specifications, proposed ADR, evaluation, and exit are independently written
+synthesis. No external code, source expression, example, option list, table,
+notice payload, or private skill wording is copied or adapted.
+
+| Practice | Source families | Mode | Destination | Lifecycle status | Maturity effect |
+| --- | --- | --- | --- | --- | --- |
+| Native Go test placement, subtest, attribution, cleanup, isolation, entry-point, parallel, goroutine, example, benchmark, fuzz, selection, caching, and structural judgment | Official Go source-derived `testing` package documentation plus separately classified go.dev release history; Go 1.26.0 and Go 1.25.0 supported, go1.26.5 and go1.25.12 current patches | Independently written synthesis | APG35 candidate and evaluation | Authored only; not integrated or adopted | None |
+| matryer/is instance mode, assertion-family, equality, typed-nil, diagnostic, and attribution judgment | Canonical matryer/is repository source and license read at release tag `v1.4.1` | Independently written synthesis | `matryer-is-test-profile`; APG35 evaluation and private calibration | Authored only; not integrated, tested, or adopted | None; a proposed row would begin `provisional` |
+| google/go-cmp equality-versus-diff, option-composition, comparer, transformer, filter, ignoring, unexported-field, tolerance, ambiguity, and ordering judgment | Official `cmp` and `cmp/cmpopts` package documentation and canonical repository release metadata at `v0.7.0` | Independently written synthesis | `go-cmp-test-profile`; APG35 evaluation and private calibration | Authored only; not integrated, tested, or adopted | None; a proposed row would begin `provisional` |
+| Thin composition ownership across already-selected Go testing components | The three component calibrations above; no independent API calibration by design | Project-authored ownership synthesis | APG35 stack candidate and rejected ADR 0025 | Authored only; rejected by APG36 | None |
+| Nix testing surface taxonomy, evidence hierarchy, platform-matrix, purity, sandbox, store, remote-builder, cache, and structural judgment | Nix 2.35.2 reference manual; Nixpkgs/NixOS 26.05 manuals; nix.dev integration-testing tutorial | Independently written synthesis | APG35 candidate and evaluation | Authored only; deferred by APG36 | None |
+| Source rights boundary | Go source and source-derived package documentation and google/go-cmp under BSD-3-Clause; general go.dev site prose under CC BY 4.0 except where noted; matryer/is under MIT; Nix source and its bundled reference manual under LGPL-2.1-or-later; Nixpkgs and NixOS under MIT subject to component-specific exceptions; independently authored nix.dev content under CC BY-SA 4.0 | Independently summarized facts and rights calibration | APG35 source ledger and APG36 review | Calibration only; no upstream expression or notice payload copied | None |
+
+These releases and source tags are calibration evidence, not project
+requirements, supported-version promises, or a verified universal combination.
+APG36 subsequently closed the two Nix source gaps: sandbox defaults and relaxed
+behavior are documented in the Nix 2.35.2 manual, and the current stable
+Nixpkgs/NixOS series is 26.05. Those facts exposed additional behavior defects
+rather than validating the candidate.
+
+Refresh affected sources before a later behavior-bearing correction, maturity
+review, or publication when the supported Go release pair or a `testing`
+restriction changes, the matryer/is assertion surface or attribution behavior
+changes, the go-cmp option set or documented comparer obligations change, the
+Nix flake-check output set, check-phase contract, pass-through convention,
+testers surface, driver surface, or sandbox boundary changes, or any license
+boundary changes.
+
+APG36 independently re-read the source families, created transient public-safe
+fixtures for all 154 frozen scenarios, and ran a disposable Go 1.25.10 harness
+against matryer/is `v1.4.1` and google/go-cmp `v0.7.0`. It found multiple
+behavior corrections per component and no viable retained stack. All five
+candidates were removed through the APG36 forward commit; ADR 0025 was
+Rejected. No copied expression or additional notice obligation was found.
+
+Integrated development remains 25 canonical skills, 25 catalog rows, and 25 flat
+projections. Public and active v0.3.0 remain unchanged at 19/19/19. No APG35
+candidate is integrated, adopted, mature, published, or deployed.
+
+APG37 re-inspected all six source families on 2026-07-25 while redesigning the
+four deferred candidates on an authoring branch. The Go family was read from a
+local read-only Go 1.25.10 installation covering the `testing` and `cmd/go`
+sources, the specification appendix on language versions, and the
+build-constraint reference; matryer/is `v1.4.1` and google/go-cmp `v0.7.0` were
+read from canonical tagged sources including the build-tagged matryer/is helper
+file; and the Nix, Nixpkgs, and NixOS families were read from the versioned
+2.35 reference and the 26.05 release-branch documentation. The rights boundary
+recorded above is unchanged, and APG37 records the Go split between
+source-derived material and general site prose rather than one class. The Nix,
+Nixpkgs, and NixOS sources are mutable, so the inspection date is their
+controlling state marker.
+
+APG37 reversed several APG35 facts against those sources: matryer/is treats two
+nil-like operands as equal so a typed nil equals an untyped nil, and it
+provides its own helper registry rather than the native mechanism; go-cmp
+requires a total order only for map sorting and explicitly not for slice
+sorting; the Go API does not require a package-level test hook to call the
+runner; language semantics follow the module directive and per-file build
+constraints rather than the toolchain; flake checking builds only the checks
+output; and sandbox defaults are platform-dependent. No copied expression or
+additional notice obligation was found. All APG37 text is independently written
+synthesis.
+
+Integrated development still remains 25/25/25 and public and active v0.3.0
+remain 19/19/19. No APG37 candidate is integrated, adopted, mature, published,
+or deployed, and none carries executable evidence.
+
+## APG38 integration provenance
+
+| Practice | Current sources | Derivation | Result | Rights and refresh |
+| --- | --- | --- | --- | --- |
+| Native Go test lifecycle and structure | Go 1.26.5 and 1.25.12 source and documentation; installed Go 1.25.10 compatibility harness; bounded maintained Go corpus | Independently worded synthesis with executable public-safe fixtures | `go-test-profile` retained `provisional` after one correction cycle and fresh review | Go source and source-derived package docs BSD-3-Clause; refresh on supported-release, `testing`, fuzz, artifact, language-version, or corpus change |
+| matryer/is assertion behavior | canonical matryer/is `v1.4.1`, commit `02e4121244e0f9e27b5ebdade62f5da7b7a42f23` | Independently worded exact-version synthesis and isolated probe | `matryer-is-test-profile` deferred after post-correction attribution and escalation defects; current leaf absent | MIT; differing selected release is a stop and refresh |
+| google/go-cmp comparison behavior | canonical google/go-cmp `v0.7.0`, commit `9b12f366a942ebc7254abc7f32ca05068b455fb7` | Independently worded exact-version synthesis and isolated probe | `go-cmp-test-profile` retained `provisional` | BSD-3-Clause; differing selected release is a stop and refresh |
+| Nix testing taxonomy candidate | Nix 2.35.1 commit `85855aacbf5659dd85a8a290c2532d5dc6196555`; Nixpkgs/NixOS 26.05 commit `597283ad8aa0b331c788e97c4c262d58877074ef`; inspected 2026-07-25 | Source-only independent review and corpus classification | `nix-test-profile` deferred after a post-correction FreeBSD sandbox-default defect; current leaf absent | Nix LGPL-2.1-or-later; Nixpkgs/NixOS MIT subject to component exceptions; exact source revision required before re-authoring |
+
+Initial rights review found that native cleanup/fuzz wording and multiple
+go-cmp comparer, transformer, filter, sorting, diff, and fixture passages
+tracked upstream expression too closely for APG37's categorical no-adaptation
+claim. APG38 independently rewrote those passages and required a final
+source-expression re-review. No public file depends on publication-excluded
+evidence or contains a development Git identity, local path, credential,
+personal detail, or private topology.
+
+## APG39 authoring provenance
+
+APG39 re-inspected the matryer/is, Nix, Nixpkgs, and NixOS families on
+2026-07-26 while authoring final replacement candidates for the two
+APG38-deferred profiles on an authoring branch. matryer/is was read at
+canonical lightweight tag `v1.4.1` (MIT; reverified as the newest upstream
+tag), which resolves to a commit dated 2022-05-16; the GitHub release was
+published 2023-02-23, and that publication date is not the tag commit date.
+The reviewed corpus covered the
+primary assertion source, the build-constrained helper-registry source, the
+release's own tests, and the license. Nix was read at canonical tag `2.35.1`
+(LGPL-2.1-or-later; reverified as the newest upstream release), covering the
+local store settings implementation, the flake-check command documentation
+source, and the 2.35 release notes; the sandbox default is enabled on Linux
+and FreeBSD and disabled elsewhere, and the setting's stale descriptive text
+is recorded as a discrepancy with the implementation and release notes
+controlling. Nixpkgs and NixOS 26.05 were read at the exact APG38-pinned
+commit for phase defaults, target fallback, cross-compilation gating, and
+package-associated tests, so the pinned commit is the controlling state
+marker. All APG39 text is independently written synthesis; no copied
+expression or additional notice obligation was found.
+
+Integrated development remains 27/27/27 and public and active v0.3.0 remain
+19/19/19. The two APG39 candidate leaves exist only on the authoring branch;
+neither is integrated, adopted, mature, published, or deployed, and neither
+carries executable evidence.
+
+## APG40 integration provenance
+
+APG40 independently reverified exact matryer/is `v1.4.1` and MIT rights, exact
+Nix 2.35.1 and LGPL-2.1-or-later rights, and the pinned Nixpkgs/NixOS 26.05
+state and MIT-with-component-exceptions boundary. The matryer/is lightweight
+tag resolves to its 2022-05-16 commit; the 2023-02-23 date is the GitHub
+release publication date. All APG40 text is independently written factual
+synthesis; no copied expression or additional notice obligation was found.
+
+The Nix profile is retained provisionally after source-only review, forty
+corrected public-safe scenarios, one coherent correction pass, and fresh
+non-author review. No Nix parse, evaluation, build, store/cache operation,
+container, virtual machine, activation, deployment, or external operation was
+run. The matryer/is profile is deferred and absent because corrected-state
+review found a remaining equality source-fact defect after its one permitted
+behavior correction. ADR 0027 is Rejected and ADR 0026 remains Accepted.
+
+Integrated development is 28/28/28. Public and active v0.3.0 remain 19/19/19.
+
+## APG41 readiness provenance
+
+APG41 derives its readiness decisions from the existing public skill
+procedures, accepted ADRs, frozen public-safe scenario fixtures,
+repository-owned executable contracts, and independently written
+publication-excluded dogfood records. It copies no external expression and
+adds no dependency or notice obligation. Exact local objects, source paths,
+commands, candidate fingerprints, environment facts, reviewer returns, and
+managed-report identities remain publication excluded.
+
+The retained Go and Nix source/version and rights boundaries remain those
+recorded by APG38 through APG40. APG41 does not refresh, broaden, or universalize
+them: native Go, go-cmp v0.7.0, Nix 2.35.1, and pinned Nixpkgs/NixOS 26.05
+dogfood is source or fixture evidence unless the readiness record explicitly
+reports current-host repository execution. Public and active v0.3.0 remain
+19/19/19. The v0.4.0 candidate result is pre-release evidence, not publication,
+deployment, stable maturity, or external compatibility evidence.
+
+## APG42 release provenance
+
+APG42 derives no new skill expression and adds no external dependency or notice
+obligation. It projects the APG41-accepted skills, records release/current-state
+policy, and retains the exact canonical NOTICE blob
+`d622b081f4cf109501d03bbfebd1224a3ecbcf33` from the verified historical
+repository object. An unrelated project identity is not part of the release.
+Existing source-version and rights boundaries remain unchanged.
+
+Public and active v0.4.0 contain the same 28/28/28 surface as the accepted
+development source. Publication does not transform source/fixture-reviewed
+Go, go-cmp, Ruby, Minitest, Dockerfile, Vagrantfile, Nix, PostgreSQL, SQLite,
+manager, or conversion evidence into universal runtime compatibility.
+Postcommit object identities, local evidence paths, reviewer returns, and
+deployment fingerprints remain publication excluded or managed operational
+evidence.

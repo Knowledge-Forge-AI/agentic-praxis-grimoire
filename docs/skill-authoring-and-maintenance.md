@@ -155,10 +155,18 @@ The checker validates:
 - nonempty support directories and contained support symlinks;
 - accepted same-line literal Markdown links and images outside fenced code,
   resolved from the containing Markdown file and contained within the leaf;
-- the exact catalog table under `## APG v0.1 catalog`, including canonical
-  bijection, links, trigger cells, and maturity vocabulary; and
-- exact checked-in `.agents/skills/<name> -> ../../skills/<name>` projections,
-  resolved identity, and containment.
+- the exact catalog table under the recognized current or historical catalog
+  heading, including canonical bijection, links, trigger cells, and maturity
+  vocabulary; and
+- exact checked-in `.agents/skills/<name>` projections to each declared direct
+  or `chatgpt/`-nested canonical path, resolved identity, and containment.
+
+ADR 0022 and APG30 accept exactly direct leaves and
+`skills/chatgpt/<name>` leaves while keeping projections flat. The checker
+derives each exact relative target from the canonical path, keeps frontmatter
+names globally unique, excludes namespace owners from counts, and rejects
+unknown namespaces or deeper owners. Historical public policy remains
+version-bounded rather than being reinterpreted by current development.
 
 The parser deliberately does not implement general YAML or Markdown. Every
 column-zero frontmatter mapping key must contain only ASCII letters, digits,
@@ -224,3 +232,125 @@ Public v0.3.0 carries all nineteen ADR 0018 release-included skills: fourteen
 stable and five provisional. APG24 distribution and lifecycle evidence does not
 promote a provisional row, change a trigger, or substitute projection success
 for this maintenance procedure. No `SKILL.md` changes in APG24.
+
+APG25 applies one behavior-bearing correction to
+`composing-approved-roadmap-assignments` after freezing three representative
+before/after assignment pairs and a failing focused test. The leaf now loads
+repository structured defaults, omits repeated ordinary procedure, and retains
+authority, acceptance, stop, and successor boundaries. Its trigger, name,
+provisional maturity, catalog row, projection, and route do not change.
+
+APG26 applies this new-skill lifecycle separately to
+`pytest-test-profile` and `converting-bash-scripts-to-python`. Each candidate
+has current source and rights evidence, thirty frozen positive/non-trigger/edge
+or stop families, failing-first focused contracts, explicit project and
+authority boundaries, rollback, and fresh non-author review. Both are retained
+`provisional`; pytest needs no behavior-bearing candidate correction, while
+conversion uses one bounded option-injection correction. The generic native
+skill scaffold does not add harness metadata or support directories when APG's
+checked direct-child text-only leaf contract has no demonstrated need for them.
+
+APG28A adopts the corrected move of the pytest-profile contract test beneath
+the mirrored skill owner without changing `SKILL.md`, maturity, catalog,
+projection, or route state. The runner collects it as pytest and the inventory
+checks its production owner and exact mirror.
+
+APG29 applies one behavior-bearing correction to each of
+`implementing-with-test-discipline`, `planning-repository-work`,
+`reviewing-and-verifying-repository-work`, and
+`composing-approved-roadmap-assignments`. Fifty-one frozen cases cover useful-
+test coverage remediation, scoped testing, mock and real boundaries, formal
+and non-phase defaults, and manager-prompt compression. Names, triggers,
+maturity rows, catalog descriptions, projections, and capability-map entries
+remain unchanged.
+
+APG30 applies this lifecycle to one new provisional subrouter and one
+procedure-preserving canonical move. Thirty frozen cases cover direct and
+nested discovery, catalog identity, flat projections, project/user lifecycle,
+historical release compatibility, router ownership, and stop boundaries.
+`chatgpt-manager-workflow` begins provisional. The moved
+`composing-approved-roadmap-assignments` bytes and maturity remain unchanged;
+its catalog path, flat projection, and local-map owner change together.
+
+APG32 applies this lifecycle to `minitest-test-profile`. Current official
+Minitest, separately extracted mock, Ruby, and RubyGems sources establish the
+version and rights boundary before thirty-six trigger, non-trigger, semantic,
+structural, and stop families are frozen. A failing-first mirrored contract
+then covers the leaf, route, projection, and scenario inventory. The retained
+candidate begins `provisional` after one bounded trigger and ownership
+correction. The native
+skill scaffold is used, while harness metadata and support directories are
+omitted because the checked APG direct-child text-only contract demonstrates no
+need for them.
+
+APG33 applies this lifecycle to `dockerfile-profile`. Current official Docker
+documentation, Dockerfile frontend, BuildKit, and OCI Image Spec sources
+establish the version and rights boundary before forty trigger, non-trigger,
+semantic, structural, platform, protected-data, truthfulness, and authority
+families are frozen. A failing-first mirrored contract then covers the leaf,
+route, projection, threshold rows, and scenario inventory. The retained
+candidate begins `provisional` after one bounded context, ownership, and
+measurement correction. The native
+skill scaffold is used, while harness metadata and support directories are
+omitted because the checked APG direct-child text-only contract demonstrates no
+need for them.
+
+APG34 applies this lifecycle to `vagrantfile-profile`. Current official
+Vagrant release and development source, documentation, licensing, and declared
+Ruby compatibility establish the version and rights boundary before forty
+trigger, non-trigger, configuration, box, provider, plugin, network, folder,
+provisioner, trigger, state, structural, truthfulness, and authority families
+are frozen. A failing-first mirrored contract then covers the leaf, route,
+projection, threshold rows, and scenario inventory. The retained candidate
+begins `provisional` after one bounded source-semantics and machine-measurement
+correction. The native skill scaffold is used, while harness metadata and
+support directories are omitted because the checked APG direct-child text-only
+contract demonstrates no need for them.
+
+APG38 applies this lifecycle independently to the four APG37 replacement
+candidates. `go-test-profile` and `go-cmp-test-profile` pass current-source
+review, public-safe fixture conversion, isolated compatibility evidence, one
+coherent correction cycle, and fresh corrected-state review, then begin
+`provisional`. `matryer-is-test-profile` and `nix-test-profile` do not pass:
+fresh corrected-state review finds new material attribution/false-escalation
+and FreeBSD sandbox-default defects after their correction cycles. Both are
+`deferred-material-defect`, and all current integration surfaces are removed.
+Candidate deferral does not promote or block the retained owners.
+
+APG39 re-authors the two deferred candidates as fresh authoring-branch
+leaves from their APG38 corrected-state defects: wrapper severity follows
+registration completeness rather than depth, relaxed-mode severity follows
+causality rather than count, and sandbox defaults are stated separately and
+exactly per platform with the actual configuration controlling. The
+candidates are `authored-pending-independent-review`; the lifecycle's
+independent review, fixtures, compatibility evidence, correction cycle, and
+integration belong to a later separately authorized Codex phase.
+
+APG40 applies that lifecycle. `nix-test-profile` passes one coherent
+source-fact correction cycle, forty executable public-safe scenarios,
+source-only corpus calibration, rights/privacy review, and fresh non-author
+corrected-state review, then begins `provisional`. `matryer-is-test-profile`
+is `deferred-material-defect`: its corrected-state equality mechanism still
+misstates exact source, so the one-cycle rule forbids another behavior
+correction and its current surfaces are removed. Mechanical public-test
+privacy repair does not consume a behavior cycle.
+
+APG41 applies readiness review to all fourteen live provisional rows without
+promoting them. Minitest, Dockerfile, and Vagrantfile each receive one
+candidate-independent removal-description repair: remove the public scenario
+fixture with the focused test and derive surviving counts from live
+inventories instead of embedding historical totals. These are rollback
+wording and contract repairs, not behavior corrections. Fresh corrected-state
+review accepts all three.
+
+APG42 publishes the exact APG41 skill set without changing a leaf, trigger,
+procedure, source calibration, route, projection target, or maturity row.
+Release inclusion leaves fourteen rows stable and fourteen provisional.
+`matryer-is-test-profile` and `go-testing-stack` remain absent; ADR 0026's
+independent Go component ownership remains controlling.
+
+Canonical leaves may exist only at `skills/<name>/SKILL.md` or
+`skills/chatgpt/<name>/SKILL.md`. The namespace is not a skill, names remain
+globally unique, and catalog links and projection targets must name the exact
+canonical path. Adding another namespace class requires a separate design and
+checker decision.

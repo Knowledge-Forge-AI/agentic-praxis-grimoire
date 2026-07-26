@@ -24,10 +24,10 @@ decommission, or APG24.
 | Nix profile | `stable`; `include-v0.3` | Released; no evaluation authority granted |
 | PostgreSQL profile | `provisional`; `include-v0.3` | Released; no live database authority granted |
 | SQLite profile | `provisional`; `include-v0.3` | Released; no live database authority granted |
-| Private router public migration | `shadow-only` | Public v0.3 and active update complete; source-qualified shadow remains external and decommission is separately authorized |
+| Private router public migration | `complete` | APG24A records the passed source-qualified shadow and separately authorized personal-router decommission; exact private restoration remains available |
 | Aggregate application smoke | `complete` | APG24 shell validation does not replace the external fresh-session shadow |
 | Readiness/maturity review | `complete` | External APG23 acceptance and separate APG24 authorization |
-| Public v0.3 release | `published` | Fresh-session source-qualified shadow smoke remains external |
+| Public v0.3 release | `complete` | APG24A records the passed external fresh-session smoke; public and active v0.3.0 remain unchanged |
 
 ## APG23 closure
 
@@ -60,3 +60,16 @@ not occur. The personal and public routers remain together for a
 source-qualified fresh-session shadow. Reference, target, RepoMap, database,
 Nix, graph, and deployment state remain unchanged. No successor phase is
 authorized.
+
+## APG24A terminal closure
+
+The maintainer reports that the APG24 follow-up public-v0.3 fresh-session smoke
+passed and that the personal same-name router was subsequently decommissioned
+under separate authority. Focused APG24A checks confirm unchanged public and
+active v0.3.0 state, nineteen aggregate skills, absence of the personal router,
+preservation of the other personal skills, and an exact tracked restoration
+source.
+
+APG24's original pending-shadow outcome remains truthful for its own exit.
+APG24A records the later evidence forward and closes the remaining v0.3
+condition. No v0.3 phase remains.

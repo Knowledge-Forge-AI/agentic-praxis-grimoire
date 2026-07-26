@@ -76,6 +76,13 @@ nineteen; update and rollback validate and restore those sets independently.
 The active maintainer integration remains aggregate-owned and is not normalized
 through this command.
 
+APG24A records the subsequent successful source-qualified shadow and the
+personal same-name router decommission performed under separate human
+authority. The aggregate-owned public source remains active with nineteen
+skills. No schema-version-1 user state or lifecycle command is introduced for
+that integration, and the former personal router remains exactly restorable
+from private history.
+
 ## Command and source requirements
 
 [`bin/apg-user-skills`](../bin/apg-user-skills) is a Python 3 and Git command:
@@ -184,10 +191,32 @@ for the active integration, and no lifecycle command in this guide is run
 against it. The personal same-name router remains present for the separately
 observable source-qualified shadow.
 
+APG24A records that the external shadow passed and that separate human
+authority then decommissioned the personal router. Focused checks leave the
+aggregate link and public source unchanged, find all nineteen public skills,
+and retain an exact private restoration source. This is not a migration to the
+direct-link lifecycle owned by this guide.
+
+APG42 preserves the same aggregate ownership while advancing the public source
+from v0.3.0 to v0.4.0 by exact fast-forward after live and fresh-public
+verification. The aggregate link is not recreated, no schema-version-1
+direct-link state is created, and no lifecycle command in this guide is run
+against the active integration. Mechanical enumeration resolves twenty-eight
+public skills; it does not by itself prove refreshed client invocation or
+precedence.
+
 Project-local adoption remains a separate operation owned by
 [`apg-project-skills`](project-skill-projection.md). User and project scope have
 different roots, state, duplicate behavior, exclusion rules, and removal
 authority and therefore do not share a command.
+
+ADR 0022 and APG30 support nested canonical source paths for ChatGPT-manager
+leaves while retaining flat user discovery names. Source identity maps every
+managed name to an exact direct or nested canonical path. Focused lifecycle
+evidence covers direct-to-nested update and nested-to-direct rollback while
+schema-version-1 historical v0.1.0 through v0.3.0 sources retain their exact
+direct-child sets. APG30 changes no state schema, active integration,
+application configuration, or personal skill.
 
 ## Failure recovery and privacy
 

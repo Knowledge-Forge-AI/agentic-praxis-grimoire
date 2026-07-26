@@ -11,14 +11,19 @@
       "trigger": "Bats-specific test judgment is material to evaluation, run status and output, hooks, fixtures, TAP, file descriptors, parallelism, background cleanup, or warning and crisis thresholds beyond repository policy."
     },
     {
-      "capability_class": "approved-roadmap manager-assignment composition",
-      "name": "composing-approved-roadmap-assignments",
-      "trigger": "A human-approved roadmap phase or explicitly approved bounded phase sequence needs a reviewable top-level coding-agent manager assignment with authority, scope, evidence, acceptance, stop, reporting, and handoff boundaries."
+      "capability_class": "ChatGPT-manager workflow routing",
+      "name": "chatgpt-manager-workflow",
+      "trigger": "Selection among multiple plausible ChatGPT top-level-manager capabilities is ambiguous or a ChatGPT-manager routing decision requires audit."
     },
     {
       "capability_class": "worker-assignment composition",
       "name": "composing-bounded-worker-assignments",
       "trigger": "Delegation is already authorized and selected, and one non-trivial worker assignment needs explicit boundaries."
+    },
+    {
+      "capability_class": "Bash-to-Python conversion",
+      "name": "converting-bash-scripts-to-python",
+      "trigger": "An existing Bash executable or script family needs a bounded conversion to Python that preserves or deliberately migrates its observable contract."
     },
     {
       "capability_class": "systematic debugging",
@@ -31,9 +36,24 @@
       "trigger": "Consequential behavior, architecture, ownership, contracts, safety, or irreversible choices remain unresolved."
     },
     {
+      "capability_class": "Dockerfile profile",
+      "name": "dockerfile-profile",
+      "trigger": "Dockerfile-specific judgment is material to parser directives, build stages, instruction forms, variable scope, build context, copies, mounts, cache behavior, file ownership, runtime metadata, platform behavior, or warning and crisis thresholds beyond repository policy."
+    },
+    {
+      "capability_class": "go-cmp test profile",
+      "name": "go-cmp-test-profile",
+      "trigger": "A repository has already selected google/go-cmp v0.7.0 and comparison judgment is material to equality versus diff, option composition and filters, comparers and transformers, ignores and unexported fields, sorting, approximation, panics, diagnostic exposure, or thresholds beyond repository policy."
+    },
+    {
       "capability_class": "Go language profile",
       "name": "go-language-profile",
       "trigger": "Go-specific judgment is material to structure, errors, context, interfaces, generics, concurrency, public APIs, reflection, unsafe, cgo, subprocesses, compatibility, or warning and crisis thresholds beyond repository policy."
+    },
+    {
+      "capability_class": "Go test profile",
+      "name": "go-test-profile",
+      "trigger": "Native Go test judgment is material to package placement, subtests, helper attribution, cleanup and isolation, TestMain, parallelism, goroutine reporting, examples, benchmarks, fuzzing, caching, effective language version, or warning and crisis thresholds beyond repository policy."
     },
     {
       "capability_class": "test-disciplined implementation",
@@ -41,9 +61,19 @@
       "trigger": "An authorized behavior change benefits from executable behavioral evidence proportional to risk."
     },
     {
+      "capability_class": "Minitest test profile",
+      "name": "minitest-test-profile",
+      "trigger": "Minitest-specific judgment is material to test or spec organization, assertions, lifecycle, mocks, stubs, fixture alternatives, isolation, parallelism, filtering, runners, plugins, reporters, subprocess, filesystem, or database test boundaries, or warning and crisis thresholds beyond repository policy."
+    },
+    {
       "capability_class": "Nix language profile",
       "name": "nix-language-profile",
       "trigger": "Nix-specific judgment is material to expressions, attribute sets, modules, derivations, flakes, overlays, purity, evaluation, store exposure, activation, remote builders, or warning and crisis thresholds beyond repository policy."
+    },
+    {
+      "capability_class": "Nix test profile",
+      "name": "nix-test-profile",
+      "trigger": "Nix test judgment is material to selecting which already-selected testing surface proves an exact claim, package phases, flake checks, Nixpkgs or NixOS test ownership, test-evidence qualification across sandbox, store, builder, or cache boundaries, or Nix-test-specific structural review."
     },
     {
       "capability_class": "repository planning",
@@ -54,6 +84,11 @@
       "capability_class": "PostgreSQL database profile",
       "name": "postgresql-database-profile",
       "trigger": "PostgreSQL-specific judgment is material to SQL, schemas, MVCC, transactions, locks, DDL, migrations, routines, triggers, security, backup and restore, replication, maintenance, or warning and crisis thresholds beyond repository policy."
+    },
+    {
+      "capability_class": "pytest test profile",
+      "name": "pytest-test-profile",
+      "trigger": "pytest-specific judgment is material to discovery, collection, assertions, fixtures, parametrization, mocks, isolation, xdist, coverage, or warning and crisis thresholds beyond repository policy."
     },
     {
       "capability_class": "Python language profile",
@@ -79,6 +114,11 @@
       "capability_class": "repository guidance synthesis",
       "name": "synthesizing-repository-guidance",
       "trigger": "A dense, duplicated, mixed-scope, private, or source-derived guidance corpus needs ownership and migration dispositions before rewrite."
+    },
+    {
+      "capability_class": "Vagrantfile profile",
+      "name": "vagrantfile-profile",
+      "trigger": "Vagrantfile-specific judgment is material to configuration versions and loading, machines, boxes, provider blocks, networks, synced folders, provisioners, triggers, Vagrant state, host-dependent behavior, or warning and crisis thresholds beyond repository policy."
     },
     {
       "capability_class": "Zsh language profile",

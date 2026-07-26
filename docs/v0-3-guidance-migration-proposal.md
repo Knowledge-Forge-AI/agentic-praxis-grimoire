@@ -115,6 +115,15 @@ Transition gate:
 7. Repeat source-qualified discovery after cutover and restore immediately on
    regression.
 
+APG24A records the subsequent terminal disposition for the personal router.
+The maintainer-reported source-qualified fresh-session shadow passed, and the
+personal same-name router was then decommissioned under separate human
+authority. Focused verification finds the public-backed aggregate active with
+all nineteen skills, the former personal router absent, the other personal
+skills preserved, and an exact tracked private restoration source. This closes
+that router transition only; it does not approve another private-skill
+decommission or a broader root cutover.
+
 Other bounded private dispositions:
 
 | Private capability class | Disposition |

@@ -1,0 +1,204 @@
+{
+  "dockerfile": [
+    {
+      "id": "APG33-DOCKERFILE-01",
+      "scenario": "A simple single-stage Dockerfile has a material instruction question",
+      "expected": "Trigger the profile and establish syntax, platform, stage, and project policy"
+    },
+    {
+      "id": "APG33-DOCKERFILE-02",
+      "scenario": "An ordinary application change has no Dockerfile concern",
+      "expected": "Non-trigger"
+    },
+    {
+      "id": "APG33-DOCKERFILE-03",
+      "scenario": "The task changes only Docker Compose behavior",
+      "expected": "Non-trigger; route to the Compose or project owner"
+    },
+    {
+      "id": "APG33-DOCKERFILE-04",
+      "scenario": "A syntax directive is unsupported or its frontend identity is unknown",
+      "expected": "Red until the selected frontend and feature support are established"
+    },
+    {
+      "id": "APG33-DOCKERFILE-05",
+      "scenario": "A parser directive appears after an ordinary comment, empty line, or instruction",
+      "expected": "Orange because the intended directive is ineffective; Red when consequential behavior depends on the false directive claim"
+    },
+    {
+      "id": "APG33-DOCKERFILE-06",
+      "scenario": "Linux versus Windows container semantics are unclear",
+      "expected": "Orange pending exact platform, escape, path, shell, and instruction evidence; unsupported claims are Red"
+    },
+    {
+      "id": "APG33-DOCKERFILE-07",
+      "scenario": "A base image uses a mutable tag",
+      "expected": "Yellow or Orange under project ownership; absent authority or verification at a consequential boundary is Red"
+    },
+    {
+      "id": "APG33-DOCKERFILE-08",
+      "scenario": "A digest-pinned base is required by project policy",
+      "expected": "Green or Yellow under project policy after platform, update, provenance, and rollback boundaries are verified"
+    },
+    {
+      "id": "APG33-DOCKERFILE-09",
+      "scenario": "A global ARG before FROM is assumed to be in ordinary stage scope",
+      "expected": "Yellow; map global and stage scope and re-declare the ARG in a stage before ordinary stage use"
+    },
+    {
+      "id": "APG33-DOCKERFILE-10",
+      "scenario": "A named multi-stage build has coherent build and runtime stages",
+      "expected": "Green when names and dependencies make the stage graph, target, and copies unambiguous"
+    },
+    {
+      "id": "APG33-DOCKERFILE-11",
+      "scenario": "COPY --from names the wrong, missing, or ambiguous stage or source",
+      "expected": "Red until the artifact source and destination stage are unambiguous"
+    },
+    {
+      "id": "APG33-DOCKERFILE-12",
+      "scenario": "The Dockerfile has unnecessary stage proliferation",
+      "expected": "At least Yellow; apply stage-count, responsibility, and coupling rules before escalation"
+    },
+    {
+      "id": "APG33-DOCKERFILE-13",
+      "scenario": "The target stage is selected by project policy",
+      "expected": "Green or Yellow after verifying the project-owned target graph without choosing it"
+    },
+    {
+      "id": "APG33-DOCKERFILE-14",
+      "scenario": "Automatic build and target platform arguments control a stage",
+      "expected": "Orange while mapping BUILD and TARGET scope, native versus cross execution, and toolchain support; unsupported claims are Red"
+    },
+    {
+      "id": "APG33-DOCKERFILE-15",
+      "scenario": "A shell-form RUN relies on expansion, pipelines, or shell failure behavior",
+      "expected": "Yellow when expansion is deliberate and trusted; pair a shell profile only when its semantics are independently material"
+    },
+    {
+      "id": "APG33-DOCKERFILE-16",
+      "scenario": "An exec-form instruction supplies a fixed argument vector",
+      "expected": "Green for a fixed supported argument vector; do not assume shell expansion or shell builtins"
+    },
+    {
+      "id": "APG33-DOCKERFILE-17",
+      "scenario": "An untrusted value reaches shell interpretation",
+      "expected": "Red source-to-shell stop"
+    },
+    {
+      "id": "APG33-DOCKERFILE-18",
+      "scenario": "ARG or ENV carries a protected value",
+      "expected": "Red because the value can reach image configuration, history, cache, provenance, output, or later layers"
+    },
+    {
+      "id": "APG33-DOCKERFILE-19",
+      "scenario": "A package-index update is separated unsafely from installation",
+      "expected": "Orange when the selected package manager requires one owned update and installation transaction; do not universalize the rule"
+    },
+    {
+      "id": "APG33-DOCKERFILE-20",
+      "scenario": "One RUN command chain obscures failure ownership",
+      "expected": "Apply the maximum RUN-command band; normally Orange once failure ownership is obscured"
+    },
+    {
+      "id": "APG33-DOCKERFILE-21",
+      "scenario": "SHELL changes the meaning of later shell-form instructions",
+      "expected": "Orange while mapping later shell-form instructions; unsafe or falsely supported behavior is Red"
+    },
+    {
+      "id": "APG33-DOCKERFILE-22",
+      "scenario": ".dockerignore excludes a file that a later instruction requires",
+      "expected": "Orange until context and ignore ownership are reconciled; source review cannot claim a successful copy or build"
+    },
+    {
+      "id": "APG33-DOCKERFILE-23",
+      "scenario": "The build context contains unintended protected or large files",
+      "expected": "Protected exposure is Red; excessive unrelated context is a structural and cache warning"
+    },
+    {
+      "id": "APG33-DOCKERFILE-24",
+      "scenario": "COPY fully expresses the required local or stage-owned transfer",
+      "expected": "Prefer the narrower semantics without turning the preference into an automatic rewrite"
+    },
+    {
+      "id": "APG33-DOCKERFILE-25",
+      "scenario": "ADD introduces a remote URL, Git source, or automatic archive extraction",
+      "expected": "Remote ADD without authority, immutability, and verification is Red; deliberate local extraction is Yellow or Orange with bounded evidence"
+    },
+    {
+      "id": "APG33-DOCKERFILE-26",
+      "scenario": "File ownership, mode, user, or permission effects are material",
+      "expected": "Normally Orange while establishing stage, platform, source metadata, runtime user, and rollback; unresolved consequential access is Red"
+    },
+    {
+      "id": "APG33-DOCKERFILE-27",
+      "scenario": "A multi-stage artifact copy deliberately narrows final image contents",
+      "expected": "Green or Yellow for an exact named-stage artifact set; do not infer build success or absence of unrelated metadata"
+    },
+    {
+      "id": "APG33-DOCKERFILE-28",
+      "scenario": "The Dockerfile is generated or vendor-owned",
+      "expected": "Classify and change the authorized owner or generator; semantic Red stops still control"
+    },
+    {
+      "id": "APG33-DOCKERFILE-29",
+      "scenario": "The final runtime configuration remains root without project rationale",
+      "expected": "Red when the consequential user, ownership, or permission boundary is unresolved"
+    },
+    {
+      "id": "APG33-DOCKERFILE-30",
+      "scenario": "ENTRYPOINT and CMD interaction or override behavior is misunderstood",
+      "expected": "Orange until the exact form and override matrix is established; unsafe runtime behavior is Red"
+    },
+    {
+      "id": "APG33-DOCKERFILE-31",
+      "scenario": "A health-check command can false-pass or expose protected output",
+      "expected": "Red until status, timing, timeout, output, and protected-data behavior are safe"
+    },
+    {
+      "id": "APG33-DOCKERFILE-32",
+      "scenario": "Signal handling or STOPSIGNAL behavior is material",
+      "expected": "Orange while establishing the runtime process and platform contract; unsafe or unsupported behavior is Red"
+    },
+    {
+      "id": "APG33-DOCKERFILE-33",
+      "scenario": "ONBUILD creates hidden downstream build behavior",
+      "expected": "At least Orange; unresolved downstream context, source, or mutation ownership is Red"
+    },
+    {
+      "id": "APG33-DOCKERFILE-34",
+      "scenario": "VOLUME creates persistence, initialization, or mutation ambiguity",
+      "expected": "Orange until image metadata, runtime ownership, initialization, persistence, mutation, and rollback are explicit; consequential ambiguity is Red"
+    },
+    {
+      "id": "APG33-DOCKERFILE-35",
+      "scenario": "A BuildKit secret mount is declared for a project-approved protected input",
+      "expected": "Green or Yellow after syntax, identity, command use, output, cache, and provenance boundaries are verified; the mount alone is not proof"
+    },
+    {
+      "id": "APG33-DOCKERFILE-36",
+      "scenario": "A protected value is copied, printed, persisted, or exported into a layer or build output",
+      "expected": "Red protected-data stop"
+    },
+    {
+      "id": "APG33-DOCKERFILE-37",
+      "scenario": "A cache or bind mount changes reproducibility or shared mutation",
+      "expected": "Orange while establishing contents, sharing, ownership, invalidation, cleanup, and clean-build fallback"
+    },
+    {
+      "id": "APG33-DOCKERFILE-38",
+      "scenario": "Repository policy is stricter than the profile fallback",
+      "expected": "Stricter repository policy controls"
+    },
+    {
+      "id": "APG33-DOCKERFILE-39",
+      "scenario": "A destructive or networked build action lacks authority",
+      "expected": "Red authority stop"
+    },
+    {
+      "id": "APG33-DOCKERFILE-40",
+      "scenario": "A maintained Dockerfile crosses a warning or crisis threshold",
+      "expected": "Apply classification, coupling, decomposition, bounded-exception, and rollback rules"
+    }
+  ]
+}

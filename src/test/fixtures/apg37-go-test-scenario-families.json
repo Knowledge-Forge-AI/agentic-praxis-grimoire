@@ -1,0 +1,216 @@
+{
+  "schema_version": 1,
+  "source_phase": "APG37",
+  "apg38_outcome_corrections": [
+    {
+      "id": "APG37-GO-TEST-12",
+      "reason": "APG38 corrected the terminal outcome after independent source or structural review."
+    },
+    {
+      "id": "APG37-GO-TEST-18",
+      "reason": "APG38 corrected the terminal outcome after independent source or structural review."
+    },
+    {
+      "id": "APG37-GO-TEST-20",
+      "reason": "APG38 corrected the terminal outcome after independent source or structural review."
+    },
+    {
+      "id": "APG37-GO-TEST-29",
+      "reason": "APG38 corrected the terminal outcome after independent source or structural review."
+    },
+    {
+      "id": "APG37-GO-TEST-32",
+      "reason": "APG38 corrected the terminal outcome after independent source or structural review."
+    },
+    {
+      "id": "APG37-GO-TEST-33",
+      "reason": "APG38 corrected the terminal outcome after independent source or structural review."
+    },
+    {
+      "id": "APG37-GO-TEST-36",
+      "reason": "APG38 corrected the terminal outcome after independent source or structural review."
+    }
+  ],
+  "go_test": [
+    {
+      "id": "APG37-GO-TEST-01",
+      "scenario": "A task materially depends on native Go test lifecycle or structure",
+      "expected": "Trigger; establish supported releases, module directive, package layout, placement, policy, and authority"
+    },
+    {
+      "id": "APG37-GO-TEST-02",
+      "scenario": "A task changes ordinary Go implementation with no material test-specific decision",
+      "expected": "Non-trigger; route to `go-language-profile` or a process owner"
+    },
+    {
+      "id": "APG37-GO-TEST-03",
+      "scenario": "Dependency adoption, commands, flags, race, coverage, fuzz duration, benchmark, worker, platform, or CI policy is requested from the profile",
+      "expected": "Non-trigger for selection; report the consequence and leave the choice to the repository"
+    },
+    {
+      "id": "APG37-GO-TEST-04",
+      "scenario": "Same-package tests need unexported identifiers",
+      "expected": "Green or Yellow after confirming placement and that access does not encode an unstable internal contract"
+    },
+    {
+      "id": "APG37-GO-TEST-05",
+      "scenario": "An external test package constrains the exported surface, or both placements coexist for one package",
+      "expected": "Green or Yellow when each file's placement, visibility, and intent are explicit; a claim that both see the same surface is Red"
+    },
+    {
+      "id": "APG37-GO-TEST-06",
+      "scenario": "Subtest names are built from data containing spaces or slashes, and a pattern is expected to select one subtest",
+      "expected": "Yellow; names are rewritten, slashes create hierarchy, and patterns match per element against the full path, so reported identity and selection change"
+    },
+    {
+      "id": "APG37-GO-TEST-07",
+      "scenario": "A package or subtest pattern selects nothing or an unintended set",
+      "expected": "Yellow; an empty or unintended selection reported as a passing suite is Red"
+    },
+    {
+      "id": "APG37-GO-TEST-08",
+      "scenario": "`TestMain` performs setup and runs the package's tests",
+      "expected": "Green or Yellow; it runs on the main goroutine, flags are not yet parsed, and a normal return propagates the recorded result without an explicit exit call"
+    },
+    {
+      "id": "APG37-GO-TEST-09",
+      "scenario": "`TestMain` deliberately returns without running the package's tests, or exits with a project-chosen code",
+      "expected": "Orange; permitted, exceptional, project-owned behavior requiring an explicit accepted rationale, and the result must never be described as the package's tests having run"
+    },
+    {
+      "id": "APG37-GO-TEST-10",
+      "scenario": "`TestMain` omits the runner call by accident, or exits with a hardcoded success code",
+      "expected": "Red false-pass and omitted-test stop; the binary reports success while required tests never executed"
+    },
+    {
+      "id": "APG37-GO-TEST-11",
+      "scenario": "`TestMain` accumulates independent setup responsibilities with separate failure contracts",
+      "expected": "Orange on breadth; Red when the package result can no longer be reported truthfully"
+    },
+    {
+      "id": "APG37-GO-TEST-12",
+      "scenario": "Language semantics are inferred for a test file",
+      "expected": "Establish the module directive, any file-level Go release constraint, and the selected toolchain, then derive the effective file version under current rules. A later file constraint can set a file above a Go 1.21 module version; inferring semantics from the toolchain alone is Red."
+    },
+    {
+      "id": "APG37-GO-TEST-13",
+      "scenario": "Table cases are launched as parallel or nested subtests inside a loop",
+      "expected": "Yellow; confirm per-iteration binding under the file's effective language version rather than assuming one historical behavior, and confirm cleanup and capture ordering"
+    },
+    {
+      "id": "APG37-GO-TEST-14",
+      "scenario": "A shared helper reports failures",
+      "expected": "Yellow until every helper frame that should be skipped is marked; materially misleading attribution is Red"
+    },
+    {
+      "id": "APG37-GO-TEST-15",
+      "scenario": "A helper calls a fatal method on the test's behalf",
+      "expected": "Yellow; establish that the helper runs on the test goroutine and that the caller expects an abort"
+    },
+    {
+      "id": "APG37-GO-TEST-16",
+      "scenario": "A nonfatal failure is expected to allow later assertions to run",
+      "expected": "Green or Yellow after distinguishing the nonfatal from the aborting method and confirming later code is safe"
+    },
+    {
+      "id": "APG37-GO-TEST-17",
+      "scenario": "An aborting, skipping, or parallel-marking method is called from a goroutine the test started",
+      "expected": "Red; those methods must be called only from the goroutine running the test function"
+    },
+    {
+      "id": "APG37-GO-TEST-18",
+      "scenario": "A test starts a goroutine that affects the result or owns an acquired resource",
+      "expected": "A required result must be delivered and checked before owner return. A resource-owning goroutine must complete or be cancelled with release confirmed. Genuinely independent no-result, no-resource work may instead be bounded under project policy; otherwise Red."
+    },
+    {
+      "id": "APG37-GO-TEST-19",
+      "scenario": "A test starts a goroutine that cannot affect the result and owns nothing the test must release",
+      "expected": "Green or Yellow when the repository accepts it; there is no universal obligation to join every goroutine, and stricter project policy wins"
+    },
+    {
+      "id": "APG37-GO-TEST-20",
+      "scenario": "Cleanup must run in a defined order and release every acquired resource",
+      "expected": "Establish cleanup order and resource release. Unexpected, unauthorized, unbounded, or privacy-unsafe retention is Red; an explicitly authorized, minimized, bounded retained test artifact is not automatically Red."
+    },
+    {
+      "id": "APG37-GO-TEST-21",
+      "scenario": "A test needs an isolated writable directory",
+      "expected": "Green when the per-test temporary directory is used and its automatic removal is not defeated by escaping paths"
+    },
+    {
+      "id": "APG37-GO-TEST-22",
+      "scenario": "A test mutates process environment",
+      "expected": "Yellow; the helper restores the prior value through cleanup and cannot be used in a parallel test or a test with a parallel ancestor"
+    },
+    {
+      "id": "APG37-GO-TEST-23",
+      "scenario": "A test changes the working directory",
+      "expected": "Yellow under the same process-wide parallel restriction; treating it as parallel-safe is Red"
+    },
+    {
+      "id": "APG37-GO-TEST-24",
+      "scenario": "Tests are marked parallel and share mutable package state or a fixture",
+      "expected": "Yellow until shared state, ordering assumptions, and contention are bounded; unsafe sharing is Red"
+    },
+    {
+      "id": "APG37-GO-TEST-25",
+      "scenario": "Parallel tests reach one external resource such as a port, file, or service",
+      "expected": "Orange until ownership is isolated or serialized; unsafe sharing is Red"
+    },
+    {
+      "id": "APG37-GO-TEST-26",
+      "scenario": "A test depends on wall-clock timing, the deadline, unseeded randomness, or map iteration order",
+      "expected": "Orange until injected, bounded, or order-independent; presenting an uncontrolled assumption as deterministic is Red"
+    },
+    {
+      "id": "APG37-GO-TEST-27",
+      "scenario": "A result is attributed to a run served from the test cache",
+      "expected": "Yellow until cacheability and invalidation inputs are established; reporting a cached result as a fresh execution is Red"
+    },
+    {
+      "id": "APG37-GO-TEST-28",
+      "scenario": "An example function documents behavior and asserts output",
+      "expected": "Green or Yellow after establishing that an output comment is required for execution and that unordered matching is explicit when used"
+    },
+    {
+      "id": "APG37-GO-TEST-29",
+      "scenario": "A benchmark measures work whose setup should be excluded, using the iteration-count or newer loop form",
+      "expected": "Yellow until timer ownership and the benchmark form supported by the selected toolchain and project support floor are explicit; do not infer B.Loop support from the effective file language version alone."
+    },
+    {
+      "id": "APG37-GO-TEST-30",
+      "scenario": "A fuzz test performs setup and registers seed entries",
+      "expected": "Yellow; the fuzz type's methods may be called only before the target is provided, and seeds come from explicit registration and the fuzz test's corpus directory"
+    },
+    {
+      "id": "APG37-GO-TEST-31",
+      "scenario": "The fuzz target executes against generated inputs",
+      "expected": "Yellow; the target takes the test type first and supported fuzzable types after, only the test type's methods and two query methods of the fuzz type are permitted inside it, and it must be fast, deterministic, free of shared state, and must not retain or modify its argument data"
+    },
+    {
+      "id": "APG37-GO-TEST-32",
+      "scenario": "A failing generated input is persisted and later replayed",
+      "expected": "Distinguish package seed files, coverage-expanding inputs in the fuzz cache, and failing inputs written to testdata/fuzz only when writable or otherwise to the fuzz cache. Only package seed files are ordinary-run replay inputs; classify every persisted artifact."
+    },
+    {
+      "id": "APG37-GO-TEST-33",
+      "scenario": "A generated or persisted corpus entry could carry protected data or cause a destructive effect",
+      "expected": "Classify generated and persisted inputs before use. Stop Red when protected data would cross an unauthorized boundary or an input could cause an unauthorized destructive effect; mere generation is not itself Red."
+    },
+    {
+      "id": "APG37-GO-TEST-34",
+      "scenario": "Mocked or stubbed behavior is described as evidence that an integration works",
+      "expected": "Red truthfulness stop; static or mocked evidence is not integration evidence"
+    },
+    {
+      "id": "APG37-GO-TEST-35",
+      "scenario": "Protected data could reach test source, logs, artifacts, temporary files, or failure output",
+      "expected": "Red protected-data stop"
+    },
+    {
+      "id": "APG37-GO-TEST-36",
+      "scenario": "A test owner is large or dense, or a legacy owner already at Red needs a small fix",
+      "expected": "Size alone is not a finding. Identify the actual package or cross-file lifecycle owner, separate a tested adverse subject from its harness, and name a concrete ownership, truthfulness, safety, or maintainability risk before escalation. Several isolated families do not escalate by count."
+    }
+  ]
+}

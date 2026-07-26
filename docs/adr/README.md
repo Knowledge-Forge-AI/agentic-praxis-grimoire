@@ -74,6 +74,22 @@ than erasing the earlier decision.
   — Accepted
 - [`0019 — v0.3 Release Distribution and Variable Skill-Set Lifecycle`](2026/07/0019-v0-3-release-distribution-and-variable-skill-set-lifecycle.md)
   — Accepted
+- [`0020 — Structured Project Phase Defaults and Prompt Compression`](2026/07/0020-structured-project-phase-defaults-and-prompt-compression.md)
+  — Accepted
+- [`0021 — Python-First Test and Agent-Reporting Architecture`](2026/07/0021-python-first-test-and-agent-reporting-architecture.md)
+  — Accepted
+- [`0022 — ChatGPT Manager Skill Topology and Personal Hygiene Transition`](2026/07/0022-chatgpt-manager-skill-topology-and-personal-hygiene-transition.md)
+  — Accepted
+- [`0023 — Python Agent-Report Formats and Git-Record Association`](2026/07/0023-python-agent-report-formats-and-git-record-association.md)
+  — Accepted
+- [`0024 — Pytest Suite and Coverage Enforcement`](2026/07/0024-pytest-suite-and-coverage-enforcement.md)
+  — Accepted
+- [`0025 — Go Testing Component and Stack Ownership`](2026/07/0025-go-testing-component-and-stack-ownership.md)
+  — Rejected
+- [`0026 — Go Testing Component Profiles Without a Stack Owner`](2026/07/0026-go-testing-component-profiles-without-a-stack-owner.md)
+  — Accepted
+- [`0027 — Version-Bounded matryer/is as an Independent Go Test Component`](2026/07/0027-version-bounded-matryer-is-go-test-component.md)
+  — Rejected
 
 APG14 adds no ADR. The v0.2.0 release applies the accepted licensing, roadmap,
 distribution, lineage, and maturity decisions in ADRs 0005, 0006, 0009, and
@@ -108,3 +124,57 @@ APG24 accepts ADR 0019 and distributes the complete nineteen-skill release set
 while retaining source-specific user and subset-preserving project state under
 schema version 1. The active integration keeps its aggregate owner, and any
 personal-router decommission remains separately authorized after shadow smoke.
+APG25 accepts ADRs 0020-0022: project-owned structured defaults and compressed
+manager assignments; Python-first reporting plus pytest/xdist/coverage
+architecture; and nested ChatGPT-manager ownership with evidence-gated personal
+hygiene transitions. Those decisions implement only one bounded existing-skill
+correction and defer tooling, test, topology, and private-source migration.
+APG27 accepts ADR 0023's design after exact old/new Git-show and compatible
+operational characterization. The implementation phase stops partial before
+commit because a second release-policy correction is required to preserve
+historical v0.3.0 reconstruction; ADR acceptance does not convert that partial
+candidate into adopted repository behavior.
+APG27A subsequently preserves the partial record, corrects historical policy
+and the Red path-safety signal, and adopts the ADR 0023 implementation.
+APG28 closes Partial with ADR 0024 still Proposed. Its uncommitted candidate did
+not satisfy the full-source component and union branch gates, release-policy
+tests, subprocess and worker accounting, or unconditional Bats equivalence.
+APG28A preserves that result, corrects the current release-policy, aggregation,
+process-accounting, artifact, and coverage defects, retains both Bats owners,
+and accepts ADR 0024.
+APG30 implements ADR 0022's topology portion with one nested ChatGPT-manager
+owner, one provisional subrouter, source-declared lifecycle paths, and
+version-bounded historical release compatibility. Its separately accepted
+personal-transition architecture remains gated to APG31 and a full application
+restart.
+APG35 proposes ADR 0025 on an authoring branch without integrating it. APG36
+rejects the ADR after fresh independent source and owner review, transient
+fixtures for all 154 scenario families, failing-first contracts, and disposable
+Go compatibility evidence. All three component contracts need more than one
+material correction, and the stack has neither its required native owner nor
+independent current value. No proposed Go-testing owner is integrated. This
+index previously recorded 0025 as Proposed after that disposition; APG37
+corrects the status label without modifying the ADR.
+APG37 proposes ADR 0026 on an authoring branch after redesigning the four
+deferred candidates from the APG36 defect dossier against reverified current
+sources. It proposes three independent component owners and no composition
+owner, leaves ADR 0025 Rejected and unreopened, and creates no
+`go-testing-stack` artifact. ADR 0026 is not decided, no candidate is
+integrated, and development remains 25/25/25.
+APG38 accepts a bounded two-owner ADR 0026 after independent source,
+owner-graph, structural, compatibility, rights, privacy, and corrected-state
+review retains native Go and go-cmp provisionally. Candidate-independent
+removal repairs surviving references without creating a stack. The matryer/is
+and Nix candidates are deferred after new post-correction material defects.
+APG39 proposes ADR 0027 on an authoring branch after redesigning the two
+APG38-deferred candidates from their corrected-state defects. It records,
+conditionally on later Codex retention of the matryer/is candidate, a third
+exact-version-bounded independent Go component that would supersede ADR 0026
+only as the complete owner-graph record while preserving every still-valid
+ADR 0026 decision. ADR 0026 remains Accepted and controlling; ADR 0025
+remains Rejected; no stack artifact is created; and development remains
+27/27/27.
+APG40 rejects ADR 0027 after corrected-state review finds the matryer/is
+candidate's equality mechanism still materially inaccurate after its one
+allowed behavior correction. ADR 0026 remains Accepted and controlling; ADR
+0025 remains Rejected; no stack artifact appears.
