@@ -39,19 +39,24 @@ SKILLS = tuple(
             "chatgpt-manager-workflow",
             "composing-approved-roadmap-assignments",
             "converting-bash-scripts-to-python",
+            "css-language-profile",
             "dockerfile-profile",
             "go-cmp-test-profile",
             "go-language-profile",
             "go-test-profile",
+            "javascript-language-profile",
+            "markdown-language-profile",
             "minitest-test-profile",
             "nix-language-profile",
             "nix-test-profile",
+            "nodejs-runtime-profile",
             "postgresql-database-profile",
             "pytest-test-profile",
             "python-language-profile",
             "ruby-language-profile",
             "sqlite-database-profile",
             "synthesizing-repository-guidance",
+            "typescript-language-profile",
             "vagrantfile-profile",
             "zsh-language-profile",
             "zunit-test-profile",
@@ -80,6 +85,11 @@ class APGProjectSkillsTests(unittest.TestCase):
         self.source = self.base / "public-source"
         (self.source / "bin").mkdir(parents=True)
         (self.source / "libexec").mkdir()
+        shutil.copytree(
+            REPOSITORY_ROOT / "src" / "agentic_praxis_grimoire",
+            self.source / "src" / "agentic_praxis_grimoire",
+            ignore=shutil.ignore_patterns("__pycache__", "*.pyc"),
+        )
         self.canonical_root = self.source / "skills"
         self.canonical_root.mkdir()
         shutil.copy2(COMMAND_SOURCE, self.source / "bin" / "apg-project-skills")
@@ -332,7 +342,7 @@ class APGProjectSkillsTests(unittest.TestCase):
         self.assert_success(result)
         self.assertEqual(result.stdout.splitlines(), list(SKILLS))
 
-    def test_02_installs_all_twenty_eight_into_an_empty_worktree(self) -> None:
+    def test_02_installs_all_thirty_three_into_an_empty_worktree(self) -> None:
         result = self.run_command("install")
         self.assert_success(result)
         state = self.read_state()
@@ -402,7 +412,7 @@ class APGProjectSkillsTests(unittest.TestCase):
         result = self.run_command("check")
         self.assert_success(result)
         self.assertIn("compliant", result.stdout.lower())
-        self.assertIn("28 managed", result.stdout.lower())
+        self.assertIn("33 managed", result.stdout.lower())
 
     def test_06_adopts_compatible_manual_links_without_retargeting(self) -> None:
         links = [self.create_manual_link(skill) for skill in SKILLS]

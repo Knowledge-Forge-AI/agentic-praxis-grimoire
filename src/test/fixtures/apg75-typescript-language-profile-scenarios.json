@@ -1,0 +1,1243 @@
+{
+  "schema_version": 1,
+  "authority": {
+    "authored_phase": "APG75",
+    "current_phase": "APG75A",
+    "source": "two candidate-independent Codex oracle lanes resolved against exact compiler and fresh target evidence",
+    "semantic_rows": 24,
+    "fixture_rows": 14,
+    "target_rows": 1
+  },
+  "vocabulary": {
+    "selections": [
+      "selected",
+      "embedded-route",
+      "route-to-owner",
+      "non-trigger"
+    ],
+    "responses": [
+      "proceed-routine",
+      "inspect-before-judgment",
+      "bounded-local-decision",
+      "stop-and-escalate"
+    ],
+    "roles": [
+      "cli-checker",
+      "declaration-emitter",
+      "programmatic-compiler-api",
+      "editor-language-service",
+      "embedded-language-checker",
+      "source-transformer-type-stripper",
+      "build-orchestrator",
+      "runtime-host"
+    ]
+  },
+  "rows": [
+    {
+      "id": "APG74-TS-001",
+      "input_class": "semantic",
+      "fact_summary": "ordinary .ts with exact CLI/config evidence",
+      "whole_file_owner": "typescript-source",
+      "typescript_selection": "selected",
+      "response": "proceed-routine",
+      "routes_or_obligations": [
+        "project-configuration",
+        "runtime-owner"
+      ],
+      "required_roles": [
+        "cli-checker"
+      ],
+      "required_option_facts": [
+        "strict=true",
+        "noUncheckedIndexedAccess=true",
+        "noEmit=true"
+      ],
+      "present_evidence": [
+        "source",
+        "exact compiler pin",
+        "effective config",
+        "CLI invocation"
+      ],
+      "required_evidence": [],
+      "owned_conclusion": "bounded static result",
+      "nonowned_conclusion": "runtime/build/emit completion",
+      "rollback_or_provenance": "restore source/config and withdraw on drift",
+      "forbid": [
+        "static success promoted to runtime success"
+      ]
+    },
+    {
+      "id": "APG74-TS-002",
+      "input_class": "semantic",
+      "fact_summary": "structural assignability",
+      "whole_file_owner": "typescript-source",
+      "typescript_selection": "selected",
+      "response": "proceed-routine",
+      "routes_or_obligations": [
+        "declaration-environment-owner"
+      ],
+      "required_roles": [
+        "cli-checker"
+      ],
+      "required_option_facts": [
+        "strict=true"
+      ],
+      "present_evidence": [
+        "complete source and target member shapes"
+      ],
+      "required_evidence": [
+        "private/protected or branded member facts when material"
+      ],
+      "owned_conclusion": "compatibility follows evidenced structure",
+      "nonowned_conclusion": "runtime identity or nominal intuition",
+      "rollback_or_provenance": "restore exact declarations",
+      "forbid": [
+        "nominal identity asserted from names"
+      ]
+    },
+    {
+      "id": "APG74-TS-003",
+      "input_class": "semantic",
+      "fact_summary": "union narrowing and exhaustiveness",
+      "whole_file_owner": "typescript-source",
+      "typescript_selection": "selected",
+      "response": "proceed-routine",
+      "routes_or_obligations": [
+        "runtime-owner"
+      ],
+      "required_roles": [
+        "cli-checker"
+      ],
+      "required_option_facts": [
+        "strict=true"
+      ],
+      "present_evidence": [
+        "closed union",
+        "exact guards"
+      ],
+      "required_evidence": [
+        "runtime producer evidence for runtime claim"
+      ],
+      "owned_conclusion": "exact closed union narrows and supports never check",
+      "nonowned_conclusion": "runtime input validity",
+      "rollback_or_provenance": "restore union/guard bytes",
+      "forbid": [
+        "static success promoted to runtime success"
+      ]
+    },
+    {
+      "id": "APG74-TS-004",
+      "input_class": "semantic",
+      "fact_summary": "generic inference under exact compiler/context",
+      "whole_file_owner": "typescript-source",
+      "typescript_selection": "selected",
+      "response": "inspect-before-judgment",
+      "routes_or_obligations": [
+        "declaration-environment-owner"
+      ],
+      "required_roles": [
+        "cli-checker"
+      ],
+      "required_option_facts": [
+        "strict=true"
+      ],
+      "present_evidence": [
+        "exact compiler"
+      ],
+      "required_evidence": [
+        "call arguments",
+        "constraints",
+        "contextual type",
+        "compiled contrast"
+      ],
+      "owned_conclusion": "inference is call- and context-specific",
+      "nonowned_conclusion": "runtime generic reification",
+      "rollback_or_provenance": "preserve compiler/config/case",
+      "forbid": [
+        "remembered cross-version inference"
+      ]
+    },
+    {
+      "id": "APG74-TS-005",
+      "input_class": "semantic",
+      "fact_summary": "strictFunctionTypes consequence and method near miss",
+      "whole_file_owner": "typescript-source",
+      "typescript_selection": "selected",
+      "response": "inspect-before-judgment",
+      "routes_or_obligations": [
+        "project-configuration"
+      ],
+      "required_roles": [
+        "cli-checker"
+      ],
+      "required_option_facts": [
+        "strictFunctionTypes=true"
+      ],
+      "present_evidence": [
+        "exact syntax category"
+      ],
+      "required_evidence": [
+        "compiled function and method controls"
+      ],
+      "owned_conclusion": "function parameter relation is option- and syntax-bound",
+      "nonowned_conclusion": "runtime callback protocol",
+      "rollback_or_provenance": "restore exact option/case",
+      "forbid": [
+        "method exception generalized away"
+      ]
+    },
+    {
+      "id": "APG74-TS-006",
+      "input_class": "semantic",
+      "fact_summary": "exact optional property consequence",
+      "whole_file_owner": "typescript-source",
+      "typescript_selection": "selected",
+      "response": "inspect-before-judgment",
+      "routes_or_obligations": [
+        "project-configuration"
+      ],
+      "required_roles": [
+        "cli-checker"
+      ],
+      "required_option_facts": [
+        "exactOptionalPropertyTypes=true"
+      ],
+      "present_evidence": [
+        "optional property declaration"
+      ],
+      "required_evidence": [
+        "compiled absent/undefined contrast"
+      ],
+      "owned_conclusion": "absence differs from explicit undefined",
+      "nonowned_conclusion": "runtime serialized key presence",
+      "rollback_or_provenance": "restore exact option/case",
+      "forbid": [
+        "option value omitted"
+      ]
+    },
+    {
+      "id": "APG74-TS-007",
+      "input_class": "semantic",
+      "fact_summary": "unchecked indexed access consequence",
+      "whole_file_owner": "typescript-source",
+      "typescript_selection": "selected",
+      "response": "inspect-before-judgment",
+      "routes_or_obligations": [
+        "project-configuration"
+      ],
+      "required_roles": [
+        "cli-checker"
+      ],
+      "required_option_facts": [
+        "noUncheckedIndexedAccess=true"
+      ],
+      "present_evidence": [
+        "actual indexed access"
+      ],
+      "required_evidence": [
+        "compiled true/false contrast"
+      ],
+      "owned_conclusion": "unchecked access includes undefined under exact option",
+      "nonowned_conclusion": "runtime bounds guarantee",
+      "rollback_or_provenance": "restore exact option/case",
+      "forbid": [
+        "option name without value"
+      ]
+    },
+    {
+      "id": "APG74-TS-008",
+      "input_class": "semantic",
+      "fact_summary": "any unknown never distinctions",
+      "whole_file_owner": "typescript-source",
+      "typescript_selection": "selected",
+      "response": "proceed-routine",
+      "routes_or_obligations": [
+        "runtime-owner"
+      ],
+      "required_roles": [
+        "cli-checker"
+      ],
+      "required_option_facts": [
+        "strict=true"
+      ],
+      "present_evidence": [
+        "exact type positions"
+      ],
+      "required_evidence": [
+        "compiled positive/negative controls"
+      ],
+      "owned_conclusion": "any opts out; unknown narrows; never is unreachable",
+      "nonowned_conclusion": "runtime validation",
+      "rollback_or_provenance": "restore exact cases",
+      "forbid": [
+        "static success promoted to runtime success"
+      ]
+    },
+    {
+      "id": "APG74-TS-009",
+      "input_class": "semantic",
+      "fact_summary": "satisfies versus assertions",
+      "whole_file_owner": "typescript-source",
+      "typescript_selection": "selected",
+      "response": "inspect-before-judgment",
+      "routes_or_obligations": [
+        "runtime-owner"
+      ],
+      "required_roles": [
+        "cli-checker"
+      ],
+      "required_option_facts": [
+        "strict=true"
+      ],
+      "present_evidence": [
+        "exact expression and contextual target"
+      ],
+      "required_evidence": [
+        "literal/context/assertion/double-assertion controls"
+      ],
+      "owned_conclusion": "satisfies checks without replacing target type; context can affect inference",
+      "nonowned_conclusion": "runtime validation",
+      "rollback_or_provenance": "restore expression/context",
+      "forbid": [
+        "as overrides all checking",
+        "static success promoted to runtime success"
+      ]
+    },
+    {
+      "id": "APG74-TS-010",
+      "input_class": "semantic",
+      "fact_summary": "overload applicability order specialization and implementation boundary",
+      "whole_file_owner": "typescript-source",
+      "typescript_selection": "selected",
+      "response": "inspect-before-judgment",
+      "routes_or_obligations": [
+        "declaration-environment-owner",
+        "runtime-owner"
+      ],
+      "required_roles": [
+        "cli-checker"
+      ],
+      "required_option_facts": [
+        "strict=true"
+      ],
+      "present_evidence": [
+        "complete ordered declarations"
+      ],
+      "required_evidence": [
+        "generic/general/literal/implementation/utility controls"
+      ],
+      "owned_conclusion": "call result uses exact applicable declared signature",
+      "nonowned_conclusion": "runtime dispatch correctness",
+      "rollback_or_provenance": "restore ordered declarations",
+      "forbid": [
+        "universal first matching rule"
+      ]
+    },
+    {
+      "id": "APG74-TS-011",
+      "input_class": "semantic",
+      "fact_summary": "type-only imports and verbatim module syntax",
+      "whole_file_owner": "typescript-source",
+      "typescript_selection": "selected",
+      "response": "inspect-before-judgment",
+      "routes_or_obligations": [
+        "project-configuration",
+        "runtime-owner"
+      ],
+      "required_roles": [
+        "cli-checker"
+      ],
+      "required_option_facts": [
+        "module=\"nodenext\"",
+        "verbatimModuleSyntax=true"
+      ],
+      "present_evidence": [
+        "source kind",
+        "exact import form"
+      ],
+      "required_evidence": [
+        "emitter/runtime evidence for broader claim"
+      ],
+      "owned_conclusion": "type-only form erases; value form follows exact module rules",
+      "nonowned_conclusion": "runtime loading",
+      "rollback_or_provenance": "regenerate output from source/config",
+      "forbid": [
+        "static success promoted to runtime success"
+      ]
+    },
+    {
+      "id": "APG74-TS-012",
+      "input_class": "semantic",
+      "fact_summary": "enum and const-enum option/role boundary",
+      "whole_file_owner": "typescript-source",
+      "typescript_selection": "selected",
+      "response": "inspect-before-judgment",
+      "routes_or_obligations": [
+        "project-configuration",
+        "declaration-provenance-owner",
+        "runtime-owner"
+      ],
+      "required_roles": [
+        "cli-checker",
+        "declaration-emitter"
+      ],
+      "required_option_facts": [
+        "preserveConstEnums=<exact>",
+        "isolatedModules=<exact>"
+      ],
+      "present_evidence": [
+        "enum kind",
+        "exact compiler"
+      ],
+      "required_evidence": [
+        "emit and ambient-consumption controls"
+      ],
+      "owned_conclusion": "object emission/substitution depend on exact isolation and preservation options",
+      "nonowned_conclusion": "runtime/version alignment",
+      "rollback_or_provenance": "regenerate generated artifacts",
+      "forbid": [
+        "universal const-enum emit result"
+      ]
+    },
+    {
+      "id": "APG74-TS-013",
+      "input_class": "semantic",
+      "fact_summary": "decorator regime boundary",
+      "whole_file_owner": "typescript-source",
+      "typescript_selection": "selected",
+      "response": "stop-and-escalate",
+      "routes_or_obligations": [
+        "project-configuration",
+        "build-owner",
+        "runtime-owner"
+      ],
+      "required_roles": [
+        "cli-checker"
+      ],
+      "required_option_facts": [
+        "experimentalDecorators=<exact>"
+      ],
+      "present_evidence": [
+        "decorator syntax",
+        "exact compiler"
+      ],
+      "required_evidence": [
+        "regime and emitter/runtime facts"
+      ],
+      "owned_conclusion": "static meaning is regime-bound",
+      "nonowned_conclusion": "runtime decorator effects",
+      "rollback_or_provenance": "restore source/config and generated output",
+      "forbid": [
+        "legacy and standard regimes merged"
+      ]
+    },
+    {
+      "id": "APG74-TS-014",
+      "input_class": "unknown-control",
+      "fact_summary": "unknown compiler role or version",
+      "whole_file_owner": "typescript-source",
+      "typescript_selection": "selected",
+      "response": "stop-and-escalate",
+      "routes_or_obligations": [
+        "project-configuration"
+      ],
+      "required_roles": [],
+      "required_option_facts": [],
+      "present_evidence": [
+        "source kind only"
+      ],
+      "required_evidence": [
+        "exact role",
+        "package",
+        "version",
+        "selection",
+        "invocation"
+      ],
+      "owned_conclusion": "no version-dependent conclusion",
+      "nonowned_conclusion": "all role-specific completion",
+      "rollback_or_provenance": "preserve unknown evidence",
+      "forbid": [
+        "unknown role alias",
+        "package presence proves role"
+      ]
+    },
+    {
+      "id": "APG74-TS-015",
+      "input_class": "unknown-control",
+      "fact_summary": "unknown consequence-bearing option",
+      "whole_file_owner": "typescript-source",
+      "typescript_selection": "selected",
+      "response": "stop-and-escalate",
+      "routes_or_obligations": [
+        "project-configuration"
+      ],
+      "required_roles": [
+        "cli-checker"
+      ],
+      "required_option_facts": [
+        "noUncheckedIndexedAccess=<required>"
+      ],
+      "present_evidence": [
+        "option-dependent source"
+      ],
+      "required_evidence": [
+        "exact effective option value"
+      ],
+      "owned_conclusion": "no option-dependent conclusion",
+      "nonowned_conclusion": "runtime or sibling-project inference",
+      "rollback_or_provenance": "preserve unknown and do not borrow config",
+      "forbid": [
+        "option name without value"
+      ]
+    },
+    {
+      "id": "APG74-TS-016",
+      "input_class": "semantic",
+      "fact_summary": "mts source-kind boundary",
+      "whole_file_owner": "typescript-source",
+      "typescript_selection": "selected",
+      "response": "proceed-routine",
+      "routes_or_obligations": [
+        "project-configuration",
+        "runtime-owner"
+      ],
+      "required_roles": [
+        "cli-checker"
+      ],
+      "required_option_facts": [
+        "module=\"nodenext\""
+      ],
+      "present_evidence": [
+        ".mts suffix",
+        "exact config"
+      ],
+      "required_evidence": [
+        "runtime loader evidence for execution"
+      ],
+      "owned_conclusion": ".mts remains ESM-form source",
+      "nonowned_conclusion": "runtime loading",
+      "rollback_or_provenance": "preserve suffix/config",
+      "forbid": [
+        "mts collapsed into cts"
+      ]
+    },
+    {
+      "id": "APG74-TS-017",
+      "input_class": "semantic",
+      "fact_summary": "cts source-kind boundary",
+      "whole_file_owner": "typescript-source",
+      "typescript_selection": "selected",
+      "response": "proceed-routine",
+      "routes_or_obligations": [
+        "project-configuration",
+        "runtime-owner"
+      ],
+      "required_roles": [
+        "cli-checker"
+      ],
+      "required_option_facts": [
+        "module=\"nodenext\"",
+        "verbatimModuleSyntax=true"
+      ],
+      "present_evidence": [
+        ".cts suffix",
+        "CommonJS-shaped source"
+      ],
+      "required_evidence": [
+        "runtime loader evidence"
+      ],
+      "owned_conclusion": ".cts remains CommonJS-form source",
+      "nonowned_conclusion": "runtime loading",
+      "rollback_or_provenance": "preserve suffix/config",
+      "forbid": [
+        "cts collapsed into mts"
+      ]
+    },
+    {
+      "id": "APG74-TS-018",
+      "input_class": "declaration",
+      "fact_summary": "handwritten declaration static meaning",
+      "whole_file_owner": "typescript-source",
+      "typescript_selection": "selected",
+      "response": "inspect-before-judgment",
+      "routes_or_obligations": [
+        "declaration-environment-owner",
+        "runtime-owner"
+      ],
+      "required_roles": [
+        "cli-checker"
+      ],
+      "required_option_facts": [
+        "types=[]"
+      ],
+      "present_evidence": [
+        "handwritten provenance",
+        "project inclusion"
+      ],
+      "required_evidence": [
+        "runtime implementation evidence"
+      ],
+      "owned_conclusion": "declaration contributes an authored static claim",
+      "nonowned_conclusion": "runtime availability",
+      "rollback_or_provenance": "restore authored bytes",
+      "forbid": [
+        "declaration proves runtime"
+      ]
+    },
+    {
+      "id": "APG74-TS-019",
+      "input_class": "declaration",
+      "fact_summary": "generated declaration provenance and edit boundary",
+      "whole_file_owner": "generated-declaration-artifact",
+      "typescript_selection": "route-to-owner",
+      "response": "stop-and-escalate",
+      "routes_or_obligations": [
+        "declaration-provenance-owner"
+      ],
+      "required_roles": [
+        "declaration-emitter"
+      ],
+      "required_option_facts": [
+        "declaration=true",
+        "emitDeclarationOnly=true"
+      ],
+      "present_evidence": [
+        "source/config/compiler provenance"
+      ],
+      "required_evidence": [
+        "current regeneration evidence"
+      ],
+      "owned_conclusion": "generated declaration is regenerated not hand-edited",
+      "nonowned_conclusion": "runtime implementation",
+      "rollback_or_provenance": "regenerate or remove from exact source",
+      "forbid": [
+        "generated declaration hand edit"
+      ]
+    },
+    {
+      "id": "APG74-TS-020",
+      "input_class": "semantic",
+      "fact_summary": "bounded checked JavaScript analysis",
+      "whole_file_owner": "javascript-source",
+      "typescript_selection": "embedded-route",
+      "response": "proceed-routine",
+      "routes_or_obligations": [
+        "javascript-owner",
+        "project-configuration",
+        "runtime-owner"
+      ],
+      "required_roles": [
+        "cli-checker"
+      ],
+      "required_option_facts": [
+        "allowJs=true",
+        "checkJs=true"
+      ],
+      "present_evidence": [
+        "JavaScript source",
+        "JSDoc",
+        "exact config"
+      ],
+      "required_evidence": [
+        "runtime evidence for execution"
+      ],
+      "owned_conclusion": "bounded TypeScript analysis can pass",
+      "nonowned_conclusion": "JavaScript ownership and runtime",
+      "rollback_or_provenance": "preserve JavaScript source owner",
+      "forbid": [
+        "selected replaces embedded-route",
+        "automatic migration"
+      ]
+    },
+    {
+      "id": "APG74-TS-021",
+      "input_class": "semantic",
+      "fact_summary": "bounded TSX static analysis",
+      "whole_file_owner": "jsx-tsx-host",
+      "typescript_selection": "embedded-route",
+      "response": "proceed-routine",
+      "routes_or_obligations": [
+        "jsx-owner",
+        "project-configuration",
+        "runtime-owner"
+      ],
+      "required_roles": [
+        "cli-checker"
+      ],
+      "required_option_facts": [
+        "jsx=\"preserve\"",
+        "strict=true"
+      ],
+      "present_evidence": [
+        "TSX source",
+        "JSX declarations"
+      ],
+      "required_evidence": [
+        "transform/runtime evidence"
+      ],
+      "owned_conclusion": "expressions and attributes check statically",
+      "nonowned_conclusion": "JSX syntax transform and runtime",
+      "rollback_or_provenance": "preserve host/config/declarations",
+      "forbid": [
+        "selected replaces embedded-route"
+      ]
+    },
+    {
+      "id": "APG74-TS-022",
+      "input_class": "host-boundary",
+      "fact_summary": "embedded TypeScript in Astro host",
+      "whole_file_owner": "astro-host",
+      "typescript_selection": "embedded-route",
+      "response": "stop-and-escalate",
+      "routes_or_obligations": [
+        "host-owner",
+        "project-configuration",
+        "runtime-owner"
+      ],
+      "required_roles": [
+        "embedded-language-checker"
+      ],
+      "required_option_facts": [],
+      "present_evidence": [
+        "host source"
+      ],
+      "required_evidence": [
+        "virtual source",
+        "exact role/version/options/invocation"
+      ],
+      "owned_conclusion": "ownership boundary only until host extraction is evidenced",
+      "nonowned_conclusion": "host transform/render/runtime",
+      "rollback_or_provenance": "preserve host-to-virtual provenance",
+      "forbid": [
+        "host file treated as ordinary TypeScript"
+      ]
+    },
+    {
+      "id": "APG74-TS-023",
+      "input_class": "declaration",
+      "fact_summary": "declaration-only emit and runtime false completion",
+      "whole_file_owner": "project-configuration",
+      "typescript_selection": "route-to-owner",
+      "response": "inspect-before-judgment",
+      "routes_or_obligations": [
+        "declaration-provenance-owner",
+        "build-owner",
+        "runtime-owner"
+      ],
+      "required_roles": [
+        "declaration-emitter",
+        "cli-checker"
+      ],
+      "required_option_facts": [
+        "emitDeclarationOnly=true",
+        "noEmit=false"
+      ],
+      "present_evidence": [
+        "separate checker and emitter invocation"
+      ],
+      "required_evidence": [
+        "runtime validation for runtime claim"
+      ],
+      "owned_conclusion": "declaration-only emit proves declaration output only",
+      "nonowned_conclusion": "JavaScript/runtime/pipeline completion",
+      "rollback_or_provenance": "regenerate/remove scratch output",
+      "forbid": [
+        "static success promoted to runtime success"
+      ]
+    },
+    {
+      "id": "APG74-TS-024",
+      "input_class": "migration",
+      "fact_summary": "project-selected primary compiler role plus conditional compatibility role",
+      "whole_file_owner": "project-configuration",
+      "typescript_selection": "route-to-owner",
+      "response": "inspect-before-judgment",
+      "routes_or_obligations": [
+        "package-owner",
+        "host-owner",
+        "project-configuration"
+      ],
+      "required_roles": [
+        "cli-checker",
+        "embedded-language-checker"
+      ],
+      "required_option_facts": [],
+      "present_evidence": [
+        "project-selected exact compiler role and version",
+        "project compatibility question"
+      ],
+      "required_evidence": [
+        "exact compatibility role need and retirement evidence when applicable"
+      ],
+      "owned_conclusion": "an exact compatibility role is conditional on project evidence",
+      "nonowned_conclusion": "select or recommend a compiler migration",
+      "rollback_or_provenance": "restore prior package/config/lock and retire temporary role",
+      "forbid": [
+        "package presence proves role",
+        "TS6 forced by availability"
+      ]
+    },
+    {
+      "id": "APG74-FX-001",
+      "input_class": "fixture",
+      "fact_summary": "ordinary .ts fixture",
+      "whole_file_owner": "typescript-source",
+      "typescript_selection": "selected",
+      "response": "proceed-routine",
+      "routes_or_obligations": [
+        "project-configuration",
+        "runtime-owner"
+      ],
+      "required_roles": [
+        "cli-checker"
+      ],
+      "required_option_facts": [
+        "strict=true",
+        "noUncheckedIndexedAccess=true",
+        "noEmit=true"
+      ],
+      "present_evidence": [
+        "ordinary TypeScript source and exact configuration",
+        "exact TS7 CLI-checker pin and invocation",
+        "strict and indexed-access option values"
+      ],
+      "required_evidence": [],
+      "owned_conclusion": "the configured ordinary TypeScript program checks under exact TS7",
+      "nonowned_conclusion": "runtime collection contents and execution remain unproved",
+      "rollback_or_provenance": "restore the handwritten source and exact project configuration",
+      "forbid": [
+        "static success promoted to runtime success"
+      ]
+    },
+    {
+      "id": "APG74-FX-002",
+      "input_class": "fixture",
+      "fact_summary": "mts fixture",
+      "whole_file_owner": "typescript-source",
+      "typescript_selection": "selected",
+      "response": "proceed-routine",
+      "routes_or_obligations": [
+        "project-configuration",
+        "runtime-owner"
+      ],
+      "required_roles": [
+        "cli-checker"
+      ],
+      "required_option_facts": [
+        "module=\"nodenext\"",
+        "noUncheckedIndexedAccess=true"
+      ],
+      "present_evidence": [
+        "exact .mts source bytes",
+        "module=\"nodenext\"",
+        "exact TS7 CLI-checker invocation"
+      ],
+      "required_evidence": [],
+      "owned_conclusion": ".mts retains ECMAScript-module source-kind semantics",
+      "nonowned_conclusion": "runtime loader and package resolution remain unproved",
+      "rollback_or_provenance": "restore the .mts source kind and project configuration",
+      "forbid": [
+        "static success promoted to runtime success"
+      ]
+    },
+    {
+      "id": "APG74-FX-003",
+      "input_class": "fixture",
+      "fact_summary": "cts fixture",
+      "whole_file_owner": "typescript-source",
+      "typescript_selection": "selected",
+      "response": "proceed-routine",
+      "routes_or_obligations": [
+        "project-configuration",
+        "runtime-owner"
+      ],
+      "required_roles": [
+        "cli-checker"
+      ],
+      "required_option_facts": [
+        "module=\"nodenext\"",
+        "verbatimModuleSyntax=true"
+      ],
+      "present_evidence": [
+        "exact .cts source bytes",
+        "module=\"nodenext\" and verbatimModuleSyntax=true",
+        "exact TS7 CLI-checker invocation"
+      ],
+      "required_evidence": [],
+      "owned_conclusion": ".cts retains CommonJS source-kind and export-shape semantics",
+      "nonowned_conclusion": "runtime loader and CommonJS execution remain unproved",
+      "rollback_or_provenance": "restore the .cts source kind and project configuration",
+      "forbid": [
+        "static success promoted to runtime success"
+      ]
+    },
+    {
+      "id": "APG74-FX-004",
+      "input_class": "fixture",
+      "fact_summary": "handwritten declaration fixture",
+      "whole_file_owner": "typescript-source",
+      "typescript_selection": "selected",
+      "response": "inspect-before-judgment",
+      "routes_or_obligations": [
+        "runtime-owner"
+      ],
+      "required_roles": [
+        "cli-checker"
+      ],
+      "required_option_facts": [
+        "types=[]"
+      ],
+      "present_evidence": [
+        "handwritten declaration bytes",
+        "exact TS7 checker pin and invocation",
+        "types=[]"
+      ],
+      "required_evidence": [
+        "runtime verification of the declared surface"
+      ],
+      "owned_conclusion": "the handwritten declaration is a checked static claim only",
+      "nonowned_conclusion": "the declared runtime shape is not verified",
+      "rollback_or_provenance": "preserve handwritten authorship and restore the source declaration",
+      "forbid": [
+        "static success promoted to runtime success"
+      ]
+    },
+    {
+      "id": "APG74-FX-005",
+      "input_class": "fixture",
+      "fact_summary": "generated declaration provenance fixture",
+      "whole_file_owner": "generated-declaration-artifact",
+      "typescript_selection": "route-to-owner",
+      "response": "inspect-before-judgment",
+      "routes_or_obligations": [
+        "declaration-provenance-owner"
+      ],
+      "required_roles": [
+        "declaration-emitter"
+      ],
+      "required_option_facts": [
+        "declaration=true",
+        "emitDeclarationOnly=true",
+        "declarationDir=\"out/declarations\""
+      ],
+      "present_evidence": [
+        "exact source and declaration configuration",
+        "exact TS7 declaration-emitter invocation",
+        "scratch-only declaration output"
+      ],
+      "required_evidence": [
+        "regeneration provenance for any consumed generated declaration"
+      ],
+      "owned_conclusion": "generated declarations are emitter output with source provenance",
+      "nonowned_conclusion": "declaration output does not prove JavaScript or runtime completion",
+      "rollback_or_provenance": "regenerate/remove output; never hand-edit",
+      "forbid": [
+        "static success promoted to runtime success"
+      ]
+    },
+    {
+      "id": "APG74-FX-006",
+      "input_class": "fixture",
+      "fact_summary": "TSX ownership fixture",
+      "whole_file_owner": "jsx-tsx-host",
+      "typescript_selection": "embedded-route",
+      "response": "proceed-routine",
+      "routes_or_obligations": [
+        "jsx-owner",
+        "runtime-owner"
+      ],
+      "required_roles": [
+        "cli-checker"
+      ],
+      "required_option_facts": [
+        "jsx=\"preserve\"",
+        "strict=true"
+      ],
+      "present_evidence": [
+        "exact TSX and local JSX declaration bytes",
+        "exact TS7 checker pin and invocation",
+        "jsx=\"preserve\""
+      ],
+      "required_evidence": [
+        "JSX transform and runtime evidence from the JSX owner"
+      ],
+      "owned_conclusion": "TypeScript checks the bounded TSX expression and attribute region",
+      "nonowned_conclusion": "JSX transform and runtime completion remain unproved",
+      "rollback_or_provenance": "restore TSX and local JSX declarations together",
+      "forbid": [
+        "selected replaces embedded-route"
+      ]
+    },
+    {
+      "id": "APG74-FX-007",
+      "input_class": "fixture",
+      "fact_summary": "unexecuted Astro host fixture",
+      "whole_file_owner": "astro-host",
+      "typescript_selection": "embedded-route",
+      "response": "stop-and-escalate",
+      "routes_or_obligations": [
+        "host-owner",
+        "project-configuration"
+      ],
+      "required_roles": [],
+      "required_option_facts": [],
+      "present_evidence": [
+        "Astro host file bytes",
+        "file excluded from every fixture tsconfig",
+        "no Astro tooling installed in the fixture"
+      ],
+      "required_evidence": [
+        "host-extracted or virtual source",
+        "exact embedded compiler role version and options",
+        "host-tool invocation evidence"
+      ],
+      "owned_conclusion": "only the host-to-TypeScript boundary is known; no embedded check result exists",
+      "nonowned_conclusion": "Astro transform render and runtime completion remain unproved",
+      "rollback_or_provenance": "preserve host ownership and host-to-virtual-source provenance",
+      "forbid": [
+        "static success promoted to runtime success"
+      ]
+    },
+    {
+      "id": "APG74-FX-008",
+      "input_class": "fixture",
+      "fact_summary": "checked JavaScript fixture",
+      "whole_file_owner": "javascript-source",
+      "typescript_selection": "embedded-route",
+      "response": "proceed-routine",
+      "routes_or_obligations": [
+        "javascript-owner",
+        "runtime-owner"
+      ],
+      "required_roles": [
+        "cli-checker"
+      ],
+      "required_option_facts": [
+        "allowJs=true",
+        "checkJs=true"
+      ],
+      "present_evidence": [
+        "checked JavaScript source and JSDoc bytes",
+        "allowJs=true and checkJs=true",
+        "exact TS7 CLI-checker invocation and seeded negative"
+      ],
+      "required_evidence": [],
+      "owned_conclusion": "TypeScript performs bounded checked-JavaScript analysis without taking source ownership",
+      "nonowned_conclusion": "JavaScript runtime behavior and migration remain unproved",
+      "rollback_or_provenance": "restore JavaScript and JSDoc bytes without language conversion",
+      "forbid": [
+        "selected replaces embedded-route"
+      ]
+    },
+    {
+      "id": "APG74-FX-009",
+      "input_class": "fixture",
+      "fact_summary": "TS7 CLI role fixture",
+      "whole_file_owner": "project-configuration",
+      "typescript_selection": "route-to-owner",
+      "response": "proceed-routine",
+      "routes_or_obligations": [
+        "package-owner"
+      ],
+      "required_roles": [
+        "cli-checker"
+      ],
+      "required_option_facts": [
+        "noEmit=true",
+        "strict=true"
+      ],
+      "present_evidence": [
+        "exact typescript@7.0.2 package pin",
+        "CLI version and project-check invocation",
+        "no stable root API or editor invocation evidence"
+      ],
+      "required_evidence": [],
+      "owned_conclusion": "only the exact TS7 CLI-checker role is selected and invoked",
+      "nonowned_conclusion": "editor API LSP workflow and runtime roles remain unproved",
+      "rollback_or_provenance": "restore the exact package pin and project configuration",
+      "forbid": [
+        "static success promoted to runtime success"
+      ]
+    },
+    {
+      "id": "APG74-FX-010",
+      "input_class": "fixture",
+      "fact_summary": "TS6 not-required disposition",
+      "whole_file_owner": "project-configuration",
+      "typescript_selection": "non-trigger",
+      "response": "proceed-routine",
+      "routes_or_obligations": [
+        "host-owner",
+        "package-owner"
+      ],
+      "required_roles": [],
+      "required_option_facts": [],
+      "present_evidence": [
+        "TypeScript 6 package absent from the fixture manifest",
+        "no TypeScript 6 role selected or invoked",
+        "target compatibility refresh condition retained"
+      ],
+      "required_evidence": [],
+      "owned_conclusion": "TypeScript 6 is not required by this fixture role set",
+      "nonowned_conclusion": "target host compatibility and future temporary roles remain separate",
+      "rollback_or_provenance": "preserve the explicit not-required disposition and refresh condition",
+      "forbid": [
+        "not-required role has concrete package/version"
+      ]
+    },
+    {
+      "id": "APG74-FX-011",
+      "input_class": "fixture",
+      "fact_summary": "declaration-only emitter fixture",
+      "whole_file_owner": "project-configuration",
+      "typescript_selection": "route-to-owner",
+      "response": "proceed-routine",
+      "routes_or_obligations": [
+        "declaration-provenance-owner"
+      ],
+      "required_roles": [
+        "declaration-emitter"
+      ],
+      "required_option_facts": [
+        "declaration=true",
+        "emitDeclarationOnly=true",
+        "noEmit=false"
+      ],
+      "present_evidence": [
+        "exact declaration-only configuration",
+        "exact TS7 declaration-emitter invocation",
+        "scratch .d.ts .d.mts and .d.cts output with no JavaScript"
+      ],
+      "required_evidence": [],
+      "owned_conclusion": "declaration-only emit preserves declaration source-kind suffixes",
+      "nonowned_conclusion": "JavaScript pipeline and runtime completion remain unproved",
+      "rollback_or_provenance": "regenerate/remove output; never hand-edit",
+      "forbid": [
+        "static success promoted to runtime success"
+      ]
+    },
+    {
+      "id": "APG74-FX-012",
+      "input_class": "fixture",
+      "fact_summary": "static/runtime refusal fixture",
+      "whole_file_owner": "typescript-source",
+      "typescript_selection": "selected",
+      "response": "stop-and-escalate",
+      "routes_or_obligations": [
+        "runtime-owner"
+      ],
+      "required_roles": [
+        "cli-checker"
+      ],
+      "required_option_facts": [
+        "noEmit=true"
+      ],
+      "present_evidence": [
+        "runtime-boundary source bytes",
+        "exact TS7 checker pin and invocation",
+        "noEmit=true"
+      ],
+      "required_evidence": [
+        "runtime execution evidence for the parsed-value shape"
+      ],
+      "owned_conclusion": "the assertion and return type check statically under the exact checker",
+      "nonowned_conclusion": "the parsed runtime value shape is not validated",
+      "rollback_or_provenance": "restore handwritten source and keep runtime validation separately owned",
+      "forbid": [
+        "static success promoted to runtime success"
+      ]
+    },
+    {
+      "id": "APG74-FX-013",
+      "input_class": "fixture",
+      "fact_summary": "unknown compiler role fixture",
+      "whole_file_owner": "typescript-source",
+      "typescript_selection": "selected",
+      "response": "stop-and-escalate",
+      "routes_or_obligations": [
+        "project-configuration"
+      ],
+      "required_roles": [],
+      "required_option_facts": [],
+      "present_evidence": [
+        "file outside every configured include"
+      ],
+      "required_evidence": [
+        "exact role/version/config and controlling option values"
+      ],
+      "owned_conclusion": "no compiler-role or version-dependent conclusion is available",
+      "nonowned_conclusion": "option static editor and runtime completion all remain unknown",
+      "rollback_or_provenance": "preserve the excluded source and unresolved role evidence gap",
+      "forbid": [
+        "unknown role alias"
+      ]
+    },
+    {
+      "id": "APG74-FX-014",
+      "input_class": "fixture",
+      "fact_summary": "unknown option fixture with excluded indexed access",
+      "whole_file_owner": "typescript-source",
+      "typescript_selection": "selected",
+      "response": "stop-and-escalate",
+      "routes_or_obligations": [
+        "project-configuration"
+      ],
+      "required_roles": [],
+      "required_option_facts": [
+        "noUncheckedIndexedAccess=<required>"
+      ],
+      "present_evidence": [
+        "file outside every configured include"
+      ],
+      "required_evidence": [
+        "exact role/version/config and controlling option values"
+      ],
+      "owned_conclusion": "no indexed-access return-type conclusion is available without the option value",
+      "nonowned_conclusion": "collection bounds runtime truth and other option consequences remain unknown",
+      "rollback_or_provenance": "preserve the excluded indexed-access source and unresolved option gap",
+      "forbid": [
+        "static success promoted to runtime success"
+      ]
+    },
+    {
+      "id": "APG75-TARGET-001",
+      "input_class": "target-migration",
+      "fact_summary": "current target migration from older embedded checker to TS7 destination",
+      "whole_file_owner": "per-artifact",
+      "typescript_selection": "route-to-owner",
+      "response": "stop-and-escalate",
+      "routes_or_obligations": [
+        "project-configuration",
+        "package-owner",
+        "host-owner",
+        "declaration-provenance-owner",
+        "runtime-owner"
+      ],
+      "required_roles": [
+        "embedded-language-checker"
+      ],
+      "required_option_facts": [
+        "declaration=true"
+      ],
+      "present_evidence": [
+        "exact live object",
+        "manifest/lock/scripts",
+        "exercised Astro checker on TS5.9.3",
+        "TS7 destination"
+      ],
+      "required_evidence": [
+        "TS7-capable host route or explicit temporary compatibility",
+        "declaration-emitter invocation"
+      ],
+      "owned_conclusion": "target is migration baseline and current embedded role excludes TS7",
+      "nonowned_conclusion": "current TS7 use runtime completion or direct CLI role",
+      "rollback_or_provenance": "restore prior manifest/lock/config; preserve declarations",
+      "forbid": [
+        "package presence proves role",
+        "stale lock proves execution",
+        "configured emit proves invocation",
+        "automatic migration"
+      ]
+    }
+  ]
+}

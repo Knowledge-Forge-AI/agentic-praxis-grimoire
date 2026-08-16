@@ -1,0 +1,8 @@
+{
+  "name": "apg80-nodejs-runtime-cli",
+  "version": "0.0.0",
+  "type": "module",
+  "private": true,
+  "description": "APG-owned Node.js runtime and CLI fixture authored in APG80. No dependency, no install, no network.",
+  "license": "SEE LICENSE IN ../../../../LICENSE"
+}

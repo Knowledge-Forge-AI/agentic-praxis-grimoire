@@ -5,9 +5,12 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+import re
 import sys
 import tempfile
 import unittest
+
+import pytest
 
 from src.test.apg_test_support import repository_root
 
@@ -378,6 +381,355 @@ class APGSkillTopologyTests(unittest.TestCase):
             {item.code for item in result.diagnostics},
             render_text(result),
         )
+
+
+_ORACLE_LIFECYCLE = re.compile(r"Lifecycle: `([a-z][a-z0-9-]*)`\.")
+_ORACLE_ADR = re.compile(
+    r"Lifecycle ADR: `(not-applicable|Proposed|Accepted with amendment)`\."
+)
+
+
+def _oracle_profile_paths(root: Path) -> dict[str, Path]:
+    paths: dict[str, Path] = {}
+    for skills_root in (root / "skills", root / "skills" / "chatgpt"):
+        for leaf in skills_root.iterdir():
+            skill = leaf / "SKILL.md"
+            if not leaf.is_dir() or not skill.is_file():
+                continue
+            names = re.findall(
+                r"(?m)^name: ([a-z0-9]+(?:-[a-z0-9]+)*)$",
+                skill.read_text(encoding="utf-8"),
+            )
+            if len(names) == 1 and names[0].endswith("-profile"):
+                paths[names[0]] = leaf.relative_to(root)
+    return {name: paths[name] for name in sorted(paths)}
+
+
+def _oracle_catalog(root: Path) -> dict[str, str]:
+    rows: dict[str, str] = {}
+    pattern = re.compile(
+        r"\| \[`([^`]+)`\]\([^)]*\) \| .* \| "
+        r"`(stable|provisional)` \|"
+    )
+    for line in (root / "skills" / "README.md").read_text(
+        encoding="utf-8"
+    ).splitlines():
+        match = pattern.fullmatch(line)
+        if match is not None:
+            rows[match.group(1)] = match.group(2)
+    return rows
+
+
+def _oracle_owner(path: Path) -> tuple[str, str] | None:
+    lines = path.read_text(encoding="utf-8").splitlines()
+    lifecycle = [line for line in lines if line.startswith("Lifecycle:")]
+    adr_status = [line for line in lines if line.startswith("Lifecycle ADR:")]
+    if not lifecycle and not adr_status:
+        return None
+    if len(lifecycle) != 1 or len(adr_status) != 1:
+        raise ValueError("oracle lifecycle owner fields are incomplete or duplicated")
+    lifecycle_match = _ORACLE_LIFECYCLE.fullmatch(lifecycle[0])
+    adr_match = _ORACLE_ADR.fullmatch(adr_status[0])
+    if lifecycle_match is None or adr_match is None:
+        raise ValueError("oracle lifecycle owner fields are not exact and anchored")
+    return lifecycle_match.group(1), adr_match.group(1)
+
+
+def _oracle_lifecycle_rows(
+    root: Path,
+) -> tuple[checker.apg_skill_topology.ProfileLifecycleRow, ...]:
+    profile_paths = _oracle_profile_paths(root)
+    catalog_profiles = {
+        name for name in _oracle_catalog(root) if name.endswith("-profile")
+    }
+    projection_profiles = {
+        path.name
+        for path in (root / ".agents" / "skills").iterdir()
+        if path.name.endswith("-profile")
+    }
+    if catalog_profiles != projection_profiles:
+        raise ValueError("independent integration owners disagree")
+    rows = []
+    for name, relative in profile_paths.items():
+        owner_values = []
+        for path in (
+            root / relative / "SKILL.md",
+            root / "docs" / "specs" / f"{name}.md",
+        ):
+            if path.is_file() and (value := _oracle_owner(path)) is not None:
+                owner_values.append((*value, path.relative_to(root).as_posix()))
+        if owner_values and len({value[:2] for value in owner_values}) != 1:
+            raise ValueError(f"independent lifecycle owners disagree for {name}")
+        lifecycle, adr_status = owner_values[0][:2] if owner_values else (
+            "not-applicable",
+            "not-applicable",
+        )
+        rows.append(
+            checker.apg_skill_topology.ProfileLifecycleRow(
+                name,
+                lifecycle,
+                adr_status,
+                "integrated" if name in catalog_profiles else "unintegrated",
+                tuple(sorted(value[2] for value in owner_values)),
+            )
+        )
+    return tuple(rows)
+
+
+def _production_lifecycle_rows(root: Path):
+    canonical = checker.apg_skill_topology.canonical_skill_paths(
+        root, root / "skills"
+    )
+    catalog = checker.parse_catalog((root / "skills" / "README.md").read_text())
+    integrated = tuple(
+        sorted(row.name for row in catalog.rows if row.name.endswith("-profile"))
+    )
+    return checker.apg_skill_topology.observe_profile_lifecycle_rows(
+        root, canonical, integrated
+    )
+
+
+def _require_independent_rows(observed_reader, authority_reader):
+    if observed_reader is authority_reader:
+        raise ValueError("observation and authority readers are not independent")
+    observed = tuple(observed_reader())
+    authority = tuple(authority_reader())
+    if observed != authority:
+        raise ValueError("production lifecycle rows disagree with independent owners")
+    return observed
+
+
+class APG81HCompleteLifecycleTransitionTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.rows = list(_oracle_lifecycle_rows(REPOSITORY_ROOT))
+        self.names = tuple(row.profile for row in self.rows)
+        self.node = next(
+            row for row in self.rows if row.profile == "nodejs-runtime-profile"
+        )
+
+    def test_complete_map_is_canonical_derived_and_binds_node_repair(self) -> None:
+        complete = checker.apg_skill_topology.complete_profile_lifecycle_rows(
+            self.names, self.rows, required_node_row=self.node
+        )
+        self.assertEqual(len(complete), len(self.names))
+        self.assertIn(self.node.text(), complete)
+
+    def test_complete_map_rejects_domain_and_no_owner_mutations(self) -> None:
+        ordinary_index = next(
+            index for index, row in enumerate(self.rows) if not row.lifecycle_owners
+        )
+        wrong = list(self.rows)
+        ordinary = wrong[ordinary_index]
+        wrong[ordinary_index] = checker.apg_skill_topology.ProfileLifecycleRow(
+            ordinary.profile,
+            "retained-provisional",
+            "not-applicable",
+            ordinary.integration,
+        )
+        unknown = checker.apg_skill_topology.ProfileLifecycleRow(
+            "unknown-language-profile",
+            "not-applicable",
+            "not-applicable",
+            "integrated",
+        )
+        mutations = (
+            [row for row in self.rows if row.profile != self.node.profile],
+            self.rows[1:],
+            self.rows + [unknown],
+            self.rows + [self.rows[0]],
+            wrong,
+        )
+        for rows in mutations:
+            with self.subTest(rows=rows), self.assertRaises(ValueError):
+                checker.apg_skill_topology.complete_profile_lifecycle_rows(
+                    self.names, rows, required_node_row=self.node
+                )
+
+
+def test_apg81h_current_repository_complete_profile_lifecycle_observation() -> None:
+    observed = _require_independent_rows(
+        lambda: _production_lifecycle_rows(REPOSITORY_ROOT),
+        lambda: _oracle_lifecycle_rows(REPOSITORY_ROOT),
+    )
+    profile_names = tuple(_oracle_profile_paths(REPOSITORY_ROOT))
+    assert len(profile_names) == 22
+    assert len(observed) == len(profile_names)
+    explicit = {row.profile for row in observed if row.lifecycle_owners}
+    assert explicit == {
+        "css-language-profile",
+        "javascript-language-profile",
+        "markdown-language-profile",
+        "nodejs-runtime-profile",
+        "typescript-language-profile",
+    }
+    no_owner = [row for row in observed if not row.lifecycle_owners]
+    assert len(no_owner) == 17
+    assert all(
+        row.lifecycle == row.adr_status == "not-applicable" for row in no_owner
+    )
+    node = next(row for row in observed if row.profile == "nodejs-runtime-profile")
+    assert node == checker.apg_skill_topology.ProfileLifecycleRow(
+        "nodejs-runtime-profile",
+        "provisionally-integrated",
+        "Accepted with amendment",
+        "integrated",
+        (
+            "docs/specs/nodejs-runtime-profile.md",
+            "skills/nodejs-runtime-profile/SKILL.md",
+        ),
+    )
+
+
+def test_apg81h_independence_mutations(tmp_path: Path) -> None:
+    production = list(_production_lifecycle_rows(REPOSITORY_ROOT))
+    authority = list(_oracle_lifecycle_rows(REPOSITORY_ROOT))
+    ordinary_index = next(
+        index for index, row in enumerate(production) if not row.lifecycle_owners
+    )
+    wrong_production = list(production)
+    row = wrong_production[ordinary_index]
+    wrong_production[ordinary_index] = checker.apg_skill_topology.ProfileLifecycleRow(
+        row.profile, "retained-provisional", "not-applicable", row.integration
+    )
+    with pytest.raises(ValueError, match="disagree"):
+        _require_independent_rows(lambda: wrong_production, lambda: authority)
+
+    altered_owner = tmp_path / "altered-owner.md"
+    altered_owner.write_text(
+        "Lifecycle: `provisionally-integrated`.\n"
+        "Lifecycle ADR: `Accepted with amendment`.\n",
+        encoding="utf-8",
+    )
+    lifecycle, adr_status = _oracle_owner(altered_owner)
+    explicit_index = next(
+        index
+        for index, candidate in enumerate(authority)
+        if candidate.profile == "javascript-language-profile"
+    )
+    altered_authority = list(authority)
+    explicit = altered_authority[explicit_index]
+    altered_authority[explicit_index] = checker.apg_skill_topology.ProfileLifecycleRow(
+        explicit.profile,
+        lifecycle,
+        adr_status,
+        explicit.integration,
+        explicit.lifecycle_owners,
+    )
+    with pytest.raises(ValueError, match="disagree"):
+        _require_independent_rows(lambda: production, lambda: altered_authority)
+
+    producer = lambda: production
+    with pytest.raises(ValueError, match="not independent"):
+        _require_independent_rows(producer, producer)
+
+
+def test_apg81h_owner_agreement_and_exact_matching(tmp_path: Path) -> None:
+    leaf = tmp_path / "skills" / "nodejs-runtime-profile"
+    spec = tmp_path / "docs" / "specs" / "nodejs-runtime-profile.md"
+    leaf.mkdir(parents=True)
+    spec.parent.mkdir(parents=True)
+    (leaf / "SKILL.md").write_text(
+        "Lifecycle: `provisionally-integrated`.\n"
+        "Lifecycle ADR: `Accepted with amendment`.\n",
+        encoding="utf-8",
+    )
+    spec.write_text(
+        "Lifecycle: `provisionally-integrated-with-known-debt`.\n"
+        "Lifecycle ADR: `Accepted with amendment`.\n",
+        encoding="utf-8",
+    )
+    with pytest.raises(ValueError, match="owners disagree"):
+        checker.apg_skill_topology.observe_profile_lifecycle_rows(
+            tmp_path,
+            {"nodejs-runtime-profile": Path("skills/nodejs-runtime-profile")},
+            (),
+        )
+    assert _oracle_owner(spec) == (
+        "provisionally-integrated-with-known-debt",
+        "Accepted with amendment",
+    )
+
+    malformed = tmp_path / "malformed-prefix.md"
+    malformed.write_text(
+        "Lifecycle: `provisionally-integrated-with-known-debt-extra`.\n"
+        "Lifecycle ADR: `Accepted with amendment`.\n",
+        encoding="utf-8",
+    )
+    with pytest.raises(ValueError, match="unknown lifecycle value"):
+        checker.apg_skill_topology._exact_lifecycle_owner(malformed)
+
+
+def test_apg81h_maturity_changes_do_not_create_lifecycle(tmp_path: Path) -> None:
+    row = next(
+        row for row in _oracle_lifecycle_rows(REPOSITORY_ROOT)
+        if not row.lifecycle_owners
+    )
+    original = _oracle_catalog(REPOSITORY_ROOT)
+    maturity = original[row.profile]
+    changed_maturity = "provisional" if maturity == "stable" else "stable"
+    catalog = (REPOSITORY_ROOT / "skills" / "README.md").read_text(
+        encoding="utf-8"
+    )
+    old_fragment = f"[`{row.profile}`]"
+    matching_line = next(
+        line for line in catalog.splitlines() if old_fragment in line
+    )
+    changed_line = matching_line.replace(
+        f"`{maturity}`", f"`{changed_maturity}`"
+    )
+    test_root = tmp_path
+    (test_root / "skills").mkdir()
+    (test_root / "skills" / "README.md").write_text(
+        changed_line + "\n", encoding="utf-8"
+    )
+    assert _oracle_catalog(test_root)[row.profile] == changed_maturity
+    assert row.lifecycle == "not-applicable"
+
+
+@pytest.mark.parametrize("case", range(50))
+def test_apg81h_exact_transition_case(case: int) -> None:
+    surfaces = tuple(sorted(checker.apg_skill_topology.EXACT_TRANSITION_SURFACES))
+    baseline = {surface: (f"{surface}-before",) for surface in surfaces}
+    if case == 0:
+        assert (
+            checker.apg_skill_topology.exact_topology_transition(
+                baseline, baseline, {}
+            )
+            == baseline
+        )
+        return
+    if case == 1:
+        observed = dict(baseline)
+        observed["profile_lifecycle"] = ("profile_lifecycle-after",)
+        assert checker.apg_skill_topology.exact_topology_transition(
+            baseline,
+            observed,
+            {
+                "profile_lifecycle": (
+                    ("profile_lifecycle-before",),
+                    ("profile_lifecycle-after",),
+                )
+            },
+        )["profile_lifecycle"] == ("profile_lifecycle-after",)
+        return
+
+    surface = surfaces[(case - 2) // 4]
+    mutation = (case - 2) % 4
+    observed = dict(baseline)
+    delta = {surface: ((f"{surface}-before",), (f"{surface}-after",))}
+    if mutation == 0:
+        observed[surface] = ()
+    elif mutation == 1:
+        observed[surface] = (f"{surface}-after", f"{surface}-unknown")
+    elif mutation == 2:
+        observed[surface] = (f"{surface}-after", f"{surface}-after")
+    else:
+        observed[surface] = (f"{surface}-drift",)
+    with pytest.raises(ValueError):
+        checker.apg_skill_topology.exact_topology_transition(
+            baseline, observed, delta
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

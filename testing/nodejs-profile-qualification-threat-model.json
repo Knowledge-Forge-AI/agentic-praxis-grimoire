@@ -1,0 +1,44 @@
+{
+  "allowed_input_classes": [
+    "apg-owned-reviewed-fixture",
+    "exact-maintainer-selected-runtime-path",
+    "synthetic-non-sensitive"
+  ],
+  "application_package_installation": "prohibited",
+  "cleanup_policy": "attempt-all-and-verify-before-success",
+  "continuous_identity_claim": "none",
+  "environment_policy": "exact-closed-synthetic-allowlist",
+  "execution_context": "controlled-local-or-ci-qualification",
+  "failure_policy": "fail-closed-with-redacted-contract-id",
+  "fixture_network": "prohibited",
+  "forbidden_input_classes": [
+    "credential-bearing-code-or-data",
+    "secret-bearing-code-or-data",
+    "target-code",
+    "untrusted-fixture",
+    "user-code"
+  ],
+  "refresh_conditions": [
+    "execution-context-change",
+    "fixture-provenance-change",
+    "runtime-role-change",
+    "scratch-or-cleanup-contract-change"
+  ],
+  "runtime_acquisition": "exact-existing-or-preinstalled-nvm",
+  "runtime_binding": "exact-pre-and-post-observation",
+  "same_uid_adversary": "excluded-route-to-security-owner",
+  "schema_version": 1,
+  "scratch_owner": "assignment-owned-external-direct-directory",
+  "scratch_topology": [
+    "node-profile-random/tmp",
+    "node-profile-random/npm-cache",
+    "node-profile-random/pnpm-home",
+    "node-profile-random/work",
+    "node-profile-random/fs-case"
+  ],
+  "security_boundary": "none",
+  "shell": "prohibited-for-maintained-fixture-invocation",
+  "symlink_policy": "refuse-preexisting-at-preflight",
+  "threat_model_id": "nodejs-profile-controlled-qualification-v1",
+  "trusted_fixture_provenance": "apg-owned-reviewed"
+}

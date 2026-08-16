@@ -1,0 +1,38 @@
+/* APG76-FX-006 and APG76-FX-007.
+   APG-owned fixture source. Independently written; no target source. */
+
+/* FX-006 — definition, inheritance, substitution, and fallback. */
+.theme-root {
+  --accent: #4060c0;
+  --empty: ;
+}
+
+.theme-root .uses-defined { color: var(--accent); }
+.theme-root .uses-fallback { color: var(--accent-missing, #606060); }
+
+/* The fallback is everything after the first comma, commas included. */
+.theme-root .uses-comma-fallback {
+  box-shadow: var(--shadow-missing, 0 1px 2px, 0 2px 8px);
+}
+
+/* An empty custom property is valid and substitutes nothing; it does not
+   select the fallback. That is a different case from an undefined name. */
+.theme-root .uses-empty { color: var(--empty, #707070); }
+
+/* FX-007 — cycle and invalid at computed-value time. */
+.cycle-root {
+  --a: var(--b);
+  --b: var(--a);
+  --not-a-color: 12px;
+}
+
+/* Both members of the cycle take the guaranteed-invalid value, so this
+   reference has no valid substitution and no fallback. */
+.cycle-root .from-cycle { color: var(--a); }
+
+/* Substitution succeeds but the result is invalid for the property. The
+   earlier declaration is not restored by that failure. */
+.cycle-root .from-invalid-substitution {
+  color: #808080;
+  color: var(--not-a-color);
+}

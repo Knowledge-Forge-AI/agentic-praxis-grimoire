@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "source_phase": "APG47",
+  "recommendations": [
+    {
+      "id": "REC-01",
+      "owner": "skills/reviewing-and-verifying-repository-work/SKILL.md",
+      "supporting": ["S02", "S04", "S05", "S06", "S07", "S17"],
+      "adverse": ["S03", "S27", "S34", "S39"],
+      "contracts": [
+        "Material implied completion is stated and evidenced.",
+        "Unsupported taste is advice while grounded evaluation may remain a finding.",
+        "Forecasts and undefined checks are not presented as established current facts.",
+        "Routine or already established claims gain no classification ceremony."
+      ]
+    },
+    {
+      "id": "REC-02",
+      "owner": "skills/reviewing-and-verifying-repository-work/SKILL.md",
+      "supporting": ["S14", "S15", "S32"],
+      "adverse": ["S27"],
+      "contracts": [
+        "Scoped absence, inconclusive evidence, and evidence weighing against a claim remain distinct.",
+        "Countervailing evidence is evaluated before its effect is dispositioned.",
+        "Established claims gain no additional report state."
+      ]
+    },
+    {
+      "id": "REC-03",
+      "owner": "docs/provenance.md",
+      "supporting": [
+        "S08",
+        "S09",
+        "S10",
+        "S11",
+        "S17",
+        "S18",
+        "S19",
+        "S20",
+        "S24",
+        "S25",
+        "S26",
+        "S28"
+      ],
+      "adverse": ["S01", "S22", "S34"],
+      "contracts": [
+        "Authority is relative to the exact claim and inspectable basis.",
+        "Formal first-party records do not settle interested interpretations automatically.",
+        "Common-origin restatements remain one lineage and derivative summaries may aid discovery.",
+        "Contested claims may require counter-search and independently produced evidence.",
+        "Corroboration remains claim- and project-owned without universal tiers, counts, or recency ceremony."
+      ]
+    },
+    {
+      "id": "REC-04",
+      "owner": "docs/provenance.md",
+      "supporting": ["S12", "S13", "S30"],
+      "adverse": ["S01", "S22", "S36", "S39"],
+      "contracts": [
+        "A material access boundary and its effect on the conclusion are recorded in prose.",
+        "Complete or immaterial access produces no additional note.",
+        "Protected details remain undisclosed.",
+        "No required field, pseudo-schema, ledger, or validator is introduced."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+/* APG76-FX-013 — generated, vendor, and minified provenance boundary.
+   APG-owned fixture source, hand-authored by APG76. It represents the shape
+   of a non-authored artifact so the provenance decision has a concrete
+   subject; it is not build output, and APG76 commits no build output. The
+   banner below is the kind of claim that raises the provenance question, and
+   is deliberately not treated as an answer to it. */
+
+/* Banner-style claim under study:
+   "Bundled output — do not edit by hand." */
+
+.g-a{color:#111;margin:0;padding:0}
+.g-b{color:#222;display:flex;gap:.25rem}
+.g-c,.g-d{border:0;font:inherit}
+
+/* A vendor-prefixed declaration alongside its standard form is a common
+   marker of tool output, and is likewise only a hint. */
+.g-e{-webkit-mask-image:none;mask-image:none}
+
+/* No source-map reference is written here: a reference would name a build
+   artifact that this fixture must not contain. Its absence is part of the
+   case, not an oversight. */

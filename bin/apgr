@@ -1,0 +1,28 @@
+#!/usr/bin/env python3
+"""Run the canonical APGR dispatcher from a source checkout."""
+
+from __future__ import annotations
+
+from pathlib import Path
+import sys
+
+
+_command = Path(__file__).resolve(strict=True)
+_repository_root = _command.parent.parent
+_source_root = _repository_root / "src"
+_adapter = _source_root / "agentic_praxis_grimoire" / "__main__.py"
+if (
+    _command.parent.name != "bin"
+    or not _source_root.is_dir()
+    or _source_root.is_symlink()
+    or not _adapter.is_file()
+    or _adapter.is_symlink()
+):
+    print("apgr: source checkout package is unavailable", file=sys.stderr)
+    raise SystemExit(1)
+sys.path.insert(0, str(_source_root))
+
+from agentic_praxis_grimoire.__main__ import main  # noqa: E402
+
+
+raise SystemExit(main())

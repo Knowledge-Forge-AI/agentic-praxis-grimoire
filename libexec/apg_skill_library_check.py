@@ -562,7 +562,19 @@ def _check_local_links(
                 token.line,
             )
             continue
-        if not _contained(resolved, physical_leaf):
+        expected_spec = root / "docs/specs" / f"{leaf.name}.md"
+        lexical_candidate = Path(os.path.normpath(candidate))
+        normative_spec = (
+            markdown == leaf / "SKILL.md"
+            and destination.split("#", 1)[0]
+            == f"../../docs/specs/{leaf.name}.md"
+            and lexical_candidate == expected_spec
+            and _ordinary_directory(root / "docs")
+            and _ordinary_directory(root / "docs/specs")
+            and _ordinary_file(expected_spec)
+            and resolved == expected_spec.resolve(strict=True)
+        )
+        if not _contained(resolved, physical_leaf) and not normative_spec:
             _diagnostic(
                 diagnostics,
                 "APG021",

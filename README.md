@@ -1,5 +1,11 @@
 # Agentic Praxis Grimoire
 
+<!-- APG-CANDIDATE-STATE: css-language-profile retained-provisional -->
+
+The marker above is the mechanical current-state authority. Bounded
+contradiction diagnostics cover only their frozen vocabulary; arbitrary prose
+still requires human review.
+
 Agentic Praxis Grimoire (APG) is a modular engineering operating
 model for coding agents. It curates practices that improve planning,
 implementation, testing, debugging, review, delivery, and coordination without
@@ -13,6 +19,25 @@ intentionally squashed release commit and an annotated tag to the preserved
 v0.1.0 through v0.3.0 history. Its canonical public
 checkout supplies the maintainer's separately managed user-global Codex
 integration. Private development history remains distinct.
+
+APG49 independently validates the APG48 matryer/is v1.4.1 candidate but does
+not retain it: fresh review after the single correction pass finds new
+material source, trigger, structural, and scenario-continuity defects. ADR
+0030 is Rejected, ADR 0026 remains the controlling two-component no-stack Go
+architecture, and development remains 28/28/28. See the
+[APG49 evaluation](docs/evaluations/apg49-matryer-is-validation-and-integration.md).
+
+APG59 independently validates and amends the APG58 CSS pilot, but corrected-
+state review finds material executable-contract and removal defects after the
+single correction pass. ADR 0035 is Rejected, all candidate surfaces are
+removed, and development remains 28/28/28 with fourteen stable and fourteen
+provisional rows. Corrected public and active v0.4.0 remain unchanged.
+
+APG60 now freezes the rejected-evidence behavior before any re-authoring:
+sixty structured CSS response cases, a deterministic reference evaluator, and
+a generic candidate-removal model exercise every current owner and preserve
+history. It authors no skill, leaves ADR 0036 unused, and grants no successor
+authority.
 
 APG0 through APG8 are the closed v0.1 development epic, with each historical
 terminal outcome preserved, including APG3's blocked result. The epic established
@@ -348,11 +373,11 @@ cost.
   an independent four-digit sequence.
 - [`docs/status/`](docs/status/README.md) records truthful phase exits under an
   independent five-digit sequence.
-- [`skills/`](skills/README.md) contains and indexes twenty-eight canonical
-  skills: fourteen stable rows and fourteen provisional manager-assignment,
+- [`skills/`](skills/README.md) contains and indexes thirty-three canonical skills:
+  fourteen stable rows and nineteen provisional manager-assignment,
   language, database, test-profile, or conversion rows.
 - [`.agents/skills/`](.agents/skills/) is the checked-in Codex repository
-  discovery projection; its twenty-eight relative symbolic links contain no
+  discovery projection; its thirty-three relative symbolic links contain no
   independent skill content.
 - [`docs/bootstrap-v0.1.md`](docs/bootstrap-v0.1.md) defines maturity,
   provisional evidence, rollback, dogfooding, and decommission gates.
@@ -383,8 +408,9 @@ cost.
   future slices without allocating phase IDs.
 - [`docs/legacy-roadmap-closure.md`](docs/legacy-roadmap-closure.md) gives every
   former candidate or deferred theme a terminal owner or condition.
-- `bin/` and `libexec/` contain deterministic reporting tools, the
-  dependency-free project-local and user-scoped projection commands, the
+- `bin/` and `libexec/` contain deterministic reporting and change-size tools,
+  the dependency-free project-local, user-scoped, and flat shared-skill
+  projection commands, the
   read-only skill-library, record-identity, and formal-phase commit-message
   checkers, and the local-only public candidate builder/checker with
   non-executable helpers.
@@ -425,6 +451,9 @@ bin/apg-check-record-identity [--root <path>] [--format text|json] \
   [--expect-available <phase>] [--expect-allocated <phase>]
 bin/apg-check-phase-commit-message --phase <PHASE-ID> \
   (--message-file <path> | --commit <revision>) [--format text|json]
+bin/apg-check-change-size staged [--format text|json]
+bin/apg-check-change-size commit <commit> [--format text|json]
+bin/apg-check-change-size tree [<commit>] [--format text|json]
 ```
 
 These commands validate only their adopted mechanical APG subsets. They do not
@@ -439,6 +468,40 @@ bin/git-show-report <phase-id> <commit> <status-doc> <result> <final-gate>
 bin/git-diff-report <phase-id> <result> <final-gate> [--status-doc <path>]
 bin/append-operational-report <phase-id> <absolute-body-path> <result> <final-gate> [options]
 ```
+
+The three compatibility report commands and canonical `apgr report` routes
+default to one current primary under
+`~/Documents/agent/outbox/<project>/<phase>/<phase>.<kind>.report.txt`.
+`GIT_SHOW_REPORT_ROOT` remains an explicit legacy-omnibus override for the
+compatibility commands, but cannot redirect canonical `apgr report` routes;
+historical reports under the earlier default are not migrated.
+`apgr report recover --phase <phase>` provides bounded interrupted-transaction
+recovery; repository-backed writes reject an explicit project identifier that
+does not match the repository basename.
+
+`bin/flatten-skill-symlinks INPUT OUTPUT` creates a flat, owner-state-backed
+symlink projection from nested skill roots. It supports deterministic
+collision handling, `--dry-run`, `--check`, state-owned `--replace` and
+`--clean`, and refuses overlap, symlinked output ancestry, unmanaged
+collisions, and indirect marker files. APG53 did not mutate a live Claude
+installation.
+
+`bin/install-global-skills AGENT [REPOSITORY ...]` projects one complete set of
+local skill repositories into a Codex or Claude personal skill root. With no
+repository arguments it uses the installed APG repository. Explicit
+repositories replace that default; `--include-apg` adds APG to an explicit
+set. Codex defaults to `$HOME/.agents/skills`, Claude defaults to
+`${CLAUDE_CONFIG_DIR:-$HOME/.claude}/skills`, and `--skills-root` overrides
+the destination exactly. Duplicate names, unmanaged collisions, and other
+command owners fail closed. `--check`, `--dry-run`, and exact owned
+`--uninstall` are supported. This is local symlink projection, not package,
+plugin, trust, release, or runtime-discovery validation.
+
+`bin/apg-check-change-size` reads index, commit, or tree Git objects. The
+versioned policy in `testing/apg-change-size-policy.json` limits ordinary
+blobs to 256 KiB, generated-derived evidence blobs to 128 KiB, generated
+evidence added per change to 512 KiB, and text lines to 64 KiB. Archives are
+rejected by default and binary assets require exact identity-bound exceptions.
 
 On Windows invoke the entry point through an interpreter, for example
 `python bin/git-diff-report --help`. Report replacement fails closed there
@@ -504,9 +567,646 @@ Contributions are accepted under the terms in
 Agents should read [`AGENTS.md`](AGENTS.md), then the focused owner for the task.
 Maintainers evaluating source-derived policy should begin with the
 [project model](docs/project-model.md), [provenance policy](docs/provenance.md),
-and the [ADR index](docs/adr/README.md).
+and the [ADR index](docs/adr/README.md). The reviewed but rejected Web and Node
+candidate boundaries and non-normative growth evidence are summarized in the
+[Web and Node profile-family architecture](docs/architecture/web-and-node-profile-family.md).
+Its repaired reproducibility foundation and named insufficient evidence
+classes are recorded in the
+[APG52 evaluation](docs/evaluations/apg52-reproducible-web-node-evidence-foundation.md);
+that evidence accepts no threshold or profile.
+A later fresh reconstruction on that foundation produced
+[ADR 0034](docs/adr/2026/07/0034-web-and-node-profile-family-reconstruction-and-authoring-sequence.md)
+with separate owner, authoring, and growth-band decisions; see the
+[APG56 evaluation](docs/evaluations/apg56-web-and-node-architecture-reconstruction.md)
+and the
+[reconstruction architecture document](docs/architecture/web-and-node-profile-family-reconstruction.md).
+The [APG57 independent review](docs/evaluations/apg57-web-and-node-architecture-review.md)
+rejects ADR 0034 after material corrected-state defects, leaves every numeric
+band and all authoring deferred, and changes no skill surface.
+The [APG58 CSS pilot](docs/evaluations/apg58-css-language-profile-pilot-authoring.md)
+authors one unintegrated `css-language-profile` candidate under explicit
+policy-selected structural limits. The
+[APG59 independent validation](docs/evaluations/apg59-css-language-profile-validation-and-integration.md)
+closes projected/resulting-count and incremental-growth loopholes and narrows
+authority and semantic boundaries, but corrected-state review finds material
+verification and removal defects. It rejects
+[ADR 0035](docs/adr/2026/07/0035-css-language-profile-and-policy-selected-structural-limits.md)
+and removes the candidate from current development.
+The
+[APG60 foundation](docs/evaluations/apg60-css-reentry-contract-and-removal-foundation.md)
+then freezes sixty candidate-independent response cases and a complete
+retained/rejected removal-closure model before any future author may write
+candidate prose. It creates no CSS surface and does not authorize APG61.
+The current multi-repository installer and its forward transaction hardening
+are recorded in the
+[APG54 integration](docs/evaluations/apg54-global-skill-installer-integration.md)
+and
+[APG55 correction](docs/evaluations/apg55-global-skill-installer-transaction-hardening.md).
 Delegated work should follow the
 [manager-worker protocol](docs/manager-worker-protocol.md). The completed v0.1
 epic, post-release APG-TEST0 foundation, and completed APG10 through APG14 v0.2
 sequence are described in the [roadmap](docs/roadmap.md). No successor roadmap
 epic begins automatically.
+## APG60A CSS foundation correction
+
+APG60A corrects the APG60 pre-authoring oracle forward without restoring the
+rejected CSS candidate. Projection overruns are operation-independent,
+artifact exceptions retain their real authority source, broken symlink
+residue is lexical, and later retained integration must pass an actual-tree
+closure gate. The 60-case register and 300/600/900 policy are unchanged.
+
+See
+[APG60A CSS Contract Foundation Hardening](docs/evaluations/apg60a-css-contract-foundation-hardening.md).
+APG61 remains recommended, not authorized.
+
+## APG60B traceability and decision closure
+
+[APG60B](docs/evaluations/apg60b-css-traceability-and-decision-closure.md)
+closes five additional pre-authoring false-pass classes without changing the
+accepted CSS behavior contract. Future contract maps must agree exactly with
+all sixty cases and reachable clause anchors; narrative state, Python owner
+variables, derived release values, and ADR 0036 lifecycle state are checked
+against their real owners. No CSS candidate or ADR 0036 is created, and no
+successor is authorized.
+
+## APG60C runtime and terminal lifecycle closure
+
+[APG60C](docs/evaluations/apg60c-css-runtime-and-terminal-lifecycle-closure.md)
+preserves accepted APG60B and records the owner-source finality claim later
+narrowed forward by APG60D. APG60C keeps exact marker state separate
+from bounded prose diagnostics, positively gates the authored Proposed but
+unintegrated state, requires preserved history for terminal rejection, and
+rejects symlinked or malformed current survivor owners. The sixty-case behavior
+contract and 28/28/28 development state remain unchanged; APG61 is recommended
+only and is not begun or authorized.
+
+## APG60D source-binding and phase-history closure
+
+[APG60D](docs/evaluations/apg60d-css-source-binding-and-history-closure.md)
+preserves accepted APG60C while replacing its overstrong runtime/call claim
+with truthful static source-binding integrity. Exact APG58 through APG60D
+foundation bundles are mandatory; authored state requires APG61, and retained
+or rejected state requires APG61 plus APG62. All repository history is exact,
+direct regular, nonempty UTF-8, and no-follow. The CSS contract and 28/28/28
+development state remain unchanged. APG61 uses future exit 00085, is
+recommended only, and is not begun or authorized.
+
+## APG60E repository-path and candidate-surface closure
+
+[APG60E](docs/evaluations/apg60e-css-repository-path-and-candidate-surface-closure.md)
+preserves accepted APG60D and closes lifecycle authority, authored-owner, and
+retained-owner ancestor-symlink false passes through one physical-root,
+descriptor-relative no-follow read contract. The expected projection remains
+an exact relative symlink whose parent and canonical target provenance are now
+closed. The CSS behavior contract and 28/28/28 development state remain
+unchanged. APG61 uses future exit 00086, is recommended only, and is not begun
+or authorized.
+
+## APG60F import, owner, and projection closure
+
+[APG60F](docs/evaluations/apg60f-css-import-owner-and-projection-closure.md)
+preserves accepted APG60E while closing repository-local transitive import and
+cache isolation, making all 52 lifecycle roles and cross-references exact, and
+revalidating the expected projection and canonical target as one bounded
+observation. APG58 through APG60F are the foundation. CSS remains absent, ADR
+0036 remains unused, and development, public, and active state remain
+unchanged. APG61 uses exit 00087, remains recommended only, and is not begun
+or authorized.
+
+## APG60G snapshot, role, and derived-set closure
+
+[APG60G](docs/evaluations/apg60g-css-snapshot-role-and-derived-set-closure.md)
+preserves accepted APG60F while binding dynamic consumers to one pinned
+repository object, comparing complete exact derived skill sets, freezing the
+52 required semantic roles in a code-owned registry, and making authoritative
+regular reads observe the same final repository entry before and after the
+read. APG58 through APG60G are now the foundation. CSS remains absent, ADR
+0035 remains Rejected, ADR 0036 remains unused, and development, public, and
+active state remain unchanged. APG61 uses exit 00088 and APG62 uses 00089;
+APG61 remains recommended only and is not begun or authorized.
+
+## APG60H snapshot and full-path binding closure
+
+[APG60H](docs/evaluations/apg60h-css-snapshot-and-full-path-binding-closure.md)
+preserves the immutable Claude object and completes worker scratch, exact
+snapshot, full-path presence and absence, final root binding, and projection
+identity verification. APG58 through APG60H are foundation; future exits are
+00089 and 00090. Candidate, public, active, target, and successor state remain
+unchanged.
+
+## APG60I worker temporary-root binding and cleanup closure
+
+[APG60I](docs/evaluations/apg60i-worker-temp-binding-and-cleanup-closure.md)
+preserves APG60H's adopted-with-exceptions history and corrects its two known
+worker temporary-storage defects forward. Child creation is bound to an
+already-opened no-follow root and cleanup owns the lifecycle before creation.
+APG58 through APG60I are foundation; future exits are 00090 and 00091. CSS,
+ADR 0036, public, active, target, and successor state remain unchanged.
+
+## APG61 CSS language-profile authoring
+
+[APG61](docs/evaluations/apg61-css-language-profile-authoring-from-frozen-contract.md)
+authors one fresh `css-language-profile` candidate from the frozen APG60A
+contract on the preserved Claude authoring branch — leaf, specification, and
+sixty-case traceability map — and proposes
+[ADR 0036](docs/adr/2026/07/0036-css-language-profile-from-frozen-contract.md).
+The candidate is not integrated: current candidate-state markers remain
+absent, integrated counts remain 28/28/28, development `main` remains at
+exact APG60I, and public, active, and target state are unchanged. APG62
+validation at exit 00091 is recommended but separately authorized.
+
+## APG62 CSS language-profile validation and rejection
+
+[APG62](docs/evaluations/apg62-css-language-profile-validation-and-integration.md)
+independently reconstructs the frozen sixty-case oracle and validates the
+exact delivered APG61 candidate. Seven initial semantic-navigation defects
+receive the one permitted coherent correction; fresh corrected-state review
+then finds a new material six-case `record-growth-state` overreach. ADR 0036
+is therefore Rejected and all current candidate surfaces are removed.
+Development remains 28/28/28 with 14 stable / 14 provisional, current markers
+remain absent, APG61 history is preserved, and public, active, and target state
+is unchanged. No successor is authorized.
+
+## APG63 Markdown architecture and lean contract
+
+[APG63](docs/evaluations/apg63-markdown-language-profile-architecture.md)
+moves to Markdown after the terminal CSS rejection without retrying
+`css-language-profile`. From exact APG62 it reverifies CommonMark 0.31.2,
+the pinned GFM specification, CC BY-SA 4.0 document rights, and the seven
+target Markdown documents; defines a narrowed coherent Markdown owner with
+closed raw-HTML, frontmatter, and MDX/host boundaries; selects qualitative
+structure-first structural policy (no numeric whole-file bands) under ten
+pre-frozen purpose controls; freezes a lean thirty-six-scenario
+candidate-independent contract; and proposes
+[ADR 0037](docs/adr/2026/07/0037-markdown-language-profile-architecture-and-lean-validation.md).
+No skill is authored and nothing is integrated: development remains
+28/28/28 with 14 stable / 14 provisional, ADR 0036 stays Rejected, and
+public, active, and target state are unchanged. Codex peer review
+(recommended APG64) terminally decides ADR 0037 and is separately
+authorized.
+
+## APG64 Markdown architecture peer review
+
+[APG64](docs/evaluations/apg64-markdown-architecture-peer-review.md)
+delivers and independently reviews exact APG63. It reproduces seven material
+architecture defects, applies one coherent forward correction, preserves
+exact corrected-state evidence, and accepts
+[ADR 0037](docs/adr/2026/07/0037-markdown-language-profile-architecture-and-lean-validation.md)
+with amendment after fresh 36/36 replay and source/target review. The accepted
+architecture remains authoring-eligible-with-narrowing, but no Markdown skill
+is authored or integrated. Development remains 28/28/28 with 14 stable / 14
+provisional; CSS stays absent; public, active, and target state is unchanged;
+and no successor is authorized.
+
+## APG65 Markdown language-profile candidate authoring
+
+[APG65](docs/evaluations/apg65-markdown-language-profile-authoring.md)
+authors one fresh branch-only `markdown-language-profile` candidate from the
+accepted
+[ADR 0037](docs/adr/2026/07/0037-markdown-language-profile-architecture-and-lean-validation.md)
+architecture: leaf, candidate specification, and navigation-only
+scenario-coverage record, with
+[ADR 0038](docs/adr/2026/07/0038-markdown-language-profile-candidate.md)
+Proposed. The candidate is branch-only, Proposed, unintegrated, and pending
+separately authorized APG66 validation; it contains no numeric whole-file
+band and creates no current integration owner. Integrated development
+remains 28/28/28 with 14 stable / 14 provisional; CSS stays absent; public,
+active, and target state is unchanged; and no successor is authorized.
+
+## APG66 Markdown language-profile validation and integration
+
+[APG66](docs/evaluations/apg66-markdown-language-profile-validation-and-integration.md)
+delivers exact APG65, independently replays the accepted 34-scenario oracle,
+freezes one coherent correction before fresh non-author review, and accepts
+[ADR 0038](docs/adr/2026/07/0038-markdown-language-profile-candidate.md) with
+amendment. The profile is retained provisionally with every current owner:
+development is 29/29/29, 14 stable / 15 provisional, with 27 general routes,
+one ChatGPT-local route, and 28 checked edges. ADR 0037 and APG65 authorship
+are preserved. Public and active corrected v0.4.0 and the read-only targets
+remain unchanged; no readiness, publication, deployment, APG67, or successor
+begins.
+
+## APG67 JavaScript language-profile architecture
+
+[APG67](docs/evaluations/apg67-javascript-language-profile-architecture.md)
+proposes the JavaScript language-profile architecture and
+candidate-independent lean validation contract under
+[ADR 0039](docs/adr/2026/08/0039-javascript-language-profile-architecture-and-lean-validation.md)
+(Proposed): the exact ECMAScript 2026 annual source is the stable
+reference, JavaScript, TypeScript, and Node.js remain separate owners,
+structural policy is qualitative with no numeric whole-file bands, and a
+frozen forty-row register binds future authoring and review. No JavaScript
+skill exists; development remains 29/29/29 with 14 stable / 15 provisional
+and 27/1/28 routes; Markdown remains retained provisional; corrected
+public and active v0.4.0 and the read-only targets are unchanged. APG68 is
+recommended but not begun.
+
+## APG68 JavaScript architecture peer review
+
+[APG68](docs/evaluations/apg68-javascript-architecture-peer-review.md)
+normally delivers and preserves exact APG67, independently reconstructs and
+replays the JavaScript architecture, and applies one coherent correction.
+[ADR 0039](docs/adr/2026/08/0039-javascript-language-profile-architecture-and-lean-validation.md)
+is Rejected after fresh review finds material defects in the sole corrected
+state; eligibility is `not-applicable-rejected`. No JavaScript skill is
+authored or integrated; development remains 29/29/29, 14/15, and 27/1/28.
+APG69 is not recommended or begun.
+
+## APG69 JavaScript core architecture reset
+
+[APG69](docs/evaluations/apg69-javascript-core-layered-architecture.md)
+exercises new human authority to propose
+[ADR 0040](docs/adr/2026/08/0040-javascript-language-profile-core-and-layered-decision-model.md)
+(Proposed): a narrower ECMAScript-core owner with question-specific
+typed authorities, a four-layer semantic/structural/policy/effective
+decision model with an ordered effective route union, and independent
+semantic, structural, composition, and process registers. ADR 0039
+remains Rejected and unchanged; no JavaScript skill is authored or
+integrated; development remains 29/29/29, 14/15, and 27/1/28.
+Separately authorized APG70 terminally decides ADR 0040.
+
+## APG70 JavaScript core layered-architecture peer review
+
+[APG70](docs/evaluations/apg70-javascript-core-layered-architecture-peer-review.md)
+normally delivers exact APG69, independently reproduces the initial material
+defects, applies one coherent correction, and preserves its actual patch.
+Fresh non-author review then finds new material source-identity,
+signal-predicate, context-route, policy-typing, checker, and owner-binding
+defects. [ADR 0040](docs/adr/2026/08/0040-javascript-language-profile-core-and-layered-decision-model.md)
+is Rejected; eligibility is `not-applicable-rejected`; no current JavaScript
+architecture input, skill, or integration owner exists. Development remains
+29/29/29, 14/15, and 27/1/28. APG71 is not recommended or begun.
+
+## APG71 TypeScript architecture and compiler-generation boundary
+
+[APG71](docs/evaluations/apg71-typescript-language-profile-architecture.md),
+under separate new human authority for TypeScript architecture only,
+proposes
+[ADR 0041](docs/adr/2026/08/0041-typescript-language-profile-architecture-and-compiler-generation-boundary.md)
+(Proposed): a narrow TypeScript static-semantics owner under
+project-selected exact compiler authority, a first-class TypeScript 6/7
+compiler-generation boundary, closed source-kind and embedded-host
+boundaries, structural disposition D, and eligibility
+`authoring-eligible-with-narrowing` with no candidate-authoring authority.
+ADR 0039 and ADR 0040 remain Rejected; no TypeScript skill or integration
+owner exists; development remains 29/29/29, 14/15, and 27/1/28. Separately
+authorized APG72 terminally decides ADR 0041.
+
+## APG72 TypeScript architecture peer review
+
+[APG72](docs/evaluations/apg72-typescript-architecture-peer-review.md)
+preserves exact APG71, independently rebuilds the oracle, freezes the complete
+initial set, and applies one coherent correction. Two fresh non-author lanes
+find new material owner/route, role-state, source-kind, and evidence-state
+defects. ADR 0041 is Rejected; eligibility is `not-applicable-rejected`; no
+current TypeScript architecture input or skill exists. Development remains
+29/29/29, 14/15, and 27/1/28. APG73 is not recommended or begun.
+
+## APG73 language-profile production recovery charter
+
+[APG73](docs/evaluations/apg73-language-profile-production-recovery-charter.md)
+records new human product authority and accepts
+[ADR 0042](docs/adr/2026/08/0042-language-profile-production-recovery-and-iterative-hardening.md).
+The controlling
+[production recovery charter](docs/governance/language-profile-production-recovery-charter.md)
+and [iterative hardening contract](docs/specs/language-profile-iterative-hardening-contract.md)
+replace automatic rejection after one correction with up to three separately
+evidenced hardening rounds by default. Critical and High defects still block
+integration; explicit human acceptance is required for Medium or Low debt and
+for terminal rejection or removal. TypeScript is essential, CSS and JavaScript
+are desirable, JSX is deferred, TypeScript 7 is the intended primary
+generation, and temporary TypeScript 6 is permitted only for an exact required
+role. No profile is authored or integrated. Development stays 29/29/29,
+14/15, and 27/1/28; Markdown, rejected ADRs, public/active v0.4.0, and targets
+remain unchanged. APG74 is recommended but not begun.
+
+## APG74 TypeScript language-profile candidate
+
+[APG74](docs/evaluations/apg74-typescript-language-profile-candidate.md)
+authors the first ADR 0042 product-recovery candidate: the
+[TypeScript language-profile leaf](skills/typescript-language-profile/SKILL.md),
+its [candidate specification](docs/specs/typescript-language-profile.md) and
+[scenario coverage](docs/specs/typescript-language-profile-scenario-coverage.md),
+and the
+[TypeScript 7 intended-state fixture](src/test/fixtures/apg74-typescript-intended-state/README.md),
+proposing
+[ADR 0043](docs/adr/2026/08/0043-typescript-language-profile-candidate-and-intended-state-harness.md).
+The exact stable compiler is freshly selected (`typescript@7.0.2`); the
+TypeScript 6 compatibility disposition is `not-required` with a recorded
+refresh condition; and the freshly pinned targets show the live theme
+checking under `typescript@5.9.3` — migration baseline, not the
+destination. The candidate is authored-proposed-unintegrated: the APG74
+branch carries a transitional 30/29/29 shape while integrated development
+remains exact APG73 at 29/29/29, 14/15, and 27/1/28. Markdown, rejected
+ADRs, public/active v0.4.0, and targets remain unchanged. APG75 owns
+iterative hardening and the terminal ADR 0043 decision; it is recommended
+but not begun.
+
+## APG75 TypeScript iterative hardening and provisional integration
+
+[APG75](docs/evaluations/apg75-typescript-iterative-hardening-and-integration.md)
+normally delivers exact APG74, independently rebuilds its 24 semantic and 14
+fixture vectors, and uses three separately preserved hardening rounds. The
+final exact-TypeScript-7 suite passes 78 focused tests and fresh review finds
+zero Critical, High, Medium, or Low defects. [ADR 0043](docs/adr/2026/08/0043-typescript-language-profile-candidate-and-intended-state-harness.md)
+is Accepted with amendment and `typescript-language-profile` is retained
+provisionally. Development is 30/30/30, 14/16, and 28/1/29. A disposable
+rollback restores 29/29/29, 14/15, and 27/1/28 while preserving history,
+decisions, Markdown, and corrected public and active v0.4.0. APG75 performs no
+target mutation, readiness, publication, deployment, stable-maturity, APG76,
+or successor work.
+
+## APG75A TypeScript scope and lifecycle closure
+
+[APG75A](docs/evaluations/apg75a-typescript-scope-and-lifecycle-closure.md)
+closes five post-integration defects without rewriting APG74 or APG75. The
+reusable profile is compiler-generation-neutral and consumes exact
+project-selected evidence; Theme Forge Terminal Nova retains its separate
+TypeScript 7 product destination. Response has exactly four values and remains
+disjoint from Selection. Coverage, fixture, manifest, and parser lifecycle now
+agree on provisional integration, and standard runners fail early unless exact
+TypeScript 7.0.2 is explicitly bound. ADR 0043 remains Accepted with amendment;
+development remains 30/30/30, 14/16, and 28/1/29; public/active corrected
+v0.4.0 and targets are unchanged. APG76 is recommended but not begun.
+## APG76 CSS language-profile candidate recovery
+
+APG76 proposes ADR 0044 on the Claude authoring branch: one reusable CSS
+semantics profile, one navigation-only twenty-four-scenario coverage record,
+and one fourteen-case target-first fixture. CSS remains unintegrated, with no
+catalog row, projection, maturity row, route, project selection, release owner,
+or maintained test owner. TypeScript and Markdown remain retained provisional
+and JavaScript remains absent. Published and active corrected v0.4.0 and both
+read-only targets are unchanged and unexecuted. APG77 Codex CSS iterative
+hardening is recommended but not begun.
+
+## APG77 CSS iterative hardening repair checkpoint
+
+[APG77](docs/evaluations/apg77-css-iterative-hardening-and-integration.md)
+preserves three immutable correction rounds and the APG76 candidate. Fresh
+terminal review finds two High retained-evidence defects, so
+[ADR 0044](docs/adr/2026/08/0044-css-language-profile-candidate-and-target-first-harness.md)
+remains Proposed and CSS remains unintegrated. Development stays 30/30/30,
+14/16, and 28/1/29; public and active corrected v0.4.0 and both read-only
+targets are unchanged. Further repair requires a human continuation decision.
+
+## APG77A CSS evidence-retention repair checkpoint
+
+[APG77A](docs/evaluations/apg77a-css-evidence-retention-closure-and-integration.md)
+preserves the explicitly authorized target-identity and independent-vector
+correction. Fresh review finds three High defects, including a wrong SVG
+authority, false-pass H2 qualification, and copied target bytes. ADR 0044 stays
+Proposed and CSS remains unintegrated at 30/30/30, 14/16, and 28/1/29. Main,
+corrected public/active v0.4.0, and both targets are unchanged. APG78 is not
+recommended; a new human decision is required.
+
+## APG77B CSS traceability and clean-room repair checkpoint
+
+[APG77B](docs/evaluations/apg77b-css-traceability-clean-room-closure-and-integration.md)
+preserves the explicitly authorized H3-H5 correction. Fresh four-lane review
+finds four High and two Medium defects in qualification, generated-report and
+escaped-copy boundaries, immutable diff binding, and artifact proportionality.
+No debt is accepted. ADR 0044 stays Proposed and CSS remains unintegrated at
+30/30/30, 14/16, and 28/1/29. Main, corrected public/active v0.4.0, and both
+targets are unchanged. APG78 is not recommended; a new human decision is
+required.
+
+## APG77C CSS evidence-proportionality repair checkpoint
+
+[APG77C](docs/evaluations/apg77c-css-evidence-proportionality-and-integration.md)
+preserves the human-authorized P1-P6 correction, makes exact private deletion
+patches a narrow historical exception, and replaces exhaustive current prose
+provenance with compact consequence-bearing evidence. Fresh review finds six
+Medium and one Low unaccepted qualification defects. ADR 0044 stays Proposed
+and CSS remains unintegrated at 30/30/30, 14/16, and 28/1/29. Main, corrected
+public/active v0.4.0, provisional TypeScript and Markdown, and both targets are
+unchanged. APG78 is not recommended; a new human decision is required.
+
+## APG77D CSS known debt and provisional integration
+
+[APG77D](docs/evaluations/apg77d-css-known-debt-and-provisional-integration.md)
+records explicit human acceptance of exactly four Medium and one Low
+qualification limitations, accepts no Critical/High or semantic/source/target/
+runtime/release/rollback debt, and closes proportionality, live lifecycle,
+release, historical-exclusion, and disposable-rollback gates. ADR 0044 is
+Accepted with amendment and CSS is provisionally integrated with known debt at
+31/31/31, 14/17, and 29/1/30. TypeScript and Markdown remain provisional;
+public/active corrected v0.4.0 and both unexecuted targets remain unchanged.
+APG78 is recommended but not begun.
+
+## APG79 JavaScript repair checkpoint
+
+[APG79](docs/evaluations/apg79-javascript-core-iterative-hardening-and-integration.md)
+preserves three correction rounds and independently validates the APG78
+candidate, fixture, exact engine, sources, rights, and target bindings. Terminal
+review finds zero Critical, two High, two Medium, and zero Low material defects,
+with no accepted JavaScript debt. ADR 0045 remains Proposed and JavaScript is
+`repair-required-after-round-3` without integration. Development remains exact
+APG77D at 31/31/31, 14/17, and 29/1/30; CSS known debt, provisional CSS,
+TypeScript and Markdown, corrected public/active v0.4.0, and targets remain
+unchanged. APG80 is not recommended; a human continuation decision is required.
+
+## APG79A JavaScript terminal-proof repair checkpoint
+
+[APG79A](docs/evaluations/apg79a-javascript-terminal-proof-closure-and-integration.md)
+preserves one separately authorized immutable correction for APG79's four
+terminal findings. Four fresh non-author lanes find five Medium material defects
+and no Critical, High, or Low finding; no JavaScript debt is accepted. ADR 0045
+remains Proposed and JavaScript is `repair-required-after-apg79a` without
+integration. Development remains exact APG77D at 31/31/31, 14/17, and 29/1/30;
+CSS known debt, provisional CSS/TypeScript/Markdown, corrected public/active
+v0.4.0, and both targets remain unchanged. APG80 is not recommended and a new
+human decision is required.
+
+
+## APG79B JavaScript contract and harness repair checkpoint
+
+[APG79B](docs/evaluations/apg79b-javascript-contract-harness-closure-and-integration.md)
+preserves one separately authorized immutable correction for APG79A's five
+Medium findings. Five fresh non-author lanes find four unique Medium material
+defects and no Critical, High, or Low finding; no JavaScript debt is accepted.
+ADR 0045 remains Proposed and JavaScript is `repair-required-after-apg79b`
+without integration. Development remains exact APG77D at 31/31/31, 14/17, and
+29/1/30; CSS debt, public/active corrected v0.4.0, and both targets remain
+unchanged. APG80 is not recommended and a new human decision is required.
+
+## APG79C JavaScript human-debt decision and integration checkpoint
+
+[APG79C](docs/evaluations/apg79c-javascript-known-debt-and-provisional-integration.md)
+accepts exactly four Medium JavaScript qualification limitations for
+provisional use, with zero Critical or High and no semantic, source, target,
+owner, release, or rollback debt accepted. A separate unaccepted Medium
+Test262 identity discrepancy blocks integration. ADR 0045 remains Proposed and
+JavaScript remains `repair-required-after-apg79b` and unintegrated. Development
+stays exact APG77D at 31/31/31, 14/17, and 29/1/30; APG80 is not recommended.
+
+## APG79E JavaScript report-binding debt and provisional integration
+
+[APG79E](docs/evaluations/apg79e-javascript-report-binding-debt-and-provisional-integration.md)
+accepts `JS-QD-005` as one additional Medium supporting qualification
+limitation and directly verifies the current APG79B report rather than claiming
+the maintained proxy is repaired. With zero Critical, High, or unaccepted
+Medium/Low findings and every product gate green, ADR 0045 is Accepted with
+amendment and JavaScript is provisionally integrated under exactly
+`JS-QD-001` through `JS-QD-005`. Development is 32/32/32, 14/18, and 30/1/31.
+Public and active corrected v0.4.0 and both read-only targets remain unchanged;
+APG80 is recommended but not begun.
+[APG80](docs/evaluations/apg80-nodejs-runtime-and-cli-stack-candidate.md)
+authors a narrow reusable `nodejs-runtime-profile` candidate with a
+twenty-four-scenario navigation record, a fourteen-case APG-owned target-first
+fixture, and Proposed ADR 0046. The candidate consumes runtime roles rather than
+selecting them, because fresh target evidence shows the exact Node version is
+never resolvable from project evidence alone in either read-only target. Nothing
+is integrated: mainline development remains 32/32/32, 14/18, and 30/1/31, known
+debt remains exactly `CSS-QD-001` through `CSS-QD-005` and `JS-QD-001` through
+`JS-QD-005`, and public and active corrected v0.4.0 and both targets are
+unchanged. APG81 is recommended but not begun.
+
+## APG81 Node.js hardening repair checkpoint
+
+[APG81](docs/evaluations/apg81-nodejs-runtime-cli-iterative-hardening-and-integration.md)
+preserves three immutable correction rounds and completes the required terminal
+review. The final ledger is zero Critical, three High, two Medium, and zero Low;
+no Node debt is accepted. ADR 0046 remains Proposed and
+`nodejs-runtime-profile` remains branch-only,
+`repair-required-after-round-3`, and unintegrated. Main remains exact APG79E at
+32/32/32, 14/18, and 30/1/31; the candidate branch remains 33/32/32. Existing
+CSS/JavaScript debt, corrected public/active v0.4.0, and both unexecuted targets
+are unchanged. A new human continuation decision is required.
+
+## APG81A Node.js threat-model correction checkpoint
+
+[APG81A](docs/evaluations/apg81a-nodejs-qualification-threat-model-and-harness-simplification.md)
+preserves a zero-finding correction that retires immutable-flag and copied-
+runtime sealing claims in favor of a controlled local-or-CI qualification
+contract with direct runtime pre/post observation. Terminal integration review
+finds one High rollback defect and one Medium contradictory ADR-index lifecycle
+defect in the proposed integration state, so those bytes are not retained. ADR
+0046 remains Proposed, Node remains corrected, repair-required, and unintegrated
+with zero Node debt, and main remains 32/32/32, 14/18, and 30/1/31. A new human
+decision is required; no successor is authorized.
+
+## APG81B Node.js integration-contract clarification checkpoint
+
+[APG81B](docs/evaluations/apg81b-nodejs-integration-contract-clarification-and-provisional-adoption.md)
+clarifies that candidate-preserving rollback targets 33/32/32. Review of the
+complete reconstructed integration candidate finds three Medium defects and no
+Critical, High, or Low finding, with zero Node debt. The candidate's rollback
+lifecycle was contradictory, its pending review records contradicted its
+proposed message, and one test-only xdist repair exceeded integration authority.
+The attempted integration is discarded. ADR 0046 remains Proposed and Node
+remains corrected, repair-required, and unintegrated at branch shape 33/32/32;
+main remains 32/32/32, 14/18, and 30/1/31. A new human decision is required.
+
+## APG81C Node.js lifecycle, test, and scratch repair checkpoint
+
+[APG81C](docs/evaluations/apg81c-nodejs-lifecycle-test-and-scratch-closure.md)
+retains the integration-support correction for rollback lifecycle, external
+review sequencing, per-invocation xdist cleanup, and ignored machine-local
+scratch. Fresh precommit review passes with zero findings and zero Node debt,
+but immutable review finds one Medium contradiction in retained pending-review
+prose. Integration stops. ADR 0046 remains Proposed, Node remains corrected,
+repair-required, and unintegrated at 33/32/32, and exact APG79E main remains
+32/32/32, 14/18, and 30/1/31. No successor is authorized.
+
+## APG81D Node.js repo-local scratch integration checkpoint
+
+[APG81D](docs/evaluations/apg81d-nodejs-provisional-integration.md) reconstructs
+the complete Node provisional-integration candidate and temporary ignored
+repo-local scratch contract. Final staged review finds one High rollback test-
+contract defect and three Medium specification, fail-closed query, and cleanup-
+evidence defects. The attempted integration is discarded without product
+repair. ADR 0046 remains Proposed; Node remains repair-required and
+unintegrated at branch shape 33/32/32; exact APG79E main remains 32/32/32,
+14/18, and 30/1/31. No Node or scratch debt is accepted and no successor is
+authorized.
+
+## APG81E Node.js final-integration review checkpoint
+
+[APG81E](docs/evaluations/apg81e-nodejs-final-integration-closure.md)
+reconstructs the complete Node integration candidate and closes the APG81D
+scratch-cleanup proof before review. Final staged review nevertheless finds one
+High incomplete rollback test-owner projection and two Medium chronology and
+fresh release-schedule evidence defects. The attempted integration is
+discarded. ADR 0046 remains Proposed; Node remains repair-required and
+unintegrated at branch shape 33/32/32; exact APG79E main remains 32/32/32,
+14/18, and 30/1/31. No Node or scratch debt is accepted and no successor is
+authorized.
+
+## APG81F Node.js actual-test-projection repair checkpoint
+
+[APG81F](docs/evaluations/apg81f-nodejs-actual-test-projection-and-integration-closure.md)
+attempts the one authorized actual-test-projection, chronology, and source-
+evidence correction. Fresh review finds three High and two Medium defects, so
+all attempted runner, test, and correction bytes are discarded. ADR 0046
+remains Proposed; Node remains retained, repair-required, and unintegrated at
+33/32/32. Exact APG79E main and all public, active, target, and debt state remain
+unchanged. No successor is authorized.
+
+## APG81G Node.js selector, release, and integration closure
+
+[APG81G](docs/evaluations/apg81g-nodejs-selector-release-and-integration-closure.md)
+attempted the one authorized correction of APG81F's five findings. Fresh review
+found two High and four Medium defects, so all attempted implementation and test
+bytes are discarded. ADR 0046 remains Proposed and Node remains retained,
+repair-required, and unintegrated at 33/32/32. No Node or scratch debt is
+accepted, and no successor is authorized.
+
+## APG81H Node.js reviewable qualification and integration closure
+
+[APG81H](docs/evaluations/apg81h-nodejs-reviewable-qualification-and-integration-closure.md)
+is the explicit human continuation after APG81G. Fresh review of its one
+correction found that the frozen topology evidence did not bind the complete
+actual language-profile lifecycle map. The attempted implementation and test
+bytes were discarded before commit. ADR 0046 remains Proposed and Node remains
+retained, repair-required, and unintegrated at 33/32/32. No integration,
+rejection, removal, debt acceptance, or successor work occurred.
+
+The resumed APG81H recovery isolates the generic change-size negative in a real
+bare-repository fixture and provisionally integrates the retained Node.js
+profile. Development is 33/33/33, 14/19, and 31/1/32; Node lifecycle is
+`provisionally-integrated` and ADR 0046 is Accepted with amendment. Node and
+scratch debt are zero. Public and active corrected v0.4.0 remain unchanged, and
+no stable maturity, readiness, publication, deployment, APG81I, APG82, or
+successor work is implied.
+
+## APG82 APGR CLI and distribution foundation
+
+[APG82](docs/evaluations/apg82-apgr-cli-distribution-configuration-and-artifact-contract-foundation.md)
+establishes the publishable `agentic-praxis-grimoire` Python distribution, the
+`agentic_praxis_grimoire` import package, and the canonical `apgr` executable.
+Installed consumer commands use a packaged, source-digest-bound skill-metadata
+manifest without an APG source checkout. Full skill content and projection
+remain repository-maintenance operations, which fail clearly when repository
+authority is absent. Maintained historical executable names remain thin
+compatibility shims over the same owners.
+
+APGR resolves `--apgr-home` over `APGR_HOME` over `~/.apgr`. Declarative global
+and project configuration use `config.toml` beneath the resolved APGR home and
+`<project-root>/.apgr/`, with scalar precedence of explicit CLI, project,
+global, then built-in default. The reserved future adapter checkout is
+`~/.apgr/agentic-praxis-grimoire-nd/`; APG82 creates no adapter or Nix
+deployment.
+
+New terminal artifacts use
+`~/Documents/agent/outbox/<project>/<phase>/`: exactly one current Git-show,
+Git-diff, or ops-only primary plus immutable numbered final responses. The
+`apgr skills context-report` measurement reports exact discoverable-description
+bytes and characters without imposing a budget threshold. APG82 publishes
+nothing and starts no successor. APG83 bounded dogfood and release readiness is
+recommended next under separate authority.
+
+## APG83 v0.5 release readiness
+
+[APG83](docs/evaluations/apg83-v0-5-bounded-dogfood-and-release-readiness.md)
+dogfoods the retained v0.5 product against exact revisions of the two approved
+Knowledge Forge repositories and qualifies APGR from fresh outside-checkout
+installs. The compact matrix produces eleven passes, one truthful deferred-v0.6
+boundary, and no material APG blocker. One deterministic sdist archive-metadata
+defect is corrected and covered before the final release rebuild.
+
+APG83 proves the v0.5 distribution contract: the public Git release carries
+the complete skill corpus, projections, and maintenance owners, while the PyPI
+distribution carries the checkout-independent `apgr` runtime and exact skill
+metadata. The pair is version-bound and reproducibly consumable without mutable
+development-checkout state. APG84 publication is recommended but separately
+authorized and is not begun here.

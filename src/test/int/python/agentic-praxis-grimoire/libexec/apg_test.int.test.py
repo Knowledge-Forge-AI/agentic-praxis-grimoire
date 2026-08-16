@@ -50,6 +50,9 @@ def run_covered_child(
             "APG_TEST_REQUIRED_ENTRYPOINTS": json.dumps(entrypoints),
             "APG_TEST_REQUIRED_MODULE_BASENAMES": json.dumps(modules),
             "APG_TEST_CANONICAL_LIBEXEC": str(REPOSITORY_ROOT / "libexec"),
+            "APG_TEST_CANONICAL_PACKAGE": str(
+                REPOSITORY_ROOT / "src" / "agentic_praxis_grimoire"
+            ),
             "COVERAGE_PROCESS_START": str(REPOSITORY_ROOT / ".coveragerc"),
             "COVERAGE_FILE": str(coverage_base),
             "PYTHONPATH": os.pathsep.join(

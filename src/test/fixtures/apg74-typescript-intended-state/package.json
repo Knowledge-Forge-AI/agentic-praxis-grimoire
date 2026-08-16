@@ -1,0 +1,10 @@
+{
+  "name": "apg74-typescript-intended-state",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "APG74 intended-state TypeScript 7 fixture project; not a published package",
+  "devDependencies": {
+    "typescript": "7.0.2"
+  }
+}

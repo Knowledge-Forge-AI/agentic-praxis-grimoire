@@ -7,6 +7,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import re
 import shutil
 import stat
 import subprocess
@@ -26,6 +27,13 @@ REQUIRED_H2S = (
     "Evidence and completion",
     "Stop or escalate",
     "Common mistakes",
+)
+_NODE_LIFECYCLE = re.compile(
+    r"Lifecycle: `(repair-required|provisionally-integrated|"
+    r"accepted-integration-rolled-back)`\."
+)
+_NODE_LIFECYCLE_ADR = re.compile(
+    r"Lifecycle ADR: `(Proposed|Accepted with amendment)`\."
 )
 
 
@@ -63,6 +71,70 @@ def catalog_text(
         "| --- | --- | --- |\n"
         f"{rows}\n"
     )
+
+
+def _node_lifecycle_owner(path: Path) -> tuple[str, str]:
+    lines = path.read_text(encoding="utf-8").splitlines()
+    lifecycle_lines = [line for line in lines if line.startswith("Lifecycle:")]
+    adr_lines = [line for line in lines if line.startswith("Lifecycle ADR:")]
+    if len(lifecycle_lines) != 1 or len(adr_lines) != 1:
+        raise ValueError(f"Node lifecycle owner fields are incomplete or duplicated: {path}")
+    lifecycle = _NODE_LIFECYCLE.fullmatch(lifecycle_lines[0])
+    adr_status = _NODE_LIFECYCLE_ADR.fullmatch(adr_lines[0])
+    if lifecycle is None or adr_status is None:
+        raise ValueError(f"Node lifecycle owner fields are not exact and anchored: {path}")
+    return lifecycle.group(1), adr_status.group(1)
+
+
+def _current_node_lifecycle(root: Path) -> tuple[str, str]:
+    owners = tuple(
+        _node_lifecycle_owner(path)
+        for path in (
+            root / "skills" / "nodejs-runtime-profile" / "SKILL.md",
+            root / "docs" / "specs" / "nodejs-runtime-profile.md",
+        )
+    )
+    if len(set(owners)) != 1:
+        raise ValueError("Node leaf and specification lifecycle owners disagree")
+    return owners[0]
+
+
+def assert_current_development_checker_state(
+    testcase: unittest.TestCase,
+    result: subprocess.CompletedProcess[str],
+    root: Path = REPOSITORY_ROOT,
+) -> None:
+    lifecycle = _current_node_lifecycle(root)
+    if lifecycle == ("provisionally-integrated", "Accepted with amendment"):
+        testcase.assertEqual(result.returncode, 0, result)
+        testcase.assertEqual(
+            result.stdout,
+            "PASS APG skill library: "
+            "33 canonical skills, 33 catalog rows, 33 projections\n",
+        )
+    elif lifecycle in {
+        ("repair-required", "Proposed"),
+        ("accepted-integration-rolled-back", "Accepted with amendment"),
+    }:
+        testcase.assertEqual(result.returncode, 1, result)
+        testcase.assertEqual(
+            result.stdout,
+            ".agents/skills APG030 projection-canonical-bijection: "
+            "projection names do not equal the canonical skill directories; "
+            "action: add missing projections and remove extra entries\n"
+            "skills/README.md APG025 catalog-canonical-bijection: "
+            "catalog skill names do not equal the canonical skill directories; "
+            "action: add missing rows and remove unknown rows until the sets match\n"
+            "skills/chatgpt/chatgpt-manager-workflow/references/capability-map.json "
+            "APG038 router-map-contract: general and ChatGPT router maps are "
+            "incomplete, cyclic, or cross-domain; action: restore disjoint "
+            "general-subrouter and ChatGPT-leaf ownership\n"
+            "FAIL APG skill library: 3 diagnostics, 33 canonical skills, "
+            "32 catalog rows, 32 projections\n",
+        )
+    else:
+        testcase.fail(f"unsupported current Node lifecycle state: {lifecycle!r}")
+    testcase.assertEqual(result.stderr, "")
 
 
 class APGCheckSkillLibraryTests(unittest.TestCase):
@@ -116,6 +188,29 @@ class APGCheckSkillLibraryTests(unittest.TestCase):
             env=os.environ.copy(),
         )
 
+    def write_node_lifecycle_owners(
+        self,
+        lifecycle: str,
+        adr_status: str,
+        *,
+        spec_lifecycle: str | None = None,
+        spec_adr_status: str | None = None,
+    ) -> None:
+        leaf = self.root / "skills" / "nodejs-runtime-profile"
+        spec = self.root / "docs" / "specs" / "nodejs-runtime-profile.md"
+        leaf.mkdir(parents=True, exist_ok=True)
+        spec.parent.mkdir(parents=True, exist_ok=True)
+        leaf_text = (
+            f"Lifecycle: `{lifecycle}`.\n"
+            f"Lifecycle ADR: `{adr_status}`.\n"
+        )
+        spec_text = (
+            f"Lifecycle: `{spec_lifecycle or lifecycle}`.\n"
+            f"Lifecycle ADR: `{spec_adr_status or adr_status}`.\n"
+        )
+        (leaf / "SKILL.md").write_text(leaf_text, encoding="utf-8")
+        spec.write_text(spec_text, encoding="utf-8")
+
     def result_codes(self, root: Path | None = None) -> set[str]:
         result = self.run_checker(root or self.root, "--format", "json")
         self.assertEqual(result.returncode, 1, result)
@@ -145,18 +240,60 @@ class APGCheckSkillLibraryTests(unittest.TestCase):
                 records.append((relative, "special", mode))
         return tuple(records)
 
-    def test_current_development_repository_passes(self) -> None:
+    def test_current_development_repository_has_exact_lifecycle_state(self) -> None:
         result = self.run_checker(REPOSITORY_ROOT)
-        self.assertEqual(result.returncode, 0, result)
-        self.assertIn("PASS APG skill library", result.stdout)
-        self.assertEqual(result.stderr, "")
+        assert_current_development_checker_state(self, result)
 
-    def test_default_root_is_the_command_repository(self) -> None:
+    def test_default_root_has_exact_current_lifecycle_state(self) -> None:
         result = self.run_checker(None)
-        self.assertEqual(result.returncode, 0, result)
-        self.assertIn(
-            "28 canonical skills, 28 catalog rows, 28 projections", result.stdout
+        assert_current_development_checker_state(self, result)
+
+    def test_lifecycle_oracle_rejects_checker_topology_disagreement(self) -> None:
+        current_integrated = self.run_checker(REPOSITORY_ROOT)
+        self.write_node_lifecycle_owners(
+            "repair-required", "Proposed"
         )
+        with self.assertRaises(AssertionError):
+            assert_current_development_checker_state(
+                self, current_integrated, self.root
+            )
+
+        unintegrated = subprocess.CompletedProcess(
+            args=[str(COMMAND)],
+            returncode=1,
+            stdout=(
+                ".agents/skills APG030 projection-canonical-bijection: "
+                "projection names do not equal the canonical skill directories; "
+                "action: add missing projections and remove extra entries\n"
+                "skills/README.md APG025 catalog-canonical-bijection: "
+                "catalog skill names do not equal the canonical skill directories; "
+                "action: add missing rows and remove unknown rows until the sets match\n"
+                "skills/chatgpt/chatgpt-manager-workflow/references/capability-map.json "
+                "APG038 router-map-contract: general and ChatGPT router maps are "
+                "incomplete, cyclic, or cross-domain; action: restore disjoint "
+                "general-subrouter and ChatGPT-leaf ownership\n"
+                "FAIL APG skill library: 3 diagnostics, 33 canonical skills, "
+                "32 catalog rows, 32 projections\n"
+            ),
+            stderr="",
+        )
+        self.write_node_lifecycle_owners(
+            "provisionally-integrated", "Accepted with amendment"
+        )
+        with self.assertRaises(AssertionError):
+            assert_current_development_checker_state(
+                self, unintegrated, self.root
+            )
+
+    def test_lifecycle_oracle_rejects_leaf_spec_disagreement(self) -> None:
+        self.write_node_lifecycle_owners(
+            "repair-required",
+            "Proposed",
+            spec_lifecycle="provisionally-integrated",
+            spec_adr_status="Accepted with amendment",
+        )
+        with self.assertRaisesRegex(ValueError, "owners disagree"):
+            _current_node_lifecycle(self.root)
 
     def test_nested_chatgpt_leaf_passes_with_exact_catalog_and_projection(self) -> None:
         name = "beta-skill"
@@ -421,6 +558,82 @@ class APGCheckSkillLibraryTests(unittest.TestCase):
         path = self.root / "skills" / "alpha-skill" / "SKILL.md"
         path.write_text(
             path.read_text(encoding="utf-8") + "\n[escape](../beta-skill/SKILL.md)\n",
+            encoding="utf-8",
+        )
+        self.assertIn("APG021", self.result_codes())
+
+    def test_exact_canonical_normative_spec_link_is_accepted(self) -> None:
+        specification = self.root / "docs/specs/alpha-skill.md"
+        specification.parent.mkdir(parents=True)
+        specification.write_text("# Alpha specification\n", encoding="utf-8")
+        path = self.root / "skills/alpha-skill/SKILL.md"
+        path.write_text(
+            path.read_text(encoding="utf-8")
+            + "\n[Specification](../../docs/specs/alpha-skill.md)\n",
+            encoding="utf-8",
+        )
+        result = self.run_checker(self.root)
+        self.assertEqual(result.returncode, 0, result)
+
+    def test_cross_skill_normative_spec_link_is_rejected(self) -> None:
+        specification = self.root / "docs/specs/beta-skill.md"
+        specification.parent.mkdir(parents=True)
+        specification.write_text("# Beta specification\n", encoding="utf-8")
+        path = self.root / "skills/alpha-skill/SKILL.md"
+        path.write_text(
+            path.read_text(encoding="utf-8")
+            + "\n[Wrong](../../docs/specs/beta-skill.md)\n",
+            encoding="utf-8",
+        )
+        self.assertIn("APG021", self.result_codes())
+
+    def test_missing_normative_spec_link_is_rejected(self) -> None:
+        path = self.root / "skills/alpha-skill/SKILL.md"
+        path.write_text(
+            path.read_text(encoding="utf-8")
+            + "\n[Missing](../../docs/specs/alpha-skill.md)\n",
+            encoding="utf-8",
+        )
+        self.assertIn("APG021", self.result_codes())
+
+    def test_external_normative_spec_symlink_is_rejected(self) -> None:
+        external = self.base / "external-alpha-skill.md"
+        external.write_text("# External specification\n", encoding="utf-8")
+        specification = self.root / "docs/specs/alpha-skill.md"
+        specification.parent.mkdir(parents=True)
+        specification.symlink_to(external)
+        path = self.root / "skills/alpha-skill/SKILL.md"
+        path.write_text(
+            path.read_text(encoding="utf-8")
+            + "\n[Specification](../../docs/specs/alpha-skill.md)\n",
+            encoding="utf-8",
+        )
+        self.assertIn("APG021", self.result_codes())
+
+    def test_symlinked_normative_spec_ancestor_is_rejected(self) -> None:
+        external = self.base / "external-specs"
+        external.mkdir()
+        (external / "alpha-skill.md").write_text(
+            "# External specification\n", encoding="utf-8"
+        )
+        (self.root / "docs").mkdir()
+        (self.root / "docs/specs").symlink_to(external, target_is_directory=True)
+        path = self.root / "skills/alpha-skill/SKILL.md"
+        path.write_text(
+            path.read_text(encoding="utf-8")
+            + "\n[Specification](../../docs/specs/alpha-skill.md)\n",
+            encoding="utf-8",
+        )
+        self.assertIn("APG021", self.result_codes())
+
+    def test_dangling_normative_spec_symlink_is_rejected(self) -> None:
+        specification = self.root / "docs/specs/alpha-skill.md"
+        specification.parent.mkdir(parents=True)
+        specification.symlink_to(self.base / "missing-alpha-skill.md")
+        path = self.root / "skills/alpha-skill/SKILL.md"
+        path.write_text(
+            path.read_text(encoding="utf-8")
+            + "\n[Specification](../../docs/specs/alpha-skill.md)\n",
             encoding="utf-8",
         )
         self.assertIn("APG021", self.result_codes())

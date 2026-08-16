@@ -698,6 +698,105 @@ class AgentReportIntegrationTests(unittest.TestCase):
         self.assertIn(b"unsafe", result.stderr)
         self.assertEqual(target.read_text(encoding="utf-8"), "unsafe\n")
 
+    def test_all_launchers_share_normalized_new_default_without_migrating_history(
+        self,
+    ) -> None:
+        repository = self.make_repo(".hidden-repo")
+        home = self.root / "home"
+        legacy = home / "Documents" / "agent" / ".hidden-repo" / "LEGACY.report.txt"
+        legacy.parent.mkdir(parents=True)
+        legacy.write_bytes(b"historical report remains here\n")
+        legacy_before = legacy.read_bytes()
+        environment = os.environ.copy()
+        environment.pop("GIT_SHOW_REPORT_ROOT", None)
+        environment["HOME"] = os.fspath(home)
+
+        commit = self.git(repository, "rev-parse", "HEAD").stdout.decode().strip()
+        shown = subprocess.run(
+            [
+                os.fspath(self.show_command),
+                "DEFAULT-SHOW",
+                commit,
+                "docs/status/example.md",
+                "passed",
+                "focused",
+            ],
+            cwd=repository,
+            env=environment,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+        self.assertEqual(shown.returncode, 0, shown.stderr.decode())
+        show_path = (
+            home
+            / "Documents"
+            / "agent"
+            / "outbox"
+            / "hidden-repo"
+            / "DEFAULT-SHOW"
+            / "DEFAULT-SHOW.git.show.report.txt"
+        )
+        show_record = rendering.parse_complete_records(show_path.read_bytes())[0]
+        self.assertEqual(show_record.record.project, "hidden-repo")
+
+        body = self.write_operational_body(
+            "default-operational.txt",
+            {
+                "report_schema": "operational-report-v1",
+                "phase": "DEFAULT-SHOW",
+                "outcome": "passed",
+                "primary_commit": commit,
+                "primary_git_report_id": f"GIT-SHOW-REPORT-{commit}",
+            },
+        )
+        appended = subprocess.run(
+            [
+                os.fspath(self.operational_command),
+                "DEFAULT-SHOW",
+                os.fspath(body),
+                "passed",
+                "focused",
+                "--related-commit",
+                commit,
+                "--related-git-report-id",
+                f"GIT-SHOW-REPORT-{commit}",
+            ],
+            cwd=repository,
+            env=environment,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+        self.assertEqual(appended.returncode, 0, appended.stderr.decode())
+        self.assertEqual(
+            [item.record.record_type for item in rendering.parse_complete_records(show_path.read_bytes())],
+            ["git-show-report", "operational-report"],
+        )
+
+        (repository / "tracked.txt").write_text("tracked\nchanged\n", encoding="utf-8")
+        diffed = subprocess.run(
+            [os.fspath(self.diff_command), "DEFAULT-DIFF", "passed", "focused"],
+            cwd=repository,
+            env=environment,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+        self.assertEqual(diffed.returncode, 0, diffed.stderr.decode())
+        diff_path = (
+            home
+            / "Documents"
+            / "agent"
+            / "outbox"
+            / "hidden-repo"
+            / "DEFAULT-DIFF"
+            / "DEFAULT-DIFF.git.diff.report.txt"
+        )
+        diff_record = rendering.parse_complete_records(diff_path.read_bytes())[0]
+        self.assertEqual(diff_record.record.project, "hidden-repo")
+        self.assertEqual(legacy.read_bytes(), legacy_before)
+        self.assertFalse(
+            (home / "Documents" / "agent" / ".hidden-repo" / "DEFAULT-SHOW.report.txt").exists()
+        )
+
     @staticmethod
     def wait_for_path(path: Path) -> None:
         deadline = time.monotonic() + 10

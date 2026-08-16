@@ -1,0 +1,27 @@
+---
+// APG76-FX-012 — host embedded-style ownership boundary.
+// APG-owned fixture source. Independently written; no target source.
+// This file is never executed, built, or rendered by APG76. It exists so the
+// host boundary is a concrete artifact rather than a described one.
+const label = 'Status';
+---
+
+<span class="status-chip" data-state="idle">{label}</span>
+
+<!-- The host owns this whole file. The profile may reason about the region
+     below at most as `embedded-route`, and only within the bounds the host's
+     scoping behavior actually permits. -->
+<style>
+  .status-chip {
+    color: #2b2b2b;
+    padding: 0.125rem 0.5rem;
+    border: 1px solid #c8c8c8;
+  }
+
+  /* Whether this selector reaches elements outside the component, and what
+     specificity it carries after the host transforms it, are host-owned
+     facts. They are not readable from these bytes. */
+  .status-chip[data-state='idle'] {
+    color: #6b6b6b;
+  }
+</style>

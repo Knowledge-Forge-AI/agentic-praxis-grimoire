@@ -85,6 +85,9 @@ def _register() -> None:
         canonical_libexec = Path(
             os.environ["APG_TEST_CANONICAL_LIBEXEC"]
         ).resolve(strict=True)
+        canonical_package = Path(
+            os.environ["APG_TEST_CANONICAL_PACKAGE"]
+        ).resolve(strict=True)
     except (KeyError, TypeError, ValueError):
         return
     previous_profile = sys.getprofile()
@@ -101,10 +104,17 @@ def _register() -> None:
             module_path = filename.resolve(strict=True)
         except OSError:
             return
-        canonical = module_path.is_relative_to(canonical_libexec)
+        canonical = module_path.is_relative_to(
+            canonical_libexec
+        ) or module_path.is_relative_to(canonical_package)
         public_copy = any(
             parent.name == "public-source"
-            and module_path.is_relative_to(parent / "libexec")
+            and (
+                module_path.is_relative_to(parent / "libexec")
+                or module_path.is_relative_to(
+                    parent / "src" / "agentic_praxis_grimoire"
+                )
+            )
             for parent in module_path.parents
         )
         if not canonical and not public_copy:

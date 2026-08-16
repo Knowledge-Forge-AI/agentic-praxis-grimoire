@@ -2,12 +2,13 @@
 
 ## Current status
 
-The development catalog contains twenty-eight canonical skills: fourteen
-stable rows and fourteen provisional rows. The provisional rows are the
-ChatGPT-manager subrouter, approved-roadmap manager-assignment leaf, Go and
-Ruby language profiles, PostgreSQL and SQLite profiles, pytest and Minitest
-test profiles, Dockerfile and Vagrantfile profiles, the Bash-to-Python
-conversion skill, the native Go and go-cmp test profiles, and the Nix test
+The development catalog contains thirty-three canonical skills: fourteen
+stable rows and nineteen provisional rows. The provisional rows are the
+ChatGPT-manager subrouter, approved-roadmap manager-assignment leaf, CSS,
+JavaScript, Node.js, Go, and Ruby language profiles, PostgreSQL and SQLite profiles,
+pytest and Minitest test profiles, Dockerfile and Vagrantfile profiles, the
+Bash-to-Python conversion skill, the native Go and go-cmp test profiles, the
+Nix test profile, the Markdown language profile, and the TypeScript language
 profile.
 APG13
 individually reviewed and promoted the six v0.2 catalog entries to `stable`
@@ -271,6 +272,56 @@ invented a source branch; its current surfaces are absent. ADR 0027 is
 Rejected, ADR 0026 remains Accepted, and no Go stack exists. Public and active
 v0.3.0 remain nineteen-skill surfaces.
 
+[APG49](../docs/evaluations/apg49-matryer-is-validation-and-integration.md)
+independently validates the APG48 matryer/is candidate and applies one
+correction pass, but fresh corrected-state review finds new material defects.
+The leaf and specification are forward removed, no catalog or projection is
+added, ADR 0030 is Rejected, and ADR 0026's two independent Go components
+remain controlling. The APG49 terminal tree stayed at 28 rows with fourteen
+stable and fourteen provisional; APG66 subsequently adds the retained
+Markdown row described below.
+
+[APG66](../docs/evaluations/apg66-markdown-language-profile-validation-and-integration.md)
+retains `markdown-language-profile` provisionally after an independent
+34-scenario oracle, failing-first evidence, one coherent correction, exact
+corrected-state preservation, and fresh non-author review. ADR 0038 is
+Accepted with amendment while ADR 0037 remains Accepted with amendment.
+Development is 29/29/29 with fourteen stable and fifteen provisional rows;
+public and active corrected v0.4.0 remain unchanged.
+
+[APG75](../docs/evaluations/apg75-typescript-iterative-hardening-and-integration.md)
+retains `typescript-language-profile` provisionally after three independently
+reviewed hardening rounds, exact TypeScript 7 compiler-backed fixture evidence,
+zero terminal findings, and a proved integration rollback. ADR 0043 is
+Accepted with amendment. Development is 30/30/30 with fourteen stable and
+sixteen provisional rows; public and active corrected v0.4.0 remain unchanged.
+
+[APG77D](../docs/evaluations/apg77d-css-known-debt-and-provisional-integration.md)
+retains `css-language-profile` provisionally after independent semantic and
+target-first validation, explicit human acceptance of four Medium and one Low
+qualification limitations, and complete integration, release, and rollback
+verification. ADR 0044 is Accepted with amendment. Development is 31/31/31
+with fourteen stable and seventeen provisional rows; stable maturity remains
+blocked by the accepted Medium qualification debt, and public and active
+corrected v0.4.0 remain unchanged.
+
+[APG79E](../docs/evaluations/apg79e-javascript-report-binding-debt-and-provisional-integration.md)
+preserves the APG79D Test262 source-role correction, accepts `JS-QD-005` as one
+additional Medium supporting qualification limitation, and provisionally
+integrates `javascript-language-profile` under exactly `JS-QD-001` through
+`JS-QD-005`. ADR 0045 is Accepted with amendment. Development is 32/32/32 with
+fourteen stable and eighteen provisional rows; JavaScript stable maturity is
+blocked, and public and active corrected v0.4.0 remain unchanged.
+
+[APG81H](../docs/evaluations/apg81h-nodejs-reviewable-qualification-and-integration-closure.md)
+selects provisional `nodejs-runtime-profile` integration in intended State A.
+Configured State A unit, integration, and combined-coverage gates and the
+candidate-preserving State B mechanical gates pass. No final review result is
+self-attested by this tree. ADR 0046 is selected as Accepted with amendment.
+The candidate topology is 33/33/33 with
+fourteen stable and nineteen provisional rows; Node debt is zero, and public
+and active corrected v0.4.0 remain unchanged.
+
 ## Canonical leaf and discovery shape
 
 Each canonical APG skill source is a direct child of `skills/`:
@@ -308,8 +359,8 @@ require separate evidence and authorization.
 
 APG30 implements ADR 0022's `skills/chatgpt/<name>/` canonical owner for
 actor-qualified ChatGPT-manager leaves while retaining flat `.agents/skills/`
-discovery. The current 28/28/28 library contains twenty-six direct children and
-two nested ChatGPT-manager leaves. The namespace directory is not a skill.
+discovery. The current 33/33/33 library contains thirty-one direct children
+and two nested ChatGPT-manager leaves. The namespace directory is not a skill.
 
 This shape follows `APG0-AGENT-SKILLS-SOURCE-01`, the public
 [Agent Skills specification](https://agentskills.io/specification) inspected on
@@ -339,6 +390,11 @@ APG0 basis.
 | [`bats-test-profile`](bats-test-profile/SKILL.md) | Bats-specific test judgment is material to evaluation, run status and output, hooks, fixtures, TAP, file descriptors, parallelism, background cleanup, or warning and crisis thresholds beyond repository policy | `stable` |
 | [`dockerfile-profile`](dockerfile-profile/SKILL.md) | Dockerfile-specific judgment is material to parser directives, build stages, instruction forms, variable scope, build context, copies, mounts, cache behavior, file ownership, runtime metadata, platform behavior, or warning and crisis thresholds beyond repository policy | `provisional` |
 | [`vagrantfile-profile`](vagrantfile-profile/SKILL.md) | Vagrantfile-specific judgment is material to configuration versions and loading, machines, boxes, provider blocks, networks, synced folders, provisioners, triggers, Vagrant state, host-dependent behavior, or warning and crisis thresholds beyond repository policy | `provisional` |
+| [`markdown-language-profile`](markdown-language-profile/SKILL.md) | A material decision depends on the repository's actual Markdown parser or selected-dialect document semantics, or on qualitative Markdown document-structure policy | `provisional` |
+| [`typescript-language-profile`](typescript-language-profile/SKILL.md) | A material decision depends on TypeScript-specific static semantics or type-erasure boundaries for an established source region, after the exact compiler role, version, options, project, source kind, and declaration environment are evidenced | `provisional` |
+| [`css-language-profile`](css-language-profile/SKILL.md) | A material decision depends on CSS-specific static semantics, selector specificity, cascade ordering, inheritance, shorthand resets, custom-property substitution, or value consequences for an established CSS region with identified consequence-bearing evidence | `provisional` |
+| [`javascript-language-profile`](javascript-language-profile/SKILL.md) | A material decision depends on ECMAScript semantics for an established JavaScript region after parse goal, host context, language context, goal evidence, whole-file ownership, and required non-language evidence are identified | `provisional` |
+| [`nodejs-runtime-profile`](nodejs-runtime-profile/SKILL.md) | A material decision depends on Node.js-specific host behavior for an established Node execution role whose exact version, platform, flags, package scope, loader, and whole-file owner are identified | `provisional` |
 | [`minitest-test-profile`](minitest-test-profile/SKILL.md) | Minitest-specific judgment is material to test or spec organization, assertions, lifecycle, mocks, stubs, fixture alternatives, isolation, parallelism, filtering, runners, plugins, reporters, subprocess, filesystem, or database test boundaries, or warning and crisis thresholds beyond repository policy | `provisional` |
 | [`pytest-test-profile`](pytest-test-profile/SKILL.md) | pytest-specific judgment is material to discovery, collection, assertions, fixtures, parametrization, mocks, isolation, xdist, coverage, or warning and crisis thresholds beyond repository policy | `provisional` |
 | [`go-cmp-test-profile`](go-cmp-test-profile/SKILL.md) | A repository has already selected google/go-cmp v0.7.0 and comparison judgment is material to equality versus diff, option composition and filters, comparers and transformers, ignores and unexported fields, sorting, approximation, panics, diagnostic exposure, or thresholds beyond repository policy | `provisional` |
@@ -402,7 +458,7 @@ Clean A/B superiority and a positive use in a second repository are valuable
 evidence but are not independent stability blockers under ADR 0006. A concrete
 unresolved material authority, privacy, safety, or procedure defect may block an
 individual skill. The current catalog contains fourteen `stable` rows and
-fourteen `provisional` manager-assignment, language, database, test-profile, or
+nineteen `provisional` manager-assignment, language, database, test-profile, or
 conversion rows. Public
 v0.1.0 retains its historical provisional catalog; public v0.2.0 contains the
 six stable leaves. APG14 changes no skill procedure or maturity row. APG16,

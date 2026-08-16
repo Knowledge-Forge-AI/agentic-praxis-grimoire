@@ -1,0 +1,63 @@
+{
+  "authority": {
+    "candidate_decision_id": "ADR-0046",
+    "candidate_state": "provisionally-integrated",
+    "current_phase_id": "APG81H",
+    "fixture_cases": 14,
+    "node_source_ids": [
+      "node-v22.22.2-2645dc73720b1b4f27c49f395d3c66025ce126cc",
+      "node-v24.19.0-cdc1b38d40cb567b7ad0b39c86addf830a0af0ae"
+    ],
+    "round_state": "terminal-repair-checkpoint-complete",
+    "runtime_roles": [
+      {"architecture": "arm64", "exec_argv": [], "executable_sha256": "b7fff29202c2d59eeff28c53588d2832323b45cb2e854ba29bea47ade37d8359", "invocation_environment": "exact-closed-synthetic-allowlist", "invocation_state": "observed-exact-pre-and-post-runtime", "node_options_present": false, "platform": "darwin", "role": "primary", "selection_source": "existing-exact-path", "version": "v22.22.2"},
+      {"architecture": "arm64", "exec_argv": [], "executable_sha256": "27db838bb204ef7c21df2931f5656e4c8fb32e6e947f363a402b49714d32b5b1", "invocation_environment": "exact-closed-synthetic-allowlist", "invocation_state": "observed-exact-pre-and-post-runtime", "node_options_present": false, "platform": "darwin", "role": "secondary", "selection_source": "preinstalled-nvm-exact-version", "version": "v24.19.0"}
+    ],
+    "scenario_purposes": 24,
+    "target_pins": [
+      {"commit": "e806e49a45797937e62f7bde61c711bec38725c7", "node_invocation_state": "unresolved", "repository_role": "website", "target_execution_state": "not-observed", "tracked_leaf_entries": 17, "tree": "93e3454a1b65d1fd5cb6e38df42e9d6cfc8c9248"},
+      {"commit": "cad2b8bdddfc0f2ac3718e7ca92e24e6b82051e0", "node_invocation_state": "not-observed", "repository_role": "theme", "target_execution_state": "not-observed", "tracked_leaf_entries": 69, "tree": "f3d563af289611cbd1f22600b777bc1de8781934"}
+    ]
+  },
+  "receivers": [
+    {"availability": "absent", "owner": "package-manager-owner", "required_evidence": "selected package-manager operation", "scope": "install graph and lifecycle scripts", "stop_state": "stopped-required-evidence"},
+    {"availability": "absent", "owner": "shell-owner", "required_evidence": "selected shell and exact command", "scope": "tokenization quoting and expansion", "stop_state": "stopped-required-evidence"},
+    {"availability": "absent", "owner": "operating-system-owner", "required_evidence": "selected host policy", "scope": "process and filesystem authorization", "stop_state": "stopped-required-evidence"},
+    {"availability": "absent", "owner": "filesystem-owner", "required_evidence": "filesystem and durability contract", "scope": "permission atomicity and durability", "stop_state": "stopped-required-evidence"},
+    {"availability": "absent", "owner": "network-owner", "required_evidence": "protocol and remote-system contract", "scope": "protocol and remote completion", "stop_state": "stopped-required-evidence"},
+    {"availability": "absent", "owner": "browser-platform-owner", "required_evidence": "selected browser host", "scope": "browser APIs and rendering", "stop_state": "stopped-required-evidence"},
+    {"availability": "absent", "owner": "build-transform-owner", "required_evidence": "selected transform pipeline", "scope": "bundling transformation and source maps", "stop_state": "stopped-required-evidence"},
+    {"availability": "absent", "owner": "test-owner", "required_evidence": "selected test framework", "scope": "test orchestration and semantics", "stop_state": "stopped-required-evidence"},
+    {"availability": "absent", "owner": "security-owner", "required_evidence": "security authority and threat decision", "scope": "credentials trust and risk acceptance", "stop_state": "stopped-required-evidence"},
+    {"availability": "absent", "owner": "performance-owner", "required_evidence": "selected performance objective", "scope": "latency throughput and resource acceptance", "stop_state": "stopped-required-evidence"},
+    {"availability": "absent", "owner": "deployment-owner", "required_evidence": "selected deployment contract", "scope": "publication and deployment completion", "stop_state": "stopped-required-evidence"},
+    {"availability": "absent", "owner": "service-supervisor-owner", "required_evidence": "selected supervision contract", "scope": "restart readiness and service lifecycle", "stop_state": "stopped-required-evidence"}
+  ],
+  "rows": [
+    {"completion_state":"stopped-required-evidence","fixture_case":"APG80-FX-001","id":"APG80-NODE-001","response":"stop-and-escalate","selection":"selected","whole_file_owner":"per-artifact"},
+    {"completion_state":"owned-complete","fixture_case":"APG80-FX-001","id":"APG80-NODE-002","response":"inspect-before-judgment","selection":"selected","whole_file_owner":"nodejs-runtime-profile"},
+    {"completion_state":"owned-complete-nonowned-routes-open","fixture_case":"APG80-FX-002","id":"APG80-NODE-003","response":"proceed-routine","selection":"selected","whole_file_owner":"javascript-language-profile"},
+    {"completion_state":"owned-complete-nonowned-routes-open","fixture_case":"APG80-FX-002","id":"APG80-NODE-004","response":"proceed-routine","selection":"selected","whole_file_owner":"node-commonjs-owner"},
+    {"completion_state":"owned-complete-nonowned-routes-open","fixture_case":"APG80-FX-002","id":"APG80-NODE-005","response":"proceed-routine","selection":"selected","whole_file_owner":"javascript-language-profile"},
+    {"completion_state":"owned-complete-nonowned-routes-open","fixture_case":"APG80-FX-002","id":"APG80-NODE-006","response":"inspect-before-judgment","selection":"selected","whole_file_owner":"node-commonjs-owner"},
+    {"completion_state":"stopped-required-evidence","fixture_case":"APG80-FX-002","id":"APG80-NODE-007","response":"stop-and-escalate","selection":"selected","whole_file_owner":"unresolved"},
+    {"completion_state":"owned-complete-nonowned-routes-open","fixture_case":"APG80-FX-003","id":"APG80-NODE-008","response":"proceed-routine","selection":"selected","whole_file_owner":"node-commonjs-owner"},
+    {"completion_state":"owned-complete-nonowned-routes-open","fixture_case":"APG80-FX-004","id":"APG80-NODE-009","response":"inspect-before-judgment","selection":"selected","whole_file_owner":"javascript-language-profile"},
+    {"completion_state":"owned-complete-nonowned-routes-open","fixture_case":"APG80-FX-005","id":"APG80-NODE-010","response":"inspect-before-judgment","selection":"selected","whole_file_owner":"nodejs-runtime-profile"},
+    {"completion_state":"owned-complete-nonowned-routes-open","fixture_case":"APG80-FX-006","id":"APG80-NODE-011","response":"inspect-before-judgment","selection":"selected","whole_file_owner":"nodejs-runtime-profile"},
+    {"completion_state":"owned-complete-nonowned-routes-open","fixture_case":"APG80-FX-007","id":"APG80-NODE-012","response":"inspect-before-judgment","selection":"selected","whole_file_owner":"per-artifact"},
+    {"completion_state":"owned-complete-nonowned-routes-open","fixture_case":"APG80-FX-008","id":"APG80-NODE-013","response":"proceed-routine","selection":"selected","whole_file_owner":"per-artifact"},
+    {"completion_state":"stopped-required-evidence","fixture_case":"APG80-FX-014","id":"APG80-NODE-014","response":"stop-and-escalate","selection":"route-to-owner","whole_file_owner":"project-configuration-owner"},
+    {"completion_state":"stopped-required-evidence","fixture_case":"APG80-FX-014","id":"APG80-NODE-015","response":"stop-and-escalate","selection":"route-to-owner","whole_file_owner":"project-configuration-owner"},
+    {"completion_state":"owned-complete-nonowned-routes-open","fixture_case":"APG80-FX-009","id":"APG80-NODE-016","response":"inspect-before-judgment","selection":"selected","whole_file_owner":"nodejs-runtime-profile"},
+    {"completion_state":"owned-complete-nonowned-routes-open","fixture_case":"APG80-FX-010","id":"APG80-NODE-017","response":"inspect-before-judgment","selection":"selected","whole_file_owner":"nodejs-runtime-profile"},
+    {"completion_state":"owned-complete-nonowned-routes-open","fixture_case":"APG80-FX-011","id":"APG80-NODE-018","response":"inspect-before-judgment","selection":"selected","whole_file_owner":"nodejs-runtime-profile"},
+    {"completion_state":"owned-complete-nonowned-routes-open","fixture_case":"APG80-FX-012","id":"APG80-NODE-019","response":"inspect-before-judgment","selection":"selected","whole_file_owner":"nodejs-runtime-profile"},
+    {"completion_state":"owned-complete-nonowned-routes-open","fixture_case":"APG80-FX-013","id":"APG80-NODE-020","response":"inspect-before-judgment","selection":"selected","whole_file_owner":"nodejs-runtime-profile"},
+    {"completion_state":"owned-complete-nonowned-routes-open","fixture_case":"APG80-FX-013","id":"APG80-NODE-021","response":"inspect-before-judgment","selection":"selected","whole_file_owner":"nodejs-runtime-profile"},
+    {"completion_state":"owned-complete-nonowned-routes-open","fixture_case":"APG80-FX-013","id":"APG80-NODE-022","response":"inspect-before-judgment","selection":"selected","whole_file_owner":"nodejs-runtime-profile"},
+    {"completion_state":"stopped-required-evidence","fixture_case":null,"id":"APG80-NODE-023","response":"stop-and-escalate","selection":"selected","whole_file_owner":"nodejs-runtime-profile"},
+    {"completion_state":"stopped-required-evidence","fixture_case":"APG80-FX-014","id":"APG80-NODE-024","response":"stop-and-escalate","selection":"selected","whole_file_owner":"per-artifact"}
+  ],
+  "schema_version": 1
+}

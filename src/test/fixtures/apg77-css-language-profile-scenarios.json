@@ -1,0 +1,1228 @@
+{
+  "schema_version": 1,
+  "authority": {
+    "phase": "APG77",
+    "source": "two independent Codex oracles resolved against primary sources and fresh target evidence",
+    "semantic_rows": 24,
+    "fixture_rows": 14,
+    "target_rows": 7
+  },
+  "vocabulary": {
+    "selections": [
+      "selected",
+      "embedded-route",
+      "route-to-owner",
+      "non-trigger"
+    ],
+    "responses": [
+      "proceed-routine",
+      "inspect-before-judgment",
+      "bounded-local-decision",
+      "stop-and-escalate"
+    ],
+    "routes": [
+      "DOM-owner",
+      "host-owner",
+      "project-configuration",
+      "project-design-owner",
+      "browser-compatibility-owner",
+      "build-transform-owner",
+      "generated-artifact-owner",
+      "visual-validation-owner",
+      "accessibility-owner",
+      "runtime-owner",
+      "asset-owner",
+      "font-owner",
+      "network-owner",
+      "security-owner",
+      "performance-owner",
+      "deployment-owner"
+    ]
+  },
+  "rows": [
+    {
+      "id": "APG77-CSS-001",
+      "purpose": "ordinary authored CSS decision",
+      "artifact_class": "authored stylesheet",
+      "whole_file_owner": "repository CSS owner",
+      "css_selection": "selected",
+      "response": "proceed-routine",
+      "routes": [],
+      "authority": [
+        "CSS Syntax 3",
+        "construct-governing property module"
+      ],
+      "present": [
+        "exact source bytes",
+        "artifact provenance"
+      ],
+      "required": [],
+      "conclusion": "static CSS semantics may be answered for the evidenced construct",
+      "edit": "repository permission required",
+      "forbid": [
+        "package presence proves invocation",
+        "static result proves render"
+      ]
+    },
+    {
+      "id": "APG77-CSS-002",
+      "purpose": "syntax recovery boundary",
+      "artifact_class": "authored stylesheet",
+      "whole_file_owner": "repository CSS owner",
+      "css_selection": "selected",
+      "response": "bounded-local-decision",
+      "routes": [
+        "project-configuration"
+      ],
+      "authority": [
+        "CSS Syntax 3"
+      ],
+      "present": [
+        "exact declaration and rule bytes"
+      ],
+      "required": [
+        "exact parser for implementation exposure"
+      ],
+      "conclusion": "invalid declaration and invalid selector rule have different recovery units",
+      "edit": "repository permission required",
+      "forbid": [
+        "one universal syntax-error consequence"
+      ]
+    },
+    {
+      "id": "APG77-CSS-003",
+      "purpose": "selector forgiveness",
+      "artifact_class": "selector text",
+      "whole_file_owner": "repository CSS owner",
+      "css_selection": "selected",
+      "response": "proceed-routine",
+      "routes": [],
+      "authority": [
+        "Selectors 4"
+      ],
+      "present": [
+        "exact selector"
+      ],
+      "required": [],
+      "conclusion": ":is and :where are forgiving while ordinary lists, :not, and :has are not",
+      "edit": "repository permission required",
+      "forbid": [
+        "all functional selectors are forgiving"
+      ]
+    },
+    {
+      "id": "APG77-CSS-004",
+      "purpose": "ordinary specificity",
+      "artifact_class": "selector text",
+      "whole_file_owner": "repository CSS owner",
+      "css_selection": "selected",
+      "response": "proceed-routine",
+      "routes": [],
+      "authority": [
+        "Selectors 4"
+      ],
+      "present": [
+        "exact selector"
+      ],
+      "required": [],
+      "conclusion": "specificity is the static lexicographic selector tuple",
+      "edit": "repository permission required",
+      "forbid": [
+        "DOM existence changes specificity"
+      ]
+    },
+    {
+      "id": "APG77-CSS-005",
+      "purpose": "functional specificity",
+      "artifact_class": "selector text",
+      "whole_file_owner": "repository CSS owner",
+      "css_selection": "selected",
+      "response": "proceed-routine",
+      "routes": [],
+      "authority": [
+        "Selectors 4"
+      ],
+      "present": [
+        "exact functional selector"
+      ],
+      "required": [],
+      "conclusion": ":is, :not, and :has use maximum argument specificity while :where is zero",
+      "edit": "repository permission required",
+      "forbid": [
+        ":not is specificity-free"
+      ]
+    },
+    {
+      "id": "APG77-CSS-006",
+      "purpose": "origin and importance",
+      "artifact_class": "bounded declarations",
+      "whole_file_owner": "repository CSS owner",
+      "css_selection": "selected",
+      "response": "bounded-local-decision",
+      "routes": [
+        "DOM-owner"
+      ],
+      "authority": [
+        "Cascade 5"
+      ],
+      "present": [
+        "declared origin and importance"
+      ],
+      "required": [
+        "other origins for global winner"
+      ],
+      "conclusion": "origin and importance precede layer and specificity",
+      "edit": "repository permission required",
+      "forbid": [
+        "important always wins across every origin"
+      ]
+    },
+    {
+      "id": "APG77-CSS-007",
+      "purpose": "cascade layers",
+      "artifact_class": "stylesheet graph",
+      "whole_file_owner": "repository CSS owner",
+      "css_selection": "selected",
+      "response": "bounded-local-decision",
+      "routes": [
+        "project-configuration"
+      ],
+      "authority": [
+        "Cascade 5"
+      ],
+      "present": [
+        "bounded layer order"
+      ],
+      "required": [
+        "unread imports for global layer order"
+      ],
+      "conclusion": "normal layer order is forward and important layer order reverses",
+      "edit": "repository permission required",
+      "forbid": [
+        "unlayered important is strongest"
+      ]
+    },
+    {
+      "id": "APG77-CSS-008",
+      "purpose": "specificity and order tie",
+      "artifact_class": "bounded declarations",
+      "whole_file_owner": "repository CSS owner",
+      "css_selection": "selected",
+      "response": "bounded-local-decision",
+      "routes": [
+        "DOM-owner"
+      ],
+      "authority": [
+        "Cascade 5",
+        "Selectors 4"
+      ],
+      "present": [
+        "bounded declarations and order"
+      ],
+      "required": [
+        "document match state"
+      ],
+      "conclusion": "specificity and order resolve only after earlier cascade criteria tie",
+      "edit": "repository permission required",
+      "forbid": [
+        "global winner from one file"
+      ]
+    },
+    {
+      "id": "APG77-CSS-009",
+      "purpose": "inheritance and wide keywords",
+      "artifact_class": "conditional element scenario",
+      "whole_file_owner": "repository CSS owner",
+      "css_selection": "selected",
+      "response": "bounded-local-decision",
+      "routes": [
+        "DOM-owner"
+      ],
+      "authority": [
+        "Cascade 5",
+        "property-defining module"
+      ],
+      "present": [
+        "property inheritance definition"
+      ],
+      "required": [
+        "parent and element cascade for concrete result"
+      ],
+      "conclusion": "inherit, initial, and unset have distinct conditional consequences",
+      "edit": "repository permission required",
+      "forbid": [
+        "selector text proves an element result"
+      ]
+    },
+    {
+      "id": "APG77-CSS-010",
+      "purpose": "shorthand reset",
+      "artifact_class": "authored declarations",
+      "whole_file_owner": "repository CSS owner",
+      "css_selection": "selected",
+      "response": "proceed-routine",
+      "routes": [],
+      "authority": [
+        "property-defining module"
+      ],
+      "present": [
+        "exact shorthand family",
+        "declaration order"
+      ],
+      "required": [],
+      "conclusion": "a shorthand sets its real longhands including omitted values",
+      "edit": "repository permission required",
+      "forbid": [
+        "name prefix proves longhand membership"
+      ]
+    },
+    {
+      "id": "APG77-CSS-011",
+      "purpose": "custom property inheritance",
+      "artifact_class": "conditional element scenario",
+      "whole_file_owner": "repository CSS owner",
+      "css_selection": "selected",
+      "response": "bounded-local-decision",
+      "routes": [
+        "DOM-owner"
+      ],
+      "authority": [
+        "Variables 1"
+      ],
+      "present": [
+        "custom property declarations"
+      ],
+      "required": [
+        "element inheritance chain"
+      ],
+      "conclusion": "unregistered custom properties inherit and substitute per element",
+      "edit": "repository permission required",
+      "forbid": [
+        "one source value proves every element result"
+      ]
+    },
+    {
+      "id": "APG77-CSS-012",
+      "purpose": "var fallback",
+      "artifact_class": "authored declaration",
+      "whole_file_owner": "repository CSS owner",
+      "css_selection": "selected",
+      "response": "proceed-routine",
+      "routes": [],
+      "authority": [
+        "Variables 1"
+      ],
+      "present": [
+        "exact var expression"
+      ],
+      "required": [],
+      "conclusion": "missing and empty custom properties differ and fallback includes commas",
+      "edit": "repository permission required",
+      "forbid": [
+        "empty always selects fallback"
+      ]
+    },
+    {
+      "id": "APG77-CSS-013",
+      "purpose": "custom property cycle and IACVT",
+      "artifact_class": "conditional element scenario",
+      "whole_file_owner": "repository CSS owner",
+      "css_selection": "selected",
+      "response": "bounded-local-decision",
+      "routes": [
+        "DOM-owner"
+      ],
+      "authority": [
+        "Variables 1",
+        "Cascade 5"
+      ],
+      "present": [
+        "complete reference chain"
+      ],
+      "required": [
+        "relevant registration state"
+      ],
+      "conclusion": "cycles and invalid substitution do not restore an earlier cascaded declaration",
+      "edit": "repository permission required",
+      "forbid": [
+        "IACVT equals parse-time drop"
+      ]
+    },
+    {
+      "id": "APG77-CSS-014",
+      "purpose": "units math and logical mapping",
+      "artifact_class": "conditional element scenario",
+      "whole_file_owner": "repository CSS owner",
+      "css_selection": "selected",
+      "response": "stop-and-escalate",
+      "routes": [
+        "runtime-owner"
+      ],
+      "authority": [
+        "Values and Units 4",
+        "Logical Properties 1"
+      ],
+      "present": [
+        "exact expression"
+      ],
+      "required": [
+        "unit references",
+        "writing mode",
+        "direction",
+        "text orientation"
+      ],
+      "conclusion": "only operands with bound references reduce; logical mapping stays conditional",
+      "edit": "repository permission required",
+      "forbid": [
+        "default viewport or writing mode"
+      ]
+    },
+    {
+      "id": "APG77-CSS-015",
+      "purpose": "currentColor resolution",
+      "artifact_class": "conditional element scenario",
+      "whole_file_owner": "repository CSS owner",
+      "css_selection": "selected",
+      "response": "bounded-local-decision",
+      "routes": [
+        "DOM-owner",
+        "browser-compatibility-owner"
+      ],
+      "authority": [
+        "Color 4"
+      ],
+      "present": [
+        "currentColor declaration"
+      ],
+      "required": [
+        "same element color cascade",
+        "browser for used-value observation"
+      ],
+      "conclusion": "currentColor resolves against the carrying element's own color",
+      "edit": "repository permission required",
+      "forbid": [
+        "ancestor literal is frozen on descendants"
+      ]
+    },
+    {
+      "id": "APG77-CSS-016",
+      "purpose": "media unknown logic",
+      "artifact_class": "conditional rule",
+      "whole_file_owner": "repository CSS owner",
+      "css_selection": "selected",
+      "response": "bounded-local-decision",
+      "routes": [
+        "browser-compatibility-owner",
+        "runtime-owner"
+      ],
+      "authority": [
+        "Media Queries 4",
+        "Media Queries 5"
+      ],
+      "present": [
+        "exact query grammar"
+      ],
+      "required": [
+        "user agent and environment for known features"
+      ],
+      "conclusion": "unknown feature or value produces unknown; negation does not make it true and two-valued application does not match",
+      "edit": "repository permission required",
+      "forbid": [
+        "unknown unconditionally equals false",
+        "comma siblings are discarded"
+      ]
+    },
+    {
+      "id": "APG77-CSS-017",
+      "purpose": "supports declaration condition",
+      "artifact_class": "conditional rule",
+      "whole_file_owner": "repository CSS owner",
+      "css_selection": "selected",
+      "response": "stop-and-escalate",
+      "routes": [
+        "browser-compatibility-owner"
+      ],
+      "authority": [
+        "Conditional Rules 3"
+      ],
+      "present": [
+        "exact declaration condition"
+      ],
+      "required": [
+        "exact user agent and feature state"
+      ],
+      "conclusion": "true declaration support is stronger than token parsing and weaker than rendering correctness",
+      "edit": "repository permission required",
+      "forbid": [
+        "parse acceptance proves supports truth",
+        "supports proves appearance"
+      ]
+    },
+    {
+      "id": "APG77-CSS-018",
+      "purpose": "nesting specificity and order",
+      "artifact_class": "nested stylesheet",
+      "whole_file_owner": "repository CSS owner",
+      "css_selection": "selected",
+      "response": "bounded-local-decision",
+      "routes": [
+        "project-configuration",
+        "browser-compatibility-owner"
+      ],
+      "authority": [
+        "Nesting 1",
+        "Selectors 4"
+      ],
+      "present": [
+        "exact nested structure"
+      ],
+      "required": [
+        "exact implementation for accepted syntax"
+      ],
+      "conclusion": "nesting uses maximum parent-list specificity and defined transformed order",
+      "edit": "repository permission required",
+      "forbid": [
+        "raw line number proves nested order"
+      ]
+    },
+    {
+      "id": "APG77-CSS-019",
+      "purpose": "pseudo-class state",
+      "artifact_class": "selector text",
+      "whole_file_owner": "repository CSS owner",
+      "css_selection": "selected",
+      "response": "stop-and-escalate",
+      "routes": [
+        "DOM-owner",
+        "runtime-owner"
+      ],
+      "authority": [
+        "Selectors 4"
+      ],
+      "present": [
+        "exact selector"
+      ],
+      "required": [
+        "document and runtime state"
+      ],
+      "conclusion": "validity and specificity are static; matching is not",
+      "edit": "repository permission required",
+      "forbid": [
+        "source selector proves state match"
+      ]
+    },
+    {
+      "id": "APG77-CSS-020",
+      "purpose": "pseudo-element generation",
+      "artifact_class": "conditional pseudo-element scenario",
+      "whole_file_owner": "repository CSS owner",
+      "css_selection": "selected",
+      "response": "stop-and-escalate",
+      "routes": [
+        "DOM-owner",
+        "browser-compatibility-owner"
+      ],
+      "authority": [
+        "Pseudo-elements 4",
+        "Generated Content 3"
+      ],
+      "present": [
+        "pseudo-element declarations"
+      ],
+      "required": [
+        "originating element",
+        "computed content",
+        "display state",
+        "browser"
+      ],
+      "conclusion": "specificity is static; generated-box existence is conditional",
+      "edit": "repository permission required",
+      "forbid": [
+        "content other than none alone proves a box"
+      ]
+    },
+    {
+      "id": "APG77-CSS-021",
+      "purpose": "host embedded region",
+      "artifact_class": "host component style region",
+      "whole_file_owner": "host owner",
+      "css_selection": "embedded-route",
+      "response": "bounded-local-decision",
+      "routes": [
+        "host-owner",
+        "build-transform-owner"
+      ],
+      "authority": [
+        "construct-governing CSS modules",
+        "host documentation"
+      ],
+      "present": [
+        "bounded style bytes"
+      ],
+      "required": [
+        "host scoping and emitted selectors for cross-region result"
+      ],
+      "conclusion": "embedded CSS semantics are readable without taking whole-file ownership",
+      "edit": "host permission required",
+      "forbid": [
+        "CSS owner takes host file"
+      ]
+    },
+    {
+      "id": "APG77-CSS-022",
+      "purpose": "generated vendor and minified boundary",
+      "artifact_class": "non-authored CSS bytes",
+      "whole_file_owner": "provenance owner",
+      "css_selection": "selected",
+      "response": "bounded-local-decision",
+      "routes": [
+        "generated-artifact-owner",
+        "build-transform-owner"
+      ],
+      "authority": [
+        "construct-governing CSS modules"
+      ],
+      "present": [
+        "exact read-only bytes"
+      ],
+      "required": [
+        "provenance for modification or regeneration"
+      ],
+      "conclusion": "bounded read-only CSS semantics may be diagnosed independently of edit permission",
+      "edit": "owner permission required",
+      "forbid": [
+        "edit refusal suppresses reading",
+        "semantic reading grants editing"
+      ]
+    },
+    {
+      "id": "APG77-CSS-023",
+      "purpose": "unknown role stop",
+      "artifact_class": "unclassified CSS-like source",
+      "whole_file_owner": "unresolved owner",
+      "css_selection": "non-trigger",
+      "response": "stop-and-escalate",
+      "routes": [
+        "project-configuration",
+        "generated-artifact-owner"
+      ],
+      "authority": [
+        "question-specific normative source"
+      ],
+      "present": [
+        "source bytes only"
+      ],
+      "required": [
+        "artifact class",
+        "consequence-bearing role evidence"
+      ],
+      "conclusion": "only tool-independent lexical observations remain available",
+      "edit": "forbidden until ownership resolves",
+      "forbid": [
+        "package presence proves role"
+      ]
+    },
+    {
+      "id": "APG77-CSS-024",
+      "purpose": "static transform render runtime separation",
+      "artifact_class": "CSS processing claim",
+      "whole_file_owner": "repository owner",
+      "css_selection": "selected",
+      "response": "stop-and-escalate",
+      "routes": [
+        "build-transform-owner",
+        "browser-compatibility-owner",
+        "runtime-owner"
+      ],
+      "authority": [
+        "exact tool proof boundary"
+      ],
+      "present": [
+        "static source result"
+      ],
+      "required": [
+        "separate transform render and runtime evidence"
+      ],
+      "conclusion": "each evidence layer proves only its own observed result",
+      "edit": "repository permission required",
+      "forbid": [
+        "parse proves render",
+        "transform proves runtime"
+      ]
+    },
+    {
+      "id": "APG77-FX-001",
+      "purpose": "declaration and rule recovery",
+      "artifact_class": "APG fixture stylesheet",
+      "whole_file_owner": "APG fixture owner",
+      "css_selection": "selected",
+      "response": "bounded-local-decision",
+      "routes": [
+        "project-configuration"
+      ],
+      "authority": [
+        "CSS Syntax 3",
+        "Selectors 4"
+      ],
+      "present": [
+        "base.css bytes"
+      ],
+      "required": [
+        "exact parser for CSSOM shape"
+      ],
+      "conclusion": "invalid padding drops alone while malformed selector invalidates its rule",
+      "edit": "APG fixture owner permission",
+      "forbid": [
+        "unsupported equals grammar-invalid"
+      ]
+    },
+    {
+      "id": "APG77-FX-002",
+      "purpose": "specificity controls",
+      "artifact_class": "APG fixture stylesheet",
+      "whole_file_owner": "APG fixture owner",
+      "css_selection": "selected",
+      "response": "proceed-routine",
+      "routes": [],
+      "authority": [
+        "Selectors 4"
+      ],
+      "present": [
+        "cascade.css selectors"
+      ],
+      "required": [],
+      "conclusion": "fixture carries ordinary, is, where, and not specificity contrasts",
+      "edit": "APG fixture owner permission",
+      "forbid": [
+        "actual matching asserted"
+      ]
+    },
+    {
+      "id": "APG77-FX-003",
+      "purpose": "layer reversal control",
+      "artifact_class": "APG fixture stylesheet",
+      "whole_file_owner": "APG fixture owner",
+      "css_selection": "selected",
+      "response": "bounded-local-decision",
+      "routes": [
+        "DOM-owner"
+      ],
+      "authority": [
+        "Cascade 5"
+      ],
+      "present": [
+        "bounded cascade.css declarations"
+      ],
+      "required": [
+        "document match for concrete element"
+      ],
+      "conclusion": "bounded declarations show unlayered normal and first-layer important precedence",
+      "edit": "APG fixture owner permission",
+      "forbid": [
+        "global cascade winner"
+      ]
+    },
+    {
+      "id": "APG77-FX-004",
+      "purpose": "wide keyword conditional control",
+      "artifact_class": "APG fixture stylesheet",
+      "whole_file_owner": "APG fixture owner",
+      "css_selection": "selected",
+      "response": "bounded-local-decision",
+      "routes": [
+        "DOM-owner"
+      ],
+      "authority": [
+        "Cascade 5",
+        "Box Model 4"
+      ],
+      "present": [
+        "conditional rules"
+      ],
+      "required": [
+        "matching parent and child"
+      ],
+      "conclusion": "color and padding consequences are conditional on the declared element relation",
+      "edit": "APG fixture owner permission",
+      "forbid": [
+        "selector text proves computed value"
+      ]
+    },
+    {
+      "id": "APG77-FX-005",
+      "purpose": "physical shorthand reset",
+      "artifact_class": "APG fixture stylesheet",
+      "whole_file_owner": "APG fixture owner",
+      "css_selection": "selected",
+      "response": "proceed-routine",
+      "routes": [],
+      "authority": [
+        "Box Model 4"
+      ],
+      "present": [
+        "ordered padding declarations"
+      ],
+      "required": [],
+      "conclusion": "later padding resets physical padding-top; later longhand can override",
+      "edit": "APG fixture owner permission",
+      "forbid": [
+        "logical property treated as physical longhand"
+      ]
+    },
+    {
+      "id": "APG77-FX-006",
+      "purpose": "fallback empty and inheritance",
+      "artifact_class": "APG fixture stylesheet",
+      "whole_file_owner": "APG fixture owner",
+      "css_selection": "selected",
+      "response": "bounded-local-decision",
+      "routes": [
+        "DOM-owner"
+      ],
+      "authority": [
+        "Variables 1"
+      ],
+      "present": [
+        "custom property source"
+      ],
+      "required": [
+        "element inheritance relation"
+      ],
+      "conclusion": "missing selects fallback, comma stays in fallback, empty does not select fallback",
+      "edit": "APG fixture owner permission",
+      "forbid": [
+        "empty equals missing"
+      ]
+    },
+    {
+      "id": "APG77-FX-007",
+      "purpose": "cycles and IACVT",
+      "artifact_class": "APG fixture stylesheet",
+      "whole_file_owner": "APG fixture owner",
+      "css_selection": "selected",
+      "response": "bounded-local-decision",
+      "routes": [
+        "DOM-owner"
+      ],
+      "authority": [
+        "Variables 1"
+      ],
+      "present": [
+        "complete fixture reference chain"
+      ],
+      "required": [
+        "registration state for registered branch"
+      ],
+      "conclusion": "cycle and invalid target substitution do not restore earlier color",
+      "edit": "APG fixture owner permission",
+      "forbid": [
+        "IACVT is ordinary invalid declaration"
+      ]
+    },
+    {
+      "id": "APG77-FX-008",
+      "purpose": "media and supports boundary",
+      "artifact_class": "APG fixture stylesheet",
+      "whole_file_owner": "APG fixture owner",
+      "css_selection": "selected",
+      "response": "stop-and-escalate",
+      "routes": [
+        "browser-compatibility-owner"
+      ],
+      "authority": [
+        "Media Queries 4",
+        "Conditional Rules 3"
+      ],
+      "present": [
+        "conditions.css structure"
+      ],
+      "required": [
+        "exact user agent and environment"
+      ],
+      "conclusion": "unknown media remains unknown in logic; supports truth is stronger than token parsing",
+      "edit": "APG fixture owner permission",
+      "forbid": [
+        "unknown equals unconditional false",
+        "supports equals parsing"
+      ]
+    },
+    {
+      "id": "APG77-FX-009",
+      "purpose": "nesting maximum specificity",
+      "artifact_class": "APG fixture stylesheet",
+      "whole_file_owner": "APG fixture owner",
+      "css_selection": "selected",
+      "response": "bounded-local-decision",
+      "routes": [
+        "DOM-owner",
+        "project-configuration"
+      ],
+      "authority": [
+        "Nesting 1",
+        "Selectors 4"
+      ],
+      "present": [
+        "nested selector source"
+      ],
+      "required": [
+        "exact implementation and matching document"
+      ],
+      "conclusion": "nested selector inherits maximum parent-list specificity conditionally",
+      "edit": "APG fixture owner permission",
+      "forbid": [
+        "raw source line decides winner"
+      ]
+    },
+    {
+      "id": "APG77-FX-010",
+      "purpose": "unit and logical conditional math",
+      "artifact_class": "APG fixture stylesheet",
+      "whole_file_owner": "APG fixture owner",
+      "css_selection": "selected",
+      "response": "stop-and-escalate",
+      "routes": [
+        "DOM-owner",
+        "runtime-owner"
+      ],
+      "authority": [
+        "Values and Units 4",
+        "Logical Properties 1"
+      ],
+      "present": [
+        "absolute declared font size",
+        "unit expressions"
+      ],
+      "required": [
+        "proof selectors apply to same element",
+        "writing mode",
+        "direction",
+        "text orientation"
+      ],
+      "conclusion": "2em and calc reduce only when the same element has the evidenced 20px font size",
+      "edit": "APG fixture owner permission",
+      "forbid": [
+        "separate selectors prove same element"
+      ]
+    },
+    {
+      "id": "APG77-FX-011",
+      "purpose": "currentColor descendant contrast",
+      "artifact_class": "APG fixture stylesheet",
+      "whole_file_owner": "APG fixture owner",
+      "css_selection": "selected",
+      "response": "bounded-local-decision",
+      "routes": [
+        "DOM-owner",
+        "browser-compatibility-owner"
+      ],
+      "authority": [
+        "Color 4"
+      ],
+      "present": [
+        "ancestor currentColor",
+        "distinct descendant color"
+      ],
+      "required": [
+        "matching element tree for observed result"
+      ],
+      "conclusion": "distinct descendant color makes re-resolution conditionally observable",
+      "edit": "APG fixture owner permission",
+      "forbid": [
+        "same inherited color demonstrates contrast"
+      ]
+    },
+    {
+      "id": "APG77-FX-012",
+      "purpose": "Astro host boundary",
+      "artifact_class": "Astro component style region",
+      "whole_file_owner": "Astro host owner",
+      "css_selection": "embedded-route",
+      "response": "bounded-local-decision",
+      "routes": [
+        "host-owner",
+        "build-transform-owner"
+      ],
+      "authority": [
+        "construct-governing CSS modules",
+        "Astro host documentation"
+      ],
+      "present": [
+        "embedded fixture bytes"
+      ],
+      "required": [
+        "Astro scoping and emitted output for cross-file claim"
+      ],
+      "conclusion": "CSS region is readable while host owns extraction and file edits",
+      "edit": "host owner permission required",
+      "forbid": [
+        "whole-file CSS ownership"
+      ]
+    },
+    {
+      "id": "APG77-FX-013",
+      "purpose": "generated representation boundary",
+      "artifact_class": "APG-authored generated-like representation",
+      "whole_file_owner": "APG fixture owner",
+      "css_selection": "selected",
+      "response": "bounded-local-decision",
+      "routes": [
+        "generated-artifact-owner",
+        "build-transform-owner"
+      ],
+      "authority": [
+        "construct-governing CSS modules"
+      ],
+      "present": [
+        "exact read-only representation"
+      ],
+      "required": [
+        "generator provenance before regeneration"
+      ],
+      "conclusion": "read-only semantic diagnosis is separate from generated status and edit authority",
+      "edit": "owner permission required",
+      "forbid": [
+        "representation proves generation",
+        "reading grants edits"
+      ]
+    },
+    {
+      "id": "APG77-FX-014",
+      "purpose": "unknown environment refusal",
+      "artifact_class": "APG fixture stylesheet",
+      "whole_file_owner": "APG fixture owner",
+      "css_selection": "selected",
+      "response": "stop-and-escalate",
+      "routes": [
+        "project-configuration",
+        "browser-compatibility-owner",
+        "runtime-owner"
+      ],
+      "authority": [
+        "question-specific normative modules"
+      ],
+      "present": [
+        "source tokens and grammar forms"
+      ],
+      "required": [
+        "exact parser for acceptance",
+        "exact environment for consequences"
+      ],
+      "conclusion": "source-level conditional observations do not establish parse render or runtime results",
+      "edit": "APG fixture owner permission",
+      "forbid": [
+        "well-formed token shape proves property acceptance"
+      ]
+    },
+    {
+      "id": "APG77-TARGET-001",
+      "purpose": "theme stylesheet import and layer graph",
+      "artifact_class": "fresh exact-object target metadata",
+      "whole_file_owner": "theme repository owner",
+      "css_selection": "selected",
+      "response": "bounded-local-decision",
+      "routes": [
+        "project-configuration",
+        "visual-validation-owner"
+      ],
+      "authority": [
+        "Cascade 5",
+        "fresh target inventory"
+      ],
+      "present": [
+        "twelve authored stylesheets",
+        "eleven local imports",
+        "one named layer"
+      ],
+      "required": [
+        "participating declarations and document for global winner"
+      ],
+      "conclusion": "bounded import and layer order is statically inspectable",
+      "edit": "target read-only",
+      "forbid": [
+        "target mutation",
+        "global cascade winner"
+      ]
+    },
+    {
+      "id": "APG77-TARGET-002",
+      "purpose": "host embedded target CSS",
+      "artifact_class": "Astro style region metadata",
+      "whole_file_owner": "theme repository host owner",
+      "css_selection": "embedded-route",
+      "response": "bounded-local-decision",
+      "routes": [
+        "host-owner",
+        "build-transform-owner"
+      ],
+      "authority": [
+        "Astro styling documentation",
+        "fresh target inventory"
+      ],
+      "present": [
+        "four host style regions"
+      ],
+      "required": [
+        "exact emitted selectors for transformed result"
+      ],
+      "conclusion": "bounded CSS semantics participate without transferring host ownership",
+      "edit": "target read-only",
+      "forbid": [
+        "host region treated as whole-file CSS"
+      ]
+    },
+    {
+      "id": "APG77-TARGET-003",
+      "purpose": "inline style target CSS",
+      "artifact_class": "markup style attribute metadata",
+      "whole_file_owner": "theme repository markup owner",
+      "css_selection": "embedded-route",
+      "response": "bounded-local-decision",
+      "routes": [
+        "host-owner",
+        "DOM-owner"
+      ],
+      "authority": [
+        "Cascade 5",
+        "Style Attributes"
+      ],
+      "present": [
+        "nine style attributes"
+      ],
+      "required": [
+        "document and competing declarations for winner"
+      ],
+      "conclusion": "a style attribute contains CSS declarations at author origin attached to its element",
+      "edit": "target read-only",
+      "forbid": [
+        "style attribute declared non-CSS",
+        "CSS takes markup ownership"
+      ]
+    },
+    {
+      "id": "APG77-TARGET-004",
+      "purpose": "SVG presentation attribute target CSS",
+      "artifact_class": "recognized SVG presentation attribute metadata",
+      "whole_file_owner": "theme repository SVG owner",
+      "css_selection": "embedded-route",
+      "response": "bounded-local-decision",
+      "routes": [
+        "host-owner",
+        "DOM-owner"
+      ],
+      "authority": [
+        "SVG 2",
+        "Cascade 5"
+      ],
+      "present": [
+        "three fill and one stroke presentation attributes"
+      ],
+      "required": [
+        "document cascade for observed value"
+      ],
+      "conclusion": "a recognized SVG presentation attribute participates at author origin with specificity zero and no important grammar",
+      "edit": "target read-only",
+      "forbid": [
+        "all SVG attributes are CSS",
+        "presentation attribute declared non-CSS"
+      ]
+    },
+    {
+      "id": "APG77-TARGET-005",
+      "purpose": "generated vendor and motion scope",
+      "artifact_class": "target provenance metadata",
+      "whole_file_owner": "theme repository and build owners",
+      "css_selection": "selected",
+      "response": "bounded-local-decision",
+      "routes": [
+        "build-transform-owner",
+        "runtime-owner",
+        "browser-compatibility-owner"
+      ],
+      "authority": [
+        "fresh target inventory",
+        "construct-governing CSS modules"
+      ],
+      "present": [
+        "no tracked generated or vendor CSS",
+        "animation transition keyframes and prefixes present"
+      ],
+      "required": [
+        "build output for generated artifacts",
+        "browser and runtime for effects"
+      ],
+      "conclusion": "read-only static semantics remain available; motion and prefix effects are routed",
+      "edit": "owner permission required",
+      "forbid": [
+        "semantic reading grants editing",
+        "motion effects claimed from source"
+      ]
+    },
+    {
+      "id": "APG77-TARGET-006",
+      "purpose": "framework pipeline and unknown browser",
+      "artifact_class": "target tool metadata",
+      "whole_file_owner": "target project owner",
+      "css_selection": "route-to-owner",
+      "response": "stop-and-escalate",
+      "routes": [
+        "project-configuration",
+        "build-transform-owner",
+        "browser-compatibility-owner"
+      ],
+      "authority": [
+        "Astro documentation",
+        "Vite documentation",
+        "exact lock identities"
+      ],
+      "present": [
+        "Astro build script",
+        "framework-selected Vite pipeline",
+        "exact PostCSS and Lightning CSS packages"
+      ],
+      "required": [
+        "actual invocation and output for transform claim",
+        "exact browser for render claim"
+      ],
+      "conclusion": "framework selection establishes pipeline selection but not actual invocation output or rendering",
+      "edit": "target read-only",
+      "forbid": [
+        "transitive package alone proves invocation",
+        "parse or transform proves render"
+      ]
+    },
+    {
+      "id": "APG77-TARGET-007",
+      "purpose": "website embedded SVG style boundary",
+      "artifact_class": "SVG embedded style region metadata",
+      "whole_file_owner": "website SVG owner",
+      "css_selection": "embedded-route",
+      "response": "bounded-local-decision",
+      "routes": [
+        "host-owner",
+        "browser-compatibility-owner"
+      ],
+      "authority": [
+        "SVG 2 Styling",
+        "CSS Syntax 3",
+        "Media Queries 5",
+        "APG host-boundary contract",
+        "fresh target inventory"
+      ],
+      "present": [
+        "one embedded SVG style region",
+        "one media query",
+        "no whole-file stylesheet"
+      ],
+      "required": [
+        "browser and environment for condition truth or rendered effect"
+      ],
+      "conclusion": "the embedded CSS structure is statically inspectable while the SVG owner retains the file",
+      "edit": "target read-only",
+      "forbid": [
+        "website CSS relevance declared absent",
+        "embedded region transfers whole-file ownership"
+      ]
+    }
+  ]
+}
+

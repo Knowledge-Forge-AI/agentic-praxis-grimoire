@@ -1,0 +1,319 @@
+{
+  "artifact": "apg60h-css-phase-history",
+  "bundles": [
+    {
+      "decision_adr_path": "docs/adr/2026/07/0035-css-language-profile-and-policy-selected-structural-limits.md",
+      "decision_adr_role": "proposed-0035",
+      "exit_path": "docs/status/2026/07/29/00078-apg58-css-language-profile-pilot-authoring-exit.md",
+      "git_object_role": "external-historical-commit",
+      "managed_report_role": "external-associated-report",
+      "phase_id": "APG58",
+      "private_index_path": "private/evaluations/apg58/README.md",
+      "private_record_paths": [
+        "private/evaluations/apg58/apg57-baseline-report-and-parity.md",
+        "private/evaluations/apg58/clean-room-rights-privacy-and-personal-data-review.md",
+        "private/evaluations/apg58/codex-apg59-handoff.md",
+        "private/evaluations/apg58/css-owner-and-boundary-review.md",
+        "private/evaluations/apg58/css-scenario-register.md",
+        "private/evaluations/apg58/css-source-version-rights-and-target-baseline.md",
+        "private/evaluations/apg58/policy-selected-band-rationale.md",
+        "private/evaluations/apg58/review-and-disposition.md",
+        "private/evaluations/apg58/target-stylesheet-dogfood.md"
+      ],
+      "public_evaluation_path": "docs/evaluations/apg58-css-language-profile-pilot-authoring.md"
+    },
+    {
+      "decision_adr_path": "docs/adr/2026/07/0035-css-language-profile-and-policy-selected-structural-limits.md",
+      "decision_adr_role": "terminal-rejected-0035",
+      "exit_path": "docs/status/2026/07/29/00079-apg59-css-language-profile-validation-and-integration-exit.md",
+      "git_object_role": "external-historical-commit",
+      "managed_report_role": "external-associated-report",
+      "phase_id": "APG59",
+      "private_index_path": "private/evaluations/apg59/README.md",
+      "private_record_paths": [
+        "private/evaluations/apg59/adr-0035-disposition.md",
+        "private/evaluations/apg59/apg58-object-report-and-delivery-verification.md",
+        "private/evaluations/apg59/candidate-correction-and-scenario-results.md",
+        "private/evaluations/apg59/clean-room-rights-privacy-and-personal-data-review.md",
+        "private/evaluations/apg59/failing-first-and-initial-review.md",
+        "private/evaluations/apg59/growth-transition-and-task-aggregation-results.md",
+        "private/evaluations/apg59/integration-and-regression-results.md",
+        "private/evaluations/apg59/owner-authority-and-semantic-boundary-review.md",
+        "private/evaluations/apg59/review-and-disposition.md",
+        "private/evaluations/apg59/source-rights-and-target-reverification.md"
+      ],
+      "public_evaluation_path": "docs/evaluations/apg59-css-language-profile-validation-and-integration.md"
+    },
+    {
+      "decision_adr_path": null,
+      "decision_adr_role": "none",
+      "exit_path": "docs/status/2026/07/29/00080-apg60-css-reentry-contract-and-removal-foundation-exit.md",
+      "git_object_role": "external-historical-commit",
+      "managed_report_role": "external-associated-report",
+      "phase_id": "APG60",
+      "private_index_path": "private/evaluations/apg60/README.md",
+      "private_record_paths": [
+        "private/evaluations/apg60/apg59-baseline-report-and-parity.md",
+        "private/evaluations/apg60/apg59-defect-ledger.md",
+        "private/evaluations/apg60/claude-apg61-handoff.md",
+        "private/evaluations/apg60/clean-room-rights-privacy-and-personal-data-review.md",
+        "private/evaluations/apg60/css-contract-freeze.md",
+        "private/evaluations/apg60/current-surface-and-removal-analysis.md",
+        "private/evaluations/apg60/executable-contract-results.md",
+        "private/evaluations/apg60/review-and-disposition.md",
+        "private/evaluations/apg60/synthetic-lifecycle-results.md",
+        "private/evaluations/apg60/test-and-regression-results.md"
+      ],
+      "public_evaluation_path": "docs/evaluations/apg60-css-reentry-contract-and-removal-foundation.md"
+    },
+    {
+      "decision_adr_path": null,
+      "decision_adr_role": "none",
+      "exit_path": "docs/status/2026/07/29/00081-apg60a-css-contract-foundation-hardening-exit.md",
+      "git_object_role": "external-historical-commit",
+      "managed_report_role": "external-associated-report",
+      "phase_id": "APG60A",
+      "private_index_path": "private/evaluations/apg60a/README.md",
+      "private_record_paths": [
+        "private/evaluations/apg60a/apg60-baseline-report-and-parity.md",
+        "private/evaluations/apg60a/claude-apg61-handoff.md",
+        "private/evaluations/apg60a/clean-room-rights-privacy-and-personal-data-review.md",
+        "private/evaluations/apg60a/css-contract-forward-correction.md",
+        "private/evaluations/apg60a/exception-authority-results.md",
+        "private/evaluations/apg60a/failing-first-findings.md",
+        "private/evaluations/apg60a/projection-overrun-results.md",
+        "private/evaluations/apg60a/review-and-disposition.md",
+        "private/evaluations/apg60a/symlink-and-actual-surface-results.md",
+        "private/evaluations/apg60a/test-and-regression-results.md"
+      ],
+      "public_evaluation_path": "docs/evaluations/apg60a-css-contract-foundation-hardening.md"
+    },
+    {
+      "decision_adr_path": null,
+      "decision_adr_role": "none",
+      "exit_path": "docs/status/2026/07/30/00082-apg60b-css-traceability-and-decision-closure-exit.md",
+      "git_object_role": "external-historical-commit",
+      "managed_report_role": "external-associated-report",
+      "phase_id": "APG60B",
+      "private_index_path": "private/evaluations/apg60b/README.md",
+      "private_record_paths": [
+        "private/evaluations/apg60b/apg60a-baseline-report-and-parity.md",
+        "private/evaluations/apg60b/claude-apg61-handoff.md",
+        "private/evaluations/apg60b/clean-room-rights-privacy-and-personal-data-review.md",
+        "private/evaluations/apg60b/decision-adr-lifecycle-results.md",
+        "private/evaluations/apg60b/failing-first-findings.md",
+        "private/evaluations/apg60b/foundation-forward-correction.md",
+        "private/evaluations/apg60b/narrative-state-results.md",
+        "private/evaluations/apg60b/python-owner-binding-results.md",
+        "private/evaluations/apg60b/review-and-disposition.md",
+        "private/evaluations/apg60b/test-and-regression-results.md",
+        "private/evaluations/apg60b/traceability-contract-results.md"
+      ],
+      "public_evaluation_path": "docs/evaluations/apg60b-css-traceability-and-decision-closure.md"
+    },
+    {
+      "decision_adr_path": null,
+      "decision_adr_role": "none",
+      "exit_path": "docs/status/2026/07/30/00083-apg60c-css-runtime-and-terminal-lifecycle-closure-exit.md",
+      "git_object_role": "external-historical-commit",
+      "managed_report_role": "external-associated-report",
+      "phase_id": "APG60C",
+      "private_index_path": "private/evaluations/apg60c/README.md",
+      "private_record_paths": [
+        "private/evaluations/apg60c/actual-lifecycle-and-history-results.md",
+        "private/evaluations/apg60c/apg60b-baseline-report-and-parity.md",
+        "private/evaluations/apg60c/claude-apg61-handoff.md",
+        "private/evaluations/apg60c/clean-room-rights-privacy-and-personal-data-review.md",
+        "private/evaluations/apg60c/failing-first-findings.md",
+        "private/evaluations/apg60c/foundation-forward-correction.md",
+        "private/evaluations/apg60c/narrative-state-scope-results.md",
+        "private/evaluations/apg60c/python-binding-finality-results.md",
+        "private/evaluations/apg60c/review-and-disposition.md",
+        "private/evaluations/apg60c/survivor-owner-integrity-results.md",
+        "private/evaluations/apg60c/test-and-regression-results.md"
+      ],
+      "public_evaluation_path": "docs/evaluations/apg60c-css-runtime-and-terminal-lifecycle-closure.md"
+    },
+    {
+      "decision_adr_path": null,
+      "decision_adr_role": "none",
+      "exit_path": "docs/status/2026/07/30/00084-apg60d-css-source-binding-and-history-closure-exit.md",
+      "git_object_role": "delivery-creates-commit",
+      "managed_report_role": "delivery-creates-associated-report",
+      "phase_id": "APG60D",
+      "private_index_path": "private/evaluations/apg60d/README.md",
+      "private_record_paths": [
+        "private/evaluations/apg60d/actual-lifecycle-history-results.md",
+        "private/evaluations/apg60d/apg60c-baseline-report-and-parity.md",
+        "private/evaluations/apg60d/claude-apg61-handoff.md",
+        "private/evaluations/apg60d/clean-room-rights-privacy-and-personal-data-review.md",
+        "private/evaluations/apg60d/failing-first-findings.md",
+        "private/evaluations/apg60d/foundation-forward-correction.md",
+        "private/evaluations/apg60d/phase-history-bundle-results.md",
+        "private/evaluations/apg60d/review-and-disposition.md",
+        "private/evaluations/apg60d/source-binding-integrity-results.md",
+        "private/evaluations/apg60d/test-and-regression-results.md"
+      ],
+      "public_evaluation_path": "docs/evaluations/apg60d-css-source-binding-and-history-closure.md"
+    },
+    {
+      "decision_adr_path": null,
+      "decision_adr_role": "none",
+      "exit_path": "docs/status/2026/07/30/00085-apg60e-css-repository-path-and-candidate-surface-closure-exit.md",
+      "git_object_role": "delivery-creates-commit",
+      "managed_report_role": "delivery-creates-associated-report",
+      "phase_id": "APG60E",
+      "private_index_path": "private/evaluations/apg60e/README.md",
+      "private_record_paths": [
+        "private/evaluations/apg60e/apg60d-baseline-report-and-parity.md",
+        "private/evaluations/apg60e/authority-input-results.md",
+        "private/evaluations/apg60e/authored-state-path-results.md",
+        "private/evaluations/apg60e/claude-apg61-handoff.md",
+        "private/evaluations/apg60e/clean-room-rights-privacy-and-personal-data-review.md",
+        "private/evaluations/apg60e/failing-first-findings.md",
+        "private/evaluations/apg60e/foundation-forward-correction.md",
+        "private/evaluations/apg60e/repository-path-contract.md",
+        "private/evaluations/apg60e/retained-state-path-results.md",
+        "private/evaluations/apg60e/review-and-disposition.md",
+        "private/evaluations/apg60e/test-and-regression-results.md"
+      ],
+      "public_evaluation_path": "docs/evaluations/apg60e-css-repository-path-and-candidate-surface-closure.md"
+    },
+    {
+      "decision_adr_path": null,
+      "decision_adr_role": "none",
+      "exit_path": "docs/status/2026/07/30/00086-apg60f-css-import-owner-and-projection-closure-exit.md",
+      "git_object_role": "delivery-creates-commit",
+      "managed_report_role": "delivery-creates-associated-report",
+      "phase_id": "APG60F",
+      "private_index_path": "private/evaluations/apg60f/README.md",
+      "private_record_paths": [
+        "private/evaluations/apg60f/apg60e-baseline-report-and-parity.md",
+        "private/evaluations/apg60f/claude-apg61-handoff.md",
+        "private/evaluations/apg60f/clean-room-rights-privacy-and-personal-data-review.md",
+        "private/evaluations/apg60f/dynamic-import-closure-results.md",
+        "private/evaluations/apg60f/failing-first-findings.md",
+        "private/evaluations/apg60f/foundation-forward-correction.md",
+        "private/evaluations/apg60f/projection-coherence-results.md",
+        "private/evaluations/apg60f/required-role-graph-results.md",
+        "private/evaluations/apg60f/review-and-disposition.md",
+        "private/evaluations/apg60f/test-and-regression-results.md"
+      ],
+      "public_evaluation_path": "docs/evaluations/apg60f-css-import-owner-and-projection-closure.md"
+    },
+    {
+      "decision_adr_path": null,
+      "decision_adr_role": "none",
+      "exit_path": "docs/status/2026/07/30/00087-apg60g-css-snapshot-role-and-derived-set-closure-exit.md",
+      "git_object_role": "delivery-creates-commit",
+      "managed_report_role": "delivery-creates-associated-report",
+      "phase_id": "APG60G",
+      "private_index_path": "private/evaluations/apg60g/README.md",
+      "private_record_paths": [
+        "private/evaluations/apg60g/apg60f-baseline-report-and-parity.md",
+        "private/evaluations/apg60g/failing-first-findings.md",
+        "private/evaluations/apg60g/pinned-root-or-snapshot-results.md",
+        "private/evaluations/apg60g/exact-derived-set-results.md",
+        "private/evaluations/apg60g/semantic-role-registry-results.md",
+        "private/evaluations/apg60g/coherent-authority-read-results.md",
+        "private/evaluations/apg60g/foundation-forward-correction.md",
+        "private/evaluations/apg60g/test-and-regression-results.md",
+        "private/evaluations/apg60g/clean-room-rights-privacy-and-personal-data-review.md",
+        "private/evaluations/apg60g/claude-apg61-handoff.md",
+        "private/evaluations/apg60g/review-and-disposition.md"
+      ],
+      "public_evaluation_path": "docs/evaluations/apg60g-css-snapshot-role-and-derived-set-closure.md"
+    },
+    {
+      "decision_adr_path": null,
+      "decision_adr_role": "none",
+      "exit_path": "docs/status/2026/07/31/00088-apg60h-css-snapshot-and-full-path-binding-closure-exit.md",
+      "git_object_role": "delivery-creates-commit",
+      "managed_report_role": "delivery-creates-associated-report",
+      "phase_id": "APG60H",
+      "private_index_path": "private/evaluations/apg60h/README.md",
+      "private_record_paths": [
+        "private/evaluations/apg60h/apg60g-baseline-report-and-parity.md",
+        "private/evaluations/apg60h/claude-object-and-report-verification.md",
+        "private/evaluations/apg60h/failing-first-findings.md",
+        "private/evaluations/apg60h/authorized-scratch-and-pinned-stack.md",
+        "private/evaluations/apg60h/snapshot-exact-read-results.md",
+        "private/evaluations/apg60h/snapshot-cleanup-results.md",
+        "private/evaluations/apg60h/full-path-and-absence-results.md",
+        "private/evaluations/apg60h/pinned-root-final-binding-results.md",
+        "private/evaluations/apg60h/projection-identity-and-portability-results.md",
+        "private/evaluations/apg60h/foundation-forward-correction.md",
+        "private/evaluations/apg60h/test-and-regression-results.md",
+        "private/evaluations/apg60h/clean-room-rights-privacy-and-personal-data-review.md",
+        "private/evaluations/apg60h/claude-apg61-handoff.md",
+        "private/evaluations/apg60h/review-and-disposition.md"
+      ],
+      "public_evaluation_path": "docs/evaluations/apg60h-css-snapshot-and-full-path-binding-closure.md"
+    },
+    {
+      "decision_adr_path": "docs/adr/2026/07/0036-css-language-profile-from-frozen-contract.md",
+      "decision_adr_role": "proposed-0036",
+      "exit_path": "docs/status/2026/07/31/00089-apg61-css-language-profile-authoring-exit.md",
+      "git_object_role": "future-delivery-commit",
+      "managed_report_role": "future-associated-report",
+      "phase_id": "APG61",
+      "private_index_path": "private/evaluations/apg61/README.md",
+      "private_record_paths": [
+        "private/evaluations/apg61/apg60h-baseline-report-and-parity.md",
+        "private/evaluations/apg61/clean-room-rights-privacy-and-personal-data-review.md",
+        "private/evaluations/apg61/codex-apg62-handoff.md",
+        "private/evaluations/apg61/contract-map-and-clause-review.md",
+        "private/evaluations/apg61/css-candidate-authoring.md",
+        "private/evaluations/apg61/css-source-rights-and-target-review.md",
+        "private/evaluations/apg61/review-and-disposition.md"
+      ],
+      "public_evaluation_path": "docs/evaluations/apg61-css-language-profile-authoring-from-frozen-contract.md"
+    },
+    {
+      "decision_adr_path": "docs/adr/2026/07/0036-css-language-profile-from-frozen-contract.md",
+      "decision_adr_role": "terminal-0036",
+      "exit_path": "docs/status/2026/07/31/00090-apg62-css-language-profile-validation-and-integration-exit.md",
+      "git_object_role": "future-delivery-commit",
+      "managed_report_role": "future-associated-report",
+      "phase_id": "APG62",
+      "private_index_path": "private/evaluations/apg62/README.md",
+      "private_record_paths": [
+        "private/evaluations/apg62/adr-0036-disposition.md",
+        "private/evaluations/apg62/apg61-object-report-and-delivery-verification.md",
+        "private/evaluations/apg62/clean-room-rights-privacy-and-personal-data-review.md",
+        "private/evaluations/apg62/failing-first-and-semantic-contract-results.md",
+        "private/evaluations/apg62/integration-or-removal-results.md",
+        "private/evaluations/apg62/review-and-disposition.md",
+        "private/evaluations/apg62/test-and-regression-results.md"
+      ],
+      "public_evaluation_path": "docs/evaluations/apg62-css-language-profile-validation-and-integration.md"
+    }
+  ],
+  "schema_version": 3,
+  "state_requirements": {
+    "authored_history": [
+      "APG61"
+    ],
+    "foundation_history": [
+      "APG58",
+      "APG59",
+      "APG60",
+      "APG60A",
+      "APG60B",
+      "APG60C",
+      "APG60D",
+      "APG60E",
+      "APG60F",
+      "APG60G",
+      "APG60H"
+    ],
+    "rejected_history": [
+      "APG61",
+      "APG62"
+    ],
+    "retained_history": [
+      "APG61",
+      "APG62"
+    ]
+  }
+}

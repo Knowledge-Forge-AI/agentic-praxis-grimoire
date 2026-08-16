@@ -1,0 +1,67 @@
+/* APG76-FX-008 — media and supports condition boundary.
+   APG-owned fixture source. Independently written; no target source. */
+
+.responsive-panel {
+  padding: 1rem;
+}
+
+/* The structure is static; the truth of the condition is not. Without the
+   exact environment value the contained declaration's effect is unknown. */
+@media (min-width: 48rem) {
+  .responsive-panel {
+    padding: 2rem;
+  }
+}
+
+/* A user-preference condition depends on the same uncontrolled environment,
+   from a different media-query level than the dimensional query above. */
+@media (prefers-reduced-motion: reduce) {
+  .responsive-panel {
+    transition: none;
+  }
+}
+
+/* An unknown media feature produces unknown. In the two-valued @media
+   application it does not match; negation does not simply turn it true, and
+   a comma-separated sibling query would recover independently. */
+@media (min-widht: 48rem) {
+  .responsive-panel {
+    padding: 4rem;
+  }
+}
+
+/* Unknown values follow the same three-valued boundary. */
+@media (width: unknown) {
+  .responsive-panel { padding: 5rem; }
+}
+
+/* Negation does not convert an unknown feature into a matching query. */
+@media not (min-widht: 48rem) {
+  .responsive-panel { padding: 6rem; }
+}
+
+/* Recovery is per comma-list member: the unknown first query does not erase
+   the syntactically valid second query. Its truth still needs an environment. */
+@media (min-widht: 48rem), (min-width: 64rem) {
+  .responsive-panel { padding: 7rem; }
+}
+
+/* A grammar-invalid query becomes not all rather than an unknown feature. */
+@media (width >= ) {
+  .responsive-panel { padding: 8rem; }
+}
+
+/* An unknown media type does not match, so negating the media type does. This
+   differs from negating an unknown feature. */
+@media not unknown-medium {
+  .responsive-panel { padding: 9rem; }
+}
+
+/* A supports declaration condition tests usable implementation acceptance by
+   the exact user agent. That is stronger than token parsing, but it proves
+   neither correct behavior nor rendering. */
+@supports (padding: 1cap) {
+  .responsive-panel {
+    padding: 1cap;
+  }
+}

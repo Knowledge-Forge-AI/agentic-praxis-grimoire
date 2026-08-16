@@ -1,0 +1,8 @@
+{
+  "name": "apg78-javascript-core-fixture",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "APG-owned JavaScript language fixture for the APG78 narrow ECMAScript core candidate. Establishes one explicit module-mode boundary and declares no third-party dependency.",
+  "license": "AGPL-3.0-only"
+}

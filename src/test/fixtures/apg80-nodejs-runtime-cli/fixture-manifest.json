@@ -1,0 +1,618 @@
+{
+  "artifacts": [
+    {"artifact_class": "esm-module-artifact", "artifact_id": "cli-adapter", "content_sha256": "20ca407e1f87d27865575860a65f911e3435b273040df267da373b35f8d28874", "edit_permission": "apg-maintainer-editable", "exact_runtime_binding_state": "bound-to-observed-runtime-only", "external_effect_class": "injected-stream-only", "invocation_state": "invoked", "loader_role_state": "node-builtin-loader", "mapping_evidence_state": "explicit-extension", "module_mapping": "nodejs-esm", "package_manager_role_state": "none-required", "package_scope": "apg80-nodejs-runtime-cli", "provenance": "apg-original", "relative_path": "cli/adapter.mjs", "rollback": "preserve-with-candidate-history", "runtime_role_state": "observed-exact-runtime", "whole_file_owner": "nodejs-runtime-profile"},
+    {"artifact_class": "esm-module-artifact", "artifact_id": "cli-core", "content_sha256": "7efbb14a6c813c0a11e9a9d4f14a4739e466584057f1c6f1d6ab9a3c4b0f9737", "edit_permission": "apg-maintainer-editable", "exact_runtime_binding_state": "bound-to-observed-runtime-only", "external_effect_class": "none", "invocation_state": "invoked", "loader_role_state": "node-builtin-loader", "mapping_evidence_state": "explicit-extension", "module_mapping": "nodejs-esm", "package_manager_role_state": "none-required", "package_scope": "apg80-nodejs-runtime-cli", "provenance": "apg-original", "relative_path": "cli/core.mjs", "rollback": "preserve-with-candidate-history", "runtime_role_state": "observed-exact-runtime", "whole_file_owner": "javascript-language-profile"},
+    {"artifact_class": "commonjs-artifact", "artifact_id": "commonjs-local-dependency", "content_sha256": "03b90112742f9d432f8cc0caaf64e009ed6a85794e8b797abf6a77f68a1c2588", "edit_permission": "apg-maintainer-editable", "exact_runtime_binding_state": "bound-to-observed-runtime-only", "external_effect_class": "none", "invocation_state": "invoked", "loader_role_state": "node-builtin-loader", "mapping_evidence_state": "explicit-extension", "module_mapping": "nodejs-commonjs", "package_manager_role_state": "none-required", "package_scope": "apg80-nodejs-runtime-cli", "provenance": "apg-original", "relative_path": "commonjs/local-dependency.cjs", "rollback": "preserve-with-candidate-history", "runtime_role_state": "observed-exact-runtime", "whole_file_owner": "node-commonjs-owner"},
+    {"artifact_class": "commonjs-artifact", "artifact_id": "commonjs-wrapper-boundary", "content_sha256": "0008f85fa2622f3bc18a1dde096fd6d4fb774d3c7d29e766a862eb094f7f9a21", "edit_permission": "apg-maintainer-editable", "exact_runtime_binding_state": "bound-to-observed-runtime-only", "external_effect_class": "none", "invocation_state": "invoked", "loader_role_state": "node-builtin-loader", "mapping_evidence_state": "explicit-extension", "module_mapping": "nodejs-commonjs", "package_manager_role_state": "none-required", "package_scope": "apg80-nodejs-runtime-cli", "provenance": "apg-original", "relative_path": "commonjs/wrapper-boundary.cjs", "rollback": "preserve-with-candidate-history", "runtime_role_state": "observed-exact-runtime", "whole_file_owner": "node-commonjs-owner"},
+    {"artifact_class": "esm-module-artifact", "artifact_id": "esm-builtin-boundary", "content_sha256": "df78e7d5b0f3c9b1415e28542ec1906fd87b329208423b0d600a6ac1378034c8", "edit_permission": "apg-maintainer-editable", "exact_runtime_binding_state": "bound-to-observed-runtime-only", "external_effect_class": "none", "invocation_state": "invoked", "loader_role_state": "node-builtin-loader", "mapping_evidence_state": "explicit-extension", "module_mapping": "nodejs-esm", "package_manager_role_state": "none-required", "package_scope": "apg80-nodejs-runtime-cli", "provenance": "apg-original", "relative_path": "esm/builtin-boundary.mjs", "rollback": "preserve-with-candidate-history", "runtime_role_state": "observed-exact-runtime", "whole_file_owner": "nodejs-runtime-profile"},
+    {"artifact_class": "esm-module-artifact", "artifact_id": "esm-metadata", "content_sha256": "46f805843a161de9e6be48ce0b97a1e846419629568e880f60364ea33749c07e", "edit_permission": "apg-maintainer-editable", "exact_runtime_binding_state": "bound-to-observed-runtime-only", "external_effect_class": "none", "invocation_state": "invoked", "loader_role_state": "node-builtin-loader", "mapping_evidence_state": "explicit-extension", "module_mapping": "nodejs-esm", "package_manager_role_state": "none-required", "package_scope": "apg80-nodejs-runtime-cli", "provenance": "apg-original", "relative_path": "esm/metadata.mjs", "rollback": "preserve-with-candidate-history", "runtime_role_state": "observed-exact-runtime", "whole_file_owner": "nodejs-runtime-profile"},
+    {"artifact_class": "commonjs-artifact", "artifact_id": "interop-dynamic-exports", "content_sha256": "cd486f29928be7110ca43a230f0d60fa6e1c442589ce7b2099a8eda60dc5e71f", "edit_permission": "apg-maintainer-editable", "exact_runtime_binding_state": "bound-to-observed-runtime-only", "external_effect_class": "none", "invocation_state": "invoked", "loader_role_state": "node-builtin-loader", "mapping_evidence_state": "explicit-extension", "module_mapping": "nodejs-commonjs", "package_manager_role_state": "none-required", "package_scope": "apg80-nodejs-runtime-cli", "provenance": "apg-original", "relative_path": "interop/dynamic-exports.cjs", "rollback": "preserve-with-candidate-history", "runtime_role_state": "observed-exact-runtime", "whole_file_owner": "node-commonjs-owner"},
+    {"artifact_class": "esm-module-artifact", "artifact_id": "interop-esm-consumer", "content_sha256": "d78b628048881880bc0d141a35a4b88bff93a1bc0aaa364464738311495561b4", "edit_permission": "apg-maintainer-editable", "exact_runtime_binding_state": "bound-to-observed-runtime-only", "external_effect_class": "none", "invocation_state": "invoked", "loader_role_state": "node-builtin-loader", "mapping_evidence_state": "explicit-extension", "module_mapping": "nodejs-esm", "package_manager_role_state": "none-required", "package_scope": "apg80-nodejs-runtime-cli", "provenance": "apg-original", "relative_path": "interop/esm-consumer.mjs", "rollback": "preserve-with-candidate-history", "runtime_role_state": "observed-exact-runtime", "whole_file_owner": "nodejs-runtime-profile"},
+    {"artifact_class": "esm-module-artifact", "artifact_id": "interop-identity", "content_sha256": "2d7a33af7807315bd2289867764e5f73bb088e0fc80a07919ae5d9875f8dee25", "edit_permission": "apg-maintainer-editable", "exact_runtime_binding_state": "bound-to-observed-runtime-only", "external_effect_class": "none", "invocation_state": "invoked", "loader_role_state": "node-builtin-loader", "mapping_evidence_state": "explicit-extension", "module_mapping": "nodejs-esm", "package_manager_role_state": "none-required", "package_scope": "apg80-nodejs-runtime-cli", "provenance": "apg-original", "relative_path": "interop/identity.mjs", "rollback": "preserve-with-candidate-history", "runtime_role_state": "observed-exact-runtime", "whole_file_owner": "nodejs-runtime-profile"},
+    {"artifact_class": "commonjs-artifact", "artifact_id": "interop-require-esm", "content_sha256": "27f6cdda5378ebd9c19815e70a62c634d96e1121454505b774fe1f57e8e37a16", "edit_permission": "apg-maintainer-editable", "exact_runtime_binding_state": "bound-to-observed-runtime-only", "external_effect_class": "none", "invocation_state": "invoked", "loader_role_state": "node-builtin-loader", "mapping_evidence_state": "explicit-extension", "module_mapping": "nodejs-commonjs", "package_manager_role_state": "none-required", "package_scope": "apg80-nodejs-runtime-cli", "provenance": "apg-original", "relative_path": "interop/require-esm.cjs", "rollback": "preserve-with-candidate-history", "runtime_role_state": "observed-exact-runtime", "whole_file_owner": "node-commonjs-owner"},
+    {"artifact_class": "commonjs-artifact", "artifact_id": "interop-static-exports", "content_sha256": "de99c6f0fb674b15131fc88f4216b0287595b0eccabd318721f8eba0b0bdcdbc", "edit_permission": "apg-maintainer-editable", "exact_runtime_binding_state": "bound-to-observed-runtime-only", "external_effect_class": "none", "invocation_state": "invoked", "loader_role_state": "node-builtin-loader", "mapping_evidence_state": "explicit-extension", "module_mapping": "nodejs-commonjs", "package_manager_role_state": "none-required", "package_scope": "apg80-nodejs-runtime-cli", "provenance": "apg-original", "relative_path": "interop/static-exports.cjs", "rollback": "preserve-with-candidate-history", "runtime_role_state": "observed-exact-runtime", "whole_file_owner": "node-commonjs-owner"},
+    {"artifact_class": "package-manifest", "artifact_id": "mapping-commonjs-scope-manifest", "content_sha256": "77decf1de391d9df359bff1149f430b89f3cbd22e64b9988b65ba04eadda8822", "edit_permission": "apg-maintainer-editable", "exact_runtime_binding_state": "unbound", "external_effect_class": "none", "invocation_state": "not-invoked", "loader_role_state": "none", "mapping_evidence_state": "not-applicable", "module_mapping": "not-node-mapped", "package_manager_role_state": "none-required", "package_scope": "apg80-mapping-commonjs-scope", "provenance": "apg-original", "relative_path": "module-mapping/commonjs-package/package.json", "rollback": "preserve-with-candidate-history", "runtime_role_state": "not-invoked", "whole_file_owner": "project-configuration-owner"},
+    {"artifact_class": "ambiguous-js-artifact", "artifact_id": "mapping-commonjs-scope-source", "content_sha256": "dc53cfb4c2cf2cd006754f78791bcb728e45d445caf33ef582f8139c2905ab1a", "edit_permission": "apg-maintainer-editable", "exact_runtime_binding_state": "bound-to-observed-runtime-only", "external_effect_class": "none", "invocation_state": "invoked", "loader_role_state": "node-builtin-loader", "mapping_evidence_state": "explicit-package-type", "module_mapping": "nodejs-commonjs", "package_manager_role_state": "none-required", "package_scope": "apg80-mapping-commonjs-scope", "provenance": "apg-original", "relative_path": "module-mapping/commonjs-package/source.js", "rollback": "preserve-with-candidate-history", "runtime_role_state": "observed-exact-runtime", "whole_file_owner": "node-commonjs-owner"},
+    {"artifact_class": "ambiguous-js-artifact", "artifact_id": "mapping-commonjs-scope-module-only", "content_sha256": "c06153d83f008e8d7f094912ccc952afa2c6c3aac95b05441ab0bba394962244", "edit_permission": "apg-maintainer-editable", "exact_runtime_binding_state": "bound-to-primary-and-secondary-runtime", "external_effect_class": "none", "invocation_state": "invoked", "loader_role_state": "node-builtin-loader", "mapping_evidence_state": "explicit-package-type-refusal", "module_mapping": "nodejs-commonjs-refused-module-syntax", "package_manager_role_state": "none-required", "package_scope": "apg80-mapping-commonjs-scope", "provenance": "apg-original-apg81-correction", "relative_path": "module-mapping/commonjs-package/module-only.js", "rollback": "preserve-with-candidate-history", "runtime_role_state": "observed-primary-and-secondary-runtime", "whole_file_owner": "node-commonjs-owner"},
+    {"artifact_class": "commonjs-artifact", "artifact_id": "mapping-explicit-commonjs", "content_sha256": "d853d6971e8604ec20f703808d75b2c7b3ada35a1fa7a1aef910aaca9bfd0d28", "edit_permission": "apg-maintainer-editable", "exact_runtime_binding_state": "bound-to-observed-runtime-only", "external_effect_class": "none", "invocation_state": "invoked", "loader_role_state": "node-builtin-loader", "mapping_evidence_state": "explicit-extension", "module_mapping": "nodejs-commonjs", "package_manager_role_state": "none-required", "package_scope": "apg80-nodejs-runtime-cli", "provenance": "apg-original", "relative_path": "module-mapping/explicit-commonjs.cjs", "rollback": "preserve-with-candidate-history", "runtime_role_state": "observed-exact-runtime", "whole_file_owner": "node-commonjs-owner"},
+    {"artifact_class": "esm-module-artifact", "artifact_id": "mapping-explicit-module", "content_sha256": "b70d975b38ffbdbd190739b20cb648e4085e6dc8843a51f17329b0b03e65e81a", "edit_permission": "apg-maintainer-editable", "exact_runtime_binding_state": "bound-to-observed-runtime-only", "external_effect_class": "none", "invocation_state": "invoked", "loader_role_state": "node-builtin-loader", "mapping_evidence_state": "explicit-extension", "module_mapping": "nodejs-esm", "package_manager_role_state": "none-required", "package_scope": "apg80-nodejs-runtime-cli", "provenance": "apg-original", "relative_path": "module-mapping/explicit-module.mjs", "rollback": "preserve-with-candidate-history", "runtime_role_state": "observed-exact-runtime", "whole_file_owner": "javascript-language-profile"},
+    {"artifact_class": "package-manifest", "artifact_id": "mapping-module-scope-manifest", "content_sha256": "beb16ca274c71c7f4d9a827c8d73a91965fcc344aee8414dc9828dea6fe9b8fa", "edit_permission": "apg-maintainer-editable", "exact_runtime_binding_state": "unbound", "external_effect_class": "none", "invocation_state": "not-invoked", "loader_role_state": "none", "mapping_evidence_state": "not-applicable", "module_mapping": "not-node-mapped", "package_manager_role_state": "none-required", "package_scope": "apg80-mapping-module-scope", "provenance": "apg-original", "relative_path": "module-mapping/module-package/package.json", "rollback": "preserve-with-candidate-history", "runtime_role_state": "not-invoked", "whole_file_owner": "project-configuration-owner"},
+    {"artifact_class": "ambiguous-js-artifact", "artifact_id": "mapping-module-scope-source", "content_sha256": "cdc7769257657e100807d1ac463d55c2a793043de562596da6dff11ba37f2323", "edit_permission": "apg-maintainer-editable", "exact_runtime_binding_state": "bound-to-observed-runtime-only", "external_effect_class": "none", "invocation_state": "invoked", "loader_role_state": "node-builtin-loader", "mapping_evidence_state": "explicit-package-type", "module_mapping": "nodejs-esm", "package_manager_role_state": "none-required", "package_scope": "apg80-mapping-module-scope", "provenance": "apg-original", "relative_path": "module-mapping/module-package/source.js", "rollback": "preserve-with-candidate-history", "runtime_role_state": "observed-exact-runtime", "whole_file_owner": "javascript-language-profile"},
+    {"artifact_class": "ambiguous-js-artifact", "artifact_id": "mapping-typeless-detected", "content_sha256": "a8bfa14741d5d9f224466acb3bf0651cd7e3b0c77aaa9da401c577994e4d3490", "edit_permission": "apg-maintainer-editable", "exact_runtime_binding_state": "bound-to-observed-runtime-only", "external_effect_class": "none", "invocation_state": "invoked", "loader_role_state": "node-builtin-loader", "mapping_evidence_state": "version-specific-syntax-detection", "module_mapping": "nodejs-esm", "package_manager_role_state": "none-required", "package_scope": "apg80-mapping-typeless-scope", "provenance": "apg-original", "relative_path": "module-mapping/typeless-package/detected-module.js", "rollback": "preserve-with-candidate-history", "runtime_role_state": "observed-exact-runtime", "whole_file_owner": "javascript-language-profile"},
+    {"artifact_class": "ambiguous-js-artifact", "artifact_id": "mapping-typeless-goal-neutral", "content_sha256": "2a4354caf5c177e048889ed34ee4a2d25bc391cee21ceaa5614c0597b9500ffa", "edit_permission": "apg-maintainer-editable", "exact_runtime_binding_state": "unbound", "external_effect_class": "none", "invocation_state": "not-invoked", "loader_role_state": "none", "mapping_evidence_state": "unresolved", "module_mapping": "unresolved", "package_manager_role_state": "none-required", "package_scope": "apg80-mapping-typeless-scope", "provenance": "apg-original", "relative_path": "module-mapping/typeless-package/goal-neutral.js", "rollback": "preserve-with-candidate-history", "runtime_role_state": "not-invoked", "whole_file_owner": "unresolved"},
+    {"artifact_class": "package-manifest", "artifact_id": "mapping-typeless-scope-manifest", "content_sha256": "e3e333852b2511c88d88d796d34fa62828e5abf07c453401f75142cce5b2161d", "edit_permission": "apg-maintainer-editable", "exact_runtime_binding_state": "unbound", "external_effect_class": "none", "invocation_state": "not-invoked", "loader_role_state": "none", "mapping_evidence_state": "not-applicable", "module_mapping": "not-node-mapped", "package_manager_role_state": "none-required", "package_scope": "apg80-mapping-typeless-scope", "provenance": "apg-original", "relative_path": "module-mapping/typeless-package/package.json", "rollback": "preserve-with-candidate-history", "runtime_role_state": "not-invoked", "whole_file_owner": "project-configuration-owner"},
+    {"artifact_class": "package-manifest", "artifact_id": "fixture-root-manifest", "content_sha256": "b5839a29efe68bc617a612c5ffbd7084008b44b876869f1bf147f60e791f0fa9", "edit_permission": "apg-maintainer-editable", "exact_runtime_binding_state": "unbound", "external_effect_class": "none", "invocation_state": "not-invoked", "loader_role_state": "none", "mapping_evidence_state": "not-applicable", "module_mapping": "not-node-mapped", "package_manager_role_state": "none-required", "package_scope": "apg80-nodejs-runtime-cli", "provenance": "apg-original", "relative_path": "package.json", "rollback": "preserve-with-candidate-history", "runtime_role_state": "not-invoked", "whole_file_owner": "project-configuration-owner"},
+    {"artifact_class": "node-cli-entrypoint", "artifact_id": "process-event-loop-commonjs", "content_sha256": "2896ea5a4199d84c5e9f9a59317952958db6aef5a3871b20f6fa7e927ecb9dba", "edit_permission": "apg-maintainer-editable", "exact_runtime_binding_state": "bound-to-observed-runtime-only", "external_effect_class": "none", "invocation_state": "invoked", "loader_role_state": "node-builtin-loader", "mapping_evidence_state": "explicit-extension", "module_mapping": "nodejs-commonjs", "package_manager_role_state": "none-required", "package_scope": "apg80-nodejs-runtime-cli", "provenance": "apg-original", "relative_path": "process/event-loop-entry.cjs", "rollback": "preserve-with-candidate-history", "runtime_role_state": "observed-exact-runtime", "whole_file_owner": "node-commonjs-owner"},
+    {"artifact_class": "node-cli-entrypoint", "artifact_id": "process-event-loop-esm", "content_sha256": "b330897aa39a7e7965a1df38bb9721ce3e76ccace5f6eef66a84fed655473302", "edit_permission": "apg-maintainer-editable", "exact_runtime_binding_state": "bound-to-observed-runtime-only", "external_effect_class": "none", "invocation_state": "invoked", "loader_role_state": "node-builtin-loader", "mapping_evidence_state": "explicit-extension", "module_mapping": "nodejs-esm", "package_manager_role_state": "none-required", "package_scope": "apg80-nodejs-runtime-cli", "provenance": "apg-original", "relative_path": "process/event-loop.mjs", "rollback": "preserve-with-candidate-history", "runtime_role_state": "observed-exact-runtime", "whole_file_owner": "nodejs-runtime-profile"},
+    {"artifact_class": "esm-module-artifact", "artifact_id": "process-filesystem", "content_sha256": "f2fe7acf725b6e2a9442f60a544a01ae5fb1392b15959e8765d2c92a3e9444d9", "edit_permission": "apg-maintainer-editable", "exact_runtime_binding_state": "bound-to-primary-and-secondary-runtime", "external_effect_class": "owned-scratch-filesystem-only", "invocation_state": "invoked", "loader_role_state": "node-builtin-loader", "mapping_evidence_state": "explicit-extension", "module_mapping": "nodejs-esm", "package_manager_role_state": "none-required", "package_scope": "apg80-nodejs-runtime-cli", "provenance": "apg-original-apg81a-correction", "relative_path": "process/filesystem.mjs", "rollback": "preserve-with-candidate-history", "runtime_role_state": "observed-primary-and-secondary-runtime", "whole_file_owner": "nodejs-runtime-profile"},
+    {"artifact_class": "esm-module-artifact", "artifact_id": "process-inputs", "content_sha256": "dd2457ceec41eeddd7641d3ed22d5cfb0c5e2b543179b3b512c9b35b843da12d", "edit_permission": "apg-maintainer-editable", "exact_runtime_binding_state": "bound-to-observed-runtime-only", "external_effect_class": "none", "invocation_state": "invoked", "loader_role_state": "node-builtin-loader", "mapping_evidence_state": "explicit-extension", "module_mapping": "nodejs-esm", "package_manager_role_state": "none-required", "package_scope": "apg80-nodejs-runtime-cli", "provenance": "apg-original", "relative_path": "process/inputs.mjs", "rollback": "preserve-with-candidate-history", "runtime_role_state": "observed-exact-runtime", "whole_file_owner": "nodejs-runtime-profile"},
+    {"artifact_class": "node-cli-entrypoint", "artifact_id": "process-lifecycle-child", "content_sha256": "b010753441836a0c5df6109974c993c94dfe5ef0ef4e27415b97697ddbe5cacc", "edit_permission": "apg-maintainer-editable", "exact_runtime_binding_state": "bound-to-observed-runtime-only", "external_effect_class": "owned-child-process-only", "invocation_state": "invoked", "loader_role_state": "node-builtin-loader", "mapping_evidence_state": "explicit-extension", "module_mapping": "nodejs-esm", "package_manager_role_state": "none-required", "package_scope": "apg80-nodejs-runtime-cli", "provenance": "apg-original", "relative_path": "process/lifecycle-child.mjs", "rollback": "preserve-with-candidate-history", "runtime_role_state": "observed-exact-runtime", "whole_file_owner": "nodejs-runtime-profile"},
+    {"artifact_class": "esm-module-artifact", "artifact_id": "process-lifecycle-parent", "content_sha256": "7e9ec9a641c245e968e89d6d154559c97fa1b1867e4b703ea33b590b0b2bca08", "edit_permission": "apg-maintainer-editable", "exact_runtime_binding_state": "bound-to-observed-runtime-only", "external_effect_class": "owned-child-process-only", "invocation_state": "invoked", "loader_role_state": "node-builtin-loader", "mapping_evidence_state": "explicit-extension", "module_mapping": "nodejs-esm", "package_manager_role_state": "none-required", "package_scope": "apg80-nodejs-runtime-cli", "provenance": "apg-original", "relative_path": "process/lifecycle-parent.mjs", "rollback": "preserve-with-candidate-history", "runtime_role_state": "observed-exact-runtime", "whole_file_owner": "nodejs-runtime-profile"},
+    {"artifact_class": "esm-module-artifact", "artifact_id": "process-stdio", "content_sha256": "d21f7acade40a44252a6a5157865d0fde2594ae0c749451f8dbe3e8229734e3b", "edit_permission": "apg-maintainer-editable", "exact_runtime_binding_state": "bound-to-observed-runtime-only", "external_effect_class": "injected-stream-only", "invocation_state": "invoked", "loader_role_state": "node-builtin-loader", "mapping_evidence_state": "explicit-extension", "module_mapping": "nodejs-esm", "package_manager_role_state": "none-required", "package_scope": "apg80-nodejs-runtime-cli", "provenance": "apg-original", "relative_path": "process/stdio.mjs", "rollback": "preserve-with-candidate-history", "runtime_role_state": "observed-exact-runtime", "whole_file_owner": "nodejs-runtime-profile"},
+    {"artifact_class": "esm-module-artifact", "artifact_id": "resolution-entry", "content_sha256": "a1b6f32e7ce8a1f04144efccdde2406a30496cab7d9adb76e3ddb1e362a90abf", "edit_permission": "apg-maintainer-editable", "exact_runtime_binding_state": "bound-to-observed-runtime-only", "external_effect_class": "none", "invocation_state": "invoked", "loader_role_state": "node-builtin-loader", "mapping_evidence_state": "explicit-extension", "module_mapping": "nodejs-esm", "package_manager_role_state": "none-required", "package_scope": "apg80-resolution-scope", "provenance": "apg-original", "relative_path": "resolution/entry.mjs", "rollback": "preserve-with-candidate-history", "runtime_role_state": "observed-exact-runtime", "whole_file_owner": "nodejs-runtime-profile"},
+    {"artifact_class": "esm-module-artifact", "artifact_id": "resolution-condition-custom", "content_sha256": "487a4d0d884109bd8edc4f711090ae3ad96c9f6ff4f48d777d03def08cd4c6c7", "edit_permission": "apg-maintainer-editable", "exact_runtime_binding_state": "bound-to-observed-runtime-only", "external_effect_class": "none", "invocation_state": "invoked", "loader_role_state": "node-builtin-loader", "mapping_evidence_state": "explicit-extension", "module_mapping": "nodejs-esm", "package_manager_role_state": "none-required", "package_scope": "apg80-resolution-scope", "provenance": "apg-original", "relative_path": "resolution/lib/condition-custom.mjs", "rollback": "preserve-with-candidate-history", "runtime_role_state": "observed-exact-runtime", "whole_file_owner": "javascript-language-profile"},
+    {"artifact_class": "esm-module-artifact", "artifact_id": "resolution-condition-default", "content_sha256": "e6c1508c047710fd2fa6fe04a82e7841af30a0da1d902bd809b7ea2c3f432625", "edit_permission": "apg-maintainer-editable", "exact_runtime_binding_state": "bound-to-observed-runtime-only", "external_effect_class": "none", "invocation_state": "invoked", "loader_role_state": "node-builtin-loader", "mapping_evidence_state": "explicit-extension", "module_mapping": "nodejs-esm", "package_manager_role_state": "none-required", "package_scope": "apg80-resolution-scope", "provenance": "apg-original", "relative_path": "resolution/lib/condition-default.mjs", "rollback": "preserve-with-candidate-history", "runtime_role_state": "observed-exact-runtime", "whole_file_owner": "javascript-language-profile"},
+    {"artifact_class": "esm-module-artifact", "artifact_id": "resolution-encapsulated", "content_sha256": "3df719b4c2253a832dba874ffa3888d645af4e1f80e289e7d63341a82debf02d", "edit_permission": "apg-maintainer-editable", "exact_runtime_binding_state": "unbound", "external_effect_class": "none", "invocation_state": "not-invoked", "loader_role_state": "node-builtin-loader", "mapping_evidence_state": "explicit-extension", "module_mapping": "nodejs-esm", "package_manager_role_state": "none-required", "package_scope": "apg80-resolution-scope", "provenance": "apg-original", "relative_path": "resolution/lib/encapsulated.mjs", "rollback": "preserve-with-candidate-history", "runtime_role_state": "not-invoked", "whole_file_owner": "javascript-language-profile"},
+    {"artifact_class": "esm-module-artifact", "artifact_id": "resolution-internal-only", "content_sha256": "e4dae3c419f908c7a6d61e3207db4851941c0560c2ffae31e2203960857a2125", "edit_permission": "apg-maintainer-editable", "exact_runtime_binding_state": "bound-to-observed-runtime-only", "external_effect_class": "none", "invocation_state": "invoked", "loader_role_state": "node-builtin-loader", "mapping_evidence_state": "explicit-extension", "module_mapping": "nodejs-esm", "package_manager_role_state": "none-required", "package_scope": "apg80-resolution-scope", "provenance": "apg-original", "relative_path": "resolution/lib/internal-only.mjs", "rollback": "preserve-with-candidate-history", "runtime_role_state": "observed-exact-runtime", "whole_file_owner": "javascript-language-profile"},
+    {"artifact_class": "esm-module-artifact", "artifact_id": "resolution-public-entry", "content_sha256": "97cb6994ce71ce423827e91f802ea2e69efe6180c297802552190791706d363b", "edit_permission": "apg-maintainer-editable", "exact_runtime_binding_state": "bound-to-observed-runtime-only", "external_effect_class": "none", "invocation_state": "invoked", "loader_role_state": "node-builtin-loader", "mapping_evidence_state": "explicit-extension", "module_mapping": "nodejs-esm", "package_manager_role_state": "none-required", "package_scope": "apg80-resolution-scope", "provenance": "apg-original", "relative_path": "resolution/lib/public-entry.mjs", "rollback": "preserve-with-candidate-history", "runtime_role_state": "observed-exact-runtime", "whole_file_owner": "javascript-language-profile"},
+    {"artifact_class": "esm-module-artifact", "artifact_id": "resolution-public-subpath", "content_sha256": "231282a9abcd0ca24a28dadd7eae196522dd0ce6ab929677e7ea43606f749045", "edit_permission": "apg-maintainer-editable", "exact_runtime_binding_state": "bound-to-observed-runtime-only", "external_effect_class": "none", "invocation_state": "invoked", "loader_role_state": "node-builtin-loader", "mapping_evidence_state": "explicit-extension", "module_mapping": "nodejs-esm", "package_manager_role_state": "none-required", "package_scope": "apg80-resolution-scope", "provenance": "apg-original", "relative_path": "resolution/lib/public-subpath.mjs", "rollback": "preserve-with-candidate-history", "runtime_role_state": "observed-exact-runtime", "whole_file_owner": "javascript-language-profile"},
+    {"artifact_class": "package-manifest", "artifact_id": "resolution-scope-manifest", "content_sha256": "d46db278787cfd5c5a7f40b81dd90b23253aeb27340efcbcb28ae6b71ed1adba", "edit_permission": "apg-maintainer-editable", "exact_runtime_binding_state": "unbound", "external_effect_class": "none", "invocation_state": "not-invoked", "loader_role_state": "none", "mapping_evidence_state": "not-applicable", "module_mapping": "not-node-mapped", "package_manager_role_state": "none-required", "package_scope": "apg80-resolution-scope", "provenance": "apg-original", "relative_path": "resolution/package.json", "rollback": "preserve-with-candidate-history", "runtime_role_state": "not-invoked", "whole_file_owner": "project-configuration-owner"},
+    {"artifact_class": "esm-module-artifact", "artifact_id": "runtime-identity", "content_sha256": "4fdebbb3832c253dca094c359c41b4f42e2f83b6395aea1960908ed9ae3801c4", "edit_permission": "apg-maintainer-editable", "exact_runtime_binding_state": "bound-to-observed-runtime-only", "external_effect_class": "none", "invocation_state": "invoked", "loader_role_state": "node-builtin-loader", "mapping_evidence_state": "explicit-extension", "module_mapping": "nodejs-esm", "package_manager_role_state": "none-required", "package_scope": "apg80-nodejs-runtime-cli", "provenance": "apg-original", "relative_path": "runtime/identity.mjs", "rollback": "preserve-with-candidate-history", "runtime_role_state": "observed-exact-runtime", "whole_file_owner": "nodejs-runtime-profile"},
+    {"artifact_class": "target-role-record", "artifact_id": "target-runtime-role-record", "content_sha256": "05e4818c84395e87a2b834f0d08d50ab32df1f278da38a511d8b622be721fa17", "edit_permission": "apg-maintainer-editable", "exact_runtime_binding_state": "unbound", "external_effect_class": "none", "invocation_state": "not-invoked", "loader_role_state": "none", "mapping_evidence_state": "not-applicable", "module_mapping": "not-node-mapped", "package_manager_role_state": "none-required", "package_scope": "apg80-nodejs-runtime-cli", "provenance": "apg-original", "relative_path": "target-boundary/public-safe-runtime-role.json", "rollback": "preserve-with-candidate-history", "runtime_role_state": "not-invoked", "whole_file_owner": "apg-fixture-owner"},
+    {"artifact_class": "typescript-source-artifact", "artifact_id": "typescript-erasable", "content_sha256": "9ebfb6e41b965344be6e6185a74c4a7ea062003c577842087f9725a1f5d4390a", "edit_permission": "apg-maintainer-editable", "exact_runtime_binding_state": "bound-to-primary-and-secondary-runtime", "external_effect_class": "stdout-closed-json-only", "invocation_state": "invoked", "loader_role_state": "node-builtin-type-stripping", "mapping_evidence_state": "explicit-typescript-extension", "module_mapping": "nodejs-typescript-strip", "package_manager_role_state": "none-required", "package_scope": "apg80-nodejs-runtime-cli", "provenance": "apg-original-apg81-correction", "relative_path": "typescript/erasable.ts", "rollback": "preserve-with-candidate-history", "runtime_role_state": "observed-primary-and-secondary-runtime", "whole_file_owner": "typescript-language-profile"},
+    {"artifact_class": "typescript-source-artifact", "artifact_id": "typescript-nonerasable", "content_sha256": "e8bf430206e1b200925ff86763d016528725e68e2d7e8c396132906f413fc588", "edit_permission": "apg-maintainer-editable", "exact_runtime_binding_state": "bound-to-primary-and-secondary-runtime", "external_effect_class": "none", "invocation_state": "invoked-refused", "loader_role_state": "node-builtin-type-stripping", "mapping_evidence_state": "explicit-typescript-extension", "module_mapping": "nodejs-typescript-strip-refused-nonerasable", "package_manager_role_state": "none-required", "package_scope": "apg80-nodejs-runtime-cli", "provenance": "apg-original-apg81-correction", "relative_path": "typescript/nonerasable.ts", "rollback": "preserve-with-candidate-history", "runtime_role_state": "observed-primary-and-secondary-runtime", "whole_file_owner": "typescript-language-profile"}
+  ],
+  "authority": {
+    "authored_phase_id": "APG80",
+    "candidate_decision_id": "ADR-0046",
+    "candidate_state": "provisionally-integrated",
+    "governing_decision_id": "ADR-0042",
+    "implementation_observation_ids": [
+      "node-v22.22.2-darwin-arm64-bounded-observation",
+      "node-v24.19.0-darwin-arm64-bounded-observation"
+    ],
+    "normative_authority_ids": [
+      "nodejs-versioned-api-documentation-v22.22.2",
+      "nodejs-versioned-api-documentation-v24.19.0",
+      "ecma262-es2026"
+    ]
+  },
+  "cases": [
+    {
+      "artifact_ids": [
+        "runtime-identity",
+        "typescript-erasable",
+        "typescript-nonerasable"
+      ],
+      "completion_state": "owned-complete",
+      "forbid": [
+        "promoting the observed version to a reusable-profile runtime selection",
+        "promoting observed feature availability to any other Node version"
+      ],
+      "id": "APG80-FX-001",
+      "node_decision": "Which runtime is actually executing, and which public features that exact runtime exposes.",
+      "present_evidence": [
+        "observed process version, V8 version, platform, architecture, and empty execArgv on both exact runtime roles",
+        "observed presence of import.meta.resolve, fetch, Web Streams, and AbortSignal",
+        "observed erasable TypeScript execute and non-erasable TypeScript refuse on both exact runtime roles"
+      ],
+      "purpose": "Exact runtime identity, version, platform, architecture, and flag boundary.",
+      "required_evidence": [
+        "the project's selected runtime version and flags for any conclusion about a role other than this process"
+      ],
+      "response": "proceed-routine",
+      "routes_or_obligations": [
+        "project-design-owner::choose the runtime family and version for any product role"
+      ],
+      "selection": "selected",
+      "smoke_state": "evaluated"
+    },
+    {
+      "artifact_ids": [
+        "fixture-root-manifest",
+        "mapping-module-scope-manifest",
+        "mapping-module-scope-source",
+        "mapping-commonjs-scope-manifest",
+        "mapping-commonjs-scope-source",
+        "mapping-commonjs-scope-module-only",
+        "mapping-typeless-scope-manifest",
+        "mapping-typeless-detected",
+        "mapping-typeless-goal-neutral",
+        "mapping-explicit-module",
+        "mapping-explicit-commonjs"
+      ],
+      "artifact_states": [
+        {"artifact_id": "fixture-root-manifest", "availability": "present", "mapping_state": "not-applicable", "selection": "non-trigger", "response": "proceed-routine"},
+        {"artifact_id": "mapping-module-scope-manifest", "availability": "present", "mapping_state": "not-applicable", "selection": "non-trigger", "response": "proceed-routine"},
+        {"artifact_id": "mapping-module-scope-source", "availability": "present", "mapping_state": "nodejs-esm", "selection": "selected", "response": "proceed-routine"},
+        {"artifact_id": "mapping-commonjs-scope-manifest", "availability": "present", "mapping_state": "not-applicable", "selection": "non-trigger", "response": "proceed-routine"},
+        {"artifact_id": "mapping-commonjs-scope-source", "availability": "present", "mapping_state": "nodejs-commonjs", "selection": "selected", "response": "proceed-routine"},
+        {"artifact_id": "mapping-commonjs-scope-module-only", "availability": "present", "mapping_state": "nodejs-commonjs-refused-module-syntax", "selection": "selected", "response": "inspect-before-judgment"},
+        {"artifact_id": "mapping-typeless-scope-manifest", "availability": "present", "mapping_state": "not-applicable", "selection": "non-trigger", "response": "proceed-routine"},
+        {"artifact_id": "mapping-typeless-detected", "availability": "present", "mapping_state": "nodejs-esm-version-specific", "selection": "selected", "response": "inspect-before-judgment"},
+        {"artifact_id": "mapping-typeless-goal-neutral", "availability": "present", "mapping_state": "unresolved", "selection": "selected", "response": "stop-and-escalate"},
+        {"artifact_id": "mapping-explicit-module", "availability": "present", "mapping_state": "nodejs-esm", "selection": "selected", "response": "proceed-routine"},
+        {"artifact_id": "mapping-explicit-commonjs", "availability": "present", "mapping_state": "nodejs-commonjs", "selection": "selected", "response": "proceed-routine"}
+      ],
+      "completion_state": "stopped-required-evidence",
+      "forbid": [
+        "flattening .js, .mjs, and .cjs into one mapping",
+        "omitting the nearest package scope from a .js mapping",
+        "promoting the unresolved goal-neutral artifact to a known mapping",
+        "promoting a Node mapping rule to ECMAScript grammar authority"
+      ],
+      "id": "APG80-FX-002",
+      "node_decision": "Which Node module system each artifact maps to, and on what evidence.",
+      "present_evidence": [
+        "the nearest controlling manifest for every mapped artifact",
+        "explicit .mjs and .cjs extension mappings observed under a type=module root scope",
+        "an explicit type=commonjs scope observed to refuse module-only syntax",
+        "a typeless scope observed to reparse module-only syntax with a typeless-package diagnostic"
+      ],
+      "purpose": "Package-scope module-mapping matrix with known module, known CommonJS, detected, and genuinely unresolved variants.",
+      "required_evidence": [
+        "the exact Node version and flag set before any mapping conclusion is generalized",
+        "a mapping decision for the goal-neutral artifact, which its own bytes cannot settle"
+      ],
+      "response": "stop-and-escalate",
+      "routes_or_obligations": [
+        "javascript-language-owner::decide ECMAScript parse-goal consequences once the host mapping is established",
+        "project-configuration-owner::declare an explicit package type where mapping must not depend on detection"
+      ],
+      "selection": "selected",
+      "smoke_state": "evaluated-except-goal-neutral-artifact"
+    },
+    {
+      "artifact_ids": [
+        "commonjs-wrapper-boundary",
+        "commonjs-local-dependency"
+      ],
+      "completion_state": "owned-complete-nonowned-routes-open",
+      "forbid": [
+        "transferring CommonJS whole-file ownership to the JavaScript language owner",
+        "presenting wrapper bindings as ECMAScript language semantics"
+      ],
+      "id": "APG80-FX-003",
+      "node_decision": "What Node's CommonJS wrapper supplies, and how the exports alias behaves across reassignment.",
+      "present_evidence": [
+        "observed exports, require, module, __filename, and __dirname bindings",
+        "observed top-level this identity with the initial module.exports",
+        "observed alias identity before and after module.exports reassignment",
+        "observed require cache identity for one resolved filename"
+      ],
+      "purpose": "Standalone CommonJS wrapper bindings and the exports/module alias boundary.",
+      "required_evidence": [
+        "the exact Node version before any wrapper claim is generalized"
+      ],
+      "response": "proceed-routine",
+      "routes_or_obligations": [
+        "javascript-language-owner::decide the ordinary ECMAScript expression semantics inside the established region"
+      ],
+      "selection": "selected",
+      "smoke_state": "evaluated"
+    },
+    {
+      "artifact_ids": [
+        "esm-metadata",
+        "esm-builtin-boundary"
+      ],
+      "completion_state": "owned-complete-nonowned-routes-open",
+      "forbid": [
+        "promoting a resolved built-in specifier to a filesystem, network, or operating-system result",
+        "assuming import.meta fields exist on an unstated Node version"
+      ],
+      "id": "APG80-FX-004",
+      "node_decision": "Which host metadata Node supplies to an ECMAScript module, and what a resolved node: specifier proves.",
+      "present_evidence": [
+        "observed import.meta url, dirname, filename, and resolve availability",
+        "observed absence of every CommonJS wrapper global",
+        "observed undefined top-level this",
+        "observed resolution of node:url and node:path specifiers"
+      ],
+      "purpose": "Node ESM host metadata and the built-in-module boundary.",
+      "required_evidence": [
+        "the exact Node version before any import.meta field is assumed available"
+      ],
+      "response": "proceed-routine",
+      "routes_or_obligations": [
+        "javascript-language-owner::decide module binding, namespace, and evaluation semantics after loading",
+        "filesystem-owner::decide any filesystem consequence, which importing a built-in does not establish"
+      ],
+      "selection": "selected",
+      "smoke_state": "evaluated"
+    },
+    {
+      "artifact_ids": [
+        "resolution-scope-manifest",
+        "resolution-entry",
+        "resolution-public-entry",
+        "resolution-internal-only"
+      ],
+      "completion_state": "owned-complete-nonowned-routes-open",
+      "forbid": [
+        "requiring package installation to run this fixture",
+        "treating a package manager's install graph as a Node resolver output",
+        "promoting a resolved specifier to an evaluation or external result"
+      ],
+      "id": "APG80-FX-005",
+      "node_decision": "How Node resolves relative, built-in, self-referencing, and imports-map specifiers from checked-in files.",
+      "present_evidence": [
+        "observed resolution of a node: built-in, a relative specifier, a package self-reference, and a #imports specifier",
+        "observed absence of any installation step, lockfile, or node_modules directory"
+      ],
+      "purpose": "Relative, built-in, and local-package resolution under an APG-owned package graph.",
+      "required_evidence": [
+        "an installed package graph before any conclusion about third-party dependency resolution"
+      ],
+      "response": "proceed-routine",
+      "routes_or_obligations": [
+        "package-manager-owner::own installation, lockfiles, and dependency solving, none of which this graph requires",
+        "javascript-language-owner::decide evaluation results after resolution and loading succeed"
+      ],
+      "selection": "selected",
+      "smoke_state": "evaluated"
+    },
+    {
+      "artifact_ids": [
+        "resolution-public-subpath",
+        "resolution-encapsulated",
+        "resolution-condition-default",
+        "resolution-condition-custom"
+      ],
+      "completion_state": "owned-complete-nonowned-routes-open",
+      "forbid": [
+        "presenting exports encapsulation as a filesystem permission or security control",
+        "assuming one condition set across differing invocations"
+      ],
+      "id": "APG80-FX-006",
+      "node_decision": "Which target an exports or imports map selects under a given condition set, and what encapsulation refuses.",
+      "present_evidence": [
+        "observed default condition selection and a different selection under an explicit custom condition",
+        "observed refusal of an unexported subpath with a Node resolver error code"
+      ],
+      "purpose": "Package exports, imports, and condition selection with an encapsulated subpath.",
+      "required_evidence": [
+        "the exact condition set of the real invocation before any condition-dependent conclusion"
+      ],
+      "response": "proceed-routine",
+      "routes_or_obligations": [
+        "security-owner::decide access control, which export encapsulation does not provide",
+        "build-transform-owner::decide bundler or framework resolution, which may differ from Node's"
+      ],
+      "selection": "selected",
+      "smoke_state": "evaluated"
+    },
+    {
+      "artifact_ids": [
+        "interop-static-exports",
+        "interop-dynamic-exports",
+        "interop-esm-consumer",
+        "interop-require-esm"
+      ],
+      "completion_state": "owned-complete-nonowned-routes-open",
+      "forbid": [
+        "stating one universal interop rule across Node versions",
+        "promoting static named-export detection into a live-binding guarantee"
+      ],
+      "id": "APG80-FX-007",
+      "node_decision": "How Node maps a CommonJS module into an ESM namespace, and whether the reverse direction is supported on this exact runtime.",
+      "present_evidence": [
+        "observed default export carrying the full module.exports object",
+        "observed static named-export detection for statically assigned names",
+        "observed detection failure for computed export names, leaving only a default export",
+        "observed result of requiring an ECMAScript module on this exact runtime"
+      ],
+      "purpose": "ESM/CommonJS interoperability and the dynamic-import boundary under the selected exact runtime.",
+      "required_evidence": [
+        "the exact Node version and flags before any interop or require-of-module claim is generalized"
+      ],
+      "response": "inspect-before-judgment",
+      "routes_or_obligations": [
+        "javascript-language-owner::decide live-binding and namespace semantics, which static detection does not supply"
+      ],
+      "selection": "selected",
+      "smoke_state": "evaluated"
+    },
+    {
+      "artifact_ids": [
+        "interop-identity"
+      ],
+      "completion_state": "owned-complete-nonowned-routes-open",
+      "forbid": [
+        "promoting cache observations into process-independent, persistence, or deployment semantics"
+      ],
+      "id": "APG80-FX-008",
+      "node_decision": "What makes two loads the same instance in each module system, and how far that identity extends.",
+      "present_evidence": [
+        "observed single CommonJS instance and require-cache presence for one resolved filename",
+        "observed identical ESM namespace for one specifier and a distinct namespace for a query-suffixed specifier"
+      ],
+      "purpose": "CommonJS and ESM cache or identity boundaries.",
+      "required_evidence": [
+        "loader, symlink, and realpath facts before any identity claim beyond these specifiers"
+      ],
+      "response": "proceed-routine",
+      "routes_or_obligations": [
+        "project-design-owner::decide whether module-level state is an acceptable design, which identity behavior does not settle"
+      ],
+      "selection": "selected",
+      "smoke_state": "evaluated"
+    },
+    {
+      "artifact_ids": [
+        "cli-core",
+        "cli-adapter"
+      ],
+      "completion_state": "owned-complete-nonowned-routes-open",
+      "forbid": [
+        "presenting a correct core result as a working command",
+        "moving process, stream, or exit concerns into the language-owned core"
+      ],
+      "id": "APG80-FX-009",
+      "node_decision": "Which parts of a CLI are Node-owned adapter behavior and which are language-owned computation.",
+      "present_evidence": [
+        "observed identical core results for identical inputs with no process, stream, or filesystem access",
+        "observed adapter writes confined to injected streams and an exit status returned rather than forced"
+      ],
+      "purpose": "Effect-free language core separated from the Node CLI adapter.",
+      "required_evidence": [
+        "real argv, environment, stream, and exit behavior before any working-command claim"
+      ],
+      "response": "proceed-routine",
+      "routes_or_obligations": [
+        "javascript-language-owner::own the effect-free core computation",
+        "project-design-owner::decide whether this decomposition is sufficient for a product"
+      ],
+      "selection": "selected",
+      "smoke_state": "evaluated"
+    },
+    {
+      "artifact_ids": [
+        "process-inputs"
+      ],
+      "completion_state": "owned-complete-nonowned-routes-open",
+      "forbid": [
+        "logging or retaining arbitrary environment values",
+        "attributing shell parsing to Node"
+      ],
+      "id": "APG80-FX-010",
+      "node_decision": "How Node exposes process inputs, and what reading one does not authorize.",
+      "present_evidence": [
+        "observed argv tail after the entry point, empty execArgv, and a present working directory",
+        "synthetic allow-listed environment names read back with plainly non-sensitive values"
+      ],
+      "purpose": "Argv, environment, cwd, and synthetic non-sensitive process inputs.",
+      "required_evidence": [
+        "the parent process or package-script wrapper before any conclusion about how arguments were produced"
+      ],
+      "response": "proceed-routine",
+      "routes_or_obligations": [
+        "shell-owner::own tokenization, quoting, and expansion performed before Node started",
+        "security-owner::own secret handling, which reading an environment value never authorizes"
+      ],
+      "selection": "selected",
+      "smoke_state": "evaluated"
+    },
+    {
+      "artifact_ids": [
+        "process-stdio"
+      ],
+      "completion_state": "owned-complete-nonowned-routes-open",
+      "forbid": [
+        "promoting a stdout write to delivery",
+        "claiming pending work flushed merely because a write returned"
+      ],
+      "id": "APG80-FX-011",
+      "node_decision": "What a stream write result means locally, and what exit status records.",
+      "present_evidence": [
+        "observed non-terminal standard streams under a piped invocation",
+        "observed accepted write, refused write above the buffer threshold, and a subsequent drain on an in-memory sink",
+        "observed exit status recorded through process.exitCode rather than a forced exit"
+      ],
+      "purpose": "Stdin, stdout, stderr, streams, backpressure, and the exit-status boundary.",
+      "required_evidence": [
+        "consumer behavior before any delivery, persistence, or completion claim"
+      ],
+      "response": "proceed-routine",
+      "routes_or_obligations": [
+        "operating-system-owner::own pipe, terminal, and file behavior beyond the Node API contract",
+        "deployment-owner::own whether any consumer received or retained the bytes"
+      ],
+      "selection": "selected",
+      "smoke_state": "evaluated"
+    },
+    {
+      "artifact_ids": [
+        "process-filesystem"
+      ],
+      "completion_state": "owned-complete-nonowned-routes-open",
+      "forbid": [
+        "promoting a filesystem call to durability, authorization, or security containment",
+        "supplying any directory other than the APG81A-created fs-case directory"
+      ],
+      "id": "APG80-FX-012",
+      "node_decision": "What Node's documented filesystem and path API results establish, and what they do not.",
+      "present_evidence": [
+        "observed file-URL round trip, rename preserving content, and a Node error code for a missing path",
+        "one exact parent-created fs-case directory used only for synthetic operations"
+      ],
+      "purpose": "Filesystem, path, and file-URL semantics inside one controlled APG-created case directory.",
+      "required_evidence": [
+        "filesystem, permission, and durability facts before any persistence or authorization claim"
+      ],
+      "response": "proceed-routine",
+      "routes_or_obligations": [
+        "filesystem-owner::own permission policy, atomicity across filesystems, and durability",
+        "security-owner::own path safety for untrusted input and business authorization"
+      ],
+      "selection": "selected",
+      "smoke_state": "evaluated"
+    },
+    {
+      "artifact_ids": [
+        "process-event-loop-esm",
+        "process-event-loop-commonjs",
+        "process-lifecycle-parent",
+        "process-lifecycle-child"
+      ],
+      "completion_state": "owned-complete-nonowned-routes-open",
+      "forbid": [
+        "using one top-level observation as a universal event-loop rule",
+        "signalling any process this fixture does not own",
+        "presenting a spawned child as evidence of shell safety"
+      ],
+      "id": "APG80-FX-013",
+      "node_decision": "How failures, scheduling order, and an owned child's termination behave under this exact runtime and entry context.",
+      "present_evidence": [
+        "a reproducible scheduling order observed from an ECMAScript module entry",
+        "a reproducible and different scheduling order observed from a CommonJS entry on the same runtime and flags",
+        "observed synchronous throw and rejected promise handled on distinct channels",
+        "one APG80-owned child spawned without a shell, terminated by its parent, and reaped with an observed close status"
+      ],
+      "purpose": "Errors, rejection, signal-safe child lifecycle, and timer or nextTick ordering with each artifact and execution state recorded separately.",
+      "required_evidence": [
+        "the exact scheduling context, entry module system, Node version, and flags before any ordering claim is reused"
+      ],
+      "response": "inspect-before-judgment",
+      "routes_or_obligations": [
+        "javascript-language-owner::own Promise and queueMicrotask language semantics",
+        "operating-system-owner::own signal delivery, scheduling, and process supervision",
+        "shell-owner::own any command grammar, which direct executable invocation does not use"
+      ],
+      "selection": "selected",
+      "smoke_state": "evaluated"
+    },
+    {
+      "artifact_ids": [
+        "target-runtime-role-record"
+      ],
+      "completion_state": "stopped-required-evidence",
+      "forbid": [
+        "promoting a declared range to an exact invocation",
+        "promoting a packageManager field to Node execution",
+        "promoting a package script or continuous-integration definition to target execution",
+        "copying target source, paths, or command bodies"
+      ],
+      "id": "APG80-FX-014",
+      "node_decision": "What each target's declared metadata settles about its Node runtime role, and what remains unresolved.",
+      "present_evidence": [
+        "declared package types, a declared minimum version range on one target, an absent range on the other",
+        "a declared exact package-manager version on one target",
+        "a continuous-integration major release line on one target and delegated selection on the other"
+      ],
+      "purpose": "Target-first runtime and package-manager role boundary using public-safe target metadata only, with no target execution.",
+      "required_evidence": [
+        "an exact resolved Node version, platform, architecture, flag set, and observed invocation for every target role"
+      ],
+      "response": "stop-and-escalate",
+      "routes_or_obligations": [
+        "project-design-owner::select an exact runtime for each target role",
+        "package-manager-owner::own package-manager selection and install behavior",
+        "deployment-owner::own continuous-integration and deployment runtime selection"
+      ],
+      "selection": "route-to-owner",
+      "smoke_state": "read-only-not-executed"
+    }
+  ],
+  "documentation_artifacts": [
+    {"artifact_class": "documentation", "artifact_id": "fixture-readme", "content_sha256": "29366d9371b23f5acfb5cac2358584d310f70fedc3ffbb9a9385bccd69573b23", "edit_permission": "apg-maintainer-editable", "provenance": "apg-original-apg81a-correction", "relative_path": "README.md", "rollback": "preserve-with-candidate-history"},
+    {"artifact_class": "fixture-manifest", "artifact_id": "fixture-manifest", "content_sha256": null, "edit_permission": "apg-maintainer-editable", "provenance": "apg-original-apg81a-correction", "relative_path": "fixture-manifest.json", "rollback": "preserve-with-candidate-history"}
+  ],
+  "fixture": {
+    "edit_permission": "apg-maintainer-editable",
+    "fixture_id": "apg80-nodejs-runtime-cli",
+    "provenance_class": "apg-original"
+  },
+  "invariants": {
+    "external_network_contacted": false,
+    "generated_output_committed": false,
+    "package_installation_required": false,
+    "shell_invoked": false,
+    "target_body_present": false,
+    "target_executed": false,
+    "target_path_present": false,
+    "unrelated_processes_signalled": false
+  },
+  "lifecycle": {
+    "authored_by_phase_id": "APG80",
+    "candidate_state": "provisionally-integrated",
+    "current_phase_id": "APG81H",
+    "is_maintained_test_owner": true,
+    "is_oracle": false,
+    "round_state": "terminal-repair-checkpoint-complete"
+  },
+  "schema_version": 1,
+  "vocabulary": {
+    "artifact_classes": [
+      "ambiguous-js-artifact",
+      "commonjs-artifact",
+      "documentation",
+      "esm-module-artifact",
+      "fixture-manifest",
+      "node-cli-entrypoint",
+      "package-manifest",
+      "target-role-record",
+      "typescript-source-artifact"
+    ],
+    "completion_states": [
+      "owned-complete",
+      "owned-complete-nonowned-routes-open",
+      "stopped-required-evidence"
+    ],
+    "exact_runtime_binding_states": [
+      "bound-to-observed-runtime-only",
+      "bound-to-primary-and-secondary-runtime",
+      "unbound"
+    ],
+    "external_effect_classes": [
+      "injected-stream-only",
+      "none",
+      "owned-scratch-filesystem-only",
+      "owned-child-process-only",
+      "scratch-filesystem-only",
+      "stdout-closed-json-only"
+    ],
+    "invocation_states": [
+      "invoked",
+      "invoked-refused",
+      "not-invoked"
+    ],
+    "loader_role_states": [
+      "node-builtin-loader",
+      "node-builtin-type-stripping",
+      "none"
+    ],
+    "mapping_evidence_states": [
+      "explicit-extension",
+      "explicit-package-type",
+      "explicit-package-type-refusal",
+      "explicit-typescript-extension",
+      "not-applicable",
+      "unresolved",
+      "version-specific-syntax-detection"
+    ],
+    "module_mappings": [
+      "nodejs-commonjs",
+      "nodejs-commonjs-refused-module-syntax",
+      "nodejs-esm",
+      "nodejs-typescript-strip",
+      "nodejs-typescript-strip-refused-nonerasable",
+      "not-node-mapped",
+      "unresolved"
+    ],
+    "package_manager_role_states": [
+      "none-required"
+    ],
+    "responses": [
+      "bounded-local-decision",
+      "inspect-before-judgment",
+      "proceed-routine",
+      "stop-and-escalate"
+    ],
+    "runtime_role_states": [
+      "not-invoked",
+      "observed-exact-runtime",
+      "observed-primary-and-secondary-runtime"
+    ],
+    "selections": [
+      "embedded-route",
+      "non-trigger",
+      "route-to-owner",
+      "selected"
+    ],
+    "smoke_states": [
+      "evaluated",
+      "evaluated-except-goal-neutral-artifact",
+      "read-only-not-executed"
+    ],
+    "whole_file_owners": [
+      "apg-fixture-owner",
+      "javascript-language-profile",
+      "node-commonjs-owner",
+      "nodejs-runtime-profile",
+      "project-configuration-owner",
+      "typescript-language-profile",
+      "unresolved"
+    ]
+  }
+}

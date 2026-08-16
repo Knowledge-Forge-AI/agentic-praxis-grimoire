@@ -93,6 +93,49 @@ def test_operational_report_preserves_source_and_writes_private_complete_record(
     assert stat.S_IMODE(destination.parent.stat().st_mode) == 0o700
 
 
+def test_default_outbox_writes_ops_only_primary_without_legacy_override(
+    tmp_path: Path,
+) -> None:
+    repository = tmp_path / "repository"
+    initialize_repository(repository)
+    home = tmp_path / "home"
+    source = tmp_path / "operational-default.txt"
+    body = (
+        "REPORT\n"
+        "report_schema: operational-report-v1\n"
+        "phase: APG82-OPS\n"
+        "outcome: passed\n"
+    ).encode()
+    source.write_bytes(body)
+    source.chmod(0o600)
+    environment = os.environ.copy()
+    environment.pop("GIT_SHOW_REPORT_ROOT", None)
+    environment["HOME"] = os.fspath(home)
+    result = subprocess.run(
+        [
+            os.fspath(COMMAND),
+            "APG82-OPS",
+            os.fspath(source),
+            "passed",
+            "pytest",
+        ],
+        cwd=repository,
+        env=environment,
+        check=False,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+    assert result.returncode == 0, result.stderr.decode()
+    phase_directory = home / "Documents" / "agent" / "outbox" / "repository" / "APG82-OPS"
+    destination = phase_directory / "APG82-OPS.ops.report.txt"
+    assert destination.exists()
+    assert b"RECORD-TYPE: operational-report\n" in destination.read_bytes()
+    assert stat.S_IMODE(phase_directory.stat().st_mode) == 0o700
+    assert stat.S_IMODE(destination.stat().st_mode) == 0o600
+    assert not (phase_directory / "APG82-OPS.git.show.report.txt").exists()
+    assert not (phase_directory / "APG82-OPS.git.diff.report.txt").exists()
+
+
 def test_operational_report_rejects_symlink_source_without_destination(
     tmp_path: Path,
 ) -> None:
@@ -228,7 +271,7 @@ def test_destination_rejects_unsafe_directory_and_lock_shapes(
 ) -> None:
     report_root = tmp_path / "reports"
     project_directory = report_root / "repository"
-    report_root.mkdir()
+    report_root.mkdir(mode=0o700)
     target = tmp_path / "target"
     target.mkdir()
     project_directory.symlink_to(target, target_is_directory=True)

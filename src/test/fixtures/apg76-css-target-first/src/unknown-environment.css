@@ -1,0 +1,30 @@
+/* APG76-FX-014 — unknown parser, browser, and render state.
+   APG-owned fixture source. Independently written; no target source.
+
+   Every declaration below has inspectable source-level grammar forms, and none can be given a
+   rendered consequence from these bytes alone: no parser or transformer role
+   is selected, no browser is named, and no document or environment is bound. */
+
+.viewport-bound {
+  width: 50vw;   /* needs an environment value */
+  height: 40%;   /* needs the containing block's used value */
+}
+
+.writing-mode-bound {
+  padding-inline-end: 1rem; /* needs writing mode, direction, orientation */
+}
+
+.support-bound {
+  text-wrap: balance; /* needs the exact user agent before availability */
+}
+
+.state-bound:hover {
+  color: #1f4f8f; /* needs a document and a runtime interaction */
+}
+
+.transform-bound {
+  /* Needs the exact transformer, if any, before emitted bytes are known.
+     The freshly pinned target selects a framework CSS pipeline, but actual
+     invocation and emitted bytes remain unobserved. */
+  color: rgb(31 79 143 / 80%);
+}

@@ -98,18 +98,29 @@ def test_run_sets_deterministic_environment_and_restores_handlers(
     monkeypatch.setattr(cli.os, "umask", lambda mode: installed.append(("umask", mode)) or 0)
     monkeypatch.setattr(cli.signal, "getsignal", lambda value: f"old-{value}")
     monkeypatch.setattr(cli.signal, "signal", lambda value, handler: installed.append((value, handler)))
-    assert cli._run("command", lambda arguments: len(arguments), ["one"]) == 1
-    assert cli.os.environ["LC_ALL"] == "C"
-    assert cli.os.environ["GIT_PAGER"] == "cat"
+    monkeypatch.setenv("LC_ALL", "before")
+    monkeypatch.delenv("GIT_PAGER", raising=False)
+
+    def observe_environment(arguments: list[str]) -> int:
+        assert cli.os.environ["LC_ALL"] == "C"
+        assert cli.os.environ["GIT_PAGER"] == "cat"
+        return len(arguments)
+
+    assert cli._run("command", observe_environment, ["one"]) == 1
+    assert cli.os.environ["LC_ALL"] == "before"
+    assert "GIT_PAGER" not in cli.os.environ
     assert installed[0] == ("umask", 0o077)
-    assert any(str(handler).startswith("old-") for _, handler in installed[1:])
+    assert installed[-1] == ("umask", 0)
+    assert any(str(handler).startswith("old-") for _, handler in installed[1:-1])
 
 
 def test_git_show_help_usage_validation_and_success(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
 ) -> None:
     assert cli._git_show(["--help"]) == 0
-    assert "Usage: git-show-report" in capsys.readouterr().out
+    help_text = capsys.readouterr().out
+    assert "Usage: git-show-report" in help_text
+    assert "~/Documents/agent/outbox/<repo-name>/<ticket-id>" in help_text
     assert cli._git_show([]) == 2
     assert "Usage: git-show-report" in capsys.readouterr().err
     with pytest.raises(safety.UsageError):
@@ -133,6 +144,7 @@ def test_git_diff_help_option_shape_and_success(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
 ) -> None:
     assert cli._git_diff(["-h"]) == 0
+    assert "~/Documents/agent/outbox/<repo-name>/<phase-id>" in capsys.readouterr().out
     assert cli._git_diff(["APG", "passed"]) == 2
     assert cli._git_diff(["APG", "passed", "gate", "--bad", "status"]) == 2
     install_common_fakes(monkeypatch, tmp_path)
@@ -203,6 +215,7 @@ def test_operational_help_short_usage_and_success(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
 ) -> None:
     assert cli._append_operational(["--help"]) == 0
+    assert "~/Documents/agent/outbox/<repo-name>/<ticket-id>" in capsys.readouterr().out
     assert cli._append_operational([]) == 2
     source = tmp_path / "body.txt"
     source.write_text("evidence", encoding="utf-8")

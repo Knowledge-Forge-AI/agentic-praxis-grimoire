@@ -1,5 +1,11 @@
 # Project-Local APG Skill Projection
 
+<!-- APG-CANDIDATE-STATE: css-language-profile retained-provisional -->
+
+The marker above is the mechanical current-state authority. Bounded
+contradiction diagnostics cover only their frozen vocabulary; arbitrary prose
+still requires human review.
+
 ## Purpose
 
 `apg-project-skills` manages opt-in Codex project discovery links from a target
@@ -342,8 +348,23 @@ rollback tests cover both path classes without changing target state format.
 - Project projection success does not prove Codex invocation, automatic trigger
   selection, user-global integration, skill maturity, or production readiness.
 - The default managed set follows the verified source identity: nineteen
-  skills for public v0.3.0 and twenty-eight for current development. The command
+  skills for public v0.3.0 and thirty-three for current development. The command
   is not a general skill installer or package manager.
+
+APG49 adds no projection. Its matryer/is candidate is terminally deferred
+after corrected-state review, so the current default remains the same
+twenty-eight canonical targets and rollback has no matryer/is link or state
+entry to remove.
+
+APG59 adds no projection. Corrected-state review rejects the CSS candidate, so
+the default remains twenty-eight canonical targets and rollback has no CSS
+link or state entry to remove.
+
+APG62 also adds no projection. Corrected-state review rejects the fresh APG61
+CSS candidate after its one permitted correction, so the default remains the
+same twenty-eight canonical targets and neither apply nor rollback owns a
+`css-language-profile` projection. APG61 authoring remains historical evidence
+only.
 
 ## APG28A adopted test ownership
 
@@ -353,3 +374,45 @@ nineteen-skill disposable public-shaped source and real disposable Git targets.
 The adopted implementation measures copied helpers through direct parallel
 coverage collection and canonical path equivalence. APG28A adopts this test
 infrastructure without changing project-skill command or schema behavior.
+
+## APG66 Markdown projection
+
+APG66 adds one current-development projection,
+`.agents/skills/markdown-language-profile`, whose exact relative target is
+`../../skills/markdown-language-profile`. The default managed set is 29 and
+the same containment, direct-target, adoption, rollback, and source-identity
+rules apply. This repository-local owner does not change public or active
+corrected v0.4.0 and grants no installation outside an explicitly opted-in
+project worktree.
+
+## APG75 TypeScript projection
+
+APG75 adds `.agents/skills/typescript-language-profile` with exact relative
+target `../../skills/typescript-language-profile`. The default current managed
+set is 30. The ordinary containment, source-identity, adoption, check, and
+rollback rules apply; historical corrected v0.4 and public/active v0.4.0 do not
+acquire this owner.
+
+## APG77D CSS projection
+
+APG77D adds `.agents/skills/css-language-profile` with exact relative target
+`../../skills/css-language-profile`. The default current managed set is 31.
+The ordinary containment, source-identity, adoption, check, and rollback rules
+apply. Corrected historical v0.4 and public/active v0.4.0 do not acquire this
+owner, and rollback removes the current projection without rewriting history.
+
+## APG79E JavaScript projection
+
+APG79E adds `.agents/skills/javascript-language-profile` with exact relative
+target `../../skills/javascript-language-profile`. The default current managed
+set is 32. Ordinary containment, source-identity, adoption, check, and rollback
+rules apply. Historical corrected v0.4 and public/active v0.4.0 do not acquire
+this owner; rollback removes only the current JavaScript projection.
+
+## APG81H Node.js projection
+
+APG81H adds `.agents/skills/nodejs-runtime-profile` with exact relative target
+`../../skills/nodejs-runtime-profile`. The default current managed set is 33.
+Ordinary containment, source-identity, adoption, check, and rollback rules
+apply. Corrected historical v0.4 and public/active v0.4.0 do not acquire this
+owner; candidate-preserving rollback removes only the current Node projection.

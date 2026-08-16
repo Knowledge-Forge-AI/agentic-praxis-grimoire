@@ -1,0 +1,534 @@
+{
+  "fixture": "apg74-typescript-intended-state",
+  "authored_phase": "APG74",
+  "current_phase": "APG75A",
+  "lifecycle": "provisionally-integrated",
+  "authority": "ADR 0042 Accepted; ADR 0043 Accepted with amendment",
+  "primary_compiler": {
+    "package": "typescript",
+    "exact_version": "7.0.2",
+    "selection_source": "package.json devDependencies exact pin",
+    "generation": "TypeScript 7 native compiler (intended primary generation)"
+  },
+  "typescript6_disposition": "not-required (see APG74-FX-010)",
+  "cases": [
+    {
+      "id": "APG74-FX-001",
+      "purpose": "ordinary .ts under the exact TypeScript 7 CLI checker",
+      "paths": [
+        "src/core/inventory.ts",
+        "tsconfig.json"
+      ],
+      "artifact_class": "handwritten-source",
+      "source_kind": "ts",
+      "whole_file_owner": "typescript-source",
+      "typescript_selection": "selected",
+      "typescript_decision_scope": "whole-file-static-analysis",
+      "role_identity_state": "known",
+      "compiler_roles": [
+        {
+          "role": "cli-checker",
+          "package": "typescript",
+          "exact_version": "7.0.2",
+          "selection_source": "package.json exact pin + tsconfig.json",
+          "product_state": "intended",
+          "invocation_state": "invoked",
+          "invocation_evidence": "APG75 scratch validation: tsc -p tsconfig.json, exit 0",
+          "retirement_condition": "not-applicable"
+        }
+      ],
+      "option_facts": [
+        "strict=true",
+        "noUncheckedIndexedAccess=true",
+        "noEmit=true"
+      ],
+      "present_evidence": [
+        "exact pin",
+        "explicit option values",
+        "smoke pass"
+      ],
+      "required_evidence": [],
+      "expected_boundary": "structural assignability, satisfies, and exhaustive narrowing check clean; indexed access widens to include undefined",
+      "live_target_state": "current",
+      "intended_product_state": "required",
+      "temporary_compatibility": "not-applicable",
+      "retirement_condition": "not-applicable"
+    },
+    {
+      "id": "APG74-FX-002",
+      "purpose": ".mts source kind: always an ECMAScript module",
+      "paths": [
+        "src/modules/loader.mts"
+      ],
+      "artifact_class": "handwritten-source",
+      "source_kind": "mts",
+      "whole_file_owner": "typescript-source",
+      "typescript_selection": "selected",
+      "typescript_decision_scope": "whole-file-static-analysis",
+      "role_identity_state": "known",
+      "compiler_roles": [
+        {
+          "role": "cli-checker",
+          "package": "typescript",
+          "exact_version": "7.0.2",
+          "selection_source": "package.json exact pin + tsconfig.json",
+          "product_state": "intended",
+          "invocation_state": "invoked",
+          "invocation_evidence": "APG75 scratch validation: tsc -p tsconfig.json, exit 0",
+          "retirement_condition": "not-applicable"
+        }
+      ],
+      "option_facts": [
+        "module=\"nodenext\"",
+        "noUncheckedIndexedAccess=true"
+      ],
+      "present_evidence": [
+        "exact pin",
+        "explicit option values",
+        "smoke pass"
+      ],
+      "required_evidence": [],
+      "expected_boundary": "module format is fixed by the .mts source kind, not by surrounding package type",
+      "live_target_state": "absent",
+      "intended_product_state": "representative",
+      "temporary_compatibility": "not-applicable",
+      "retirement_condition": "not-applicable"
+    },
+    {
+      "id": "APG74-FX-003",
+      "purpose": ".cts source kind: always CommonJS; verbatimModuleSyntax forces CommonJS-shaped syntax",
+      "paths": [
+        "src/modules/legacy.cts"
+      ],
+      "artifact_class": "handwritten-source",
+      "source_kind": "cts",
+      "whole_file_owner": "typescript-source",
+      "typescript_selection": "selected",
+      "typescript_decision_scope": "whole-file-static-analysis",
+      "role_identity_state": "known",
+      "compiler_roles": [
+        {
+          "role": "cli-checker",
+          "package": "typescript",
+          "exact_version": "7.0.2",
+          "selection_source": "package.json exact pin + tsconfig.json",
+          "product_state": "intended",
+          "invocation_state": "invoked",
+          "invocation_evidence": "APG75 scratch validation: tsc -p tsconfig.json, exit 0",
+          "retirement_condition": "not-applicable"
+        }
+      ],
+      "option_facts": [
+        "module=\"nodenext\"",
+        "verbatimModuleSyntax=true"
+      ],
+      "present_evidence": [
+        "exact pin",
+        "explicit option values",
+        "smoke pass"
+      ],
+      "required_evidence": [],
+      "expected_boundary": ".cts is never collapsed into .mts; export = is the accepted export shape here",
+      "live_target_state": "absent",
+      "intended_product_state": "representative",
+      "temporary_compatibility": "not-applicable",
+      "retirement_condition": "not-applicable"
+    },
+    {
+      "id": "APG74-FX-004",
+      "purpose": "handwritten declaration file asserting an unverified runtime surface",
+      "paths": [
+        "src/declarations/host-metrics.d.ts"
+      ],
+      "artifact_class": "handwritten-declaration",
+      "source_kind": "dts",
+      "whole_file_owner": "typescript-source",
+      "typescript_selection": "selected",
+      "typescript_decision_scope": "handwritten-declaration-static-analysis",
+      "role_identity_state": "known",
+      "compiler_roles": [
+        {
+          "role": "cli-checker",
+          "package": "typescript",
+          "exact_version": "7.0.2",
+          "selection_source": "package.json exact pin + tsconfig.json",
+          "product_state": "intended",
+          "invocation_state": "invoked",
+          "invocation_evidence": "APG75 scratch validation: tsc -p tsconfig.json, exit 0",
+          "retirement_condition": "not-applicable"
+        }
+      ],
+      "option_facts": [
+        "types=[]"
+      ],
+      "present_evidence": [
+        "exact pin",
+        "explicit option values",
+        "smoke pass"
+      ],
+      "required_evidence": [
+        "runtime verification of the declared surface"
+      ],
+      "expected_boundary": "the declaration states, and never proves, the runtime shape it describes",
+      "live_target_state": "current",
+      "intended_product_state": "required",
+      "temporary_compatibility": "not-applicable",
+      "retirement_condition": "not-applicable"
+    },
+    {
+      "id": "APG74-FX-005",
+      "purpose": "generated declaration provenance and edit boundary",
+      "paths": [
+        "tsconfig.declarations.json",
+        "src/core/inventory.ts"
+      ],
+      "artifact_class": "generated-declaration-boundary",
+      "source_kind": "dts",
+      "whole_file_owner": "typescript-source",
+      "typescript_selection": "selected",
+      "typescript_decision_scope": "generated-declaration-provenance",
+      "role_identity_state": "known",
+      "compiler_roles": [
+        {
+          "role": "declaration-emitter",
+          "package": "typescript",
+          "exact_version": "7.0.2",
+          "selection_source": "package.json exact pin + tsconfig.declarations.json",
+          "product_state": "intended",
+          "invocation_state": "invoked",
+          "invocation_evidence": "APG75 scratch validation: tsc -p tsconfig.declarations.json, exit 0, emitted into the scratch copy only",
+          "retirement_condition": "not-applicable"
+        }
+      ],
+      "option_facts": [
+        "declaration=true",
+        "emitDeclarationOnly=true",
+        "declarationDir=\"out/declarations\""
+      ],
+      "present_evidence": [
+        "exact pin",
+        "explicit option values",
+        "scratch emit pass"
+      ],
+      "required_evidence": [
+        "regeneration provenance for any consumed generated declaration"
+      ],
+      "expected_boundary": "generated declarations are regenerated from source, never hand-edited; none are committed",
+      "live_target_state": "unknown",
+      "intended_product_state": "representative",
+      "temporary_compatibility": "not-applicable",
+      "retirement_condition": "not-applicable"
+    },
+    {
+      "id": "APG74-FX-006",
+      "purpose": ".tsx ownership boundary with a local minimal JSX host",
+      "paths": [
+        "src/ui/badge.tsx",
+        "src/ui/jsx-host.d.ts"
+      ],
+      "artifact_class": "handwritten-source",
+      "source_kind": "tsx",
+      "whole_file_owner": "jsx-tsx-host",
+      "typescript_selection": "embedded-route",
+      "typescript_decision_scope": "bounded-tsx-static-analysis",
+      "role_identity_state": "known",
+      "compiler_roles": [
+        {
+          "role": "cli-checker",
+          "package": "typescript",
+          "exact_version": "7.0.2",
+          "selection_source": "package.json exact pin + tsconfig.json",
+          "product_state": "intended",
+          "invocation_state": "invoked",
+          "invocation_evidence": "APG75 scratch validation: tsc -p tsconfig.json, exit 0",
+          "retirement_condition": "not-applicable"
+        }
+      ],
+      "option_facts": [
+        "jsx=\"preserve\"",
+        "strict=true"
+      ],
+      "present_evidence": [
+        "exact pin",
+        "explicit option values",
+        "smoke pass",
+        "local JSX declarations"
+      ],
+      "required_evidence": [
+        "JSX transform and runtime evidence from the JSX owner"
+      ],
+      "expected_boundary": "TypeScript types expressions and attributes; JSX syntax and transform stay with the JSX owner",
+      "live_target_state": "absent",
+      "intended_product_state": "boundary-only",
+      "temporary_compatibility": "not-applicable",
+      "retirement_condition": "not-applicable"
+    },
+    {
+      "id": "APG74-FX-007",
+      "purpose": "embedded TypeScript boundary in an Astro host file (nonexecuted host fixture)",
+      "paths": [
+        "src/embedded/widget.astro"
+      ],
+      "artifact_class": "host-source",
+      "source_kind": "astro-frontmatter",
+      "whole_file_owner": "astro-host",
+      "typescript_selection": "embedded-route",
+      "typescript_decision_scope": "host-embedded-boundary",
+      "role_identity_state": "not-required",
+      "compiler_roles": [],
+      "option_facts": [],
+      "present_evidence": [
+        "host file present",
+        "excluded by omission from every fixture tsconfig include"
+      ],
+      "required_evidence": [
+        "host-extracted or virtual source, compiler role, and options from Astro tooling"
+      ],
+      "expected_boundary": "the host owns the whole file; TypeScript receives only a host-supplied embedded region, which this fixture deliberately does not exercise",
+      "live_target_state": "current",
+      "intended_product_state": "boundary-only",
+      "temporary_compatibility": "not-applicable",
+      "retirement_condition": "not-applicable"
+    },
+    {
+      "id": "APG74-FX-008",
+      "purpose": "checked JavaScript under bounded non-additive analysis",
+      "paths": [
+        "src/checked/config-loader.js"
+      ],
+      "artifact_class": "checked-javascript-source",
+      "source_kind": "checked-js",
+      "whole_file_owner": "javascript-source",
+      "typescript_selection": "embedded-route",
+      "typescript_decision_scope": "bounded-checked-javascript-analysis",
+      "role_identity_state": "known",
+      "compiler_roles": [
+        {
+          "role": "cli-checker",
+          "package": "typescript",
+          "exact_version": "7.0.2",
+          "selection_source": "package.json exact pin + tsconfig.json",
+          "product_state": "intended",
+          "invocation_state": "invoked",
+          "invocation_evidence": "APG75 scratch validation: tsc -p tsconfig.json, exit 0; seeded JSDoc defect failed with TS2322",
+          "retirement_condition": "not-applicable"
+        }
+      ],
+      "option_facts": [
+        "allowJs=true",
+        "checkJs=true"
+      ],
+      "present_evidence": [
+        "exact pin",
+        "explicit option values",
+        "smoke pass and seeded-defect failure"
+      ],
+      "required_evidence": [],
+      "expected_boundary": "analysis is bounded and non-additive; the file keeps its JavaScript source-language owner",
+      "live_target_state": "absent",
+      "intended_product_state": "representative",
+      "temporary_compatibility": "not-applicable",
+      "retirement_condition": "not-applicable"
+    },
+    {
+      "id": "APG74-FX-009",
+      "purpose": "TypeScript 7 CLI checker role as the intended primary generation",
+      "paths": [
+        "package.json",
+        "tsconfig.json"
+      ],
+      "artifact_class": "project-configuration",
+      "source_kind": "json-config",
+      "whole_file_owner": "project-configuration",
+      "typescript_selection": "route-to-owner",
+      "typescript_decision_scope": "project-role-selection",
+      "role_identity_state": "known",
+      "compiler_roles": [
+        {
+          "role": "cli-checker",
+          "package": "typescript",
+          "exact_version": "7.0.2",
+          "selection_source": "package.json devDependencies exact pin",
+          "product_state": "intended",
+          "invocation_state": "invoked",
+          "invocation_evidence": "APG75 scratch validation: tsc --version reported Version 7.0.2; tsc -p tsconfig.json, exit 0",
+          "retirement_condition": "not-applicable"
+        }
+      ],
+      "option_facts": [
+        "noEmit=true",
+        "strict=true"
+      ],
+      "present_evidence": [
+        "exact pin",
+        "smoke version and check pass",
+        "seeded-defect failure proof"
+      ],
+      "required_evidence": [],
+      "expected_boundary": "one evidenced role at a time: the CLI checker role never stands in for emit, editor, or API roles",
+      "live_target_state": "absent",
+      "intended_product_state": "required",
+      "temporary_compatibility": "not-applicable",
+      "retirement_condition": "not-applicable"
+    },
+    {
+      "id": "APG74-FX-010",
+      "purpose": "TypeScript 6 compatibility disposition",
+      "paths": [
+        "package.json",
+        "fixture-manifest.json"
+      ],
+      "artifact_class": "dependency-disposition",
+      "source_kind": "not-applicable",
+      "whole_file_owner": "project-configuration",
+      "typescript_selection": "non-trigger",
+      "typescript_decision_scope": "compatibility-disposition",
+      "role_identity_state": "not-required",
+      "compiler_roles": [],
+      "option_facts": [],
+      "present_evidence": [
+        "package absent from package.json",
+        "scratch node_modules contained no @typescript/typescript6"
+      ],
+      "required_evidence": [],
+      "expected_boundary": "no exact fixture role independently requires TypeScript 6; TypeScript 7 remains the primary generation",
+      "live_target_state": "absent",
+      "intended_product_state": "required",
+      "temporary_compatibility": "not-required",
+      "retirement_condition": "refresh this disposition if a later phase exercises an embedded checker whose exact peer range excludes the selected TypeScript 7 (the current theme's @astrojs/check@0.9.9 declares typescript ^5.0.0 || ^6.0.0)"
+    },
+    {
+      "id": "APG74-FX-011",
+      "purpose": "declaration-only emit as a separately evidenced role",
+      "paths": [
+        "tsconfig.declarations.json"
+      ],
+      "artifact_class": "project-configuration",
+      "source_kind": "json-config",
+      "whole_file_owner": "project-configuration",
+      "typescript_selection": "route-to-owner",
+      "typescript_decision_scope": "declaration-emitter-role",
+      "role_identity_state": "known",
+      "compiler_roles": [
+        {
+          "role": "declaration-emitter",
+          "package": "typescript",
+          "exact_version": "7.0.2",
+          "selection_source": "package.json exact pin + tsconfig.declarations.json",
+          "product_state": "intended",
+          "invocation_state": "invoked",
+          "invocation_evidence": "APG75 scratch validation: tsc -p tsconfig.declarations.json, exit 0; .d.ts/.d.mts/.d.cts appeared under the scratch copy's out/declarations only",
+          "retirement_condition": "not-applicable"
+        }
+      ],
+      "option_facts": [
+        "declaration=true",
+        "emitDeclarationOnly=true",
+        "noEmit=false"
+      ],
+      "present_evidence": [
+        "exact pin",
+        "explicit option values",
+        "scratch emit listing"
+      ],
+      "required_evidence": [],
+      "expected_boundary": "declaration-only emit produces no JavaScript; declaration success is not runtime or emit-pipeline success",
+      "live_target_state": "unknown",
+      "intended_product_state": "representative",
+      "temporary_compatibility": "not-applicable",
+      "retirement_condition": "not-applicable"
+    },
+    {
+      "id": "APG74-FX-012",
+      "purpose": "emitted-JavaScript/runtime boundary and false completion",
+      "paths": [
+        "src/core/runtime-boundary.ts"
+      ],
+      "artifact_class": "handwritten-source",
+      "source_kind": "ts",
+      "whole_file_owner": "typescript-source",
+      "typescript_selection": "selected",
+      "typescript_decision_scope": "static-runtime-boundary",
+      "role_identity_state": "known",
+      "compiler_roles": [
+        {
+          "role": "cli-checker",
+          "package": "typescript",
+          "exact_version": "7.0.2",
+          "selection_source": "package.json exact pin + tsconfig.json",
+          "product_state": "intended",
+          "invocation_state": "invoked",
+          "invocation_evidence": "APG75 scratch validation: tsc -p tsconfig.json, exit 0",
+          "retirement_condition": "not-applicable"
+        }
+      ],
+      "option_facts": [
+        "noEmit=true"
+      ],
+      "present_evidence": [
+        "exact pin",
+        "smoke pass"
+      ],
+      "required_evidence": [
+        "runtime execution evidence for any claim about parsed-value shape"
+      ],
+      "expected_boundary": "the type assertion is erased at emit; a clean check never proves runtime behavior",
+      "live_target_state": "not-applicable",
+      "intended_product_state": "boundary-only",
+      "temporary_compatibility": "not-applicable",
+      "retirement_condition": "not-applicable"
+    },
+    {
+      "id": "APG74-FX-013",
+      "purpose": "unknown compiler-role case: no configuration binds this file",
+      "paths": [
+        "src/unbound/orphan-role-unknown.ts"
+      ],
+      "artifact_class": "handwritten-source",
+      "source_kind": "ts",
+      "whole_file_owner": "typescript-source",
+      "typescript_selection": "selected",
+      "typescript_decision_scope": "unknown-role-stop",
+      "role_identity_state": "unresolved",
+      "compiler_roles": [],
+      "option_facts": [],
+      "present_evidence": [
+        "file exists outside every configured include"
+      ],
+      "required_evidence": [
+        "exact compiler role, package, version, and configuration"
+      ],
+      "expected_boundary": "analysis stops: the main project's evidence must not be assumed to apply",
+      "live_target_state": "not-applicable",
+      "intended_product_state": "boundary-only",
+      "temporary_compatibility": "not-applicable",
+      "retirement_condition": "not-applicable"
+    },
+    {
+      "id": "APG74-FX-014",
+      "purpose": "unknown option-state case: consequence-bearing option values not established",
+      "paths": [
+        "src/unbound/option-state-unknown.ts"
+      ],
+      "artifact_class": "handwritten-source",
+      "source_kind": "ts",
+      "whole_file_owner": "typescript-source",
+      "typescript_selection": "selected",
+      "typescript_decision_scope": "unknown-option-stop",
+      "role_identity_state": "unresolved",
+      "compiler_roles": [],
+      "option_facts": [],
+      "present_evidence": [
+        "file exists outside every configured include"
+      ],
+      "required_evidence": [
+        "exact values for the consequence-bearing options (for example noUncheckedIndexedAccess)"
+      ],
+      "expected_boundary": "no result is asserted while controlling option values are unknown",
+      "live_target_state": "not-applicable",
+      "intended_product_state": "boundary-only",
+      "temporary_compatibility": "not-applicable",
+      "retirement_condition": "not-applicable"
+    }
+  ]
+}

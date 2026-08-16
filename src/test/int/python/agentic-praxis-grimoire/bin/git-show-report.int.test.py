@@ -296,3 +296,42 @@ def test_concurrent_append_and_released_lock_are_complete(tmp_path: Path) -> Non
     assert process.returncode == 0, (stdout + stderr).decode()
     assert field(released.read_bytes(), b"RECORD-COMPLETE") == b"true"
     assert not lock.exists()
+
+
+def test_default_outbox_phase_lock_serializes_same_phase_appends(tmp_path: Path) -> None:
+    repository = tmp_path / "repository"
+    environment = initialize(repository)
+    (repository / "tracked.txt").write_text("first\n", encoding="utf-8")
+    git(repository, "add", "tracked.txt")
+    first = commit(repository, environment, "first")
+    (repository / "tracked.txt").write_text("second\n", encoding="utf-8")
+    git(repository, "add", "tracked.txt")
+    second = commit(repository, environment, "second")
+    home = tmp_path / "home"
+    process_environment = os.environ.copy()
+    process_environment.pop("GIT_SHOW_REPORT_ROOT", None)
+    process_environment.pop("APGR_OUTBOX_ROOT", None)
+    process_environment["HOME"] = os.fspath(home)
+    processes = [
+        subprocess.Popen(
+            [COMMAND, "CANONICAL-CONCURRENT", revision, "status", "passed", "gate"],
+            cwd=repository,
+            env=process_environment,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+        for revision in (first, second)
+    ]
+    results = [process.communicate(timeout=10) for process in processes]
+    assert all(process.returncode == 0 for process in processes), results
+    destination = (
+        home
+        / "Documents"
+        / "agent"
+        / "outbox"
+        / "repository"
+        / "CANONICAL-CONCURRENT"
+        / "CANONICAL-CONCURRENT.git.show.report.txt"
+    )
+    assert destination.read_bytes().count(b"RECORD-COMPLETE: true\n") == 2
+    assert not destination.with_name(".phase.lock").exists()

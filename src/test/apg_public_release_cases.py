@@ -44,7 +44,7 @@ EXPECTED_V03_SKILLS = tuple(
         "zunit-test-profile",
     )
 )
-EXPECTED_APG40_SKILLS = tuple(
+EXPECTED_APG81H_SKILLS = tuple(
     sorted(
         (
             *(
@@ -57,20 +57,25 @@ EXPECTED_APG40_SKILLS = tuple(
             "skills/chatgpt/chatgpt-manager-workflow/SKILL.md",
             "skills/chatgpt/composing-approved-roadmap-assignments/SKILL.md",
             "skills/converting-bash-scripts-to-python/SKILL.md",
+            "skills/css-language-profile/SKILL.md",
             "skills/dockerfile-profile/SKILL.md",
             "skills/go-cmp-test-profile/SKILL.md",
             "skills/go-test-profile/SKILL.md",
+            "skills/javascript-language-profile/SKILL.md",
+            "skills/markdown-language-profile/SKILL.md",
             "skills/minitest-test-profile/SKILL.md",
             "skills/nix-test-profile/SKILL.md",
+            "skills/nodejs-runtime-profile/SKILL.md",
             "skills/pytest-test-profile/SKILL.md",
+            "skills/typescript-language-profile/SKILL.md",
             "skills/vagrantfile-profile/SKILL.md",
         )
     )
 )
-EXPECTED_APG40_PROJECTIONS = tuple(
+EXPECTED_APG81H_PROJECTIONS = tuple(
     sorted(
         f".agents/skills/{Path(path).parent.name}"
-        for path in EXPECTED_APG40_SKILLS
+        for path in EXPECTED_APG81H_SKILLS
     )
 )
 HISTORICAL_V02_SKILLS = tuple(
@@ -88,7 +93,7 @@ HISTORICAL_V02_SKILLS = tuple(
 
 class APGPublicReleaseCaseMixin:
     def valid_policy(self) -> dict[str, object]:
-        surface = release.audited_policy_surfaces("0.4.0")[0]
+        surface = release.audited_policy_surfaces("0.5.0")[0]
         return {
             "schema_version": 1,
             "canonical_public_identity": "agentic-praxis-grimoire",
@@ -154,11 +159,11 @@ class APGPublicReleaseCaseMixin:
         parsed = release.validate_date("2026-07-20T12:00:00-04:00")
         self.assertEqual(release.deterministic_tagger(parsed), "1784563200 -0400")
 
-    def test_current_audited_surface_requires_all_28_skills(self) -> None:
-        self.assertEqual(release.AUDITED_SKILLS, EXPECTED_APG40_SKILLS)
+    def test_current_audited_surface_requires_all_33_skills(self) -> None:
+        self.assertEqual(release.AUDITED_SKILLS, EXPECTED_APG81H_SKILLS)
         self.assertEqual(
             release.AUDITED_PROJECTIONS,
-            EXPECTED_APG40_PROJECTIONS,
+            EXPECTED_APG81H_PROJECTIONS,
         )
         self.assertIn(
             "src/test/fixtures/apg32-minitest-scenario-families.json",
@@ -191,20 +196,55 @@ class APGPublicReleaseCaseMixin:
             "src/test/fixtures/apg37-go-test-scenario-families.json",
             "src/test/fixtures/apg37-go-cmp-scenario-families.json",
             "src/test/fixtures/apg39-nix-test-scenario-families.json",
+            "src/test/fixtures/apg66-markdown-language-profile-scenarios.json",
+            "src/test/fixtures/apg77-css-language-profile-scenarios.json",
+            "src/test/fixtures/apg79-javascript-language-profile-scenarios.json",
         ):
             self.assertIn(fixture, release.AUDITED_CRITICAL)
+        for support in (
+            "src/test/fixtures/apg64-markdown-scenario-register.md",
+            "src/test/support/apg_markdown_candidate_contract.py",
+            "src/test/support/apg_markdown_clause_guard_contract.py",
+            "src/test/support/apg_markdown_polarity_guard_contract.py",
+            "src/test/support/apg_markdown_register_contract.py",
+            "src/test/support/apg_markdown_token_guard_contract.py",
+            "src/test/support/apg_markdown_vocabulary_contract.py",
+            "src/test/support/apg_repository_import_cache_contract.py",
+            "docs/evaluations/apg66a-markdown-replay-evidence-truth.md",
+            "docs/evaluations/apg66c-markdown-clause-polarity-and-predicate-binding.md",
+            "docs/evaluations/apg66d-repository-import-cache-entry-presence.md",
+            "docs/status/2026/08/01/00096-apg66a-markdown-replay-evidence-truth-exit.md",
+            "docs/status/2026/08/01/00098-apg66c-markdown-clause-polarity-and-predicate-binding-exit.md",
+            "docs/status/2026/08/01/00099-apg66d-repository-import-cache-entry-presence-exit.md",
+        ):
+            self.assertIn(support, release.AUDITED_CRITICAL)
+        for test in (
+            "src/test/unit/python/agentic-praxis-grimoire/skills/markdown-language-profile/SKILL.unit.test.py",
+            "src/test/int/python/agentic-praxis-grimoire/skills/markdown-language-profile/SKILL.int.test.py",
+            "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_markdown_candidate_contract.unit.test.py",
+            "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_markdown_clause_guard_contract.unit.test.py",
+            "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_markdown_polarity_guard_contract.unit.test.py",
+            "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_markdown_register_contract.unit.test.py",
+            "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_markdown_token_guard_contract.unit.test.py",
+            "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_markdown_vocabulary_contract.unit.test.py",
+            "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_repository_import_cache_contract.unit.test.py",
+            "src/test/unit/python/agentic-praxis-grimoire/skills/css-language-profile/SKILL.unit.test.py",
+            "src/test/unit/python/agentic-praxis-grimoire/skills/javascript-language-profile/SKILL.unit.test.py",
+            "src/test/int/python/agentic-praxis-grimoire/skills/javascript-language-profile/SKILL.int.test.py",
+        ):
+            self.assertIn(test, release.AUDITED_TESTS)
 
     def test_policy_surfaces_are_exactly_version_bounded(self) -> None:
         historical_v02 = release.audited_policy_surfaces("0.2.0")
         historical_v03 = release.audited_policy_surfaces("0.3.0")
-        current = release.audited_policy_surfaces("0.4.0")
+        current = release.audited_policy_surfaces("0.5.0")
 
         self.assertEqual(historical_v02[0]["required_skills"], HISTORICAL_V02_SKILLS)
         self.assertEqual(historical_v03[0]["required_skills"], EXPECTED_V03_SKILLS)
-        self.assertEqual(current[0]["required_skills"], EXPECTED_APG40_SKILLS)
+        self.assertEqual(current[0]["required_skills"], EXPECTED_APG81H_SKILLS)
         self.assertEqual(
             current[0]["required_projections"],
-            EXPECTED_APG40_PROJECTIONS,
+            EXPECTED_APG81H_PROJECTIONS,
         )
         self.assertIn("libexec/agent-report/common.sh", historical_v03[0]["required_helpers"])
         self.assertNotIn("bin/git-diff-report", historical_v03[0]["required_wrappers"])
@@ -213,6 +253,49 @@ class APGPublicReleaseCaseMixin:
         self.assertEqual(len(historical_v02), 1)
         self.assertEqual(len(historical_v03), 1)
         self.assertEqual(len(current), 1)
+
+    def test_historical_v0_4_excludes_every_apg66_owner(self) -> None:
+        historical = release.audited_policy_surfaces("0.4.0")[0]
+        current = release.audited_policy_surfaces("0.5.0")[0]
+        for key, owners in (
+            ("required_skills", release.APG66_V05_SKILLS),
+            ("required_projections", release.APG66_V05_PROJECTIONS),
+            ("required_test_entrypoints", release.APG66_V05_TESTS),
+            ("critical_files", release.APG66_V05_CRITICAL),
+        ):
+            self.assertTrue(owners <= set(current[key]))
+            self.assertFalse(owners & set(historical[key]))
+
+    def test_historical_v0_4_excludes_apg66d_records(self) -> None:
+        historical = release.audited_policy_surfaces("0.4.0")[0]
+        current = release.audited_policy_surfaces("0.5.0")[0]
+        owners = release.APG66D_V05_CRITICAL
+        self.assertTrue(owners <= set(current["critical_files"]))
+        self.assertFalse(owners & set(historical["critical_files"]))
+
+    def test_historical_v0_4_excludes_every_apg77d_owner(self) -> None:
+        historical = release.audited_policy_surfaces("0.4.0")[0]
+        current = release.audited_policy_surfaces("0.5.0")[0]
+        for key, owners in (
+            ("required_skills", release.APG77D_V05_SKILLS),
+            ("required_projections", release.APG77D_V05_PROJECTIONS),
+            ("required_test_entrypoints", release.APG77D_V05_TESTS),
+            ("critical_files", release.APG77D_V05_CRITICAL),
+        ):
+            self.assertTrue(owners <= set(current[key]))
+            self.assertFalse(owners & set(historical[key]))
+
+    def test_historical_v0_4_excludes_every_apg79e_owner(self) -> None:
+        historical = release.audited_policy_surfaces("0.4.0")[0]
+        current = release.audited_policy_surfaces("0.5.0")[0]
+        for key, owners in (
+            ("required_skills", release.APG79E_V05_SKILLS),
+            ("required_projections", release.APG79E_V05_PROJECTIONS),
+            ("required_test_entrypoints", release.APG79E_V05_TESTS),
+            ("critical_files", release.APG79E_V05_CRITICAL),
+        ):
+            self.assertTrue(owners <= set(current[key]))
+            self.assertFalse(owners & set(historical[key]))
 
     def test_historical_v0_3_surface_is_independent_of_current_arrays(self) -> None:
         historical = release.audited_policy_surfaces("0.3.0")[0]
@@ -236,8 +319,25 @@ class APGPublicReleaseCaseMixin:
                 release.AUDITED_CRITICAL,
             ) = original
 
+    def test_historical_v0_4_surface_fingerprint_fails_closed(self) -> None:
+        historical = release.audited_policy_surfaces("0.4.0")[0]
+        original = release.HISTORICAL_V04_HELPERS
+        try:
+            release.HISTORICAL_V04_HELPERS = (
+                *release.HISTORICAL_V04_HELPERS,
+                "libexec/future-owner.py",
+            )
+            with self.assertRaisesRegex(
+                release.ToolError,
+                "historical public v0.4.0 policy surface changed",
+            ):
+                release.audited_policy_surfaces("0.4.0")
+        finally:
+            release.HISTORICAL_V04_HELPERS = original
+        self.assertEqual(release.audited_policy_surfaces("0.4.0")[0], historical)
+
     def test_unknown_policy_surface_identity_fails_closed(self) -> None:
-        for version in ("0.1.0", "0.3.1", "0.5.0", "1.0.0", "invalid"):
+        for version in ("0.1.0", "0.3.1", "0.5.1", "1.0.0", "invalid"):
             with self.subTest(version=version), self.assertRaises(release.ToolError):
                 release.audited_policy_surfaces(version)
 
@@ -261,34 +361,39 @@ class APGPublicReleaseCaseMixin:
 
     def test_load_policy_rejects_each_schema_and_array_failure(self) -> None:
         repository = release.Repository(Path("repo"), "a" * 40, "b" * 40)
-        mutations = []
-        value = self.valid_policy()
-        value["schema_version"] = True
-        mutations.append((value, "schema version"))
-        value = self.valid_policy()
-        value["canonical_public_identity"] = "other"
-        mutations.append((value, "canonical identity"))
-        value = self.valid_policy()
-        value["excluded_prefix"] = "public/"
-        mutations.append((value, "excluded prefix"))
-        value = self.valid_policy()
-        value["required_helpers"] = "not-an-array"
-        mutations.append((value, "string array"))
-        value = self.valid_policy()
-        value["required_helpers"] = ["z", "a"]
-        mutations.append((value, "sorted and unique"))
-        value = self.valid_policy()
-        value["required_helpers"] = ["../unsafe"]
-        mutations.append((value, "unsafe path"))
-        value = self.valid_policy()
-        value["required_helpers"] = ["private/unsafe"]
-        mutations.append((value, "private paths"))
-        value = self.valid_policy()
-        value["validation_categories"] = ["unknown"]
-        mutations.append((value, "unknown validation"))
-        value = self.valid_policy()
-        value["required_helpers"] = ["libexec/future.py"]
-        mutations.append((value, "audited schema"))
+        policy = self.valid_policy()
+        mutations = [
+            ({**policy, "schema_version": True}, "schema version"),
+            (
+                {**policy, "canonical_public_identity": "other"},
+                "canonical identity",
+            ),
+            ({**policy, "excluded_prefix": "public/"}, "excluded prefix"),
+            (
+                {**policy, "required_helpers": "not-an-array"},
+                "string array",
+            ),
+            (
+                {**policy, "required_helpers": ["z", "a"]},
+                "sorted and unique",
+            ),
+            (
+                {**policy, "required_helpers": ["../unsafe"]},
+                "unsafe path",
+            ),
+            (
+                {**policy, "required_helpers": ["private/unsafe"]},
+                "private paths",
+            ),
+            (
+                {**policy, "validation_categories": ["unknown"]},
+                "unknown validation",
+            ),
+            (
+                {**policy, "required_helpers": ["libexec/future.py"]},
+                "audited schema",
+            ),
+        ]
 
         for candidate, message in mutations:
             raw = json.dumps(candidate, sort_keys=True).encode()

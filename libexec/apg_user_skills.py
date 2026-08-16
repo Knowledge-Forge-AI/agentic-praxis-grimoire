@@ -395,6 +395,15 @@ def ensure_state_directory() -> Path:
     return directory
 
 
+def reject_global_skills_owner(root: Path) -> None:
+    owner_names = (
+        ".install-global-skills-state.json",
+        ".install-global-skills.lock",
+    )
+    if any(os.path.lexists(root / name) for name in owner_names):
+        fail("skills root is owned by the separate install-global-skills command")
+
+
 @contextmanager
 def state_lock() -> Iterator[tuple[Path, Path]]:
     directory = ensure_state_directory()
@@ -991,6 +1000,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         reject_mutation_root(user_state_root, verified_source, "user-state root")
         lock_context = read_only_state_lock() if arguments.operation == "check" else state_lock()
         with lock_context as (state_path, _lock_path):
+            if arguments.operation != "check":
+                reject_global_skills_owner(root)
             if arguments.operation == "install":
                 output = do_install(verified_source, root, state_path)
             elif arguments.operation == "adopt":

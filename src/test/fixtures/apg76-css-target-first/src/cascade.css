@@ -1,0 +1,62 @@
+/* APG76-FX-002, APG76-FX-003, APG76-FX-004, APG76-FX-005.
+   APG-owned fixture source. Independently written; no target source. */
+
+@layer reset, theme;
+
+/* FX-002 — specificity contrast, then a same-specificity source-order tie.
+   The three link rules differ only in functional-pseudo-class contribution. */
+.menu a { color: #205080; }
+:is(.menu, .sidebar) a { color: #206080; }
+:where(.menu, .sidebar) a { color: #207080; }
+a:not(.menu, #menu-primary) { color: #208080; }
+
+.badge { color: #303030; }
+.badge { color: #404040; }
+
+/* FX-003 — layer ordering. Same selector, same specificity, normal and
+   important declarations in two layers and outside every layer. */
+@layer reset {
+  .card {
+    margin: 0;
+    color: #111111 !important;
+  }
+}
+
+@layer theme {
+  .card {
+    margin: 1rem;
+    color: #222222 !important;
+  }
+}
+
+.card {
+  margin: 2rem;
+  color: #333333 !important;
+}
+
+/* FX-004 — the CSS-wide keywords on one inherited and one non-inherited
+   property under the same ancestor. The non-inherited property is chosen so
+   that its initial value does not depend on the inherited one: an initial
+   value of currentColor would make inherit and unset agree and hide the
+   contrast this case exists to show. */
+.tree {
+  color: #0a4a2a;
+  padding-left: 3px;
+}
+
+.tree .leaf-inherit { color: inherit; padding-left: inherit; }
+.tree .leaf-initial { color: initial; padding-left: initial; }
+.tree .leaf-unset { color: unset; padding-left: unset; }
+
+/* FX-005 — shorthand reset, in both orders, over true physical longhands of
+   the padding shorthand. A flow-relative property is deliberately NOT used
+   here: it is not a longhand of this shorthand and belongs to FX-010. */
+.tile {
+  padding-top: 3px;
+  padding: 8px;
+}
+
+.tile--reordered {
+  padding: 8px;
+  padding-top: 3px;
+}

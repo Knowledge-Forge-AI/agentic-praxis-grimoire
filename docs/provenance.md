@@ -1,5 +1,11 @@
 # Reference and Provenance Policy
 
+<!-- APG-CANDIDATE-STATE: css-language-profile retained-provisional -->
+
+The marker above is the mechanical current-state authority. Bounded
+contradiction diagnostics cover only their frozen vocabulary; arbitrary prose
+still requires human review.
+
 ## Purpose
 
 Provenance connects a materially source-derived APG practice to dated evidence,
@@ -21,6 +27,14 @@ Record these facts independently:
 Ownership does not imply public eligibility or a license grant. A public source
 is not automatically adopted. A compatible source license does not choose APG's
 own distribution license.
+
+Public readability is not reuse permission. When source code, a specification,
+and associated documentation use different terms, record each artifact's
+license separately; do not collapse them into labels such as `public`,
+`MIT-adjacent`, or `docs/source licensed`. If the inspected artifact grants no
+reuse license, copied and adapted expression are blocked even when factual
+clean-room analysis remains possible. Search the complete source record for
+inline grants as well as standalone license files and package metadata.
 
 ## Two-level provenance
 
@@ -102,6 +116,49 @@ Promotion requires a concrete problem, source and license review, destination
 decision, benefit and cost analysis, trigger-risk analysis, compatibility and
 rollback consideration, and validation proportional to the claim. Preference or
 source frequency alone is insufficient.
+
+## Claim-relative source authority
+
+Weigh material evidence by how directly its inspectable basis bears on the
+exact claim under evaluation, not by a universal source rank or document
+count. APG adopts no universal source tiers and no source-count minimum.
+
+A first-party source may settle its own formal record — for example a release
+tag, a specification, statute text, a configured default, or a currently
+published price. A first-party or otherwise interested source does not
+automatically control conclusions about impact, reliability, safety, quality,
+disputed interpretation, or contested real-world behavior; those conclusions
+may need independently produced evidence.
+
+Separate URLs, articles, or artifacts that reuse one underlying evidentiary
+basis — the same upstream announcement, dataset, report, or origin post — are
+one corroborating lineage, not independent confirmation. Weigh origins, not
+restatements; a derivative summary may still aid discovery of the origin it
+summarizes.
+
+The amount of corroboration remains claim- and project-owned. A narrow formal
+fact may be settled by one authoritative source. A disputed or consequential
+claim may require searching for the opposing claim and weighing independently
+produced evidence before disposition.
+
+## Material access limitations
+
+When incomplete access to evidence could materially affect a conclusion,
+record the limitation in the provenance prose: what inspection was
+unavailable or constrained — for example a partial or truncated view, a
+search-result snippet without the full text, a paywall or other block, or
+only an archived copy — and how that limitation constrained validation,
+confidence, or the terminal claim. Describe the boundary without exposing
+protected content, credentials, private paths, machine topology, or
+confidential source details.
+
+Omit the note when access was complete or when the limitation was immaterial
+to the conclusion. This guidance adds no required field, key, schema, or
+validator, and existing free-prose provenance records remain valid. A
+sufficient note can be one sentence, for example: the upstream manual was
+truncated at its public preview boundary, so defaults beyond the inspected
+sections were not verified and the compatibility claim covers only those
+sections.
 
 ## Public provenance template
 
@@ -1289,3 +1346,697 @@ manager, or conversion evidence into universal runtime compatibility.
 Postcommit object identities, local evidence paths, reviewer returns, and
 deployment fingerprints remain publication excluded or managed operational
 evidence.
+
+## APG43 correction provenance
+
+APG43 records a one-time maintainer-authorized correction of a release-blocking
+unrelated project identity in the v0.4.0 `NOTICE`. The canonical historical
+NOTICE bytes were restored in amended APG42, then projected into the corrected
+public release and active public-backed source. No skill expression,
+dependency, maturity, routing, release metadata, or historical v0.1.0-v0.3.0
+object changed. Exact old/new objects, leases, and managed-report evidence are
+publication excluded under `private/evaluations/apg43/`. Future releases are
+append-only; v0.5 requires separate authority.
+
+## APG44 analysis provenance
+
+APG44 inspects one external source family: `petar-nauka/fact-check-skill`,
+default branch `main` at `ebfde09a28b5547cbed29f5f66ddfd3595e64ade` (MIT), with
+a local clone verified clean at exact remote parity on 2026-07-26. Every APG44
+adopted boundary is independently written synthesis from observable facts
+(derivation mode: synthesized); no external table, taxonomy, schema, code,
+scoring formula, or output structure is adopted. APG45 later found short
+source-shaped phrases in publication-excluded authoring analysis,
+independently re-expressed them, and confirmed no material external expression
+remains in the resulting state. Nothing is adopted in APG44.
+
+The three Go dogfood clones and two Knowledge Forge AI repositories named in
+the [v0.5 roadmap](v0-5-roadmap.md) were inspected only enough to validate
+roadmap owner boundaries; that inspection is not dogfood, compatibility, or
+adoption evidence. Exact local identities, the recommendation ledger, frozen
+scenarios, and the Codex handoff remain publication excluded under
+`private/evaluations/apg44/`. Development, public, and active surfaces remain
+28/28/28.
+
+## APG45 peer-review provenance
+
+APG45 independently reverifies the same exact external source and its declared
+MIT license, corrects the tracked source count to 26, and records static
+schema/validator, package-license, and renderer URL-boundary findings. A bounded
+disposable standard-library characterization runs without installation or
+network and proves only external structure and arithmetic behavior.
+
+REC-01 through REC-04 are accepted or accepted with narrowing as clean-room
+future contracts; REC-05 and REC-07 through REC-10 are rejected; REC-06 is
+deferred. No recommendation is implemented. ADR 0029 is Accepted with
+amendment. Exact APG44/APG45 objects, reports, local source paths, reviewer
+returns, and probe details remain publication excluded. Development, public,
+and active surfaces remain 28/28/28.
+
+## APG46 authoring provenance
+
+APG46 authors the candidate guidance for accepted REC-01 through REC-04 from
+the APG45 clean-room contracts without returning to the external source for
+wording. The review-skill and provenance-policy additions — including the
+claim-relative source authority and material access-limitation sections above
+— are independently written synthesis (derivation mode: synthesized). No
+external table, tier ordering, schema, score, mode taxonomy, template, or
+output structure is adopted, and no rejected or deferred recommendation is
+implemented. The candidate changes are authored on a Claude branch and remain
+pending separately authorized Codex validation and integration; integrated
+development, public, and active surfaces remain 28/28/28.
+
+## APG47 integration provenance
+
+APG47 preserves the exact APG46 authoring object, records failing-first
+semantic evidence before correction, and independently retains REC-01 through
+REC-04 after one forward review-skill correction. `docs/provenance.md` remains
+the sole normative source-authority owner; the synthesis path required no
+additional pointer.
+
+The correction and its tests are independently written project synthesis.
+Fresh comparison with the external fact-check corpus found no exact sequence of
+five or more normalized tokens and no copied or recognizably adapted table,
+taxonomy, score, mode, schema, template, ledger, renderer, or result structure.
+No new notice obligation arises.
+
+Development remains 28/28/28 with unchanged 14/14 maturity and routing. Public
+and active tracked corrected-v0.4.0 fingerprints remain unchanged. Exact
+objects, report identities, external comparison evidence, reviewer returns,
+and operational details remain managed or publication excluded.
+
+## APG48 dogfood and authoring provenance
+
+APG48 inspects five public Go repositories read-only as dogfood evidence —
+conduitio-labs/conduit-connector-http, esnet/gdg, blockvisionhq/sui-go-sdk,
+kubernetes-sigs/bom, and apache/skywalking-mcp (Apache-2.0 and a BSD-style
+LBNL variant) — and reverifies the canonical matryer/is `v1.4.1` tag (MIT)
+and the go-cmp `v0.7.0` version identity (BSD-3-Clause). Derivation mode for
+every APG48 artifact is independently written synthesis from observed facts:
+no target test code, upstream prose, table, example, or diagnostic text was
+copied or adapted, and no notice obligation arises. Factual API identifiers
+are used as facts.
+
+One material access limitation is recorded under the access-limitations
+policy: canonical matryer/is sources were read through a fetch-summarized
+channel rather than byte-level files, converging with the prior exact-source
+and runtime records; byte-level re-reading is a required later Codex step.
+Negative dogfood findings are scoped to the inspected samples and
+inventories.
+
+The authored `matryer-is-test-profile` candidate and its specification are
+candidates pending Codex review, not integrated behavior. Development remains
+28/28/28 with unchanged maturity and routing; public and active remain
+corrected v0.4.0. Exact clone commits, local paths, and operational details
+remain publication excluded.
+
+## APG49 validation provenance
+
+APG49 closes APG48's byte-access limitation with a clean exact `v1.4.1`
+source read, module checksum verification, selected-build-file inspection, and
+isolated runtime probes. It independently re-reads the five dogfood
+repositories at their recorded commits. Exact local paths, private APG commit
+and report identities, raw module output, and probe transcripts remain
+publication excluded.
+
+The correction guidance, public-safe scenarios, tests, evaluation, and
+decision language are independently written synthesis. Fresh comparison found
+no material sequence of five or more normalized tokens shared with upstream
+source or the APG48 private scenario ledger. Factual API names, versions,
+reflection kinds, and minimal call shapes do not copy protectable expression.
+No source or license text enters the public artifacts and no new notice duty
+arises.
+
+The candidate is terminally deferred after fresh corrected-state review and
+its current public candidate surfaces are forward removed. The exact source,
+runtime, dogfood, rights, and defect evidence remains publication excluded;
+it is evidence for a possible separately authorized future attempt, not a
+retained skill or compatibility claim.
+
+## APG52 evidence-foundation provenance
+
+APG52 independently reproduces the APG51 evidence defect, resolves every named
+abbreviated source identity without substitution, and selects a new corpus
+before accepted measurement. Publication-excluded manifests pin full commits,
+trees, roots, rights blobs, classification and exclusion rules, artifacts,
+measurements, samples, exact statistics, and hypothesis comparisons. Two
+disjoint acquisitions produce byte-identical canonical evidence.
+
+The rights ledger separates source code, specification, documentation, README
+grant, and package-metadata absence controls. It rechecks ECMA-262 document and
+embedded-software terms separately; TypeScript source and website terms; Node,
+CSSWG, CommonMark, GFM, JSX, React/react.dev, MDX, Astro, Starlight, and Vitest
+terms. APG52 performs factual measurement only, copies no upstream or target
+expression, and exposes no private path or personal identifier in canonical
+output. Exact target and source objects, local acquisitions, and detailed
+machine evidence remain publication excluded. No evidence label constitutes a
+license conclusion beyond its exact row, architecture decision, candidate
+approval, or authoring authority.
+
+## APG53 operational-tooling provenance
+
+| Practice | Source families | Mode | Destination | Lifecycle status | Maturity effect |
+| --- | --- | --- | --- | --- | --- |
+| Flat shared-skill symlink projection | Exact maintainer-supplied `flatten-skill-symlinks` input, SHA-256 `b8b9ef833465ba01485d635db7eb1cd7bda2b65b191c633952bfabe47d150c00`; APG53 integration authority | Supplied expression retained and adapted, then independently hardened for owner state, overlap, marker, lock, no-overwrite installation, transactional rollback, and race checks | `bin/flatten-skill-symlinks`; `libexec/flatten_skill_symlinks.py`; `libexec/skill_projection_state.py` | Current development and future v0.5 public candidate; not yet published | Input has no embedded third-party notice or license marker; record as maintainer-supplied and integration-authorized, not APG-authored |
+| Preventive Git change-size policy | APG52 blob/report measurements; official GitHub repository limits, large-file guidance, and generated-file display guidance reviewed 2026-07-28 | Independently written standard-library Git-object checker and APG-specific policy | `bin/apg-check-change-size`; `testing/apg-change-size-policy.json`; ADR 0032 | Adopted for current development and future public candidates | APG limits are stricter preventive and review-usability controls, not GitHub platform limits |
+
+APG53's disposable Claude-shaped filesystem dogfood verifies the projection
+layout and command behavior. The reviewed Claude documentation does not
+explicitly guarantee directory-symlink discovery, so APG53 makes no
+Claude-runtime recognition claim and does not mutate a live integration.
+
+## APG54 global-installer provenance
+
+| Practice | Source families | Mode | Destination | Lifecycle status | Maturity effect |
+| --- | --- | --- | --- | --- | --- |
+| Multi-repository personal skill projection | Exact 944-byte maintainer-supplied Bash prototype identity; official Codex and Claude skill-root documentation reviewed 2026-07-28; existing APG projection contracts | Intended convenience behavior retained; production expression independently implemented with Python standard library, combined inventory/state, collision refusal, state-last transaction, rollback, and uninstall | `bin/install-global-skills`; maintained inventory, state, transaction, and CLI helpers; ADR 0033 | Current development and future v0.5 public candidate; not published or live-installed | No skill, catalog, projection, route, or maturity change |
+
+The local corroborating Bash bytes match the declared supplied identity,
+remain publication excluded, and are recorded as maintainer-supplied rather
+than APG-authored. The uploaded attachment was not materialized separately in
+the APG54 session. The Python implementation does not translate the loop
+literally and copies no third-party expression.
+Official documentation contributes current compatibility facts only. Exact
+local intake paths, user-local state, scratch targets, and operational
+transcripts remain publication excluded. Disposable filesystem dogfood proves
+link and ownership behavior, not live Codex or Claude runtime discovery.
+
+## APG55 transaction-hardening provenance
+
+APG55 is an independently implemented correction derived from the APG54
+codebase, maintainer-declared defect cases, POSIX filesystem behavior, and the
+Python standard library. It adds no third-party source corpus, dependency, or
+copied expression. Functional metadata names, transaction stages, and
+fault-injection cases carry no new attribution or notice duty.
+
+Exact development identities, external fingerprints, local paths, temporary
+names, and test transcripts remain publication excluded. Public guidance
+contains only generalized behavior. No skill, catalog, projection, route,
+maturity, release, or active-deployment provenance changes.
+
+## APG56 reconstruction provenance
+
+APG56 synthesizes a fresh Web and Node owner architecture from the verified
+APG52 compact evidence, the exact pinned target objects, and the APG50/51
+records as prior art and falsification history. Its band derivation consumes
+only committed APG52 statistics through a frozen method and a deterministic
+publication-excluded tool; no bulk dataset is regenerated and no APG51
+hypothesis value contributes to any anchor.
+
+Rights facts are restated from the APG52 exact ledger with every distinction
+preserved (ECMA document versus embedded-software terms; TypeScript Apache-2.0
+source versus CC BY 4.0 handbook; Node MIT; W3C document license;
+CommonMark/GFM CC BY-SA 4.0; the canonical JSX repository's inline README
+CC BY 4.0 grant; React MIT source and CC BY 4.0 react.dev; MDX, Astro,
+Starlight, and Vitest MIT repository terms; and target rights controls).
+APG57 subsequently narrows the theme statement: its original baseline carries
+`LICENSE-MIT`, exact post-baseline additions and modifications carry an
+AGPL-3.0 notice, package metadata says
+AGPL-3.0-or-later, and commercial/NOTICE/CLA surfaces remain separate. No
+standards, documentation, code, example, table, or upstream structure is
+copied or adapted into APG56
+guidance; every record uses independently authored expression
+(`synthesized`). Proposed ADR 0034 and its records are design evidence only:
+no skill, catalog, projection, route, maturity, release, or
+active-deployment provenance changes, and exact development identities and
+local paths remain publication excluded.
+
+## APG57 independent-review provenance
+
+APG57 uses exact APG56 and APG52 compact records, exact read-only target
+objects, primary source/right records, and an independently implemented
+standard-library reviewer. The reviewer method was frozen and approved before
+output; it reproduces the historical APG56 values and emits only compact
+family, anchor, target-placement, threshold, purpose, and robustness results.
+It copies no source or target expression and introduces no dependency.
+Corrected-state review finds material compact-interval, target-completeness,
+and exact-reproduction-gate defects in that reviewer. Its generated output is
+therefore preserved as publication-excluded failure evidence and is not an
+accepted measurement surface.
+
+APG57's rejected ADR expression is independently synthesized. Historical
+APG56 values and the attempted APG57 ledger/scenarios remain evidence, not
+accepted policy. Exact commits,
+trees, hashes, local acquisitions, operational reports, and detailed review
+output remain publication excluded. No skill, catalog, projection, route,
+maturity, release, public, active-deployment, or target provenance changes.
+
+## APG58 CSS-pilot provenance
+
+APG58 authors one candidate CSS leaf and specification from independently
+written behavioral synthesis. Its structural limits (300/600/900) are
+explicit engineering policy selected before target placement — not derived
+from, and never described as, corpus percentiles; the APG52 corpus, the
+rejected APG56/APG57 numeric outputs, and the pinned targets serve only as
+falsification history and legacy classification evidence. The CSS-language
+basis is the CSSWG draft set pinned by the APG52 exact rights ledger (W3C
+Software and Document License, document-specific headers respected); target
+facts come from live read-only inspection of the exact pinned commits. No
+specification wording, source comment, example, target CSS, selector, or
+target layout is copied into any APG58 artifact. Proposed ADR 0035 and the
+candidate records are design evidence under the practice lifecycle: no
+skill-catalog, projection, route, maturity, release, public,
+active-deployment, or target provenance changes, and exact development
+identities, placements, and local paths remain publication excluded.
+
+## APG59 CSS validation and integration provenance
+
+APG59 independently reverifies the exact CSSWG source and rights pin and the
+two exact read-only target trees, then expresses its correction and executable
+contracts independently. The transient public-safe fixture contained scenario
+identities, policy transitions, and synthetic obligations only; it contained
+no target CSS, selector, layout, source comment, local path, or private payload.
+Exact object identities, acquisition details, local paths, and reviewer
+evidence remain publication excluded.
+
+The proposed limits remain explicit APG maintainability-policy evidence rather
+than a corpus statistic. APG59 adds no browser-support claim and does not absorb
+design, HTML, browser runtime, accessibility acceptance, Astro/MDX/React host
+semantics, Starlight, or tooling ownership. Corrected-state executable and
+removal defects require Rejected ADR 0035 and candidate cleanup; development,
+public, and active remain 28/28/28.
+
+## APG60 CSS contract-foundation provenance
+
+APG60 derives its behavior only from the accepted APG59 correction and exact
+APG58/APG59 history. Its independently written fixtures contain synthetic
+counts, labels, authority facts, action tokens, and relative owner locators;
+they copy no CSSWG wording, code, selector, example, target source, target
+layout, or third-party implementation structure.
+
+The generic surface manifest names public, publication-excluded, and managed-
+report owner classes without exposing private payloads or local report
+identities. The executable tests use disposable synthetic trees and read-only
+Git objects, require no target content or command, and introduce no dependency.
+The 300/600/900 values remain rejected-evidence pre-authoring policy, not
+current guidance or a corpus statistic. No skill, ADR 0036, catalog,
+projection, route, maturity, release, public, active-deployment, or target
+provenance changes.
+## APG60A provenance
+
+APG60A derives from exact APG60 and preserves the original APG60 fixture as the
+named superseded object. The v2 fixture records the forward revision and real
+exception grant source. No third-party implementation or prose is copied.
+Future CSS evidence remains pinned to the CSSWG commit, tree, license blob,
+and right recorded in the publication-excluded handoff.
+
+## APG60B provenance
+
+APG60B is a clean-room forward correction derived from the accepted APG60A
+contract and independently reproduced false-pass shapes. Its traceability,
+narrative, Python-binding, isolated derivation, and ADR-lifecycle fixtures use
+synthetic values and disposable trees. They copy no CSSWG prose, target CSS,
+selector, layout, comment, or private payload, and introduce no dependency.
+Exact source and target pins remain unchanged and publication excluded where
+required. The candidate stays absent; no target command or mutation occurs.
+
+## APG60C provenance
+
+APG60C is a clean-room forward correction derived from accepted APG60B and
+independently reproduced synthetic final-value, narrative, history-removal,
+and survivor-replacement false passes. It copies no CSSWG prose or target
+source, uses Python standard library only, and preserves the frozen CSS
+behavior fixture byte-for-byte.
+
+## APG60D provenance
+
+APG60D is an independently written clean-room forward correction derived from
+accepted APG60C and synthetic callback, namespace-write, wildcard-history, and
+symlink counterexamples. It copies no CSSWG prose, target CSS, selector,
+layout, source comment, or third-party implementation expression. The exact
+phase manifest contains semantic phase IDs and repository-relative record
+paths only. It adds no dependency and changes no source, rights, target,
+release, publication, deployment, or active-state provenance.
+
+## APG60E provenance
+
+APG60E is an independently written clean-room forward correction derived from
+accepted APG60D and synthetic ancestor-symlink, projection, replacement, and
+short-read counterexamples. It copies no CSSWG prose, target CSS, selector,
+layout, source comment, private target content, or third-party implementation
+expression. The repository-path owner uses Python standard library facilities
+only. The frozen CSS behavior fixture, source and rights pins, targets,
+release, publication, deployment, and active state remain unchanged.
+
+## APG60F provenance
+
+APG60F is an independently written clean-room forward correction derived from
+accepted APG60E behavior and synthetic failing-first import, authority-graph,
+and projection-race controls. It adds no third-party dependency and copies no
+CSS specification wording, target source, selector, layout, or private payload
+into public artifacts.
+
+The repository import boundary, required-role declaration, and coherent
+projection observation use Python standard-library facilities and
+repository-owned contracts. The APG60E phase-history fixture remains immutable;
+the APG60F manifest versions current foundation and future exit identities
+forward. CSS behavior, sources, rights, targets, release, publication,
+deployment, and active state remain unchanged.
+
+## APG60G provenance
+
+APG60G is an independently written clean-room forward correction derived from
+accepted APG60F and synthetic root-replacement, duplicate-derived-set,
+semantic-role-redirection, and stale-authority-read controls. It adds no
+third-party dependency and copies no CSS specification wording, target source,
+selector, layout, or private payload into public artifacts.
+
+The pinned-root, exact-set, code-owned role registry, and entry/descriptor
+authority-read contracts use Python standard-library facilities and
+repository-owned evidence. APG60F history and reports remain immutable; the
+current lifecycle artifacts advance through APG60G. CSS behavior, sources,
+rights, targets, release, publication, deployment, and active state remain
+unchanged.
+
+## APG60H provenance
+
+APG60H is an independently written forward correction over repository-owned
+Python and synthetic tests. It preserves Claude's immutable object, copies no
+external expression, adds no dependency, and changes no rights, notice,
+target, release, publication, deployment, or active state.
+
+## APG60I provenance
+
+APG60I is an independently written clean-room forward correction derived from
+the adopted APG60H object and deterministic synthetic substitution and cleanup
+controls. Its descriptor-bound implementation uses Python standard-library
+facilities only. It copies no target or third-party source, adds no dependency,
+and changes no rights, notice, target, release, publication, deployment, or
+active state.
+
+## APG61 provenance
+
+APG61 is independently written clean-room authoring: the candidate leaf,
+specification, traceability map, ADR 0036, and records were synthesized from
+the frozen APG60A contract, with the CSSWG rights identities reverified from
+the repository-owned APG52 ledger and both targets read only as exact Git
+objects. It copies no CSSWG, target, or APG58/APG59 candidate expression,
+adds no dependency, integrates no surface, and changes no rights, notice,
+target, release, publication, deployment, or active state.
+
+## APG62 provenance
+
+APG62 is independently written validation and terminal-disposition work over
+the immutable APG61 object and repository-owned frozen APG60A contract. Its
+oracle, tests, semantic ledger, correction, and rejection records copy no
+CSSWG, target, or rejected-pilot expression and add no dependency. Exact
+CSSWG rights identities and both read-only target objects were reverified;
+neither target was executed or mutated. Removing the rejected current
+candidate changes no rights, notice, public release, active deployment, or
+target state.
+
+## APG63 provenance
+
+APG63 is independently written clean-room architecture work: the Markdown
+architecture, lean validation contract, ADR 0037, scenario register, and
+records were synthesized from repository-owned evidence, with CommonMark
+0.31.2 and pinned GFM specification identities and their CC BY-SA 4.0
+document rights reverified at exact objects and both targets read only as
+exact Git objects. It copies no specification, implementation, or target
+expression, adds no dependency, authors no skill, integrates no surface,
+and changes no rights, notice, target, release, publication, deployment,
+or active state.
+
+## APG64 provenance
+
+APG64 is independently written clean-room review and forward-correction work
+over the immutable APG63 object. Exact CommonMark, GFM, target, rights,
+configuration, and inventory facts were reverified from primary objects; no
+specification, implementation, target, or reviewer expression was copied.
+Corrected bytes, exact patch identities, replay vectors, and non-author review
+bindings are preserved in publication-excluded evidence. No dependency,
+license, NOTICE, target, release, publication, deployment, or active state
+changed.
+
+## APG65 provenance
+
+APG65 is independently written clean-room candidate authoring from the
+accepted APG64 architecture, lean contract, and corrected scenario register.
+The pinned CommonMark 0.31.2 and GFM 0.29 specification objects and their
+rights were reverified at exact objects as evidence only; no specification,
+implementation, target, APG63, or APG64 expression was copied, and the
+rejected CSS candidate prose was not reused. The candidate is synthesized
+APG-native expression. No dependency, license, NOTICE, target, release,
+publication, deployment, or active state changed.
+
+## APG66 Markdown validation and integration provenance
+
+APG66 independently derives its 34-row executable vector from the accepted
+APG64 register and uses exact CommonMark 0.31.2, GFM 0.29, website, and theme
+Git objects only as bounded read-only evidence. The retained leaf,
+specification, coverage, fixture, tests, integration owners, evaluation, and
+exit are independently written APG expression. No CommonMark, GFM,
+implementation, test, target, or reviewer expression is copied or adapted.
+Specification-document CC BY-SA 4.0 rights remain distinct from identified
+BSD-2-Clause/MIT implementation, test, and derived-code regions. This is a
+bounded clean-room finding, not legal advice. No dependency, license, NOTICE,
+target, publication, deployment, or active-state change occurred.
+
+## APG67 JavaScript architecture provenance
+
+APG67 uses the exact ECMA-262 `es2026` annual tag (ECMAScript 2026, 17th
+edition), the live 2027 draft head as moving evidence only, Test262 under its
+verified Ecma BSD-style license, and the two pinned target objects as bounded
+read-only evidence. The architecture, lean contract, scenario register, ADR
+0039, and records are independently written APG expression: no specification
+algorithm, grammar production, table, example, Test262 case, or target
+expression is copied or adapted. Ecma's natural-language text rights,
+MIT-style source-code policy, and TC39 contribution policy are recorded
+separately; this is a bounded clean-room finding, not legal advice. No
+dependency, license, NOTICE, target, publication, deployment, or
+active-state change occurred.
+
+## APG68 JavaScript architecture review provenance
+
+APG68 independently fetched and read exact ECMA-262 annual and errata Git
+objects, Test262 objects, and the two pinned target trees. It separates
+specification-text, repository-source, annual embedded-software,
+contribution, Test262, and target rights. The correction and records are
+independently written APG expression: no specification algorithm, grammar,
+table, example, Test262 case, source, or target expression is copied or
+adapted. The clean-room result is bounded, not legal advice.
+
+## APG69 JavaScript architecture reset provenance
+
+APG69 reverified the exact es2026 annual tag, errata tag, moving-draft
+head, and Test262 identities by read-only remote query and refetched the
+annual specification, annual license, errata-changed specification, and
+Test262 license blobs at their exact commits with matching hashes. Both
+pinned target trees were verified unchanged by exact object read. The
+fresh architecture, contract, registers, and records are independently
+written APG expression: no specification algorithm, grammar, table,
+example, Test262 case, source, target, or rejected-APG67/APG68
+expression is copied or adapted. The clean-room result is bounded, not
+legal advice.
+
+## APG79 JavaScript hardening provenance
+
+APG79 independently reconstructs 24 semantic purposes, 14 fixture purposes,
+and three target rows from ECMA-262 17th edition, exact source and rights
+objects, read-only target objects, an exact bounded engine observation, and
+independently authored APG controls. No specification, Test262, engine-test,
+target, or rejected-candidate expression is copied. Three correction rounds are
+preserved. Terminal review leaves material proof and ownership defects, so the
+candidate remains Proposed and unintegrated. This is bounded factual evidence,
+not legal advice.
+
+## APG77D CSS integration provenance
+
+APG77D derives its human-debt and integration records from the preserved
+APG76 through APG77C objects, exact W3C source identities, read-only target Git
+objects, independently authored APG scenarios and fixtures, and repository-
+owned lifecycle, release, test, and rollback checks. It copies no target or
+specification expression. Compact v3 remains supporting evidence only. Public
+records exclude private topology, local scratch paths, and private payloads.
+This is bounded factual evidence, not legal advice.
+
+## APG70 JavaScript architecture review provenance
+
+APG70 independently reverified the exact annual, errata, draft, Test262,
+target, rights, and corpus identities; used source expression only as read-only
+evidence; and wrote its vectors, correction, reviews, and records as APG
+expression. No specification algorithm, grammar, table, example, Test262 case,
+source, or target expression was copied or adapted. Fresh review found false
+source hashes in the corrected APG70 public snapshot; the preserved snapshot is
+Rejected evidence and the terminal record restores the verified identities.
+The clean-room/privacy boundary otherwise passes and remains bounded, not legal
+advice.
+
+## APG71 TypeScript architecture provenance
+
+APG71 independently verified the TypeScript 7 native release (tag, peeled
+commit, tree, license blob, npm version, integrity, and package-to-source
+binding), the TypeScript 6 legacy 6.0 patch-line tags and packages, the
+`@typescript/typescript6` package (whose exact source relation is recorded
+as unavailable), and documentation rights (prose CC-BY-4.0, website code
+MIT, compiler repositories Apache-2.0), all from exact objects. Full source
+identities live in the single private APG71 identity record and the managed
+report; public records use stable labels. Both targets were read as exact
+Git objects only. No compiler, baseline, test, diagnostic, documentation,
+release-note, target, or rejected-JavaScript-architecture expression was
+copied or adapted; every APG71 record is APG expression. The
+clean-room/privacy review passes and remains bounded factual evidence, not
+legal advice.
+
+## APG72 TypeScript architecture peer-review provenance
+
+APG72 independently reverified the exact TypeScript 7.0.2, 6.0.2/6.0.3, and
+5.9.3 package/source bindings, the TypeScript 6 compatibility wrapper's absent
+source binding, documentation rights and version scope, and both exact target
+objects. Full identities remain publication-excluded; public records use
+stable labels. No compiler, package, documentation, target, register, or
+rejected-architecture expression was copied or adapted. The website's absent
+reuse grant and theme's qualified rights remain non-blocking because no target
+expression was reused. The clean-room/privacy conclusion passes as bounded
+factual evidence, not legal advice.
+
+## APG73 production recovery governance provenance
+
+APG73 derives product priority, TypeScript 7 destination intent, the bounded
+iterative-hardening lifecycle, authority split, debt gate, and future sequence
+from explicit human product and governance authority. Existing APG58 through
+APG72 records supply historical evidence about the one-correction lifecycle and
+its CSS, JavaScript, and TypeScript results; they do not supply the new product
+priority or terminal-disposition authority. No target, compiler,
+specification, documentation, package, test, or third-party expression was
+copied or adapted. Public records omit unpublished target identity and private
+topology. Target and corrected release objects were read only for preservation;
+no target command ran. The clean-room, rights, privacy, and personal-data
+review is bounded factual evidence, not legal advice.
+
+## APG75 TypeScript hardening provenance
+
+APG75 independently reconstructs candidate-semantic, fixture, compiler, target,
+rights, and lifecycle evidence before comparing candidate prose. Three
+separately preserved correction rounds are independently written APG expression.
+No compiler implementation, test or baseline, documentation passage, target
+source, or rejected-architecture expression is copied. Maintained fixture and
+scenario changes remain original test expression. Public records exclude local
+paths, private topology, and personal data. The result is bounded clean-room,
+rights, privacy, and personal-data evidence, not legal advice.
+
+## APG74 TypeScript candidate provenance
+
+APG74 derives the candidate and fixture from accepted ADR 0042 product
+intent plus fresh primary evidence: npm registry metadata and dist-tags for
+`typescript@7.0.2` and `@typescript/typescript6@6.0.2`, the
+`microsoft/typescript-go` release-tag source binding, freshly pinned
+read-only target objects, and scratch-run compiler observations. The
+rejected APG71/APG72 architecture supplied historical defect evidence only;
+none of its prose, registers, or vocabularies was copied or revived. No
+compiler implementation, compiler test or baseline, documentation passage,
+or target source was copied; fixture sources are independently written.
+Public records omit private topology and the absolute scratch path. Targets
+and corrected release objects were read as exact Git objects only; no
+target command ran. The clean-room, rights, privacy, and personal-data
+review is bounded factual evidence, not legal advice.
+
+## APG75A TypeScript scope and lifecycle provenance
+
+APG75A derives its correction from the accepted project/compiler ownership
+model, the maintained scenario and fixture data, exact APG75 Git/report
+objects, and clean-checkout runner observations. The reusable neutrality,
+axis, lifecycle, and prerequisite controls are independently authored APG
+expression. Theme Forge intent is retained as project metadata without copying
+target source. No compiler implementation or documentation text, target source,
+private payload, local path, or rejected-candidate expression is copied. Exact
+TypeScript 7.0.2 executes only from invocation-owned scratch under its existing
+Apache-2.0 rights record. This is bounded factual evidence, not legal advice.
+## APG76 CSS candidate provenance
+
+APG76 derives its candidate from freshly read W3C module snapshots under the
+W3C Software and Document License, a live pin of the CSS Working Group drafts
+repository, and read-only inspection of both targets at exact Git objects. The
+profile text, the scenario coverage, and every fixture file are independently
+authored APG expression. No specification prose, algorithm, table, example, or
+test, no CSS Working Group or browser test, no target stylesheet, and no APG58,
+APG59, or APG61 candidate expression is copied; the rejected CSS candidates were
+verified by object identity alone. This is bounded factual evidence, not legal
+advice.
+
+## APG77 CSS hardening provenance
+
+APG77 independently reconstructs candidate and fixture consequences from dated
+W3C modules, exact read-only target objects, official Astro/Vite role
+documentation, and independently authored APG tests. Three correction rounds
+remain separately committed. No specification, WPT, BCD, package, target, or
+rejected-candidate expression is copied. Terminal review leaves two proof-
+retention defects, so the clean-room candidate remains Proposed and
+unintegrated pending human continuation. This is bounded factual evidence, not
+legal advice.
+
+## APG79A JavaScript correction provenance
+
+APG79A preserves the exact APG78/APG79 chain and independently authored APG
+correction expression over retained ECMA-262, Test262 rights, bounded exact
+engine, and read-only target identities. It copies no specification, test,
+engine, or target expression and adds no dependency or notice obligation. Fresh
+review leaves five Medium APG contract/evidence defects, so the corrected bytes
+remain unintegrated historical evidence and ADR 0045 remains Proposed. This is
+bounded factual evidence, not legal advice.
+
+
+## APG79B JavaScript correction provenance
+
+APG79B preserves the exact APG78 through APG79A chain and independently authored
+APG correction expression over retained ECMA-262, Test262 rights, bounded exact
+engine, and read-only target identities. It copies no specification, test,
+engine, target, or rejected-candidate expression and adds no dependency or
+notice obligation. Fresh review leaves four Medium APG contract/evidence
+defects, so the corrected bytes remain unintegrated historical evidence and ADR
+0045 remains Proposed. This is bounded factual evidence, not legal advice.
+
+## APG79C JavaScript decision provenance
+
+APG79C independently records the maintainer's four-item qualification-debt
+decision and references exact retained ECMA-262, Test262 rights, Node, target,
+and predecessor identities. It copies no specification, test, engine, target,
+fixture-output, or third-party source expression and adds no dependency or
+notice obligation. Fresh source preflight records one unaccepted Medium
+Test262 identity discrepancy and blocks integration without treating Test262 as
+semantic authority. This is bounded factual evidence, not legal advice.
+
+## APG79D Test262 source-role correction provenance
+
+APG79D directly re-reads the official Test262 repository identity,
+default-branch ref, commit and tree metadata, and top-level licence object. It
+preserves the APG79 reviewed pin and the false APG79B assertion as distinct
+historical evidence, while making the current authority role-specific and
+consequence-bearing. Test262 remains non-normative and no test body, path
+inventory, expected result, or other corpus expression is read, copied,
+executed, or vendored. The compact exact source-role record and development
+evidence stay publication-excluded; public-safe upstream object identities may
+appear in lifecycle records without exposing corpus content or private
+topology. The correction is independently authored APG expression and adds no
+dependency or notice obligation. This is bounded factual evidence, not legal
+advice.
+
+## APG79E JavaScript decision and integration provenance
+
+APG79E independently records the maintainer's `JS-QD-005` decision and directly
+reverifies the immutable APG79B managed report without copying its body. It
+preserves the APG79D source-role correction and Test262's non-normative rights-
+only, no-corpus, no-oracle role. Current integration expression is independently
+authored APG material; no Test262 test body, engine output, target expression,
+or managed-report body is copied. No dependency or notice obligation is added.
+This is bounded factual evidence, not legal advice.
+## APG80 Node.js candidate provenance
+
+APG80 records fresh Node.js release-schedule, versioned-API-documentation, and
+license identities without copying documentation prose, examples, source, tests,
+or generated API data. Node repository source and tests are treated as
+implementation evidence rather than as a copying license or a public-contract
+override. ECMA-262 remains the authority for ECMAScript semantics and is routed
+rather than restated, and Test262 is neither needed nor read. All candidate,
+fixture, and record expression is independently authored APG material; no target
+source, path, command body, package-manager expression, or managed-report body
+is copied. No dependency or notice obligation is added. This is bounded factual
+evidence, not legal advice.
+
+APG81H integration adds no new external source, copied expression, dependency,
+or notice obligation. It retains APG80's independently authored candidate and
+the subsequently hardened APG fixture and harness, while current catalog,
+projection, route, release, test, and inventory expression remains
+independently authored APG material. The exact Node runtimes and TypeScript
+compiler are qualification tools, not redistributed release inputs. This is
+bounded factual evidence, not legal advice.

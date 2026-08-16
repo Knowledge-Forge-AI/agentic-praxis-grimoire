@@ -7,14 +7,18 @@ import json
 import os
 from pathlib import Path
 import subprocess
+import sys
 import tempfile
 import unittest
+from unittest import mock
 
 from src.test.apg_test_support import repository_root
 
 
 REPOSITORY_ROOT = repository_root(__file__)
 COMMAND = REPOSITORY_ROOT / "bin" / "apg-check-record-identity"
+sys.path.insert(0, str(REPOSITORY_ROOT / "libexec"))
+import apg_record_identity as identity  # noqa: E402
 
 
 class APGRecordIdentityTests(unittest.TestCase):
@@ -259,6 +263,65 @@ class APGRecordIdentityTests(unittest.TestCase):
             encoding="utf-8",
         )
         self.assertIn("APGR009", self.codes())
+
+    def test_replacement_ref_cannot_change_first_parent_phase_chronology(
+        self,
+    ) -> None:
+        repository = Path(self.temporary.name) / "chronology"
+        repository.mkdir()
+
+        def git(
+            *arguments: str,
+            environment: dict[str, str] | None = None,
+        ) -> subprocess.CompletedProcess[str]:
+            return subprocess.run(
+                ["git", "-C", str(repository), *arguments],
+                check=True,
+                env=environment,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+            )
+
+        def replacement_observing_git_environment() -> dict[str, str]:
+            environment = os.environ.copy()
+            environment.pop("GIT_NO_REPLACE_OBJECTS", None)
+            return environment
+
+        git("init", "-q")
+        git("config", "user.name", "APG Test")
+        git("config", "user.email", "apg-test@example.invalid")
+        (repository / "phase").write_text("one\n", encoding="utf-8")
+        git("add", "phase")
+        git("commit", "-q", "-m", "APG1: First phase")
+        first = git("rev-parse", "HEAD").stdout.strip()
+        (repository / "phase").write_text("two\n", encoding="utf-8")
+        git("commit", "-q", "-am", "APG2: Second phase")
+        second = git("rev-parse", "HEAD").stdout.strip()
+        self.assertEqual(
+            identity.first_parent_phase_chronology(repository),
+            ("APG1", "APG2"),
+        )
+        git("replace", second, first)
+        self.assertEqual(git("replace", "--list").stdout.splitlines(), [second])
+        with mock.patch.dict(os.environ, {"GIT_NO_REPLACE_OBJECTS": "1"}):
+            suppressed = git("log", "--first-parent", "--reverse", "--format=%s")
+            self.assertEqual(
+                suppressed.stdout.splitlines(),
+                ["APG1: First phase", "APG2: Second phase"],
+            )
+            ordinary = git(
+                "log",
+                "--first-parent",
+                "--reverse",
+                "--format=%s",
+                environment=replacement_observing_git_environment(),
+            )
+            self.assertEqual(ordinary.stdout.splitlines(), ["APG1: First phase"])
+            self.assertEqual(
+                identity.first_parent_phase_chronology(repository),
+                ("APG1", "APG2"),
+            )
 
 
 if __name__ == "__main__":

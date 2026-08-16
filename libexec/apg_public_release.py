@@ -57,6 +57,7 @@ ALLOWED_CATEGORIES = {
     "skill-library",
 }
 AUDITED_WRAPPERS = (
+    "bin/apg-check-change-size",
     "bin/apg-check-record-identity",
     "bin/apg-check-skill-library",
     "bin/apg-project-skills",
@@ -64,8 +65,10 @@ AUDITED_WRAPPERS = (
     "bin/apg-test",
     "bin/apg-user-skills",
     "bin/append-operational-report",
+    "bin/flatten-skill-symlinks",
     "bin/git-diff-report",
     "bin/git-show-report",
+    "bin/install-global-skills",
 )
 AUDITED_HELPERS = (
     "libexec/agent_report/__init__.py",
@@ -85,8 +88,21 @@ AUDITED_HELPERS = (
     "libexec/apg_skill_topology.py",
     "libexec/apg_test.py",
     "libexec/apg_user_skills.py",
+    "libexec/change_size/__init__.py",
+    "libexec/change_size/checker.py",
+    "libexec/change_size/cli.py",
+    "libexec/change_size/git_adapter.py",
+    "libexec/change_size/inspection.py",
+    "libexec/change_size/policy.py",
+    "libexec/flatten_skill_symlinks.py",
+    "libexec/global_skills_inventory.py",
+    "libexec/global_skills_state.py",
+    "libexec/global_skills_transaction.py",
+    "libexec/install_global_skills.py",
+    "libexec/skill_projection_state.py",
 )
-AUDITED_TESTS = (
+AUDITED_TESTS = tuple(sorted((
+    "src/test/int/python/agentic-praxis-grimoire/bin/apg-check-change-size.int.test.py",
     "src/test/int/python/agentic-praxis-grimoire/bin/apg-check-phase-commit-message.int.test.py",
     "src/test/int/python/agentic-praxis-grimoire/bin/apg-check-record-identity.int.test.py",
     "src/test/int/python/agentic-praxis-grimoire/bin/apg-check-skill-library.int.test.py",
@@ -95,14 +111,23 @@ AUDITED_TESTS = (
     "src/test/int/python/agentic-praxis-grimoire/bin/apg-test.int.test.py",
     "src/test/int/python/agentic-praxis-grimoire/bin/apg-user-skills.int.test.py",
     "src/test/int/python/agentic-praxis-grimoire/bin/append-operational-report.int.test.py",
+    "src/test/int/python/agentic-praxis-grimoire/bin/flatten-skill-symlinks.int.test.py",
     "src/test/int/python/agentic-praxis-grimoire/bin/git-diff-report.int.test.py",
     "src/test/int/python/agentic-praxis-grimoire/bin/git-show-report.int.test.py",
+    "src/test/int/python/agentic-praxis-grimoire/bin/install-global-skills.int.test.py",
     "src/test/int/python/agentic-praxis-grimoire/libexec/apg_project_skills_commands.int.test.py",
     "src/test/int/python/agentic-praxis-grimoire/libexec/apg_project_skills_core.int.test.py",
     "src/test/int/python/agentic-praxis-grimoire/libexec/apg_public_release.int.test.py",
     "src/test/int/python/agentic-praxis-grimoire/libexec/apg_skill_topology.int.test.py",
     "src/test/int/python/agentic-praxis-grimoire/libexec/apg_test.int.test.py",
     "src/test/int/python/agentic-praxis-grimoire/libexec/apg_user_skills.int.test.py",
+    "src/test/int/python/agentic-praxis-grimoire/libexec/global_skills_inventory.int.test.py",
+    "src/test/int/python/agentic-praxis-grimoire/libexec/global_skills_state.int.test.py",
+    "src/test/int/python/agentic-praxis-grimoire/libexec/global_skills_transaction.int.test.py",
+    "src/test/int/python/agentic-praxis-grimoire/skills/javascript-language-profile/SKILL.int.test.py",
+    "src/test/int/python/agentic-praxis-grimoire/skills/markdown-language-profile/SKILL.int.test.py",
+    "src/test/int/python/agentic-praxis-grimoire/skills/nodejs-runtime-profile/SKILL.int.test.py",
+    "src/test/int/python/agentic-praxis-grimoire/skills/typescript-language-profile/SKILL.int.test.py",
     "src/test/unit/bash/append-operational-report.unit.test.bats",
     "src/test/unit/bash/git-show-report.unit.test.bats",
     "src/test/unit/python/agentic-praxis-grimoire/docs/evaluations/apg41-v0-4-readiness-and-pre-release-smoke.unit.test.py",
@@ -122,19 +147,49 @@ AUDITED_TESTS = (
     "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_skill_topology.unit.test.py",
     "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_test.unit.test.py",
     "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_user_skills.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/libexec/change_size/checker.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/libexec/change_size/cli.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/libexec/change_size/git_adapter.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/libexec/change_size/policy.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/libexec/flatten_skill_symlinks.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/libexec/global_skills_inventory.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/libexec/global_skills_state.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/libexec/global_skills_transaction.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/libexec/install_global_skills.unit.test.py",
     "src/test/unit/python/agentic-praxis-grimoire/skills/chatgpt/chatgpt-manager-workflow/SKILL.unit.test.py",
     "src/test/unit/python/agentic-praxis-grimoire/skills/chatgpt/composing-approved-roadmap-assignments/SKILL.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/skills/css-language-profile/SKILL.unit.test.py",
     "src/test/unit/python/agentic-praxis-grimoire/skills/dockerfile-profile/SKILL.unit.test.py",
     "src/test/unit/python/agentic-praxis-grimoire/skills/go-cmp-test-profile/SKILL.unit.test.py",
     "src/test/unit/python/agentic-praxis-grimoire/skills/go-test-profile/SKILL.unit.test.py",
     "src/test/unit/python/agentic-praxis-grimoire/skills/implementing-with-test-discipline/SKILL.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/skills/javascript-language-profile/SKILL.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/skills/markdown-language-profile/SKILL.unit.test.py",
     "src/test/unit/python/agentic-praxis-grimoire/skills/minitest-test-profile/SKILL.unit.test.py",
     "src/test/unit/python/agentic-praxis-grimoire/skills/nix-test-profile/SKILL.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/skills/nodejs-runtime-profile/SKILL.unit.test.py",
     "src/test/unit/python/agentic-praxis-grimoire/skills/planning-repository-work/SKILL.unit.test.py",
     "src/test/unit/python/agentic-praxis-grimoire/skills/pytest-test-profile/SKILL.unit.test.py",
     "src/test/unit/python/agentic-praxis-grimoire/skills/reviewing-and-verifying-repository-work/SKILL.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/skills/typescript-language-profile/SKILL.unit.test.py",
     "src/test/unit/python/agentic-praxis-grimoire/skills/vagrantfile-profile/SKILL.unit.test.py",
-)
+    "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_markdown_candidate_contract.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_css_candidate_contract.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_css_profile_candidate_contract.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_css_profile_fixture_contract.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_javascript_candidate_contract.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_javascript_fixture_contract.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_markdown_clause_guard_contract.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_markdown_polarity_guard_contract.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_markdown_register_contract.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_markdown_token_guard_contract.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_markdown_vocabulary_contract.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_nodejs_candidate_contract.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_nodejs_fixture_contract.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_repository_import_cache_contract.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_typescript_candidate_contract.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_typescript_fixture_contract.unit.test.py",
+)))
 AUDITED_LICENSING = (
     "CLA.md",
     "COMMERCIAL-LICENSE.md",
@@ -150,6 +205,7 @@ AUDITED_SKILLS = tuple(sorted((
     "skills/chatgpt/composing-approved-roadmap-assignments/SKILL.md",
     "skills/composing-bounded-worker-assignments/SKILL.md",
     "skills/converting-bash-scripts-to-python/SKILL.md",
+    "skills/css-language-profile/SKILL.md",
     "skills/debugging-systematically/SKILL.md",
     "skills/designing-significant-changes/SKILL.md",
     "skills/dockerfile-profile/SKILL.md",
@@ -157,9 +213,12 @@ AUDITED_SKILLS = tuple(sorted((
     "skills/go-language-profile/SKILL.md",
     "skills/go-test-profile/SKILL.md",
     "skills/implementing-with-test-discipline/SKILL.md",
+    "skills/javascript-language-profile/SKILL.md",
+    "skills/markdown-language-profile/SKILL.md",
     "skills/minitest-test-profile/SKILL.md",
     "skills/nix-language-profile/SKILL.md",
     "skills/nix-test-profile/SKILL.md",
+    "skills/nodejs-runtime-profile/SKILL.md",
     "skills/planning-repository-work/SKILL.md",
     "skills/postgresql-database-profile/SKILL.md",
     "skills/pytest-test-profile/SKILL.md",
@@ -168,6 +227,7 @@ AUDITED_SKILLS = tuple(sorted((
     "skills/ruby-language-profile/SKILL.md",
     "skills/sqlite-database-profile/SKILL.md",
     "skills/synthesizing-repository-guidance/SKILL.md",
+    "skills/typescript-language-profile/SKILL.md",
     "skills/vagrantfile-profile/SKILL.md",
     "skills/zsh-language-profile/SKILL.md",
     "skills/zunit-test-profile/SKILL.md",
@@ -189,6 +249,7 @@ AUDITED_CRITICAL = tuple(sorted((
     "src/test/apg_skill_library_cases.py",
     "src/test/apg_test_support.py",
     "src/test/apg_user_skills_cases.py",
+    "src/test/install_global_skills_cases.py",
     "src/test/fixtures/apg26-scenario-families.json",
     "src/test/fixtures/apg32-minitest-scenario-families.json",
     "src/test/fixtures/apg33-dockerfile-scenario-families.json",
@@ -197,6 +258,79 @@ AUDITED_CRITICAL = tuple(sorted((
     "src/test/fixtures/apg37-go-test-scenario-families.json",
     "src/test/fixtures/apg39-nix-test-scenario-families.json",
     "src/test/fixtures/apg41-provisional-readiness-cases.json",
+    "src/test/fixtures/apg64-markdown-scenario-register.md",
+    "src/test/fixtures/apg66-markdown-language-profile-scenarios.json",
+    "src/test/fixtures/apg75-typescript-language-profile-scenarios.json",
+    "src/test/fixtures/apg77-css-language-profile-scenarios.json",
+    "src/test/fixtures/apg79-javascript-language-profile-scenarios.json",
+    "src/test/fixtures/apg76-css-target-first/README.md",
+    "src/test/fixtures/apg76-css-target-first/fixture-manifest.json",
+    "src/test/fixtures/apg76-css-target-first/src/base.css",
+    "src/test/fixtures/apg76-css-target-first/src/cascade.css",
+    "src/test/fixtures/apg76-css-target-first/src/conditions.css",
+    "src/test/fixtures/apg76-css-target-first/src/custom-properties.css",
+    "src/test/fixtures/apg76-css-target-first/src/generated-boundary.css",
+    "src/test/fixtures/apg76-css-target-first/src/host-boundary.astro",
+    "src/test/fixtures/apg76-css-target-first/src/nesting.css",
+    "src/test/fixtures/apg76-css-target-first/src/units-and-color.css",
+    "src/test/fixtures/apg76-css-target-first/src/unknown-environment.css",
+    "src/test/fixtures/apg78-javascript-core/README.md",
+    "src/test/fixtures/apg78-javascript-core/fixture-manifest.json",
+    "src/test/fixtures/apg78-javascript-core/package.json",
+    "src/test/fixtures/apg78-javascript-core/src/async.mjs",
+    "src/test/fixtures/apg78-javascript-core/src/checked.js",
+    "src/test/fixtures/apg78-javascript-core/src/cli-core.mjs",
+    "src/test/fixtures/apg78-javascript-core/src/cli-node-adapter-boundary.cjs",
+    "src/test/fixtures/apg78-javascript-core/src/coercion.mjs",
+    "src/test/fixtures/apg78-javascript-core/src/commonjs-boundary.cjs",
+    "src/test/fixtures/apg78-javascript-core/src/dynamic-import-boundary.mjs",
+    "src/test/fixtures/apg78-javascript-core/src/errors.mjs",
+    "src/test/fixtures/apg78-javascript-core/src/evaluation.mjs",
+    "src/test/fixtures/apg78-javascript-core/src/functions.mjs",
+    "src/test/fixtures/apg78-javascript-core/src/iteration.mjs",
+    "src/test/fixtures/apg78-javascript-core/src/mode-selected.js",
+    "src/test/fixtures/apg78-javascript-core/src/module-boundary.mjs",
+    "src/test/fixtures/apg78-javascript-core/src/modules/consumer.mjs",
+    "src/test/fixtures/apg78-javascript-core/src/modules/counter.mjs",
+    "src/test/fixtures/apg78-javascript-core/src/modules/cycle-a.mjs",
+    "src/test/fixtures/apg78-javascript-core/src/modules/cycle-b.mjs",
+    "src/test/fixtures/apg78-javascript-core/src/modules/top-level-await.mjs",
+    "src/test/fixtures/apg78-javascript-core/src/objects.mjs",
+    "src/test/fixtures/apg78-javascript-core/src/scope.mjs",
+    "src/test/fixtures/apg78-javascript-core/unbound/mode-neutral.js.txt",
+    "src/test/fixtures/apg78-javascript-core/unbound/sloppy-script.js.txt",
+    "src/test/fixtures/apg78-javascript-core/unbound/strict-script.js.txt",
+    "src/test/fixtures/apg74-typescript-intended-state/README.md",
+    "src/test/fixtures/apg74-typescript-intended-state/fixture-manifest.json",
+    "src/test/fixtures/apg74-typescript-intended-state/package.json",
+    "src/test/fixtures/apg74-typescript-intended-state/src/checked/config-loader.js",
+    "src/test/fixtures/apg74-typescript-intended-state/src/core/inventory.ts",
+    "src/test/fixtures/apg74-typescript-intended-state/src/core/runtime-boundary.ts",
+    "src/test/fixtures/apg74-typescript-intended-state/src/declarations/host-metrics.d.ts",
+    "src/test/fixtures/apg74-typescript-intended-state/src/embedded/widget.astro",
+    "src/test/fixtures/apg74-typescript-intended-state/src/modules/legacy.cts",
+    "src/test/fixtures/apg74-typescript-intended-state/src/modules/loader.mts",
+    "src/test/fixtures/apg74-typescript-intended-state/src/ui/badge.tsx",
+    "src/test/fixtures/apg74-typescript-intended-state/src/ui/jsx-host.d.ts",
+    "src/test/fixtures/apg74-typescript-intended-state/src/unbound/option-state-unknown.ts",
+    "src/test/fixtures/apg74-typescript-intended-state/src/unbound/orphan-role-unknown.ts",
+    "src/test/fixtures/apg74-typescript-intended-state/tsconfig.declarations.json",
+    "src/test/fixtures/apg74-typescript-intended-state/tsconfig.json",
+    "src/test/support/apg_markdown_candidate_contract.py",
+    "src/test/support/apg_css_candidate_contract.py",
+    "src/test/support/apg_css_profile_candidate_contract.py",
+    "src/test/support/apg_css_profile_fixture_contract.py",
+    "src/test/support/apg_javascript_candidate_contract.py",
+    "src/test/support/apg_javascript_fixture_contract.py",
+    "src/test/support/apg_markdown_clause_guard_contract.py",
+    "src/test/support/apg_markdown_polarity_guard_contract.py",
+    "src/test/support/apg_markdown_register_contract.py",
+    "src/test/support/apg_markdown_token_guard_contract.py",
+    "src/test/support/apg_markdown_vocabulary_contract.py",
+    "src/test/support/apg_repository_import_cache_contract.py",
+    "src/test/support/apg_typescript_candidate_contract.py",
+    "src/test/support/apg_typescript_fixture_contract.py",
+    "testing/apg-change-size-policy.json",
     "testing/apg-test-inventory.json",
     "docs/adr/2026/07/0005-public-license-and-contribution-governance.md",
     "docs/adr/2026/07/0009-public-distribution-and-reproducible-release-validation.md",
@@ -210,6 +344,12 @@ AUDITED_CRITICAL = tuple(sorted((
     "docs/adr/2026/07/0017-approved-roadmap-manager-assignment-ownership.md",
     "docs/adr/2026/07/0018-v0-3-readiness-maturity-and-release-inclusion.md",
     "docs/adr/2026/07/0019-v0-3-release-distribution-and-variable-skill-set-lifecycle.md",
+    "docs/adr/2026/07/0032-agent-report-storage-project-identity-and-change-size-policy.md",
+    "docs/adr/2026/07/0033-multi-repository-global-skill-installation.md",
+    "docs/adr/2026/07/0038-markdown-language-profile-candidate.md",
+    "docs/adr/2026/08/0043-typescript-language-profile-candidate-and-intended-state-harness.md",
+    "docs/adr/2026/08/0044-css-language-profile-candidate-and-target-first-harness.md",
+    "docs/adr/2026/08/0045-javascript-language-profile-candidate-and-target-first-harness.md",
     "docs/adr/README.md",
     "docs/bootstrap-v0.1.md",
     "docs/evaluations/apg12-public-distribution-and-release-validation.md",
@@ -234,6 +374,30 @@ AUDITED_CRITICAL = tuple(sorted((
     "docs/evaluations/apg24-v0-3-release-candidate-and-publication.md",
     "docs/evaluations/apg41-v0-4-readiness-and-pre-release-smoke.md",
     "docs/evaluations/apg42-v0-4-release-publication-and-active-deployment.md",
+    "docs/evaluations/apg54-global-skill-installer-integration.md",
+    "docs/evaluations/apg55-global-skill-installer-transaction-hardening.md",
+    "docs/evaluations/apg66-markdown-language-profile-validation-and-integration.md",
+    "docs/evaluations/apg66a-markdown-replay-evidence-truth.md",
+    "docs/evaluations/apg66b-markdown-register-vocabulary-and-guard-exactness.md",
+    "docs/evaluations/apg66c-markdown-clause-polarity-and-predicate-binding.md",
+    "docs/evaluations/apg66d-repository-import-cache-entry-presence.md",
+    "docs/evaluations/apg75-typescript-iterative-hardening-and-integration.md",
+    "docs/evaluations/apg75a-typescript-scope-and-lifecycle-closure.md",
+    "docs/evaluations/apg76-css-language-profile-candidate-recovery.md",
+    "docs/evaluations/apg77-css-iterative-hardening-and-integration.md",
+    "docs/evaluations/apg77a-css-evidence-retention-closure-and-integration.md",
+    "docs/evaluations/apg77b-css-traceability-clean-room-closure-and-integration.md",
+    "docs/evaluations/apg77c-css-evidence-proportionality-and-integration.md",
+    "docs/evaluations/apg77d-css-known-debt-and-provisional-integration.md",
+    "docs/evaluations/apg78-javascript-core-candidate.md",
+    "docs/evaluations/apg79-javascript-core-iterative-hardening-and-integration.md",
+    "docs/evaluations/apg79a-javascript-terminal-proof-closure-and-integration.md",
+    "docs/evaluations/apg79b-javascript-contract-harness-closure-and-integration.md",
+    "docs/evaluations/apg79c-javascript-known-debt-and-provisional-integration.md",
+    "docs/evaluations/apg79d-test262-source-evidence-and-javascript-integration.md",
+    "docs/evaluations/apg79e-javascript-report-binding-debt-and-provisional-integration.md",
+    "docs/governance/language-profile-known-debt.json",
+    "docs/governance/language-profile-known-debt.md",
     "docs/language-profile-contract.md",
     "docs/legacy-roadmap-closure.md",
     "docs/manager-worker-protocol.md",
@@ -244,6 +408,14 @@ AUDITED_CRITICAL = tuple(sorted((
     "docs/public-release-process.md",
     "docs/roadmap.md",
     "docs/skill-authoring-and-maintenance.md",
+    "docs/specs/markdown-language-profile-scenario-coverage.md",
+    "docs/specs/markdown-language-profile.md",
+    "docs/specs/typescript-language-profile-scenario-coverage.md",
+    "docs/specs/typescript-language-profile.md",
+    "docs/specs/css-language-profile-scenario-coverage.md",
+    "docs/specs/css-language-profile.md",
+    "docs/specs/javascript-language-profile-scenario-coverage.md",
+    "docs/specs/javascript-language-profile.md",
     "docs/status/2026/07/20/00018-apg12-public-distribution-and-release-validation-exit.md",
     "docs/status/2026/07/20/00019-apg12a-public-lineage-and-read-only-validation-correction-exit.md",
     "docs/status/2026/07/20/00020-apg13-six-skill-post-superpowers-stability-review-exit.md",
@@ -267,6 +439,98 @@ AUDITED_CRITICAL = tuple(sorted((
     "docs/status/2026/07/21/00038-apg23-v0-3-readiness-maturity-and-application-smoke-exit.md",
     "docs/status/2026/07/22/00039-apg24-v0-3-release-candidate-and-publication-exit.md",
     "docs/status/2026/07/26/00062-apg42-v0-4-release-publication-and-active-deployment-exit.md",
+    "docs/status/2026/07/28/00074-apg54-global-skill-installer-integration-exit.md",
+    "docs/status/2026/07/29/00075-apg55-global-skill-installer-transaction-hardening-exit.md",
+    "docs/status/2026/08/01/00095-apg66-markdown-language-profile-validation-and-integration-exit.md",
+    "docs/status/2026/08/01/00096-apg66a-markdown-replay-evidence-truth-exit.md",
+    "docs/status/2026/08/01/00097-apg66b-markdown-register-vocabulary-and-guard-exactness-exit.md",
+    "docs/status/2026/08/01/00098-apg66c-markdown-clause-polarity-and-predicate-binding-exit.md",
+    "docs/status/2026/08/01/00099-apg66d-repository-import-cache-entry-presence-exit.md",
+    "docs/status/2026/08/03/00108-apg75-typescript-iterative-hardening-and-integration-exit.md",
+    "docs/status/2026/08/03/00109-apg75a-typescript-scope-and-lifecycle-closure-exit.md",
+    "docs/status/2026/08/04/00110-apg76-css-language-profile-candidate-recovery-exit.md",
+    "docs/status/2026/08/04/00111-apg77-css-iterative-hardening-and-integration-exit.md",
+    "docs/status/2026/08/06/00112-apg77a-css-evidence-retention-closure-and-integration-exit.md",
+    "docs/status/2026/08/06/00113-apg77b-css-traceability-clean-room-closure-and-integration-exit.md",
+    "docs/status/2026/08/07/00114-apg77c-css-evidence-proportionality-and-integration-exit.md",
+    "docs/status/2026/08/08/00115-apg77d-css-known-debt-and-provisional-integration-exit.md",
+    "docs/status/2026/08/08/00116-apg78-javascript-core-candidate-exit.md",
+    "docs/status/2026/08/08/00117-apg79-javascript-core-iterative-hardening-and-integration-exit.md",
+    "docs/status/2026/08/08/00118-apg79a-javascript-terminal-proof-closure-and-integration-exit.md",
+    "docs/status/2026/08/08/00119-apg79b-javascript-contract-harness-closure-and-integration-exit.md",
+    "docs/status/2026/08/08/00120-apg79c-javascript-known-debt-and-provisional-integration-exit.md",
+    "docs/status/2026/08/08/00121-apg79d-test262-source-evidence-and-javascript-integration-exit.md",
+    "docs/status/2026/08/09/00122-apg79e-javascript-report-binding-debt-and-provisional-integration-exit.md",
+    "docs/adr/2026/08/0046-nodejs-runtime-and-cli-stack-candidate-and-target-first-harness.md",
+    "docs/evaluations/apg80-nodejs-runtime-and-cli-stack-candidate.md",
+    "docs/evaluations/apg81-nodejs-runtime-cli-iterative-hardening-and-integration.md",
+    "docs/evaluations/apg81a-nodejs-qualification-threat-model-and-harness-simplification.md",
+    "docs/evaluations/apg81b-nodejs-integration-contract-clarification-and-provisional-adoption.md",
+    "docs/evaluations/apg81c-nodejs-lifecycle-test-and-scratch-closure.md",
+    "docs/evaluations/apg81d-nodejs-provisional-integration.md",
+    "docs/evaluations/apg81e-nodejs-final-integration-closure.md",
+    "docs/evaluations/apg81f-nodejs-actual-test-projection-and-integration-closure.md",
+    "docs/evaluations/apg81g-nodejs-selector-release-and-integration-closure.md",
+    "docs/evaluations/apg81h-nodejs-reviewable-qualification-and-integration-closure.md",
+    "docs/specs/nodejs-runtime-profile-scenario-coverage.md",
+    "docs/specs/nodejs-runtime-profile.md",
+    "docs/status/2026/08/09/00123-apg80-nodejs-runtime-and-cli-stack-candidate-exit.md",
+    "docs/status/2026/08/10/00124-apg81-nodejs-runtime-cli-iterative-hardening-and-integration-exit.md",
+    "docs/status/2026/08/10/00125-apg81a-nodejs-qualification-threat-model-and-harness-simplification-exit.md",
+    "docs/status/2026/08/10/00126-apg81b-nodejs-integration-contract-clarification-and-provisional-adoption-exit.md",
+    "docs/status/2026/08/10/00127-apg81c-nodejs-lifecycle-test-and-scratch-closure-exit.md",
+    "docs/status/2026/08/10/00128-apg81d-nodejs-provisional-integration-exit.md",
+    "docs/status/2026/08/11/00129-apg81e-nodejs-final-integration-closure-exit.md",
+    "docs/status/2026/08/11/00130-apg81f-nodejs-actual-test-projection-and-integration-closure-exit.md",
+    "docs/status/2026/08/11/00131-apg81g-nodejs-selector-release-and-integration-closure-exit.md",
+    "docs/status/2026/08/11/00132-apg81h-nodejs-reviewable-qualification-and-integration-closure-exit.md",
+    "src/test/fixtures/apg80-nodejs-runtime-cli/README.md",
+    "src/test/fixtures/apg80-nodejs-runtime-cli/cli/adapter.mjs",
+    "src/test/fixtures/apg80-nodejs-runtime-cli/cli/core.mjs",
+    "src/test/fixtures/apg80-nodejs-runtime-cli/commonjs/local-dependency.cjs",
+    "src/test/fixtures/apg80-nodejs-runtime-cli/commonjs/wrapper-boundary.cjs",
+    "src/test/fixtures/apg80-nodejs-runtime-cli/esm/builtin-boundary.mjs",
+    "src/test/fixtures/apg80-nodejs-runtime-cli/esm/metadata.mjs",
+    "src/test/fixtures/apg80-nodejs-runtime-cli/fixture-manifest.json",
+    "src/test/fixtures/apg80-nodejs-runtime-cli/interop/dynamic-exports.cjs",
+    "src/test/fixtures/apg80-nodejs-runtime-cli/interop/esm-consumer.mjs",
+    "src/test/fixtures/apg80-nodejs-runtime-cli/interop/identity.mjs",
+    "src/test/fixtures/apg80-nodejs-runtime-cli/interop/require-esm.cjs",
+    "src/test/fixtures/apg80-nodejs-runtime-cli/interop/static-exports.cjs",
+    "src/test/fixtures/apg80-nodejs-runtime-cli/module-mapping/commonjs-package/module-only.js",
+    "src/test/fixtures/apg80-nodejs-runtime-cli/module-mapping/commonjs-package/package.json",
+    "src/test/fixtures/apg80-nodejs-runtime-cli/module-mapping/commonjs-package/source.js",
+    "src/test/fixtures/apg80-nodejs-runtime-cli/module-mapping/explicit-commonjs.cjs",
+    "src/test/fixtures/apg80-nodejs-runtime-cli/module-mapping/explicit-module.mjs",
+    "src/test/fixtures/apg80-nodejs-runtime-cli/module-mapping/module-package/package.json",
+    "src/test/fixtures/apg80-nodejs-runtime-cli/module-mapping/module-package/source.js",
+    "src/test/fixtures/apg80-nodejs-runtime-cli/module-mapping/typeless-package/detected-module.js",
+    "src/test/fixtures/apg80-nodejs-runtime-cli/module-mapping/typeless-package/goal-neutral.js",
+    "src/test/fixtures/apg80-nodejs-runtime-cli/module-mapping/typeless-package/package.json",
+    "src/test/fixtures/apg80-nodejs-runtime-cli/package.json",
+    "src/test/fixtures/apg80-nodejs-runtime-cli/process/event-loop-entry.cjs",
+    "src/test/fixtures/apg80-nodejs-runtime-cli/process/event-loop.mjs",
+    "src/test/fixtures/apg80-nodejs-runtime-cli/process/filesystem.mjs",
+    "src/test/fixtures/apg80-nodejs-runtime-cli/process/inputs.mjs",
+    "src/test/fixtures/apg80-nodejs-runtime-cli/process/lifecycle-child.mjs",
+    "src/test/fixtures/apg80-nodejs-runtime-cli/process/lifecycle-parent.mjs",
+    "src/test/fixtures/apg80-nodejs-runtime-cli/process/stdio.mjs",
+    "src/test/fixtures/apg80-nodejs-runtime-cli/resolution/entry.mjs",
+    "src/test/fixtures/apg80-nodejs-runtime-cli/resolution/lib/condition-custom.mjs",
+    "src/test/fixtures/apg80-nodejs-runtime-cli/resolution/lib/condition-default.mjs",
+    "src/test/fixtures/apg80-nodejs-runtime-cli/resolution/lib/encapsulated.mjs",
+    "src/test/fixtures/apg80-nodejs-runtime-cli/resolution/lib/internal-only.mjs",
+    "src/test/fixtures/apg80-nodejs-runtime-cli/resolution/lib/public-entry.mjs",
+    "src/test/fixtures/apg80-nodejs-runtime-cli/resolution/lib/public-subpath.mjs",
+    "src/test/fixtures/apg80-nodejs-runtime-cli/resolution/package.json",
+    "src/test/fixtures/apg80-nodejs-runtime-cli/runtime/identity.mjs",
+    "src/test/fixtures/apg80-nodejs-runtime-cli/target-boundary/public-safe-runtime-role.json",
+    "src/test/fixtures/apg80-nodejs-runtime-cli/typescript/erasable.ts",
+    "src/test/fixtures/apg80-nodejs-runtime-cli/typescript/nonerasable.ts",
+    "src/test/fixtures/apg81-nodejs-runtime-profile-scenarios.json",
+    "src/test/support/apg_nodejs_candidate_contract.py",
+    "src/test/support/apg_nodejs_fixture_contract.py",
+    "testing/nodejs-profile-qualification-threat-model.json",
     "docs/status/README.md",
     "docs/user-scoped-skill-integration.md",
     "docs/v0-3-guidance-migration-proposal.md",
@@ -358,6 +622,621 @@ HISTORICAL_V02_CRITICAL = (
     "release/public-surface.json",
     "skills/README.md",
 )
+APG53_V05_WRAPPERS = frozenset(
+    {"bin/apg-check-change-size", "bin/flatten-skill-symlinks"}
+)
+APG53_V05_HELPERS = frozenset(
+    {
+        "libexec/change_size/__init__.py",
+        "libexec/change_size/checker.py",
+        "libexec/change_size/cli.py",
+        "libexec/change_size/git_adapter.py",
+        "libexec/change_size/inspection.py",
+        "libexec/change_size/policy.py",
+        "libexec/flatten_skill_symlinks.py",
+        "libexec/skill_projection_state.py",
+    }
+)
+APG53_V05_TESTS = frozenset(
+    {
+        "src/test/int/python/agentic-praxis-grimoire/bin/apg-check-change-size.int.test.py",
+        "src/test/int/python/agentic-praxis-grimoire/bin/flatten-skill-symlinks.int.test.py",
+        "src/test/unit/python/agentic-praxis-grimoire/libexec/change_size/checker.unit.test.py",
+        "src/test/unit/python/agentic-praxis-grimoire/libexec/change_size/cli.unit.test.py",
+        "src/test/unit/python/agentic-praxis-grimoire/libexec/change_size/git_adapter.unit.test.py",
+        "src/test/unit/python/agentic-praxis-grimoire/libexec/change_size/policy.unit.test.py",
+        "src/test/unit/python/agentic-praxis-grimoire/libexec/flatten_skill_symlinks.unit.test.py",
+    }
+)
+APG53_V05_CRITICAL = frozenset(
+    {
+        "docs/adr/2026/07/0032-agent-report-storage-project-identity-and-change-size-policy.md",
+        "testing/apg-change-size-policy.json",
+    }
+)
+APG54_V05_WRAPPERS = frozenset({"bin/install-global-skills"})
+APG54_V05_HELPERS = frozenset(
+    {
+        "libexec/global_skills_inventory.py",
+        "libexec/global_skills_state.py",
+        "libexec/global_skills_transaction.py",
+        "libexec/install_global_skills.py",
+    }
+)
+APG54_V05_TESTS = frozenset(
+    {
+        "src/test/int/python/agentic-praxis-grimoire/bin/install-global-skills.int.test.py",
+        "src/test/int/python/agentic-praxis-grimoire/libexec/global_skills_inventory.int.test.py",
+        "src/test/int/python/agentic-praxis-grimoire/libexec/global_skills_state.int.test.py",
+        "src/test/int/python/agentic-praxis-grimoire/libexec/global_skills_transaction.int.test.py",
+        "src/test/unit/python/agentic-praxis-grimoire/libexec/global_skills_inventory.unit.test.py",
+        "src/test/unit/python/agentic-praxis-grimoire/libexec/global_skills_state.unit.test.py",
+        "src/test/unit/python/agentic-praxis-grimoire/libexec/global_skills_transaction.unit.test.py",
+        "src/test/unit/python/agentic-praxis-grimoire/libexec/install_global_skills.unit.test.py",
+    }
+)
+APG54_V05_CRITICAL = frozenset(
+    {
+        "docs/adr/2026/07/0033-multi-repository-global-skill-installation.md",
+        "docs/evaluations/apg54-global-skill-installer-integration.md",
+        "docs/status/2026/07/28/00074-apg54-global-skill-installer-integration-exit.md",
+        "src/test/install_global_skills_cases.py",
+    }
+)
+APG55_V05_CRITICAL = frozenset(
+    {
+        "docs/evaluations/apg55-global-skill-installer-transaction-hardening.md",
+        "docs/status/2026/07/29/00075-apg55-global-skill-installer-transaction-hardening-exit.md",
+    }
+)
+APG66_V05_SKILLS = frozenset(
+    {"skills/markdown-language-profile/SKILL.md"}
+)
+APG66_V05_PROJECTIONS = frozenset(
+    {".agents/skills/markdown-language-profile"}
+)
+APG66_V05_TESTS = frozenset(
+    {
+        "src/test/int/python/agentic-praxis-grimoire/skills/markdown-language-profile/SKILL.int.test.py",
+        "src/test/unit/python/agentic-praxis-grimoire/skills/markdown-language-profile/SKILL.unit.test.py",
+        "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_markdown_candidate_contract.unit.test.py",
+    }
+)
+APG66_V05_CRITICAL = frozenset(
+    {
+        "docs/adr/2026/07/0038-markdown-language-profile-candidate.md",
+        "docs/evaluations/apg66-markdown-language-profile-validation-and-integration.md",
+        "docs/specs/markdown-language-profile-scenario-coverage.md",
+        "docs/specs/markdown-language-profile.md",
+        "docs/status/2026/08/01/00095-apg66-markdown-language-profile-validation-and-integration-exit.md",
+        "src/test/fixtures/apg66-markdown-language-profile-scenarios.json",
+        "src/test/support/apg_markdown_candidate_contract.py",
+    }
+)
+APG66A_V05_TESTS = frozenset(
+    {"src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_markdown_register_contract.unit.test.py"}
+)
+APG66A_V05_CRITICAL = frozenset(
+    {
+        "docs/evaluations/apg66a-markdown-replay-evidence-truth.md",
+        "docs/status/2026/08/01/00096-apg66a-markdown-replay-evidence-truth-exit.md",
+        "src/test/fixtures/apg64-markdown-scenario-register.md",
+        "src/test/support/apg_markdown_register_contract.py",
+    }
+)
+APG66B_V05_TESTS = frozenset(
+    {
+        "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_markdown_polarity_guard_contract.unit.test.py",
+        "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_markdown_token_guard_contract.unit.test.py",
+        "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_markdown_vocabulary_contract.unit.test.py",
+    }
+)
+APG66B_V05_CRITICAL = frozenset(
+    {
+        "docs/evaluations/apg66b-markdown-register-vocabulary-and-guard-exactness.md",
+        "docs/status/2026/08/01/00097-apg66b-markdown-register-vocabulary-and-guard-exactness-exit.md",
+        "src/test/support/apg_markdown_polarity_guard_contract.py",
+        "src/test/support/apg_markdown_token_guard_contract.py",
+        "src/test/support/apg_markdown_vocabulary_contract.py",
+    }
+)
+APG66C_V05_TESTS = frozenset(
+    {
+        "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_markdown_clause_guard_contract.unit.test.py",
+        "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_repository_import_cache_contract.unit.test.py",
+    }
+)
+APG66C_V05_CRITICAL = frozenset(
+    {
+        "docs/evaluations/apg66c-markdown-clause-polarity-and-predicate-binding.md",
+        "docs/status/2026/08/01/00098-apg66c-markdown-clause-polarity-and-predicate-binding-exit.md",
+        "src/test/support/apg_markdown_clause_guard_contract.py",
+        "src/test/support/apg_repository_import_cache_contract.py",
+    }
+)
+APG66D_V05_CRITICAL = frozenset(
+    {
+        "docs/evaluations/apg66d-repository-import-cache-entry-presence.md",
+        "docs/status/2026/08/01/00099-apg66d-repository-import-cache-entry-presence-exit.md",
+    }
+)
+APG75_V05_SKILLS = frozenset(
+    {"skills/typescript-language-profile/SKILL.md"}
+)
+APG75_V05_PROJECTIONS = frozenset(
+    {".agents/skills/typescript-language-profile"}
+)
+APG75_V05_TESTS = frozenset(
+    {
+        "src/test/int/python/agentic-praxis-grimoire/skills/typescript-language-profile/SKILL.int.test.py",
+        "src/test/unit/python/agentic-praxis-grimoire/skills/typescript-language-profile/SKILL.unit.test.py",
+        "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_typescript_candidate_contract.unit.test.py",
+        "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_typescript_fixture_contract.unit.test.py",
+    }
+)
+APG75_V05_CRITICAL = frozenset(
+    {
+        "docs/adr/2026/08/0043-typescript-language-profile-candidate-and-intended-state-harness.md",
+        "docs/evaluations/apg75-typescript-iterative-hardening-and-integration.md",
+        "docs/specs/typescript-language-profile-scenario-coverage.md",
+        "docs/specs/typescript-language-profile.md",
+        "docs/status/2026/08/03/00108-apg75-typescript-iterative-hardening-and-integration-exit.md",
+        "src/test/fixtures/apg75-typescript-language-profile-scenarios.json",
+        "src/test/fixtures/apg74-typescript-intended-state/README.md",
+        "src/test/fixtures/apg74-typescript-intended-state/fixture-manifest.json",
+        "src/test/fixtures/apg74-typescript-intended-state/package.json",
+        "src/test/fixtures/apg74-typescript-intended-state/src/checked/config-loader.js",
+        "src/test/fixtures/apg74-typescript-intended-state/src/core/inventory.ts",
+        "src/test/fixtures/apg74-typescript-intended-state/src/core/runtime-boundary.ts",
+        "src/test/fixtures/apg74-typescript-intended-state/src/declarations/host-metrics.d.ts",
+        "src/test/fixtures/apg74-typescript-intended-state/src/embedded/widget.astro",
+        "src/test/fixtures/apg74-typescript-intended-state/src/modules/legacy.cts",
+        "src/test/fixtures/apg74-typescript-intended-state/src/modules/loader.mts",
+        "src/test/fixtures/apg74-typescript-intended-state/src/ui/badge.tsx",
+        "src/test/fixtures/apg74-typescript-intended-state/src/ui/jsx-host.d.ts",
+        "src/test/fixtures/apg74-typescript-intended-state/src/unbound/option-state-unknown.ts",
+        "src/test/fixtures/apg74-typescript-intended-state/src/unbound/orphan-role-unknown.ts",
+        "src/test/fixtures/apg74-typescript-intended-state/tsconfig.declarations.json",
+        "src/test/fixtures/apg74-typescript-intended-state/tsconfig.json",
+        "src/test/support/apg_typescript_candidate_contract.py",
+        "src/test/support/apg_typescript_fixture_contract.py",
+    }
+)
+APG75A_V05_CRITICAL = frozenset(
+    {
+        "docs/evaluations/apg75a-typescript-scope-and-lifecycle-closure.md",
+        "docs/status/2026/08/03/00109-apg75a-typescript-scope-and-lifecycle-closure-exit.md",
+    }
+)
+APG77D_V05_SKILLS = frozenset(
+    {"skills/css-language-profile/SKILL.md"}
+)
+APG77D_V05_PROJECTIONS = frozenset(
+    {".agents/skills/css-language-profile"}
+)
+APG77D_V05_TESTS = frozenset(
+    {
+        "src/test/unit/python/agentic-praxis-grimoire/skills/css-language-profile/SKILL.unit.test.py",
+        "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_css_candidate_contract.unit.test.py",
+        "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_css_profile_candidate_contract.unit.test.py",
+        "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_css_profile_fixture_contract.unit.test.py",
+    }
+)
+APG77D_V05_CRITICAL = frozenset(
+    {
+        "docs/adr/2026/08/0044-css-language-profile-candidate-and-target-first-harness.md",
+        "docs/evaluations/apg76-css-language-profile-candidate-recovery.md",
+        "docs/evaluations/apg77-css-iterative-hardening-and-integration.md",
+        "docs/evaluations/apg77a-css-evidence-retention-closure-and-integration.md",
+        "docs/evaluations/apg77b-css-traceability-clean-room-closure-and-integration.md",
+        "docs/evaluations/apg77c-css-evidence-proportionality-and-integration.md",
+        "docs/evaluations/apg77d-css-known-debt-and-provisional-integration.md",
+        "docs/governance/language-profile-known-debt.json",
+        "docs/governance/language-profile-known-debt.md",
+        "docs/specs/css-language-profile-scenario-coverage.md",
+        "docs/specs/css-language-profile.md",
+        "docs/status/2026/08/04/00110-apg76-css-language-profile-candidate-recovery-exit.md",
+        "docs/status/2026/08/04/00111-apg77-css-iterative-hardening-and-integration-exit.md",
+        "docs/status/2026/08/06/00112-apg77a-css-evidence-retention-closure-and-integration-exit.md",
+        "docs/status/2026/08/06/00113-apg77b-css-traceability-clean-room-closure-and-integration-exit.md",
+        "docs/status/2026/08/07/00114-apg77c-css-evidence-proportionality-and-integration-exit.md",
+        "docs/status/2026/08/08/00115-apg77d-css-known-debt-and-provisional-integration-exit.md",
+        "src/test/fixtures/apg76-css-target-first/README.md",
+        "src/test/fixtures/apg76-css-target-first/fixture-manifest.json",
+        "src/test/fixtures/apg76-css-target-first/src/base.css",
+        "src/test/fixtures/apg76-css-target-first/src/cascade.css",
+        "src/test/fixtures/apg76-css-target-first/src/conditions.css",
+        "src/test/fixtures/apg76-css-target-first/src/custom-properties.css",
+        "src/test/fixtures/apg76-css-target-first/src/generated-boundary.css",
+        "src/test/fixtures/apg76-css-target-first/src/host-boundary.astro",
+        "src/test/fixtures/apg76-css-target-first/src/nesting.css",
+        "src/test/fixtures/apg76-css-target-first/src/units-and-color.css",
+        "src/test/fixtures/apg76-css-target-first/src/unknown-environment.css",
+        "src/test/fixtures/apg77-css-language-profile-scenarios.json",
+        "src/test/support/apg_css_candidate_contract.py",
+        "src/test/support/apg_css_profile_candidate_contract.py",
+        "src/test/support/apg_css_profile_fixture_contract.py",
+    }
+)
+APG79E_V05_SKILLS = frozenset(
+    {"skills/javascript-language-profile/SKILL.md"}
+)
+APG79E_V05_PROJECTIONS = frozenset(
+    {".agents/skills/javascript-language-profile"}
+)
+APG79E_V05_TESTS = frozenset(
+    {
+        "src/test/int/python/agentic-praxis-grimoire/skills/javascript-language-profile/SKILL.int.test.py",
+        "src/test/unit/python/agentic-praxis-grimoire/skills/javascript-language-profile/SKILL.unit.test.py",
+        "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_javascript_candidate_contract.unit.test.py",
+        "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_javascript_fixture_contract.unit.test.py",
+    }
+)
+APG79E_V05_CRITICAL = frozenset(
+    {
+        "docs/adr/2026/08/0045-javascript-language-profile-candidate-and-target-first-harness.md",
+        "docs/evaluations/apg78-javascript-core-candidate.md",
+        "docs/evaluations/apg79-javascript-core-iterative-hardening-and-integration.md",
+        "docs/evaluations/apg79a-javascript-terminal-proof-closure-and-integration.md",
+        "docs/evaluations/apg79b-javascript-contract-harness-closure-and-integration.md",
+        "docs/evaluations/apg79c-javascript-known-debt-and-provisional-integration.md",
+        "docs/evaluations/apg79d-test262-source-evidence-and-javascript-integration.md",
+        "docs/evaluations/apg79e-javascript-report-binding-debt-and-provisional-integration.md",
+        "docs/specs/javascript-language-profile-scenario-coverage.md",
+        "docs/specs/javascript-language-profile.md",
+        "docs/status/2026/08/08/00116-apg78-javascript-core-candidate-exit.md",
+        "docs/status/2026/08/08/00117-apg79-javascript-core-iterative-hardening-and-integration-exit.md",
+        "docs/status/2026/08/08/00118-apg79a-javascript-terminal-proof-closure-and-integration-exit.md",
+        "docs/status/2026/08/08/00119-apg79b-javascript-contract-harness-closure-and-integration-exit.md",
+        "docs/status/2026/08/08/00120-apg79c-javascript-known-debt-and-provisional-integration-exit.md",
+        "docs/status/2026/08/08/00121-apg79d-test262-source-evidence-and-javascript-integration-exit.md",
+        "docs/status/2026/08/09/00122-apg79e-javascript-report-binding-debt-and-provisional-integration-exit.md",
+        "src/test/fixtures/apg79-javascript-language-profile-scenarios.json",
+        "src/test/fixtures/apg78-javascript-core/README.md",
+        "src/test/fixtures/apg78-javascript-core/fixture-manifest.json",
+        "src/test/fixtures/apg78-javascript-core/package.json",
+        "src/test/fixtures/apg78-javascript-core/src/async.mjs",
+        "src/test/fixtures/apg78-javascript-core/src/checked.js",
+        "src/test/fixtures/apg78-javascript-core/src/cli-core.mjs",
+        "src/test/fixtures/apg78-javascript-core/src/cli-node-adapter-boundary.cjs",
+        "src/test/fixtures/apg78-javascript-core/src/coercion.mjs",
+        "src/test/fixtures/apg78-javascript-core/src/commonjs-boundary.cjs",
+        "src/test/fixtures/apg78-javascript-core/src/dynamic-import-boundary.mjs",
+        "src/test/fixtures/apg78-javascript-core/src/errors.mjs",
+        "src/test/fixtures/apg78-javascript-core/src/evaluation.mjs",
+        "src/test/fixtures/apg78-javascript-core/src/functions.mjs",
+        "src/test/fixtures/apg78-javascript-core/src/iteration.mjs",
+        "src/test/fixtures/apg78-javascript-core/src/mode-selected.js",
+        "src/test/fixtures/apg78-javascript-core/src/module-boundary.mjs",
+        "src/test/fixtures/apg78-javascript-core/src/modules/consumer.mjs",
+        "src/test/fixtures/apg78-javascript-core/src/modules/counter.mjs",
+        "src/test/fixtures/apg78-javascript-core/src/modules/cycle-a.mjs",
+        "src/test/fixtures/apg78-javascript-core/src/modules/cycle-b.mjs",
+        "src/test/fixtures/apg78-javascript-core/src/modules/top-level-await.mjs",
+        "src/test/fixtures/apg78-javascript-core/src/objects.mjs",
+        "src/test/fixtures/apg78-javascript-core/src/scope.mjs",
+        "src/test/fixtures/apg78-javascript-core/unbound/mode-neutral.js.txt",
+        "src/test/fixtures/apg78-javascript-core/unbound/sloppy-script.js.txt",
+        "src/test/fixtures/apg78-javascript-core/unbound/strict-script.js.txt",
+        "src/test/support/apg_javascript_candidate_contract.py",
+        "src/test/support/apg_javascript_fixture_contract.py",
+    }
+)
+APG81H_V05_SKILLS = frozenset(
+    {"skills/nodejs-runtime-profile/SKILL.md"}
+)
+APG81H_V05_PROJECTIONS = frozenset(
+    {".agents/skills/nodejs-runtime-profile"}
+)
+APG81H_V05_TESTS = frozenset(
+    {
+        "src/test/int/python/agentic-praxis-grimoire/skills/nodejs-runtime-profile/SKILL.int.test.py",
+        "src/test/unit/python/agentic-praxis-grimoire/skills/nodejs-runtime-profile/SKILL.unit.test.py",
+        "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_nodejs_candidate_contract.unit.test.py",
+        "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_nodejs_fixture_contract.unit.test.py",
+    }
+)
+APG81H_V05_CRITICAL = frozenset(
+    {
+        "docs/adr/2026/08/0046-nodejs-runtime-and-cli-stack-candidate-and-target-first-harness.md",
+        "docs/evaluations/apg80-nodejs-runtime-and-cli-stack-candidate.md",
+        "docs/evaluations/apg81-nodejs-runtime-cli-iterative-hardening-and-integration.md",
+        "docs/evaluations/apg81a-nodejs-qualification-threat-model-and-harness-simplification.md",
+        "docs/evaluations/apg81b-nodejs-integration-contract-clarification-and-provisional-adoption.md",
+        "docs/evaluations/apg81c-nodejs-lifecycle-test-and-scratch-closure.md",
+        "docs/evaluations/apg81d-nodejs-provisional-integration.md",
+        "docs/evaluations/apg81e-nodejs-final-integration-closure.md",
+        "docs/evaluations/apg81f-nodejs-actual-test-projection-and-integration-closure.md",
+        "docs/evaluations/apg81g-nodejs-selector-release-and-integration-closure.md",
+        "docs/evaluations/apg81h-nodejs-reviewable-qualification-and-integration-closure.md",
+        "docs/specs/nodejs-runtime-profile-scenario-coverage.md",
+        "docs/specs/nodejs-runtime-profile.md",
+        "docs/status/2026/08/09/00123-apg80-nodejs-runtime-and-cli-stack-candidate-exit.md",
+        "docs/status/2026/08/10/00124-apg81-nodejs-runtime-cli-iterative-hardening-and-integration-exit.md",
+        "docs/status/2026/08/10/00125-apg81a-nodejs-qualification-threat-model-and-harness-simplification-exit.md",
+        "docs/status/2026/08/10/00126-apg81b-nodejs-integration-contract-clarification-and-provisional-adoption-exit.md",
+        "docs/status/2026/08/10/00127-apg81c-nodejs-lifecycle-test-and-scratch-closure-exit.md",
+        "docs/status/2026/08/10/00128-apg81d-nodejs-provisional-integration-exit.md",
+        "docs/status/2026/08/11/00129-apg81e-nodejs-final-integration-closure-exit.md",
+        "docs/status/2026/08/11/00130-apg81f-nodejs-actual-test-projection-and-integration-closure-exit.md",
+        "docs/status/2026/08/11/00131-apg81g-nodejs-selector-release-and-integration-closure-exit.md",
+        "docs/status/2026/08/11/00132-apg81h-nodejs-reviewable-qualification-and-integration-closure-exit.md",
+        "src/test/fixtures/apg80-nodejs-runtime-cli/README.md",
+        "src/test/fixtures/apg80-nodejs-runtime-cli/cli/adapter.mjs",
+        "src/test/fixtures/apg80-nodejs-runtime-cli/cli/core.mjs",
+        "src/test/fixtures/apg80-nodejs-runtime-cli/commonjs/local-dependency.cjs",
+        "src/test/fixtures/apg80-nodejs-runtime-cli/commonjs/wrapper-boundary.cjs",
+        "src/test/fixtures/apg80-nodejs-runtime-cli/esm/builtin-boundary.mjs",
+        "src/test/fixtures/apg80-nodejs-runtime-cli/esm/metadata.mjs",
+        "src/test/fixtures/apg80-nodejs-runtime-cli/fixture-manifest.json",
+        "src/test/fixtures/apg80-nodejs-runtime-cli/interop/dynamic-exports.cjs",
+        "src/test/fixtures/apg80-nodejs-runtime-cli/interop/esm-consumer.mjs",
+        "src/test/fixtures/apg80-nodejs-runtime-cli/interop/identity.mjs",
+        "src/test/fixtures/apg80-nodejs-runtime-cli/interop/require-esm.cjs",
+        "src/test/fixtures/apg80-nodejs-runtime-cli/interop/static-exports.cjs",
+        "src/test/fixtures/apg80-nodejs-runtime-cli/module-mapping/commonjs-package/module-only.js",
+        "src/test/fixtures/apg80-nodejs-runtime-cli/module-mapping/commonjs-package/package.json",
+        "src/test/fixtures/apg80-nodejs-runtime-cli/module-mapping/commonjs-package/source.js",
+        "src/test/fixtures/apg80-nodejs-runtime-cli/module-mapping/explicit-commonjs.cjs",
+        "src/test/fixtures/apg80-nodejs-runtime-cli/module-mapping/explicit-module.mjs",
+        "src/test/fixtures/apg80-nodejs-runtime-cli/module-mapping/module-package/package.json",
+        "src/test/fixtures/apg80-nodejs-runtime-cli/module-mapping/module-package/source.js",
+        "src/test/fixtures/apg80-nodejs-runtime-cli/module-mapping/typeless-package/detected-module.js",
+        "src/test/fixtures/apg80-nodejs-runtime-cli/module-mapping/typeless-package/goal-neutral.js",
+        "src/test/fixtures/apg80-nodejs-runtime-cli/module-mapping/typeless-package/package.json",
+        "src/test/fixtures/apg80-nodejs-runtime-cli/package.json",
+        "src/test/fixtures/apg80-nodejs-runtime-cli/process/event-loop-entry.cjs",
+        "src/test/fixtures/apg80-nodejs-runtime-cli/process/event-loop.mjs",
+        "src/test/fixtures/apg80-nodejs-runtime-cli/process/filesystem.mjs",
+        "src/test/fixtures/apg80-nodejs-runtime-cli/process/inputs.mjs",
+        "src/test/fixtures/apg80-nodejs-runtime-cli/process/lifecycle-child.mjs",
+        "src/test/fixtures/apg80-nodejs-runtime-cli/process/lifecycle-parent.mjs",
+        "src/test/fixtures/apg80-nodejs-runtime-cli/process/stdio.mjs",
+        "src/test/fixtures/apg80-nodejs-runtime-cli/resolution/entry.mjs",
+        "src/test/fixtures/apg80-nodejs-runtime-cli/resolution/lib/condition-custom.mjs",
+        "src/test/fixtures/apg80-nodejs-runtime-cli/resolution/lib/condition-default.mjs",
+        "src/test/fixtures/apg80-nodejs-runtime-cli/resolution/lib/encapsulated.mjs",
+        "src/test/fixtures/apg80-nodejs-runtime-cli/resolution/lib/internal-only.mjs",
+        "src/test/fixtures/apg80-nodejs-runtime-cli/resolution/lib/public-entry.mjs",
+        "src/test/fixtures/apg80-nodejs-runtime-cli/resolution/lib/public-subpath.mjs",
+        "src/test/fixtures/apg80-nodejs-runtime-cli/resolution/package.json",
+        "src/test/fixtures/apg80-nodejs-runtime-cli/runtime/identity.mjs",
+        "src/test/fixtures/apg80-nodejs-runtime-cli/target-boundary/public-safe-runtime-role.json",
+        "src/test/fixtures/apg80-nodejs-runtime-cli/typescript/erasable.ts",
+        "src/test/fixtures/apg80-nodejs-runtime-cli/typescript/nonerasable.ts",
+        "src/test/fixtures/apg81-nodejs-runtime-profile-scenarios.json",
+        "src/test/support/apg_nodejs_candidate_contract.py",
+        "src/test/support/apg_nodejs_fixture_contract.py",
+        "testing/nodejs-profile-qualification-threat-model.json",
+    }
+)
+APG82_V05_WRAPPERS = frozenset({"bin/apgr"})
+APG82_V05_HELPERS = frozenset(
+    {
+        "src/agentic_praxis_grimoire/__init__.py",
+        "src/agentic_praxis_grimoire/__main__.py",
+        "src/agentic_praxis_grimoire/cli.py",
+        "src/agentic_praxis_grimoire/config.py",
+        "src/agentic_praxis_grimoire/paths.py",
+        "src/agentic_praxis_grimoire/reports.py",
+        "src/agentic_praxis_grimoire/resources/__init__.py",
+        "src/agentic_praxis_grimoire/response.py",
+        "src/agentic_praxis_grimoire/skills.py",
+        "src/agentic_praxis_grimoire/version.py",
+    }
+)
+APG82_V05_TESTS = frozenset(
+    {
+        "src/test/int/python/agentic-praxis-grimoire/src/agentic_praxis_grimoire/cli.int.test.py",
+        "src/test/int/python/agentic-praxis-grimoire/src/agentic_praxis_grimoire/reports.int.test.py",
+        "src/test/int/python/agentic-praxis-grimoire/src/agentic_praxis_grimoire/response.int.test.py",
+        "src/test/unit/python/agentic-praxis-grimoire/src/agentic_praxis_grimoire/cli.unit.test.py",
+        "src/test/unit/python/agentic-praxis-grimoire/src/agentic_praxis_grimoire/config.unit.test.py",
+        "src/test/unit/python/agentic-praxis-grimoire/src/agentic_praxis_grimoire/paths.unit.test.py",
+        "src/test/unit/python/agentic-praxis-grimoire/src/agentic_praxis_grimoire/reports.unit.test.py",
+        "src/test/unit/python/agentic-praxis-grimoire/src/agentic_praxis_grimoire/response.unit.test.py",
+        "src/test/unit/python/agentic-praxis-grimoire/src/agentic_praxis_grimoire/skills.unit.test.py",
+        "src/test/unit/python/agentic-praxis-grimoire/src/agentic_praxis_grimoire/version.unit.test.py",
+    }
+)
+APG82_PACKAGE_RESOURCES = frozenset(
+    {"src/agentic_praxis_grimoire/resources/skill-metadata.json"}
+)
+APG82_V05_CRITICAL = frozenset(
+    {
+        "docs/evaluations/apg82-apgr-cli-distribution-configuration-and-artifact-contract-foundation.md",
+        "docs/status/2026/08/15/00133-apg82-apgr-cli-distribution-configuration-and-artifact-contract-foundation-exit.md",
+        "docs/v0-6-roadmap.md",
+        "pyproject.toml",
+        "src/agentic_praxis_grimoire/VERSION",
+    }
+) | APG82_PACKAGE_RESOURCES
+
+APG83_V05_WRAPPERS = frozenset({"bin/apg-normalize-python-sdist"})
+APG83_V05_HELPERS = frozenset({"libexec/apg_python_distribution.py"})
+APG83_V05_TESTS = frozenset(
+    {
+        "src/test/int/python/agentic-praxis-grimoire/bin/apg-normalize-python-sdist.int.test.py",
+        "src/test/int/python/agentic-praxis-grimoire/libexec/apg_python_distribution.int.test.py",
+        "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_python_distribution.unit.test.py",
+    }
+)
+APG83_V05_CRITICAL = frozenset(
+    {
+        "docs/evaluations/apg83-v0-5-bounded-dogfood-and-release-readiness.md",
+        "docs/status/2026/08/16/00134-apg83-v0-5-bounded-dogfood-and-release-readiness-exit.md",
+    }
+)
+
+APG84_V05_WRAPPERS = frozenset({"bin/apg-build-python-release-bundle"})
+APG84_V05_HELPERS = frozenset({"libexec/apg_python_publication.py"})
+APG84_V05_TESTS = frozenset(
+    {
+        "src/test/int/python/agentic-praxis-grimoire/bin/apg-build-python-release-bundle.int.test.py",
+        "src/test/int/python/agentic-praxis-grimoire/.github/workflows/release.yml.int.test.py",
+        "src/test/unit/python/agentic-praxis-grimoire/.github/workflows/release.yml.unit.test.py",
+        "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_python_publication.unit.test.py",
+    }
+)
+APG84_V05_CRITICAL = frozenset(
+    {
+        ".github/workflows/release.yml",
+        "docs/evaluations/apg84-v0-5-public-github-and-pypi-publication.md",
+        "docs/status/2026/08/16/00135-apg84-v0-5-public-github-and-pypi-publication-exit.md",
+        "release/v0.5.0-notes.md",
+    }
+)
+
+AUDITED_WRAPPERS = tuple(
+    sorted(
+        set(AUDITED_WRAPPERS)
+        | APG82_V05_WRAPPERS
+        | APG83_V05_WRAPPERS
+        | APG84_V05_WRAPPERS
+    )
+)
+AUDITED_HELPERS = tuple(
+    sorted(
+        set(AUDITED_HELPERS)
+        | APG82_V05_HELPERS
+        | APG83_V05_HELPERS
+        | APG84_V05_HELPERS
+    )
+)
+AUDITED_TESTS = tuple(
+    sorted(
+        set(AUDITED_TESTS)
+        | APG82_V05_TESTS
+        | APG83_V05_TESTS
+        | APG84_V05_TESTS
+    )
+)
+AUDITED_CRITICAL = tuple(
+    sorted(
+        set(AUDITED_CRITICAL)
+        | APG82_V05_CRITICAL
+        | APG83_V05_CRITICAL
+        | APG84_V05_CRITICAL
+    )
+)
+
+V05_ONLY_WRAPPERS = (
+    APG53_V05_WRAPPERS | APG54_V05_WRAPPERS | APG82_V05_WRAPPERS
+    | APG83_V05_WRAPPERS | APG84_V05_WRAPPERS
+)
+V05_ONLY_HELPERS = (
+    APG53_V05_HELPERS | APG54_V05_HELPERS | APG82_V05_HELPERS
+    | APG83_V05_HELPERS | APG84_V05_HELPERS
+)
+V05_ONLY_TESTS = (
+    APG53_V05_TESTS | APG54_V05_TESTS | APG66_V05_TESTS | APG75_V05_TESTS
+    | APG77D_V05_TESTS | APG79E_V05_TESTS | APG81H_V05_TESTS
+    | APG66A_V05_TESTS | APG66B_V05_TESTS | APG66C_V05_TESTS
+    | APG82_V05_TESTS | APG83_V05_TESTS | APG84_V05_TESTS
+)
+V05_ONLY_CRITICAL = (
+    APG53_V05_CRITICAL
+    | APG54_V05_CRITICAL
+    | APG55_V05_CRITICAL
+    | APG66_V05_CRITICAL
+    | APG66A_V05_CRITICAL
+    | APG66B_V05_CRITICAL
+    | APG66C_V05_CRITICAL
+    | APG66D_V05_CRITICAL
+    | APG75_V05_CRITICAL
+    | APG75A_V05_CRITICAL
+    | APG77D_V05_CRITICAL
+    | APG79E_V05_CRITICAL
+    | APG81H_V05_CRITICAL
+    | APG82_V05_CRITICAL
+    | APG83_V05_CRITICAL
+    | APG84_V05_CRITICAL
+)
+HISTORICAL_V04_WRAPPERS = tuple(
+    item for item in AUDITED_WRAPPERS if item not in V05_ONLY_WRAPPERS
+)
+HISTORICAL_V04_HELPERS = tuple(
+    item for item in AUDITED_HELPERS if item not in V05_ONLY_HELPERS
+)
+HISTORICAL_V04_TESTS = tuple(
+    item for item in AUDITED_TESTS if item not in V05_ONLY_TESTS
+)
+HISTORICAL_V04_CRITICAL = tuple(
+    item for item in AUDITED_CRITICAL if item not in V05_ONLY_CRITICAL
+)
+HISTORICAL_V04_LICENSING = tuple(AUDITED_LICENSING)
+HISTORICAL_V04_PROJECTIONS = tuple(
+    item for item in AUDITED_PROJECTIONS
+    if item not in (
+        APG66_V05_PROJECTIONS | APG75_V05_PROJECTIONS | APG77D_V05_PROJECTIONS
+        | APG79E_V05_PROJECTIONS | APG81H_V05_PROJECTIONS
+    )
+)
+HISTORICAL_V04_SKILLS = tuple(
+    item for item in AUDITED_SKILLS
+    if item not in (
+        APG66_V05_SKILLS | APG75_V05_SKILLS | APG77D_V05_SKILLS
+        | APG79E_V05_SKILLS | APG81H_V05_SKILLS
+    )
+)
+HISTORICAL_V04_CATEGORIES = tuple(sorted(ALLOWED_CATEGORIES))
+HISTORICAL_V04_FORBIDDEN_FUTURE_OWNERS = tuple(
+    sorted(
+        APG53_V05_WRAPPERS
+        | APG53_V05_HELPERS
+        | APG53_V05_TESTS
+        | APG53_V05_CRITICAL
+        | APG54_V05_WRAPPERS
+        | APG54_V05_HELPERS
+        | APG54_V05_TESTS
+        | APG54_V05_CRITICAL
+        | APG55_V05_CRITICAL
+        | APG66_V05_SKILLS
+        | APG66_V05_PROJECTIONS
+        | APG66_V05_TESTS
+        | APG66_V05_CRITICAL
+        | APG66A_V05_TESTS
+        | APG66A_V05_CRITICAL
+        | APG66B_V05_TESTS
+        | APG66B_V05_CRITICAL
+        | APG66C_V05_TESTS
+        | APG66C_V05_CRITICAL
+        | APG66D_V05_CRITICAL
+        | APG75_V05_SKILLS
+        | APG75_V05_PROJECTIONS
+        | APG75_V05_TESTS
+        | APG75_V05_CRITICAL
+        | APG75A_V05_CRITICAL
+        | APG77D_V05_SKILLS
+        | APG77D_V05_PROJECTIONS
+        | APG77D_V05_TESTS
+        | APG77D_V05_CRITICAL
+        | APG79E_V05_SKILLS
+        | APG79E_V05_PROJECTIONS
+        | APG79E_V05_TESTS
+        | APG79E_V05_CRITICAL
+        | APG81H_V05_SKILLS
+        | APG81H_V05_PROJECTIONS
+        | APG81H_V05_TESTS
+        | APG81H_V05_CRITICAL
+        | APG82_V05_WRAPPERS
+        | APG82_V05_HELPERS
+        | APG82_V05_TESTS
+        | APG82_V05_CRITICAL
+        | APG83_V05_WRAPPERS
+        | APG83_V05_HELPERS
+        | APG83_V05_TESTS
+        | APG83_V05_CRITICAL
+        | APG84_V05_WRAPPERS
+        | APG84_V05_HELPERS
+        | APG84_V05_TESTS
+        | APG84_V05_CRITICAL
+    )
+)
+HISTORICAL_V04_SURFACE_SHA256 = (
+    "4bc8571149c708023712f3963e81e0594d46a9a78da74ac48d8dba3e4b73a083"
+)
+
 HISTORICAL_V03_WRAPPERS = (
     "bin/apg-check-record-identity",
     "bin/apg-check-skill-library",
@@ -724,8 +1603,30 @@ def audited_policy_surfaces(version: str) -> tuple[dict[str, tuple[str, ...]], .
     if not SEMVER.fullmatch(version):
         fail("public release policy identity is malformed or unsupported")
     core = version.split("+", 1)[0].split("-", 1)[0]
-    if core == "0.4.0":
+    if core == "0.5.0":
         return (current,)
+    if core == "0.4.0":
+        historical_v04 = {
+            "required_helpers": HISTORICAL_V04_HELPERS,
+            "required_licensing_files": HISTORICAL_V04_LICENSING,
+            "required_projections": HISTORICAL_V04_PROJECTIONS,
+            "required_skills": HISTORICAL_V04_SKILLS,
+            "required_test_entrypoints": HISTORICAL_V04_TESTS,
+            "required_wrappers": HISTORICAL_V04_WRAPPERS,
+            "critical_files": HISTORICAL_V04_CRITICAL,
+            "validation_categories": HISTORICAL_V04_CATEGORIES,
+        }
+        historical_v04_digest = hashlib.sha256(
+            json.dumps(
+                historical_v04,
+                ensure_ascii=True,
+                separators=(",", ":"),
+                sort_keys=True,
+            ).encode("utf-8")
+        ).hexdigest()
+        if historical_v04_digest != HISTORICAL_V04_SURFACE_SHA256:
+            fail("historical public v0.4.0 policy surface changed")
+        return (historical_v04,)
     if core == "0.3.0":
         historical_v03 = {
             "required_helpers": HISTORICAL_V03_HELPERS,
@@ -787,7 +1688,7 @@ def load_policy(
             fail(f"public release policy {key} may not name private paths")
     if not set(value["validation_categories"]).issubset(ALLOWED_CATEGORIES):
         fail("public release policy contains an unknown validation category")
-    allowed_surfaces = tuple(expected_surfaces or audited_policy_surfaces("0.4.0"))
+    allowed_surfaces = tuple(expected_surfaces or audited_policy_surfaces("0.5.0"))
     if not any(
         all(tuple(value[key]) == expected for key, expected in surface.items())
         for surface in allowed_surfaces
@@ -950,9 +1851,15 @@ def validate_versioned_policy_exclusions(
     entries: Sequence[Entry],
     version: str,
 ) -> None:
-    """Reject future report owners from the immutable public v0.3.0 tree."""
+    """Reject future owners from immutable historical public trees."""
 
     core = version.split("+", 1)[0].split("-", 1)[0]
+    if core == "0.4.0":
+        paths = {entry.display_path for entry in entries}
+        for path in HISTORICAL_V04_FORBIDDEN_FUTURE_OWNERS:
+            if path in paths:
+                fail(f"public v0.4.0 contains unsupported future owner: {path}")
+        return
     if core != "0.3.0":
         return
     paths = {entry.display_path for entry in entries}
@@ -1013,22 +1920,8 @@ def validate_repository_separation(*repositories: Repository) -> None:
 
 def validate_output_path(output: Path, source: Path, base: Path) -> None:
     absolute = Path(os.path.abspath(output))
-    try:
-        physical = (
-            absolute.resolve(strict=True)
-            if os.path.lexists(absolute)
-            else absolute.parent.resolve(strict=True) / absolute.name
-        )
-    except OSError:
-        unsafe("output parent cannot be resolved safely")
-    if (
-        physical in {source, base}
-        or source in physical.parents
-        or base in physical.parents
-        or physical in source.parents
-        or physical in base.parents
-    ):
-        unsafe("output must be disjoint from source and base")
+    if os.path.lexists(absolute) and stat.S_ISLNK(absolute.lstat().st_mode):
+        unsafe("output has a symlinked or non-directory ancestor")
     current = absolute.parent
     allowed_system_aliases = {
         (Path("/tmp"), Path("/private/tmp")),
@@ -1049,6 +1942,22 @@ def validate_output_path(output: Path, source: Path, base: Path) -> None:
         if current == current.parent:
             break
         current = current.parent
+    try:
+        physical = (
+            absolute.resolve(strict=True)
+            if os.path.lexists(absolute)
+            else absolute.parent.resolve(strict=True) / absolute.name
+        )
+    except OSError:
+        unsafe("output parent cannot be resolved safely")
+    if (
+        physical in {source, base}
+        or source in physical.parents
+        or base in physical.parents
+        or physical in source.parents
+        or physical in base.parents
+    ):
+        unsafe("output must be disjoint from source and base")
     if os.path.lexists(absolute):
         metadata = absolute.lstat()
         if stat.S_ISLNK(metadata.st_mode) or not stat.S_ISDIR(metadata.st_mode):
@@ -1509,6 +2418,7 @@ def isolated_validation_environment(
         "XDG_RUNTIME_DIR": root / "xdg-runtime",
         "XDG_STATE_HOME": root / "xdg-state",
         "TMPDIR": root / "tmp",
+        "PYTEST_DEBUG_TEMPROOT": root / "pytest",
         "PYTHONPYCACHEPREFIX": root / "pycache",
     }
     for path in locations.values():
@@ -1524,7 +2434,13 @@ def isolated_validation_environment(
         ):
             environment.pop(name)
     environment["PYTEST_DISABLE_PLUGIN_AUTOLOAD"] = "1"
+    environment["PYTEST_DEBUG_TEMPROOT"] = str(
+        locations["PYTEST_DEBUG_TEMPROOT"]
+    )
     environment["PYTHONPYCACHEPREFIX"] = str(locations["PYTHONPYCACHEPREFIX"])
+    environment["PYTHONPATH"] = os.pathsep.join(
+        (str(candidate.root / "src"), str(candidate.root))
+    )
     environment["PWD"] = str(candidate.root)
     environment.pop("OLDPWD", None)
     environment["APG12_PUBLIC_V01_ROOT"] = str(base.root)

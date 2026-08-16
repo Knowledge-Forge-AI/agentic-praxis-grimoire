@@ -1,0 +1,51 @@
+{
+  "classification": {
+    "archive_extensions": [
+      ".7z",
+      ".bz2",
+      ".db",
+      ".gz",
+      ".jar",
+      ".rar",
+      ".sqlite",
+      ".tar",
+      ".tgz",
+      ".whl",
+      ".xz",
+      ".zip"
+    ],
+    "archive_signatures": [
+      {
+        "hex": "1f8b08",
+        "offset": 0
+      },
+      {
+        "hex": "504b0304",
+        "offset": 0
+      },
+      {
+        "hex": "377abcaf271c",
+        "offset": 0
+      },
+      {
+        "hex": "425a68",
+        "offset": 0
+      }
+    ],
+    "archive_treatment": "reject-by-default",
+    "binary_treatment": "exact-exception-required",
+    "generated_derived_evidence_globs": [
+      "private/evaluations/**/*.json",
+      "private/evaluations/**/*.jsonl"
+    ],
+    "lfs_pointer_treatment": "reject"
+  },
+  "exceptions": [],
+  "limits": {
+    "maximum_aggregate_generated_derived_evidence_bytes_per_change": 524288,
+    "maximum_generated_derived_evidence_blob_bytes": 131072,
+    "maximum_one_line_text_bytes": 65536,
+    "maximum_ordinary_tracked_blob_bytes": 262144
+  },
+  "schema_version": 1
+}

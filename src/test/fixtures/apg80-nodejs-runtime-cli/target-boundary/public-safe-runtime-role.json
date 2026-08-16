@@ -1,0 +1,63 @@
+{
+  "case": "APG80-FX-014",
+  "purpose": "Target runtime and package-manager role boundary from public-safe metadata only. No target path, body, command, or execution appears here.",
+  "evidence_class": "public-safe-summarized-target-metadata",
+  "target_execution_state": "not-observed",
+  "target_mutation_state": "none",
+  "roles": [
+    {
+      "role_id": "website-runtime-role",
+      "runtime_family": "nodejs",
+      "family_selection_source": "framework and package-script tooling require a Node runtime",
+      "declared_version_range_state": "absent",
+      "package_manager_state": "npm lockfile present; no packageManager field declared",
+      "continuous_integration_selection_state": "delegated to a third-party composite action that selects its own runtime",
+      "exact_version_state": "unresolved",
+      "platform_state": "unresolved",
+      "architecture_state": "unresolved",
+      "flags_state": "unresolved",
+      "invocation_state": "not-observed",
+      "module_system_evidence": "package type module declared",
+      "direct_node_cli_entrypoint_state": "none present",
+      "node_builtin_specifier_use": "none present",
+      "candidate_consequence": "Runtime family is the only settled level. Every version-, flag-, or invocation-dependent Node conclusion stops on required evidence."
+    },
+    {
+      "role_id": "theme-runtime-role",
+      "runtime_family": "nodejs",
+      "family_selection_source": "workspace tooling, package scripts, and a published package manifest",
+      "declared_version_range_state": "a minimum-version range is declared on every retained package surface",
+      "package_manager_state": "an exact pnpm version is declared in a packageManager field at the workspace root",
+      "continuous_integration_selection_state": "a major release line is selected by a setup action; the resolved patch version is decided at run time",
+      "exact_version_state": "unresolved",
+      "platform_state": "unresolved",
+      "architecture_state": "unresolved",
+      "flags_state": "unresolved",
+      "invocation_state": "not-observed",
+      "module_system_evidence": "package type module declared on every retained package surface",
+      "direct_node_cli_entrypoint_state": "none present",
+      "node_builtin_specifier_use": "present in exactly one TypeScript source artifact that a package export map designates as the package entry",
+      "candidate_consequence": "A declared range, a package-manager selection, a continuous-integration major line, and the local authoring engine are four distinct facts. None of them is the exact runtime that executed anything, and none of them is an observed invocation."
+    }
+  ],
+  "separations_demonstrated": [
+    "runtime family selected is not a version range",
+    "a version range is not an exact version",
+    "a continuous-integration major line is not a resolved patch version",
+    "a packageManager field selects a package-manager role, not a Node process",
+    "a lockfile constrains an install graph, not the project's runtime selection",
+    "a dependency engines constraint is not the project's runtime selection",
+    "a package script names a command role, not proof that the command ran",
+    "a package export map entry naming a TypeScript source is source and tool evidence, not proof that Node directly executes TypeScript",
+    "an export map entry naming a framework component format is not a Node-loadable module",
+    "no target command, install, build, lint, or deployment was run by this fixture"
+  ],
+  "forbidden_here": [
+    "target source text",
+    "target file paths",
+    "target command bodies",
+    "private repository topology",
+    "credentials or environment values",
+    "any claim of target execution"
+  ]
+}

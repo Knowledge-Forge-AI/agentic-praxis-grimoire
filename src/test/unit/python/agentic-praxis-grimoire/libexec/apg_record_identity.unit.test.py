@@ -153,3 +153,110 @@ def test_record_file_discovery_rejects_unsafe_owner_tree(tmp_path: Path) -> None
     owner.parent.mkdir(parents=True)
     owner.symlink_to(outside, target_is_directory=True)
     assert identity._record_files(tmp_path, "adr") == ()
+
+
+def test_replacement_free_environment_strips_repository_selectors(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("GIT_DIR", "/untrusted/repository")
+    monkeypatch.setenv("GIT_REPLACE_REF_BASE", "refs/untrusted/")
+    monkeypatch.setenv("GIT_CONFIG_COUNT", "1")
+    monkeypatch.setenv("GIT_CONFIG_KEY_0", "core.hooksPath")
+    monkeypatch.setenv("GIT_CONFIG_VALUE_0", "/untrusted/hooks")
+    environment = identity.replacement_free_git_environment()
+    assert "GIT_DIR" not in environment
+    assert "GIT_REPLACE_REF_BASE" not in environment
+    assert "GIT_CONFIG_COUNT" not in environment
+    assert "GIT_CONFIG_KEY_0" not in environment
+    assert "GIT_CONFIG_VALUE_0" not in environment
+    assert environment["GIT_NO_REPLACE_OBJECTS"] == "1"
+    assert environment["GIT_CONFIG_GLOBAL"] == identity.os.devnull
+    assert environment["GIT_CONFIG_NOSYSTEM"] == "1"
+    assert environment["GIT_OPTIONAL_LOCKS"] == "0"
+
+
+def test_status_chronology_matches_collapsed_commit_groups_and_one_pending() -> None:
+    committed = ("APG1", "APG2", "APG3")
+    status = ((1, "APG0"), (2, "APG1"), (3, "APG2"), (4, "APG3"))
+    assert identity.validate_phase_chronology(committed, status) == (
+        "APG1",
+        "APG2",
+        "APG3",
+    )
+    assert identity.validate_phase_chronology(
+        committed, status + ((5, "APG4"),), pending_phase="APG4"
+    )[-1] == "APG4"
+    assert identity.validate_phase_chronology(
+        committed, ((1, "APG1"), (2, "APG9"), (3, "APG2"), (4, "APG3"))
+    ) == committed
+    with pytest.raises(ValueError, match="no status"):
+        identity.validate_phase_chronology(
+            committed, status + ((5, "APG5"),), pending_phase="APG4"
+        )
+    with pytest.raises(ValueError, match="already committed"):
+        identity.validate_phase_chronology(
+            committed, status, pending_phase="APG3"
+        )
+    with pytest.raises(ValueError, match="no status"):
+        identity.validate_phase_chronology(
+            committed, status, pending_phase="APG4"
+        )
+
+
+def test_first_parent_chronology_collapses_groups_and_ignores_other_subjects(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    completed = identity.subprocess.CompletedProcess(
+        (),
+        0,
+        "bootstrap\nAPG1: one\nAPG1: continuation\nAPG2: two\n",
+        "",
+    )
+    monkeypatch.setattr(identity.subprocess, "run", lambda *_a, **_k: completed)
+    assert identity.first_parent_phase_chronology(tmp_path) == ("APG1", "APG2")
+
+
+@pytest.mark.parametrize(
+    ("completed", "message"),
+    (
+        (identity.subprocess.CompletedProcess((), 1, "", "failure"), "traversal"),
+        (identity.subprocess.CompletedProcess((), 0, "bootstrap\n", ""), "no APG"),
+        (
+            identity.subprocess.CompletedProcess(
+                (), 0, "APG1: one\nAPG2: two\nAPG1: again\n", ""
+            ),
+            "non-adjacent",
+        ),
+    ),
+)
+def test_first_parent_chronology_fails_closed(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    completed: identity.subprocess.CompletedProcess[str],
+    message: str,
+) -> None:
+    monkeypatch.setattr(identity.subprocess, "run", lambda *_a, **_k: completed)
+    with pytest.raises(ValueError, match=message):
+        identity.first_parent_phase_chronology(tmp_path)
+
+
+def test_first_parent_chronology_fails_closed_on_spawn_error(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    def fail(*_args, **_kwargs):
+        raise OSError("unavailable")
+
+    monkeypatch.setattr(identity.subprocess, "run", fail)
+    with pytest.raises(ValueError, match="traversal"):
+        identity.first_parent_phase_chronology(tmp_path)
+
+
+def test_status_chronology_rejects_duplicate_and_unallocated_groups() -> None:
+    with pytest.raises(ValueError, match="committed"):
+        identity.validate_phase_chronology(("APG1", "APG1"), ((1, "APG1"),))
+    with pytest.raises(ValueError, match="duplicate"):
+        identity.validate_phase_chronology(
+            ("APG1",), ((1, "APG1"), (2, "APG1"))
+        )
+    with pytest.raises(ValueError, match="no status"):
+        identity.validate_phase_chronology(("APG2",), ((1, "APG1"),))
