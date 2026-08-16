@@ -2,14 +2,22 @@
 """Run the project-local APG skill projection command."""
 
 from pathlib import Path
-import runpy
 import sys
 
 
 command = Path(__file__).resolve(strict=True)
-apg_root = command.parent.parent
-helper_directory = apg_root / "libexec"
-if command.parent.name != "bin" or not helper_directory.is_dir():
+root = command.parent.parent
+source = root / "src"
+adapter = source / "agentic_praxis_grimoire" / "cli.py"
+helper_directory = root / "libexec"
+if (
+    command.parent.name != "bin"
+    or not helper_directory.is_dir()
+    or not source.is_dir()
+    or source.is_symlink()
+    or not adapter.is_file()
+    or adapter.is_symlink()
+):
     print(
         "apg-project-skills: installed APG command layout is invalid; "
         "restore the APG checkout",
@@ -17,5 +25,8 @@ if command.parent.name != "bin" or not helper_directory.is_dir():
     )
     raise SystemExit(1)
 
-sys.path.insert(0, str(helper_directory))
-runpy.run_module("apg_project_skills_commands", run_name="__main__")
+sys.path.insert(0, str(source))
+from agentic_praxis_grimoire.cli import compatibility_main  # noqa: E402
+
+
+raise SystemExit(compatibility_main("apg-project-skills", root))

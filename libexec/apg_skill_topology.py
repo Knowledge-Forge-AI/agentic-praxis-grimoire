@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable, Mapping
+from collections.abc import Callable, Mapping, Sequence
+from dataclasses import dataclass
 import json
 from pathlib import Path
 import re
@@ -13,9 +14,230 @@ CANONICAL_NAMESPACES = frozenset({"chatgpt"})
 GENERAL_ROUTER_NAME = "agentic-praxis-grimoire-workflow"
 CHATGPT_ROUTER_NAME = "chatgpt-manager-workflow"
 CAPABILITY_MAP_PATH = Path("references/capability-map.json")
+EXACT_TRANSITION_SURFACES = frozenset(
+    {
+        "canonical",
+        "catalog",
+        "projections",
+        "stable_maturity",
+        "provisional_maturity",
+        "general_routes",
+        "chatgpt_local_routes",
+        "checked_routes",
+        "project_selections",
+        "current_release",
+        "test_inventory",
+        "profile_lifecycle",
+    }
+)
+PROFILE_LIFECYCLE_STATES = frozenset(
+    {
+        "not-applicable",
+        "repair-required",
+        "retained-provisional",
+        "retained-stable",
+        "provisionally-integrated",
+        "provisionally-integrated-with-known-debt",
+        "accepted-integration-rolled-back",
+    }
+)
+PROFILE_ADR_STATES = frozenset(
+    {"not-applicable", "Proposed", "Accepted with amendment"}
+)
+PROFILE_INTEGRATION_STATES = frozenset({"integrated", "unintegrated"})
 
 IssueReporter = Callable[[str, str, str, str, str], None]
 NameValidator = Callable[[str], bool]
+
+
+@dataclass(frozen=True, order=True)
+class ProfileLifecycleRow:
+    """One current canonical profile's independently owned lifecycle facts."""
+
+    profile: str
+    lifecycle: str
+    adr_status: str
+    integration: str
+    lifecycle_owners: tuple[str, ...] = ()
+
+    def text(self) -> str:
+        owners = ",".join(self.lifecycle_owners) or "none"
+        return "|".join(
+            (self.profile, self.lifecycle, self.adr_status, self.integration, owners)
+        )
+
+
+_LIFECYCLE_FIELD = re.compile(r"Lifecycle: `([a-z][a-z0-9-]*)`\.")
+_LIFECYCLE_ADR_FIELD = re.compile(
+    r"Lifecycle ADR: `(not-applicable|Proposed|Accepted with amendment)`\."
+)
+
+
+def _exact_lifecycle_owner(path: Path) -> tuple[str, str] | None:
+    """Parse one optional lifecycle owner using exact anchored fields."""
+
+    text = path.read_text(encoding="utf-8")
+    lifecycle_lines = [line for line in text.splitlines() if line.startswith("Lifecycle:")]
+    adr_lines = [line for line in text.splitlines() if line.startswith("Lifecycle ADR:")]
+    if not lifecycle_lines and not adr_lines:
+        return None
+    if len(lifecycle_lines) != 1 or len(adr_lines) != 1:
+        raise ValueError(f"lifecycle owner fields are incomplete or duplicated: {path}")
+    lifecycle = _LIFECYCLE_FIELD.fullmatch(lifecycle_lines[0])
+    adr_status = _LIFECYCLE_ADR_FIELD.fullmatch(adr_lines[0])
+    if lifecycle is None or adr_status is None:
+        raise ValueError(f"lifecycle owner fields are not exact and anchored: {path}")
+    if lifecycle.group(1) not in PROFILE_LIFECYCLE_STATES - {"not-applicable"}:
+        raise ValueError(f"lifecycle owner has an unknown lifecycle value: {path}")
+    return lifecycle.group(1), adr_status.group(1)
+
+
+def observe_profile_lifecycle_rows(
+    root: Path,
+    canonical_paths: Mapping[str, Path],
+    integrated_names: Sequence[str],
+) -> tuple[ProfileLifecycleRow, ...]:
+    """Observe lifecycle owners independently from integration membership."""
+
+    profile_paths = {
+        name: path for name, path in canonical_paths.items() if name.endswith("-profile")
+    }
+    integrated = tuple(integrated_names)
+    if len(integrated) != len(set(integrated)) or not set(integrated).issubset(
+        profile_paths
+    ):
+        raise ValueError("integrated profile names are duplicated or unknown")
+    rows: list[ProfileLifecycleRow] = []
+    for name in sorted(profile_paths):
+        candidates = (
+            root / profile_paths[name] / "SKILL.md",
+            root / "docs" / "specs" / f"{name}.md",
+        )
+        owners: list[tuple[str, str, str]] = []
+        for path in candidates:
+            if not path.is_file():
+                continue
+            value = _exact_lifecycle_owner(path)
+            if value is not None:
+                owners.append((*value, path.relative_to(root).as_posix()))
+        if owners and len({owner[:2] for owner in owners}) != 1:
+            raise ValueError(f"lifecycle owners disagree for {name}")
+        lifecycle, adr_status = owners[0][:2] if owners else (
+            "not-applicable",
+            "not-applicable",
+        )
+        rows.append(
+            ProfileLifecycleRow(
+                name,
+                lifecycle,
+                adr_status,
+                "integrated" if name in integrated else "unintegrated",
+                tuple(sorted(owner[2] for owner in owners)),
+            )
+        )
+    return tuple(rows)
+
+
+def complete_profile_lifecycle_rows(
+    canonical_names: Sequence[str],
+    rows: Sequence[ProfileLifecycleRow],
+    *,
+    required_node_row: ProfileLifecycleRow,
+) -> tuple[str, ...]:
+    """Bind one lifecycle row to every canonical profile leaf.
+
+    Canonical discovery owns the domain.  Catalog membership and maturity are
+    deliberately not accepted as substitutes for this complete map.
+    """
+
+    names = tuple(canonical_names)
+    if (
+        names != tuple(sorted(set(names)))
+        or not names
+        or any(not name.endswith("-profile") for name in names)
+    ):
+        raise ValueError("canonical profile names are not exact sorted leaves")
+    if len(rows) != len(set(rows)):
+        raise ValueError("profile lifecycle rows contain a duplicate")
+    by_name: dict[str, ProfileLifecycleRow] = {}
+    for row in rows:
+        if (
+            not row.profile
+            or not row.lifecycle
+            or not row.adr_status
+            or not row.integration
+            or row.lifecycle not in PROFILE_LIFECYCLE_STATES
+            or row.adr_status not in PROFILE_ADR_STATES
+            or row.integration not in PROFILE_INTEGRATION_STATES
+            or row.lifecycle_owners != tuple(sorted(set(row.lifecycle_owners)))
+            or (
+                row.lifecycle == "not-applicable"
+                and (row.adr_status != "not-applicable" or row.lifecycle_owners)
+            )
+            or (
+                row.lifecycle != "not-applicable"
+                and (row.adr_status == "not-applicable" or not row.lifecycle_owners)
+            )
+            or any(
+                "|" in value
+                for value in (
+                    row.profile,
+                    row.lifecycle,
+                    row.adr_status,
+                    row.integration,
+                    *row.lifecycle_owners,
+                )
+            )
+        ):
+            raise ValueError("profile lifecycle row is malformed")
+        if row.profile in by_name:
+            raise ValueError("profile lifecycle map contains a duplicate profile")
+        by_name[row.profile] = row
+    if tuple(sorted(by_name)) != names:
+        raise ValueError("profile lifecycle map is incomplete or has an unknown profile")
+    if by_name.get(required_node_row.profile) != required_node_row:
+        raise ValueError("Node lifecycle row does not match the current owner")
+    return tuple(by_name[name].text() for name in names)
+
+
+def exact_topology_transition(
+    baseline: Mapping[str, Sequence[str]],
+    observed: Mapping[str, Sequence[str]],
+    deltas: Mapping[str, tuple[Sequence[str], Sequence[str]]],
+) -> dict[str, tuple[str, ...]]:
+    """Require an exact member-for-member transition on every owned surface."""
+
+    if set(baseline) != EXACT_TRANSITION_SURFACES:
+        raise ValueError("baseline topology surfaces are incomplete")
+    if set(observed) != EXACT_TRANSITION_SURFACES:
+        raise ValueError("observed topology surfaces are incomplete")
+    if not set(deltas).issubset(EXACT_TRANSITION_SURFACES):
+        raise ValueError("transition delta names an unknown topology surface")
+
+    normalized: dict[str, tuple[str, ...]] = {}
+    for surface in sorted(EXACT_TRANSITION_SURFACES):
+        before = tuple(baseline[surface])
+        after = tuple(observed[surface])
+        if (
+            before != tuple(sorted(set(before)))
+            or after != tuple(sorted(set(after)))
+        ):
+            raise ValueError(f"{surface} rows are not exact sorted unique sets")
+        removed_values, added_values = deltas.get(surface, ((), ()))
+        removed = tuple(removed_values)
+        added = tuple(added_values)
+        if (
+            removed != tuple(sorted(set(removed)))
+            or added != tuple(sorted(set(added)))
+            or set(removed) & set(added)
+            or not set(removed).issubset(before)
+        ):
+            raise ValueError(f"{surface} delta is malformed")
+        expected = tuple(sorted((set(before) - set(removed)) | set(added)))
+        if after != expected:
+            raise ValueError(f"{surface} transition is not the exact baseline delta")
+        normalized[surface] = after
+    return normalized
 
 
 def frontmatter_name(path: Path) -> str:

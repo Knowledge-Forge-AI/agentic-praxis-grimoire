@@ -1,0 +1,47 @@
+/* APG76-FX-010 and APG76-FX-011.
+   APG-owned fixture source. Independently written; no target source. */
+
+/* FX-010 — units, math functions, and the logical/physical boundary. */
+.metric {
+  /* Declared in absolute units so that local font-relative units below have
+     a bound reference. Root font-relative units would not: nothing here
+     declares a root font-size. */
+  font-size: 20px;
+  margin-block: 2em;
+}
+
+.metric.metric--computed {
+  width: calc(4em + 12px);               /* local reference bound: reduces */
+  max-width: min(40rem, 100%);           /* root font-size and percentage
+                                            reference both unbound */
+  padding-inline: clamp(1rem, 4vw, 3rem); /* root and viewport unbound */
+}
+
+/* A flow-relative property and its physical counterpart are distinct
+   properties in one logical property group: they share a computed value,
+   resolved by declaration order together with the element's writing mode,
+   direction, and text orientation. None is declared here, so the outcome is
+   required evidence rather than a fixture fact — and the physical shorthand
+   above does not reach these. */
+.metric--logical {
+  padding-left: 4px;
+  padding-inline-start: 12px;
+  border-inline-end: 1px solid #909090;
+}
+
+/* FX-011 — color consequences. currentColor computes to the keyword and
+   resolves at used-value time against the element's own color, which is why
+   a descendant with its own distinct color re-resolves it rather than freezing
+   the ancestor's literal. */
+.swatch {
+  color: #2a6f4b;
+  border: 1px solid currentColor;
+}
+
+.swatch .swatch__child {
+  color: #1f4f8f;
+  outline: 1px solid currentColor;
+}
+
+.swatch--mixed { color: color-mix(in oklab, #2a6f4b 60%, #ffffff); }
+.swatch--perceptual { color: oklch(62% 0.13 158); }

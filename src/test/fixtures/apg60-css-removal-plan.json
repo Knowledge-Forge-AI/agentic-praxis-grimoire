@@ -1,0 +1,914 @@
+{
+  "actions": [
+    "delete",
+    "preserve-historical",
+    "remove-entry",
+    "rewrite-current-summary",
+    "verify-absent",
+    "verify-survivors"
+  ],
+  "artifact": "apg60-css-removal-plan",
+  "candidate": {
+    "active_guidance": "not-active",
+    "candidate_id": "css-language-profile",
+    "candidate_phase": "pre-authoring",
+    "evidence_status": "rejected-evidence"
+  },
+  "closure_contracts": {
+    "actual_lifecycle": {
+      "authored_owner_ids": [
+        "canonical-leaf",
+        "candidate-contract-map",
+        "candidate-specification"
+      ],
+      "authoritative_regular_file_read": "entry-descriptor-entry-bounded-complete-stable-open-object",
+      "authoring_history": [
+        "APG61"
+      ],
+      "current_survivor_ownership": "direct-regular-no-follow",
+      "foundation_history": [
+        "APG58",
+        "APG59",
+        "APG60",
+        "APG60A",
+        "APG60B",
+        "APG60C",
+        "APG60D",
+        "APG60E",
+        "APG60F",
+        "APG60G",
+        "APG60H",
+        "APG60I"
+      ],
+      "derived_skill_set_contract": "exact-sorted-unique-direct-canonical-owner-set",
+      "dynamic_consumer_root_binding": "pinned-root-descriptor-fchdir-parent-entry-revalidation",
+      "history_requirement": "closed-exact-phase-bundles",
+      "integrated_count": 28,
+      "phase_history_manifest": "src/test/fixtures/apg60i-css-phase-history.json",
+      "path_absence_observation": "missing-component-before-revalidate-after",
+      "pinned_root_final_binding": "before-and-immediately-before-success",
+      "projection_identity": "retained-no-follow-handle-platform-fail-closed",
+      "projection_ownership": "exact-relative-leaf-direct-ancestors-direct-canonical-target",
+      "repository_path_ownership": "physical-root-direct-ancestors-descriptor-relative-no-follow",
+      "semantic_role_registry": "code-owned-registry-v1-independent-of-co-mutable-authority",
+      "snapshot_cleanup": "lexical-absence-no-follow-parent-owned-timeout-cleanup",
+      "snapshot_read": "exact-declared-bytes-explicit-eof",
+      "states": [
+        "pre-authoring-absent",
+        "authored-proposed-unintegrated",
+        "retained-provisional",
+        "retained-stable",
+        "rejected-preserved"
+      ],
+      "terminal_history": [
+        "APG62"
+      ],
+      "worker_temporary_storage": "caller-controlled-no-follow-open-root-descriptor-relative-child-parent-owned-cleanup"
+    },
+    "candidate_decision": {
+      "decision_owner_id": "candidate-decision-record",
+      "index_owner_id": "narrative-adr-index",
+      "index_path": "docs/adr/README.md",
+      "lifecycle_states": [
+        "authored-proposed-unintegrated",
+        "unused",
+        "retained",
+        "rejected"
+      ],
+      "retained_statuses": [
+        "Accepted",
+        "Accepted with amendment"
+      ]
+    },
+    "current_survivor_python_bindings": {
+      "project-expected-skills": "EXPECTED_SKILLS",
+      "release-helper-audited-critical": "AUDITED_CRITICAL",
+      "release-helper-audited-projections": "AUDITED_PROJECTIONS",
+      "release-helper-audited-skills": "AUDITED_SKILLS",
+      "release-helper-audited-tests": "AUDITED_TESTS"
+    },
+    "derived_skill_set": {
+      "candidate_diagnostic": "explanatory-only",
+      "comparison": "topology-library-installer-exact-set",
+      "expected_source": "direct-canonical-leaves",
+      "name_grammar": "lowercase-dash-safe-component",
+      "ordering": "sorted-unique"
+    },
+    "dynamic_consumer": {
+      "descriptor_cleanup": "parent-and-worker-finally-close",
+      "root_binding": "pinned-root-descriptor-fchdir-parent-entry-revalidation",
+      "root_entry_revalidation": "before-launch-during-worker-after-worker",
+      "runtime_observation": "inherited-root-descriptor-fchdir-relative",
+      "source_collection": "descriptor-relative-closed-transitive-import-set"
+    },
+    "narrative_state": {
+      "current_state": "absent",
+      "diagnostic_scope": "frozen-bounded-vocabulary",
+      "human_review": "required-for-arbitrary-prose",
+      "marker_syntax": "<!-- APG-CANDIDATE-STATE: {candidate_id} {state} -->",
+      "mechanical_authority": "exact-marker",
+      "states": [
+        "absent",
+        "retained-provisional",
+        "retained-stable"
+      ]
+    },
+    "python_bindings": {
+      "project-command-integration-mirror": "EXPECTED_SKILLS",
+      "project-expected-skills": "EXPECTED_SKILLS",
+      "project-integration-mirror": "EXPECTED_SKILLS",
+      "project-unit-mirror": "EXPECTED_SKILLS",
+      "release-helper-audited-critical": "AUDITED_CRITICAL",
+      "release-helper-audited-projections": "AUDITED_PROJECTIONS",
+      "release-helper-audited-skills": "AUDITED_SKILLS",
+      "release-helper-audited-tests": "AUDITED_TESTS",
+      "release-integration-mirror": "EXPECTED_SURFACES",
+      "release-shared-case-mirror": "EXPECTED_SURFACES",
+      "release-unit-mirror": "EXPECTED_SURFACES"
+    },
+    "python_source_binding": {
+      "arbitrary_caller_mutation_scope": "outside-static-source-proof",
+      "assignment_count": 1,
+      "binding_scope": "module-and-nested-syntactic-bindings",
+      "collection": "immutable-static",
+      "dynamic_write_policy": "reject-mechanically-identifiable",
+      "projection_derivation": "exact-audited-skills",
+      "proof_scope": "exact static owner declaration and mechanically identifiable protected-name write refusal",
+      "reflective_call_effect_scope": "outside-static-syntactic-proof",
+      "runtime_value_authority": "not-used"
+    },
+    "repository_path": {
+      "authority_root": "single-resolved-physical-repository-root",
+      "direct_owner_ancestry": "descriptor-relative-no-follow",
+      "glob_ownership": "verified-direct-parent-and-direct-regular-matches",
+      "projection_leaf": "exact-relative-symlink",
+      "projection_target": "direct-regular-canonical-owner",
+      "regular_file_read": "entry-descriptor-entry-bounded-complete-stable-open-object"
+    },
+    "semantic_role_registry": {
+      "authority": "code-owned-registry-v1-independent-of-co-mutable-authority",
+      "extension_policy": "additive-unrelated-no-shadow",
+      "path": "src/test/support/apg_candidate_required_role_registry.py",
+      "required_role_count": 52,
+      "schema_version": 1
+    },
+    "traceability": {
+      "clause_marker_syntax": "<!-- APG-CLAUSE: {clause_id} -->",
+      "clause_owner_ids": [
+        "canonical-leaf",
+        "candidate-specification"
+      ],
+      "clause_owner_paths": [
+        "skills/{candidate_id}/SKILL.md",
+        "docs/specs/{candidate_id}.md"
+      ],
+      "contract_map_owner_id": "candidate-contract-map",
+      "contract_path": "src/test/fixtures/apg60-css-reentry-contract.json",
+      "contract_revision": "APG60A",
+      "contract_sha256": "1e96535c451dda91dea871679f5a6c9ee7639f4bcd443b4dfbbda4eb28086aed",
+      "schema_version": 2,
+      "semantic_boundary": "navigation-only; clause prose requires APG62 semantic validation"
+    }
+  },
+  "contract_foundation_exclusions": [
+    {
+      "path": "src/test/fixtures/apg60-css-phrase-only-control.md",
+      "reason": "Anti-phrase-only executable control, not a CSS candidate integration surface."
+    },
+    {
+      "path": "src/test/fixtures/apg60-css-reentry-contract.json",
+      "reason": "Pre-authoring executable contract, not a CSS candidate integration surface."
+    },
+    {
+      "path": "src/test/fixtures/apg60-css-removal-plan.json",
+      "reason": "Removal-closure fixture, not a CSS candidate integration surface."
+    },
+    {
+      "path": "src/test/fixtures/apg60d-css-phase-history.json",
+      "reason": "Historical APG60D lifecycle history manifest preserved byte-for-byte, not a CSS candidate integration surface."
+    },
+    {
+      "path": "src/test/int/python/agentic-praxis-grimoire/src/test/support/apg_css_candidate_contract.int.test.py",
+      "reason": "Candidate-independent APG60 lifecycle test, not a CSS candidate integration surface."
+    },
+    {
+      "path": "src/test/support/apg_actual_retained_surface_contract.py",
+      "reason": "Generic actual retained-surface closure support, not active CSS guidance."
+    },
+    {
+      "path": "src/test/support/apg_candidate_actual_lifecycle_contract.py",
+      "reason": "Generic actual absent, authored, retained, and rejected lifecycle support, not active CSS guidance."
+    },
+    {
+      "path": "src/test/support/apg_candidate_current_state_contract.py",
+      "reason": "Generic direct-regular current-survivor ownership support, not active CSS guidance."
+    },
+    {
+      "path": "src/test/support/apg_candidate_decision_contract.py",
+      "reason": "Generic candidate-decision lifecycle closure support, not active CSS guidance."
+    },
+    {
+      "path": "src/test/support/apg_candidate_history_contract.py",
+      "reason": "Generic repository-resident lifecycle history support, not active CSS guidance."
+    },
+    {
+      "path": "src/test/support/apg_candidate_lifecycle_fixture.py",
+      "reason": "Disposable candidate-lifecycle test materializer, not active CSS guidance."
+    },
+    {
+      "path": "src/test/support/apg_candidate_narrative_state_contract.py",
+      "reason": "Generic exact narrative-state marker support, not active CSS guidance."
+    },
+    {
+      "path": "src/test/support/apg_candidate_phase_history_contract.py",
+      "reason": "Generic exact direct-regular phase-bundle support, not active CSS guidance."
+    },
+    {
+      "path": "src/test/support/apg_candidate_surface_contract.py",
+      "reason": "Generic candidate-surface and removal-closure test support, not active CSS guidance."
+    },
+    {
+      "path": "src/test/support/apg_candidate_traceability_contract.py",
+      "reason": "Generic future traceability-map closure support, not active CSS guidance."
+    },
+    {
+      "path": "src/test/support/apg_css_candidate_contract.py",
+      "reason": "Pre-authoring test oracle, not active CSS guidance."
+    },
+    {
+      "path": "src/test/support/apg_live_owner_binding_contract.py",
+      "reason": "Generic exact Python-owner and isolated derivation support, not active CSS guidance."
+    },
+    {
+      "path": "src/test/support/apg_python_source_binding_contract.py",
+      "reason": "Generic static source-binding integrity support, not active CSS guidance."
+    },
+    {
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/fixtures/apg60-css-reentry-contract.json.unit.test.py",
+      "reason": "Candidate-independent fixture mutation test, not a CSS candidate integration surface."
+    },
+    {
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_actual_retained_surface_contract.unit.test.py",
+      "reason": "Candidate-independent actual retained-surface contract test, not a CSS candidate integration surface."
+    },
+    {
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_candidate_actual_lifecycle_contract.unit.test.py",
+      "reason": "Candidate-independent complete actual-lifecycle contract test, not a CSS candidate integration surface."
+    },
+    {
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_candidate_decision_contract.unit.test.py",
+      "reason": "Candidate-independent decision-lifecycle contract test, not a CSS candidate integration surface."
+    },
+    {
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_candidate_history_contract.unit.test.py",
+      "reason": "Candidate-independent repository-history contract test, not a CSS candidate integration surface."
+    },
+    {
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_candidate_narrative_state_contract.unit.test.py",
+      "reason": "Candidate-independent narrative-state contract test, not a CSS candidate integration surface."
+    },
+    {
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_candidate_phase_history_contract.unit.test.py",
+      "reason": "Candidate-independent exact phase-history bundle test, not a CSS candidate integration surface."
+    },
+    {
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_candidate_surface_contract.unit.test.py",
+      "reason": "Candidate-independent generic lifecycle test, not a CSS candidate integration surface."
+    },
+    {
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_candidate_traceability_contract.unit.test.py",
+      "reason": "Candidate-independent traceability contract test, not a CSS candidate integration surface."
+    },
+    {
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_css_candidate_contract.unit.test.py",
+      "reason": "Candidate-independent APG60 contract test, not a CSS candidate integration surface."
+    },
+    {
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_live_owner_binding_contract.unit.test.py",
+      "reason": "Candidate-independent exact owner-binding and module-isolation test, not a CSS candidate integration surface."
+    },
+    {
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_python_source_binding_contract.unit.test.py",
+      "reason": "Candidate-independent static source-binding integrity test, not a CSS candidate integration surface."
+    },
+    {
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_candidate_current_state_contract.unit.test.py",
+      "reason": "Candidate-independent strict current-survivor integrity test, not a CSS candidate integration surface."
+    },
+    {
+      "path": "testing/apg-skill-candidate-surfaces.json",
+      "reason": "Generic candidate lifecycle manifest, not a CSS candidate integration surface."
+    },
+    {
+      "path": "src/test/fixtures/apg60e-css-phase-history.json",
+      "reason": "Current exact repository-resident lifecycle history manifest, not a CSS candidate integration surface."
+    }
+  ],
+  "owners": [
+    {
+      "actions": [
+        "delete",
+        "verify-absent"
+      ],
+      "owner_id": "canonical-leaf",
+      "path": "skills/css-language-profile/SKILL.md",
+      "rejected_stale_test": true,
+      "retained_omission_test": true,
+      "surface_class": "current-integration-surface"
+    },
+    {
+      "actions": [
+        "preserve-historical",
+        "verify-absent",
+        "verify-survivors"
+      ],
+      "owner_id": "candidate-decision-record",
+      "path": "docs/adr/2026/07/0036-css-language-profile-from-frozen-contract.md",
+      "rejected_stale_test": true,
+      "retained_omission_test": true,
+      "surface_class": "candidate-decision-lifecycle"
+    },
+    {
+      "actions": [
+        "delete",
+        "verify-absent"
+      ],
+      "owner_id": "candidate-fixture",
+      "path_pattern": "src/test/fixtures/**/*css-language-profile*.json",
+      "rejected_stale_test": true,
+      "retained_omission_test": true,
+      "surface_class": "current-integration-surface"
+    },
+    {
+      "actions": [
+        "delete",
+        "verify-absent"
+      ],
+      "owner_id": "candidate-specification",
+      "path": "docs/specs/css-language-profile.md",
+      "rejected_stale_test": true,
+      "retained_omission_test": true,
+      "surface_class": "current-integration-surface"
+    },
+    {
+      "actions": [
+        "delete",
+        "verify-absent"
+      ],
+      "owner_id": "candidate-contract-map",
+      "path": "docs/specs/css-language-profile.contract-map.json",
+      "rejected_stale_test": true,
+      "retained_omission_test": true,
+      "surface_class": "current-integration-surface"
+    },
+    {
+      "actions": [
+        "remove-entry",
+        "verify-absent",
+        "verify-survivors"
+      ],
+      "owner_id": "capability-map-entry",
+      "path": "skills/agentic-praxis-grimoire-workflow/references/capability-map.json",
+      "rejected_stale_test": true,
+      "retained_omission_test": true,
+      "surface_class": "current-integration-surface"
+    },
+    {
+      "actions": [
+        "verify-absent",
+        "verify-survivors"
+      ],
+      "owner_id": "dynamic-global-installer-consumer",
+      "path": "libexec/install_global_skills.py",
+      "rejected_stale_test": true,
+      "retained_omission_test": true,
+      "surface_class": "current-integration-surface"
+    },
+    {
+      "actions": [
+        "verify-absent",
+        "verify-survivors"
+      ],
+      "owner_id": "dynamic-skill-library-consumer",
+      "path": "libexec/apg_skill_library_check.py",
+      "rejected_stale_test": true,
+      "retained_omission_test": true,
+      "surface_class": "current-integration-surface"
+    },
+    {
+      "actions": [
+        "verify-absent",
+        "verify-survivors"
+      ],
+      "owner_id": "dynamic-topology-consumer",
+      "path": "libexec/apg_skill_topology.py",
+      "rejected_stale_test": true,
+      "retained_omission_test": true,
+      "surface_class": "current-integration-surface"
+    },
+    {
+      "actions": [
+        "delete",
+        "verify-absent"
+      ],
+      "owner_id": "focused-integration-test",
+      "path_pattern": "src/test/int/**/*css-language-profile*.test.py",
+      "rejected_stale_test": true,
+      "retained_omission_test": true,
+      "surface_class": "current-integration-surface"
+    },
+    {
+      "actions": [
+        "delete",
+        "verify-absent"
+      ],
+      "owner_id": "focused-unit-test",
+      "path_pattern": "src/test/unit/**/*css-language-profile*.test.py",
+      "rejected_stale_test": true,
+      "retained_omission_test": true,
+      "surface_class": "current-integration-surface"
+    },
+    {
+      "actions": [
+        "remove-entry",
+        "verify-absent",
+        "verify-survivors"
+      ],
+      "owner_id": "project-command-integration-mirror",
+      "path": "src/test/int/python/agentic-praxis-grimoire/bin/apg-project-skills.int.test.py",
+      "rejected_stale_test": true,
+      "retained_omission_test": true,
+      "surface_class": "current-integration-surface"
+    },
+    {
+      "actions": [
+        "remove-entry",
+        "verify-absent",
+        "verify-survivors"
+      ],
+      "owner_id": "project-expected-skills",
+      "path": "libexec/apg_project_skills_core.py",
+      "rejected_stale_test": true,
+      "retained_omission_test": true,
+      "surface_class": "current-integration-surface"
+    },
+    {
+      "actions": [
+        "remove-entry",
+        "verify-absent",
+        "verify-survivors"
+      ],
+      "owner_id": "project-integration-mirror",
+      "path": "src/test/int/python/agentic-praxis-grimoire/libexec/apg_project_skills_core.int.test.py",
+      "rejected_stale_test": true,
+      "retained_omission_test": true,
+      "surface_class": "current-integration-surface"
+    },
+    {
+      "actions": [
+        "remove-entry",
+        "verify-absent",
+        "verify-survivors"
+      ],
+      "owner_id": "project-unit-mirror",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_project_skills_core.unit.test.py",
+      "rejected_stale_test": true,
+      "retained_omission_test": true,
+      "surface_class": "current-integration-surface"
+    },
+    {
+      "actions": [
+        "delete",
+        "verify-absent"
+      ],
+      "owner_id": "projection",
+      "path": ".agents/skills/css-language-profile",
+      "rejected_stale_test": true,
+      "retained_omission_test": true,
+      "surface_class": "current-integration-surface"
+    },
+    {
+      "actions": [
+        "remove-entry",
+        "verify-absent",
+        "verify-survivors"
+      ],
+      "owner_id": "release-helper-audited-critical",
+      "path": "libexec/apg_public_release.py",
+      "rejected_stale_test": true,
+      "retained_omission_test": true,
+      "surface_class": "current-integration-surface"
+    },
+    {
+      "actions": [
+        "remove-entry",
+        "verify-absent",
+        "verify-survivors"
+      ],
+      "owner_id": "release-helper-audited-projections",
+      "path": "libexec/apg_public_release.py",
+      "rejected_stale_test": true,
+      "retained_omission_test": true,
+      "surface_class": "current-integration-surface"
+    },
+    {
+      "actions": [
+        "remove-entry",
+        "verify-absent",
+        "verify-survivors"
+      ],
+      "owner_id": "release-helper-audited-skills",
+      "path": "libexec/apg_public_release.py",
+      "rejected_stale_test": true,
+      "retained_omission_test": true,
+      "surface_class": "current-integration-surface"
+    },
+    {
+      "actions": [
+        "remove-entry",
+        "verify-absent",
+        "verify-survivors"
+      ],
+      "owner_id": "release-helper-audited-tests",
+      "path": "libexec/apg_public_release.py",
+      "rejected_stale_test": true,
+      "retained_omission_test": true,
+      "surface_class": "current-integration-surface"
+    },
+    {
+      "actions": [
+        "remove-entry",
+        "verify-absent",
+        "verify-survivors"
+      ],
+      "owner_id": "release-integration-mirror",
+      "path": "src/test/int/python/agentic-praxis-grimoire/libexec/apg_public_release.int.test.py",
+      "rejected_stale_test": true,
+      "retained_omission_test": true,
+      "surface_class": "current-integration-surface"
+    },
+    {
+      "actions": [
+        "remove-entry",
+        "verify-absent",
+        "verify-survivors"
+      ],
+      "owner_id": "release-policy-critical-files",
+      "path": "release/public-surface.json",
+      "rejected_stale_test": true,
+      "retained_omission_test": true,
+      "surface_class": "current-integration-surface"
+    },
+    {
+      "actions": [
+        "remove-entry",
+        "verify-absent",
+        "verify-survivors"
+      ],
+      "owner_id": "release-policy-required-projections",
+      "path": "release/public-surface.json",
+      "rejected_stale_test": true,
+      "retained_omission_test": true,
+      "surface_class": "current-integration-surface"
+    },
+    {
+      "actions": [
+        "remove-entry",
+        "verify-absent",
+        "verify-survivors"
+      ],
+      "owner_id": "release-policy-required-skills",
+      "path": "release/public-surface.json",
+      "rejected_stale_test": true,
+      "retained_omission_test": true,
+      "surface_class": "current-integration-surface"
+    },
+    {
+      "actions": [
+        "remove-entry",
+        "verify-absent",
+        "verify-survivors"
+      ],
+      "owner_id": "release-policy-required-tests",
+      "path": "release/public-surface.json",
+      "rejected_stale_test": true,
+      "retained_omission_test": true,
+      "surface_class": "current-integration-surface"
+    },
+    {
+      "actions": [
+        "remove-entry",
+        "verify-absent",
+        "verify-survivors"
+      ],
+      "owner_id": "release-shared-case-mirror",
+      "path": "src/test/apg_public_release_cases.py",
+      "rejected_stale_test": true,
+      "retained_omission_test": true,
+      "surface_class": "current-integration-surface"
+    },
+    {
+      "actions": [
+        "remove-entry",
+        "verify-absent",
+        "verify-survivors"
+      ],
+      "owner_id": "release-unit-mirror",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_public_release.unit.test.py",
+      "rejected_stale_test": true,
+      "retained_omission_test": true,
+      "surface_class": "current-integration-surface"
+    },
+    {
+      "actions": [
+        "verify-absent",
+        "verify-survivors"
+      ],
+      "owner_id": "router-consumer",
+      "path": "skills/agentic-praxis-grimoire-workflow/SKILL.md",
+      "rejected_stale_test": true,
+      "retained_omission_test": true,
+      "surface_class": "current-integration-surface"
+    },
+    {
+      "actions": [
+        "remove-entry",
+        "verify-absent",
+        "verify-survivors"
+      ],
+      "owner_id": "skill-catalog-row",
+      "path": "skills/README.md",
+      "rejected_stale_test": true,
+      "retained_omission_test": true,
+      "surface_class": "current-integration-surface"
+    },
+    {
+      "actions": [
+        "remove-entry",
+        "verify-absent",
+        "verify-survivors"
+      ],
+      "owner_id": "skill-maturity-row",
+      "path": "skills/README.md",
+      "rejected_stale_test": true,
+      "retained_omission_test": true,
+      "surface_class": "current-integration-surface"
+    },
+    {
+      "actions": [
+        "remove-entry",
+        "verify-absent",
+        "verify-survivors"
+      ],
+      "owner_id": "test-inventory-entry",
+      "path": "testing/apg-test-inventory.json",
+      "rejected_stale_test": true,
+      "retained_omission_test": true,
+      "surface_class": "current-integration-surface"
+    },
+    {
+      "actions": [
+        "rewrite-current-summary",
+        "verify-absent",
+        "verify-survivors"
+      ],
+      "owner_id": "narrative-adr-index",
+      "path": "docs/adr/README.md",
+      "rejected_stale_test": true,
+      "retained_omission_test": true,
+      "surface_class": "current-narrative-owner"
+    },
+    {
+      "actions": [
+        "rewrite-current-summary",
+        "verify-absent",
+        "verify-survivors"
+      ],
+      "owner_id": "narrative-agents",
+      "path": "AGENTS.md",
+      "rejected_stale_test": true,
+      "retained_omission_test": true,
+      "surface_class": "current-narrative-owner"
+    },
+    {
+      "actions": [
+        "rewrite-current-summary",
+        "verify-absent",
+        "verify-survivors"
+      ],
+      "owner_id": "narrative-project-model",
+      "path": "docs/project-model.md",
+      "rejected_stale_test": true,
+      "retained_omission_test": true,
+      "surface_class": "current-narrative-owner"
+    },
+    {
+      "actions": [
+        "rewrite-current-summary",
+        "verify-absent",
+        "verify-survivors"
+      ],
+      "owner_id": "narrative-project-skill-projection",
+      "path": "docs/project-skill-projection.md",
+      "rejected_stale_test": true,
+      "retained_omission_test": true,
+      "surface_class": "current-narrative-owner"
+    },
+    {
+      "actions": [
+        "rewrite-current-summary",
+        "verify-absent",
+        "verify-survivors"
+      ],
+      "owner_id": "narrative-provenance",
+      "path": "docs/provenance.md",
+      "rejected_stale_test": true,
+      "retained_omission_test": true,
+      "surface_class": "current-narrative-owner"
+    },
+    {
+      "actions": [
+        "rewrite-current-summary",
+        "verify-absent",
+        "verify-survivors"
+      ],
+      "owner_id": "narrative-public-release-process",
+      "path": "docs/public-release-process.md",
+      "rejected_stale_test": true,
+      "retained_omission_test": true,
+      "surface_class": "current-narrative-owner"
+    },
+    {
+      "actions": [
+        "rewrite-current-summary",
+        "verify-absent",
+        "verify-survivors"
+      ],
+      "owner_id": "narrative-readme",
+      "path": "README.md",
+      "rejected_stale_test": true,
+      "retained_omission_test": true,
+      "surface_class": "current-narrative-owner"
+    },
+    {
+      "actions": [
+        "rewrite-current-summary",
+        "verify-absent",
+        "verify-survivors"
+      ],
+      "owner_id": "narrative-roadmap",
+      "path": "docs/roadmap.md",
+      "rejected_stale_test": true,
+      "retained_omission_test": true,
+      "surface_class": "current-narrative-owner"
+    },
+    {
+      "actions": [
+        "rewrite-current-summary",
+        "verify-absent",
+        "verify-survivors"
+      ],
+      "owner_id": "narrative-skill-maintenance",
+      "path": "docs/skill-authoring-and-maintenance.md",
+      "rejected_stale_test": true,
+      "retained_omission_test": true,
+      "surface_class": "current-narrative-owner"
+    },
+    {
+      "actions": [
+        "rewrite-current-summary",
+        "verify-absent",
+        "verify-survivors"
+      ],
+      "owner_id": "narrative-status-index",
+      "path": "docs/status/README.md",
+      "rejected_stale_test": true,
+      "retained_omission_test": true,
+      "surface_class": "current-narrative-owner"
+    },
+    {
+      "actions": [
+        "rewrite-current-summary",
+        "verify-absent",
+        "verify-survivors"
+      ],
+      "owner_id": "narrative-v0-5-roadmap",
+      "path": "docs/v0-5-roadmap.md",
+      "rejected_stale_test": true,
+      "retained_omission_test": true,
+      "surface_class": "current-narrative-owner"
+    },
+    {
+      "actions": [
+        "preserve-historical",
+        "verify-survivors"
+      ],
+      "owner_id": "history-candidate-adr",
+      "path": "docs/adr/2026/07/0035-css-language-profile-and-policy-selected-structural-limits.md",
+      "rejected_stale_test": false,
+      "retained_omission_test": false,
+      "surface_class": "historical-evidence"
+    },
+    {
+      "actions": [
+        "preserve-historical",
+        "verify-survivors"
+      ],
+      "owner_id": "history-candidate-evaluations",
+      "path_pattern": "docs/evaluations/apg5[89]-css-language-profile-*.md",
+      "rejected_stale_test": false,
+      "retained_omission_test": false,
+      "surface_class": "historical-evidence"
+    },
+    {
+      "actions": [
+        "preserve-historical",
+        "verify-survivors"
+      ],
+      "owner_id": "history-candidate-exits",
+      "path_pattern": "docs/status/2026/07/29/0007[89]-apg5[89]-css-language-profile-*.md",
+      "rejected_stale_test": false,
+      "retained_omission_test": false,
+      "surface_class": "historical-evidence"
+    },
+    {
+      "actions": [
+        "preserve-historical",
+        "verify-survivors"
+      ],
+      "owner_id": "history-git-objects",
+      "path_pattern": "git-object:APG5[89]",
+      "rejected_stale_test": false,
+      "retained_omission_test": false,
+      "surface_class": "historical-evidence"
+    },
+    {
+      "actions": [
+        "preserve-historical",
+        "verify-survivors"
+      ],
+      "owner_id": "history-predecessor-fact-check",
+      "path": "docs/evaluations/apg45-fact-check-peer-review-and-roadmap-disposition.md",
+      "rejected_stale_test": false,
+      "retained_omission_test": false,
+      "surface_class": "historical-evidence"
+    },
+    {
+      "actions": [
+        "preserve-historical",
+        "verify-survivors"
+      ],
+      "owner_id": "history-predecessor-public-evidence",
+      "path_pattern": "docs/**/*web*node*.md",
+      "rejected_stale_test": false,
+      "retained_omission_test": false,
+      "surface_class": "historical-evidence"
+    },
+    {
+      "actions": [
+        "preserve-historical",
+        "verify-survivors"
+      ],
+      "owner_id": "history-provenance-sections",
+      "path": "docs/provenance.md",
+      "rejected_stale_test": false,
+      "retained_omission_test": false,
+      "surface_class": "historical-evidence"
+    },
+    {
+      "actions": [
+        "preserve-historical",
+        "verify-survivors"
+      ],
+      "owner_id": "private-candidate-phase-evidence",
+      "path_pattern": "private/evaluations/apg5[89]/**",
+      "rejected_stale_test": false,
+      "retained_omission_test": false,
+      "surface_class": "publication-excluded-history"
+    },
+    {
+      "actions": [
+        "preserve-historical",
+        "verify-survivors"
+      ],
+      "owner_id": "private-predecessor-evidence",
+      "path_pattern": "private/evaluations/apg*/**",
+      "rejected_stale_test": false,
+      "retained_omission_test": false,
+      "surface_class": "publication-excluded-history"
+    },
+    {
+      "actions": [
+        "preserve-historical",
+        "verify-survivors"
+      ],
+      "owner_id": "managed-candidate-reports",
+      "path_pattern": "managed-report:APG5[89]",
+      "rejected_stale_test": false,
+      "retained_omission_test": false,
+      "surface_class": "managed-report"
+    }
+  ],
+  "schema_version": 8,
+  "source_contract_sha256": "1e96535c451dda91dea871679f5a6c9ee7639f4bcd443b4dfbbda4eb28086aed"
+}

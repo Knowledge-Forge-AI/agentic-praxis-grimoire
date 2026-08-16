@@ -6,8 +6,10 @@ import argparse
 from collections import Counter
 from dataclasses import dataclass
 import json
+import os
 from pathlib import Path
 import re
+import subprocess
 import sys
 from typing import Sequence
 
@@ -34,6 +36,125 @@ HEADING = re.compile(
 EXPLICIT_FIELD = re.compile(
     rf"^Phase ID: `(?P<phase>{PHASE_TEXT})`$", re.IGNORECASE | re.MULTILINE
 )
+COMMIT_PHASE = re.compile(rf"^(?P<phase>{PHASE_TEXT})(?::|\b)", re.IGNORECASE)
+GIT_SELECTOR_ENVIRONMENT = frozenset(
+    {
+        "GIT_ALTERNATE_OBJECT_DIRECTORIES",
+        "GIT_COMMON_DIR",
+        "GIT_CONFIG",
+        "GIT_CONFIG_COUNT",
+        "GIT_CONFIG_PARAMETERS",
+        "GIT_DIR",
+        "GIT_GRAFT_FILE",
+        "GIT_IMPLICIT_WORK_TREE",
+        "GIT_INDEX_FILE",
+        "GIT_NO_REPLACE_OBJECTS",
+        "GIT_OBJECT_DIRECTORY",
+        "GIT_PREFIX",
+        "GIT_REPLACE_REF_BASE",
+        "GIT_SHALLOW_FILE",
+        "GIT_WORK_TREE",
+    }
+)
+
+
+def replacement_free_git_environment() -> dict[str, str]:
+    """Return a Git environment with inherited repository selectors removed."""
+
+    environment = {
+        key: value
+        for key, value in os.environ.items()
+        if key not in GIT_SELECTOR_ENVIRONMENT
+        and not key.startswith("GIT_CONFIG_KEY_")
+        and not key.startswith("GIT_CONFIG_VALUE_")
+    }
+    environment.update(
+        {
+            "GIT_CONFIG_NOSYSTEM": "1",
+            "GIT_CONFIG_GLOBAL": os.devnull,
+            "GIT_NO_LAZY_FETCH": "1",
+            "GIT_NO_REPLACE_OBJECTS": "1",
+            "GIT_OPTIONAL_LOCKS": "0",
+            "GIT_TERMINAL_PROMPT": "0",
+        }
+    )
+    return environment
+
+
+def first_parent_phase_chronology(root: Path) -> tuple[str, ...]:
+    """Derive adjacent-collapsed APG phase order from real first-parent history."""
+
+    try:
+        completed = subprocess.run(
+            [
+                "git",
+                "-C",
+                str(root),
+                "log",
+                "--first-parent",
+                "--reverse",
+                "--format=%s",
+            ],
+            check=False,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            env=replacement_free_git_environment(),
+            text=True,
+        )
+    except OSError as error:
+        raise ValueError("replacement-free first-parent Git traversal failed") from error
+    if completed.returncode != 0:
+        raise ValueError("replacement-free first-parent Git traversal failed")
+
+    phases: list[str] = []
+    for subject in completed.stdout.splitlines():
+        match = COMMIT_PHASE.match(subject)
+        if match is None:
+            continue
+        phase = canonical_phase(match.group("phase"))
+        if not phases or phases[-1] != phase:
+            phases.append(phase)
+    if not phases:
+        raise ValueError("first-parent history contains no APG phase commits")
+    if len(phases) != len(set(phases)):
+        raise ValueError("one APG phase occurs in non-adjacent commit groups")
+    return tuple(phases)
+
+
+def validate_phase_chronology(
+    committed: Sequence[str],
+    status_rows: Sequence[tuple[int, str]],
+    *,
+    pending_phase: str | None = None,
+) -> tuple[str, ...]:
+    """Bind numeric status order to committed phase groups and one pending tail."""
+
+    phases = tuple(canonical_phase(phase) for phase in committed)
+    if not phases or len(phases) != len(set(phases)):
+        raise ValueError("committed phase chronology is invalid")
+    ordered_status = tuple(
+        canonical_phase(phase)
+        for _sequence, phase in sorted(status_rows, key=lambda item: item[0])
+    )
+    if len(ordered_status) != len(set(ordered_status)):
+        raise ValueError("status phase chronology contains a duplicate")
+    try:
+        start = ordered_status.index(phases[0])
+    except ValueError as error:
+        raise ValueError("first committed phase has no status record") from error
+    tail = tuple(phase for phase in ordered_status[start:] if phase in set(phases))
+    expected = phases
+    if pending_phase is not None:
+        pending = canonical_phase(pending_phase)
+        if pending in phases:
+            raise ValueError("pending phase is already committed")
+        if pending not in ordered_status:
+            raise ValueError("pending phase has no status record")
+        expected = phases + (pending,)
+        tail += (pending,)
+    if tail != expected:
+        raise ValueError("numeric status chronology disagrees with first-parent history")
+    return tail
 
 
 @dataclass(frozen=True)

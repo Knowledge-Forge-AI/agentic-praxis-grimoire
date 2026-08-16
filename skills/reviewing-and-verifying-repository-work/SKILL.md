@@ -48,6 +48,38 @@ that requests no disposition may use a lighter review.
 
 A no-finding review does not create a reason to modify the artifact.
 
+### Material claims and evidence direction
+
+Before disposing a material claim, identify what kind of claim it is: a fact
+that can presently be checked, a judgment or interpretation, a forecast, or an
+assertion with no presently defined check or disconfirming observation. Verify
+the checkable fact. Unsupported preference or taste is advice, not a required
+finding. A judgment or interpretation may be a finding when its stated basis in
+repository policy, an accepted contract, observable structure, demonstrated
+behavior, or a named risk supports that disposition. Treat a forecast as a
+forecast rather than an established current fact; verify the current facts
+that bear on it, which may support a bounded risk judgment. Do not represent an
+assertion with no presently defined check or disconfirming observation as
+established; narrow the assertion, defer it, or state the limitation. When
+acceptance would rely on an unstated material inference, state that inference
+as its own claim and require evidence matching it. This is proportional
+judgment applied to material claims, not a claim ledger, fixed taxonomy, or
+classification step added to routine review, and it does not weaken the fresh
+resulting-state evidence that completion claims already require.
+
+When evidence does not establish a material claim, report the direction of what
+was found: no relevant evidence within the inspected scope, relevant but
+inconclusive evidence, or evidence that weighs against the claim. Name the
+inspected scope when reporting absence, and do not report missing support as
+refutation. Evaluate evidence that weighs against a claim for its relevance to
+the exact claim, the directness of its inspectable basis, whether its
+evidentiary lineage is shared or independent, its method or reliability when
+material, and its strength and scope. After that evaluation it may support a
+finding, an unresolved disposition, a narrower claim, a request for additional
+evidence, or no change; it does not automatically refute the claim, create a
+finding, or outweigh stronger evidence. A claim already established by fresh
+resulting-state evidence needs no additional evidence-direction statement.
+
 ### Test, coverage, and report review
 
 Verify that tests assert useful observable behavior and can fail for the stated

@@ -4,10 +4,25 @@
 from pathlib import Path
 import sys
 
+
 command = Path(__file__).resolve(strict=True)
 root = command.parent.parent
-sys.path.insert(0, str(root))
+source = root / "src"
+adapter = source / "agentic_praxis_grimoire" / "cli.py"
+helper_directory = root / "libexec"
+if (
+    command.parent.name != "bin"
+    or not helper_directory.is_dir()
+    or not source.is_dir()
+    or source.is_symlink()
+    or not adapter.is_file()
+    or adapter.is_symlink()
+):
+    print("apg-test: installed command layout is invalid", file=sys.stderr)
+    raise SystemExit(1)
 
-from libexec.apg_test import main
+sys.path.insert(0, str(source))
+from agentic_praxis_grimoire.cli import compatibility_main  # noqa: E402
 
-raise SystemExit(main())
+
+raise SystemExit(compatibility_main("apg-test", root))

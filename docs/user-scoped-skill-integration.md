@@ -205,6 +205,48 @@ against the active integration. Mechanical enumeration resolves twenty-eight
 public skills; it does not by itself prove refreshed client invocation or
 precedence.
 
+## Local repository-set projection
+
+APG54 adds a separate command:
+
+```text
+install-global-skills AGENT [REPOSITORY ...] [options]
+```
+
+This is not the verified public-source lifecycle above. With no repository
+arguments it projects installed APG. Explicit arguments select exactly those
+local repository `skills/` trees, while `--include-apg` adds APG. Codex
+defaults to `$HOME/.agents/skills`; Claude defaults to
+`${CLAUDE_CONFIG_DIR:-$HOME/.claude}/skills`; `--skills-root` overrides the
+destination exactly.
+
+The command discovers every direct regular `SKILL.md` before mutation, never
+executes or fetches source content, and uses skill directory basenames as
+global names. Duplicate names fail rather than being renamed. One owner-only
+destination state and lock represent the complete desired set. State-proven
+updates add, replace, or remove stale links as one rollback boundary;
+`--check` and `--dry-run` do not mutate, and `--uninstall` removes only exact
+owned links and unchanged empty created containers.
+
+`apg-user-skills` remains APG-only and release-identity-aware.
+`install-global-skills` is local-repository-set projection and makes no
+release, trust, maturity, compatibility, package, or plugin claim. It refuses
+a destination claimed by the public lifecycle, flattener metadata, unmanaged
+collisions, another schema/agent/destination, and implicit migration. ADR 0033
+owns this coexistence boundary. APG54 uses disposable roots only and does not
+alter the active aggregate integration.
+
+APG55 preserves those semantics while hardening failure handling. Each missing
+destination component is created as an owner-only staged sibling, identified,
+and atomically installed without overwrite before journal ownership transfers;
+partial creation is then self-cleaning. Replacement rollback follows explicit
+completed stages; private state reads require exact EOF and stable descriptor
+metadata; control-bearing input paths fail before output; and source roots,
+directories, and markers are identity-revalidated inside link and state
+installation. No source-identity device or inode value enters output or
+persisted state; the existing created-container ownership identities remain
+part of private installer state.
+
 Project-local adoption remains a separate operation owned by
 [`apg-project-skills`](project-skill-projection.md). User and project scope have
 different roots, state, duplicate behavior, exclusion rules, and removal

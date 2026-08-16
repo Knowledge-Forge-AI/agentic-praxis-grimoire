@@ -2,15 +2,16 @@
 """Validate one APG formal-phase commit message."""
 
 from pathlib import Path
-import runpy
 import sys
 
 
 sys.dont_write_bytecode = True
 
 command = Path(__file__).resolve(strict=True)
-apg_root = command.parent.parent
-helper_directory = apg_root / "libexec"
+root = command.parent.parent
+source = root / "src"
+adapter = source / "agentic_praxis_grimoire" / "cli.py"
+helper_directory = root / "libexec"
 helper = helper_directory / "apg_phase_commit_message.py"
 if (
     command.parent.name != "bin"
@@ -18,6 +19,10 @@ if (
     or helper_directory.is_symlink()
     or not helper.is_file()
     or helper.is_symlink()
+    or not source.is_dir()
+    or source.is_symlink()
+    or not adapter.is_file()
+    or adapter.is_symlink()
 ):
     print(
         "apg-check-phase-commit-message: installed APG command layout is invalid; "
@@ -26,5 +31,8 @@ if (
     )
     raise SystemExit(3)
 
-sys.path.insert(0, str(helper_directory))
-runpy.run_module("apg_phase_commit_message", run_name="__main__")
+sys.path.insert(0, str(source))
+from agentic_praxis_grimoire.cli import compatibility_main  # noqa: E402
+
+
+raise SystemExit(compatibility_main("apg-check-phase-commit-message", root))

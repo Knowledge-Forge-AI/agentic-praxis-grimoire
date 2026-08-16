@@ -272,11 +272,29 @@ of caller evidence.
 
 ### Shared storage behavior
 
-All three commands derive a project key from the current Git-root basename and write
-under a configurable report root. They build one complete record, acquire a
-bounded lock, copy any existing destination plus the new record into a private
-replacement, and atomically replace the destination. This is logical append by
-replacement, not immutable append-only storage.
+All three commands derive a project key from the current Git-root basename.
+The canonical outbox requires a bounded path-safe project identifier; an
+explicit legacy-omnibus override preserves the prior normalized-basename
+behavior. The default destination is:
+
+```text
+~/Documents/agent/outbox/<project-key>/<phase-id>/<phase-id>.<primary-kind>.report.txt
+```
+
+`GIT_SHOW_REPORT_ROOT=/explicit/root` remains an exact override and writes
+under `/explicit/root/<project-key>/`; the command never appends `reports` to
+an override. Reports created under the earlier omnibus default remain historical
+records and are neither searched nor migrated automatically.
+
+The commands build one complete record, acquire a bounded lock, copy any
+existing current primary plus the new record into a private replacement, and
+atomically replace the destination. A primary-kind change transactionally
+removes stale sibling primaries. This is logical append by replacement, not
+immutable append-only storage.
+An owner-proven dead-process lock is recoverable, and `apgr report recover
+--phase <phase-id>` resolves a retained transaction marker under that same
+lock. An explicit project override on a repository-backed write must match the
+derived basename.
 
 The adopted shared Python core validates the canonical common envelopes before append,
 holds the destination lock across association lookup and replacement, and

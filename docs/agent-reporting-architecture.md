@@ -178,6 +178,27 @@ and compatibility decision.
 
 ## Destination safety and locking
 
+APG82 changes the default delivery layout for new terminal runs to
+`~/Documents/agent/outbox/<project>/<phase>/`. One phase directory has exactly
+one current primary artifact: `<phase>.git.show.report.txt`,
+`<phase>.git.diff.report.txt`, or `<phase>.ops.report.txt` only when no Git
+report applies. Operational evidence associated with Git remains a framed
+record inside that Git primary. Supersession uses a private transaction marker;
+an interrupted post-publication stale-primary removal remains detectable and is
+completed under the phase lock. Historical omnibus artifacts are not migrated.
+The lock owner records its process identity; a later invocation removes an
+owner-proven lock only after the process no longer exists. Operators can run
+`apgr report recover --phase <phase>` to complete or roll back a detected
+transaction before retrying publication.
+
+The canonical `apgr report` surface resolves its outbox through explicit CLI,
+project config, global config, then the built-in default; that resolved outbox
+cannot be redirected by the legacy environment variable. The maintained legacy
+report entry points retain explicit `GIT_SHOW_REPORT_ROOT` omnibus behavior for
+compatibility; an unset or empty value uses the canonical default.
+For repository-backed writes, an explicit `--project` must equal the checked
+repository basename; it cannot redirect evidence into a different project key.
+
 The cross-platform baseline uses standard-library primitives:
 
 - `pathlib` for lexical and resolved path handling;

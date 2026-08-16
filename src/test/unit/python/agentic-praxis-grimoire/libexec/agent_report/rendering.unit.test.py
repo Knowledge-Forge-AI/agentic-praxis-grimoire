@@ -277,41 +277,49 @@ class AgentReportUnitTests(unittest.TestCase):
             ):
                 destination = safety.Destination(repository, "LOCK-INIT")
 
-            original_write_text = Path.write_text
+            original_write = safety.os.write
 
-            def fail_owner_write(path: Path, *args, **kwargs):
-                if path.name == "owner":
-                    raise OSError("injected owner write failure")
-                return original_write_text(path, *args, **kwargs)
+            def fail_owner_write(_descriptor: int, _body: bytes) -> int:
+                raise OSError("injected owner write failure")
 
-            with mock.patch.object(Path, "write_text", new=fail_owner_write):
+            with mock.patch.object(safety.os, "write", new=fail_owner_write):
                 with self.assertRaises(OSError):
                     with destination.lock():
                         self.fail("lock body must not run")
 
             self.assertFalse(destination.lock_path.exists())
 
-            def fail_after_partial_write(path: Path, *args, **kwargs):
-                if path.name == "owner":
-                    original_write_text(path, "partial-token", encoding="utf-8")
-                    raise OSError("injected partial owner write failure")
-                return original_write_text(path, *args, **kwargs)
+            writes = 0
 
-            with mock.patch.object(Path, "write_text", new=fail_after_partial_write):
+            def short_owner_write(descriptor: int, body: bytes) -> int:
+                nonlocal writes
+                writes += 1
+                return original_write(descriptor, body[:1])
+
+            with mock.patch.object(safety.os, "write", new=short_owner_write):
+                with destination.lock():
+                    self.assertTrue(destination.lock_path.is_dir())
+            self.assertGreater(writes, 1)
+            self.assertFalse(destination.lock_path.exists())
+
+            def fail_after_partial_write(descriptor: int, body: bytes) -> int:
+                original_write(descriptor, body[:5])
+                raise OSError("injected partial owner write failure")
+
+            with mock.patch.object(safety.os, "write", new=fail_after_partial_write):
                 with self.assertRaises(OSError):
                     with destination.lock():
                         self.fail("lock body must not run")
 
             self.assertFalse(destination.lock_path.exists())
 
-            def replace_owner_before_failure(path: Path, *args, **kwargs):
-                if path.name == "owner":
-                    path.unlink()
-                    original_write_text(path, "foreign-token\n", encoding="utf-8")
-                    raise OSError("injected foreign owner replacement")
-                return original_write_text(path, *args, **kwargs)
+            def replace_owner_before_failure(_descriptor: int, _body: bytes) -> int:
+                owner = destination.lock_path / "owner"
+                owner.unlink()
+                owner.write_text("foreign-token\n", encoding="utf-8")
+                raise OSError("injected foreign owner replacement")
 
-            with mock.patch.object(Path, "write_text", new=replace_owner_before_failure):
+            with mock.patch.object(safety.os, "write", new=replace_owner_before_failure):
                 with self.assertRaises(OSError):
                     with destination.lock():
                         self.fail("lock body must not run")

@@ -1,0 +1,15 @@
+---
+// APG74-FX-007: embedded TypeScript boundary in an Astro host file. The host
+// owns this whole file; TypeScript may receive only the extracted or virtual
+// frontmatter region that host tooling supplies. This fixture file is a
+// nonexecuted host boundary: no Astro tooling is installed or run here, and
+// tsconfig.json does not include this directory.
+interface Props {
+  title: string;
+}
+const props: Props = { title: "APG74 embedded boundary" };
+---
+
+<section class="widget">
+  <h2>{props.title}</h2>
+</section>

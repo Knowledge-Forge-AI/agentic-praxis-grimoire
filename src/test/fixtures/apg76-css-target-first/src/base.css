@@ -1,0 +1,30 @@
+/* APG76-FX-001 — ordinary authored stylesheet.
+   APG-owned fixture source. Independently written; no target source. */
+
+.panel {
+  color: #1b1b1b;
+  background: #f4f4f4;
+  padding: 0.75rem 1rem;
+  border: 1px solid #d0d0d0;
+}
+
+.panel__title {
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+/* Declaration-level recovery: a value that cannot match the property's
+   grammar drops only its own declaration, and the surrounding declarations
+   survive. This is the authoring-defect case, distinct from a value that a
+   particular user agent merely does not support. */
+.panel__note {
+  color: #444444;
+  padding: not-a-length;
+  font-style: italic;
+}
+
+/* Rule-level recovery: the whole block is discarded when its selector list
+   is malformed, which is a different boundary from the case above. */
+.panel__aside %% {
+  color: #777777;
+}

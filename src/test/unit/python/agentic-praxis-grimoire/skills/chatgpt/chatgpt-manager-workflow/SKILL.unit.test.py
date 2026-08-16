@@ -57,6 +57,11 @@ def test_general_router_has_one_subrouter_edge_and_no_manager_leaf_edge() -> Non
         ).read_text(encoding="utf-8")
     )
     names = [entry["name"] for entry in capability_map["capabilities"]]
-    assert len(names) == 26
+    assert len(names) == 31
+    assert "css-language-profile" in names
+    assert "javascript-language-profile" in names
+    assert "markdown-language-profile" in names
+    assert "nodejs-runtime-profile" in names
+    assert "typescript-language-profile" in names
     assert names.count("chatgpt-manager-workflow") == 1
     assert "composing-approved-roadmap-assignments" not in names

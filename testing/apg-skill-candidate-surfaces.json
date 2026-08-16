@@ -1,0 +1,899 @@
+{
+  "artifact": "apg-skill-candidate-surfaces",
+  "lifecycle_contracts": {
+    "authoritative_regular_file_read": "entry-descriptor-entry-bounded-complete-stable-open-object",
+    "actual_states": [
+      "pre-authoring-absent",
+      "authored-proposed-unintegrated",
+      "retained-provisional",
+      "retained-stable",
+      "rejected-preserved"
+    ],
+    "current_survivor_ownership": "direct-regular-no-follow",
+    "derived_skill_set_contract": "exact-sorted-unique-direct-canonical-owner-set",
+    "dynamic_consumer_root_binding": "pinned-root-descriptor-fchdir-parent-entry-revalidation",
+    "history_requirement": "closed-exact-phase-bundles-direct-regular-no-follow",
+    "narrative_authority": "exact-marker",
+    "narrative_diagnostics": "bounded-vocabulary-human-review-required",
+    "projection_ownership": "exact-relative-leaf-direct-ancestors-direct-canonical-target",
+    "projection_identity": "retained-no-follow-handle-platform-fail-closed",
+    "path_absence_observation": "missing-component-before-revalidate-after",
+    "pinned_root_final_binding": "before-and-immediately-before-success",
+    "python_arbitrary_caller_mutation": "outside-static-source-proof",
+    "python_reflective_call_effects": "outside-static-syntactic-proof",
+    "python_runtime_value_authority": "not-used",
+    "python_source_binding": "exact-static-declaration-mechanical-write-refusal",
+    "repository_path_ownership": "physical-root-direct-ancestors-descriptor-relative-no-follow",
+    "semantic_role_registry": "code-owned-registry-v1-independent-of-co-mutable-authority",
+    "snapshot_cleanup": "lexical-absence-no-follow-parent-owned-timeout-cleanup",
+    "snapshot_read": "exact-declared-bytes-explicit-eof",
+    "worker_temporary_storage": "caller-controlled-no-follow-open-root-descriptor-relative-child-parent-owned-cleanup"
+  },
+  "lifecycle_labels": {
+    "active_guidance": "not-active",
+    "candidate_phase": "pre-authoring",
+    "evidence_status": "rejected-evidence"
+  },
+  "owner_schema": {
+    "additional_properties": false,
+    "allowed_surface_classes": [
+      "candidate-decision-lifecycle",
+      "current-integration-surface",
+      "current-narrative-owner",
+      "historical-evidence",
+      "managed-report",
+      "publication-excluded-history"
+    ],
+    "locator_rule": "exactly-one-of-path-or-path_pattern",
+    "required_fields": [
+      "historical_preservation_rule",
+      "owner_id",
+      "present_state_obligation",
+      "rejected_removal_obligation",
+      "surface_class",
+      "verification_family",
+      "verification_method"
+    ]
+  },
+  "owners": [
+    {
+      "historical_preservation_rule": "Not historical; remove only this candidate-owned file on rejection.",
+      "owner_id": "canonical-leaf",
+      "path": "skills/{candidate_id}/SKILL.md",
+      "present_state_obligation": "A retained candidate has one canonical leaf whose frontmatter name equals candidate_id.",
+      "rejected_removal_obligation": "The candidate leaf is absent.",
+      "surface_class": "current-integration-surface",
+      "verification_family": "frontmatter",
+      "verification_method": "family:frontmatter| regular-file and frontmatter-name check"
+    },
+    {
+      "historical_preservation_rule": "Not historical; remove only candidate-owned public-safe fixtures.",
+      "owner_id": "candidate-fixture",
+      "path_pattern": "src/test/fixtures/**/*{candidate_id}*.json",
+      "present_state_obligation": "Every retained candidate fixture selected by its focused contract exists and is public-safe.",
+      "rejected_removal_obligation": "No candidate-owned fixture remains; phase-level contract-foundation fixtures are excluded explicitly by the removal plan.",
+      "surface_class": "current-integration-surface",
+      "verification_family": "fixture",
+      "verification_method": "family:fixture| candidate-token fixture glob plus focused-test reference check"
+    },
+    {
+      "historical_preservation_rule": "Not historical; remove only this candidate-owned specification on rejection.",
+      "owner_id": "candidate-specification",
+      "path": "docs/specs/{candidate_id}.md",
+      "present_state_obligation": "A retained candidate has one current specification that agrees with the canonical leaf.",
+      "rejected_removal_obligation": "The current candidate specification is absent.",
+      "surface_class": "current-integration-surface",
+      "verification_family": "candidate-token",
+      "verification_method": "family:candidate-token| regular-file and candidate-token check"
+    },
+    {
+      "historical_preservation_rule": "Not historical by default; preserve only when explicit repository policy requires historical retention.",
+      "owner_id": "candidate-contract-map",
+      "path": "docs/specs/{candidate_id}.contract-map.json",
+      "present_state_obligation": "A retained candidate has one public traceability map with complete unique frozen-case coverage and stable normative clause ownership.",
+      "rejected_removal_obligation": "The current candidate contract map is absent unless explicit repository policy reclassifies it as historical evidence.",
+      "surface_class": "current-integration-surface",
+      "verification_family": "contract-map",
+      "verification_method": "family:contract-map| closed JSON v2 exact frozen-contract row, digest, stable clause-anchor, navigation-boundary, and privacy check"
+    },
+    {
+      "historical_preservation_rule": "Preserve a terminal Rejected decision as historical evidence; APG60B pre-authoring state leaves the future path unused.",
+      "owner_id": "candidate-decision-record",
+      "path": "docs/adr/2026/07/0036-{candidate_id}-from-frozen-contract.md",
+      "present_state_obligation": "Retention requires one APG61-proposed and APG62-decided Accepted or Accepted-with-amendment ADR whose index entry agrees.",
+      "rejected_removal_obligation": "Rejection preserves one terminal Rejected ADR and agreeing index entry; pre-authoring unused state has neither file nor index entry.",
+      "surface_class": "candidate-decision-lifecycle",
+      "verification_family": "decision",
+      "verification_method": "family:decision| exact unused, retained-terminal, or rejected-preserved ADR and index lifecycle check"
+    },
+    {
+      "historical_preservation_rule": "Preserve the generic capability map and unrelated capability records.",
+      "owner_id": "capability-map-entry",
+      "path": "skills/agentic-praxis-grimoire-workflow/references/capability-map.json",
+      "present_state_obligation": "A retained generally routable candidate has exactly one capability record whose name equals candidate_id.",
+      "rejected_removal_obligation": "No capability record names candidate_id.",
+      "surface_class": "current-integration-surface",
+      "verification_family": "capability",
+      "verification_method": "family:capability| closed JSON capability-name membership check"
+    },
+    {
+      "historical_preservation_rule": "Preserve the generic global installer and its tests; it is not a candidate-specific owner.",
+      "owner_id": "dynamic-global-installer-consumer",
+      "path": "libexec/install_global_skills.py",
+      "present_state_obligation": "The installer derives the retained canonical skill from live inventory without a candidate-specific hard-coded row.",
+      "rejected_removal_obligation": "The installer derives the rejected absence and contains no candidate-specific hard-coded row.",
+      "surface_class": "current-integration-surface",
+      "verification_family": "dynamic",
+      "verification_method": "family:dynamic| synthetic live-inventory installer check and candidate-token source scan"
+    },
+    {
+      "historical_preservation_rule": "Preserve the generic skill-library checker and its tests; it is not a candidate-specific owner.",
+      "owner_id": "dynamic-skill-library-consumer",
+      "path": "libexec/apg_skill_library_check.py",
+      "present_state_obligation": "The checker derives the retained candidate from canonical, catalog, route, and projection state without a candidate-specific hard-coded row.",
+      "rejected_removal_obligation": "The checker derives the rejected absence and contains no candidate-specific hard-coded row.",
+      "surface_class": "current-integration-surface",
+      "verification_family": "dynamic",
+      "verification_method": "family:dynamic| synthetic skill-library check and candidate-token source scan"
+    },
+    {
+      "historical_preservation_rule": "Preserve the generic topology checker and its tests; it is not a candidate-specific owner.",
+      "owner_id": "dynamic-topology-consumer",
+      "path": "libexec/apg_skill_topology.py",
+      "present_state_obligation": "The checker derives the retained canonical/projection topology without a candidate-specific hard-coded row.",
+      "rejected_removal_obligation": "The checker derives the rejected absence and contains no candidate-specific hard-coded row.",
+      "surface_class": "current-integration-surface",
+      "verification_family": "dynamic",
+      "verification_method": "family:dynamic| synthetic topology check and candidate-token source scan"
+    },
+    {
+      "historical_preservation_rule": "Not historical; remove only candidate-owned focused integration tests.",
+      "owner_id": "focused-integration-test",
+      "path_pattern": "src/test/int/**/*{candidate_id}*.test.py",
+      "present_state_obligation": "A retained candidate has every integration owner required by its test contract.",
+      "rejected_removal_obligation": "No candidate-owned focused integration test remains; generic lifecycle tests survive.",
+      "surface_class": "current-integration-surface",
+      "verification_family": "test",
+      "verification_method": "family:test| candidate-token test glob plus test-inventory agreement"
+    },
+    {
+      "historical_preservation_rule": "Not historical; remove only candidate-owned focused unit tests.",
+      "owner_id": "focused-unit-test",
+      "path_pattern": "src/test/unit/**/*{candidate_id}*.test.py",
+      "present_state_obligation": "A retained candidate has every focused unit owner required by its test contract.",
+      "rejected_removal_obligation": "No candidate-owned focused unit test remains; generic lifecycle tests survive.",
+      "surface_class": "current-integration-surface",
+      "verification_family": "test",
+      "verification_method": "family:test| candidate-token test glob plus test-inventory agreement"
+    },
+    {
+      "historical_preservation_rule": "Preserve the project-skills helper and every unrelated expected skill.",
+      "owner_id": "project-expected-skills",
+      "path": "libexec/apg_project_skills_core.py",
+      "present_state_obligation": "EXPECTED_SKILLS contains candidate_id exactly once and remains sorted and unique.",
+      "rejected_removal_obligation": "EXPECTED_SKILLS does not contain candidate_id.",
+      "surface_class": "current-integration-surface",
+      "verification_family": "assignment",
+      "verification_method": "family:assignment| AST assignment membership check for EXPECTED_SKILLS"
+    },
+    {
+      "historical_preservation_rule": "Preserve the project-skills integration suite and unrelated cases.",
+      "owner_id": "project-integration-mirror",
+      "path": "src/test/int/python/agentic-praxis-grimoire/libexec/apg_project_skills_core.int.test.py",
+      "present_state_obligation": "The integration mirror exercises candidate_id through live canonical and projection discovery.",
+      "rejected_removal_obligation": "The integration mirror has no stale candidate_id expectation and proves the surviving live inventory.",
+      "surface_class": "current-integration-surface",
+      "verification_family": "assignment",
+      "verification_method": "family:assignment| focused synthetic integration mutation and source candidate-token check"
+    },
+    {
+      "historical_preservation_rule": "Preserve the project-skills command integration suite and every unrelated expected skill.",
+      "owner_id": "project-command-integration-mirror",
+      "path": "src/test/int/python/agentic-praxis-grimoire/bin/apg-project-skills.int.test.py",
+      "present_state_obligation": "The command integration SKILLS mirror contains candidate_id exactly once and agrees with EXPECTED_SKILLS.",
+      "rejected_removal_obligation": "The command integration SKILLS mirror contains no rejected candidate_id and agrees with the surviving EXPECTED_SKILLS inventory.",
+      "surface_class": "current-integration-surface",
+      "verification_family": "assignment",
+      "verification_method": "family:assignment| AST assignment membership and equality check for SKILLS versus EXPECTED_SKILLS"
+    },
+    {
+      "historical_preservation_rule": "Preserve the project-skills unit suite and unrelated assertions.",
+      "owner_id": "project-unit-mirror",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_project_skills_core.unit.test.py",
+      "present_state_obligation": "The unit mirror recognizes candidate_id and derives any cardinality from EXPECTED_SKILLS.",
+      "rejected_removal_obligation": "The unit mirror has no stale candidate_id assertion or fixed resulting cardinality.",
+      "surface_class": "current-integration-surface",
+      "verification_family": "assignment",
+      "verification_method": "family:assignment| focused unit mutation and source candidate-token/cardinality check"
+    },
+    {
+      "historical_preservation_rule": "Not historical; remove only the rejected candidate projection.",
+      "owner_id": "projection",
+      "path": ".agents/skills/{candidate_id}",
+      "present_state_obligation": "A retained candidate has exactly one relative projection resolving to its canonical leaf.",
+      "rejected_removal_obligation": "The candidate projection is absent.",
+      "surface_class": "current-integration-surface",
+      "verification_family": "projection",
+      "verification_method": "family:projection| relative-symlink target and absence check"
+    },
+    {
+      "historical_preservation_rule": "Preserve the release helper and unrelated audited critical paths.",
+      "owner_id": "release-helper-audited-critical",
+      "path": "libexec/apg_public_release.py",
+      "present_state_obligation": "AUDITED_CRITICAL contains each candidate-owned fixture, focused test, manifest, or specification required for a retained release surface.",
+      "rejected_removal_obligation": "AUDITED_CRITICAL contains no rejected candidate-owned current path; shared contract-foundation paths remain.",
+      "surface_class": "current-integration-surface",
+      "verification_family": "assignment",
+      "verification_method": "family:assignment| AST assignment membership check for AUDITED_CRITICAL"
+    },
+    {
+      "historical_preservation_rule": "Preserve the release helper and unrelated audited projections.",
+      "owner_id": "release-helper-audited-projections",
+      "path": "libexec/apg_public_release.py",
+      "present_state_obligation": "AUDITED_PROJECTIONS derives exactly one candidate projection from AUDITED_SKILLS.",
+      "rejected_removal_obligation": "AUDITED_PROJECTIONS derives no rejected candidate projection.",
+      "surface_class": "current-integration-surface",
+      "verification_family": "assignment",
+      "verification_method": "family:assignment| evaluated AUDITED_PROJECTIONS candidate membership check"
+    },
+    {
+      "historical_preservation_rule": "Preserve the release helper and unrelated audited skills.",
+      "owner_id": "release-helper-audited-skills",
+      "path": "libexec/apg_public_release.py",
+      "present_state_obligation": "AUDITED_SKILLS contains the retained canonical leaf exactly once.",
+      "rejected_removal_obligation": "AUDITED_SKILLS contains no rejected candidate leaf.",
+      "surface_class": "current-integration-surface",
+      "verification_family": "assignment",
+      "verification_method": "family:assignment| AST assignment membership check for AUDITED_SKILLS"
+    },
+    {
+      "historical_preservation_rule": "Preserve the release helper and unrelated audited tests.",
+      "owner_id": "release-helper-audited-tests",
+      "path": "libexec/apg_public_release.py",
+      "present_state_obligation": "AUDITED_TESTS contains every release-owned focused candidate test exactly once.",
+      "rejected_removal_obligation": "AUDITED_TESTS contains no rejected candidate-owned focused test.",
+      "surface_class": "current-integration-surface",
+      "verification_family": "assignment",
+      "verification_method": "family:assignment| AST assignment membership check for AUDITED_TESTS"
+    },
+    {
+      "historical_preservation_rule": "Preserve the release integration suite and unrelated cases.",
+      "owner_id": "release-integration-mirror",
+      "path": "src/test/int/python/agentic-praxis-grimoire/libexec/apg_public_release.int.test.py",
+      "present_state_obligation": "The integration mirror proves retained candidate agreement across policy and audited arrays.",
+      "rejected_removal_obligation": "The integration mirror has no stale candidate expectation and proves surviving policy/helper agreement.",
+      "surface_class": "current-integration-surface",
+      "verification_family": "assignment",
+      "verification_method": "family:assignment| focused synthetic release integration mutation and source candidate-token check"
+    },
+    {
+      "historical_preservation_rule": "Preserve the shared release cases and every unrelated expected surface.",
+      "owner_id": "release-shared-case-mirror",
+      "path": "src/test/apg_public_release_cases.py",
+      "present_state_obligation": "The shared current-surface mirror contains the retained canonical leaf and agrees with all policy and audited arrays.",
+      "rejected_removal_obligation": "The shared current-surface mirror contains no rejected candidate-owned path and agrees with all surviving policy and audited arrays.",
+      "surface_class": "current-integration-surface",
+      "verification_family": "assignment",
+      "verification_method": "family:assignment| AST expected-set membership plus policy/helper equality check"
+    },
+    {
+      "historical_preservation_rule": "Preserve the release policy and every unrelated critical path.",
+      "owner_id": "release-policy-critical-files",
+      "path": "release/public-surface.json",
+      "present_state_obligation": "critical_files contains each candidate-owned fixture, focused test, manifest, or specification required for a retained release surface.",
+      "rejected_removal_obligation": "critical_files contains no rejected candidate-owned current path; shared contract-foundation paths remain.",
+      "surface_class": "current-integration-surface",
+      "verification_family": "membership",
+      "verification_method": "family:membership| closed JSON critical_files membership check"
+    },
+    {
+      "historical_preservation_rule": "Preserve the release policy and every unrelated projection.",
+      "owner_id": "release-policy-required-projections",
+      "path": "release/public-surface.json",
+      "present_state_obligation": "required_projections contains the retained candidate projection exactly once.",
+      "rejected_removal_obligation": "required_projections contains no rejected candidate projection.",
+      "surface_class": "current-integration-surface",
+      "verification_family": "membership",
+      "verification_method": "family:membership| closed JSON required_projections membership check"
+    },
+    {
+      "historical_preservation_rule": "Preserve the release policy and every unrelated skill.",
+      "owner_id": "release-policy-required-skills",
+      "path": "release/public-surface.json",
+      "present_state_obligation": "required_skills contains the retained canonical leaf exactly once.",
+      "rejected_removal_obligation": "required_skills contains no rejected candidate leaf.",
+      "surface_class": "current-integration-surface",
+      "verification_family": "membership",
+      "verification_method": "family:membership| closed JSON required_skills membership check"
+    },
+    {
+      "historical_preservation_rule": "Preserve the release policy and every unrelated test entrypoint.",
+      "owner_id": "release-policy-required-tests",
+      "path": "release/public-surface.json",
+      "present_state_obligation": "required_test_entrypoints contains every release-owned focused candidate test exactly once.",
+      "rejected_removal_obligation": "required_test_entrypoints contains no rejected candidate-owned focused test.",
+      "surface_class": "current-integration-surface",
+      "verification_family": "membership",
+      "verification_method": "family:membership| closed JSON required_test_entrypoints membership check"
+    },
+    {
+      "historical_preservation_rule": "Preserve the release unit suite and unrelated assertions.",
+      "owner_id": "release-unit-mirror",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_public_release.unit.test.py",
+      "present_state_obligation": "The unit mirror independently verifies candidate agreement across all four policy arrays and all four audited arrays.",
+      "rejected_removal_obligation": "The unit mirror has no stale candidate expectation and independently verifies all surviving arrays.",
+      "surface_class": "current-integration-surface",
+      "verification_family": "assignment",
+      "verification_method": "family:assignment| focused unit mutation per release subowner and source candidate-token check"
+    },
+    {
+      "historical_preservation_rule": "Preserve the generic router procedure and unrelated routing behavior.",
+      "owner_id": "router-consumer",
+      "path": "skills/agentic-praxis-grimoire-workflow/SKILL.md",
+      "present_state_obligation": "The router can select a retained map entry without a candidate-specific hard-coded branch.",
+      "rejected_removal_obligation": "The router cannot select the rejected candidate and contains no candidate-specific hard-coded branch.",
+      "surface_class": "current-integration-surface",
+      "verification_family": "router",
+      "verification_method": "family:router| synthetic route selection and candidate-token source scan"
+    },
+    {
+      "historical_preservation_rule": "Preserve the catalog and every unrelated row.",
+      "owner_id": "skill-catalog-row",
+      "path": "skills/README.md",
+      "present_state_obligation": "The catalog contains exactly one candidate row linked to the canonical leaf.",
+      "rejected_removal_obligation": "No current catalog row names candidate_id.",
+      "surface_class": "current-integration-surface",
+      "verification_family": "catalog",
+      "verification_method": "family:catalog| parsed catalog-row membership and link-target check"
+    },
+    {
+      "historical_preservation_rule": "Preserve every unrelated maturity disposition and derive summary counts from live rows.",
+      "owner_id": "skill-maturity-row",
+      "path": "skills/README.md",
+      "present_state_obligation": "The retained candidate catalog row has one explicit current maturity disposition.",
+      "rejected_removal_obligation": "No current maturity row names candidate_id and no fixed resulting count is introduced.",
+      "surface_class": "current-integration-surface",
+      "verification_family": "catalog",
+      "verification_method": "family:catalog| parsed maturity-row membership and live-row aggregation check"
+    },
+    {
+      "historical_preservation_rule": "Preserve the test inventory and every unrelated test or coverage owner.",
+      "owner_id": "test-inventory-entry",
+      "path": "testing/apg-test-inventory.json",
+      "present_state_obligation": "Every retained candidate focused test and maintained executable owner required by policy has one matching inventory record.",
+      "rejected_removal_obligation": "No test, owner, or coverage-source record names a rejected candidate-owned surface.",
+      "surface_class": "current-integration-surface",
+      "verification_family": "inventory",
+      "verification_method": "family:inventory| closed JSON tests/coverage_sources candidate membership check"
+    },
+    {
+      "historical_preservation_rule": "Preserve AGENTS.md and its phase history while changing only its current project map or summary.",
+      "owner_id": "narrative-agents",
+      "path": "AGENTS.md",
+      "present_state_obligation": "The current project map truthfully describes the retained candidate and its present lifecycle state.",
+      "rejected_removal_obligation": "The current project map does not claim candidate presence and may describe the rejection as history.",
+      "surface_class": "current-narrative-owner",
+      "verification_family": "narrative",
+      "verification_method": "family:narrative| section-scoped current-state assertion plus historical-context allowance"
+    },
+    {
+      "historical_preservation_rule": "Preserve README.md history while changing only current inventory or lifecycle claims.",
+      "owner_id": "narrative-readme",
+      "path": "README.md",
+      "present_state_obligation": "The current overview truthfully describes the retained candidate and derives inventory counts from live state.",
+      "rejected_removal_obligation": "The current overview does not claim candidate presence and may describe the rejection as history.",
+      "surface_class": "current-narrative-owner",
+      "verification_family": "narrative",
+      "verification_method": "family:narrative| section-scoped current-state assertion plus live-inventory comparison"
+    },
+    {
+      "historical_preservation_rule": "Preserve historical ADR entries and their terminal dispositions.",
+      "owner_id": "narrative-adr-index",
+      "path": "docs/adr/README.md",
+      "present_state_obligation": "The index truthfully records the candidate ADR's current disposition without implying more integration than exists.",
+      "rejected_removal_obligation": "The index preserves the rejected ADR entry and does not claim current candidate integration.",
+      "surface_class": "current-narrative-owner",
+      "verification_family": "narrative",
+      "verification_method": "family:narrative| ADR-index disposition and current-state check"
+    },
+    {
+      "historical_preservation_rule": "Preserve current and historical provenance sections while rewriting only false current-presence claims.",
+      "owner_id": "narrative-provenance",
+      "path": "docs/provenance.md",
+      "present_state_obligation": "Current provenance truthfully identifies the retained candidate's derivation and lifecycle status.",
+      "rejected_removal_obligation": "Current provenance does not claim candidate presence; historical authoring and rejection provenance remains.",
+      "surface_class": "current-narrative-owner",
+      "verification_family": "narrative",
+      "verification_method": "family:narrative| section-scoped current-state assertion and historical-section preservation check"
+    },
+    {
+      "historical_preservation_rule": "Preserve the project model's lifecycle history and unrelated ownership decisions.",
+      "owner_id": "narrative-project-model",
+      "path": "docs/project-model.md",
+      "present_state_obligation": "The current project model includes the retained candidate in every applicable owner and inventory rule.",
+      "rejected_removal_obligation": "The current project model removes presence claims, names the project-owned fallback, and derives counts from live inventories.",
+      "surface_class": "current-narrative-owner",
+      "verification_family": "narrative",
+      "verification_method": "family:narrative| current-state section assertion plus live owner/inventory comparison"
+    },
+    {
+      "historical_preservation_rule": "Preserve the projection guide and unrelated lifecycle guidance.",
+      "owner_id": "narrative-project-skill-projection",
+      "path": "docs/project-skill-projection.md",
+      "present_state_obligation": "The current projection guide agrees with the retained canonical leaf, EXPECTED_SKILLS, and relative projection.",
+      "rejected_removal_obligation": "The current projection guide does not claim candidate presence and identifies the surviving project-owned fallback.",
+      "surface_class": "current-narrative-owner",
+      "verification_family": "narrative",
+      "verification_method": "family:narrative| current-state section assertion plus project-owner agreement check"
+    },
+    {
+      "historical_preservation_rule": "Preserve release history and unrelated release rules.",
+      "owner_id": "narrative-public-release-process",
+      "path": "docs/public-release-process.md",
+      "present_state_obligation": "The current release narrative agrees with retained policy and audited arrays.",
+      "rejected_removal_obligation": "The current release narrative does not claim candidate inclusion and preserves corrected public/active history.",
+      "surface_class": "current-narrative-owner",
+      "verification_family": "narrative",
+      "verification_method": "family:narrative| current-state section assertion plus release-array agreement check"
+    },
+    {
+      "historical_preservation_rule": "Preserve completed roadmap history and future authorization boundaries.",
+      "owner_id": "narrative-roadmap",
+      "path": "docs/roadmap.md",
+      "present_state_obligation": "The roadmap truthfully states retained candidate status without authorizing a successor.",
+      "rejected_removal_obligation": "The roadmap records terminal rejection without claiming current presence or successor authority.",
+      "surface_class": "current-narrative-owner",
+      "verification_family": "narrative",
+      "verification_method": "family:narrative| phase-scoped lifecycle-state and successor-boundary check"
+    },
+    {
+      "historical_preservation_rule": "Preserve lifecycle guidance and unrelated candidate procedures.",
+      "owner_id": "narrative-skill-maintenance",
+      "path": "docs/skill-authoring-and-maintenance.md",
+      "present_state_obligation": "Current maintenance guidance truthfully includes the retained candidate's complete owner set.",
+      "rejected_removal_obligation": "Current maintenance guidance records complete removal and no stale candidate presence.",
+      "surface_class": "current-narrative-owner",
+      "verification_family": "narrative",
+      "verification_method": "family:narrative| candidate lifecycle section and owner-closure check"
+    },
+    {
+      "historical_preservation_rule": "Preserve all exit entries and their terminal outcomes.",
+      "owner_id": "narrative-status-index",
+      "path": "docs/status/README.md",
+      "present_state_obligation": "The index preserves candidate phase entries and truthfully reflects the latest disposition.",
+      "rejected_removal_obligation": "The index preserves authoring and rejection exits without claiming current integration.",
+      "surface_class": "current-narrative-owner",
+      "verification_family": "narrative",
+      "verification_method": "family:narrative| exit-link presence, disposition, and current-state check"
+    },
+    {
+      "historical_preservation_rule": "Preserve completed v0.5 workstream history and later-phase authorization boundaries.",
+      "owner_id": "narrative-v0-5-roadmap",
+      "path": "docs/v0-5-roadmap.md",
+      "present_state_obligation": "The v0.5 roadmap truthfully records the retained candidate and its decision status.",
+      "rejected_removal_obligation": "The v0.5 roadmap records rejection without claiming current presence or activating a later phase.",
+      "surface_class": "current-narrative-owner",
+      "verification_family": "narrative",
+      "verification_method": "family:narrative| phase-scoped lifecycle-state and authorization-boundary check"
+    },
+    {
+      "historical_preservation_rule": "Preserve the candidate ADR byte-for-byte except for separately authorized forward disposition updates.",
+      "owner_id": "history-candidate-adr",
+      "path_pattern": "docs/adr/**/*{candidate_id}*.md",
+      "present_state_obligation": "Historical ADR evidence exists with its truthful terminal or pending disposition.",
+      "rejected_removal_obligation": "Preserve the rejected ADR; do not treat it as a stale current integration reference.",
+      "surface_class": "historical-evidence",
+      "verification_family": "history",
+      "verification_method": "family:history| historical path presence and terminal-disposition check"
+    },
+    {
+      "historical_preservation_rule": "Preserve authoring and validation evaluations, including superseded findings and later corrections.",
+      "owner_id": "history-candidate-evaluations",
+      "path_pattern": "docs/evaluations/{candidate_phase_slug}.md",
+      "present_state_obligation": "Historical candidate evaluations remain available and truthfully labeled.",
+      "rejected_removal_obligation": "Preserve evaluations; do not treat historical candidate names as stale current integration.",
+      "surface_class": "historical-evidence",
+      "verification_family": "history",
+      "verification_method": "family:history| declared phase-evaluation presence and historical-label check"
+    },
+    {
+      "historical_preservation_rule": "Preserve authoring and validation exits and their terminal outcomes.",
+      "owner_id": "history-candidate-exits",
+      "path_pattern": "docs/status/**/{candidate_exit_slug}.md",
+      "present_state_obligation": "Historical candidate exits remain available and truthfully labeled.",
+      "rejected_removal_obligation": "Preserve exits; do not treat historical candidate names as stale current integration.",
+      "surface_class": "historical-evidence",
+      "verification_family": "history",
+      "verification_method": "family:history| declared phase-exit presence and terminal-result check"
+    },
+    {
+      "historical_preservation_rule": "Preserve immutable authoring and rejection commits and their sole-parent relationship.",
+      "owner_id": "history-git-objects",
+      "path_pattern": "git-object:{candidate_phase_id}",
+      "present_state_obligation": "Declared candidate-phase Git objects remain readable and connected by the recorded ancestry.",
+      "rejected_removal_obligation": "Preserve exact history and reject raw historical revert as cleanup.",
+      "surface_class": "historical-evidence",
+      "verification_family": "history",
+      "verification_method": "family:history| read-only git cat-file, tree, parent, and negative-revert control"
+    },
+    {
+      "historical_preservation_rule": "Preserve the public fact-check disposition that established independent candidate-family ownership.",
+      "owner_id": "history-predecessor-fact-check",
+      "path": "docs/evaluations/apg45-fact-check-peer-review-and-roadmap-disposition.md",
+      "present_state_obligation": "The predecessor disposition remains available and explicitly historical or non-current.",
+      "rejected_removal_obligation": "Preserve the predecessor disposition; candidate-family mentions alone are not stale current references.",
+      "surface_class": "historical-evidence",
+      "verification_family": "history",
+      "verification_method": "family:history| historical path presence and current-section exclusion check"
+    },
+    {
+      "historical_preservation_rule": "Preserve older public architecture and evaluation evidence that mentions the candidate family.",
+      "owner_id": "history-predecessor-public-evidence",
+      "path_pattern": "docs/**/*{candidate_family_token}*.md",
+      "present_state_obligation": "Older family evidence remains available and explicitly historical or non-current.",
+      "rejected_removal_obligation": "Preserve older evidence; candidate-family mentions alone are not stale current references.",
+      "surface_class": "historical-evidence",
+      "verification_family": "history",
+      "verification_method": "family:history| repository-wide reference classification with current-section exclusion"
+    },
+    {
+      "historical_preservation_rule": "Preserve historical provenance for source, rights, authoring, correction, and disposition.",
+      "owner_id": "history-provenance-sections",
+      "path": "docs/provenance.md",
+      "present_state_obligation": "Historical provenance sections remain truthful and distinguish current state.",
+      "rejected_removal_obligation": "Preserve historical provenance while removing only false current-presence claims.",
+      "surface_class": "historical-evidence",
+      "verification_family": "history",
+      "verification_method": "family:history| named historical-section digest and current-section separation check"
+    },
+    {
+      "historical_preservation_rule": "Preserve publication-excluded authoring and validation evidence; never make it a public prerequisite.",
+      "owner_id": "private-candidate-phase-evidence",
+      "path_pattern": "private/evaluations/{candidate_phase_id}/**",
+      "present_state_obligation": "Declared publication-excluded phase evidence remains available to authorized review.",
+      "rejected_removal_obligation": "Preserve private evidence; public tests and artifacts must not depend on reading it.",
+      "surface_class": "publication-excluded-history",
+      "verification_family": "history",
+      "verification_method": "family:history| authorized history-presence audit outside public fixture execution"
+    },
+    {
+      "historical_preservation_rule": "Preserve older publication-excluded architecture and candidate-family evidence.",
+      "owner_id": "private-predecessor-evidence",
+      "path_pattern": "private/evaluations/{predecessor_phase_id}/**",
+      "present_state_obligation": "Declared predecessor evidence remains available to authorized review.",
+      "rejected_removal_obligation": "Preserve predecessor evidence; candidate-family mentions alone are not stale current references.",
+      "surface_class": "publication-excluded-history",
+      "verification_family": "history",
+      "verification_method": "family:history| authorized repository-wide reference classification outside public fixture execution"
+    },
+    {
+      "historical_preservation_rule": "Preserve managed Git-show and associated operational reports with their original access controls.",
+      "owner_id": "managed-candidate-reports",
+      "path_pattern": "managed-report:{candidate_phase_id}",
+      "present_state_obligation": "Every declared candidate phase retains its Git-show report and associated operational record.",
+      "rejected_removal_obligation": "Preserve reports outside the repository; do not copy report bodies or private paths into public artifacts.",
+      "surface_class": "managed-report",
+      "verification_family": "report",
+      "verification_method": "family:report| authorized managed-report identity and regeneration check"
+    }
+  ],
+  "required_roles": {
+    "registry": "src/test/support/apg_candidate_required_role_registry.py",
+    "roles": [
+      {
+        "generic_locator": "skills/{candidate_id}/SKILL.md",
+        "locator_kind": "path",
+        "owner_id": "canonical-leaf",
+        "surface_class": "current-integration-surface"
+      },
+      {
+        "generic_locator": "src/test/fixtures/**/*{candidate_id}*.json",
+        "locator_kind": "path_pattern",
+        "owner_id": "candidate-fixture",
+        "surface_class": "current-integration-surface"
+      },
+      {
+        "generic_locator": "docs/specs/{candidate_id}.md",
+        "locator_kind": "path",
+        "owner_id": "candidate-specification",
+        "surface_class": "current-integration-surface"
+      },
+      {
+        "generic_locator": "docs/specs/{candidate_id}.contract-map.json",
+        "locator_kind": "path",
+        "owner_id": "candidate-contract-map",
+        "surface_class": "current-integration-surface"
+      },
+      {
+        "generic_locator": "docs/adr/2026/07/0036-{candidate_id}-from-frozen-contract.md",
+        "locator_kind": "path",
+        "owner_id": "candidate-decision-record",
+        "surface_class": "candidate-decision-lifecycle"
+      },
+      {
+        "generic_locator": "skills/agentic-praxis-grimoire-workflow/references/capability-map.json",
+        "locator_kind": "path",
+        "owner_id": "capability-map-entry",
+        "surface_class": "current-integration-surface"
+      },
+      {
+        "generic_locator": "libexec/install_global_skills.py",
+        "locator_kind": "path",
+        "owner_id": "dynamic-global-installer-consumer",
+        "surface_class": "current-integration-surface"
+      },
+      {
+        "generic_locator": "libexec/apg_skill_library_check.py",
+        "locator_kind": "path",
+        "owner_id": "dynamic-skill-library-consumer",
+        "surface_class": "current-integration-surface"
+      },
+      {
+        "generic_locator": "libexec/apg_skill_topology.py",
+        "locator_kind": "path",
+        "owner_id": "dynamic-topology-consumer",
+        "surface_class": "current-integration-surface"
+      },
+      {
+        "generic_locator": "src/test/int/**/*{candidate_id}*.test.py",
+        "locator_kind": "path_pattern",
+        "owner_id": "focused-integration-test",
+        "surface_class": "current-integration-surface"
+      },
+      {
+        "generic_locator": "src/test/unit/**/*{candidate_id}*.test.py",
+        "locator_kind": "path_pattern",
+        "owner_id": "focused-unit-test",
+        "surface_class": "current-integration-surface"
+      },
+      {
+        "generic_locator": "libexec/apg_project_skills_core.py",
+        "locator_kind": "path",
+        "owner_id": "project-expected-skills",
+        "surface_class": "current-integration-surface"
+      },
+      {
+        "generic_locator": "src/test/int/python/agentic-praxis-grimoire/libexec/apg_project_skills_core.int.test.py",
+        "locator_kind": "path",
+        "owner_id": "project-integration-mirror",
+        "surface_class": "current-integration-surface"
+      },
+      {
+        "generic_locator": "src/test/int/python/agentic-praxis-grimoire/bin/apg-project-skills.int.test.py",
+        "locator_kind": "path",
+        "owner_id": "project-command-integration-mirror",
+        "surface_class": "current-integration-surface"
+      },
+      {
+        "generic_locator": "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_project_skills_core.unit.test.py",
+        "locator_kind": "path",
+        "owner_id": "project-unit-mirror",
+        "surface_class": "current-integration-surface"
+      },
+      {
+        "generic_locator": ".agents/skills/{candidate_id}",
+        "locator_kind": "path",
+        "owner_id": "projection",
+        "surface_class": "current-integration-surface"
+      },
+      {
+        "generic_locator": "libexec/apg_public_release.py",
+        "locator_kind": "path",
+        "owner_id": "release-helper-audited-critical",
+        "surface_class": "current-integration-surface"
+      },
+      {
+        "generic_locator": "libexec/apg_public_release.py",
+        "locator_kind": "path",
+        "owner_id": "release-helper-audited-projections",
+        "surface_class": "current-integration-surface"
+      },
+      {
+        "generic_locator": "libexec/apg_public_release.py",
+        "locator_kind": "path",
+        "owner_id": "release-helper-audited-skills",
+        "surface_class": "current-integration-surface"
+      },
+      {
+        "generic_locator": "libexec/apg_public_release.py",
+        "locator_kind": "path",
+        "owner_id": "release-helper-audited-tests",
+        "surface_class": "current-integration-surface"
+      },
+      {
+        "generic_locator": "src/test/int/python/agentic-praxis-grimoire/libexec/apg_public_release.int.test.py",
+        "locator_kind": "path",
+        "owner_id": "release-integration-mirror",
+        "surface_class": "current-integration-surface"
+      },
+      {
+        "generic_locator": "src/test/apg_public_release_cases.py",
+        "locator_kind": "path",
+        "owner_id": "release-shared-case-mirror",
+        "surface_class": "current-integration-surface"
+      },
+      {
+        "generic_locator": "release/public-surface.json",
+        "locator_kind": "path",
+        "owner_id": "release-policy-critical-files",
+        "surface_class": "current-integration-surface"
+      },
+      {
+        "generic_locator": "release/public-surface.json",
+        "locator_kind": "path",
+        "owner_id": "release-policy-required-projections",
+        "surface_class": "current-integration-surface"
+      },
+      {
+        "generic_locator": "release/public-surface.json",
+        "locator_kind": "path",
+        "owner_id": "release-policy-required-skills",
+        "surface_class": "current-integration-surface"
+      },
+      {
+        "generic_locator": "release/public-surface.json",
+        "locator_kind": "path",
+        "owner_id": "release-policy-required-tests",
+        "surface_class": "current-integration-surface"
+      },
+      {
+        "generic_locator": "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_public_release.unit.test.py",
+        "locator_kind": "path",
+        "owner_id": "release-unit-mirror",
+        "surface_class": "current-integration-surface"
+      },
+      {
+        "generic_locator": "skills/agentic-praxis-grimoire-workflow/SKILL.md",
+        "locator_kind": "path",
+        "owner_id": "router-consumer",
+        "surface_class": "current-integration-surface"
+      },
+      {
+        "generic_locator": "skills/README.md",
+        "locator_kind": "path",
+        "owner_id": "skill-catalog-row",
+        "surface_class": "current-integration-surface"
+      },
+      {
+        "generic_locator": "skills/README.md",
+        "locator_kind": "path",
+        "owner_id": "skill-maturity-row",
+        "surface_class": "current-integration-surface"
+      },
+      {
+        "generic_locator": "testing/apg-test-inventory.json",
+        "locator_kind": "path",
+        "owner_id": "test-inventory-entry",
+        "surface_class": "current-integration-surface"
+      },
+      {
+        "generic_locator": "AGENTS.md",
+        "locator_kind": "path",
+        "owner_id": "narrative-agents",
+        "surface_class": "current-narrative-owner"
+      },
+      {
+        "generic_locator": "README.md",
+        "locator_kind": "path",
+        "owner_id": "narrative-readme",
+        "surface_class": "current-narrative-owner"
+      },
+      {
+        "generic_locator": "docs/adr/README.md",
+        "locator_kind": "path",
+        "owner_id": "narrative-adr-index",
+        "surface_class": "current-narrative-owner"
+      },
+      {
+        "generic_locator": "docs/provenance.md",
+        "locator_kind": "path",
+        "owner_id": "narrative-provenance",
+        "surface_class": "current-narrative-owner"
+      },
+      {
+        "generic_locator": "docs/project-model.md",
+        "locator_kind": "path",
+        "owner_id": "narrative-project-model",
+        "surface_class": "current-narrative-owner"
+      },
+      {
+        "generic_locator": "docs/project-skill-projection.md",
+        "locator_kind": "path",
+        "owner_id": "narrative-project-skill-projection",
+        "surface_class": "current-narrative-owner"
+      },
+      {
+        "generic_locator": "docs/public-release-process.md",
+        "locator_kind": "path",
+        "owner_id": "narrative-public-release-process",
+        "surface_class": "current-narrative-owner"
+      },
+      {
+        "generic_locator": "docs/roadmap.md",
+        "locator_kind": "path",
+        "owner_id": "narrative-roadmap",
+        "surface_class": "current-narrative-owner"
+      },
+      {
+        "generic_locator": "docs/skill-authoring-and-maintenance.md",
+        "locator_kind": "path",
+        "owner_id": "narrative-skill-maintenance",
+        "surface_class": "current-narrative-owner"
+      },
+      {
+        "generic_locator": "docs/status/README.md",
+        "locator_kind": "path",
+        "owner_id": "narrative-status-index",
+        "surface_class": "current-narrative-owner"
+      },
+      {
+        "generic_locator": "docs/v0-5-roadmap.md",
+        "locator_kind": "path",
+        "owner_id": "narrative-v0-5-roadmap",
+        "surface_class": "current-narrative-owner"
+      },
+      {
+        "generic_locator": "docs/adr/**/*{candidate_id}*.md",
+        "locator_kind": "path_pattern",
+        "owner_id": "history-candidate-adr",
+        "surface_class": "historical-evidence"
+      },
+      {
+        "generic_locator": "docs/evaluations/{candidate_phase_slug}.md",
+        "locator_kind": "path_pattern",
+        "owner_id": "history-candidate-evaluations",
+        "surface_class": "historical-evidence"
+      },
+      {
+        "generic_locator": "docs/status/**/{candidate_exit_slug}.md",
+        "locator_kind": "path_pattern",
+        "owner_id": "history-candidate-exits",
+        "surface_class": "historical-evidence"
+      },
+      {
+        "generic_locator": "git-object:{candidate_phase_id}",
+        "locator_kind": "path_pattern",
+        "owner_id": "history-git-objects",
+        "surface_class": "historical-evidence"
+      },
+      {
+        "generic_locator": "docs/evaluations/apg45-fact-check-peer-review-and-roadmap-disposition.md",
+        "locator_kind": "path",
+        "owner_id": "history-predecessor-fact-check",
+        "surface_class": "historical-evidence"
+      },
+      {
+        "generic_locator": "docs/**/*{candidate_family_token}*.md",
+        "locator_kind": "path_pattern",
+        "owner_id": "history-predecessor-public-evidence",
+        "surface_class": "historical-evidence"
+      },
+      {
+        "generic_locator": "docs/provenance.md",
+        "locator_kind": "path",
+        "owner_id": "history-provenance-sections",
+        "surface_class": "historical-evidence"
+      },
+      {
+        "generic_locator": "private/evaluations/{candidate_phase_id}/**",
+        "locator_kind": "path_pattern",
+        "owner_id": "private-candidate-phase-evidence",
+        "surface_class": "publication-excluded-history"
+      },
+      {
+        "generic_locator": "private/evaluations/{predecessor_phase_id}/**",
+        "locator_kind": "path_pattern",
+        "owner_id": "private-predecessor-evidence",
+        "surface_class": "publication-excluded-history"
+      },
+      {
+        "generic_locator": "managed-report:{candidate_phase_id}",
+        "locator_kind": "path_pattern",
+        "owner_id": "managed-candidate-reports",
+        "surface_class": "managed-report"
+      }
+    ],
+    "schema_version": 2
+  },
+  "schema_version": 8
+}

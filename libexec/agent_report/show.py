@@ -9,7 +9,13 @@ import re
 from .git_adapter import GitAdapter, GitError
 from .models import ReportRecord
 from .rendering import ensure_payload_ending, render_section
-from .safety import ReportError, contains_control, header_value, injected_failure
+from .safety import (
+    ReportError,
+    contains_control,
+    header_value,
+    infer_project_name,
+    injected_failure,
+)
 
 
 _HEX_COMMIT = re.compile(r"^[0-9A-Fa-f]{7,64}$")
@@ -93,9 +99,7 @@ def collect_show_report(
 
     request = ShowRequest(phase, commit_input, status_doc, result, final_gate)
     commit = _resolve_commit(git, commit_input)
-    project = git.root.name
-    if contains_control(project):
-        raise ReportError("repository name contains a control character")
+    project = infer_project_name(git.root)
     metadata = _collect_metadata(git, commit)
     comparison = _comparison(git, metadata.parents)
     evidence = _collect_evidence(git, commit, comparison.diff_from)

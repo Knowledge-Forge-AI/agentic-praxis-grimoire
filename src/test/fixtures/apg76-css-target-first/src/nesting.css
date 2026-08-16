@@ -1,0 +1,31 @@
+/* APG76-FX-009 — nesting boundary.
+   APG-owned fixture source. Independently written; no target source. */
+
+/* The parent selector list has two members of different specificity. Every
+   nested rule below resolves against the list as one unit, so the resolved
+   specificity follows the most specific member, not the nearer one. */
+.nav, #nav-primary {
+  color: #102030;
+
+  /* Explicit nesting selector in a compound. */
+  &.is-active {
+    color: #203040;
+  }
+
+  /* No nesting selector written: one is implied with a descendant
+     combinator against the same parent list. */
+  .nav-link {
+    color: #304050;
+  }
+
+  /* A leading combinator is also relative to the parent list. */
+  > .nav-group {
+    color: #405060;
+  }
+}
+
+/* The resolved selector, not the nested text, participates in the cascade.
+   This unnested rule is written to contrast with the nested forms above. */
+.nav .nav-link {
+  color: #506070;
+}

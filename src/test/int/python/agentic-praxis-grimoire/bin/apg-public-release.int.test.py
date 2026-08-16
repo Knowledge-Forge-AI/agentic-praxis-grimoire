@@ -25,7 +25,7 @@ import apg_public_release as release  # noqa: E402
 
 
 COMMAND = REPOSITORY_ROOT / "bin" / "apg-public-release"
-VERSION = "0.4.0-apg27a.1"
+VERSION = "0.5.0-apg53.1"
 RELEASE_DATE = "2026-07-20T12:00:00-04:00"
 
 
@@ -189,6 +189,12 @@ class APGPublicReleaseTests(unittest.TestCase):
     def historical_v03_policy(self) -> dict[str, object]:
         value = self.policy()
         for key, paths in release.audited_policy_surfaces("0.3.0")[0].items():
+            value[key] = list(paths)
+        return value
+
+    def historical_v04_policy(self) -> dict[str, object]:
+        value = self.policy()
+        for key, paths in release.audited_policy_surfaces("0.4.0")[0].items():
             value[key] = list(paths)
         return value
 
@@ -869,14 +875,25 @@ class APGPublicReleaseTests(unittest.TestCase):
             version="0.2.0",
         )
         self.assert_success(later_build)
+        historical_v04_source = self.copy_source_with_policy(
+            "historical-v0.4-matrix-source",
+            self.historical_v04_policy(),
+        )
+        v04, v04_build = self.build(
+            self.root / "valid-v0.4-base",
+            base=later,
+            source=historical_v04_source,
+            version="0.4.0",
+        )
+        self.assert_success(v04_build)
         candidate, result = self.build(
             self.root / "valid-later-candidate",
-            base=later,
-            version="0.4.0",
+            base=v04,
+            version="0.5.0",
         )
         self.assert_success(result)
         self.assert_success(
-            self.check_candidate(candidate, base=later, version="0.4.0")
+            self.check_candidate(candidate, base=v04, version="0.5.0")
         )
 
         scenarios: dict[str, Callable[[Path], None]]
@@ -966,7 +983,7 @@ class APGPublicReleaseTests(unittest.TestCase):
             "for name in names:\n"
             "    root = Path(os.environ[name])\n"
             "    assert root.is_absolute()\n"
-            f"    assert not root.is_relative_to(Path({str(ambient)!r}))\n"
+            "    assert 'ambient-validation-state' not in root.parts\n"
             "    (root / f'{name}.marker').write_text('isolated\\n')\n"
         )
         self.commit_all(self.source, "Add environment-isolation regression")
@@ -1058,6 +1075,23 @@ class APGPublicReleaseTests(unittest.TestCase):
                     self.environment = original
                 self.assertEqual(result.returncode, 1)
                 self.assertIn(path, result.stderr)
+
+    def test_33_historical_v0_4_policy_rejects_future_owners(self) -> None:
+        source = self.root / "v0.4-policy-with-future-owners-source"
+        shutil.copytree(self.source, source, symlinks=True)
+        self.write_policy(source, self.historical_v04_policy())
+        self.commit_all(source, "Pair historical v0.4 policy with future owners")
+        output = self.root / "v0.4-policy-with-future-owners-candidate"
+        candidate, result = self.build(
+            output,
+            source=source,
+            version="0.4.0",
+        )
+        self.assertEqual(candidate, output)
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("unsupported future owner", result.stderr)
+        self.assertIn(".agents/skills/css-language-profile", result.stderr)
+        self.assertFalse(output.exists())
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

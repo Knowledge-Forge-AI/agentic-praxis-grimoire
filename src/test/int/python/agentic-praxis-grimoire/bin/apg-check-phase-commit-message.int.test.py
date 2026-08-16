@@ -18,6 +18,7 @@ from src.test.apg_test_support import repository_root
 REPOSITORY_ROOT = repository_root(__file__)
 COMMAND = REPOSITORY_ROOT / "bin" / "apg-check-phase-commit-message"
 HELPER = REPOSITORY_ROOT / "libexec" / "apg_phase_commit_message.py"
+PACKAGE = REPOSITORY_ROOT / "src" / "agentic_praxis_grimoire"
 DIRECT_HELPERS = (
     "apg_phase_commit_message.py",
     "apg_project_skills_commands.py",
@@ -244,6 +245,11 @@ class APGPhaseCommitMessageIntegrationTests(unittest.TestCase):
         command = installed_bin / COMMAND.name
         shutil.copy2(COMMAND, command)
         shutil.copy2(HELPER, installed_libexec / HELPER.name)
+        shutil.copytree(
+            PACKAGE,
+            installed / "src" / PACKAGE.name,
+            ignore=shutil.ignore_patterns("__pycache__", "*.pyc"),
+        )
         result = self.run_checker(
             "--phase",
             "APG26A",
@@ -252,6 +258,42 @@ class APGPhaseCommitMessageIntegrationTests(unittest.TestCase):
             command=command,
         )
         self.assertEqual(result.returncode, 0, result)
+
+    def test_wrapper_delegates_exact_arguments_to_canonical_adapter(self) -> None:
+        installed = self.root / "adapter-install"
+        command = installed / "bin" / COMMAND.name
+        adapter = installed / "src" / "agentic_praxis_grimoire"
+        (installed / "libexec").mkdir(parents=True)
+        command.parent.mkdir(parents=True)
+        adapter.mkdir(parents=True)
+        shutil.copy2(COMMAND, command)
+        command.chmod(0o755)
+        (installed / "libexec" / HELPER.name).write_text("# adapter fixture\n")
+        (adapter / "__init__.py").write_text("", encoding="utf-8")
+        (adapter / "cli.py").write_text(
+            "import sys\n"
+            "from pathlib import Path\n"
+            "def compatibility_main(command, root):\n"
+            "    print(f'{command}|{Path(root)}|{sys.argv[1:]}')\n"
+            "    return 7\n",
+            encoding="utf-8",
+        )
+        result = self.run_checker(
+            "--phase",
+            "APG26A",
+            "--message-file",
+            str(self.message_file),
+            command=command,
+        )
+        expected_root = command.parent.parent.resolve()
+        self.assertEqual(result.returncode, 7, result)
+        self.assertEqual(
+            result.stdout,
+            f"apg-check-phase-commit-message|{expected_root}|"
+            "['--phase', 'APG26A', '--message-file', "
+            f"'{self.message_file}']\n",
+        )
+        self.assertEqual(result.stderr, "")
 
     def test_real_cli_rejects_each_message_structure_boundary(self) -> None:
         cases = (

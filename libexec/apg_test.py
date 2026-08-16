@@ -3,17 +3,20 @@
 from __future__ import annotations
 
 import argparse
+from contextlib import contextmanager
 from dataclasses import dataclass
+import hashlib
 from importlib import metadata
 import json
 import os
 from pathlib import Path, PurePosixPath
 import secrets
 import shutil
+import stat
 import subprocess
 import sys
 import tempfile
-from typing import NoReturn, Sequence
+from typing import Callable, NoReturn, Sequence
 
 
 COMMAND = "apg-test"
@@ -26,6 +29,72 @@ EXPECTED_VERSIONS = {
     "pytest-cov": "7.1.0",
     "pytest-xdist": "3.8.0",
 }
+EXPECTED_TYPESCRIPT_VERSION = "Version 7.0.2"
+EXPECTED_JAVASCRIPT_ENGINE = "v22.22.2|darwin/arm64|12.4.254.21-node.39"
+EXPECTED_JAVASCRIPT_ENGINE_SHA256 = (
+    "b7fff29202c2d59eeff28c53588d2832323b45cb2e854ba29bea47ade37d8359"
+)
+EXPECTED_JAVASCRIPT_ENGINE_ROOT = Path("/nix/store")
+EXPECTED_JAVASCRIPT_ENGINE_UID = 0
+NODE_PROFILE_RUNTIME_TEST_PATHS = frozenset(
+    {
+        "src/test/int/python/agentic-praxis-grimoire/skills/nodejs-runtime-profile/SKILL.int.test.py",
+    }
+)
+NODE_PROFILE_RUNTIME_CONTRACTS = {
+    "primary": (
+        "APG_NODEJS_PRIMARY_NODE",
+        "v22.22.2|darwin/arm64|12.4.254.21-node.39|1.51.0",
+        "b7fff29202c2d59eeff28c53588d2832323b45cb2e854ba29bea47ade37d8359",
+    ),
+    "secondary": (
+        "APG_NODEJS_SECONDARY_NODE",
+        "v24.19.0|darwin/arm64|13.6.233.17-node.51|1.52.1",
+        "27db838bb204ef7c21df2931f5656e4c8fb32e6e947f363a402b49714d32b5b1",
+    ),
+}
+NODE_PROFILE_ENVIRONMENT_KEYS = frozenset(
+    {"NO_COLOR", "PNPM_HOME", "TEMP", "TMP", "TMPDIR", "npm_config_cache"}
+)
+_NODE_SCRATCH_RESULT = {
+    "contentPreserved": True,
+    "durabilityProven": False,
+    "fileUrlProtocol": "file:",
+    "missingCode": "ENOENT",
+    "permissionPolicyProven": False,
+    "roundTripEqual": True,
+    "separator": "/",
+}
+NODE_PROFILE_OUTPUT_CONTRACTS = {
+    "primary-commonjs-namespace": (0, "json-exact", "empty", ["alpha", "beta", "default"]),
+    "secondary-commonjs-namespace": (0, "json-exact", "empty", ["alpha", "beta", "default", "module.exports"]),
+    "primary-default-type-flag": (0, "json-exact", "empty", {"defaultType": True}),
+    "secondary-default-type-flag": (0, "json-exact", "empty", {"defaultType": False}),
+    "primary-explicit-commonjs-refusal": (1, "empty", "discard", None),
+    "secondary-explicit-commonjs-refusal": (1, "empty", "discard", None),
+    "primary-no-manifest-detection": (0, "json-exact", "empty", {"mapping": "module-only"}),
+    "secondary-no-manifest-detection": (0, "json-exact", "empty", {"mapping": "module-only"}),
+    "primary-owned-scratch": (0, "json-exact", "empty", _NODE_SCRATCH_RESULT),
+    "secondary-owned-scratch": (0, "json-exact", "empty", _NODE_SCRATCH_RESULT),
+    "primary-scratch-symlink-refusal": (0, "json-exact", "empty", {"refused": True}),
+    "secondary-scratch-symlink-refusal": (0, "json-exact", "empty", {"refused": True}),
+    "primary-typescript-erasable": (0, "json-exact", "empty", {"label": "erasable"}),
+    "secondary-typescript-erasable": (0, "json-exact", "empty", {"label": "erasable"}),
+    "primary-typescript-nonerasable": (1, "empty", "discard", None),
+    "secondary-typescript-nonerasable": (1, "empty", "discard", None),
+    "redaction-negative": (0, "json-exact", "empty", {"secret": "expected-safe-value"}),
+}
+TYPESCRIPT_COMPILER_TEST_PATHS = frozenset(
+    {
+        "src/test/int/python/agentic-praxis-grimoire/skills/typescript-language-profile/SKILL.int.test.py",
+        "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_typescript_fixture_contract.unit.test.py",
+    }
+)
+JAVASCRIPT_ENGINE_TEST_PATHS = frozenset(
+    {
+        "src/test/int/python/agentic-praxis-grimoire/skills/javascript-language-profile/SKILL.int.test.py",
+    }
+)
 THRESHOLDS = {
     "unit": (80, 80),
     "integration": (80, 80),
@@ -35,6 +104,18 @@ THRESHOLDS = {
 
 class ToolError(Exception):
     """A bounded invocation, inventory, test, or coverage failure."""
+
+
+class JavascriptQualificationError(ToolError):
+    """A bounded JavaScript qualification failure with no captured streams."""
+
+
+class NodeProfileQualificationError(ToolError):
+    """A bounded Node-profile qualification failure with no captured streams."""
+
+
+class NodeProfileCleanupError(ToolError):
+    """A bounded Node-profile cleanup failure with no raw path or stream data."""
 
 
 @dataclass(frozen=True)
@@ -57,6 +138,87 @@ class Inventory:
 
 
 @dataclass(frozen=True)
+class JavascriptEngineBinding:
+    """Exact executable facts observed around one JavaScript invocation."""
+
+    path: Path
+    file_identity: tuple[int, int, int, int, int, int, int]
+    executable_sha256: str
+    public_identity: str
+
+
+@dataclass(frozen=True)
+class JavascriptOutputContract:
+    """One closed contract for a maintained JavaScript engine observation."""
+
+    expected_return_code: int
+    stdout_policy: str
+    stderr_policy: str
+    expected_result: object = None
+
+
+@dataclass(frozen=True)
+class JavascriptObservation:
+    """Redacted validated JavaScript facts with no reachable captured streams."""
+
+    return_code: int
+    output_contract_id: str
+    result: object
+    stdout_empty: bool
+    stderr_empty: bool
+    engine_public_identity: str
+    engine_sha256: str
+
+
+@dataclass(frozen=True)
+class NodeProfileRuntimeBinding:
+    """Exact executable facts observed around one Node-profile invocation."""
+
+    role: str
+    path: Path
+    file_identity: tuple[int, int, int, int, int, int, int]
+    executable_sha256: str
+    public_identity: str
+
+
+@dataclass(frozen=True)
+class NodeProfileInvocation:
+    """One parent-owned private scratch topology for one Node invocation."""
+
+    contract_id: str
+    root: Path
+    temporary: Path
+    npm_cache: Path
+    pnpm_home: Path
+    work: Path
+    filesystem_case: Path
+
+    @property
+    def environment(self) -> dict[str, str]:
+        """Return the exact synthetic child environment for this invocation."""
+        temporary = os.fspath(self.temporary)
+        return {
+            "NO_COLOR": "1",
+            "PNPM_HOME": os.fspath(self.pnpm_home),
+            "TEMP": temporary,
+            "TMP": temporary,
+            "TMPDIR": temporary,
+            "npm_config_cache": os.fspath(self.npm_cache),
+        }
+
+
+@dataclass(frozen=True)
+class NodeProfileObservation:
+    """Redacted validated Node-profile facts with no captured streams."""
+
+    role: str
+    output_contract_id: str
+    result: object
+    runtime_public_identity: str
+    runtime_sha256: str
+
+
+@dataclass(frozen=True)
 class ComponentResult:
     """One test component with valid completeness and coverage data."""
 
@@ -72,6 +234,168 @@ class ArtifactDirectory:
     path: Path
     device: int
     inode: int
+
+
+JAVASCRIPT_OUTPUT_CONTRACTS = {
+    "script-module-strictness": JavascriptOutputContract(
+        0, "json-exact", "empty",
+        {"sloppy": True, "strict": True, "moduleThis": True},
+    ),
+    "script-goal-strictness": JavascriptOutputContract(
+        0, "json-exact", "empty",
+        {
+            "sloppy": {"error": None, "result": 1},
+            "strict": {"error": "ReferenceError"},
+        },
+    ),
+    "scope-declarations": JavascriptOutputContract(
+        0, "json-exact", "empty",
+        {
+            "tdzError": "ReferenceError",
+            "varBefore": "undefined",
+            "fnBefore": "function",
+            "perIteration": {"fromLet": [0, 1, 2], "fromVar": [3, 3, 3]},
+        },
+    ),
+    "functions-boundaries": JavascriptOutputContract(
+        0, "json-exact", "empty",
+        {
+            "binding": {"called": "holder", "arrow": "lexical"},
+            "defaults": {"first": 1, "second": 2},
+            "spread": {
+                "head": 1,
+                "tail": [2, 3],
+                "widened": [1, 2, 3],
+                "called": [1, 2, 3],
+                "copied": {"head": 1, "own": "included"},
+                "captured": 1,
+            },
+            "abrupt": "TypeError",
+            "trace": ["first", "throw"],
+        },
+    ),
+    "optional-chain": JavascriptOutputContract(
+        0, "json-exact", "empty",
+        {
+            "result": {
+                "conjunction": False,
+                "disjunction": "r",
+                "coalesced": "r",
+                "grouped": "TypeError",
+                "optionalCall": 6,
+            },
+            "trace": ["or-right", "coalesce-right", "optional-argument"],
+        },
+    ),
+    "objects-classes": JavascriptOutputContract(
+        0, "json-exact", "empty",
+        {
+            "chain": {"ownKind": True, "ownShared": False, "shared": "from-base"},
+            "fixed": {
+                "assign": {"threw": "TypeError"},
+                "remove": {"threw": "TypeError"},
+                "value": "original",
+            },
+            "setter": {"observed": 7, "ownsValue": False},
+            "nonWritable": {"threw": "TypeError", "value": "base", "owns": False},
+            "trace": ["base-constructor", "derived-field", "derived-after-super"],
+            "field": "derived-field",
+            "staticTrace": ["static-field", "static-block"],
+            "secret": "derived-private",
+            "brand": True,
+        },
+    ),
+    "equality": JavascriptOutputContract(
+        0, "json-exact", "empty",
+        {
+            "nanStrict": False,
+            "nanSame": True,
+            "zeroSame": False,
+            "set": 2,
+            "bigintError": "TypeError",
+        },
+    ),
+    "coercion": JavascriptOutputContract(
+        0, "json-exact", "empty",
+        {
+            "trace": ["number", "string", "default"],
+            "result": {"number": 42, "string": "forty-two", "loose": True},
+        },
+    ),
+    "iterator-close": JavascriptOutputContract(
+        0, "json-exact", "empty",
+        {
+            "a": ["next:1", "next:2", "return"],
+            "b": ["next:1"],
+            "body": "TypeError:body",
+            "missingTrace": ["next:1", "next:2"],
+            "missing": {"first": 1, "second": 2},
+            "noncall": "TypeError",
+            "nonobject": "TypeError",
+        },
+    ),
+    "finally-completion": JavascriptOutputContract(
+        0, "json-exact", "empty",
+        {
+            "throwing": "from-finally",
+            "returning": "from-finally",
+            "normal": {
+                "name": "TypeError",
+                "message": "preserved",
+                "trace": ["finally"],
+            },
+        },
+    ),
+    "promise-async": JavascriptOutputContract(
+        0, "json-exact", "empty",
+        {
+            "promiseTrace": ["synchronous", "after-call", "then-1", "then-2"],
+            "awaitTrace": ["before-await", "after-await"],
+            "rejected": {"caught": "async-origin"},
+        },
+    ),
+    "module-live-bindings": JavascriptOutputContract(
+        0, "json-exact", "empty",
+        {
+            "live": {"before": 0, "after": 1},
+            "namespace": {
+                "label": "counter",
+                "count": 1,
+                "keys": ["count", "increment", "label"],
+                "tag": "[object Module]",
+            },
+            "write": {"threw": "TypeError"},
+        },
+    ),
+    "module-cycle": JavascriptOutputContract(0, "json-exact", "empty", "ReferenceError"),
+    "top-level-await": JavascriptOutputContract(0, "json-exact", "empty", 1),
+    "dynamic-import-failure": JavascriptOutputContract(0, "json-exact", "empty", "Error"),
+    "module-strictness": JavascriptOutputContract(
+        0, "json-exact", "empty",
+        {"topLevelThisIsUndefined": True, "strict": {"threw": "ReferenceError"}},
+    ),
+    "module-goal-evidence": JavascriptOutputContract(
+        0, "json-exact", "empty", 'nearest package.json "type" field'
+    ),
+    "checked-javascript": JavascriptOutputContract(
+        0, "json-exact", "empty", {"total": 6, "count": 3}
+    ),
+    "cli-core": JavascriptOutputContract(
+        0, "json-exact", "empty",
+        {
+            "first": {
+                "total": 5,
+                "operandCount": 2,
+                "verbose": True,
+                "messages": ["operands:2"],
+                "status": "computed",
+            },
+            "stable": True,
+        },
+    ),
+    "commonjs-boundary-syntax": JavascriptOutputContract(0, "empty", "empty"),
+    "cli-commonjs-adapter-syntax": JavascriptOutputContract(0, "empty", "empty"),
+}
 
 
 def fail(message: str) -> NoReturn:
@@ -110,8 +434,8 @@ def load_inventory(root: Path) -> Inventory:
         "tests",
     }:
         fail("test inventory has unknown or missing top-level fields")
-    if value["schema_version"] != 1:
-        fail("test inventory schema_version must be 1")
+    if value["schema_version"] != 2:
+        fail("test inventory schema_version must be 2")
 
     coverage_sources: dict[str, tuple[str, ...]] = {}
     source_entries = value["coverage_sources"]
@@ -183,7 +507,8 @@ def validate_inventory(root: Path, inventory: Inventory) -> None:
     """Reject stale, omitted, duplicate, or incorrectly mirrored ownership."""
     actual_sources = {
         path.relative_to(root).as_posix()
-        for path in (root / "libexec").rglob("*.py")
+        for source_root in (root / "libexec", root / "src/agentic_praxis_grimoire")
+        for path in source_root.rglob("*.py")
         if "__pycache__" not in path.parts
     }
     declared_sources = set(inventory.coverage_sources)
@@ -237,6 +562,808 @@ def dependency_versions() -> dict[str, str]:
             )
         versions[distribution] = actual
     return versions
+
+
+def requires_typescript_compiler(inventory: Inventory) -> bool:
+    """Return whether the validated inventory owns compiler-backed tests."""
+    return bool(TYPESCRIPT_COMPILER_TEST_PATHS & set(inventory.tests))
+
+
+def validate_typescript_compiler(root: Path) -> str:
+    """Require the exact externally provisioned compiler used by maintained tests."""
+    raw = os.environ.get("APG_TYPESCRIPT_TSC")
+    if not raw:
+        fail(
+            "TypeScript test prerequisite is unavailable: set APG_TYPESCRIPT_TSC "
+            "to an absolute executable typescript@7.0.2 tsc installed outside "
+            "the repository checkout"
+        )
+    executable = Path(raw)
+    if (
+        not executable.is_absolute()
+        or executable.is_symlink()
+        or not executable.is_file()
+        or not os.access(executable, os.X_OK)
+    ):
+        fail(
+            "APG_TYPESCRIPT_TSC must name an absolute regular executable "
+            "typescript@7.0.2 tsc outside the repository checkout"
+        )
+    try:
+        resolved_executable = executable.resolve(strict=True)
+        resolved_root = root.resolve(strict=True)
+    except OSError as error:
+        fail(f"TypeScript compiler prerequisite path could not be resolved: {error}")
+    if resolved_executable == resolved_root or resolved_root in resolved_executable.parents:
+        fail("APG_TYPESCRIPT_TSC must be installed outside the repository checkout")
+    try:
+        completed = subprocess.run(
+            [str(executable), "--version"],
+            check=False,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+            timeout=10,
+            env={**os.environ, "NO_COLOR": "1"},
+        )
+    except (OSError, subprocess.TimeoutExpired) as error:
+        fail(f"TypeScript compiler prerequisite could not be executed: {error}")
+    version = completed.stdout.strip()
+    if completed.returncode != 0 or version != EXPECTED_TYPESCRIPT_VERSION:
+        fail(
+            "TypeScript compiler version mismatch: "
+            f"observed {version or '<no version>'}; expected {EXPECTED_TYPESCRIPT_VERSION}"
+        )
+    return version
+
+
+def requires_javascript_engine(inventory: Inventory) -> bool:
+    """Return whether the validated inventory owns engine-backed JavaScript tests."""
+    return bool(JAVASCRIPT_ENGINE_TEST_PATHS & set(inventory.tests))
+
+
+def requires_node_profile_runtimes(inventory: Inventory) -> bool:
+    """Return whether the inventory owns exact two-runtime Node tests."""
+    return bool(NODE_PROFILE_RUNTIME_TEST_PATHS & set(inventory.tests))
+
+
+def _observe_node_profile_owned_scratch(root: Path) -> Path:
+    """Observe the assignment owner behind a path-free public wrapper."""
+    raw = os.environ.get("APG_NODEJS_OWNED_SCRATCH_ROOT")
+    if not raw:
+        fail("Node-profile scratch owner is unavailable: set APG_NODEJS_OWNED_SCRATCH_ROOT")
+    scratch = Path(raw)
+    try:
+        resolved = scratch.resolve(strict=True)
+        repository = root.resolve(strict=True)
+    except OSError as error:
+        fail(f"Node-profile scratch owner could not be resolved: {type(error).__name__}")
+    if (
+        not scratch.is_absolute()
+        or scratch.is_symlink()
+        or not scratch.is_dir()
+        or resolved != scratch
+        or resolved == repository
+        or repository in resolved.parents
+        or resolved in repository.parents
+    ):
+        fail("APG_NODEJS_OWNED_SCRATCH_ROOT must be a separate external direct directory")
+    return resolved
+
+
+def _node_profile_owned_scratch(root: Path) -> Path:
+    """Require the explicit owner without retaining its path on failure."""
+    try:
+        return _observe_node_profile_owned_scratch(root)
+    except ToolError as error:
+        safe_kind = str(error)
+        root = None
+        error = None
+        _raise_node_profile_qualification(safe_kind, "scratch-owner")
+
+
+def _validate_node_profile_directory(path: Path, owner: Path, label: str) -> None:
+    """Require one existing private direct path beneath the invocation owner."""
+    try:
+        resolved = path.resolve(strict=True)
+        metadata = path.lstat()
+    except OSError as error:
+        fail(f"Node-profile {label} directory is unavailable: {type(error).__name__}")
+    if (
+        not path.is_absolute()
+        or path.is_symlink()
+        or not path.is_dir()
+        or resolved != path
+        or not resolved.is_relative_to(owner)
+        or stat.S_IMODE(metadata.st_mode) & 0o077
+    ):
+        fail(f"Node-profile {label} directory violates its exact private owner")
+
+
+def _validate_node_profile_invocation(root: Path, invocation: NodeProfileInvocation) -> None:
+    """Revalidate one exact direct-child topology at ordinary preflight."""
+    owned = _node_profile_owned_scratch(root)
+    if invocation.root.parent != owned:
+        fail("Node-profile invocation root is not a direct child of its exact owner")
+    _validate_node_profile_directory(invocation.root, owned, "invocation-root")
+    expected = {
+        invocation.temporary: "tmp",
+        invocation.npm_cache: "npm-cache",
+        invocation.pnpm_home: "pnpm-home",
+        invocation.work: "work",
+        invocation.filesystem_case: "fs-case",
+    }
+    if set(expected) != {
+        invocation.root / "tmp",
+        invocation.root / "npm-cache",
+        invocation.root / "pnpm-home",
+        invocation.root / "work",
+        invocation.root / "fs-case",
+    }:
+        fail("Node-profile invocation topology is not exact")
+    for path, label in expected.items():
+        if path.parent != invocation.root:
+            fail("Node-profile invocation child is not direct")
+        _validate_node_profile_directory(path, invocation.root, label)
+    environment = invocation.environment
+    if set(environment) != NODE_PROFILE_ENVIRONMENT_KEYS or environment["NO_COLOR"] != "1":
+        fail("Node-profile child environment is not the exact closed allowlist")
+    if environment != {
+        "NO_COLOR": "1",
+        "PNPM_HOME": os.fspath(invocation.pnpm_home),
+        "TEMP": os.fspath(invocation.temporary),
+        "TMP": os.fspath(invocation.temporary),
+        "TMPDIR": os.fspath(invocation.temporary),
+        "npm_config_cache": os.fspath(invocation.npm_cache),
+    }:
+        fail("Node-profile child environment disagrees with its exact topology")
+
+
+def _node_profile_cleanup_actions(
+    invocation: NodeProfileInvocation,
+) -> tuple[tuple[str, Callable[[], None]], ...]:
+    """Return the complete ordered cleanup plan for fault-injection tests."""
+    return (("remove-root", lambda: shutil.rmtree(invocation.root)),)
+
+
+def _cleanup_node_profile_invocation(invocation: NodeProfileInvocation) -> str | None:
+    """Attempt every owned cleanup action and return only a bounded failure."""
+    failures: list[str] = []
+    actions = _node_profile_cleanup_actions(invocation)
+    for action_id, action in actions:
+        try:
+            action()
+        except Exception:
+            failures.append(action_id)
+    try:
+        invocation.root.lstat()
+    except FileNotFoundError:
+        pass
+    except OSError:
+        failures.append("absence-verification")
+    else:
+        failures.append("retained-artifact")
+    action = None
+    actions = ()
+    return ",".join(dict.fromkeys(failures)) or None
+
+
+def _raise_node_profile_cleanup(contract_id: str, detail: str) -> NoReturn:
+    """Raise one path-free cleanup failure from a path-free frame."""
+    raise NodeProfileCleanupError(
+        f"Node-profile cleanup failed: {contract_id}; {detail}"
+    ) from None
+
+
+def _raise_node_profile_qualification(kind: str, contract_id: str) -> NoReturn:
+    """Raise one path-free qualification failure from a path-free frame."""
+    raise NodeProfileQualificationError(
+        f"Node-profile {kind}: {contract_id}"
+    ) from None
+
+
+@contextmanager
+def node_profile_invocation(root: Path, contract_id: str):
+    """Create and completely clean one exact parent-owned invocation topology."""
+    if contract_id not in NODE_PROFILE_OUTPUT_CONTRACTS:
+        root = None
+        contract_id = ""
+        _raise_node_profile_qualification("output contract is unknown", "unknown-contract")
+    try:
+        owned = _node_profile_owned_scratch(root)
+        invocation_root = Path(tempfile.mkdtemp(prefix="node-profile-", dir=owned))
+    except (OSError, ToolError) as error:
+        safe_kind = f"invocation root creation failed ({type(error).__name__})"
+        root = None
+        contract_id = ""
+        owned = None
+        error = None
+        _raise_node_profile_qualification(safe_kind, "scratch-root")
+    invocation = NodeProfileInvocation(
+        contract_id,
+        invocation_root,
+        invocation_root / "tmp",
+        invocation_root / "npm-cache",
+        invocation_root / "pnpm-home",
+        invocation_root / "work",
+        invocation_root / "fs-case",
+    )
+    try:
+        invocation_root.chmod(0o700)
+        for child in (
+            invocation.temporary,
+            invocation.npm_cache,
+            invocation.pnpm_home,
+            invocation.work,
+            invocation.filesystem_case,
+        ):
+            child.mkdir(mode=0o700)
+        _validate_node_profile_invocation(root, invocation)
+    except Exception as error:
+        setup_error = f"setup failed ({type(error).__name__})"
+    else:
+        setup_error = None
+    if setup_error is not None:
+        cleanup_error = _cleanup_node_profile_invocation(invocation)
+        safe_contract_id = contract_id
+        child = None
+        error = None
+        invocation = None
+        invocation_root = None
+        owned = None
+        root = None
+        contract_id = ""
+        if cleanup_error is not None:
+            _raise_node_profile_cleanup(safe_contract_id, cleanup_error)
+        _raise_node_profile_qualification(setup_error, safe_contract_id)
+    try:
+        yield invocation
+    finally:
+        cleanup_error = _cleanup_node_profile_invocation(invocation)
+        safe_contract_id = contract_id
+        child = None
+        invocation = None
+        invocation_root = None
+        owned = None
+        root = None
+        contract_id = ""
+        if cleanup_error is not None:
+            _raise_node_profile_cleanup(safe_contract_id, cleanup_error)
+
+
+def _observe_node_profile_runtime_binding(
+    root: Path, role: str
+) -> NodeProfileRuntimeBinding:
+    """Observe one runtime; its public wrapper removes unsafe failure frames."""
+    contract = NODE_PROFILE_RUNTIME_CONTRACTS.get(role)
+    if contract is None:
+        fail("unknown Node-profile runtime role")
+    environment_name, expected_identity, expected_sha256 = contract
+    raw = os.environ.get(environment_name)
+    if not raw:
+        fail(f"Node-profile prerequisite is unavailable: set {environment_name}")
+    executable = Path(raw)
+    if (
+        not executable.is_absolute()
+        or executable.is_symlink()
+        or not executable.is_file()
+        or not os.access(executable, os.X_OK)
+    ):
+        fail(f"{environment_name} must name an absolute direct regular executable")
+    try:
+        resolved = executable.resolve(strict=True)
+        repository = root.resolve(strict=True)
+        before = executable.lstat()
+    except OSError as error:
+        fail(f"Node-profile {role} prerequisite identity could not be read: {type(error).__name__}")
+    if resolved != executable:
+        fail(f"{environment_name} must contain no symlinked path component")
+    if resolved == repository or repository in resolved.parents:
+        fail(f"{environment_name} must be outside the repository checkout")
+    identity = (
+        before.st_dev, before.st_ino, before.st_mode, before.st_uid,
+        before.st_gid, before.st_size, before.st_mtime_ns,
+    )
+    try:
+        with resolved.open("rb") as stream:
+            digest = hashlib.file_digest(stream, "sha256").hexdigest()
+    except OSError as error:
+        fail(f"Node-profile {role} prerequisite content could not be read: {type(error).__name__}")
+    if digest != expected_sha256:
+        fail(f"Node-profile {role} executable digest mismatch")
+    identity_environment = {"NO_COLOR": "1"}
+    identity_expression = (
+        "JSON.stringify({identity:process.version+'|'+process.platform+'/'+process.arch+'|'"
+        "+process.versions.v8+'|'+process.versions.uv,execArgv:process.execArgv.slice(0,-2),"
+        "nodeOptions:Object.hasOwn(process.env,'NODE_OPTIONS')})"
+    )
+    try:
+        completed = _run_javascript_process(
+            [os.fspath(resolved), "-p", identity_expression],
+            cwd=None,
+            timeout=10,
+            environment=identity_environment,
+        )
+    except (OSError, subprocess.TimeoutExpired) as error:
+        fail(f"Node-profile {role} prerequisite could not be executed: {type(error).__name__}")
+    try:
+        after = executable.lstat()
+        after_resolved = executable.resolve(strict=True)
+        with resolved.open("rb") as stream:
+            after_digest = hashlib.file_digest(stream, "sha256").hexdigest()
+    except OSError as error:
+        fail(f"Node-profile {role} prerequisite changed during validation: {type(error).__name__}")
+    after_identity = (
+        after.st_dev, after.st_ino, after.st_mode, after.st_uid,
+        after.st_gid, after.st_size, after.st_mtime_ns,
+    )
+    try:
+        public_probe = json.loads(completed.stdout)
+    except (TypeError, ValueError, json.JSONDecodeError):
+        public_probe = None
+    public_identity = public_probe.get("identity") if isinstance(public_probe, dict) else None
+    if (
+        after_identity != identity
+        or after_resolved != resolved
+        or after_digest != digest
+        or completed.returncode != 0
+        or completed.stderr != ""
+        or public_identity != expected_identity
+        or not isinstance(public_probe, dict)
+        or public_probe.get("execArgv") != []
+        or public_probe.get("nodeOptions") is not False
+        or identity_environment != {"NO_COLOR": "1"}
+        or os.environ.get(environment_name) != raw
+    ):
+        fail(f"Node-profile {role} prerequisite changed or has the wrong identity")
+    return NodeProfileRuntimeBinding(role, resolved, identity, digest, expected_identity)
+
+
+def _node_profile_runtime_binding(root: Path, role: str) -> NodeProfileRuntimeBinding:
+    """Resolve one exact runtime and expose only a bounded failure frame."""
+    if role not in NODE_PROFILE_RUNTIME_CONTRACTS:
+        root = None
+        role = ""
+        _raise_node_profile_qualification("runtime role is unknown", "runtime-binding")
+    try:
+        return _observe_node_profile_runtime_binding(root, role)
+    except ToolError as error:
+        safe_kind = str(error)
+        root = None
+        role = ""
+        error = None
+        _raise_node_profile_qualification(safe_kind, "runtime-binding")
+
+
+def validate_node_profile_runtimes(root: Path) -> tuple[str, str]:
+    """Validate both exact maintained Node-profile runtime roles."""
+    try:
+        bindings = tuple(
+            _node_profile_runtime_binding(root, role) for role in ("primary", "secondary")
+        )
+    except ToolError as error:
+        safe_kind = str(error)
+        root = None
+        error = None
+        _raise_node_profile_qualification(safe_kind, "runtime-roles")
+    if bindings[0].path == bindings[1].path or bindings[0].executable_sha256 == bindings[1].executable_sha256:
+        bindings = ()
+        root = None
+        _raise_node_profile_qualification(
+            "primary and secondary runtime roles must remain distinct", "runtime-roles"
+        )
+    return tuple(binding.public_identity for binding in bindings)
+
+
+def invoke_node_profile_runtime(
+    root: Path,
+    role: str,
+    arguments: Sequence[str],
+    *,
+    invocation: NodeProfileInvocation,
+    output_contract_id: str,
+    expected_result: object,
+    expected_return_code: int = 0,
+    stdout_policy: str = "json-exact",
+    stderr_policy: str = "empty",
+    timeout: int = 20,
+) -> NodeProfileObservation:
+    """Execute one exact runtime and return only a closed redacted observation."""
+    contract = NODE_PROFILE_OUTPUT_CONTRACTS.get(output_contract_id)
+    early_error = None
+    if contract is None:
+        early_error = "output contract is unknown"
+    supplied_contract = (
+        expected_return_code, stdout_policy, stderr_policy, expected_result
+    )
+    if early_error is None and supplied_contract != contract:
+        early_error = "invocation disagrees with its closed output contract"
+    if early_error is None and invocation.contract_id != output_contract_id:
+        early_error = "invocation disagrees with its scratch contract"
+    if early_error is not None:
+        safe_error_kind = early_error
+        safe_contract_id = (
+            output_contract_id if output_contract_id in NODE_PROFILE_OUTPUT_CONTRACTS
+            else "unknown-contract"
+        )
+        root = None
+        role = ""
+        arguments = ()
+        invocation = None
+        output_contract_id = ""
+        expected_result = None
+        contract = None
+        supplied_contract = None
+        _raise_node_profile_qualification(safe_error_kind, safe_contract_id)
+    before = None
+    try:
+        _validate_node_profile_invocation(root, invocation)
+    except ToolError as error:
+        error_kind = str(error)
+        before = None
+        result = None
+    else:
+        try:
+            before = _node_profile_runtime_binding(root, role)
+        except ToolError as error:
+            error_kind = "runtime preflight contract failed"
+            result = None
+        else:
+            result, error_kind = _execute_node_profile_contract(
+                before.path,
+                arguments,
+                cwd=invocation.work,
+                environment=invocation.environment,
+                timeout=timeout,
+                expected_return_code=expected_return_code,
+                stdout_policy=stdout_policy,
+                stderr_policy=stderr_policy,
+                expected_result=expected_result,
+            )
+    postflight_error = None
+    if before is not None:
+        try:
+            _validate_node_profile_invocation(root, invocation)
+        except ToolError:
+            postflight_error = "scratch postflight contract failed"
+    # Drop caller-supplied and captured-data-adjacent references before any
+    # bounded error is raised. Traceback-local rendering must remain safe.
+    arguments = ()
+    expected_result = None
+    after = None
+    if before is not None:
+        try:
+            after = _node_profile_runtime_binding(root, role)
+        except ToolError:
+            error_kind = "runtime postflight contract failed"
+        if after is not None and after != before:
+            error_kind = "runtime binding changed across invocation"
+    if postflight_error is not None:
+        error_kind = postflight_error
+    if error_kind is not None:
+        safe_error_kind = error_kind
+        safe_contract_id = output_contract_id
+        root = None
+        role = ""
+        arguments = ()
+        invocation = None
+        output_contract_id = ""
+        expected_result = None
+        contract = None
+        supplied_contract = None
+        before = None
+        after = None
+        result = None
+        error = None
+        _raise_node_profile_qualification(safe_error_kind, safe_contract_id)
+    return NodeProfileObservation(
+        role, output_contract_id, result, before.public_identity, before.executable_sha256
+    )
+
+
+def _exact_json_matches(actual: object, expected: object) -> bool:
+    """Compare one closed JSON value without raising through raw values."""
+    if type(actual) is not type(expected):
+        return False
+    if isinstance(expected, dict):
+        return set(actual) == set(expected) and all(
+            _exact_json_matches(actual[key], value) for key, value in expected.items()
+        )
+    if isinstance(expected, list):
+        return len(actual) == len(expected) and all(
+            _exact_json_matches(item, value) for item, value in zip(actual, expected)
+        )
+    return actual == expected
+
+
+def _execute_node_profile_contract(
+    executable: Path,
+    arguments: Sequence[str],
+    *,
+    cwd: Path,
+    environment: dict[str, str],
+    timeout: int,
+    expected_return_code: int,
+    stdout_policy: str,
+    stderr_policy: str,
+    expected_result: object,
+) -> tuple[object, str | None]:
+    """Capture and consume raw process data without propagating its frames."""
+    try:
+        completed = _run_javascript_process(
+            [os.fspath(executable), *arguments],
+            cwd=cwd,
+            timeout=timeout,
+            environment=environment,
+        )
+    except (OSError, subprocess.TimeoutExpired) as error:
+        return None, f"invocation failed ({type(error).__name__})"
+    if completed.returncode != expected_return_code:
+        return None, "status contract failed"
+    if stderr_policy not in {"empty", "discard"}:
+        return None, "stderr policy is invalid"
+    if stderr_policy == "empty" and completed.stderr != "":
+        return None, "stderr contract failed"
+    if stdout_policy == "empty":
+        if completed.stdout != "" or expected_result is not None:
+            return None, "output contract failed"
+        return None, None
+    if stdout_policy != "json-exact":
+        return None, "stdout policy is invalid"
+    try:
+        actual = json.loads(completed.stdout, object_pairs_hook=_unique_object)
+    except (ToolError, TypeError, ValueError, json.JSONDecodeError):
+        return None, "output contract failed"
+    if not _exact_json_matches(actual, expected_result):
+        return None, "output contract failed"
+    return actual, None
+
+
+def validate_javascript_engine(root: Path) -> str:
+    """Require the exact external engine used for bounded observations."""
+    return _javascript_engine_binding(root).public_identity
+
+
+def _run_javascript_process(
+    arguments: Sequence[str],
+    *,
+    cwd: Path | None,
+    timeout: int,
+    environment: dict[str, str],
+) -> subprocess.CompletedProcess[str]:
+    """Own the sole JavaScript qualification process-spawn site."""
+    return subprocess.run(
+        list(arguments),
+        check=False,
+        cwd=cwd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        timeout=timeout,
+        env=environment,
+    )
+
+
+def _javascript_error(kind: str, output_contract_id: str) -> NoReturn:
+    raise JavascriptQualificationError(
+        f"JavaScript qualification {kind}: output contract {output_contract_id}"
+    )
+
+
+def _require_exact_json(
+    actual: object,
+    expected: object,
+    context: str,
+    output_contract_id: str,
+) -> None:
+    if type(actual) is not type(expected):
+        _javascript_error(f"result type mismatch at {context}", output_contract_id)
+    if isinstance(expected, dict):
+        if set(actual) != set(expected):
+            _javascript_error(f"result fields mismatch at {context}", output_contract_id)
+        for key, value in expected.items():
+            _require_exact_json(
+                actual[key], value, f"{context}.{key}", output_contract_id
+            )
+        return
+    if isinstance(expected, list):
+        if len(actual) != len(expected):
+            _javascript_error(f"result length mismatch at {context}", output_contract_id)
+        for index, value in enumerate(expected):
+            _require_exact_json(
+                actual[index], value, f"{context}[{index}]", output_contract_id
+            )
+        return
+    if actual != expected:
+        _javascript_error(f"result value mismatch at {context}", output_contract_id)
+
+
+def _validate_javascript_output(
+    output_contract_id: str,
+    return_code: int,
+    stdout: str,
+    stderr: str,
+) -> object:
+    """Validate captured streams locally and return only a closed result."""
+    contract = JAVASCRIPT_OUTPUT_CONTRACTS.get(output_contract_id)
+    if contract is None:
+        _javascript_error("selected an unknown contract", output_contract_id)
+    if return_code != contract.expected_return_code:
+        _javascript_error("returned an unexpected status", output_contract_id)
+    if contract.stderr_policy == "empty" and stderr != "":
+        _javascript_error("returned unexpected stderr", output_contract_id)
+    if contract.stdout_policy == "empty":
+        if stdout != "":
+            _javascript_error("returned unexpected stdout", output_contract_id)
+        return None
+    if contract.stdout_policy != "json-exact":
+        _javascript_error("selected an invalid stdout policy", output_contract_id)
+    try:
+        result = json.loads(stdout, object_pairs_hook=_unique_object)
+    except (TypeError, ValueError, json.JSONDecodeError):
+        _javascript_error("returned invalid structured output", output_contract_id)
+    _require_exact_json(result, contract.expected_result, "result", output_contract_id)
+    return result
+
+
+def _javascript_engine_binding(root: Path) -> JavascriptEngineBinding:
+    """Resolve and validate one direct engine path without returning a loose path."""
+    raw = os.environ.get("APG_JAVASCRIPT_NODE")
+    if not raw:
+        fail(
+            "JavaScript test prerequisite is unavailable: set APG_JAVASCRIPT_NODE "
+            "to the absolute regular Node v22.22.2 executable outside the repository"
+        )
+    executable = Path(raw)
+    if (
+        not executable.is_absolute()
+        or executable.is_symlink()
+        or not executable.is_file()
+        or not os.access(executable, os.X_OK)
+    ):
+        fail(
+            "APG_JAVASCRIPT_NODE must name an absolute regular executable "
+            "Node v22.22.2 outside the repository checkout"
+        )
+    try:
+        resolved_executable = executable.resolve(strict=True)
+        resolved_root = root.resolve(strict=True)
+    except OSError as error:
+        fail(f"JavaScript engine prerequisite path could not be resolved: {error}")
+    if resolved_executable == resolved_root or resolved_root in resolved_executable.parents:
+        fail("APG_JAVASCRIPT_NODE must be installed outside the repository checkout")
+    if resolved_executable != executable:
+        fail(
+            "APG_JAVASCRIPT_NODE must name a direct resolved executable path "
+            "without symlinked path components"
+        )
+    if EXPECTED_JAVASCRIPT_ENGINE_ROOT not in resolved_executable.parents:
+        fail("APG_JAVASCRIPT_NODE must name the approved immutable Nix-store engine")
+    try:
+        before = resolved_executable.lstat()
+    except OSError as error:
+        fail(f"JavaScript engine prerequisite identity could not be read: {error}")
+    before_identity: tuple[int, int, int, int, int, int, int] = (
+        before.st_dev,
+        before.st_ino,
+        before.st_mode,
+        before.st_uid,
+        before.st_gid,
+        before.st_size,
+        before.st_mtime_ns,
+    )
+    if before.st_uid != EXPECTED_JAVASCRIPT_ENGINE_UID:
+        fail("APG_JAVASCRIPT_NODE must be owned by root")
+    try:
+        with resolved_executable.open("rb") as stream:
+            executable_sha256 = hashlib.file_digest(stream, "sha256").hexdigest()
+    except OSError as error:
+        fail(f"JavaScript engine prerequisite content could not be read: {error}")
+    if executable_sha256 != EXPECTED_JAVASCRIPT_ENGINE_SHA256:
+        fail("JavaScript engine executable digest mismatch")
+    try:
+        completed = _run_javascript_process(
+            [
+                str(resolved_executable),
+                "-p",
+                "process.version+'|'+process.platform+'/'+process.arch+'|'+process.versions.v8",
+            ],
+            cwd=None,
+            timeout=10,
+            environment={**os.environ, "NO_COLOR": "1"},
+        )
+    except (OSError, subprocess.TimeoutExpired) as error:
+        fail(f"JavaScript engine prerequisite could not be executed: {error}")
+    try:
+        after = resolved_executable.lstat()
+        after_identity = (
+            after.st_dev,
+            after.st_ino,
+            after.st_mode,
+            after.st_uid,
+            after.st_gid,
+            after.st_size,
+            after.st_mtime_ns,
+        )
+        after_resolved = resolved_executable.resolve(strict=True)
+    except OSError as error:
+        fail(f"JavaScript engine prerequisite changed during validation: {error}")
+    if after_identity != before_identity or after_resolved != resolved_executable:
+        fail("JavaScript engine prerequisite changed during validation")
+    try:
+        with resolved_executable.open("rb") as stream:
+            after_sha256 = hashlib.file_digest(stream, "sha256").hexdigest()
+    except OSError as error:
+        fail(f"JavaScript engine prerequisite changed during validation: {error}")
+    if after_sha256 != EXPECTED_JAVASCRIPT_ENGINE_SHA256:
+        fail("JavaScript engine prerequisite changed during validation")
+    identity = completed.stdout.strip()
+    if (
+        completed.returncode != 0
+        or completed.stderr != ""
+        or identity != EXPECTED_JAVASCRIPT_ENGINE
+    ):
+        fail(
+            "JavaScript engine identity mismatch; expected "
+            f"{EXPECTED_JAVASCRIPT_ENGINE}"
+        )
+    if os.environ.get("APG_JAVASCRIPT_NODE") != raw:
+        fail("JavaScript engine environment binding changed during validation")
+    return JavascriptEngineBinding(
+        path=resolved_executable,
+        file_identity=before_identity,
+        executable_sha256=executable_sha256,
+        public_identity=identity,
+    )
+
+
+def invoke_javascript_engine(
+    root: Path,
+    arguments: Sequence[str],
+    *,
+    cwd: Path,
+    timeout: int = 20,
+    environment: dict[str, str] | None = None,
+    output_contract_id: str,
+) -> JavascriptObservation:
+    """Run one semantic or syntax subprocess through one pre/post exact binding."""
+    before = _javascript_engine_binding(root)
+    if os.environ.get("APG_JAVASCRIPT_NODE") != os.fspath(before.path):
+        fail("JavaScript engine path changed before invocation")
+    try:
+        completed = _run_javascript_process(
+            [os.fspath(before.path), *arguments],
+            cwd=cwd,
+            timeout=timeout,
+            environment=(
+                environment if environment is not None else {**os.environ, "NO_COLOR": "1"}
+            ),
+        )
+    except (OSError, subprocess.TimeoutExpired) as error:
+        _javascript_error(
+            f"subprocess could not be executed ({type(error).__name__})",
+            output_contract_id,
+        )
+    if os.environ.get("APG_JAVASCRIPT_NODE") != os.fspath(before.path):
+        fail("JavaScript engine path changed after invocation")
+    after = _javascript_engine_binding(root)
+    if after != before:
+        fail("JavaScript engine binding changed across invocation")
+    result = _validate_javascript_output(
+        output_contract_id,
+        completed.returncode,
+        completed.stdout,
+        completed.stderr,
+    )
+    return JavascriptObservation(
+        return_code=completed.returncode,
+        output_contract_id=output_contract_id,
+        result=result,
+        stdout_empty=completed.stdout == "",
+        stderr_empty=completed.stderr == "",
+        engine_public_identity=before.public_identity,
+        engine_sha256=before.executable_sha256,
+    )
 
 
 def record_worker_coverage_sentinel() -> None:
@@ -547,6 +1674,7 @@ def _pytest_command(
         "-p",
         "src.test.apg_pytest_plugin",
         "--cov=libexec",
+        "--cov=src/agentic_praxis_grimoire",
         "--cov-branch",
         f"--cov-config={root / '.coveragerc'}",
         f"--cov-report=json:{json_file}",
@@ -592,11 +1720,27 @@ def _run_pytest(
         sorted(path.name for path in (root / "bin").iterdir() if path.is_file())
     )
     environment["APG_TEST_REQUIRED_MODULE_BASENAMES"] = json.dumps(
-        sorted({path.name for path in (root / "libexec").rglob("*.py")})
+        sorted(
+            {
+                path.name
+                for source_root in (
+                    root / "libexec",
+                    root / "src/agentic_praxis_grimoire",
+                )
+                for path in source_root.rglob("*.py")
+            }
+        )
     )
     environment["APG_TEST_CANONICAL_LIBEXEC"] = str((root / "libexec").resolve())
+    environment["APG_TEST_CANONICAL_PACKAGE"] = str(
+        (root / "src/agentic_praxis_grimoire").resolve()
+    )
     bootstrap = str(root / "src/test/apg_coverage_bootstrap")
-    environment["PYTHONPATH"] = bootstrap + os.pathsep + environment.get("PYTHONPATH", "")
+    package_root = str(root / "src")
+    inherited_pythonpath = environment.get("PYTHONPATH", "")
+    environment["PYTHONPATH"] = os.pathsep.join(
+        part for part in (bootstrap, package_root, inherited_pythonpath) if part
+    )
     if failure_mode:
         environment["APG_TEST_FAILURE_MODE"] = failure_mode
     else:
@@ -691,6 +1835,12 @@ def run(
     inventory = load_inventory(root)
     validate_inventory(root, inventory)
     dependency_versions()
+    if requires_typescript_compiler(inventory):
+        validate_typescript_compiler(root)
+    if requires_javascript_engine(inventory):
+        validate_javascript_engine(root)
+    if requires_node_profile_runtimes(inventory):
+        validate_node_profile_runtimes(root)
     artifact_ownership = _artifact_directory(root)
     artifacts = artifact_ownership.path
     completed = False

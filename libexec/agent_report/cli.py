@@ -8,6 +8,7 @@ import os
 from pathlib import Path
 import signal
 import sys
+from functools import partial
 from typing import Callable, Sequence
 
 from .diff import collect_diff_report
@@ -37,26 +38,29 @@ from .show import collect_show_report, validate_commit_input
 
 SHOW_USAGE = """Usage: git-show-report <ticket-id> <commit-hash> <status-doc-path-from-repo-root> <result> <final-gate>
 
-Append one complete version-2 Git commit report to:
-  ~/Documents/agent/<repo-name>/<ticket-id>.report.txt
+Append one complete version-2 Git commit report to the current APGR phase outbox:
+  ~/Documents/agent/outbox/<repo-name>/<ticket-id>/<ticket-id>.git.show.report.txt
 
 Environment:
-  GIT_SHOW_REPORT_ROOT  Override the report root directory.
+  APGR_OUTBOX_ROOT      Override the canonical outbox root directory.
+  GIT_SHOW_REPORT_ROOT  Retain the legacy omnibus destination and append semantics.
 """
 
 DIFF_USAGE = """Usage: git-diff-report <phase-id> <result> <final-gate> [--status-doc <repository-relative-path>]
 
-Append one complete version-1 uncommitted Git snapshot report to:
-  ~/Documents/agent/<repo-name>/<phase-id>.report.txt
+Append one complete version-1 uncommitted Git snapshot report to the current APGR phase outbox:
+  ~/Documents/agent/outbox/<repo-name>/<phase-id>/<phase-id>.git.diff.report.txt
 
 Environment:
-  GIT_SHOW_REPORT_ROOT  Override the report root directory.
+  APGR_OUTBOX_ROOT      Override the canonical outbox root directory.
+  GIT_SHOW_REPORT_ROOT  Retain the legacy omnibus destination and append semantics.
 """
 
 OPERATIONAL_USAGE = """Usage: append-operational-report <ticket-id> <operational-report-path> <result> <final-gate> [options]
 
-Append one complete operational-report record to:
-  ~/Documents/agent/<repo-name>/<ticket-id>.report.txt
+Append one complete operational-report record to the current APGR phase outbox:
+  ~/Documents/agent/outbox/<repo-name>/<ticket-id>/<ticket-id>.ops.report.txt
+  (or inside the current Git show/diff primary when one exists)
 
 Options:
   --related-commit <commit>
@@ -64,7 +68,8 @@ Options:
   -h, --help
 
 Environment:
-  GIT_SHOW_REPORT_ROOT  Override the report root directory.
+  APGR_OUTBOX_ROOT      Override the canonical outbox root directory.
+  GIT_SHOW_REPORT_ROOT  Retain the legacy omnibus destination and append semantics.
 """
 
 
@@ -82,34 +87,71 @@ class _UsageAlreadyRendered(Exception):
     """Signal exit 2 after a compatibility usage block was already written."""
 
 
-def git_show_main(arguments: Sequence[str] | None = None) -> int:
+def _destination(git_root: Path, phase: str, outbox_root: Path | None) -> Destination:
+    """Construct a destination without changing the legacy call shape by default."""
+
+    if outbox_root is None:
+        return Destination(git_root, phase)
+    return Destination(git_root, phase, outbox_root=outbox_root)
+
+
+def git_show_main(
+    arguments: Sequence[str] | None = None,
+    *,
+    outbox_root: Path | None = None,
+) -> int:
     """Run the compatible Git-show CLI."""
 
     values = sys.argv[1:] if arguments is None else arguments
-    return _run("git-show-report", _git_show, list(values))
+    return _run(
+        "git-show-report",
+        partial(_git_show, outbox_root=outbox_root),
+        list(values),
+    )
 
 
-def git_diff_main(arguments: Sequence[str] | None = None) -> int:
+def git_diff_main(
+    arguments: Sequence[str] | None = None,
+    *,
+    outbox_root: Path | None = None,
+) -> int:
     """Run the uncommitted Git-diff CLI."""
 
     values = sys.argv[1:] if arguments is None else arguments
-    return _run("git-diff-report", _git_diff, list(values))
+    return _run(
+        "git-diff-report",
+        partial(_git_diff, outbox_root=outbox_root),
+        list(values),
+    )
 
 
-def append_operational_main(arguments: Sequence[str] | None = None) -> int:
+def append_operational_main(
+    arguments: Sequence[str] | None = None,
+    *,
+    outbox_root: Path | None = None,
+) -> int:
     """Run the operational append CLI."""
 
     values = sys.argv[1:] if arguments is None else arguments
     return _run(
         "append-operational-report",
-        _append_operational,
+        partial(_append_operational, outbox_root=outbox_root),
         list(values),
     )
 
 
 def _run(command_name: str, command: Callable[[list[str]], int], arguments: list[str]) -> int:
-    os.umask(0o077)
-    os.environ.update({"LC_ALL": "C", "LANG": "C", "GIT_PAGER": "cat", "PAGER": "cat"})
+    previous_umask = os.umask(0o077)
+    deterministic_environment = {
+        "LC_ALL": "C",
+        "LANG": "C",
+        "GIT_PAGER": "cat",
+        "PAGER": "cat",
+    }
+    previous_environment = {
+        name: os.environ.get(name) for name in deterministic_environment
+    }
+    os.environ.update(deterministic_environment)
     handled_signals = [signal.SIGTERM]
     if os.name != "nt" and hasattr(signal, "SIGHUP"):
         handled_signals.append(signal.SIGHUP)
@@ -142,9 +184,15 @@ def _run(command_name: str, command: Callable[[list[str]], int], arguments: list
     finally:
         for value, handler in previous.items():
             signal.signal(value, handler)
+        for name, prior in previous_environment.items():
+            if prior is None:
+                os.environ.pop(name, None)
+            else:
+                os.environ[name] = prior
+        os.umask(previous_umask)
 
 
-def _git_show(arguments: list[str]) -> int:
+def _git_show(arguments: list[str], *, outbox_root: Path | None = None) -> int:
     if arguments and arguments[0] in {"-h", "--help"}:
         sys.stdout.write(SHOW_USAGE)
         return 0
@@ -169,13 +217,13 @@ def _git_show(arguments: list[str]) -> int:
             result=result,
             final_gate=final_gate,
         )
-        destination = Destination(git.root, phase)
+        destination = _destination(git.root, phase, outbox_root)
         destination.append(build_record(show.record))
     print(f"git-show-report: appended {show.commit} to {destination.path}")
     return 0
 
 
-def _git_diff(arguments: list[str]) -> int:
+def _git_diff(arguments: list[str], *, outbox_root: Path | None = None) -> int:
     if arguments and arguments[0] in {"-h", "--help"}:
         sys.stdout.write(DIFF_USAGE)
         return 0
@@ -202,13 +250,15 @@ def _git_diff(arguments: list[str]) -> int:
             final_gate=final_gate,
             status_doc=status_doc,
         )
-        destination = Destination(git.root, phase)
+        destination = _destination(git.root, phase, outbox_root)
         destination.append(build_record(diff.record))
     print(f"git-diff-report: appended {diff.record.record_id} to {destination.path}")
     return 0
 
 
-def _append_operational(arguments: list[str]) -> int:
+def _append_operational(
+    arguments: list[str], *, outbox_root: Path | None = None
+) -> int:
     if arguments and arguments[0] in {"-h", "--help"}:
         sys.stdout.write(OPERATIONAL_USAGE)
         return 0
@@ -223,7 +273,7 @@ def _append_operational(arguments: list[str]) -> int:
     if related_commit != "NONE" and related_id != f"GIT-SHOW-REPORT-{related_commit}":
         raise UsageError("related commit and Git report id conflict")
 
-    destination = Destination(git.root, parsed.phase)
+    destination = _destination(git.root, parsed.phase, outbox_root)
     source_path = Path(parsed.source_value)
     metadata = validate_source_path(
         source_path,

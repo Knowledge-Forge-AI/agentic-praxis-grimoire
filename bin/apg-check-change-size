@@ -1,0 +1,30 @@
+#!/usr/bin/env python3
+"""Run the APG Git-object change-size policy checker."""
+
+from pathlib import Path
+import sys
+
+
+command = Path(__file__).resolve(strict=True)
+root = command.parent.parent
+source = root / "src"
+adapter = source / "agentic_praxis_grimoire" / "cli.py"
+helper_directory = root / "libexec"
+if (
+    command.parent.name != "bin"
+    or not helper_directory.is_dir()
+    or not source.is_dir()
+    or source.is_symlink()
+    or not adapter.is_file()
+    or adapter.is_symlink()
+):
+    raise SystemExit(
+        "apg-check-change-size: installed APG command layout is invalid; "
+        "expected ../libexec"
+    )
+
+sys.path.insert(0, str(source))
+from agentic_praxis_grimoire.cli import compatibility_main  # noqa: E402
+
+
+raise SystemExit(compatibility_main("apg-check-change-size", root))

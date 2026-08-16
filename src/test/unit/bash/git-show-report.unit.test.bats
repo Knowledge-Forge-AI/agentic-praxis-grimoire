@@ -207,7 +207,7 @@ extract_payload() {
   report_dir="$report_root/example-repo"
   report_file="$report_dir/APPEND.report.txt"
   mkdir -p "$report_dir"
-  chmod 700 "$report_dir"
+  chmod 700 "$report_root" "$report_dir"
   printf 'PHASE: LEGACY-V1' > "$report_file"
   chmod 600 "$report_file"
 
@@ -235,7 +235,7 @@ extract_payload() {
   commit_hash="$(init_report_repo "$work_repo")"
   report_dir="$report_root/example-repo"
   mkdir -p "$report_dir"
-  chmod 700 "$report_dir"
+  chmod 700 "$report_root" "$report_dir"
   target="$report_dir/UNSAFE.report.txt"
   printf '%s\n' unsafe > "$target"
   chmod 660 "$target"
@@ -364,7 +364,7 @@ sha256_file_for_test() {
   report_dir="$report_root/failure-repo"
   report_file="$report_dir/FAILURE.report.txt"
   mkdir -p "$report_dir"
-  chmod 700 "$report_dir"
+  chmod 700 "$report_root" "$report_dir"
   printf '%s\n' "existing evidence" > "$report_file"
   chmod 600 "$report_file"
   cp "$report_file" "$BATS_TEST_TMPDIR/before"
@@ -426,7 +426,7 @@ sha256_file_for_test() {
   lock_dir="$report_dir/RELEASED.report.txt.lock"
   output_file="$BATS_TEST_TMPDIR/released-lock.out"
   mkdir -p "$lock_dir"
-  chmod 700 "$report_dir" "$lock_dir"
+  chmod 700 "$report_root" "$report_dir" "$lock_dir"
 
   (
     cd "$work_repo"

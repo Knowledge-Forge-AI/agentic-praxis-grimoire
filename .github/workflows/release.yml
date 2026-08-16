@@ -1,0 +1,36 @@
+{
+  "name": "Publish Python distribution",
+  "on": {
+    "release": {
+      "types": ["published"]
+    }
+  },
+  "permissions": {},
+  "jobs": {
+    "publish": {
+      "runs-on": "ubuntu-latest",
+      "environment": "pypi",
+      "permissions": {
+        "contents": "read",
+        "id-token": "write"
+      },
+      "steps": [
+        {
+          "name": "Download and verify exact GitHub Release assets",
+          "env": {
+            "GH_TOKEN": "${{ github.token }}"
+          },
+          "shell": "bash",
+          "run": "set -euo pipefail\nexpected_repository=Knowledge-Forge-AI/agentic-praxis-grimoire\nexpected_tag=v0.5.0\nwheel=agentic_praxis_grimoire-0.5.0-py3-none-any.whl\nsdist=agentic_praxis_grimoire-0.5.0.tar.gz\nchecksums=SHA256SUMS\n[[ $GITHUB_REPOSITORY == \"$expected_repository\" ]] || exit 1\n[[ $(jq -r '.release.tag_name' \"$GITHUB_EVENT_PATH\") == \"$expected_tag\" ]] || exit 1\n[[ $(jq -r '.release.draft' \"$GITHUB_EVENT_PATH\") == false ]] || exit 1\n[[ $(jq -r '.release.prerelease' \"$GITHUB_EVENT_PATH\") == false ]] || exit 1\nnames=()\nwhile IFS= read -r name; do names+=(\"$name\"); done < <(jq -r '.release.assets[].name' \"$GITHUB_EVENT_PATH\" | LC_ALL=C sort)\nexpected=(\"$checksums\" \"$wheel\" \"$sdist\")\n[[ ${#names[@]} -eq 3 ]] || exit 1\n[[ \"${names[*]}\" == \"${expected[*]}\" ]] || exit 1\nmkdir -m 700 checksums verified-dist\nfor name in \"${expected[@]}\"; do\n  asset_id=$(jq -er --arg name \"$name\" '.release.assets[] | select(.name == $name) | .id' \"$GITHUB_EVENT_PATH\") || exit 1\n  if [[ $name == \"$checksums\" ]]; then\n    target=checksums/$name\n  else\n    target=verified-dist/$name\n  fi\n  gh api -H 'Accept: application/octet-stream' \"/repos/$GITHUB_REPOSITORY/releases/assets/$asset_id\" > \"$target\"\n  chmod 600 \"$target\"\ndone\n[[ $(wc -l < checksums/SHA256SUMS) -eq 2 ]] || exit 1\ngrep -Eq \"^[0-9a-f]{64}  $wheel$\" checksums/SHA256SUMS || exit 1\ngrep -Eq \"^[0-9a-f]{64}  $sdist$\" checksums/SHA256SUMS || exit 1\n(\n  cd verified-dist\n  sha256sum --check --strict ../checksums/SHA256SUMS\n)\ndistributions=()\nwhile IFS= read -r path; do distributions+=(\"$path\"); done < <(find verified-dist -maxdepth 1 -type f -print | LC_ALL=C sort)\n[[ ${#distributions[@]} -eq 2 ]] || exit 1\n[[ ${distributions[0]} == \"verified-dist/$wheel\" ]] || exit 1\n[[ ${distributions[1]} == \"verified-dist/$sdist\" ]] || exit 1\n"
+        },
+        {
+          "name": "Publish verified distributions to PyPI",
+          "uses": "pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33",
+          "with": {
+            "packages-dir": "verified-dist"
+          }
+        }
+      ]
+    }
+  }
+}

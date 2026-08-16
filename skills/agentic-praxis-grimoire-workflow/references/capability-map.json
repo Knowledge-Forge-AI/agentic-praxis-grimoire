@@ -26,6 +26,11 @@
       "trigger": "An existing Bash executable or script family needs a bounded conversion to Python that preserves or deliberately migrates its observable contract."
     },
     {
+      "capability_class": "CSS language profile",
+      "name": "css-language-profile",
+      "trigger": "A material decision depends on CSS-specific static semantics, selector specificity, cascade ordering, inheritance, shorthand resets, custom-property substitution, or value consequences for an established CSS region with identified consequence-bearing evidence."
+    },
+    {
       "capability_class": "systematic debugging",
       "name": "debugging-systematically",
       "trigger": "Behavior is failing, inconsistent, flaky, unexplained, or has multiple plausible causes."
@@ -61,6 +66,16 @@
       "trigger": "An authorized behavior change benefits from executable behavioral evidence proportional to risk."
     },
     {
+      "capability_class": "JavaScript language profile",
+      "name": "javascript-language-profile",
+      "trigger": "A material decision depends on ECMAScript semantics for an established JavaScript region after parse goal, host context, language context, goal evidence, whole-file ownership, and required non-language evidence are identified."
+    },
+    {
+      "capability_class": "Markdown language profile",
+      "name": "markdown-language-profile",
+      "trigger": "A material decision depends on the repository's actual Markdown parser or selected-dialect document semantics, or on qualitative Markdown document-structure policy."
+    },
+    {
       "capability_class": "Minitest test profile",
       "name": "minitest-test-profile",
       "trigger": "Minitest-specific judgment is material to test or spec organization, assertions, lifecycle, mocks, stubs, fixture alternatives, isolation, parallelism, filtering, runners, plugins, reporters, subprocess, filesystem, or database test boundaries, or warning and crisis thresholds beyond repository policy."
@@ -74,6 +89,11 @@
       "capability_class": "Nix test profile",
       "name": "nix-test-profile",
       "trigger": "Nix test judgment is material to selecting which already-selected testing surface proves an exact claim, package phases, flake checks, Nixpkgs or NixOS test ownership, test-evidence qualification across sandbox, store, builder, or cache boundaries, or Nix-test-specific structural review."
+    },
+    {
+      "capability_class": "Node.js runtime profile",
+      "name": "nodejs-runtime-profile",
+      "trigger": "A material decision depends on Node.js-specific host behavior for an established Node execution role whose exact version, platform, flags, package scope, loader, and whole-file owner are identified."
     },
     {
       "capability_class": "repository planning",
@@ -114,6 +134,11 @@
       "capability_class": "repository guidance synthesis",
       "name": "synthesizing-repository-guidance",
       "trigger": "A dense, duplicated, mixed-scope, private, or source-derived guidance corpus needs ownership and migration dispositions before rewrite."
+    },
+    {
+      "capability_class": "TypeScript language profile",
+      "name": "typescript-language-profile",
+      "trigger": "A material decision depends on TypeScript-specific static semantics or type-erasure boundaries for an established source region, after the exact compiler role, version, options, project, source kind, and declaration environment are evidenced."
     },
     {
       "capability_class": "Vagrantfile profile",

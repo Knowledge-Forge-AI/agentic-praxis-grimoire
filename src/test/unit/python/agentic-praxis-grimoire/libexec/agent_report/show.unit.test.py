@@ -100,6 +100,21 @@ def test_complete_show_collection_renders_identity_summary_and_evidence() -> Non
     assert b"END-OF-PATCH-REACHED: true\n" in result.record.payload
 
 
+def test_show_collection_uses_normalized_project_identity() -> None:
+    git = ShowGit()
+    git.root = Path("/repo/...project.dev")
+    result = show.collect_show_report(
+        git,
+        phase="APG53",
+        commit_input=COMMIT,
+        status_doc="docs/status/exit.md",
+        result="complete",
+        final_gate="focused",
+    )
+    assert result.record.project == "project.dev"
+    assert b"REPOSITORY: project.dev\n" in result.record.payload
+
+
 def test_show_commit_resolution_and_metadata_reject_malformed_git_output() -> None:
     class BadResolve(ShowGit):
         def run(self, arguments: list[str], **kwargs: object) -> subprocess.CompletedProcess[bytes]:

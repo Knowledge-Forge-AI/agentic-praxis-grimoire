@@ -1,5 +1,11 @@
 # Public Release Process
 
+<!-- APG-CANDIDATE-STATE: css-language-profile retained-provisional -->
+
+The marker above is the mechanical current-state authority. Bounded
+contradiction diagnostics cover only their frozen vocabulary; arbitrary prose
+still requires human review.
+
 ## Purpose and boundary
 
 APG develops in a private history and publishes a separate public history. A
@@ -38,11 +44,11 @@ omission; the critical-path lists do not replace it.
 [`release/public-surface.json`](../release/public-surface.json) is the strict
 schema-version-1 current-development policy. It fixes the canonical identity,
 sole exclusion, critical owners, wrappers, helpers, licensing files,
-twenty-eight skills, twenty-eight discovery links, test entrypoints, and
-validation categories for v0.4.0. Code separately owns the immutable
-historical v0.1.0 through v0.3.0 surfaces; v0.3.0 remains nineteen skills and
-nineteen discovery links. The policy cannot execute commands or remove a
-projected path.
+thirty-three skills, thirty-three discovery links, test entrypoints, and
+validation categories for current development. Code separately owns the
+immutable historical v0.1.0 through v0.4.0 surfaces; v0.3.0 remains nineteen
+skills and nineteen discovery links, while corrected v0.4.0 remains twenty-
+eight. The policy cannot execute commands or remove a projected path.
 
 An optional publication-excluded check policy may add only sorted literal
 confidentiality patterns. It cannot weaken another check and never enters the
@@ -65,6 +71,14 @@ apg-public-release --help
 
 Exit `0` is success, exit `1` is release, repository, candidate, or policy
 noncompliance, and exit `2` is invalid usage or an unsafe build invocation.
+
+The current-development public candidate also owns
+`flatten-skill-symlinks`, `install-global-skills`, `apg-check-change-size`,
+their maintained Python helpers, mirrored tests, and
+`testing/apg-change-size-policy.json`. Exact projection makes those paths
+future v0.5 candidate content; APG53 and APG54 do not publish a v0.5 release.
+Versioned policy reconstruction excludes all APG53 and APG54 owners from the
+immutable historical v0.4 surface.
 
 `manifest` reads committed Git objects and emits deterministic schema-version-1
 text or canonical JSON. It reports one sorted projected entry per path with
@@ -320,6 +334,32 @@ link recreation, or Codex configuration change occurs. Mechanical discovery
 does not establish refreshed client invocation; that observation remains
 truthfully pending when no safe fresh client is available.
 
+APG43 is a separately recorded, one-time exception for a release-blocking
+identity defect in `NOTICE`. Its explicit leases and replacement of the named
+development and v0.4.0 objects do not alter this normal process into a reusable
+force-push policy. Future releases return to append-only publication.
+
+APG49 is development-only validation. Its terminally deferred matryer/is
+candidate adds no current release-policy path and does not change the
+corrected public or active v0.4.0 surface. No v0.5 candidate construction,
+publication, or deployment is implied.
+
+APG55 is also development-only. It hardens the already selected
+current-development `install-global-skills` transaction and its tests without
+changing the immutable historical v0.4.0 projection policy, public refs,
+active checkout, or publication authority. A later candidate includes the
+corrected resulting source through the ordinary current-development manifest.
+
+APG59 rejects the CSS candidate after corrected-state review and adds no
+current release-policy path. Historical v0.4.0 reconstruction, public refs,
+the active checkout, and publication authority remain unchanged.
+
+APG62 rejects the separately authored APG61 CSS candidate after independent
+sixty-case validation, one permitted correction, and fresh corrected-state
+review. It adds no current release-policy path or release owner. Historical
+v0.4.0 reconstruction, public refs, the active checkout, and publication
+authority remain unchanged.
+
 ## Limitations
 
 The checker does not decide semantic confidentiality, provenance sufficiency,
@@ -327,3 +367,109 @@ license interpretation, or publication fitness. Candidate tests execute trusted
 APG code without a sandbox. Advisory path and repository checks do not defend
 against a hostile same-user process. Reproducibility covers Git objects and
 declared output, not incidental `.git` filesystem layout.
+
+APG66 adds the retained Markdown leaf, projection, specification, coverage,
+public-safe fixture, focused test contract, and unit/integration entrypoints
+only to current-development release ownership. Explicit APG66 exclusion sets
+keep every one of those paths out of immutable historical v0.4 reconstruction;
+the frozen v0.4 surface digest and public/active objects remain unchanged.
+
+APG75 similarly adds the retained TypeScript leaf, projection, specifications,
+TypeScript 7 fixture, support contracts, and maintained unit/integration tests
+only to current-development ownership. `APG75_V05_*` exclusion sets keep every
+APG75 owner out of historical corrected v0.4 reconstruction. This is current
+development integration, not readiness, publication, or active deployment.
+
+APG75A modifies existing APG75-excluded TypeScript owners and adds only bounded
+current-development evaluation, exit, runner-prerequisite, and runner-test
+owners. Exact APG75A exclusions keep those new paths out of historical
+corrected v0.4 reconstruction. The current compiler prerequisite is not needed
+to reconstruct v0.4. Published and active corrected v0.4.0 remain immutable;
+APG75A performs no readiness, publication, or deployment.
+
+APG77D adds the retained CSS leaf, projection, specification, navigation
+coverage, target-first fixture, semantic scenarios, known-debt owner, current
+support contracts, maintained tests, accepted ADR, and APG76 through APG77D
+public phase records only to current-development ownership. `APG77D_V05_*`
+exclusion sets keep every current-only CSS owner out of corrected historical
+v0.4 reconstruction. Published and active corrected v0.4.0 remain immutable;
+APG77D performs no readiness, publication, or deployment.
+
+APG79E adds the retained JavaScript leaf, projection, specifications, APG-owned
+fixture, semantic scenarios, source-role association, known-debt association,
+support contracts, maintained tests, accepted ADR, and APG78 through APG79E
+public phase records only to current-development ownership. `APG79E_V05_*`
+exclusion sets keep every current-only JavaScript owner out of corrected
+historical v0.4 reconstruction. The private Test262 source-role record and
+managed reports remain excluded by their standing boundaries. Published and
+active corrected v0.4.0 remain immutable; APG79E performs no readiness,
+publication, or deployment.
+
+APG81H adds the retained Node.js leaf, projection, specifications, APG-owned
+fixture, semantic scenarios, support contracts, maintained tests, accepted
+ADR, and APG80 through APG81H public phase records only to current-development
+ownership. `APG81H_V05_*` exclusion sets keep every current-only Node owner out
+of corrected historical v0.4 reconstruction. Published and active corrected
+v0.4.0 remain immutable; APG81H performs no readiness, publication, or
+deployment.
+
+APG82 adds `bin/apgr`, the `agentic_praxis_grimoire` package, package metadata,
+exact package-owned skill resources, APGR configuration/report/response/context
+owners, and their maintained tests only to current-development v0.5 ownership.
+`APG82_V05_*` exclusions keep every new APG82 owner out of corrected historical
+v0.4 reconstruction. `src/agentic_praxis_grimoire/VERSION` is the sole package
+version resource and setuptools reads that exact file dynamically. Local wheel
+and sdist construction in APG82 is qualification evidence only; APG84 owns any
+final exact release build and publication.
+
+APG83 proves the approved v0.5 deployment split. The public Git release is the
+versioned authority for complete skill bodies, projections, and repository
+maintenance owners. The PyPI `agentic-praxis-grimoire` distribution is the
+versioned authority for the checkout-independent `apgr` runtime and exact
+packaged skill metadata. Qualification binds every installed metadata row to
+the corresponding skill in the exact reconstructed public release; consumer
+commands do not silently depend on a development checkout. A downstream
+adapter can therefore consume the exact versioned pair reproducibly.
+
+Python release qualification builds the wheel and sdist in two disjoint clean
+roots under one controlled release environment. The exact v0.5 release epoch is
+`1700000000`: set `SOURCE_DATE_EPOCH=1700000000` for both package builds and pass
+`--epoch 1700000000` to `bin/apg-normalize-python-sdist` for each built sdist.
+The repository-maintenance wrapper deliberately has no installed-consumer
+`apgr` route. It rejects any other epoch and requires the environment value to
+match, mechanically binding the sdist normalization step to the wheel-build
+environment.
+The normalizer is part of the publication procedure, not a comparison-only
+filter: the normalized sdist is the release artifact. It accepts only
+canonical relative safe regular-file and directory members (including PAX long
+names, but excluding `./` aliases), emits ordered PAX gzip/tar bytes, clears
+input PAX headers, and fixes ownership, regular-file mode `0644`, directory mode
+`0755`, timestamps, and output-file mode `0600`. Both final wheel and normalized
+sdist must match by exact filename, contents, metadata, and SHA-256 in the same
+Python and linked-zlib release environment. APG84 still owns the publication
+build, readback, GitHub release creation, and PyPI upload.
+
+The normalizer accepts only a trusted locally built setuptools sdist and reads
+that bounded release artifact in memory. The v0.5 package manifest contains no
+executable-intended member; forcing regular members to `0644` is therefore part
+of this release contract. A future manifest that adds executable content must
+change this contract and its tests before publication.
+
+APG84 makes that qualification contract the publication path.
+`bin/apg-build-python-release-bundle` builds in two disjoint roots, invokes the
+maintained normalizer on each raw sdist, validates exact cross-format metadata,
+independently re-normalizes each selected sdist to prove its canonical bytes,
+requires byte and mode equality, writes canonical `SHA256SUMS`, and selects one
+directory containing only the final wheel, normalized sdist, and checksum
+manifest. The trusted local input is the exact reviewed release reconstruction;
+the operator binds its public Git identity and artifact metadata before upload.
+GitHub Release upload consumes only that directory.
+
+The v0.5 PyPI workflow runs only for a published GitHub Release and downloads
+the triggering release's exact three asset IDs. It rejects any tag, filename,
+asset count, or checksum mismatch before supplying only the verified wheel and
+sdist directory to PyPA Trusted Publishing. The checked-in action identity is
+PyPA `gh-action-pypi-publish` v1.14.2 at immutable commit
+`dc37677b2e1c63e2034f94d8a5b11f265b73ba33`. Release publication and immutable
+GitHub/PyPI readback remain external operational evidence rather than tracked
+self-attestation.

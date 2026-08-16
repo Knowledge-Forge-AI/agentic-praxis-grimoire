@@ -234,6 +234,21 @@ class APGUserSkillsUnitTests(APGUserSkillsCaseMixin, unittest.TestCase):
                 with user_skills.read_only_state_lock() as (state_path, lock_path):
                     self.assertTrue(state_path.exists() and lock_path.exists())
 
+    def test_mutation_refuses_separate_global_installer_owner(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            for name in (
+                ".install-global-skills-state.json",
+                ".install-global-skills.lock",
+            ):
+                owner = root / name
+                owner.mkdir()
+                with self.subTest(name=name), self.assertRaisesRegex(
+                    user_skills.ToolError, "separate install-global-skills"
+                ):
+                    user_skills.reject_global_skills_owner(root)
+                owner.rmdir()
+
     def test_atomic_state_source_match_and_container_creation(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             base = Path(temporary)

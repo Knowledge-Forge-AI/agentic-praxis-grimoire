@@ -1,0 +1,2 @@
+undeclaredAssignment = 1;
+globalThis.result = undeclaredAssignment;

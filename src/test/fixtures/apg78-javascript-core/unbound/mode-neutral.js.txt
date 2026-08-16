@@ -1,0 +1,6 @@
+// APG78-FX-012 — goal-neutral JavaScript source-text input.
+// This non-executed .txt input has no filename or package mapping to a Script
+// or Module goal. Any goal-sensitive conclusion stays unresolved.
+
+const modeNeutral = true;
+void modeNeutral;

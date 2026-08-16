@@ -15,7 +15,13 @@ from typing import Mapping
 from .git_adapter import GitAdapter
 from .models import RealGitObservation, ReportRecord, WorktreeSnapshot
 from .rendering import ensure_payload_ending, render_section
-from .safety import ReportError, header_value, injected_failure, testing_pause
+from .safety import (
+    ReportError,
+    header_value,
+    infer_project_name,
+    injected_failure,
+    testing_pause,
+)
 from .show import encode_lines, sha256, summarize_diff
 
 
@@ -101,7 +107,13 @@ def collect_diff_report(
     _ensure_supported_state_still_present(git)
     if not first.patch:
         raise ReportError("no reportable change relative to HEAD")
-    record = _render_diff_record(request, git.root.name, index_mode, pre, first)
+    record = _render_diff_record(
+        request,
+        infer_project_name(git.root),
+        index_mode,
+        pre,
+        first,
+    )
     return DiffResult(record=record, head=pre.head)
 
 

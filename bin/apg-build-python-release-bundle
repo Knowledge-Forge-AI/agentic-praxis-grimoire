@@ -1,0 +1,31 @@
+#!/usr/bin/env python3
+"""Build or validate the exact normalized v0.5 Python release bundle."""
+
+from pathlib import Path
+import sys
+
+
+command = Path(__file__).resolve(strict=True)
+root = command.parent.parent
+source = root / "src"
+adapter = source / "agentic_praxis_grimoire" / "cli.py"
+helper_directory = root / "libexec"
+helper = helper_directory / "apg_python_publication.py"
+if (
+    command.parent.name != "bin"
+    or not helper_directory.is_dir()
+    or not helper.is_file()
+    or helper.is_symlink()
+    or not source.is_dir()
+    or source.is_symlink()
+    or not adapter.is_file()
+    or adapter.is_symlink()
+):
+    print("apg-build-python-release-bundle: installed command layout is invalid", file=sys.stderr)
+    raise SystemExit(1)
+
+sys.path.insert(0, str(source))
+from agentic_praxis_grimoire.cli import compatibility_main  # noqa: E402
+
+
+raise SystemExit(compatibility_main("apg-build-python-release-bundle", root))

@@ -2,15 +2,27 @@
 """Manage user-scoped APG skill links from a verified public checkout."""
 
 from pathlib import Path
-import runpy
 import sys
 
 
 command = Path(__file__).resolve(strict=True)
 root = command.parent.parent
-helper = root / "libexec"
-if command.parent.name != "bin" or not helper.is_dir():
+source = root / "src"
+adapter = source / "agentic_praxis_grimoire" / "cli.py"
+helper_directory = root / "libexec"
+if (
+    command.parent.name != "bin"
+    or not helper_directory.is_dir()
+    or not source.is_dir()
+    or source.is_symlink()
+    or not adapter.is_file()
+    or adapter.is_symlink()
+):
     print("apg-user-skills: installed command layout is invalid", file=sys.stderr)
     raise SystemExit(1)
-sys.path.insert(0, str(helper))
-runpy.run_module("apg_user_skills", run_name="__main__")
+
+sys.path.insert(0, str(source))
+from agentic_praxis_grimoire.cli import compatibility_main  # noqa: E402
+
+
+raise SystemExit(compatibility_main("apg-user-skills", root))

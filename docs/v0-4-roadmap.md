@@ -368,6 +368,15 @@ aggregate-owned active integration by exact fast-forward. It retains 28/28/28,
 fourteen stable and fourteen provisional rows, and the grouped provisional
 limitations without procedure or maturity change.
 
+### 10. Exceptional NOTICE identity correction
+
+APG43 is a one-time maintainer-authorized correction of a release-blocking
+unrelated project identity in `NOTICE`. It amends APG42, replaces only the
+named development and public v0.4.0 refs with explicit leases, verifies the
+corrected public objects, and converges the active public-backed source. It
+does not change the v0.4.0 skill surface, maturity, routing, metadata, or
+historical v0.1.0-v0.3.0 refs. Future releases return to append-only behavior.
+
 ## Cross-cutting gates
 
 Every slice:
@@ -387,6 +396,6 @@ migration, or canonical-path move by implication.
 
 ## Next authorization boundary
 
-No phase after APG42 is authorized. Signing, announcement, GitHub Release,
+No phase after APG43 is authorized. Signing, announcement, GitHub Release,
 plugin publication, rollback, target mutation, and any successor work require
-a separate explicit maintainer instruction.
+a separate explicit maintainer instruction. v0.5 requires separate authority.

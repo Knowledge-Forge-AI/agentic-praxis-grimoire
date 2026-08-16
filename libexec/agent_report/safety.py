@@ -19,6 +19,11 @@ from .rendering import parse_canonical_records
 
 MAX_SOURCE_BYTES = 8 * 1024 * 1024
 _TICKET = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
+_PRIMARY_TYPES = {
+    "git-show-report": "git.show",
+    "git-diff-report": "git.diff",
+    "operational-report": "ops",
+}
 
 
 class UsageError(ValueError):
@@ -53,12 +58,33 @@ def validate_ticket(value: str) -> str:
     return value
 
 
+def validate_path_identifier(value: str, name: str = "path identifier") -> str:
+    """Validate a bounded identifier used as one outbox path component."""
+
+    if len(value) > 128 or value in {".", ".."} or not _TICKET.fullmatch(value):
+        raise UsageError(f"{name} is unsafe")
+    return value
+
+
 def validate_metadata(value: str, name: str = "operational metadata") -> str:
     """Reject control characters from line-oriented report fields."""
 
     if contains_control(value):
         raise UsageError(f"{name} contains a control character")
     return value
+
+
+def infer_project_name(git_root: Path) -> str:
+    """Return a safe report identity with every leading ASCII period removed."""
+
+    project = git_root.name.lstrip(".")
+    if not project:
+        raise ReportError("normalized repository name is empty")
+    if contains_control(project):
+        raise ReportError("repository name contains a control character")
+    if "/" in project or "\\" in project:
+        raise ReportError("repository name contains a path separator")
+    return project
 
 
 def source_value_is_absolute(value: str) -> bool:
@@ -290,34 +316,106 @@ RecordBuilder = Callable[[bytes, tuple[ParsedRecord, ...]], bytes]
 
 
 class Destination:
-    """Canonical private report destination with serialized atomic append."""
+    """Private report destination with legacy and single-primary outbox modes.
 
-    def __init__(self, git_root: Path, ticket: str) -> None:
+    ``GIT_SHOW_REPORT_ROOT`` intentionally selects the historical omnibus
+    layout.  Without it, each phase owns a private directory and exactly one
+    current primary artifact.  The latter mode is deliberately kept here,
+    beside the existing lock and replacement code, so the Git and operational
+    adapters cannot accidentally choose different storage semantics.
+    """
+
+    def __init__(self, git_root: Path, ticket: str, *, outbox_root: Path | None = None) -> None:
         if os.name == "nt":
             raise ReportError(
                 "Windows report replacement safety is not yet characterized; "
                 "interpreter invocation is supported only for fail-closed diagnostics"
             )
-        self.project = git_root.name
-        validate_metadata(self.project, "repository name")
+        self.project = infer_project_name(git_root)
+        self.ticket = validate_path_identifier(ticket, "phase identifier")
         configured = os.environ.get("GIT_SHOW_REPORT_ROOT")
-        self.root = Path(configured) if configured else Path.home() / "Documents" / "agent"
-        self.directory = self.root / self.project
-        self.path = self.directory / f"{ticket}.report.txt"
-        self.lock_path = self.path.with_name(self.path.name + ".lock")
-        self.ticket = ticket
-        self._token = f"{os.getpid()}-{secrets.token_hex(8)}-{ticket}"
+        # An explicit canonical outbox is authoritative.  The legacy variable
+        # remains a compatibility-wrapper selector only when no canonical
+        # destination was supplied by the APGR route.
+        self.legacy = bool(configured) and outbox_root is None
+        if self.legacy:
+            assert configured is not None
+            self.root = Path(configured)
+            self.project_directory = self.root / self.project
+            self.directory = self.project_directory
+            self._legacy_path = self.directory / f"{self.ticket}.report.txt"
+            self.lock_path = self._legacy_path.with_name(
+                self._legacy_path.name + ".lock"
+            )
+            self.transaction_path = self._legacy_path.with_name(
+                self._legacy_path.name + ".transaction"
+            )
+        else:
+            validate_path_identifier(self.project, "project identifier")
+            configured_outbox = os.environ.get("APGR_OUTBOX_ROOT")
+            if outbox_root is not None:
+                self.root = Path(outbox_root)
+                if not self.root.is_absolute():
+                    raise UsageError("outbox root must be absolute")
+            elif configured_outbox:
+                self.root = Path(configured_outbox)
+                if not self.root.is_absolute():
+                    raise UsageError("APGR_OUTBOX_ROOT must be absolute")
+            else:
+                self.root = Path.home() / "Documents" / "agent" / "outbox"
+            self.project_directory = self.root / self.project
+            self.directory = self.project_directory / self.ticket
+            self._legacy_path = None
+            self.lock_path = self.directory / ".phase.lock"
+            self.transaction_path = self.directory / ".phase.transaction"
+        self._show_path = self.directory / f"{self.ticket}.git.show.report.txt"
+        self._diff_path = self.directory / f"{self.ticket}.git.diff.report.txt"
+        self._ops_path = self.directory / f"{self.ticket}.ops.report.txt"
+        self._token = f"{os.getpid()}-{secrets.token_hex(8)}-{self.ticket}"
         self._locked = False
         self._lock_identity: tuple[int, int] | None = None
         self._owner_identity: tuple[int, int] | None = None
         self._owner_initialized = False
+        self._transaction_identity: tuple[int, int] | None = None
         self._prepare_directory()
 
+    @property
+    def path(self) -> Path:
+        """Return the current primary path, refusing unresolved publication."""
+
+        self._ensure_no_unresolved_transaction()
+        if self.legacy:
+            assert self._legacy_path is not None
+            return self._legacy_path
+        return self._current_path() or self._ops_path
+
+    @property
+    def primary_paths(self) -> tuple[Path, Path, Path]:
+        """Return show, diff, and ops paths in their canonical order."""
+
+        return self._show_path, self._diff_path, self._ops_path
+
     def _prepare_directory(self) -> None:
-        if not self.root.exists():
+        if self.root.is_symlink():
+            raise ReportError("report root is unsafe")
+        try:
             self.root.mkdir(parents=True)
-        if self.directory.is_symlink():
+            self.root.chmod(0o700)
+        except FileExistsError:
+            pass
+        _validate_private_directory(self.root)
+        if self.project_directory.is_symlink():
             raise ReportError("report directory is unsafe")
+        try:
+            self.project_directory.mkdir()
+            self.project_directory.chmod(0o700)
+        except FileExistsError:
+            pass
+        _validate_private_directory(self.project_directory)
+        if self.legacy:
+            return
+        if self.directory.is_symlink():
+            raise ReportError("phase directory is unsafe")
         try:
             self.directory.mkdir()
             self.directory.chmod(0o700)
@@ -325,11 +423,72 @@ class Destination:
             pass
         _validate_private_directory(self.directory)
 
+    def _ensure_no_unresolved_transaction(self) -> None:
+        try:
+            metadata = self.transaction_path.lstat()
+        except FileNotFoundError:
+            return
+        except OSError as error:
+            raise ReportError("report transaction marker is unsafe") from error
+        if (
+            self.transaction_path.is_symlink()
+            or not stat.S_ISREG(metadata.st_mode)
+            or metadata.st_uid != os.getuid()
+            or stat.S_IMODE(metadata.st_mode) != 0o600
+        ):
+            raise ReportError("report transaction marker is unsafe")
+        raise ReportError("unresolved report transaction marker")
+
+    def recover_transaction(self) -> bool:
+        """Complete or roll back one interrupted supersession under the phase lock."""
+
+        if self.legacy:
+            return False
+        with self.lock():
+            try:
+                metadata = self.transaction_path.lstat()
+            except FileNotFoundError:
+                return False
+            except OSError as error:
+                raise ReportError("report transaction marker is unsafe") from error
+            raw = self._read_regular_file(self.transaction_path, metadata)
+            try:
+                lines = raw.decode("utf-8").splitlines()
+            except UnicodeDecodeError as error:
+                raise ReportError("report transaction marker is unsafe") from error
+            fields = dict(
+                line.split(": ", 1) for line in lines[1:] if ": " in line
+            )
+            if (
+                not lines
+                or lines[0] != "agent-report-transaction-v1"
+                or fields.get("phase") != self.ticket
+                or "target" not in fields
+                or "stale" not in fields
+            ):
+                raise ReportError("report transaction marker is unsafe")
+            allowed = {path.name: path for path in self.primary_paths}
+            target = allowed.get(fields["target"])
+            stale_names = tuple(filter(None, fields["stale"].split(",")))
+            if target is None or any(name not in allowed for name in stale_names):
+                raise ReportError("report transaction marker is unsafe")
+            if self._exists_safe(target):
+                for name in stale_names:
+                    if name != target.name:
+                        self._unlink_stale(allowed[name])
+            current = self.transaction_path.lstat()
+            if (current.st_ino, current.st_dev) != (metadata.st_ino, metadata.st_dev):
+                raise ReportError("report transaction marker ownership changed")
+            self.transaction_path.unlink()
+            _fsync_directory(self.directory)
+            return True
+
     @contextlib.contextmanager
     def lock(self):
         """Acquire the report's atomic lock directory and release only our token."""
 
-        for _ in range(200):
+        recovered = False
+        for _ in range(400):
             try:
                 self.lock_path.mkdir()
                 metadata = self.lock_path.lstat()
@@ -345,6 +504,9 @@ class Destination:
                     continue
                 if self.lock_path.is_symlink() or not stat.S_ISDIR(metadata.st_mode):
                     raise ReportError("report append lock is unsafe")
+                if not recovered and self._recover_stale_lock(metadata):
+                    recovered = True
+                    continue
                 time.sleep(0.01)
         if not self._locked:
             raise ReportError("report append is already active")
@@ -355,14 +517,74 @@ class Destination:
             try:
                 owner_metadata = os.fstat(descriptor)
                 self._owner_identity = (owner_metadata.st_dev, owner_metadata.st_ino)
+                _write_all(descriptor, (self._token + "\n").encode("ascii"))
+                os.fsync(descriptor)
             finally:
                 os.close(descriptor)
-            owner.write_text(self._token + "\n", encoding="utf-8")
-            owner.chmod(0o600)
             self._owner_initialized = True
             yield
         finally:
             self._release_lock()
+
+    def _recover_stale_lock(self, directory_metadata: os.stat_result) -> bool:
+        """Remove one owner-proven lock whose recorded process no longer exists."""
+
+        owner = self.lock_path / "owner"
+        try:
+            metadata = owner.lstat()
+        except FileNotFoundError:
+            if time.time() - directory_metadata.st_mtime < 1.0:
+                return False
+            current_directory = self.lock_path.lstat()
+            if (
+                (current_directory.st_dev, current_directory.st_ino)
+                != (directory_metadata.st_dev, directory_metadata.st_ino)
+                or any(self.lock_path.iterdir())
+            ):
+                return False
+            self.lock_path.rmdir()
+            _fsync_directory(self.directory)
+            return True
+        except OSError as error:
+            raise ReportError("report append lock owner is unsafe") from error
+        if (
+            owner.is_symlink()
+            or not stat.S_ISREG(metadata.st_mode)
+            or metadata.st_uid != os.getuid()
+            or stat.S_IMODE(metadata.st_mode) != 0o600
+        ):
+            raise ReportError("report append lock owner is unsafe")
+        try:
+            token = self._read_regular_file(owner, metadata).decode("ascii").rstrip("\n")
+        except UnicodeDecodeError as error:
+            raise ReportError("report append lock owner is unsafe") from error
+        try:
+            pid = int(token.split("-", 1)[0])
+            if pid <= 0:
+                raise ValueError
+        except ValueError as error:
+            raise ReportError("report append lock owner is unsafe") from error
+        try:
+            os.kill(pid, 0)
+        except ProcessLookupError:
+            pass
+        except PermissionError:
+            return False
+        else:
+            return False
+        current_directory = self.lock_path.lstat()
+        current_owner = owner.lstat()
+        if (
+            (current_directory.st_dev, current_directory.st_ino)
+            != (directory_metadata.st_dev, directory_metadata.st_ino)
+            or (current_owner.st_dev, current_owner.st_ino)
+            != (metadata.st_dev, metadata.st_ino)
+        ):
+            raise ReportError("report append lock ownership changed")
+        owner.unlink()
+        self.lock_path.rmdir()
+        _fsync_directory(self.directory)
+        return True
 
     def _release_lock(self) -> None:
         if not self._locked:
@@ -399,56 +621,245 @@ class Destination:
             self._owner_initialized = False
 
     def append(self, record_or_builder: bytes | RecordBuilder) -> bytes:
-        """Append one complete record after validation under the phase lock."""
+        """Append a record; a different primary type supersedes its stale sibling."""
 
-        replacement: Path | None = None
         with self.lock():
-            existing = self._read_existing()
-            try:
-                records = parse_canonical_records(existing)
-            except ValueError as error:
-                raise ReportError("existing report record structure is unsafe") from error
+            self._ensure_no_unresolved_transaction()
+            current = self._current_path()
+            existing = self._read_existing(current)
+            records = self._parse_existing(existing)
             record = (
                 record_or_builder(existing, records)
                 if callable(record_or_builder)
                 else record_or_builder
             )
-            parsed_new = parse_canonical_records(record)
-            if len(parsed_new) != 1 or parsed_new[0].start != 0 or parsed_new[0].end != len(record):
-                raise ReportError("report record envelope is invalid")
-            descriptor, replacement_value = tempfile.mkstemp(
-                prefix=f".{self.ticket}.report.", dir=self.directory
-            )
-            replacement = Path(replacement_value)
-            try:
-                os.fchmod(descriptor, 0o600)
-                with os.fdopen(descriptor, "wb") as stream:
-                    stream.write(existing)
-                    if existing and not existing.endswith(b"\n"):
-                        stream.write(b"\n")
-                    stream.write(record)
-                    stream.flush()
-                    os.fsync(stream.fileno())
-                injected_failure("before-destination-replacement")
-                os.replace(replacement, self.path)
-                replacement = None
-                self.path.chmod(0o600)
-                _fsync_directory(self.directory)
-            finally:
-                if replacement is not None:
-                    replacement.unlink(missing_ok=True)
-        return record
+            parsed_new = self._parse_new(record)
+            target = self._target_for_type(parsed_new[0].record.record_type)
+            if target != current:
+                existing = self._read_existing(target)
+                records = self._parse_existing(existing)
+                if callable(record_or_builder):
+                    record = record_or_builder(existing, records)
+                    parsed_new = self._parse_new(record)
+                    target = self._target_for_type(parsed_new[0].record.record_type)
+            combined = existing + (b"\n" if existing and not existing.endswith(b"\n") else b"") + record
+            self._parse_existing(combined)
+            if self.legacy:
+                return self._replace_legacy(combined, target)
+            stale = tuple(path for path in self.primary_paths if path != target)
+            return self._replace_outbox(target, combined, stale)
 
-    def _read_existing(self) -> bytes:
+    @staticmethod
+    def _parse_existing(existing: bytes) -> tuple[ParsedRecord, ...]:
         try:
-            metadata = self.path.lstat()
+            return parse_canonical_records(existing)
+        except ValueError as error:
+            raise ReportError("existing report record structure is unsafe") from error
+
+    @staticmethod
+    def _parse_new(record: bytes) -> tuple[ParsedRecord, ...]:
+        try:
+            parsed = parse_canonical_records(record)
+        except ValueError as error:
+            raise ReportError("report record envelope is invalid") from error
+        if len(parsed) != 1 or parsed[0].start != 0 or parsed[0].end != len(record):
+            raise ReportError("report record envelope is invalid")
+        return parsed
+
+    def _target_for_type(self, record_type: str) -> Path:
+        if self.legacy:
+            assert self._legacy_path is not None
+            return self._legacy_path
+        suffix = _PRIMARY_TYPES.get(record_type)
+        if suffix == "git.show":
+            return self._show_path
+        if suffix == "git.diff":
+            return self._diff_path
+        if suffix == "ops":
+            git_path = self._current_git_path()
+            return self._ops_path if git_path is None else git_path
+        raise ReportError("unsupported report record type for the APGR outbox")
+
+    def _replace_legacy(self, combined: bytes, target: Path) -> bytes:
+        return self._write_replacement(combined, target, f".{self.ticket}.report.")
+
+    def _replace_outbox(
+        self, target: Path, combined: bytes, stale: tuple[Path, ...]
+    ) -> bytes:
+        self._begin_transaction(target, stale)
+        try:
+            result = self._write_replacement(combined, target, f".{self.ticket}.primary.")
+            for path in stale:
+                self._unlink_stale(path)
+            self._finish_transaction()
+            return result
+        except BaseException:
+            # Retain the marker: recovery can distinguish pre-publication rollback
+            # from post-publication stale-primary completion.
+            self._transaction_identity = None
+            raise
+
+    def _write_replacement(self, combined: bytes, target: Path, prefix: str) -> bytes:
+        replacement: Path | None = None
+        descriptor, replacement_value = tempfile.mkstemp(prefix=prefix, dir=self.directory)
+        replacement = Path(replacement_value)
+        try:
+            os.fchmod(descriptor, 0o600)
+            with os.fdopen(descriptor, "wb") as stream:
+                stream.write(combined)
+                stream.flush()
+                os.fsync(stream.fileno())
+            injected_failure("before-destination-replacement")
+            os.replace(replacement, target)
+            replacement = None
+            target.chmod(0o600)
+            _fsync_directory(self.directory)
+            return combined
+        finally:
+            if replacement is not None:
+                replacement.unlink(missing_ok=True)
+
+    def _begin_transaction(self, target: Path, stale: tuple[Path, ...]) -> None:
+        self._ensure_no_unresolved_transaction()
+        try:
+            descriptor = os.open(
+                self.transaction_path,
+                os.O_WRONLY | os.O_CREAT | os.O_EXCL,
+                0o600,
+            )
+        except FileExistsError as error:
+            self._ensure_no_unresolved_transaction()
+            raise ReportError("report transaction marker is already active") from error
+        try:
+            self._transaction_identity = os.fstat(descriptor).st_ino, os.fstat(descriptor).st_dev
+            details = "\n".join(
+                (
+                    "agent-report-transaction-v1",
+                    f"phase: {self.ticket}",
+                    f"target: {target.name}",
+                    "stale: " + ",".join(path.name for path in stale),
+                    f"token: {self._token}",
+                    "",
+                )
+            ).encode("utf-8")
+            with os.fdopen(descriptor, "wb") as stream:
+                stream.write(details)
+                stream.flush()
+                os.fsync(stream.fileno())
+            _fsync_directory(self.directory)
+        except BaseException:
+            try:
+                os.close(descriptor)
+            except OSError:
+                pass
+            self.transaction_path.unlink(missing_ok=True)
+            self._transaction_identity = None
+            raise
+
+    def _finish_transaction(self) -> None:
+        if self._transaction_identity is None:
+            return
+        metadata = self.transaction_path.lstat()
+        identity = metadata.st_ino, metadata.st_dev
+        if identity != self._transaction_identity:
+            raise ReportError("report transaction marker ownership changed")
+        self.transaction_path.unlink()
+        _fsync_directory(self.directory)
+        self._transaction_identity = None
+
+    def _abort_transaction(self) -> None:
+        if self._transaction_identity is None:
+            return
+        try:
+            metadata = self.transaction_path.lstat()
+            identity = metadata.st_ino, metadata.st_dev
+            if identity == self._transaction_identity:
+                self.transaction_path.unlink()
+                _fsync_directory(self.directory)
+        except OSError:
+            pass
+        finally:
+            self._transaction_identity = None
+
+    def _unlink_stale(self, path: Path) -> None:
+        try:
+            metadata = path.lstat()
         except FileNotFoundError:
-            return b""
-        if self.path.is_symlink() or not stat.S_ISREG(metadata.st_mode):
+            return
+        if path.is_symlink() or not stat.S_ISREG(metadata.st_mode):
+            raise ReportError("stale report artifact is unsafe")
+        if metadata.st_uid != os.getuid() or stat.S_IMODE(metadata.st_mode) != 0o600:
+            raise ReportError("stale report artifact is unsafe")
+        path.unlink()
+
+    def _current_git_path(self) -> Path | None:
+        present = [path for path in (self._show_path, self._diff_path) if self._exists_safe(path)]
+        if len(present) > 1:
+            raise ReportError("multiple current Git report artifacts")
+        return present[0] if present else None
+
+    def _current_path(self) -> Path | None:
+        if self.legacy:
+            return self._legacy_path
+        git_path = self._current_git_path()
+        ops_present = self._exists_safe(self._ops_path)
+        if git_path is not None and ops_present:
+            raise ReportError("multiple current primary report artifacts")
+        if git_path is not None:
+            return git_path
+        return self._ops_path if ops_present else None
+
+    def _exists_safe(self, path: Path) -> bool:
+        try:
+            metadata = path.lstat()
+        except FileNotFoundError:
+            return False
+        if path.is_symlink() or not stat.S_ISREG(metadata.st_mode):
             raise ReportError("existing report file is unsafe")
         if metadata.st_uid != os.getuid() or stat.S_IMODE(metadata.st_mode) != 0o600:
             raise ReportError("existing report file is unsafe")
-        return self.path.read_bytes()
+        return True
+
+    def _read_existing(self, path: Path | None = None) -> bytes:
+        self._ensure_no_unresolved_transaction()
+        target = self.path if path is None else path
+        try:
+            metadata = target.lstat()
+        except FileNotFoundError:
+            return b""
+        except OSError as error:
+            raise ReportError("existing report file is unsafe") from error
+        return self._read_regular_file(target, metadata)
+
+    @staticmethod
+    def _read_regular_file(path: Path, expected: os.stat_result) -> bytes:
+        """Read one exact private regular file without following replacement links."""
+
+        flags = os.O_RDONLY
+        if hasattr(os, "O_NOFOLLOW"):
+            flags |= os.O_NOFOLLOW
+        try:
+            descriptor = os.open(path, flags)
+        except OSError as error:
+            raise ReportError("existing report file is unsafe") from error
+        try:
+            observed = os.fstat(descriptor)
+            if (
+                not stat.S_ISREG(observed.st_mode)
+                or observed.st_uid != os.getuid()
+                or stat.S_IMODE(observed.st_mode) != 0o600
+                or (observed.st_dev, observed.st_ino)
+                != (expected.st_dev, expected.st_ino)
+            ):
+                raise ReportError("existing report file is unsafe")
+            chunks: list[bytes] = []
+            while chunk := os.read(descriptor, 1024 * 1024):
+                chunks.append(chunk)
+            return b"".join(chunks)
+        except OSError as error:
+            raise ReportError("existing report file is unsafe") from error
+        finally:
+            os.close(descriptor)
 
 
 def _validate_private_directory(path: Path) -> None:
@@ -473,6 +884,16 @@ def _fsync_directory(path: Path) -> None:
         pass
     finally:
         os.close(descriptor)
+
+
+def _write_all(descriptor: int, payload: bytes) -> None:
+    view = memoryview(payload)
+    offset = 0
+    while offset < len(view):
+        written = os.write(descriptor, view[offset:])
+        if written <= 0:
+            raise OSError("report lock owner write made no progress")
+        offset += written
 
 
 def _is_windows_reparse(metadata: os.stat_result) -> bool:

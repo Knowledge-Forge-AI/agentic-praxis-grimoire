@@ -59,6 +59,33 @@ HISTORICAL_V02_SKILLS = tuple(
 
 
 class APGPublicReleaseUnitTests(APGPublicReleaseCaseMixin, unittest.TestCase):
+    def test_prominent_public_guidance_matches_current_skill_topology(self) -> None:
+        surface = json.loads(
+            (REPOSITORY_ROOT / "release" / "public-surface.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        self.assertEqual(len(surface["required_skills"]), 33)
+        self.assertEqual(len(surface["required_projections"]), 33)
+        expected = {
+            "README.md": (
+                "thirty-three canonical skills",
+                "fourteen stable rows and nineteen provisional",
+                "thirty-three relative symbolic links",
+            ),
+            "AGENTS.md": (
+                "thirty-three skill owners, fourteen stable\n  and nineteen provisional",
+            ),
+            "docs/project-skill-projection.md": (
+                "nineteen\n  skills for public v0.3.0 and thirty-three for current development",
+            ),
+        }
+        for relative, fragments in expected.items():
+            source = (REPOSITORY_ROOT / relative).read_text(encoding="utf-8")
+            for fragment in fragments:
+                with self.subTest(path=relative, fragment=fragment):
+                    self.assertIn(fragment, source)
+
     def test_public_symlink_validation_accepts_contained_links_and_rejects_unsafe_targets(self) -> None:
         repository = release.Repository(Path("repo"), "a" * 40, "b" * 40)
         regular = release.Entry("100644", "blob", "a" * 40, b"target/file")
@@ -139,6 +166,48 @@ class APGPublicReleaseUnitTests(APGPublicReleaseCaseMixin, unittest.TestCase):
         self.assertEqual(
             release.render_manifest(manifest, "text"),
             "APG public manifest v1\n100644 abc README.md\n",
+        )
+
+    def test_apg54_and_apg55_surfaces_are_v05_only_without_historical_v04_drift(
+        self,
+    ) -> None:
+        historical = release.audited_policy_surfaces("0.4.0")[0]
+        current = release.audited_policy_surfaces("0.5.0")[0]
+        installer = "bin/install-global-skills"
+        transaction = "libexec/global_skills_transaction.py"
+
+        self.assertNotIn(installer, historical["required_wrappers"])
+        self.assertNotIn(transaction, historical["required_helpers"])
+        self.assertIn(installer, current["required_wrappers"])
+        self.assertIn(transaction, current["required_helpers"])
+        entry = release.Entry(
+            "100755", "blob", "a" * 40, installer.encode("ascii")
+        )
+        with self.assertRaisesRegex(release.ToolError, "future owner"):
+            release.validate_versioned_policy_exclusions(
+                (entry,), "0.4.0"
+            )
+        self.assertTrue(
+            release.APG55_V05_CRITICAL.isdisjoint(
+                historical["critical_files"]
+            )
+        )
+        self.assertTrue(
+            release.APG55_V05_CRITICAL.issubset(
+                current["critical_files"]
+            )
+        )
+        for path in sorted(release.APG55_V05_CRITICAL):
+            future = release.Entry(
+                "100644", "blob", "a" * 40, path.encode("ascii")
+            )
+            with self.assertRaisesRegex(release.ToolError, "future owner"):
+                release.validate_versioned_policy_exclusions(
+                    (future,), "0.4.0"
+                )
+        self.assertEqual(
+            release.HISTORICAL_V04_SURFACE_SHA256,
+            "4bc8571149c708023712f3963e81e0594d46a9a78da74ac48d8dba3e4b73a083",
         )
 
     def test_repository_separation_and_output_path_reject_overlap_and_unsafe_types(self) -> None:
@@ -269,6 +338,15 @@ class APGPublicReleaseUnitTests(APGPublicReleaseCaseMixin, unittest.TestCase):
             environment = release.isolated_validation_environment(Path(temporary), candidate, base)
             self.assertEqual(environment["PWD"], "candidate")
             self.assertEqual(environment["APG12_PUBLIC_V01_ROOT"], "base")
+            self.assertEqual(
+                environment["PYTHONPATH"],
+                os.pathsep.join(("candidate/src", "candidate")),
+            )
+            pytest_root = Path(environment["PYTEST_DEBUG_TEMPROOT"])
+            worker_root = Path(environment["TMPDIR"])
+            self.assertTrue(pytest_root.is_dir())
+            self.assertEqual(pytest_root.parent, worker_root.parent)
+            self.assertNotEqual(pytest_root, worker_root)
             self.assertNotIn("OLDPWD", environment)
         with mock.patch.object(
             release.subprocess,
@@ -476,7 +554,7 @@ class APGPublicReleaseUnitTests(APGPublicReleaseCaseMixin, unittest.TestCase):
                 source,
                 base,
                 Path("candidate"),
-                "0.4.0",
+                "0.5.0",
                 "2026-07-20T12:00:00-04:00",
                 "Release Author",
                 "release@example.invalid",
