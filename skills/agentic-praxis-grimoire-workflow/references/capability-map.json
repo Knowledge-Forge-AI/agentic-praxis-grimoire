@@ -1,6 +1,11 @@
 {
   "capabilities": [
     {
+      "capability_class": "Astro profile",
+      "name": "astro-profile",
+      "trigger": "Astro behavior hinges on .astro execution, islands or client directives, server/client boundaries, content collections, routing, or integration conventions; not for adjacent component, syntax, language/runtime, build, style, accessibility, or deployment concerns."
+    },
+    {
       "capability_class": "Bash language profile",
       "name": "bash-language-profile",
       "trigger": "Bash-specific judgment is material to quoting, expansion, arrays, pipelines, traps, subprocesses, files, portability, or warning and crisis thresholds beyond repository policy."
@@ -61,6 +66,11 @@
       "trigger": "Native Go test judgment is material to package placement, subtests, helper attribution, cleanup and isolation, TestMain, parallelism, goroutine reporting, examples, benchmarks, fuzzing, caching, effective language version, or warning and crisis thresholds beyond repository policy."
     },
     {
+      "capability_class": "GoMock test profile",
+      "name": "gomock-test-profile",
+      "trigger": "A project has already selected GoMock v0.6.0 and judgment is material to mockgen generation, generated mocks, controller lifecycle, expectations, call counts or order, matchers, or GoMock failure diagnosis; not for native test lifecycle, value diffs, or Go semantics."
+    },
+    {
       "capability_class": "test-disciplined implementation",
       "name": "implementing-with-test-discipline",
       "trigger": "An authorized behavior change benefits from executable behavioral evidence proportional to risk."
@@ -71,9 +81,19 @@
       "trigger": "A material decision depends on ECMAScript semantics for an established JavaScript region after parse goal, host context, language context, goal evidence, whole-file ownership, and required non-language evidence are identified."
     },
     {
+      "capability_class": "JSX language profile",
+      "name": "jsx-language-profile",
+      "trigger": "JSX-specific judgment is material to element, attribute, child, expression, fragment, spread, file-kind, or transform semantics; not for React behavior, TypeScript checking, JavaScript evaluation, runtime hosts, MDX, Astro, or build tools."
+    },
+    {
       "capability_class": "Markdown language profile",
       "name": "markdown-language-profile",
       "trigger": "A material decision depends on the repository's actual Markdown parser or selected-dialect document semantics, or on qualitative Markdown document-structure policy."
+    },
+    {
+      "capability_class": "MDX profile",
+      "name": "mdx-profile",
+      "trigger": "An MDX decision depends on the Markdown-to-JSX/component seam, imports or exports, expressions, provider mapping, or compile/runtime split; not for pure Markdown, JSX, React, TypeScript, JavaScript, or Astro behavior."
     },
     {
       "capability_class": "Minitest test profile",
@@ -116,6 +136,11 @@
       "trigger": "Python-specific judgment is material to structure, complexity, public APIs, typing, concurrency, serialization, packaging, or warning and crisis thresholds beyond repository policy."
     },
     {
+      "capability_class": "React component profile",
+      "name": "react-component-profile",
+      "trigger": "React component judgment is material to composition, props, rendering, state, effects, hooks, context, memoization, error boundaries, or component testing; not for JSX syntax, language typing, runner mechanics, routing, styling, MDX, Astro, or metaframeworks."
+    },
+    {
       "capability_class": "repository review and verification",
       "name": "reviewing-and-verifying-repository-work",
       "trigger": "A bounded artifact or resulting repository state needs evidence-backed acceptance, correction, disposition, or a completion claim."
@@ -144,6 +169,11 @@
       "capability_class": "Vagrantfile profile",
       "name": "vagrantfile-profile",
       "trigger": "Vagrantfile-specific judgment is material to configuration versions and loading, machines, boxes, provider blocks, networks, synced folders, provisioners, triggers, Vagrant state, host-dependent behavior, or warning and crisis thresholds beyond repository policy."
+    },
+    {
+      "capability_class": "Vitest test profile",
+      "name": "vitest-test-profile",
+      "trigger": "A project has already selected Vitest 4.1 and runner-specific judgment is material to configuration, projects, environments, assertions, mocks, timers, concurrency, isolation, snapshots, or coverage providers; not for test sufficiency, language or React semantics, or coverage policy."
     },
     {
       "capability_class": "Zsh language profile",

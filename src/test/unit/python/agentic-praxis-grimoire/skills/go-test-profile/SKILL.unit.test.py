@@ -70,6 +70,14 @@ class APG38GoTestProfileContractTests(unittest.TestCase):
             policy["critical_files"],
         )
 
+    def test_apg89_go_composition_preserves_language_and_native_test_owners(self) -> None:
+        document = json.loads(
+            (ROOT / "src/test/fixtures/apg89-profile-composition-scenarios.json").read_text()
+        )
+        rows = {row["id"]: row for row in document["go"]}
+        self.assertEqual(rows["APG89-GO-01"]["owner"], "go-language-profile")
+        self.assertEqual(rows["APG89-GO-02"]["owner"], NAME)
+
 
 if __name__ == "__main__":
     unittest.main()

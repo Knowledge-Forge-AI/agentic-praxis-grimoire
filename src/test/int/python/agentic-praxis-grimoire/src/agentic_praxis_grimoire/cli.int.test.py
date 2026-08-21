@@ -47,7 +47,7 @@ def test_package_contracts_replay_in_an_isolated_python_process(
     assert completed.returncode == 0, (
         f"stdout:\n{completed.stdout}\nstderr:\n{completed.stderr}"
     )
-    assert "154 passed" in completed.stdout
+    assert "155 passed" in completed.stdout
 
 
 def test_checkout_apgr_rejects_symlinked_source_adapter(tmp_path: Path) -> None:

@@ -232,7 +232,7 @@ def test_exact_apg58_apg59_history_and_live_integrated_surface() -> None:
         ROOT
         / "docs/adr/2026/08/0044-css-language-profile-candidate-and-target-first-harness.md"
     ).read_text(encoding="utf-8")
-    assert derive_skill_surface_counts(ROOT) == (33, 33, 33)
+    assert derive_skill_surface_counts(ROOT) == (39, 39, 39)
 
 
 def test_raw_apg59_revert_restores_candidate_and_fails_closure() -> None:
@@ -447,8 +447,8 @@ def test_apg59_and_live_counts_preserve_css_rejection_across_growth(
         capture_output=True,
     )
     assert derive_skill_surface_counts(checkout) == (28, 28, 28)
-    assert derive_skill_surface_counts(ROOT) == (33, 33, 33)
-    for repository, expected in ((checkout, 28), (ROOT, 33)):
+    assert derive_skill_surface_counts(ROOT) == (39, 39, 39)
+    for repository, expected in ((checkout, 28), (ROOT, 39)):
         result = subprocess.run(
             ["bin/apg-check-skill-library", "--format", "json"],
             cwd=repository,

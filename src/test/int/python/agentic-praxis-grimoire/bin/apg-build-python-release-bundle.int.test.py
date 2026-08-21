@@ -32,7 +32,7 @@ def _metadata() -> bytes:
     return (
         b"Metadata-Version: 2.4\n"
         b"Name: agentic-praxis-grimoire\n"
-        b"Version: 0.5.0\n"
+        b"Version: 0.6.0\n"
         b"License-Expression: AGPL-3.0-or-later\n"
         b"Requires-Python: >=3.10\n\n"
     )
@@ -43,13 +43,13 @@ def _bundle(root: Path) -> None:
     with zipfile.ZipFile(root / publication.WHEEL_NAME, "w") as archive:
         archive.writestr("agentic_praxis_grimoire/__init__.py", b"")
         archive.writestr(
-            "agentic_praxis_grimoire-0.5.0.dist-info/METADATA", _metadata()
+            "agentic_praxis_grimoire-0.6.0.dist-info/METADATA", _metadata()
         )
     raw = root.parent / "raw.tar.gz"
     payload = BytesIO()
     with gzip.GzipFile(fileobj=payload, mode="wb", mtime=1) as compressed:
         with tarfile.open(fileobj=compressed, mode="w") as archive:
-            info = tarfile.TarInfo("agentic_praxis_grimoire-0.5.0/PKG-INFO")
+            info = tarfile.TarInfo("agentic_praxis_grimoire-0.6.0/PKG-INFO")
             info.size = len(_metadata())
             archive.addfile(info, BytesIO(_metadata()))
     raw.write_bytes(payload.getvalue())
@@ -132,7 +132,7 @@ def test_bundle_validation_rejects_filesystem_and_artifact_tampering(
     payload = BytesIO()
     with gzip.GzipFile(fileobj=payload, mode="wb", mtime=7) as compressed:
         with tarfile.open(fileobj=compressed, mode="w") as archive:
-            info = tarfile.TarInfo("agentic_praxis_grimoire-0.5.0/PKG-INFO")
+            info = tarfile.TarInfo("agentic_praxis_grimoire-0.6.0/PKG-INFO")
             info.size = len(_metadata())
             info.uid = 7
             info.gid = 7
@@ -157,8 +157,8 @@ def test_bundle_validation_rejects_filesystem_and_artifact_tampering(
         wrong_metadata / publication.WHEEL_NAME, "w"
     ) as archive:
         archive.writestr(
-            "agentic_praxis_grimoire-0.5.0.dist-info/METADATA",
-            _metadata().replace(b"Version: 0.5.0", b"Version: 9.9.9"),
+            "agentic_praxis_grimoire-0.6.0.dist-info/METADATA",
+            _metadata().replace(b"Version: 0.6.0", b"Version: 9.9.9"),
         )
     _write_manifest(wrong_metadata)
     with pytest.raises(publication.PublicationError, match="metadata"):
@@ -185,7 +185,7 @@ def test_bundle_validation_rejects_archive_identity_tampering(tmp_path: Path) ->
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", UserWarning)
             archive.writestr(
-                "agentic_praxis_grimoire-0.5.0.dist-info/METADATA", _metadata()
+                "agentic_praxis_grimoire-0.6.0.dist-info/METADATA", _metadata()
             )
     with pytest.raises(publication.PublicationError, match="duplicate"):
         publication.validate_bundle(duplicate)
@@ -194,7 +194,7 @@ def test_bundle_validation_rejects_archive_identity_tampering(tmp_path: Path) ->
     shutil.copytree(source, linked_member)
     with zipfile.ZipFile(linked_member / publication.WHEEL_NAME, "w") as archive:
         archive.writestr(
-            "agentic_praxis_grimoire-0.5.0.dist-info/METADATA", _metadata()
+            "agentic_praxis_grimoire-0.6.0.dist-info/METADATA", _metadata()
         )
         info = zipfile.ZipInfo("agentic_praxis_grimoire/link")
         info.external_attr = (stat.S_IFLNK | 0o777) << 16
@@ -221,7 +221,7 @@ def test_bundle_validation_rejects_archive_identity_tampering(tmp_path: Path) ->
     shutil.copytree(source, unsafe_member)
     with zipfile.ZipFile(unsafe_member / publication.WHEEL_NAME, "w") as archive:
         archive.writestr(
-            "agentic_praxis_grimoire-0.5.0.dist-info/METADATA", _metadata()
+            "agentic_praxis_grimoire-0.6.0.dist-info/METADATA", _metadata()
         )
         archive.writestr("/absolute", b"")
     with pytest.raises(publication.PublicationError, match="unsafe member"):
@@ -317,7 +317,7 @@ def test_publication_selection_rejects_release_root_drift(tmp_path: Path) -> Non
         matching_source / "src" / "agentic_praxis_grimoire" / "VERSION"
     )
     matching_version.parent.mkdir(parents=True)
-    matching_version.write_text("0.5.0\n", encoding="utf-8")
+    matching_version.write_text("0.6.0\n", encoding="utf-8")
     matching_normalizer = matching_source / "bin" / "apg-normalize-python-sdist"
     matching_normalizer.parent.mkdir()
     matching_normalizer.write_text("#!/usr/bin/env python3\n", encoding="utf-8")
@@ -341,7 +341,7 @@ def test_publication_selection_rejects_release_root_drift(tmp_path: Path) -> Non
     normalizer.write_text("#!/usr/bin/env python3\n", encoding="utf-8")
     clean_work = tmp_path / "clean-work"
     clean_work.mkdir()
-    with pytest.raises(publication.PublicationError, match="not exact v0.5.0"):
+    with pytest.raises(publication.PublicationError, match="not exact v0.6.0"):
         publication.build_bundle(
             wrong_source,
             tmp_path / "wrong-publication",

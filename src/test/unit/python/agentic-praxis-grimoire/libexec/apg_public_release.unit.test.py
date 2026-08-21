@@ -65,19 +65,19 @@ class APGPublicReleaseUnitTests(APGPublicReleaseCaseMixin, unittest.TestCase):
                 encoding="utf-8"
             )
         )
-        self.assertEqual(len(surface["required_skills"]), 33)
-        self.assertEqual(len(surface["required_projections"]), 33)
+        self.assertEqual(len(surface["required_skills"]), 39)
+        self.assertEqual(len(surface["required_projections"]), 39)
         expected = {
             "README.md": (
-                "thirty-three canonical skills",
-                "fourteen stable rows and nineteen provisional",
-                "thirty-three relative symbolic links",
+                "thirty-nine canonical skills",
+                "fourteen stable rows and twenty-five provisional",
+                "thirty-nine relative symbolic links",
             ),
             "AGENTS.md": (
-                "thirty-three skill owners, fourteen stable\n  and nineteen provisional",
+                "thirty-nine skill owners, fourteen stable\n  and twenty-five provisional",
             ),
             "docs/project-skill-projection.md": (
-                "nineteen\n  skills for public v0.3.0 and thirty-three for current development",
+                "nineteen\n  skills for public v0.3.0 and thirty-nine for current development",
             ),
         }
         for relative, fragments in expected.items():
@@ -554,7 +554,7 @@ class APGPublicReleaseUnitTests(APGPublicReleaseCaseMixin, unittest.TestCase):
                 source,
                 base,
                 Path("candidate"),
-                "0.5.0",
+                "0.6.0",
                 "2026-07-20T12:00:00-04:00",
                 "Release Author",
                 "release@example.invalid",

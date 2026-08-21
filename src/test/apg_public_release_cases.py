@@ -44,7 +44,7 @@ EXPECTED_V03_SKILLS = tuple(
         "zunit-test-profile",
     )
 )
-EXPECTED_APG81H_SKILLS = tuple(
+EXPECTED_APG88_SKILLS = tuple(
     sorted(
         (
             *(
@@ -56,26 +56,32 @@ EXPECTED_APG81H_SKILLS = tuple(
             ),
             "skills/chatgpt/chatgpt-manager-workflow/SKILL.md",
             "skills/chatgpt/composing-approved-roadmap-assignments/SKILL.md",
+            "skills/astro-profile/SKILL.md",
             "skills/converting-bash-scripts-to-python/SKILL.md",
             "skills/css-language-profile/SKILL.md",
             "skills/dockerfile-profile/SKILL.md",
             "skills/go-cmp-test-profile/SKILL.md",
             "skills/go-test-profile/SKILL.md",
+            "skills/gomock-test-profile/SKILL.md",
             "skills/javascript-language-profile/SKILL.md",
+            "skills/jsx-language-profile/SKILL.md",
             "skills/markdown-language-profile/SKILL.md",
+            "skills/mdx-profile/SKILL.md",
             "skills/minitest-test-profile/SKILL.md",
             "skills/nix-test-profile/SKILL.md",
             "skills/nodejs-runtime-profile/SKILL.md",
             "skills/pytest-test-profile/SKILL.md",
+            "skills/react-component-profile/SKILL.md",
             "skills/typescript-language-profile/SKILL.md",
             "skills/vagrantfile-profile/SKILL.md",
+            "skills/vitest-test-profile/SKILL.md",
         )
     )
 )
-EXPECTED_APG81H_PROJECTIONS = tuple(
+EXPECTED_APG88_PROJECTIONS = tuple(
     sorted(
         f".agents/skills/{Path(path).parent.name}"
-        for path in EXPECTED_APG81H_SKILLS
+        for path in EXPECTED_APG88_SKILLS
     )
 )
 HISTORICAL_V02_SKILLS = tuple(
@@ -93,7 +99,7 @@ HISTORICAL_V02_SKILLS = tuple(
 
 class APGPublicReleaseCaseMixin:
     def valid_policy(self) -> dict[str, object]:
-        surface = release.audited_policy_surfaces("0.5.0")[0]
+        surface = release.audited_policy_surfaces("0.6.0")[0]
         return {
             "schema_version": 1,
             "canonical_public_identity": "agentic-praxis-grimoire",
@@ -159,11 +165,11 @@ class APGPublicReleaseCaseMixin:
         parsed = release.validate_date("2026-07-20T12:00:00-04:00")
         self.assertEqual(release.deterministic_tagger(parsed), "1784563200 -0400")
 
-    def test_current_audited_surface_requires_all_33_skills(self) -> None:
-        self.assertEqual(release.AUDITED_SKILLS, EXPECTED_APG81H_SKILLS)
+    def test_current_audited_surface_requires_all_39_skills(self) -> None:
+        self.assertEqual(release.AUDITED_SKILLS, EXPECTED_APG88_SKILLS)
         self.assertEqual(
             release.AUDITED_PROJECTIONS,
-            EXPECTED_APG81H_PROJECTIONS,
+            EXPECTED_APG88_PROJECTIONS,
         )
         self.assertIn(
             "src/test/fixtures/apg32-minitest-scenario-families.json",
@@ -237,22 +243,67 @@ class APGPublicReleaseCaseMixin:
     def test_policy_surfaces_are_exactly_version_bounded(self) -> None:
         historical_v02 = release.audited_policy_surfaces("0.2.0")
         historical_v03 = release.audited_policy_surfaces("0.3.0")
-        current = release.audited_policy_surfaces("0.5.0")
+        historical_v05 = release.audited_policy_surfaces("0.5.0")
+        current = release.audited_policy_surfaces("0.6.0")
 
         self.assertEqual(historical_v02[0]["required_skills"], HISTORICAL_V02_SKILLS)
         self.assertEqual(historical_v03[0]["required_skills"], EXPECTED_V03_SKILLS)
-        self.assertEqual(current[0]["required_skills"], EXPECTED_APG81H_SKILLS)
+        self.assertEqual(current[0]["required_skills"], EXPECTED_APG88_SKILLS)
         self.assertEqual(
             current[0]["required_projections"],
-            EXPECTED_APG81H_PROJECTIONS,
+            EXPECTED_APG88_PROJECTIONS,
         )
         self.assertIn("libexec/agent-report/common.sh", historical_v03[0]["required_helpers"])
         self.assertNotIn("bin/git-diff-report", historical_v03[0]["required_wrappers"])
         self.assertIn("libexec/agent_report/diff.py", current[0]["required_helpers"])
         self.assertIn("bin/git-diff-report", current[0]["required_wrappers"])
+        self.assertEqual(len(historical_v05[0]["required_skills"]), 33)
+        self.assertEqual(len(historical_v05[0]["required_projections"]), 33)
+        self.assertEqual(len(current[0]["required_skills"]), 39)
+        self.assertEqual(len(current[0]["required_projections"]), 39)
+        self.assertNotIn(
+            "release/v0.6.0-notes.md",
+            historical_v05[0]["critical_files"],
+        )
+        self.assertIn("release/v0.6.0-notes.md", current[0]["critical_files"])
         self.assertEqual(len(historical_v02), 1)
         self.assertEqual(len(historical_v03), 1)
+        self.assertEqual(len(historical_v05), 1)
         self.assertEqual(len(current), 1)
+
+    def test_historical_v0_5_excludes_every_v0_6_owner(self) -> None:
+        historical = release.audited_policy_surfaces("0.5.0")[0]
+        current = release.audited_policy_surfaces("0.6.0")[0]
+        for key, owners in (
+            (
+                "required_skills",
+                release.APG86_V06_SKILLS
+                | release.APG87_V06_SKILLS
+                | release.APG88_V06_SKILLS,
+            ),
+            (
+                "required_projections",
+                release.APG86_V06_PROJECTIONS
+                | release.APG87_V06_PROJECTIONS
+                | release.APG88_V06_PROJECTIONS,
+            ),
+            (
+                "required_test_entrypoints",
+                release.APG86_V06_TESTS
+                | release.APG87_V06_TESTS
+                | release.APG88_V06_TESTS,
+            ),
+            (
+                "critical_files",
+                release.APG86_V06_CRITICAL
+                | release.APG87_V06_CRITICAL
+                | release.APG88_V06_CRITICAL
+                | release.APG89_V06_CRITICAL
+                | release.APG90_V06_CRITICAL,
+            ),
+        ):
+            self.assertTrue(owners <= set(current[key]))
+            self.assertFalse(owners & set(historical[key]))
 
     def test_historical_v0_4_excludes_every_apg66_owner(self) -> None:
         historical = release.audited_policy_surfaces("0.4.0")[0]
@@ -336,8 +387,25 @@ class APGPublicReleaseCaseMixin:
             release.HISTORICAL_V04_HELPERS = original
         self.assertEqual(release.audited_policy_surfaces("0.4.0")[0], historical)
 
+    def test_historical_v0_5_surface_fingerprint_fails_closed(self) -> None:
+        historical = release.audited_policy_surfaces("0.5.0")[0]
+        original = release.HISTORICAL_V05_HELPERS
+        try:
+            release.HISTORICAL_V05_HELPERS = (
+                *release.HISTORICAL_V05_HELPERS,
+                "libexec/future-owner.py",
+            )
+            with self.assertRaisesRegex(
+                release.ToolError,
+                "historical public v0.5.0 policy surface changed",
+            ):
+                release.audited_policy_surfaces("0.5.0")
+        finally:
+            release.HISTORICAL_V05_HELPERS = original
+        self.assertEqual(release.audited_policy_surfaces("0.5.0")[0], historical)
+
     def test_unknown_policy_surface_identity_fails_closed(self) -> None:
-        for version in ("0.1.0", "0.3.1", "0.5.1", "1.0.0", "invalid"):
+        for version in ("0.1.0", "0.3.1", "0.5.1", "0.6.1", "1.0.0", "invalid"):
             with self.subTest(version=version), self.assertRaises(release.ToolError):
                 release.audited_policy_surfaces(version)
 

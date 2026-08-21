@@ -1,0 +1,23 @@
+{
+  "mdx": [
+    {"id": "APG88-MDX-01", "scenario": "A document decision turns on where Markdown ends and evaluated JSX or a mapped component begins.", "owner": "mdx-profile"},
+    {"id": "APG88-MDX-02", "scenario": "An MDX import, export, expression, component provider, or compile/runtime seam controls the result.", "owner": "mdx-profile"},
+    {"id": "APG88-MDX-03", "scenario": "Removing all JSX and component expressions leaves a heading, list, link, or reference question intact.", "owner": "markdown-language-profile"},
+    {"id": "APG88-MDX-04", "scenario": "Element grammar or transform configuration is independent of the MDX document seam.", "owner": "jsx-language-profile"},
+    {"id": "APG88-MDX-05", "scenario": "A rendered embedded component has a React Hook, state, effect, or render question.", "owner": "react-component-profile"},
+    {"id": "APG88-MDX-06", "scenario": "An imported typed component or TSX expression has a TypeScript checking question.", "owner": "typescript-language-profile"},
+    {"id": "APG88-MDX-07", "scenario": "An expression turns only on general JavaScript evaluation semantics.", "owner": "javascript-language-profile"},
+    {"id": "APG88-MDX-08", "scenario": "An Astro collection, route, or island directive controls an MDX document's framework placement.", "owner": "astro-profile"}
+  ],
+  "astro": [
+    {"id": "APG88-ASTRO-01", "scenario": "An .astro component decision depends on the frontmatter and template execution split.", "owner": "astro-profile"},
+    {"id": "APG88-ASTRO-02", "scenario": "An island client directive determines hydration or the server/client execution boundary.", "owner": "astro-profile"},
+    {"id": "APG88-ASTRO-03", "scenario": "A content collection schema, file route, project convention, or Astro integration controls the result.", "owner": "astro-profile"},
+    {"id": "APG88-ASTRO-04", "scenario": "A React component inside an island has a state, Hook, effect, or render question after hydration.", "owner": "react-component-profile"},
+    {"id": "APG88-ASTRO-05", "scenario": "An MDX document question turns on its Markdown-to-component seam.", "owner": "mdx-profile"},
+    {"id": "APG88-ASTRO-06", "scenario": "A library-independent JSX syntax or transform question appears inside Astro.", "owner": "jsx-language-profile"},
+    {"id": "APG88-ASTRO-07", "scenario": "A TypeScript type-checking question appears in Astro frontmatter or an imported component.", "owner": "typescript-language-profile"},
+    {"id": "APG88-ASTRO-08", "scenario": "A generic Node host, package, process, or runtime question is outside Astro's framework boundary.", "owner": "nodejs-runtime-profile"},
+    {"id": "APG88-ASTRO-09", "scenario": "A Vite-internals, Starlight, styling, accessibility, or deployment decision is requested.", "owner": "project-owner"}
+  ]
+}

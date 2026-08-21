@@ -38,6 +38,19 @@ REQUIRED_H2S = (
     "Common mistakes",
 )
 SUPPORT_DIRECTORIES = frozenset({"scripts", "references", "assets", "agents"})
+V06_PROFILE_NAMES = frozenset(
+    {
+        "astro-profile",
+        "gomock-test-profile",
+        "jsx-language-profile",
+        "mdx-profile",
+        "react-component-profile",
+        "vitest-test-profile",
+    }
+)
+V06_DESCRIPTION_BYTES_MINIMUM = 170
+V06_DESCRIPTION_BYTES_MAXIMUM = 330
+V06_TOTAL_DESCRIPTION_BYTES_MAXIMUM = 9527
 SKILL_NAME = re.compile(r"[a-z0-9]+(?:-[a-z0-9]+)*\Z")
 TOP_LEVEL_KEY = re.compile(r"(?P<key>[A-Za-z0-9_-]+):")
 OPENING_FENCE = re.compile(r"^ {0,3}(`{3,}|~{3,})")
@@ -50,6 +63,14 @@ CATALOG_ROW = re.compile(
     r"\| (?P<trigger>[^|]*?) \| `(?P<maturity>[^`|]+)` \|$"
 )
 EXTERNAL_DESTINATION = re.compile(r"^[A-Za-z][A-Za-z0-9+.-]*:")
+
+
+def context_footprint_report(*, blobs: dict[str, bytes]) -> dict[str, object]:
+    """Load the canonical package measurement owner only when the gate runs."""
+
+    from agentic_praxis_grimoire.skills import context_footprint_report as measure
+
+    return measure(blobs=blobs)
 
 
 @dataclass(frozen=True)
@@ -498,6 +519,21 @@ def _check_frontmatter_and_body(
                 "trigger-oriented-description",
                 "description must begin with 'Use when ' and contain at most 1024 characters",
                 "write one bounded trigger-oriented description",
+                parsed.line_for("description"),
+            )
+        description_bytes = len(description.encode("utf-8"))
+        if leaf.name in V06_PROFILE_NAMES and not (
+            V06_DESCRIPTION_BYTES_MINIMUM
+            <= description_bytes
+            <= V06_DESCRIPTION_BYTES_MAXIMUM
+        ):
+            _diagnostic(
+                diagnostics,
+                "APG039",
+                relative,
+                "v0-6-description-byte-band",
+                "v0.6 profile description is outside the inclusive 170 to 330 UTF-8 byte band",
+                "sharpen the v0.6 trigger and non-trigger boundary within the frozen byte band",
                 parsed.line_for("description"),
             )
 
@@ -977,6 +1013,40 @@ def check_library(root: Path) -> CheckResult:
                         f"frontmatter name {name!r} is declared by {count} leaves",
                         "give every canonical leaf one unique matching name",
                     )
+
+    if V06_PROFILE_NAMES.intersection(canonical):
+        blobs: dict[str, bytes] = {}
+        for leaf in sorted(canonical_leaves, key=lambda item: item.as_posix()):
+            skill_file = leaf / "SKILL.md"
+            if leaf.is_symlink() or not _ordinary_file(skill_file):
+                continue
+            try:
+                blobs[_relative(skill_file, root)] = skill_file.read_bytes()
+            except OSError:
+                continue
+        context_report = context_footprint_report(blobs=blobs)
+        aggregate_failures: list[str] = []
+        if (
+            context_report["total_description_bytes"]
+            > V06_TOTAL_DESCRIPTION_BYTES_MAXIMUM
+        ):
+            aggregate_failures.append("total description bytes exceed 9527")
+        if (
+            context_report["discoverable_skill_count"]
+            != context_report["skill_count"]
+        ):
+            aggregate_failures.append("discoverable and measured skill counts disagree")
+        if context_report["malformed"]:
+            aggregate_failures.append("canonical context metadata is malformed")
+        if aggregate_failures:
+            _diagnostic(
+                diagnostics,
+                "APG040",
+                "skills",
+                "v0-6-context-budget",
+                "; ".join(aggregate_failures),
+                "restore complete discoverable metadata and keep the canonical context report within the frozen v0.6 ceiling",
+            )
 
     rows = _check_catalog(
         root, skills / "README.md", canonical, diagnostics

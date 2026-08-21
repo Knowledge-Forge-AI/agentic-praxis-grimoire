@@ -69,6 +69,14 @@ def test_fixture_is_public_safe_and_bound_to_accepted_apg64() -> None:
     assert not ({"In", "Invariant", "Forbid"} & set(FIXTURE["rows"][0]))
 
 
+def test_apg89_web_composition_preserves_pure_markdown_ownership() -> None:
+    document = json.loads(
+        (ROOT / "src/test/fixtures/apg89-profile-composition-scenarios.json").read_text()
+    )
+    rows = {row["id"]: row for row in document["web"]}
+    assert rows["APG89-WEB-01"]["owner"] == "markdown-language-profile"
+
+
 def test_candidate_identity_and_canonical_frontmatter(candidate: dict[str, object]) -> None:
     frontmatter = parse_frontmatter(candidate["leaf"])
     assert frontmatter == {

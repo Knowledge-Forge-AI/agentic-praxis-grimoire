@@ -34,6 +34,7 @@ SKILLS = tuple(
         (
             *V0_2_SKILLS,
             "agentic-praxis-grimoire-workflow",
+            "astro-profile",
             "bash-language-profile",
             "bats-test-profile",
             "chatgpt-manager-workflow",
@@ -42,10 +43,13 @@ SKILLS = tuple(
             "css-language-profile",
             "dockerfile-profile",
             "go-cmp-test-profile",
+            "gomock-test-profile",
             "go-language-profile",
             "go-test-profile",
             "javascript-language-profile",
+            "jsx-language-profile",
             "markdown-language-profile",
+            "mdx-profile",
             "minitest-test-profile",
             "nix-language-profile",
             "nix-test-profile",
@@ -53,10 +57,12 @@ SKILLS = tuple(
             "postgresql-database-profile",
             "pytest-test-profile",
             "python-language-profile",
+            "react-component-profile",
             "ruby-language-profile",
             "sqlite-database-profile",
             "synthesizing-repository-guidance",
             "typescript-language-profile",
+            "vitest-test-profile",
             "vagrantfile-profile",
             "zsh-language-profile",
             "zunit-test-profile",
@@ -342,7 +348,7 @@ class APGProjectSkillsTests(unittest.TestCase):
         self.assert_success(result)
         self.assertEqual(result.stdout.splitlines(), list(SKILLS))
 
-    def test_02_installs_all_thirty_three_into_an_empty_worktree(self) -> None:
+    def test_02_installs_all_thirty_nine_into_an_empty_worktree(self) -> None:
         result = self.run_command("install")
         self.assert_success(result)
         state = self.read_state()
@@ -412,7 +418,7 @@ class APGProjectSkillsTests(unittest.TestCase):
         result = self.run_command("check")
         self.assert_success(result)
         self.assertIn("compliant", result.stdout.lower())
-        self.assertIn("33 managed", result.stdout.lower())
+        self.assertIn("39 managed", result.stdout.lower())
 
     def test_06_adopts_compatible_manual_links_without_retargeting(self) -> None:
         links = [self.create_manual_link(skill) for skill in SKILLS]

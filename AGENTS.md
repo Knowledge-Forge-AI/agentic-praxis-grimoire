@@ -127,8 +127,8 @@ prerequisite, never a fabricated fact.
 - [Exit records](docs/status/README.md): phase outcomes and next authorization.
 - [Phase and record identity](docs/phase-and-record-identity.md): semantic phase
   IDs, independent sequences, durable references, and precommit finalization.
-- [Skill library](skills/README.md): thirty-three skill owners, fourteen stable
-  and nineteen provisional, and current scope.
+- [Skill library](skills/README.md): thirty-nine skill owners, fourteen stable
+  and twenty-five provisional, and current scope.
 - [Roadmap](docs/roadmap.md): completed phases and future authorization
   boundary.
 - [v0.4 roadmap](docs/v0-4-roadmap.md): dependency-ordered implementation,
@@ -139,6 +139,25 @@ prerequisite, never a fabricated fact.
 - [v0.6 scope record](docs/v0-6-roadmap.md): six approved future profile
   candidates and explicit project-selected context/projection infrastructure
   without implementation authority.
+- [v0.6 architecture contract](docs/architecture/v0-6-skill-ownership-and-context-budget.md):
+  frozen six-profile scope, ownership and composition matrix, derived context
+  budget, selection authority, and the bounded APG86–APG90 sequence.
+- [APG85 architecture evaluation](docs/evaluations/apg85-v0-6-architecture-discoverability-and-context-budget.md):
+  budget derivation from measured evidence, enforcement ownership, and the
+  stated-but-unenforced limitation boundary.
+- [APG86 GoMock and Vitest integration](docs/evaluations/apg86-gomock-vitest-profiles-and-context-budget-enforcement.md):
+  provisional profile ownership, context-budget enforcement, conserved
+  headroom, and the APG87 stop boundary.
+- [APG87 JSX and React integration](docs/evaluations/apg87-jsx-react-profiles-and-apg88-headroom-conservation.md):
+  provisional syntax/component ownership, boundary evidence, APG88 headroom
+  conservation, and the no-successor boundary.
+- [APG88 MDX and Astro integration](docs/evaluations/apg88-mdx-astro-profiles-and-v0-6-authoring-completion.md):
+  provisional document/framework ownership, complete six-profile authoring,
+  terminal context budget, and the no-successor boundary.
+- [APG89 v0.6 readiness](docs/evaluations/apg89-v0-6-dogfood-composition-context-and-readiness.md):
+  read-only target dogfood, deterministic cross-profile ownership, explicit
+  selection, installed context and reproducibility, and bounded coverage
+  determinism evidence.
 - [APG41 readiness evaluation](docs/evaluations/apg41-v0-4-readiness-and-pre-release-smoke.md):
   retained provisional dispositions, candidate smoke, limitations, and the
   publication boundary.
@@ -917,3 +936,130 @@ GitHub refs, release assets, workflow outcome, PyPI hashes, and public install
 readback. Successful readback finishes v0.5. APG84 grants no Nix deployment,
 adapter creation, active skill migration, v0.6, target mutation, private-remote
 push, or announcement authority.
+
+## APG85 v0.6 architecture, discoverability, and context budget
+
+APG85 is the first v0.6 phase and is architecture and documentation only. ADR
+0047 freezes the exact six-profile scope — `astro-profile`,
+`jsx-language-profile`, `mdx-profile`, `react-component-profile`,
+`vitest-test-profile`, and `gomock-test-profile` — with a no-seventh rule, gives
+each an owns, does-not-own, and composes-with boundary, and adds a deterministic
+composition rule under which the narrowest applicable owner answers and ties
+resolve by a stated layer order from document to mock library.
+
+The context budget is derived from the measured 22-profile corpus rather than
+chosen by intuition: two descriptions exceeding twice the 173-byte minimum are
+treated as outliers, and the remaining 20-profile body yields a 170 to 330
+UTF-8 byte band per new profile, an aggregate v0.6 delta of at most 1,560 bytes,
+and a post-v0.6 total of at most 9,527 bytes over exactly 39 skills. Enforcement
+is fail-closed in `libexec/apg_skill_library_check.py`, and its aggregate gate
+must call `context_footprint_report(blobs=...)` so no second competing context
+report exists. The band binds only the six new profiles; diagnostic APG014 is
+unchanged. Explicit project selection remains the sole projection authority, and
+any advisory surface must be read-only, evidence-separated, deterministic, and
+never implicit.
+
+The successor sequence is frozen as APG86 (GoMock and Vitest), APG87 (JSX and
+React), APG88 (MDX and Astro), APG89 (dogfood, composition, and the context and
+readiness gate), and APG90 (publication), with expected topology 35/35/35, then
+37/37/37, then 39/39/39. Development remains 33/33/33 and 14/19 at the APG85
+terminal. APG85 implements no skill body, adds no catalog row or projection,
+implements no budget check, advances no version, and performs no publication,
+deployment, target mutation, remote push, or APG86 execution.
+
+## APG86 GoMock and Vitest profile integration
+
+APG86 provisionally integrates exactly `gomock-test-profile` and
+`vitest-test-profile` under ADR 0048. GoMock owns v0.6.0 generator,
+controller, expectation, matcher, and diagnostic behavior without absorbing
+native Go testing, go-cmp, or Go semantics. Vitest owns 4.1.x runner,
+configuration, environment, assertion, mock, timer, isolation, snapshot, and
+coverage-provider mechanics without absorbing language, Node, React, generic
+test-discipline, coverage-policy, or dependency-selection decisions.
+
+Diagnostics APG039 and APG040 activate the APG85 description and aggregate
+budget through the canonical context-report owner. The shipped checker remains
+topology-agnostic and relational: exact 35/35/35 belongs to APG86 tests and
+phase evidence, and neither the 7,967 baseline nor a 340-to-660 delta rule is
+generic enforcement. GoMock uses 276 description bytes, Vitest uses 293, the
+library total is 8,536, and 991 bytes remain under the 9,527 ceiling.
+
+Development is 35/35/35 with 35 discoverable, zero malformed, and 14 stable /
+21 provisional. Existing explicit project subsets do not expand implicitly.
+No package version, dependency, lockfile, advisory discovery, public or active
+release, target, publication, deployment, remote push, APG87, JSX, React, MDX,
+or Astro work is included.
+
+## APG87 JSX and React profile integration
+
+APG87 provisionally integrates exactly `jsx-language-profile` and
+`react-component-profile` under ADR 0049. JSX owns library-independent syntax
+and transform semantics; React owns host-independent component, render, state,
+Effect, Hook, context, memoization, error-boundary, and component-test
+interactions. TypeScript, JavaScript, Node, Vitest, generic test discipline,
+MDX, Astro, routing, styling, accessibility, build tooling, and metaframework
+behavior remain independent owners or reserved routes.
+
+Development is 37/37/37 with 37 discoverable, zero malformed, and 14 stable /
+23 provisional. JSX uses 248 description bytes and React uses 268; the 516-byte
+pair produces a 9,052-byte total and preserves 475 bytes under 9,527 for APG88.
+The APG86 generic checker is unchanged and remains topology-agnostic. Existing
+explicit project subsets do not expand implicitly.
+
+No MDX/Astro implementation, APG88, package version, dependency, lockfile,
+advisory discovery, publication, deployment, target mutation, or remote push is
+included.
+
+## APG88 MDX and Astro profile integration
+
+APG88 provisionally integrates exactly `mdx-profile` and `astro-profile` under
+ADR 0050. MDX owns the Markdown-to-JSX/component seam, ESM, expressions,
+provider mapping, and MDX-specific compile/runtime boundary. Astro owns `.astro`
+structure, frontmatter/template execution, islands and directives,
+server/client placement, content collections, routes, project conventions, and
+Astro integration configuration. Markdown, JSX, React, TypeScript, JavaScript,
+Node, Vite, Starlight, styling, accessibility, hosting, and deployment remain
+independent owners or explicit project routes.
+
+Development is 39/39/39 with 39 discoverable, zero malformed, and 14 stable /
+25 provisional. MDX uses 214 description bytes and Astro uses 238; the 452-byte
+pair produces a 9,504-byte total and preserves 23 bytes under 9,527. The generic
+APG039/APG040 checker is unchanged and remains topology-agnostic. Existing
+explicit project subsets do not expand implicitly.
+
+No APG89, package version, dependency, lockfile, advisory discovery, release
+publication, deployment, active projection mutation, provider staging, commit,
+push, or successor work is included.
+
+## APG89 v0.6 dogfood and readiness
+
+APG89 exercises the complete 39-skill development tree against read-only web
+and Go targets, binds fifteen composition questions to their one narrowest
+existing owner, proves exact explicit project subsets, and compares checkout
+with isolated installed context. It preserves 39/39/39, 14 stable / 25
+provisional, 39 discoverable, zero malformed, 9,504 bytes, 9,492 characters,
+the 9,527-byte ceiling, and the exact no-seventh-profile set.
+
+Target-owned locked-install failure is retained rather than bypassed. Coverage
+variance must be investigated with a fixed sample and unchanged policy; passing
+thresholds alone do not establish determinism. APG89 changes no skill,
+description, route, source, rights, provenance, package version, dependency,
+lockfile, public release, active projection, or deployment. APG90 remains
+separately authorized and must not begin from a non-terminal readiness result.
+
+## APG90 v0.6 publication preparation and public release handoff
+
+The external APG89 supervisory review accepted exact APG89 with C0/H0/M0/L0
+technical findings and terminalized it as `READY_FOR_APG90` without rewriting
+history. APG90 advances the canonical package version to 0.6.0, preserves the
+digest-pinned historical thirty-three-skill v0.5.0 policy, and binds the exact
+thirty-nine-skill v0.6.0 policy, release epoch, notes, workflow assets,
+distribution bundle, installed readback, and public handoff.
+
+The six v0.6 profiles remain provisional; explicit project selection remains
+authoritative; no seventh profile, mandatory chain, advisory selection, Nix
+deployment, or active APGR mutation is added. Provider work does not stage,
+commit, tag, push, or publish. Unless an authorized external mechanism actually
+completes immutable GitHub and PyPI readback, the terminal APG90 disposition is
+tracked publication preparation complete with external public finalization
+pending. No APG91 or v0.7 work is authorized.

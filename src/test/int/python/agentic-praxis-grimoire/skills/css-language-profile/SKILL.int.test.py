@@ -164,24 +164,24 @@ def test_candidate_fixture_debt_and_repository_lifecycle_agree() -> None:
 def test_catalog_projection_maturity_routes_and_project_set_are_exact() -> None:
     rows = _catalog_rows()
     candidate_rows = [row for row in rows if f"[`{CANDIDATE}`]" in row]
-    assert len(rows) == 33
+    assert len(rows) == 39
     assert len(candidate_rows) == 1
     assert candidate_rows[0].endswith("| `provisional` |")
     assert sum(row.endswith("| `stable` |") for row in rows) == 14
-    assert sum(row.endswith("| `provisional` |") for row in rows) == 19
+    assert sum(row.endswith("| `provisional` |") for row in rows) == 25
     projection = ROOT / ".agents/skills" / CANDIDATE
     assert projection.is_symlink()
     assert os.readlink(projection) == "../../skills/css-language-profile"
     assert projection.resolve() == LEAF.parent.resolve()
     general, local = _routes(ROOT)
     entries = [entry for entry in general if entry["name"] == CANDIDATE]
-    assert len(general) == 31
+    assert len(general) == 37
     assert len(local) == 1
-    assert len(general) + len(local) == 32
+    assert len(general) + len(local) == 38
     assert len(entries) == 1
     assert "CSS-specific static semantics" in entries[0]["trigger"]
     assert CANDIDATE in project_skills.EXPECTED_SKILLS
-    assert len(project_skills.EXPECTED_SKILLS) == 33
+    assert len(project_skills.EXPECTED_SKILLS) == 39
 
 
 def test_release_inventory_and_historical_exclusions_are_exact() -> None:
@@ -224,7 +224,7 @@ def test_release_inventory_and_historical_exclusions_are_exact() -> None:
     inventory_paths = {entry["path"] for entry in inventory["tests"]}
     assert all_tests <= inventory_paths
     historical = public_release.audited_policy_surfaces("0.4.0")[0]
-    current = public_release.audited_policy_surfaces("0.5.0")[0]
+    current = public_release.audited_policy_surfaces("0.6.0")[0]
     assert public_release.APG77D_V05_CRITICAL <= set(current["critical_files"])
     historical_owners = set().union(*(
         set(historical[key])

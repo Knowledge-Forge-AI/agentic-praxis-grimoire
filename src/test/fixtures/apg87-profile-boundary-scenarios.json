@@ -1,0 +1,24 @@
+{
+  "jsx": [
+    {"id": "APG87-JSX-01", "scenario": "A library-independent JSX element uses attributes, expression children, a fragment, and a spread.", "owner": "jsx-language-profile"},
+    {"id": "APG87-JSX-02", "scenario": "A project must distinguish classic and automatic JSX transform behavior and bind jsxImportSource.", "owner": "jsx-language-profile"},
+    {"id": "APG87-JSX-03", "scenario": "A .tsx intrinsic element or generic component must type-check under exact compiler options.", "owner": "typescript-language-profile"},
+    {"id": "APG87-JSX-04", "scenario": "An expression container depends on JavaScript evaluation order and coercion.", "owner": "javascript-language-profile"},
+    {"id": "APG87-JSX-05", "scenario": "A key changes React reconciliation or a Hook changes component rendering.", "owner": "react-component-profile"},
+    {"id": "APG87-JSX-06", "scenario": "A transformed JSX module depends on Node package mapping or loader behavior.", "owner": "nodejs-runtime-profile"},
+    {"id": "APG87-JSX-07", "scenario": "An MDX document mixes Markdown and evaluated JSX at the document-to-component seam.", "owner": "mdx-profile"},
+    {"id": "APG87-JSX-08", "scenario": "An Astro component uses frontmatter, islands, and a client directive.", "owner": "astro-profile"}
+  ],
+  "react": [
+    {"id": "APG87-REACT-01", "scenario": "A component state update changes a later render and preserves state by tree position.", "owner": "react-component-profile"},
+    {"id": "APG87-REACT-02", "scenario": "An Effect synchronizes with an external system and needs setup and cleanup reasoning.", "owner": "react-component-profile"},
+    {"id": "APG87-REACT-03", "scenario": "A Hook call is conditional or occurs after an early return.", "owner": "react-component-profile"},
+    {"id": "APG87-REACT-04", "scenario": "Context, memoization, or an error boundary changes component behavior.", "owner": "react-component-profile"},
+    {"id": "APG87-REACT-05", "scenario": "A fragment, attribute spread, or transform configuration is library-independent JSX.", "owner": "jsx-language-profile"},
+    {"id": "APG87-REACT-06", "scenario": "A prop generic or intrinsic-element declaration depends on TypeScript checking.", "owner": "typescript-language-profile"},
+    {"id": "APG87-REACT-07", "scenario": "A Vitest mock, fake timer, environment, or runner configuration controls the test.", "owner": "vitest-test-profile"},
+    {"id": "APG87-REACT-08", "scenario": "The team must decide whether the component test is sufficient evidence.", "owner": "implementing-with-test-discipline"},
+    {"id": "APG87-REACT-09", "scenario": "An Astro island directive controls hydration of a React component.", "owner": "astro-profile"},
+    {"id": "APG87-REACT-10", "scenario": "An MDX provider controls the document-to-component mapping seam.", "owner": "mdx-profile"}
+  ]
+}

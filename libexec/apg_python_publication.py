@@ -1,4 +1,4 @@
-"""Build and validate the exact v0.5 Python publication bundle."""
+"""Build and validate the exact v0.6 Python publication bundle."""
 
 from __future__ import annotations
 
@@ -20,11 +20,11 @@ import apg_python_distribution as distribution
 
 
 COMMAND = "apg-build-python-release-bundle"
-EPOCH = 1_700_000_000
-VERSION = "0.5.0"
+EPOCH = 1_787_270_400
+VERSION = "0.6.0"
 PROJECT_NAME = "agentic-praxis-grimoire"
-WHEEL_NAME = "agentic_praxis_grimoire-0.5.0-py3-none-any.whl"
-SDIST_NAME = "agentic_praxis_grimoire-0.5.0.tar.gz"
+WHEEL_NAME = "agentic_praxis_grimoire-0.6.0-py3-none-any.whl"
+SDIST_NAME = "agentic_praxis_grimoire-0.6.0.tar.gz"
 CHECKSUM_NAME = "SHA256SUMS"
 BUNDLE_NAMES = (WHEEL_NAME, SDIST_NAME, CHECKSUM_NAME)
 _METADATA_FIELDS = ("Name", "Version", "Requires-Python", "License-Expression")
@@ -99,7 +99,7 @@ def _metadata_contract(payload: bytes, label: str) -> bytes:
         "License-Expression": "AGPL-3.0-or-later",
     }
     if values != expected:
-        _fail(f"{label} metadata does not match the v0.5 publication contract")
+        _fail(f"{label} metadata does not match the v{VERSION} publication contract")
     return b"".join(
         f"{field}: {values[field]}\n".encode("utf-8") for field in _METADATA_FIELDS
     ) + b"\n"
@@ -120,7 +120,7 @@ def _wheel_metadata(path: Path) -> bytes:
             metadata_names = [
                 name
                 for name in names
-                if name == "agentic_praxis_grimoire-0.5.0.dist-info/METADATA"
+                if name == f"agentic_praxis_grimoire-{VERSION}.dist-info/METADATA"
             ]
             if len(metadata_names) != 1:
                 _fail("wheel must contain one exact METADATA member")
@@ -131,7 +131,7 @@ def _wheel_metadata(path: Path) -> bytes:
 
 def _sdist_metadata(path: Path) -> bytes:
     _regular(path, "normalized sdist")
-    expected_root = "agentic_praxis_grimoire-0.5.0"
+    expected_root = f"agentic_praxis_grimoire-{VERSION}"
     try:
         with tarfile.open(path, mode="r:gz") as archive:
             members = archive.getmembers()
@@ -165,7 +165,7 @@ def validate_distributions(wheel: Path, sdist: Path) -> tuple[bytes, bytes]:
     """Validate exact filenames, formats, metadata, and cross-format binding."""
 
     if wheel.name != WHEEL_NAME or sdist.name != SDIST_NAME:
-        _fail("distribution filenames do not match the v0.5 publication contract")
+        _fail(f"distribution filenames do not match the v{VERSION} publication contract")
     with tempfile.TemporaryDirectory(
         prefix=".apg-normalization-check-", dir=sdist.parent
     ) as temporary:
@@ -175,7 +175,7 @@ def validate_distributions(wheel: Path, sdist: Path) -> tuple[bytes, bytes]:
         except distribution.NormalizationError as error:
             raise PublicationError("normalized sdist cannot be revalidated") from error
         if normalized.read_bytes() != sdist.read_bytes():
-            _fail("sdist is not normalized under the v0.5 publication contract")
+            _fail(f"sdist is not normalized under the v{VERSION} publication contract")
     wheel_contract = _metadata_contract(_wheel_metadata(wheel), "wheel")
     sdist_contract = _metadata_contract(_sdist_metadata(sdist), "normalized sdist")
     if wheel_contract != sdist_contract:
@@ -351,7 +351,7 @@ def build_bundle(
     _regular(version, "package version resource")
     _regular(normalizer, "sdist normalizer")
     if version.read_text(encoding="utf-8").strip() != VERSION:
-        _fail("package version resource is not exact v0.5.0")
+        _fail(f"package version resource is not exact v{VERSION}")
     if any((work / f"build-{seed}").exists() for seed in ("a", "b")):
         _fail("publication build roots must not already exist")
 
@@ -365,7 +365,7 @@ def build_bundle(
 def parser() -> argparse.ArgumentParser:
     command = argparse.ArgumentParser(
         prog=COMMAND,
-        description="Build or validate the exact normalized v0.5 publication bundle.",
+        description=f"Build or validate the exact normalized v{VERSION} publication bundle.",
     )
     subcommands = command.add_subparsers(dest="subcommand", required=True)
     build = subcommands.add_parser("build", help="build twice and select exact bytes")

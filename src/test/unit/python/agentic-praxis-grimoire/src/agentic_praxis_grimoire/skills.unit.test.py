@@ -20,9 +20,27 @@ sys.path.insert(0, str(ROOT / "src"))
 
 def test_installed_skill_metadata_is_deterministic_and_complete() -> None:
     metadata = skills.list_skill_metadata()
-    assert len(metadata) == 33
+    assert len(metadata) == 39
     assert [entry.name for entry in metadata] == sorted(entry.name for entry in metadata)
     assert all(entry.description for entry in metadata)
+
+
+def test_apg88_packaged_context_and_headroom_are_exact() -> None:
+    report = skills.context_footprint_report()
+    by_name = {entry["name"]: entry for entry in report["skills"]}
+
+    assert report["skill_count"] == 39
+    assert report["discoverable_skill_count"] == 39
+    assert report["malformed"] == []
+    assert report["total_description_bytes"] == 9504
+    assert by_name["gomock-test-profile"]["description_bytes"] == 276
+    assert by_name["vitest-test-profile"]["description_bytes"] == 293
+    assert by_name["jsx-language-profile"]["description_bytes"] == 248
+    assert by_name["react-component-profile"]["description_bytes"] == 268
+    assert by_name["mdx-profile"]["description_bytes"] == 214
+    assert by_name["astro-profile"]["description_bytes"] == 238
+    assert report["total_description_bytes"] - 7967 == 1537
+    assert 9527 - report["total_description_bytes"] == 23
 
 
 def test_context_report_counts_exact_utf8_description_bytes_and_characters() -> None:
@@ -53,7 +71,7 @@ def test_packaged_metadata_manifest_is_bounded_and_source_bound() -> None:
     document = json.loads(packaged)
 
     assert document["schema_version"] == 1
-    assert len(document["skills"]) == 33
+    assert len(document["skills"]) == 39
     paths = [row["path"] for row in document["skills"]]
     assert paths == sorted(paths)
     assert all(len(row["source_sha256"]) == 64 for row in document["skills"])

@@ -15,8 +15,8 @@ from src.test.apg_test_support import repository_root
 
 REPOSITORY_ROOT = repository_root(__file__)
 WORKFLOW = REPOSITORY_ROOT / ".github" / "workflows" / "release.yml"
-WHEEL = "agentic_praxis_grimoire-0.5.0-py3-none-any.whl"
-SDIST = "agentic_praxis_grimoire-0.5.0.tar.gz"
+WHEEL = "agentic_praxis_grimoire-0.6.0-py3-none-any.whl"
+SDIST = "agentic_praxis_grimoire-0.6.0.tar.gz"
 
 
 def _verification_script() -> str:
@@ -28,7 +28,7 @@ def _fixture(
     tmp_path: Path,
     *,
     corrupt: bool = False,
-    tag: str = "v0.5.0",
+    tag: str = "v0.6.0",
     extra_asset: bool = False,
     draft: bool = False,
     prerelease: bool = False,
@@ -81,7 +81,7 @@ def _run(
     tmp_path: Path,
     *,
     corrupt: bool = False,
-    tag: str = "v0.5.0",
+    tag: str = "v0.6.0",
     extra_asset: bool = False,
     draft: bool = False,
     prerelease: bool = False,
@@ -109,7 +109,7 @@ import os
 import shutil
 import sys
 
-names = {"1": "agentic_praxis_grimoire-0.5.0-py3-none-any.whl", "2": "agentic_praxis_grimoire-0.5.0.tar.gz", "3": "SHA256SUMS"}
+names = {"1": "agentic_praxis_grimoire-0.6.0-py3-none-any.whl", "2": "agentic_praxis_grimoire-0.6.0.tar.gz", "3": "SHA256SUMS"}
 asset_id = sys.argv[-1].rsplit("/", 1)[-1]
 with (Path(os.environ["APG_FAKE_ASSETS"]) / names[asset_id]).open("rb") as source:
     shutil.copyfileobj(source, sys.stdout.buffer)

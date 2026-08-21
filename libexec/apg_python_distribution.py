@@ -18,6 +18,8 @@ import zlib
 
 COMMAND = "apg-normalize-python-sdist"
 V05_RELEASE_EPOCH = 1_700_000_000
+V06_RELEASE_EPOCH = 1_787_270_400
+RELEASE_EPOCHS = (V05_RELEASE_EPOCH, V06_RELEASE_EPOCH)
 # The gzip header is the tighter of the gzip uint32 and tar timestamp bounds.
 MAX_ARCHIVE_MTIME = 0xFFFFFFFF
 _BLOCK_SIZE = 512
@@ -332,9 +334,11 @@ def _epoch_argument(value: str) -> int:
         raise argparse.ArgumentTypeError(
             str(error)
         ) from error
-    if selected != V05_RELEASE_EPOCH:
+    if selected not in RELEASE_EPOCHS:
         raise argparse.ArgumentTypeError(
-            f"v0.5 release epoch must be exactly {V05_RELEASE_EPOCH} seconds"
+            "release epoch must be one of "
+            + ", ".join(str(epoch) for epoch in RELEASE_EPOCHS)
+            + " seconds"
         )
     return selected
 

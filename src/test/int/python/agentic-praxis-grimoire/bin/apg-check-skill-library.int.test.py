@@ -110,7 +110,7 @@ def assert_current_development_checker_state(
         testcase.assertEqual(
             result.stdout,
             "PASS APG skill library: "
-            "33 canonical skills, 33 catalog rows, 33 projections\n",
+            "39 canonical skills, 39 catalog rows, 39 projections\n",
         )
     elif lifecycle in {
         ("repair-required", "Proposed"),

@@ -348,7 +348,7 @@ rollback tests cover both path classes without changing target state format.
 - Project projection success does not prove Codex invocation, automatic trigger
   selection, user-global integration, skill maturity, or production readiness.
 - The default managed set follows the verified source identity: nineteen
-  skills for public v0.3.0 and thirty-three for current development. The command
+  skills for public v0.3.0 and thirty-nine for current development. The command
   is not a general skill installer or package manager.
 
 APG49 adds no projection. Its matryer/is candidate is terminally deferred
@@ -416,3 +416,61 @@ APG81H adds `.agents/skills/nodejs-runtime-profile` with exact relative target
 Ordinary containment, source-identity, adoption, check, and rollback rules
 apply. Corrected historical v0.4 and public/active v0.4.0 do not acquire this
 owner; candidate-preserving rollback removes only the current Node projection.
+
+## APG85 v0.6 selection authority
+
+APG85 adds no projection. The default current managed set remains 33 and no
+lifecycle operation, state field, target effect, or rollback behavior changes.
+Under ADR 0047 it records only the authority boundary that later v0.6 phases
+must preserve.
+
+Explicit selection remains authoritative. This command, driven by an operator or
+project configuration, is the only mechanism that selects, installs, adopts,
+projects, or removes a skill. v0.6 introduces no inference that changes the
+active set.
+
+If a later v0.6 phase proposes an advisory discovery or recommendation surface,
+it must be read-only, must report observed repository evidence separately from
+the profiles that evidence suggests, must be deterministic enough to test, and
+must never write projection state, managed links, the Git-local exclusion block,
+or configuration. No detection may run implicitly inside install, adopt, check,
+or uninstall; an operator asks for a recommendation or does not receive one. A
+recommendation is an input to an operator decision and never selects, installs,
+projects, or activates anything.
+
+If no such surface can be delivered within those constraints, none ships and
+v0.6 remains explicit-selection-only. APG86 through APG88 each add their own
+projections for the profiles they author, raising the default current managed
+set to 35, then 37, then 39 under the ordinary containment, source-identity,
+adoption, check, and rollback rules. APG85 grants none of that.
+
+## APG86 GoMock and Vitest projections
+
+APG86 adds `.agents/skills/gomock-test-profile` and
+`.agents/skills/vitest-test-profile` with exact relative targets
+`../../skills/gomock-test-profile` and `../../skills/vitest-test-profile`.
+The default current managed set is 35. Existing six-skill and other explicit
+subsets retain only their recorded names and do not gain either profile
+implicitly. State version 1, containment, source identity, adoption, check,
+uninstall, and rollback behavior are unchanged; no advisory selection exists.
+
+## APG87 JSX and React projections
+
+APG87 adds `.agents/skills/jsx-language-profile` and
+`.agents/skills/react-component-profile` with exact relative targets
+`../../skills/jsx-language-profile` and
+`../../skills/react-component-profile`. The default current managed set is 37.
+Existing six-skill and other explicit subsets retain only their recorded names
+and do not gain either profile implicitly. State version 1, containment, source
+identity, adoption, check, uninstall, and rollback behavior are unchanged; no
+advisory selection exists and no MDX/Astro projection is added.
+
+## APG88 MDX and Astro projections
+
+APG88 adds `.agents/skills/mdx-profile` and `.agents/skills/astro-profile` with
+exact relative targets `../../skills/mdx-profile` and
+`../../skills/astro-profile`. The default current managed set is 39. Existing
+six-skill and other explicit subsets retain only their recorded names and do
+not gain either profile implicitly. State version 1, containment, source
+identity, adoption, check, uninstall, and rollback behavior are unchanged; no
+advisory selection exists.

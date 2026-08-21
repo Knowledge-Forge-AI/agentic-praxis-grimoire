@@ -930,3 +930,49 @@ lifecycle ownership. Node lifecycle is `provisionally-integrated`, ADR 0046 is
 Accepted with amendment, and the current surface is 33/33/33. Corrected
 historical, published, and active v0.4.0 continue to exclude every APG80 and
 APG81H current-only owner.
+
+## APG86 GoMock and Vitest current ownership
+
+APG86 installs the complete current owner set for `gomock-test-profile` and
+`vitest-test-profile`: canonical leaves, catalog maturity rows, capability
+routes, exact relative projections, default project selection, current release
+policy, packaged metadata, public-safe scenarios, focused tests, inventory,
+ADR 0048, evaluation, and exit. Both lifecycle states are
+`provisionally-integrated` and both maturity rows are `provisional`.
+
+Development is 35/35/35 and 14/21. The context-budget checker owns only the
+six-name byte band and relational aggregate contract; phase topology and
+historical deltas remain fixture and record evidence. Historical public and
+active releases exclude APG86-only owners, and explicit project subsets remain
+membership-stable.
+
+## APG87 JSX and React current ownership
+
+APG87 installs the complete current owner sets for `jsx-language-profile` and
+`react-component-profile`: canonical leaves, catalog rows, exact relative
+projections, general capability routes, provisional maturity, project default
+membership, current-development release audit entries, packaged metadata,
+boundary fixtures, focused tests, test inventory, ADR 0049, evaluation, and
+exit. Both lifecycle states are `provisionally-integrated`.
+
+The owners remain direct independently selectable siblings. JSX owns
+library-independent syntax and transforms; React owns host-independent
+component and render behavior. The project model creates no web-stack owner,
+and reserved MDX/Astro routes are not installed owners. Development is
+37/37/37 and 14/23; public and active v0.5.0 exclude APG87-only owners, and
+explicit project subsets remain membership-stable.
+
+## APG88 MDX and Astro current ownership
+
+APG88 installs the complete current owner sets for `mdx-profile` and
+`astro-profile`: canonical leaves, catalog rows, exact relative projections,
+general capability routes, provisional maturity, project default membership,
+current-development release audit entries, packaged metadata, boundary
+fixtures, focused tests, test inventory, ADR 0050, evaluation, and exit. Both
+lifecycle states are `provisionally-integrated`.
+
+The owners are direct independently selectable siblings. MDX owns the
+document/component seam and Astro owns framework/project/execution placement;
+adjacent Markdown, JSX, React, TypeScript, JavaScript, and Node regions remain
+independent. Development is 39/39/39 and 14/25; public and active v0.5.0 exclude
+APG88-only owners, and explicit project subsets remain membership-stable.

@@ -111,6 +111,34 @@ def test_process_death_releases_phase_lock_for_recovery(tmp_path: Path) -> None:
     assert created.read_bytes() == b"after-kill\n"
 
 
+def test_capture_retries_one_observed_phase_lock_contention(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    calls = 0
+    flock = response.fcntl.flock
+
+    def contend_once(descriptor: int, operation: int) -> None:
+        nonlocal calls
+        calls += 1
+        if calls == 1:
+            raise BlockingIOError
+        flock(descriptor, operation)
+
+    monkeypatch.setattr(response.fcntl, "flock", contend_once)
+    monkeypatch.setattr(response.time, "sleep", lambda _seconds: None)
+
+    created = response.capture_response(
+        outbox_root=tmp_path / "outbox",
+        project="project",
+        phase="APG89",
+        body=b"after-contention\n",
+    )
+
+    assert calls == 2
+    assert created.read_bytes() == b"after-contention\n"
+
+
 def test_next_capture_cleans_dead_process_body_and_rejects_relative_root(
     tmp_path: Path,
 ) -> None:

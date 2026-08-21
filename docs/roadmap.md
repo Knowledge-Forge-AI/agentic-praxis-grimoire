@@ -1921,3 +1921,110 @@ operational facts recorded outside the prepublication source commit.
 
 Successful APG84 finishes v0.5. It does not start Nix deployment,
 `agentic-praxis-grimoire-nd`, `composition-nd`, or v0.6.
+
+## APG85 v0.6 architecture, discoverability, and context budget
+
+APG85 is the first v0.6 phase and is architecture and documentation only. Under
+ADR 0047 it freezes the exact six-profile scope, states each profile's owns,
+does-not-own, and composes-with boundary, and adds a deterministic composition
+rule under which the narrowest applicable owner answers and ties resolve by a
+stated layer order.
+
+It derives the first real growth limit on discovery metadata from the measured
+existing profile corpus: a 170 to 330 UTF-8 byte band per new profile, at most
+1,560 aggregate bytes for the six, and at most 9,527 bytes over exactly 39
+skills, with an expected envelope of 8,987 to 9,527. Enforcement is fail-closed
+under one measurement owner, binds only the six new profiles, and leaves
+diagnostic APG014 unchanged. Explicit project selection remains the sole
+projection authority, and any advisory surface must be read-only,
+evidence-separated, deterministic, and never implicit.
+
+The successor sequence is frozen as APG86 (GoMock and Vitest), APG87 (JSX and
+React), APG88 (MDX and Astro), APG89 (dogfood, composition, and the context and
+readiness gate), and APG90 (publication). APG85 implements no skill body, adds
+no catalog row or projection, advances no version, and performs no publication,
+deployment, target mutation, or push. Each successor phase remains separately
+authorized.
+
+## APG86 GoMock and Vitest implementation
+
+APG86 implements the first two frozen v0.6 profiles and the APG85 budget gate.
+GoMock v0.6.0 and Vitest 4.1.x receive narrow provisional owners, public-safe
+boundary fixtures, catalog rows, routes, projections, packaged metadata, and
+current project/release inventory ownership. Development is 35/35/35, 14/21,
+and 35 discoverable with zero malformed entries.
+
+APG039 enforces the six-name 170-to-330 UTF-8 byte band. APG040 calls the
+canonical context-report implementation and enforces the 9,527-byte ceiling,
+relational discoverability, and malformed-entry refusal without a phase-
+specific topology or baseline. The two descriptions add 569 bytes, producing
+8,536 total and preserving 991 bytes for APG87 and APG88.
+
+APG86 changes no version, dependency, lockfile, public release, active target,
+or advisory discovery surface and starts no APG87 work. APG87 remains the next
+separately authorized phase.
+
+## APG87 JSX and React implementation
+
+APG87 implements the second frozen v0.6 pair. JSX receives a
+library-independent syntax/transform owner and React receives a host-independent
+component/render owner, with public-safe boundary fixtures, catalog rows,
+routes, projections, packaged metadata, and current project/release inventory
+ownership. Development is 37/37/37, 14/23, and 37 discoverable with zero
+malformed entries.
+
+The descriptions consume 248 and 268 bytes, 516 combined, producing 9,052
+total and preserving 475 bytes for APG88. This dispositions the post-planning
+review's headroom finding without changing the generic topology-agnostic
+checker. APG87 changes no version, dependency, lockfile, public release, active
+target, or advisory discovery surface and starts no MDX/Astro or APG88 work.
+APG88 remains separately authorized.
+
+## APG88 MDX and Astro implementation
+
+APG88 implements the final frozen v0.6 authoring pair. MDX receives a
+document/component-seam owner and Astro receives a framework/project/execution
+owner, with public-safe boundary fixtures, catalog rows, routes, projections,
+packaged metadata, and current project/release inventory ownership. Development
+is 39/39/39, 14/25, and 39 discoverable with zero malformed entries.
+
+The descriptions consume 214 and 238 bytes, 452 combined, producing 9,504
+total and preserving 23 bytes beneath 9,527. This dispositions the reviewed
+topology, Markdown-route, description-allocation, and `AGENTS.md` findings
+without changing the generic topology-agnostic checker. All six frozen v0.6
+profiles are authored and provisionally integrated. APG88 changes no version,
+dependency, lockfile, public release, active target, or advisory discovery
+surface and starts no APG89 work. APG89 remains separately authorized.
+
+## APG89 v0.6 dogfood, composition, context, and readiness
+
+APG89 qualifies the complete 39-skill development tree without changing its
+skills, routes, descriptions, maturity, dependencies, or version. Read-only
+web and Go dogfood, a fifteen-row owner matrix, exact explicit project subsets,
+isolated installed context, and two disjoint package builds exercise the
+accepted APG85-APG88 architecture. The result preserves 39/39/39, 14/25, 39
+discoverable, zero malformed, 9,504 bytes, 9,492 characters, 23 bytes of
+headroom, and the no-seventh-profile rule.
+
+The recurring integration branch variance is reproduced with a fixed sample
+and corrected only through deterministic test evidence; production behavior,
+thresholds, exclusions, rounding, and denominators remain unchanged. APG89
+does not advance a version, name or publish a release candidate, tag, upload,
+deploy, mutate active projections, or begin APG90. APG90 remains separately
+authorized and depends on a terminal green APG89 disposition.
+
+## APG90 v0.6 publication preparation and public release handoff
+
+The external APG89 supervisory review returned **ACCEPT** with C0/H0/M0/L0
+technical findings, so APG90 advances the canonical package version to 0.6.0
+and prepares the exact public release. Historical v0.5.0 remains a digest-
+pinned thirty-three-skill policy surface; current v0.6.0 contains exactly 39
+skills and 39 projections, with all six new profiles still provisional and
+project selection explicit-only.
+
+APG90 binds the v0.6 release epoch, exact GitHub workflow tag and assets,
+release notes, reproducible Python bundle, installed context, normal forward
+public lineage, and a same-phase operator handoff. Provider work does not
+stage, commit, tag, push, publish, deploy, or mutate active projections. Public
+GitHub/PyPI finalization remains pending unless separately completed through
+an authorized mechanism; no APG91 or v0.7 work follows by implication.

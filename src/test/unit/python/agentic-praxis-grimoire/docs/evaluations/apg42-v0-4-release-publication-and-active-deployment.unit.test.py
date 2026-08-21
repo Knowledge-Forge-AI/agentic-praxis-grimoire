@@ -98,8 +98,8 @@ class APG42PublicReleaseContractTests(unittest.TestCase):
         evaluation = EVALUATION.relative_to(ROOT).as_posix()
         exit_record = EXIT.relative_to(ROOT).as_posix()
 
-        self.assertEqual(len(policy["required_skills"]), 33)
-        self.assertEqual(len(policy["required_projections"]), 33)
+        self.assertEqual(len(policy["required_skills"]), 39)
+        self.assertEqual(len(policy["required_projections"]), 39)
         self.assertIn(evaluation, policy["critical_files"])
         self.assertIn(exit_record, policy["critical_files"])
         self.assertIn(TEST_PATH, policy["required_test_entrypoints"])

@@ -1,4 +1,4 @@
-"""Focused contracts for the v0.5 Python publication bundle."""
+"""Focused contracts for the v0.6 Python publication bundle."""
 
 from __future__ import annotations
 
@@ -29,7 +29,7 @@ def _metadata() -> bytes:
     return (
         b"Metadata-Version: 2.4\n"
         b"Name: agentic-praxis-grimoire\n"
-        b"Version: 0.5.0\n"
+        b"Version: 0.6.0\n"
         b"License-Expression: AGPL-3.0-or-later\n"
         b"Requires-Python: >=3.10\n\n"
     )
@@ -40,14 +40,14 @@ def _wheel(path: Path, *, suffix: bytes = b"") -> None:
     with zipfile.ZipFile(path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
         archive.writestr("agentic_praxis_grimoire/__init__.py", b"" + suffix)
         archive.writestr(
-            "agentic_praxis_grimoire-0.5.0.dist-info/METADATA", metadata
+            "agentic_praxis_grimoire-0.6.0.dist-info/METADATA", metadata
         )
         archive.writestr(
-            "agentic_praxis_grimoire-0.5.0.dist-info/WHEEL",
+            "agentic_praxis_grimoire-0.6.0.dist-info/WHEEL",
             b"Wheel-Version: 1.0\nTag: py3-none-any\n",
         )
         archive.writestr(
-            "agentic_praxis_grimoire-0.5.0.dist-info/RECORD", b""
+            "agentic_praxis_grimoire-0.6.0.dist-info/RECORD", b""
         )
 
 
@@ -56,10 +56,10 @@ def _raw_sdist(path: Path, *, seed: int) -> None:
     with gzip.GzipFile(fileobj=payload, mode="wb", mtime=seed) as compressed:
         with tarfile.open(fileobj=compressed, mode="w") as archive:
             for name, content in (
-                ("agentic_praxis_grimoire-0.5.0/PKG-INFO", _metadata()),
-                ("agentic_praxis_grimoire-0.5.0/pyproject.toml", b"[build-system]\n"),
+                ("agentic_praxis_grimoire-0.6.0/PKG-INFO", _metadata()),
+                ("agentic_praxis_grimoire-0.6.0/pyproject.toml", b"[build-system]\n"),
                 (
-                    "agentic_praxis_grimoire-0.5.0/"
+                    "agentic_praxis_grimoire-0.6.0/"
                     "src/agentic_praxis_grimoire/__init__.py",
                     b"",
                 ),
@@ -87,7 +87,7 @@ def _fake_runner(
         del cwd, check
         calls.append(tuple(os.fspath(value) for value in arguments))
         assert env is not None
-        assert env["SOURCE_DATE_EPOCH"] == "1700000000"
+        assert env["SOURCE_DATE_EPOCH"] == "1787270400"
         if arguments[1:5] == ["-m", "build", "--wheel", "--sdist"]:
             output = Path(arguments[arguments.index("--outdir") + 1])
             output.mkdir(parents=True, exist_ok=False)
@@ -136,7 +136,7 @@ def test_build_bundle_invokes_normalizer_and_selects_only_reproducible_bytes(
         call for call in calls if Path(call[1]).name == "apg-normalize-python-sdist"
     ]
     assert len(normalizers) == 2
-    assert all("--epoch" in call and "1700000000" in call for call in normalizers)
+    assert all("--epoch" in call and "1787270400" in call for call in normalizers)
     assert not any(path.name.startswith("raw-") for path in output.iterdir())
     publication.validate_bundle(output)
 
@@ -240,7 +240,7 @@ def test_distribution_contract_rejects_wrong_names_and_metadata(tmp_path: Path) 
         publication.validate_distributions(tmp_path / "wrong.whl", sdist)
     with pytest.raises(publication.PublicationError, match="metadata"):
         publication._metadata_contract(
-            _metadata().replace(b"Version: 0.5.0", b"Version: 9.9.9"), "wheel"
+            _metadata().replace(b"Version: 0.6.0", b"Version: 9.9.9"), "wheel"
         )
 
 
@@ -338,7 +338,7 @@ def test_direct_file_and_executable_guards_reject_wrong_kinds(tmp_path: Path) ->
 
 def test_wheel_rejects_duplicate_members(tmp_path: Path) -> None:
     wheel = tmp_path / publication.WHEEL_NAME
-    metadata_name = "agentic_praxis_grimoire-0.5.0.dist-info/METADATA"
+    metadata_name = "agentic_praxis_grimoire-0.6.0.dist-info/METADATA"
     with zipfile.ZipFile(wheel, "w") as archive:
         archive.writestr(metadata_name, _metadata())
         with pytest.warns(UserWarning, match="Duplicate name"):

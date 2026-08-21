@@ -25,8 +25,8 @@ import apg_public_release as release  # noqa: E402
 
 
 COMMAND = REPOSITORY_ROOT / "bin" / "apg-public-release"
-VERSION = "0.5.0-apg53.1"
-RELEASE_DATE = "2026-07-20T12:00:00-04:00"
+VERSION = "0.6.0-apg90.1"
+RELEASE_DATE = "2026-08-21T00:00:00Z"
 
 
 class APGPublicReleaseTests(unittest.TestCase):
@@ -195,6 +195,12 @@ class APGPublicReleaseTests(unittest.TestCase):
     def historical_v04_policy(self) -> dict[str, object]:
         value = self.policy()
         for key, paths in release.audited_policy_surfaces("0.4.0")[0].items():
+            value[key] = list(paths)
+        return value
+
+    def historical_v05_policy(self) -> dict[str, object]:
+        value = self.policy()
+        for key, paths in release.audited_policy_surfaces("0.5.0")[0].items():
             value[key] = list(paths)
         return value
 
@@ -886,14 +892,32 @@ class APGPublicReleaseTests(unittest.TestCase):
             version="0.4.0",
         )
         self.assert_success(v04_build)
+        historical_v05_source = self.copy_source_with_policy(
+            "historical-v0.5-matrix-source",
+            self.historical_v05_policy(),
+        )
+        v05, v05_build = self.build(
+            self.root / "valid-v0.5-base",
+            base=v04,
+            source=historical_v05_source,
+            version="0.5.0",
+        )
+        self.assert_success(v05_build)
+        self.assert_success(
+            self.check_candidate(
+                v05,
+                source=historical_v05_source,
+                base=v04,
+                version="0.5.0",
+            )
+        )
         candidate, result = self.build(
             self.root / "valid-later-candidate",
-            base=v04,
-            version="0.5.0",
+            base=v05,
         )
         self.assert_success(result)
         self.assert_success(
-            self.check_candidate(candidate, base=v04, version="0.5.0")
+            self.check_candidate(candidate, base=v05)
         )
 
         scenarios: dict[str, Callable[[Path], None]]
@@ -1090,7 +1114,7 @@ class APGPublicReleaseTests(unittest.TestCase):
         self.assertEqual(candidate, output)
         self.assertEqual(result.returncode, 1)
         self.assertIn("unsupported future owner", result.stderr)
-        self.assertIn(".agents/skills/css-language-profile", result.stderr)
+        self.assertIn(".agents/skills/astro-profile", result.stderr)
         self.assertFalse(output.exists())
 
 if __name__ == "__main__":

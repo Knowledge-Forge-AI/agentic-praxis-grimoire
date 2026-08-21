@@ -373,11 +373,11 @@ cost.
   an independent four-digit sequence.
 - [`docs/status/`](docs/status/README.md) records truthful phase exits under an
   independent five-digit sequence.
-- [`skills/`](skills/README.md) contains and indexes thirty-three canonical skills:
-  fourteen stable rows and nineteen provisional manager-assignment,
+- [`skills/`](skills/README.md) contains and indexes thirty-nine canonical skills:
+  fourteen stable rows and twenty-five provisional manager-assignment,
   language, database, test-profile, or conversion rows.
 - [`.agents/skills/`](.agents/skills/) is the checked-in Codex repository
-  discovery projection; its thirty-three relative symbolic links contain no
+  discovery projection; its thirty-nine relative symbolic links contain no
   independent skill content.
 - [`docs/bootstrap-v0.1.md`](docs/bootstrap-v0.1.md) defines maturity,
   provisional evidence, rollback, dogfooding, and decommission gates.
@@ -1210,3 +1210,57 @@ distribution carries the checkout-independent `apgr` runtime and exact skill
 metadata. The pair is version-bound and reproducibly consumable without mutable
 development-checkout state. APG84 publication is recommended but separately
 authorized and is not begun here.
+
+## APG87 JSX and React profile integration
+
+[APG87](docs/evaluations/apg87-jsx-react-profiles-and-apg88-headroom-conservation.md)
+provisionally integrates one library-independent JSX syntax/transform owner and
+one host-independent React component/render owner. Objective boundary fixtures
+keep TypeScript, JavaScript, Node, Vitest, generic test discipline, and the
+future MDX/Astro owners separate. Development is 37/37/37 and 14/23, with 37
+discoverable entries and zero malformed metadata.
+
+The 248-byte JSX and 268-byte React descriptions consume 516 bytes, producing
+9,052 total and retaining 475 bytes for APG88. The generic APG039/APG040 checker
+is unchanged and topology-agnostic. Public and active v0.5.0 remain unchanged;
+no MDX/Astro implementation, APG88, advisory discovery, version change,
+publication, deployment, target mutation, or remote push occurs.
+
+## APG88 MDX and Astro profile integration
+
+[APG88](docs/evaluations/apg88-mdx-astro-profiles-and-v0-6-authoring-completion.md)
+provisionally integrates one MDX document/component-seam owner and one Astro
+framework/project/execution owner. Objective boundary fixtures keep Markdown,
+JSX, React, TypeScript, JavaScript, Node, Vite, Starlight, styling,
+accessibility, and deployment concerns separate. Development is 39/39/39 and
+14/25, with 39 discoverable entries and zero malformed metadata.
+
+The 214-byte MDX and 238-byte Astro descriptions consume 452 bytes, producing
+9,504 total and retaining 23 bytes beneath 9,527. All six frozen v0.6 profiles
+are authored and provisionally integrated. The generic APG039/APG040 checker is
+unchanged and topology-agnostic, and explicit project subsets do not expand.
+Public and active v0.5.0 remain unchanged; no APG89, advisory discovery,
+version change, release publication, deployment, active projection mutation,
+provider Git publication, or successor work occurs.
+
+## APG89 v0.6 readiness
+
+[APG89](docs/evaluations/apg89-v0-6-dogfood-composition-context-and-readiness.md)
+qualifies the 39-skill tree through read-only target dogfood, sibling-owner
+composition, exact project-selected subsets, installed context readback,
+reproducible packages, and deterministic coverage evidence. Its external
+supervisory review returned **ACCEPT** with C0/H0/M0/L0 findings and
+terminalized the phase as `READY_FOR_APG90`.
+
+## APG90 v0.6 publication preparation
+
+APG90 advances the package version to 0.6.0 and prepares the exact public
+release while preserving historical v0.5.0. v0.6 contains 39 skills, 39
+projections, 14 stable and 25 provisional rows, and 9,504 description bytes.
+Explicit project selection remains authoritative; no automatic profile chain
+or seventh v0.6 profile ships.
+
+Tracked preparation and an exact public-publication handoff do not themselves
+claim that the public tag, GitHub Release, Trusted Publishing workflow, or PyPI
+version exists. No Nix deployment or active APGR projection mutation is part
+of APG90.

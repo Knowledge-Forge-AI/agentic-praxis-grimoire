@@ -88,7 +88,7 @@ identified exactly.
    `parser-tool-owner`, content and permission policy to `project-policy`,
    document taxonomy and decomposition shape to `project-design`, stricter
    repository rules to `repository-policy`, MDX whole-file work to
-   `mdx-owner`, host-owned artifacts to `host-owner`, HTML meaning to the
+   `mdx-profile`, host-owned artifacts to `host-owner`, HTML meaning to the
    HTML owner, accessibility acceptance to the accessibility owner, fenced
    content to the embedded-language owner, and frontmatter data syntax to
    the data-language owner.

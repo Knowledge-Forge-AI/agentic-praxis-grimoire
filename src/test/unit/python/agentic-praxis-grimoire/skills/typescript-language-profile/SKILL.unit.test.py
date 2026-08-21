@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 import sys
 
@@ -40,3 +41,11 @@ def test_leaf_uses_qualitative_structure_policy_only() -> None:
     assert "300 lines" not in normalized
     assert "600 lines" not in normalized
     assert "900 lines" not in normalized
+
+
+def test_apg89_web_composition_preserves_typescript_checking() -> None:
+    document = json.loads(
+        (ROOT / "src/test/fixtures/apg89-profile-composition-scenarios.json").read_text()
+    )
+    rows = {row["id"]: row for row in document["web"]}
+    assert rows["APG89-WEB-06"]["owner"] == "typescript-language-profile"

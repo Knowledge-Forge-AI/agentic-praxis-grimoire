@@ -1087,6 +1087,120 @@ APG84_V05_CRITICAL = frozenset(
     }
 )
 
+APG86_V06_SKILLS = frozenset(
+    {
+        "skills/gomock-test-profile/SKILL.md",
+        "skills/vitest-test-profile/SKILL.md",
+    }
+)
+APG86_V06_PROJECTIONS = frozenset(
+    {
+        ".agents/skills/gomock-test-profile",
+        ".agents/skills/vitest-test-profile",
+    }
+)
+APG86_V06_TESTS = frozenset(
+    {
+        "src/test/unit/python/agentic-praxis-grimoire/skills/gomock-test-profile/SKILL.unit.test.py",
+        "src/test/unit/python/agentic-praxis-grimoire/skills/vitest-test-profile/SKILL.unit.test.py",
+    }
+)
+APG86_V06_CRITICAL = frozenset(
+    {
+        "docs/adr/2026/08/0048-gomock-vitest-profiles-and-context-budget-enforcement.md",
+        "docs/evaluations/apg86-gomock-vitest-profiles-and-context-budget-enforcement.md",
+        "docs/status/2026/08/20/00137-apg86-gomock-vitest-profiles-and-context-budget-enforcement-exit.md",
+        "src/test/fixtures/apg86-profile-boundary-scenarios.json",
+    }
+)
+
+APG87_V06_SKILLS = frozenset(
+    {
+        "skills/jsx-language-profile/SKILL.md",
+        "skills/react-component-profile/SKILL.md",
+    }
+)
+APG87_V06_PROJECTIONS = frozenset(
+    {
+        ".agents/skills/jsx-language-profile",
+        ".agents/skills/react-component-profile",
+    }
+)
+APG87_V06_TESTS = frozenset(
+    {
+        "src/test/unit/python/agentic-praxis-grimoire/skills/jsx-language-profile/SKILL.unit.test.py",
+        "src/test/unit/python/agentic-praxis-grimoire/skills/react-component-profile/SKILL.unit.test.py",
+    }
+)
+APG87_V06_CRITICAL = frozenset(
+    {
+        "docs/adr/2026/08/0049-jsx-react-profiles-and-apg88-headroom-conservation.md",
+        "docs/evaluations/apg87-jsx-react-profiles-and-apg88-headroom-conservation.md",
+        "docs/status/2026/08/20/00138-apg87-jsx-react-profiles-and-apg88-headroom-conservation-exit.md",
+        "src/test/fixtures/apg87-profile-boundary-scenarios.json",
+    }
+)
+
+APG88_V06_SKILLS = frozenset(
+    {
+        "skills/astro-profile/SKILL.md",
+        "skills/mdx-profile/SKILL.md",
+    }
+)
+APG88_V06_PROJECTIONS = frozenset(
+    {
+        ".agents/skills/astro-profile",
+        ".agents/skills/mdx-profile",
+    }
+)
+APG88_V06_TESTS = frozenset(
+    {
+        "src/test/unit/python/agentic-praxis-grimoire/skills/astro-profile/SKILL.unit.test.py",
+        "src/test/unit/python/agentic-praxis-grimoire/skills/mdx-profile/SKILL.unit.test.py",
+    }
+)
+APG88_V06_CRITICAL = frozenset(
+    {
+        "docs/adr/2026/08/0050-mdx-astro-profiles-and-v0-6-authoring-completion.md",
+        "docs/evaluations/apg88-mdx-astro-profiles-and-v0-6-authoring-completion.md",
+        "docs/status/2026/08/20/00139-apg88-mdx-astro-profiles-and-v0-6-authoring-completion-exit.md",
+        "src/test/fixtures/apg88-profile-boundary-scenarios.json",
+    }
+)
+
+APG89_V06_CRITICAL = frozenset(
+    {
+        "docs/evaluations/apg89-v0-6-dogfood-composition-context-and-readiness.md",
+        "docs/status/2026/08/20/00140-apg89-v0-6-dogfood-composition-context-and-readiness-exit.md",
+        "src/test/fixtures/apg89-profile-composition-scenarios.json",
+    }
+)
+
+APG90_V06_CRITICAL = frozenset(
+    {
+        "docs/evaluations/apg90-v0-6-publication-preparation-and-public-release-handoff.md",
+        "docs/status/2026/08/21/00141-apg90-v0-6-publication-preparation-and-public-release-handoff-exit.md",
+        "release/v0.6.0-notes.md",
+    }
+)
+
+AUDITED_SKILLS = tuple(
+    sorted(
+        set(AUDITED_SKILLS)
+        | APG86_V06_SKILLS
+        | APG87_V06_SKILLS
+        | APG88_V06_SKILLS
+    )
+)
+AUDITED_PROJECTIONS = tuple(
+    sorted(
+        set(AUDITED_PROJECTIONS)
+        | APG86_V06_PROJECTIONS
+        | APG87_V06_PROJECTIONS
+        | APG88_V06_PROJECTIONS
+    )
+)
+
 AUDITED_WRAPPERS = tuple(
     sorted(
         set(AUDITED_WRAPPERS)
@@ -1109,6 +1223,9 @@ AUDITED_TESTS = tuple(
         | APG82_V05_TESTS
         | APG83_V05_TESTS
         | APG84_V05_TESTS
+        | APG86_V06_TESTS
+        | APG87_V06_TESTS
+        | APG88_V06_TESTS
     )
 )
 AUDITED_CRITICAL = tuple(
@@ -1117,24 +1234,32 @@ AUDITED_CRITICAL = tuple(
         | APG82_V05_CRITICAL
         | APG83_V05_CRITICAL
         | APG84_V05_CRITICAL
+        | APG86_V06_CRITICAL
+        | APG87_V06_CRITICAL
+        | APG88_V06_CRITICAL
+        | APG89_V06_CRITICAL
+        | APG90_V06_CRITICAL
     )
 )
 
-V05_ONLY_WRAPPERS = (
+POST_V04_WRAPPERS = (
     APG53_V05_WRAPPERS | APG54_V05_WRAPPERS | APG82_V05_WRAPPERS
     | APG83_V05_WRAPPERS | APG84_V05_WRAPPERS
 )
-V05_ONLY_HELPERS = (
+POST_V04_HELPERS = (
     APG53_V05_HELPERS | APG54_V05_HELPERS | APG82_V05_HELPERS
     | APG83_V05_HELPERS | APG84_V05_HELPERS
 )
-V05_ONLY_TESTS = (
+POST_V04_TESTS = (
     APG53_V05_TESTS | APG54_V05_TESTS | APG66_V05_TESTS | APG75_V05_TESTS
     | APG77D_V05_TESTS | APG79E_V05_TESTS | APG81H_V05_TESTS
     | APG66A_V05_TESTS | APG66B_V05_TESTS | APG66C_V05_TESTS
     | APG82_V05_TESTS | APG83_V05_TESTS | APG84_V05_TESTS
+    | APG86_V06_TESTS
+    | APG87_V06_TESTS
+    | APG88_V06_TESTS
 )
-V05_ONLY_CRITICAL = (
+POST_V04_CRITICAL = (
     APG53_V05_CRITICAL
     | APG54_V05_CRITICAL
     | APG55_V05_CRITICAL
@@ -1151,18 +1276,23 @@ V05_ONLY_CRITICAL = (
     | APG82_V05_CRITICAL
     | APG83_V05_CRITICAL
     | APG84_V05_CRITICAL
+    | APG86_V06_CRITICAL
+    | APG87_V06_CRITICAL
+    | APG88_V06_CRITICAL
+    | APG89_V06_CRITICAL
+    | APG90_V06_CRITICAL
 )
 HISTORICAL_V04_WRAPPERS = tuple(
-    item for item in AUDITED_WRAPPERS if item not in V05_ONLY_WRAPPERS
+    item for item in AUDITED_WRAPPERS if item not in POST_V04_WRAPPERS
 )
 HISTORICAL_V04_HELPERS = tuple(
-    item for item in AUDITED_HELPERS if item not in V05_ONLY_HELPERS
+    item for item in AUDITED_HELPERS if item not in POST_V04_HELPERS
 )
 HISTORICAL_V04_TESTS = tuple(
-    item for item in AUDITED_TESTS if item not in V05_ONLY_TESTS
+    item for item in AUDITED_TESTS if item not in POST_V04_TESTS
 )
 HISTORICAL_V04_CRITICAL = tuple(
-    item for item in AUDITED_CRITICAL if item not in V05_ONLY_CRITICAL
+    item for item in AUDITED_CRITICAL if item not in POST_V04_CRITICAL
 )
 HISTORICAL_V04_LICENSING = tuple(AUDITED_LICENSING)
 HISTORICAL_V04_PROJECTIONS = tuple(
@@ -1170,13 +1300,18 @@ HISTORICAL_V04_PROJECTIONS = tuple(
     if item not in (
         APG66_V05_PROJECTIONS | APG75_V05_PROJECTIONS | APG77D_V05_PROJECTIONS
         | APG79E_V05_PROJECTIONS | APG81H_V05_PROJECTIONS
+        | APG86_V06_PROJECTIONS
+        | APG87_V06_PROJECTIONS
+        | APG88_V06_PROJECTIONS
     )
 )
 HISTORICAL_V04_SKILLS = tuple(
     item for item in AUDITED_SKILLS
     if item not in (
         APG66_V05_SKILLS | APG75_V05_SKILLS | APG77D_V05_SKILLS
-        | APG79E_V05_SKILLS | APG81H_V05_SKILLS
+        | APG79E_V05_SKILLS | APG81H_V05_SKILLS | APG86_V06_SKILLS
+        | APG87_V06_SKILLS
+        | APG88_V06_SKILLS
     )
 )
 HISTORICAL_V04_CATEGORIES = tuple(sorted(ALLOWED_CATEGORIES))
@@ -1231,10 +1366,64 @@ HISTORICAL_V04_FORBIDDEN_FUTURE_OWNERS = tuple(
         | APG84_V05_HELPERS
         | APG84_V05_TESTS
         | APG84_V05_CRITICAL
+        | APG86_V06_SKILLS
+        | APG86_V06_PROJECTIONS
+        | APG86_V06_TESTS
+        | APG86_V06_CRITICAL
+        | APG87_V06_SKILLS
+        | APG87_V06_PROJECTIONS
+        | APG87_V06_TESTS
+        | APG87_V06_CRITICAL
+        | APG88_V06_SKILLS
+        | APG88_V06_PROJECTIONS
+        | APG88_V06_TESTS
+        | APG88_V06_CRITICAL
+        | APG89_V06_CRITICAL
+        | APG90_V06_CRITICAL
     )
 )
 HISTORICAL_V04_SURFACE_SHA256 = (
     "4bc8571149c708023712f3963e81e0594d46a9a78da74ac48d8dba3e4b73a083"
+)
+
+V06_ONLY_SKILLS = APG86_V06_SKILLS | APG87_V06_SKILLS | APG88_V06_SKILLS
+V06_ONLY_PROJECTIONS = (
+    APG86_V06_PROJECTIONS | APG87_V06_PROJECTIONS | APG88_V06_PROJECTIONS
+)
+V06_ONLY_TESTS = APG86_V06_TESTS | APG87_V06_TESTS | APG88_V06_TESTS
+V06_ONLY_CRITICAL = (
+    APG86_V06_CRITICAL
+    | APG87_V06_CRITICAL
+    | APG88_V06_CRITICAL
+    | APG89_V06_CRITICAL
+    | APG90_V06_CRITICAL
+)
+HISTORICAL_V05_WRAPPERS = tuple(AUDITED_WRAPPERS)
+HISTORICAL_V05_HELPERS = tuple(AUDITED_HELPERS)
+HISTORICAL_V05_TESTS = tuple(
+    item for item in AUDITED_TESTS if item not in V06_ONLY_TESTS
+)
+HISTORICAL_V05_CRITICAL = tuple(
+    item for item in AUDITED_CRITICAL if item not in V06_ONLY_CRITICAL
+)
+HISTORICAL_V05_LICENSING = tuple(AUDITED_LICENSING)
+HISTORICAL_V05_PROJECTIONS = tuple(
+    item for item in AUDITED_PROJECTIONS if item not in V06_ONLY_PROJECTIONS
+)
+HISTORICAL_V05_SKILLS = tuple(
+    item for item in AUDITED_SKILLS if item not in V06_ONLY_SKILLS
+)
+HISTORICAL_V05_CATEGORIES = tuple(sorted(ALLOWED_CATEGORIES))
+HISTORICAL_V05_FORBIDDEN_FUTURE_OWNERS = tuple(
+    sorted(
+        V06_ONLY_SKILLS
+        | V06_ONLY_PROJECTIONS
+        | V06_ONLY_TESTS
+        | V06_ONLY_CRITICAL
+    )
+)
+HISTORICAL_V05_SURFACE_SHA256 = (
+    "9f20ad43ffd4f4eeb72fe4cfe4aeb1cbe6449e5993bc641563f36a99a378bbef"
 )
 
 HISTORICAL_V03_WRAPPERS = (
@@ -1603,8 +1792,30 @@ def audited_policy_surfaces(version: str) -> tuple[dict[str, tuple[str, ...]], .
     if not SEMVER.fullmatch(version):
         fail("public release policy identity is malformed or unsupported")
     core = version.split("+", 1)[0].split("-", 1)[0]
-    if core == "0.5.0":
+    if core == "0.6.0":
         return (current,)
+    if core == "0.5.0":
+        historical_v05 = {
+            "required_helpers": HISTORICAL_V05_HELPERS,
+            "required_licensing_files": HISTORICAL_V05_LICENSING,
+            "required_projections": HISTORICAL_V05_PROJECTIONS,
+            "required_skills": HISTORICAL_V05_SKILLS,
+            "required_test_entrypoints": HISTORICAL_V05_TESTS,
+            "required_wrappers": HISTORICAL_V05_WRAPPERS,
+            "critical_files": HISTORICAL_V05_CRITICAL,
+            "validation_categories": HISTORICAL_V05_CATEGORIES,
+        }
+        historical_v05_digest = hashlib.sha256(
+            json.dumps(
+                historical_v05,
+                ensure_ascii=True,
+                separators=(",", ":"),
+                sort_keys=True,
+            ).encode("utf-8")
+        ).hexdigest()
+        if historical_v05_digest != HISTORICAL_V05_SURFACE_SHA256:
+            fail("historical public v0.5.0 policy surface changed")
+        return (historical_v05,)
     if core == "0.4.0":
         historical_v04 = {
             "required_helpers": HISTORICAL_V04_HELPERS,
@@ -1688,7 +1899,7 @@ def load_policy(
             fail(f"public release policy {key} may not name private paths")
     if not set(value["validation_categories"]).issubset(ALLOWED_CATEGORIES):
         fail("public release policy contains an unknown validation category")
-    allowed_surfaces = tuple(expected_surfaces or audited_policy_surfaces("0.5.0"))
+    allowed_surfaces = tuple(expected_surfaces or audited_policy_surfaces("0.6.0"))
     if not any(
         all(tuple(value[key]) == expected for key, expected in surface.items())
         for surface in allowed_surfaces
@@ -1854,6 +2065,12 @@ def validate_versioned_policy_exclusions(
     """Reject future owners from immutable historical public trees."""
 
     core = version.split("+", 1)[0].split("-", 1)[0]
+    if core == "0.5.0":
+        paths = {entry.display_path for entry in entries}
+        for path in HISTORICAL_V05_FORBIDDEN_FUTURE_OWNERS:
+            if path in paths:
+                fail(f"public v0.5.0 contains unsupported future owner: {path}")
+        return
     if core == "0.4.0":
         paths = {entry.display_path for entry in entries}
         for path in HISTORICAL_V04_FORBIDDEN_FUTURE_OWNERS:

@@ -66,6 +66,13 @@ class APG38GoCmpProfileContractTests(unittest.TestCase):
         policy = json.loads((ROOT / "release/public-surface.json").read_text())
         self.assertIn(f"skills/{NAME}/SKILL.md", policy["required_skills"])
 
+    def test_apg89_go_composition_preserves_go_cmp_comparison(self) -> None:
+        document = json.loads(
+            (ROOT / "src/test/fixtures/apg89-profile-composition-scenarios.json").read_text()
+        )
+        rows = {row["id"]: row for row in document["go"]}
+        self.assertEqual(rows["APG89-GO-04"]["owner"], NAME)
+
 
 if __name__ == "__main__":
     unittest.main()
