@@ -9,21 +9,29 @@ and stops.
 
 ## Owner graph
 
-Two independent owners are retained. There is no composition owner.
+Three independent owners are retained. There is no composition owner.
 
 ```text
 go-language-profile        general Go semantics (existing)
   go-test-profile          native testing lifecycle and go test semantics
   go-cmp-test-profile      optional, after project dependency selection
+  gomock-test-profile      optional, after project dependency selection
 ```
 
 Indentation records subject-matter narrowing only. It is not a call sequence,
 an entry order, or a dependency.
 
+APG86 and ADR 0048 integrate `gomock-test-profile` as the third direct,
+independently selectable sibling under the boundary frozen by APG85 and
+ADR 0047. It owns `mockgen` generation, generated-mock classification,
+controller lifecycle, expectations, counts, ordering, matchers, and GoMock
+failure diagnosis. It owns neither native lifecycle nor value comparison.
+
 | Owner | Owns | Does not own |
 | --- | --- | --- |
 | `go-test-profile` | native `testing` and `go test` behavior: placement, subtests, helper attribution, reporting, cleanup and isolation, `TestMain`, parallelism, goroutine reporting boundaries, examples, benchmarks, fuzzing, selection, caching, and test-specific effects of the effective language version | dependency selection, library-specific behavior, general Go semantics, project commands and policy |
 | `go-cmp-test-profile` | version-bounded go-cmp behavior after selection: equality versus diff, option composition and filters, comparer and transformer obligations, ignoring and unexported boundaries, sorting and approximation contracts, ambiguity and panic conditions, diagnostic exposure | whether to adopt the dependency, native lifecycle, terse local assertions, production equality design, project commands and policy |
+| `gomock-test-profile` | version-bounded GoMock behavior after selection: generation modes, generated-mock classification, controller lifecycle, expectation declaration, call counts and ordering, matchers, actions, and GoMock failure diagnosis | whether to adopt the dependency, native lifecycle, value diffing, interface design, project commands and policy |
 
 ## Trigger rules
 
@@ -37,11 +45,14 @@ normal path.
 2. `go-cmp-test-profile` triggers only when the repository has **already
    selected** google/go-cmp and the task materially depends on semantic
    comparison. Selection is a precondition, never an outcome.
-3. A question about whether to adopt the dependency is a non-trigger for
+3. `gomock-test-profile` triggers only when the repository has **already
+   selected** GoMock and the task materially depends on generation, a controller,
+   an expectation, a matcher, or GoMock-owned diagnosis.
+4. A question about whether to adopt a dependency is a non-trigger for
    every profile here and is project-owned.
-4. Ordinary Go implementation with no material test-specific decision is a
+5. Ordinary Go implementation with no material test-specific decision is a
    non-trigger; `go-language-profile` or a process skill applies.
-5. Entering either profile never replaces a process skill. A behavior
+6. Entering any profile never replaces a process skill. A behavior
    change can keep `implementing-with-test-discipline` primary; a review can
    keep `reviewing-and-verifying-repository-work` primary.
 
@@ -73,7 +84,9 @@ only under these constraints:
    in text; each leaf states the boundary from its own side.
 4. Permitted cross-references are limited to: native lifecycle routed to a
    retained `go-test-profile`; structured or domain-sensitive comparison routed
-   to a retained `go-cmp-test-profile` after selection; general Go semantics
+   to a retained `go-cmp-test-profile` after selection; GoMock generation,
+   controller, expectation, and matcher behavior routed to a retained
+   `gomock-test-profile` after selection; general Go semantics
    routed to `go-language-profile`; and all assertion, selection, command,
    flag, fallback, and policy questions routed to the target repository. When
    a named optional owner is unavailable, the cross-reference states the
@@ -88,8 +101,9 @@ only under these constraints:
 | --- | --- | --- |
 | `go-test-profile` | current supported Go 1.26.5 and 1.25.12 sources plus installed Go 1.25.10 compatibility evidence, the language-version specification, and build constraints | `testing` API, language-version rules, fuzzing or artifact behavior, caching, or false-escalation evidence changes materially |
 | `go-cmp-test-profile` | google/go-cmp `v0.7.0` comparison, option, sorting, and equating sources | the selected release differs, or the option set, comparer obligations, transformer filtering, unexported handling, sorting or approximation contracts, or documented panics change |
+| `gomock-test-profile` | Uber GoMock `v0.6.0` generator, controller, call, matcher, and action sources | the selected release differs, or generation modes, controller cleanup, expectation counts or ordering, matchers, actions, or failure behavior change |
 
-The optional component profile treats a differing selected release as a **stop and
+The optional component profiles treat a differing selected release as a **stop and
 reverify** condition before any behavior claim, not as an assumption of
 compatibility. The native profile distinguishes the module `go` directive, the
 effective per-file language version, and the installed toolchain, and never

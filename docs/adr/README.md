@@ -134,6 +134,14 @@ than erasing the earlier decision.
   — Accepted with amendment
 - [`0046 — Node.js Runtime and CLI-Stack Candidate and Target-First Harness`](2026/08/0046-nodejs-runtime-and-cli-stack-candidate-and-target-first-harness.md)
   — Accepted with amendment
+- [`0047 — v0.6 Skill Scope, Ownership, and Context Budget`](2026/08/0047-v0-6-skill-scope-ownership-and-context-budget.md)
+  — Accepted
+- [`0048 — GoMock and Vitest Profiles and Context-Budget Enforcement`](2026/08/0048-gomock-vitest-profiles-and-context-budget-enforcement.md)
+  — Accepted with amendment
+- [`0049 — JSX and React Profiles with APG88 Headroom Conservation`](2026/08/0049-jsx-react-profiles-and-apg88-headroom-conservation.md)
+  — Accepted with amendment
+- [`0050 — MDX and Astro Profiles Complete the v0.6 Authoring Set`](2026/08/0050-mdx-astro-profiles-and-v0-6-authoring-completion.md)
+  — Accepted with amendment
 
 APG14 adds no ADR. The v0.2.0 release applies the accepted licensing, roadmap,
 distribution, lineage, and maturity decisions in ADRs 0005, 0006, 0009, and
@@ -585,3 +593,43 @@ mechanically qualified; final Sol and Claude review remains an external commit
 gate and is not self-attested by the tree. Node and scratch debt remain zero.
 Stable maturity, readiness, publication, deployment, and successor work remain
 outside this decision.
+
+APG85 proposes and accepts ADR 0047 in-phase, following the APG73 and ADR 0042
+governance precedent rather than the candidate-architecture pattern in which a
+Proposed ADR is decided by a later review phase. The operator assignment itself
+freezes the six-profile v0.6 scope and the APG86 through APG90 sequence, and
+APG86 is an implementation phase rather than an architecture review, so no
+successor phase exists that could decide a Proposed status. The decision fixes
+skill ownership and composition, a byte-denominated context and discoverability
+budget derived from the measured existing profile corpus, fail-closed
+enforcement under a single measurement owner, and explicit project selection as
+the sole projection authority. It grants no authority to author a skill body,
+add a catalog row, install a projection, advance a version, publish, or push.
+
+APG86 implements the first bounded slice of ADR 0047. It provisionally
+integrates `gomock-test-profile` and `vitest-test-profile`, retains explicit
+project selection as the only projection authority, and enforces the APG85
+description budget through the shared packaged-metadata measurement owner.
+ADR 0048 is Accepted with amendment. The current topology is 35 canonical skills, 35 catalog
+rows, and 35 projections, with 14 stable and 21 provisional skills. The
+measured description total is 8,536 bytes, leaving 991 bytes below the 9,527
+ceiling. No release, publication, deployment, remote push, or APG87 work is
+authorized by this decision.
+
+APG87 implements the second bounded slice of ADR 0047. It provisionally
+integrates `jsx-language-profile` and `react-component-profile`, preserves
+explicit selection and the generic topology-agnostic checker, and dispositions
+the post-planning headroom finding by using 516 rather than 651 bytes. ADR 0049
+is Accepted with amendment. Current topology is 37/37/37 with 14 stable and 23
+provisional skills; 9,052 description bytes leave 475 for APG88. No MDX/Astro
+implementation, APG88, version, publication, deployment, or push is authorized
+by this decision.
+
+APG88 implements the final authoring slice of ADR 0047. It provisionally
+integrates `mdx-profile` and `astro-profile`, replaces Markdown's abstract MDX
+route with the canonical leaf, preserves explicit selection and the generic
+topology-agnostic checker, and leaves historical public surfaces unchanged.
+ADR 0050 is Accepted with amendment. Current topology is 39/39/39 with 14
+stable and 25 provisional skills; 9,504 description bytes leave 23 under the
+9,527 ceiling. No APG89, version, publication, deployment, provider Git
+publication, or successor work is authorized by this decision.

@@ -1,0 +1,22 @@
+{
+  "gomock": [
+    {"id": "APG86-GOMOCK-01", "scenario": "A selected GoMock controller reports an unexpected call against an expectation.", "owner": "gomock-test-profile"},
+    {"id": "APG86-GOMOCK-02", "scenario": "A table-driven test must decide where a controller is created for each subtest.", "owner": "go-test-profile"},
+    {"id": "APG86-GOMOCK-03", "scenario": "A failure needs a structured value diff rather than a GoMock matcher diagnostic.", "owner": "go-cmp-test-profile"},
+    {"id": "APG86-GOMOCK-04", "scenario": "A proposed interface method set depends on Go assignability and type identity.", "owner": "go-language-profile"},
+    {"id": "APG86-GOMOCK-05", "scenario": "The selected mockgen v0.6.0 source, package, or archive mode must be chosen for recorded inputs.", "owner": "gomock-test-profile"},
+    {"id": "APG86-GOMOCK-06", "scenario": "An expectation needs exact call counts and a real ordering prerequisite.", "owner": "gomock-test-profile"},
+    {"id": "APG86-GOMOCK-07", "scenario": "The project has not decided whether to add a mocking dependency.", "owner": "project-dependency-owner"},
+    {"id": "APG86-GOMOCK-08", "scenario": "Regenerated mocks change package imports and typed helpers.", "owner": "gomock-test-profile"}
+  ],
+  "vitest": [
+    {"id": "APG86-VITEST-01", "scenario": "A selected Vitest run needs effective project, environment, mock, and timer behavior.", "owner": "vitest-test-profile"},
+    {"id": "APG86-VITEST-02", "scenario": "A JavaScript closure and promise result depends on ECMAScript semantics.", "owner": "javascript-language-profile"},
+    {"id": "APG86-VITEST-03", "scenario": "A TypeScript generic assertion depends on checker options and static semantics.", "owner": "typescript-language-profile"},
+    {"id": "APG86-VITEST-04", "scenario": "The team must decide whether a test is sufficient for the behavior change.", "owner": "implementing-with-test-discipline"},
+    {"id": "APG86-VITEST-05", "scenario": "A React component effect and rerender contract is under test.", "owner": "react-component-profile"},
+    {"id": "APG86-VITEST-06", "scenario": "Fake timers are being confused with Node event-loop completion.", "owner": "nodejs-runtime-profile"},
+    {"id": "APG86-VITEST-07", "scenario": "The project must choose coverage thresholds and exclusions.", "owner": "project-coverage-owner"},
+    {"id": "APG86-VITEST-08", "scenario": "A snapshot update and coverage-provider result need runner-specific handling.", "owner": "vitest-test-profile"}
+  ]
+}

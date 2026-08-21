@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from io import BytesIO
 from pathlib import Path
+import argparse
 import gzip
 import stat
 import tarfile
@@ -214,3 +215,12 @@ def test_rejects_non_integer_or_out_of_range_epoch(tmp_path: Path) -> None:
     for epoch in (-1, 0x100000000):
         with pytest.raises(distribution.NormalizationError, match="epoch"):
             distribution.normalize_archive(source, tmp_path / f"{epoch}.tar.gz", epoch)
+
+
+def test_cli_epoch_preserves_v05_and_binds_v06() -> None:
+    assert distribution.V05_RELEASE_EPOCH == 1_700_000_000
+    assert distribution.V06_RELEASE_EPOCH == 1_787_270_400
+    assert distribution._epoch_argument("1700000000") == distribution.V05_RELEASE_EPOCH
+    assert distribution._epoch_argument("1787270400") == distribution.V06_RELEASE_EPOCH
+    with pytest.raises(argparse.ArgumentTypeError, match="release epoch"):
+        distribution._epoch_argument("1700000001")

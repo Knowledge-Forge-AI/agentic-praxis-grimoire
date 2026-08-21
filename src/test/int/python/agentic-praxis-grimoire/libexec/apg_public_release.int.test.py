@@ -31,12 +31,13 @@ class APGPublicReleaseBoundaryTests(unittest.TestCase):
             ("0.2.0", release.HISTORICAL_V02_SKILLS),
             ("0.3.0+build.1", release.HISTORICAL_V03_SKILLS),
             ("0.4.0-rc.1", release.HISTORICAL_V04_SKILLS),
-            ("0.5.0", release.AUDITED_SKILLS),
+            ("0.5.0", release.HISTORICAL_V05_SKILLS),
+            ("0.6.0", release.AUDITED_SKILLS),
         ):
             with self.subTest(version=version):
                 surfaces = release.audited_policy_surfaces(version)
                 self.assertEqual(surfaces[0]["required_skills"], expected)
-        for version in ("invalid", "0.5.1"):
+        for version in ("invalid", "0.5.1", "0.6.1"):
             with self.subTest(version=version):
                 with self.assertRaisesRegex(release.ToolError, "policy identity"):
                     release.audited_policy_surfaces(version)
@@ -126,6 +127,11 @@ class APGPublicReleaseBoundaryTests(unittest.TestCase):
                 release.validate_versioned_policy_exclusions(
                     [future], "0.4.0"
                 )
+        v06_path = sorted(release.V06_ONLY_SKILLS)[0]
+        future = release.Entry("100644", "blob", "a" * 40, v06_path.encode("ascii"))
+        with self.assertRaisesRegex(release.ToolError, "unsupported future owner"):
+            release.validate_versioned_policy_exclusions([future], "0.5.0")
+        release.validate_versioned_policy_exclusions([future], "0.6.0")
 
     def test_semver_date_and_author_boundaries_are_strict(self) -> None:
         self.assertEqual(release.validate_version("0.4.0-rc.1+build.2"), "0.4.0-rc.1+build.2")
@@ -274,7 +280,7 @@ class APGPublicReleaseV03PolicyTests(unittest.TestCase):
         fixture.git(later, "tag", "-a", "v0.3.0", "-m", "Release v0.3.0")
 
         output = fixture.root / "policy-incomplete-base-candidate"
-        result = fixture.build(output, base=later, version="0.5.0")[1]
+        result = fixture.build(output, base=later, version="0.6.0")[1]
         self.assertEqual(result.returncode, 1)
         self.assertIn("policy", result.stderr.lower())
         self.assertFalse(output.exists())
@@ -283,7 +289,7 @@ class APGPublicReleaseV03PolicyTests(unittest.TestCase):
         checked = fixture.check_candidate(
             check_candidate,
             base=later,
-            version="0.5.0",
+            version="0.6.0",
         )
         self.assertEqual(checked.returncode, 1)
         self.assertIn("policy", checked.stderr.lower())
@@ -332,11 +338,11 @@ class APGPublicReleaseV03PolicyTests(unittest.TestCase):
         candidate, built = fixture.build(
             fixture.root / "current-from-historical-v0.2",
             base=later,
-            version="0.5.0",
+            version="0.6.0",
         )
         fixture.assert_success(built)
         fixture.assert_success(
-            fixture.check_candidate(candidate, base=later, version="0.5.0")
+            fixture.check_candidate(candidate, base=later, version="0.6.0")
         )
 
     def test_build_and_check_reject_current_surface_under_v0_2_identity(self) -> None:
@@ -352,7 +358,7 @@ class APGPublicReleaseV03PolicyTests(unittest.TestCase):
 
         candidate, built_as_current = fixture.build(
             fixture.root / "valid-current-candidate",
-            version="0.5.0",
+            version="0.6.0",
         )
         fixture.assert_success(built_as_current)
         checked_as_v0_2 = fixture.check_candidate(candidate, version="0.2.0")
@@ -385,7 +391,7 @@ class APGPublicReleaseV03PolicyTests(unittest.TestCase):
         result = fixture.build(
             fixture.root / "missing-current-report-owner-candidate",
             source=source,
-            version="0.5.0",
+            version="0.6.0",
         )[1]
         self.assertEqual(result.returncode, 1)
         self.assertIn("bin/git-diff-report", result.stderr)

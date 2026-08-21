@@ -161,3 +161,47 @@ v0.8.2 and Zsh 5.9.2 support boundary remains retained; Zsh 5.3.1 remains
 unsupported because its independent runner dependency probe times out. The
 correction changes no language-profile contract, skill wording, maturity,
 catalog shape, distribution boundary, or application-smoke disposition.
+
+## v0.6 boundary and description budget
+
+APG85 and ADR 0047 add a bounded v0.6 boundary above this contract without
+changing any rule in it. APG86 and ADR 0048 provisionally integrate
+`vitest-test-profile` and `gomock-test-profile`; APG87 and ADR 0049
+provisionally integrate `jsx-language-profile` and `react-component-profile`;
+APG88 and ADR 0050 provisionally integrate `mdx-profile` and `astro-profile`.
+All six frozen v0.6 profiles are now authored. Each authored v0.6 profile
+satisfies every requirement in this document and additionally states an
+explicit owns, does-not-own, and composes-with boundary against its adjacent
+siblings under
+[the v0.6 architecture contract](architecture/v0-6-skill-ownership-and-context-budget.md).
+
+That contract adds one constraint this document does not otherwise impose: the
+`description` scalar of each new v0.6 profile must be between 170 and 330 UTF-8
+bytes, and the six together may add at most 1,560 bytes to the discoverable
+metadata surface. The band is derived from the measured existing profile corpus
+and applies only to the six new v0.6 profiles. Existing descriptions are
+unchanged and remain governed by the `Use when ` prefix and 1,024-character cap
+already enforced as diagnostic APG014.
+
+The process and domain pairing rule above is unchanged and is the reason a
+domain profile does not restate planning, review, or test-discipline procedure.
+A v0.6 profile that reproduces process guidance owned by an existing process
+skill is defective regardless of its description size.
+
+APG86 activates the deferred enforcement as diagnostics APG039 and APG040.
+The checker applies the byte band only to the six frozen names and obtains the
+aggregate from `context_footprint_report(blobs=...)`; its count rule remains
+relational rather than phase-specific. Development is 35/35/35 and 14/21,
+with 8,536 description bytes and 991 bytes of remaining aggregate headroom.
+
+APG87 leaves that generic enforcement unchanged. Its two phase-specific
+descriptions consume 516 bytes, so development is 37/37/37 and 14/23, with
+9,052 total description bytes and 475 bytes of remaining aggregate headroom.
+Exact APG87 topology and conservation values remain phase-test and evidence
+owners rather than generic checker constants.
+
+APG88 leaves the generic enforcement unchanged. MDX and Astro consume 214 and
+238 bytes, so development is 39/39/39 and 14/25, with 9,504 total description
+bytes and 23 bytes of remaining aggregate headroom. Exact APG88 topology and
+terminal arithmetic remain focused-test and phase-evidence owners rather than
+generic checker constants.

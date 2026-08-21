@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "constraints": {
+    "selection": "explicit-only",
+    "mandatory_chain": false,
+    "aggregate_owner": null,
+    "v0_6_profiles": [
+      "astro-profile",
+      "gomock-test-profile",
+      "jsx-language-profile",
+      "mdx-profile",
+      "react-component-profile",
+      "vitest-test-profile"
+    ]
+  },
+  "web": [
+    {"id": "APG89-WEB-01", "question": "A heading and list remain pure Markdown after all component expressions are removed.", "owner": "markdown-language-profile"},
+    {"id": "APG89-WEB-02", "question": "An MDX document crosses from Markdown into an imported component expression.", "owner": "mdx-profile"},
+    {"id": "APG89-WEB-03", "question": "An Astro island directive determines server and client placement for that component.", "owner": "astro-profile"},
+    {"id": "APG89-WEB-04", "question": "The hydrated component has a React state, Hook, effect, or rerender decision.", "owner": "react-component-profile"},
+    {"id": "APG89-WEB-05", "question": "The component contains a library-independent JSX or TSX element and transform decision.", "owner": "jsx-language-profile"},
+    {"id": "APG89-WEB-06", "question": "The TSX region has a TypeScript checking or type-erasure decision.", "owner": "typescript-language-profile"},
+    {"id": "APG89-WEB-07", "question": "An expression result depends only on ECMAScript evaluation semantics.", "owner": "javascript-language-profile"},
+    {"id": "APG89-WEB-08", "question": "A process, package scope, module loader, or runtime decision is outside Astro's framework boundary.", "owner": "nodejs-runtime-profile"},
+    {"id": "APG89-WEB-09", "question": "The selected Vitest run needs runner configuration, mocking, timers, isolation, or snapshot handling.", "owner": "vitest-test-profile"},
+    {"id": "APG89-WEB-10", "question": "The team must decide which behaviors need tests and whether the evidence is sufficient.", "owner": "implementing-with-test-discipline"}
+  ],
+  "go": [
+    {"id": "APG89-GO-01", "question": "An interface method set or assignability decision depends on Go language semantics.", "owner": "go-language-profile"},
+    {"id": "APG89-GO-02", "question": "A table, subtest, helper, cleanup, or parallel-test decision uses the native Go test lifecycle.", "owner": "go-test-profile"},
+    {"id": "APG89-GO-03", "question": "Selected GoMock v0.6.0 generation, controller, expectation, count, order, or matcher mechanics control the result.", "owner": "gomock-test-profile"},
+    {"id": "APG89-GO-04", "question": "Selected go-cmp v0.7.0 option composition or structured value-diff behavior controls the result.", "owner": "go-cmp-test-profile"},
+    {"id": "APG89-GO-05", "question": "The team must decide which Go behaviors need tests and whether the evidence is sufficient.", "owner": "implementing-with-test-discipline"}
+  ]
+}

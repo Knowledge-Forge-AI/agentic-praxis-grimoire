@@ -3,6 +3,8 @@
 
 from __future__ import annotations
 
+import json
+
 from src.test.apg_test_support import repository_root
 
 
@@ -36,3 +38,11 @@ def test_selection_and_checked_status_do_not_transfer_whole_file_ownership() -> 
     assert "configuration module may remain `project-configuration-owner`" in lowered
     assert "checker selection and invocation evidence" in lowered
     assert "configuration, loader, build, or deployment decision" in lowered
+
+
+def test_apg89_web_composition_preserves_ecmascript_semantics() -> None:
+    document = json.loads(
+        (ROOT / "src/test/fixtures/apg89-profile-composition-scenarios.json").read_text()
+    )
+    rows = {row["id"]: row for row in document["web"]}
+    assert rows["APG89-WEB-07"]["owner"] == "javascript-language-profile"

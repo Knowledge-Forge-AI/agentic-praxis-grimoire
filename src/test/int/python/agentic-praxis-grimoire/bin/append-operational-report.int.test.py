@@ -286,6 +286,43 @@ def test_destination_rejects_unsafe_directory_and_lock_shapes(
             pass
 
 
+def test_destination_does_not_steal_fresh_ownerless_lock(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("GIT_SHOW_REPORT_ROOT", str(tmp_path / "reports"))
+    destination = safety.Destination(tmp_path / "repository", "APG89-LOCK")
+    destination.lock_path.mkdir(mode=0o700)
+    created = destination.lock_path.lstat()
+    monkeypatch.setattr(safety.time, "time", lambda: created.st_mtime + 0.5)
+    monkeypatch.setattr(safety.time, "sleep", lambda _seconds: None)
+
+    with pytest.raises(safety.ReportError, match="append is already active"):
+        with destination.lock():
+            pass
+
+    assert destination.lock_path.is_dir()
+
+
+def test_destination_does_not_steal_live_owned_lock(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("GIT_SHOW_REPORT_ROOT", str(tmp_path / "reports"))
+    destination = safety.Destination(tmp_path / "repository", "APG89-LIVE-LOCK")
+    destination.lock_path.mkdir(mode=0o700)
+    owner = destination.lock_path / "owner"
+    owner.write_text(f"{os.getpid()}-apg89\n", encoding="ascii")
+    owner.chmod(0o600)
+    monkeypatch.setattr(safety.time, "sleep", lambda _seconds: None)
+
+    with pytest.raises(safety.ReportError, match="append is already active"):
+        with destination.lock():
+            pass
+
+    assert owner.read_text(encoding="ascii") == f"{os.getpid()}-apg89\n"
+
+
 def test_destination_release_preserves_changed_owner_evidence(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,

@@ -2,14 +2,15 @@
 
 ## Current status
 
-The development catalog contains thirty-three canonical skills: fourteen
-stable rows and nineteen provisional rows. The provisional rows are the
+The development catalog contains thirty-nine canonical skills: fourteen
+stable rows and twenty-five provisional rows. The provisional rows are the
 ChatGPT-manager subrouter, approved-roadmap manager-assignment leaf, CSS,
-JavaScript, Node.js, Go, and Ruby language profiles, PostgreSQL and SQLite profiles,
-pytest and Minitest test profiles, Dockerfile and Vagrantfile profiles, the
-Bash-to-Python conversion skill, the native Go and go-cmp test profiles, the
-Nix test profile, the Markdown language profile, and the TypeScript language
-profile.
+JavaScript, JSX, Node.js, Go, and Ruby language profiles, the React component,
+MDX, and Astro profiles, PostgreSQL and SQLite profiles,
+pytest, Minitest, Vitest, and GoMock test profiles, Dockerfile and Vagrantfile
+profiles, the Bash-to-Python conversion skill, the native Go and go-cmp test
+profiles, the Nix test profile, the Markdown language profile, and the
+TypeScript language profile.
 APG13
 individually reviewed and promoted the six v0.2 catalog entries to `stable`
 after repeated real use,
@@ -357,9 +358,27 @@ and exclusion. [The projection guide](../docs/project-skill-projection.md)
 defines that installation and rollback boundary. Other harness projections
 require separate evidence and authorization.
 
+APG86 provisionally integrates `gomock-test-profile` and
+`vitest-test-profile` under ADR 0048 and activates the APG85 context-budget
+gate. Development is 35 canonical skills, 35 catalog rows, and 35 projections,
+with fourteen stable and twenty-one provisional rows. The exact description
+sizes and remaining aggregate headroom are owned by the APG86 evaluation.
+
+APG87 provisionally integrates `jsx-language-profile` and
+`react-component-profile` under ADR 0049. Development is 37 canonical skills,
+37 catalog rows, and 37 projections, with fourteen stable and twenty-three
+provisional rows. The profiles consume 516 description bytes and preserve 475
+bytes of full-v0.6 headroom for APG88.
+
+APG88 provisionally integrates `mdx-profile` and `astro-profile` under ADR
+0050. Development is 39 canonical skills, 39 catalog rows, and 39 projections,
+with fourteen stable and twenty-five provisional rows. Their 452 description
+bytes produce a 9,504-byte total and preserve 23 bytes under the full-v0.6
+ceiling.
+
 APG30 implements ADR 0022's `skills/chatgpt/<name>/` canonical owner for
 actor-qualified ChatGPT-manager leaves while retaining flat `.agents/skills/`
-discovery. The current 33/33/33 library contains thirty-one direct children
+discovery. The current 39/39/39 library contains thirty-seven direct children
 and two nested ChatGPT-manager leaves. The namespace directory is not a skill.
 
 This shape follows `APG0-AGENT-SKILLS-SOURCE-01`, the public
@@ -386,20 +405,26 @@ APG0 basis.
 | [`chatgpt-manager-workflow`](chatgpt/chatgpt-manager-workflow/SKILL.md) | Selection among multiple plausible ChatGPT top-level-manager capabilities is ambiguous or a ChatGPT-manager routing decision requires audit | `provisional` |
 | [`synthesizing-repository-guidance`](synthesizing-repository-guidance/SKILL.md) | A dense, duplicated, mixed-scope, private, or source-derived guidance corpus needs bounded ownership and migration dispositions before rewrite | `stable` |
 | [`python-language-profile`](python-language-profile/SKILL.md) | Python-specific judgment is material to structure, complexity, public APIs, typing, concurrency, serialization, packaging, or warning and crisis thresholds beyond repository policy | `stable` |
+| [`astro-profile`](astro-profile/SKILL.md) | Astro behavior hinges on `.astro` execution, islands or client directives, server/client boundaries, content collections, routing, or integration conventions; not for adjacent component, syntax, language/runtime, build, style, accessibility, or deployment concerns | `provisional` |
+| [`react-component-profile`](react-component-profile/SKILL.md) | React component judgment is material to composition, props, rendering, state, effects, hooks, context, memoization, error boundaries, or component testing; not for JSX syntax, language typing, runner mechanics, routing, styling, MDX, Astro, or metaframeworks | `provisional` |
 | [`bash-language-profile`](bash-language-profile/SKILL.md) | Bash-specific judgment is material to quoting, expansion, arrays, pipelines, traps, subprocesses, files, portability, or warning and crisis thresholds beyond repository policy | `stable` |
 | [`bats-test-profile`](bats-test-profile/SKILL.md) | Bats-specific test judgment is material to evaluation, run status and output, hooks, fixtures, TAP, file descriptors, parallelism, background cleanup, or warning and crisis thresholds beyond repository policy | `stable` |
 | [`dockerfile-profile`](dockerfile-profile/SKILL.md) | Dockerfile-specific judgment is material to parser directives, build stages, instruction forms, variable scope, build context, copies, mounts, cache behavior, file ownership, runtime metadata, platform behavior, or warning and crisis thresholds beyond repository policy | `provisional` |
 | [`vagrantfile-profile`](vagrantfile-profile/SKILL.md) | Vagrantfile-specific judgment is material to configuration versions and loading, machines, boxes, provider blocks, networks, synced folders, provisioners, triggers, Vagrant state, host-dependent behavior, or warning and crisis thresholds beyond repository policy | `provisional` |
 | [`markdown-language-profile`](markdown-language-profile/SKILL.md) | A material decision depends on the repository's actual Markdown parser or selected-dialect document semantics, or on qualitative Markdown document-structure policy | `provisional` |
+| [`mdx-profile`](mdx-profile/SKILL.md) | An MDX decision depends on the Markdown-to-JSX/component seam, imports or exports, expressions, provider mapping, or compile/runtime split; not for pure Markdown, JSX, React, TypeScript, JavaScript, or Astro behavior | `provisional` |
 | [`typescript-language-profile`](typescript-language-profile/SKILL.md) | A material decision depends on TypeScript-specific static semantics or type-erasure boundaries for an established source region, after the exact compiler role, version, options, project, source kind, and declaration environment are evidenced | `provisional` |
 | [`css-language-profile`](css-language-profile/SKILL.md) | A material decision depends on CSS-specific static semantics, selector specificity, cascade ordering, inheritance, shorthand resets, custom-property substitution, or value consequences for an established CSS region with identified consequence-bearing evidence | `provisional` |
 | [`javascript-language-profile`](javascript-language-profile/SKILL.md) | A material decision depends on ECMAScript semantics for an established JavaScript region after parse goal, host context, language context, goal evidence, whole-file ownership, and required non-language evidence are identified | `provisional` |
+| [`jsx-language-profile`](jsx-language-profile/SKILL.md) | JSX-specific judgment is material to element, attribute, child, expression, fragment, spread, file-kind, or transform semantics; not for React behavior, TypeScript checking, JavaScript evaluation, runtime hosts, MDX, Astro, or build tools | `provisional` |
 | [`nodejs-runtime-profile`](nodejs-runtime-profile/SKILL.md) | A material decision depends on Node.js-specific host behavior for an established Node execution role whose exact version, platform, flags, package scope, loader, and whole-file owner are identified | `provisional` |
 | [`minitest-test-profile`](minitest-test-profile/SKILL.md) | Minitest-specific judgment is material to test or spec organization, assertions, lifecycle, mocks, stubs, fixture alternatives, isolation, parallelism, filtering, runners, plugins, reporters, subprocess, filesystem, or database test boundaries, or warning and crisis thresholds beyond repository policy | `provisional` |
 | [`pytest-test-profile`](pytest-test-profile/SKILL.md) | pytest-specific judgment is material to discovery, collection, assertions, fixtures, parametrization, mocks, isolation, xdist, coverage, or warning and crisis thresholds beyond repository policy | `provisional` |
 | [`go-cmp-test-profile`](go-cmp-test-profile/SKILL.md) | A repository has already selected google/go-cmp v0.7.0 and comparison judgment is material to equality versus diff, option composition and filters, comparers and transformers, ignores and unexported fields, sorting, approximation, panics, diagnostic exposure, or thresholds beyond repository policy | `provisional` |
+| [`gomock-test-profile`](gomock-test-profile/SKILL.md) | A project has already selected GoMock v0.6.0 and judgment is material to mockgen generation, generated mocks, controller lifecycle, expectations, call counts or order, matchers, or GoMock failure diagnosis; not for native test lifecycle, value diffs, or Go semantics | `provisional` |
 | [`go-language-profile`](go-language-profile/SKILL.md) | Go-specific judgment is material to structure, errors, context, interfaces, generics, concurrency, public APIs, reflection, unsafe, cgo, subprocesses, compatibility, or warning and crisis thresholds beyond repository policy | `provisional` |
 | [`go-test-profile`](go-test-profile/SKILL.md) | Native Go test judgment is material to package placement, subtests, helper attribution, cleanup and isolation, TestMain, parallelism, goroutine reporting, examples, benchmarks, fuzzing, caching, effective language version, or warning and crisis thresholds beyond repository policy | `provisional` |
+| [`vitest-test-profile`](vitest-test-profile/SKILL.md) | A project has already selected Vitest 4.1 and runner-specific judgment is material to configuration, projects, environments, assertions, mocks, timers, concurrency, isolation, snapshots, or coverage providers; not for test sufficiency, language or React semantics, or coverage policy | `provisional` |
 | [`nix-language-profile`](nix-language-profile/SKILL.md) | Nix-specific judgment is material to expressions, attribute sets, modules, derivations, flakes, overlays, purity, evaluation, store exposure, activation, remote builders, or warning and crisis thresholds beyond repository policy | `stable` |
 | [`nix-test-profile`](nix-test-profile/SKILL.md) | Nix test judgment is material to selecting which already-selected testing surface proves an exact claim, package phases, flake checks, Nixpkgs or NixOS test ownership, test-evidence qualification across sandbox, store, builder, or cache boundaries, or Nix-test-specific structural review | `provisional` |
 | [`postgresql-database-profile`](postgresql-database-profile/SKILL.md) | PostgreSQL-specific judgment is material to SQL, schemas, MVCC, transactions, locks, DDL, migrations, routines, triggers, security, backup and restore, replication, maintenance, or warning and crisis thresholds beyond repository policy | `provisional` |
@@ -458,7 +483,7 @@ Clean A/B superiority and a positive use in a second repository are valuable
 evidence but are not independent stability blockers under ADR 0006. A concrete
 unresolved material authority, privacy, safety, or procedure defect may block an
 individual skill. The current catalog contains fourteen `stable` rows and
-nineteen `provisional` manager-assignment, language, database, test-profile, or
+twenty-three `provisional` manager-assignment, language, database, test-profile, or
 conversion rows. Public
 v0.1.0 retains its historical provisional catalog; public v0.2.0 contains the
 six stable leaves. APG14 changes no skill procedure or maturity row. APG16,

@@ -14,6 +14,7 @@ ROOT = repository_root(__file__)
 GO_COMPONENTS = (
     "go-test-profile",
     "go-cmp-test-profile",
+    "gomock-test-profile",
 )
 
 
@@ -73,6 +74,7 @@ class APG38GoComponentOwnerGraphTests(unittest.TestCase):
         expectations = {
             "go-test-profile": "project-owned assertion policy",
             "go-cmp-test-profile": "project-owned assertion policy",
+            "gomock-test-profile": "project-owned policy",
         }
         for name, phrase in expectations.items():
             with self.subTest(name=name):

@@ -3,6 +3,8 @@
 
 from __future__ import annotations
 
+import json
+
 from src.test.apg_test_support import repository_root
 
 
@@ -46,3 +48,11 @@ def test_leaf_preserves_exact_stop_and_evidence_boundaries() -> None:
 def test_leaf_declares_the_integrated_lifecycle_independently() -> None:
     assert "Lifecycle: `provisionally-integrated`." in LEAF
     assert "Lifecycle ADR: `Accepted with amendment`." in LEAF
+
+
+def test_apg89_web_composition_preserves_node_runtime_ownership() -> None:
+    document = json.loads(
+        (ROOT / "src/test/fixtures/apg89-profile-composition-scenarios.json").read_text()
+    )
+    rows = {row["id"]: row for row in document["web"]}
+    assert rows["APG89-WEB-08"]["owner"] == "nodejs-runtime-profile"

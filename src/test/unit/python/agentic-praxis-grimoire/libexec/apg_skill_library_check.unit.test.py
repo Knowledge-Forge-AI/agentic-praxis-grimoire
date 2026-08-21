@@ -163,6 +163,134 @@ class FrontmatterTests(unittest.TestCase):
         self.assertFalse(shifted.starts_at_byte_one)
 
 
+class TestV06ContextBudget(unittest.TestCase):
+    @staticmethod
+    def diagnostics_for(name: str, description_bytes: int) -> list[Diagnostic]:
+        prefix = "Use when "
+        description = prefix + ("x" * (description_bytes - len(prefix)))
+        data = (
+            f"---\nname: {name}\ndescription: {description}\n---\n"
+            "# Profile\n"
+            + "".join(
+                f"\n## {heading}\nEvidence.\n" for heading in checker.REQUIRED_H2S
+            )
+        ).encode("utf-8")
+        diagnostics: list[Diagnostic] = []
+        checker._check_frontmatter_and_body(
+            Path(name),
+            Path(name) / "SKILL.md",
+            f"skills/{name}/SKILL.md",
+            data,
+            data.decode("utf-8"),
+            diagnostics,
+            [],
+        )
+        return diagnostics
+
+    def test_v06_description_band_is_utf8_byte_exact(self) -> None:
+        for byte_count, should_pass in ((169, False), (170, True), (250, True), (330, True), (331, False)):
+            with self.subTest(byte_count=byte_count):
+                codes = {
+                    item.code
+                    for item in self.diagnostics_for(
+                        "gomock-test-profile", byte_count
+                    )
+                }
+                self.assertEqual("APG039" not in codes, should_pass)
+
+        prefix = "Use when "
+        multibyte = prefix + ("é" * 80) + "x"
+        self.assertEqual(len(multibyte.encode("utf-8")), 170)
+        data = (
+            "---\nname: gomock-test-profile\n"
+            f"description: {multibyte}\n---\n# Profile\n"
+            + "".join(
+                f"\n## {heading}\nEvidence.\n" for heading in checker.REQUIRED_H2S
+            )
+        ).encode("utf-8")
+        diagnostics: list[Diagnostic] = []
+        checker._check_frontmatter_and_body(
+            Path("gomock-test-profile"),
+            Path("gomock-test-profile/SKILL.md"),
+            "skills/gomock-test-profile/SKILL.md",
+            data,
+            data.decode("utf-8"),
+            diagnostics,
+            [],
+        )
+        self.assertNotIn("APG039", {item.code for item in diagnostics})
+
+    def test_band_is_scoped_to_the_frozen_v06_names(self) -> None:
+        self.assertNotIn(
+            "APG039",
+            {
+                item.code
+                for item in self.diagnostics_for(
+                    "javascript-language-profile", 417
+                )
+            },
+        )
+
+    def test_aggregate_gate_uses_the_canonical_context_report_owner(self) -> None:
+        cases = (
+            (
+                "topology-agnostic-valid",
+                {
+                    "skill_count": 7,
+                    "discoverable_skill_count": 7,
+                    "total_description_bytes": 9527,
+                    "malformed": [],
+                },
+                False,
+            ),
+            (
+                "over-ceiling",
+                {
+                    "skill_count": 7,
+                    "discoverable_skill_count": 7,
+                    "total_description_bytes": 9528,
+                    "malformed": [],
+                },
+                True,
+            ),
+            (
+                "discoverability-mismatch",
+                {
+                    "skill_count": 7,
+                    "discoverable_skill_count": 6,
+                    "total_description_bytes": 9527,
+                    "malformed": [],
+                },
+                True,
+            ),
+            (
+                "malformed",
+                {
+                    "skill_count": 7,
+                    "discoverable_skill_count": 7,
+                    "total_description_bytes": 9527,
+                    "malformed": [
+                        {"path": "skills/bad/SKILL.md", "error": "bad"}
+                    ],
+                },
+                True,
+            ),
+        )
+        for label, report, should_fail in cases:
+            with self.subTest(label=label), tempfile.TemporaryDirectory() as temporary:
+                root = Path(temporary)
+                (root / "skills" / "gomock-test-profile").mkdir(parents=True)
+                with mock.patch.object(
+                    checker, "context_footprint_report", return_value=report
+                ) as context_report:
+                    result = check_library(root)
+                context_report.assert_called_once_with(blobs={})
+                self.assertEqual(
+                    "APG040" in {item.code for item in result.diagnostics},
+                    should_fail,
+                )
+
+
 class MarkdownLexicalTests(unittest.TestCase):
     def test_fenced_content_is_not_structural(self) -> None:
         text = (

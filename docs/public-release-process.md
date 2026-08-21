@@ -44,11 +44,13 @@ omission; the critical-path lists do not replace it.
 [`release/public-surface.json`](../release/public-surface.json) is the strict
 schema-version-1 current-development policy. It fixes the canonical identity,
 sole exclusion, critical owners, wrappers, helpers, licensing files,
-thirty-three skills, thirty-three discovery links, test entrypoints, and
-validation categories for current development. Code separately owns the
-immutable historical v0.1.0 through v0.4.0 surfaces; v0.3.0 remains nineteen
-skills and nineteen discovery links, while corrected v0.4.0 remains twenty-
-eight. The policy cannot execute commands or remove a projected path.
+thirty-nine skills, thirty-nine discovery links, test entrypoints, and
+validation categories for current development. Code separately owns immutable
+historical v0.1.0 through v0.5.0 surfaces: v0.3.0 remains nineteen skills and
+nineteen discovery links, corrected v0.4.0 remains twenty-eight, and public
+v0.5.0 remains thirty-three. Exact digests pin the v0.4.0 and v0.5.0 policy
+surfaces, and versioned exclusion sets reject later owners. The policy cannot
+execute commands or remove a projected path.
 
 An optional publication-excluded check policy may add only sorted literal
 confidentiality patterns. It cannot weaken another check and never enters the
@@ -432,13 +434,14 @@ commands do not silently depend on a development checkout. A downstream
 adapter can therefore consume the exact versioned pair reproducibly.
 
 Python release qualification builds the wheel and sdist in two disjoint clean
-roots under one controlled release environment. The exact v0.5 release epoch is
-`1700000000`: set `SOURCE_DATE_EPOCH=1700000000` for both package builds and pass
-`--epoch 1700000000` to `bin/apg-normalize-python-sdist` for each built sdist.
-The repository-maintenance wrapper deliberately has no installed-consumer
-`apgr` route. It rejects any other epoch and requires the environment value to
-match, mechanically binding the sdist normalization step to the wheel-build
-environment.
+roots under one controlled release environment. Historical v0.5 keeps its
+exact release epoch `1700000000`. v0.6 uses the separately frozen epoch
+`1787270400`, representing 2026-08-21 00:00:00 UTC. The maintained normalizer
+accepts only those two named release epochs and requires `SOURCE_DATE_EPOCH` to
+equal the selected value; the v0.6 bundle owner always selects `1787270400`.
+This preserves historical reconstruction without silently reinterpreting the
+v0.5 epoch. The repository-maintenance wrapper deliberately has no installed-
+consumer `apgr` route.
 The normalizer is part of the publication procedure, not a comparison-only
 filter: the normalized sdist is the release artifact. It accepts only
 canonical relative safe regular-file and directory members (including PAX long
@@ -446,11 +449,12 @@ names, but excluding `./` aliases), emits ordered PAX gzip/tar bytes, clears
 input PAX headers, and fixes ownership, regular-file mode `0644`, directory mode
 `0755`, timestamps, and output-file mode `0600`. Both final wheel and normalized
 sdist must match by exact filename, contents, metadata, and SHA-256 in the same
-Python and linked-zlib release environment. APG84 still owns the publication
-build, readback, GitHub release creation, and PyPI upload.
+Python and linked-zlib release environment. APG90 owns the v0.6 publication
+build and handoff; actual public GitHub and PyPI finalization remains separately
+evidenced when it is outside dispatcher Git authority.
 
 The normalizer accepts only a trusted locally built setuptools sdist and reads
-that bounded release artifact in memory. The v0.5 package manifest contains no
+that bounded release artifact in memory. The v0.5 and v0.6 package manifests contain no
 executable-intended member; forcing regular members to `0644` is therefore part
 of this release contract. A future manifest that adds executable content must
 change this contract and its tests before publication.
@@ -465,11 +469,44 @@ manifest. The trusted local input is the exact reviewed release reconstruction;
 the operator binds its public Git identity and artifact metadata before upload.
 GitHub Release upload consumes only that directory.
 
-The v0.5 PyPI workflow runs only for a published GitHub Release and downloads
+The v0.6 PyPI workflow runs only for a published GitHub Release and downloads
 the triggering release's exact three asset IDs. It rejects any tag, filename,
 asset count, or checksum mismatch before supplying only the verified wheel and
 sdist directory to PyPA Trusted Publishing. The checked-in action identity is
 PyPA `gh-action-pypi-publish` v1.14.2 at immutable commit
-`dc37677b2e1c63e2034f94d8a5b11f265b73ba33`. Release publication and immutable
-GitHub/PyPI readback remain external operational evidence rather than tracked
-self-attestation.
+`dc37677b2e1c63e2034f94d8a5b11f265b73ba33`. The workflow binds tag `v0.6.0`
+and exactly the v0.6 wheel, normalized sdist, and `SHA256SUMS`. Release
+publication and immutable GitHub/PyPI readback remain external operational
+evidence rather than tracked self-attestation.
+
+APG87 adds the JSX and React leaves, projections, tests, fixture, ADR,
+evaluation, and exit only to current-development audit ownership through
+`APG87_V06_*` sets. Historical v0.1 through v0.4 surfaces remain excluded from
+every APG87-only owner, and published/active v0.5.0 remains unchanged. This
+current-development inventory update is not a version advance, release
+candidate, publication, deployment, or remote push.
+
+APG88 adds the MDX and Astro leaves, projections, tests, fixture, ADR,
+evaluation, and exit only to current-development audit ownership through
+`APG88_V06_*` sets. Historical v0.1 through v0.4 surfaces remain excluded from
+every APG88-only owner, and published/active v0.5.0 remains unchanged. This
+current-development inventory update is not a version advance, release
+candidate, publication, deployment, active projection mutation, or provider
+Git publication.
+
+APG89 adds its composition fixture, evaluation, and exit only to
+current-development audit ownership through `APG89_V06_CRITICAL`. Historical
+v0.1 through v0.5 surfaces remain excluded from every APG89-only owner. Its
+later supervisory review accepted the exact candidate with C0/H0/M0/L0
+findings and terminalized the phase as `READY_FOR_APG90`; the historical APG89
+commit remains unchanged. This readiness evidence is not a version advance,
+named release candidate, publication, deployment, active projection mutation,
+or provider Git publication.
+
+APG90 makes the policy explicitly versioned: v0.5.0 reconstructs the digest-
+pinned thirty-three-skill historical surface and rejects all APG86-APG90
+owners, while v0.6.0 selects the thirty-nine-skill current surface and release
+records. Public construction remains a normal single-parent release from the
+live v0.5.0 line. When public Git/tag/GitHub/PyPI operations are outside the
+dispatcher boundary, APG90 stops at an exact same-phase operator handoff and
+does not claim publication.

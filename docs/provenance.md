@@ -1975,6 +1975,56 @@ review leaves five Medium APG contract/evidence defects, so the corrected bytes
 remain unintegrated historical evidence and ADR 0045 remains Proposed. This is
 bounded factual evidence, not legal advice.
 
+## APG86 GoMock and Vitest provenance
+
+APG86 independently writes `gomock-test-profile` from the official Uber GoMock
+v0.6.0 tagged README, changelog, `mockgen` sources, and `gomock` package source
+and documentation. The upstream repository is Apache-2.0. APG copies no prose,
+code, example, table, generated mock, or diagnostic expression; factual API
+identifiers and versioned behavior are used as facts. Refresh is required when
+the selected release, generator modes, controller cleanup, expectation counts
+or order, matchers, actions, or failure behavior changes.
+
+APG86 independently writes `vitest-test-profile` from official Vitest 4.1
+documentation and tagged v4.1.7 repository sources for configuration,
+projects, environments, assertions, mocking, timers, pools and isolation,
+snapshots, and coverage. Vitest is MIT licensed; its published package records
+separately licensed bundled dependencies. APG copies no upstream prose, code,
+example, table, snapshot, or diagnostic expression. Refresh is required when
+the selected Vitest line or those runner behaviors materially change.
+
+The APG86 boundary fixture, checker diagnostics, integration expression, ADR,
+evaluation, and exit are independently authored APG material. No upstream
+source is vendored, no dependency or lockfile is added, and no notice
+obligation changes. This is bounded factual evidence, not legal advice.
+
+## APG87 JSX and React provenance
+
+APG87 independently writes `jsx-language-profile` from the CC-BY-4.0 draft JSX
+specification at `react/jsx` commit
+`d614ce76e6ea996ea6dfa122f2a7be71ed96e6eb`, official CC-BY-4.0 TypeScript
+JSX/TSConfig documentation, MIT-licensed TypeScript website code, and
+Apache-2.0 TypeScript compiler source, all inspected 2026-08-20. JSX grammar is
+mutable, defines no runtime semantics, and TypeScript evidence describes one
+implementation. APG copies no source prose, grammar, code, examples, or tables;
+factual syntax and configuration identifiers are used under clean-room
+synthesis.
+
+APG87 independently writes `react-component-profile` from CC-BY-4.0 official
+React documentation and MIT-licensed repository tag `v19.2.6`, annotated object
+`2fcbe419ed90f863e6f67ce5b9738f38dbec640b`, commit
+`eaf3e95ca92be7a23d3c9cc8ffd6f199a40be401`, released 2026-05-06 and
+inspected 2026-08-20. APG copies no upstream prose, code, examples, tables, or
+diagnostics. Mutable documentation, canary features, and framework-integrated
+features do not silently extend the host-independent owner.
+
+Refresh JSX when the grammar, selected transform modes, import-source behavior,
+or file-kind handling changes. Refresh React when the selected release line,
+render/state model, Effect or Hook rules, context, memoization/compiler
+relationship, or error-boundary behavior changes. Removal preserves ADR,
+evaluation, exit, and source facts as historical provenance. This is bounded
+factual evidence, not legal advice.
+
 
 ## APG79B JavaScript correction provenance
 
@@ -2040,3 +2090,21 @@ projection, route, release, test, and inventory expression remains
 independently authored APG material. The exact Node runtimes and TypeScript
 compiler are qualification tools, not redistributed release inputs. This is
 bounded factual evidence, not legal advice.
+
+## APG88 MDX and Astro integration provenance
+
+APG88 independently synthesizes MDX guidance from exact MDX 3.1.1 object
+`50aa8df0b027c893dec9f97a2b7c51539e9f1a4b` and official documentation object
+`685627a819567c0788eadb85f5f57065bcc81c2c`, inspected 2026-08-20. The MDX
+repository and documentation are MIT-licensed. No upstream prose, source,
+examples, tables, fixtures, or diagnostics are copied.
+
+Astro guidance is independently synthesized from Astro 7.1.6 annotated tag
+`adbb7cbd12c47a869ad5008688209152e2362849`, exact commit
+`9865d1c03af6d1a1f15c9811858778cc952ca4e4`, and official docs object
+`ad92aec16358fee8e85f0dcd3b1e6baa9fd039c8`, inspected 2026-08-20. The Astro
+and docs repositories are MIT-licensed. No upstream prose, code, examples,
+tables, fixtures, or diagnostics are copied. Source versions are calibration
+evidence rather than project dependency requirements; mutable behavior is
+refresh-gated in each leaf. No dependency or notice obligation is added. This
+is bounded factual evidence, not legal advice.

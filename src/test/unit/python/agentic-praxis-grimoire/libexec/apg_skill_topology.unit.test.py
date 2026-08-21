@@ -552,15 +552,21 @@ def test_apg81h_current_repository_complete_profile_lifecycle_observation() -> N
         lambda: _oracle_lifecycle_rows(REPOSITORY_ROOT),
     )
     profile_names = tuple(_oracle_profile_paths(REPOSITORY_ROOT))
-    assert len(profile_names) == 22
+    assert len(profile_names) == 28
     assert len(observed) == len(profile_names)
     explicit = {row.profile for row in observed if row.lifecycle_owners}
     assert explicit == {
+        "astro-profile",
         "css-language-profile",
+        "gomock-test-profile",
         "javascript-language-profile",
+        "jsx-language-profile",
         "markdown-language-profile",
+        "mdx-profile",
         "nodejs-runtime-profile",
+        "react-component-profile",
         "typescript-language-profile",
+        "vitest-test-profile",
     }
     no_owner = [row for row in observed if not row.lifecycle_owners]
     assert len(no_owner) == 17
