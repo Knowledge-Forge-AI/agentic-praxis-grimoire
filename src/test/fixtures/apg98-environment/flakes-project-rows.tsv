@@ -1,0 +1,22 @@
+name	validator	max_bytes	required	default	description
+PATH	path_list	8192	false	/fixture/apg98/bin:/fixture/apg98/sbin	Synthetic executable search path
+JAVA_HOME	path	1024	false	/fixture/apg98/jdk	Synthetic JDK root
+SPRING_PROFILES_ACTIVE	token_list	512	false	fixture,test	Synthetic Spring profile list
+SPRING_APPLICATION_JSON	raw_safe	8192	false	{"fixture":true}	Synthetic Spring JSON override
+POSTGRES_HOST	host	255	false	service.fixture.invalid	Synthetic database host
+POSTGRES_PORT	port	5	false	4312	Synthetic database port
+POSTGRES_DB	token	128	false	fixturedb	Synthetic database name
+POSTGRES_USER	token	128	false	fixtureuser	Synthetic database user
+REDIS_HOST	host	255	false	cache.fixture.invalid	Synthetic cache host
+REDIS_PORT	port	5	false	6380	Synthetic cache port
+REDIS_URL	uri	1024	false	redis://cache.fixture.invalid:6380	Synthetic cache URI
+NODE_ENV	token	64	false	fixture	Synthetic Node mode
+VITE_API_URL	uri_or_path	1024	false	https://api.fixture.invalid	Synthetic Vite endpoint
+REACT_APP_API_URL	uri_or_path	1024	false	/fixture/apg98/react	Synthetic React endpoint
+ANGULAR_ENV	token	64	false	fixture	Synthetic Angular selector
+NESTJS_ENV	token	64	false	fixture	Synthetic NestJS selector
+FASTAPI_ENV	token	64	false	fixture	Synthetic FastAPI selector
+HANAMI_ENV	token	64	false	fixture	Synthetic Hanami selector
+NIX_CONFIG	raw_safe	4096	false	fixture-option=true	Synthetic Nix option text
+NIX_PATH	path_list	4096	false	/fixture/apg98/nixpkgs:/fixture/apg98/overlays	Synthetic Nix search path
+NIXPKGS_ALLOW_UNFREE	bool	8	false	1	Synthetic boolean selector

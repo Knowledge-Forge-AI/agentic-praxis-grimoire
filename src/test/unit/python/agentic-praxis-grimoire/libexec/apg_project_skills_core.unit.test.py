@@ -160,6 +160,16 @@ def test_frontmatter_and_canonical_skill_discovery_enforce_exact_catalog(tmp_pat
         (path / "SKILL.md").write_text(f"---\nname: {name}\n---\n")
     discovered = core.canonical_skills(tmp_path)
     assert tuple(discovered) == core.EXPECTED_SKILLS
+    go_source = skills_root / "corpus.go"
+    go_source.write_text("package skills\n")
+    assert tuple(core.canonical_skills(tmp_path)) == core.EXPECTED_SKILLS
+    go_source.unlink()
+    go_target = tmp_path / "outside.go"
+    go_target.write_text("package skills\n")
+    go_source.symlink_to(go_target)
+    with pytest.raises(core.ToolError, match="unsupported owner or depth"):
+        core.canonical_skills(tmp_path)
+    go_source.unlink()
     extra = skills_root / "unexpected"
     extra.mkdir()
     with pytest.raises(core.ToolError, match="unsupported owner or depth"):

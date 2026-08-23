@@ -1,0 +1,82 @@
+[
+  {
+    "case_id": "profile-unknown-field",
+    "kind": "json",
+    "input": {
+      "schema_version": "apg.environment-profile/v1",
+      "profile_id": "fixture-invalid",
+      "entries": [],
+      "unexpected": true
+    },
+    "expected": "reject-unknown-field"
+  },
+  {
+    "case_id": "profile-duplicate-json-key",
+    "kind": "json-text",
+    "input": "{\"schema_version\":\"apg.environment-profile/v1\",\"schema_version\":\"apg.environment-profile/v1\",\"profile_id\":\"fixture-invalid\",\"entries\":[]}",
+    "expected": "reject-duplicate-key"
+  },
+  {
+    "case_id": "duplicate-name",
+    "kind": "profile-entry",
+    "entries": [
+      {"name": "APG98_DUPLICATE", "validator": "token", "max_bytes": 32, "required": false},
+      {"name": "APG98_DUPLICATE", "validator": "token", "max_bytes": 32, "required": false}
+    ],
+    "expected": "reject-duplicate-name"
+  },
+  {
+    "case_id": "wildcard-name",
+    "kind": "profile-entry",
+    "entry": {"name": "APG98_*", "validator": "raw_safe", "max_bytes": 32, "required": false},
+    "expected": "reject-wildcard-name"
+  },
+  {
+    "case_id": "malformed-name",
+    "kind": "profile-entry",
+    "entry": {"name": "1_APG98", "validator": "raw_safe", "max_bytes": 32, "required": false},
+    "expected": "reject-malformed-name"
+  },
+  {
+    "case_id": "unknown-validator",
+    "kind": "profile-entry",
+    "entry": {"name": "APG98_UNKNOWN", "validator": "mystery", "max_bytes": 32, "required": false},
+    "expected": "reject-unknown-validator"
+  },
+  {
+    "case_id": "non-positive-limit",
+    "kind": "profile-entry",
+    "entry": {"name": "APG98_ZERO", "validator": "raw_safe", "max_bytes": 0, "required": false},
+    "expected": "reject-max-bytes"
+  },
+  {
+    "case_id": "invalid-default",
+    "kind": "profile-entry",
+    "entry": {"name": "APG98_BAD_DEFAULT", "validator": "port", "max_bytes": 5, "required": false, "default": "65536"},
+    "expected": "reject-default-validator"
+  },
+  {
+    "case_id": "control-default",
+    "kind": "profile-entry",
+    "entry": {"name": "APG98_CONTROL", "validator": "raw_safe", "max_bytes": 32, "required": false, "default": "fixture\nvalue"},
+    "expected": "reject-control-character"
+  },
+  {
+    "case_id": "denied-sentinel",
+    "kind": "profile-entry",
+    "entry": {"name": "APG98_SENTINEL", "validator": "token", "max_bytes": 32, "required": false, "default": "NULL"},
+    "expected": "reject-denied-sentinel"
+  },
+  {
+    "case_id": "sensitive-name",
+    "kind": "profile-entry",
+    "entry": {"name": "APG98_PASSWORD", "validator": "raw_safe", "max_bytes": 64, "required": false},
+    "expected": "reject-sensitive-name"
+  },
+  {
+    "case_id": "capability-path-exception",
+    "kind": "profile-entry",
+    "entry": {"name": "SSH_AUTH_SOCK", "validator": "path", "max_bytes": 1024, "required": false},
+    "expected": "permit-capability-path"
+  }
+]

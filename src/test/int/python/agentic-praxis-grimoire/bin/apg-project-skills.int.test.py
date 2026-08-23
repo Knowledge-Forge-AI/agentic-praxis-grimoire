@@ -122,6 +122,17 @@ class APGProjectSkillsTests(unittest.TestCase):
         self.home = self.base / "home"
         self.home.mkdir()
         self.environment = os.environ.copy()
+        inherited_site_packages = [
+            p for p in sys.path if p
+        ]
+        try:
+            import coverage
+
+            cov_dir = str(Path(coverage.__file__).resolve().parent.parent)
+            if cov_dir not in inherited_site_packages:
+                inherited_site_packages.append(cov_dir)
+        except Exception:
+            pass
         self.environment.update(
             {
                 "HOME": str(self.home),
@@ -129,6 +140,7 @@ class APGProjectSkillsTests(unittest.TestCase):
                 "LANG": "C",
                 "GIT_CONFIG_NOSYSTEM": "1",
                 "GIT_TERMINAL_PROMPT": "0",
+                "PYTHONPATH": os.pathsep.join(inherited_site_packages),
             }
         )
         self.repo = self.create_repository(self.base / "target")
@@ -200,10 +212,10 @@ class APGProjectSkillsTests(unittest.TestCase):
         environment: dict[str, str] | None = None,
     ) -> subprocess.CompletedProcess[str]:
         selected_repo = repo or self.repo
+        coverage_bin = shutil.which("coverage")
+        coverage_prefix = [coverage_bin] if coverage_bin else [sys.executable, "-m", "coverage"]
         command = [
-            sys.executable,
-            "-m",
-            "coverage",
+            *coverage_prefix,
             "run",
             "--parallel-mode",
             "--branch",

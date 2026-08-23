@@ -6,14 +6,16 @@ import os
 from pathlib import Path
 import shutil
 import stat
+import sys
 
 import pytest
 
-from libexec import apg_project_skills_core as project_core
 from src.test.apg_test_support import repository_root
 
-
 REPOSITORY_ROOT = repository_root(__file__)
+sys.path.insert(0, str(REPOSITORY_ROOT / "libexec"))
+
+import apg_project_skills_core as project_core  # noqa: E402
 
 
 def test_atomic_replace_restore_and_inode_identity(tmp_path: Path) -> None:

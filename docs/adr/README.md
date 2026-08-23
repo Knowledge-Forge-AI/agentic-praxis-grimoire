@@ -142,6 +142,8 @@ than erasing the earlier decision.
   — Accepted with amendment
 - [`0050 — MDX and Astro Profiles Complete the v0.6 Authoring Set`](2026/08/0050-mdx-astro-profiles-and-v0-6-authoring-completion.md)
   — Accepted with amendment
+- [`0051 — v0.7 Embeddable Toolkit Architecture and Roadmap`](2026/08/0051-v0-7-embeddable-toolkit-architecture-and-roadmap.md)
+  — Accepted
 
 APG14 adds no ADR. The v0.2.0 release applies the accepted licensing, roadmap,
 distribution, lineage, and maturity decisions in ADRs 0005, 0006, 0009, and
@@ -633,3 +635,13 @@ ADR 0050 is Accepted with amendment. Current topology is 39/39/39 with 14
 stable and 25 provisional skills; 9,504 description bytes leave 23 under the
 9,527 ceiling. No APG89, version, publication, deployment, provider Git
 publication, or successor work is authorized by this decision.
+
+APG94 accepts ADR 0051 in-phase under explicit human architecture authority.
+It freezes APG v0.7 as a library-first Go toolkit with root domain packages,
+JACA direct imports, Python-report parity, a Go CLI strangler bridge,
+platform-specific Python and scoped npm distribution, deterministic task-scoped
+skill bundles, portable curated environment snapshots, honest structural-
+hotspot capability reporting, a human documentation information architecture,
+and the bounded APG95 through APG103 sequence. APG94 adds no module, code,
+dependency, skill, maturity change, version, distribution, publication,
+deployment, JACA/`.flakes`/Nix change, or successor implementation.

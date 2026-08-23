@@ -142,6 +142,15 @@ prerequisite, never a fabricated fact.
 - [v0.6 architecture contract](docs/architecture/v0-6-skill-ownership-and-context-budget.md):
   frozen six-profile scope, ownership and composition matrix, derived context
   budget, selection authority, and the bounded APG86–APG90 sequence.
+- [v0.7 architecture contract](docs/architecture/v0-7-embeddable-toolkit.md):
+  library-first Go ownership, APIs and schemas, distribution, task-scoped
+  context, environment, hotspots, documentation IA, and APG95–APG103 sequence.
+- [APG-JACA integration boundary](docs/architecture/apg-jaca-integration.md):
+  direct Go imports, in-memory evidence, context/error behavior, and the strict
+  orchestration/non-orchestration boundary.
+- [v0.7 roadmap](docs/v0-7-roadmap.md): reporting, CLI, context, environment,
+  analysis, packaging, documentation, readiness, and publication slices without
+  automatic successor authority.
 - [APG85 architecture evaluation](docs/evaluations/apg85-v0-6-architecture-discoverability-and-context-budget.md):
   budget derivation from measured evidence, enforcement ownership, and the
   stated-but-unenforced limitation boundary.
@@ -158,6 +167,33 @@ prerequisite, never a fabricated fact.
   read-only target dogfood, deterministic cross-profile ownership, explicit
   selection, installed context and reproducibility, and bounded coverage
   determinism evidence.
+- [APG94 v0.7 architecture](docs/evaluations/apg94-v0-7-embeddable-toolkit-architecture.md):
+  source-first ownership and API freeze, migration/distribution decisions,
+  resolver/environment/hotspot contracts, and the no-successor boundary.
+- [APG95 Go reporting library](docs/evaluations/apg95-go-reporting-library-vertical-slice.md):
+  root Go module, public in-memory report API, Python byte/error parity,
+  publication safety, external import proof, and the APG96 stop boundary.
+- [APG96 Go CLI and report bridge](docs/evaluations/apg96-go-cli-foundation-and-python-report-migration-bridge.md):
+  root Go command, private build/CLI adapters, Python strangler migration,
+  compatibility routing, and the APG97 stop boundary.
+- [APG97 deterministic skill context bundles](docs/evaluations/apg97-deterministic-skill-context-bundles-and-agent-scoped-materialization.md):
+  embedded canonical corpus, structured resolver, fail-closed budgets, isolated
+  materialization, Go/Python consumer routes, and the APG98 stop boundary.
+- [APG98 portable environment snapshots](docs/evaluations/apg98-portable-environment-snapshots-and-resolution.md):
+  strict profiles and snapshots, explicit-map capture, locked no-churn storage,
+  isolated/overlay resolution, `.flakes` parity, and the APG99 stop boundary.
+- [APG99 structural hotspot analyzer](docs/evaluations/apg99-structural-hotspot-analyzer.md):
+  provider-neutral read-only analysis, the frozen capability matrix, canonical
+  machine reports, deterministic rankings and renderers, and the APG100 stop
+  boundary.
+- [APG100 Go strangler and multi-ecosystem distribution](docs/evaluations/apg100-complete-go-strangler-and-multi-ecosystem-distribution.md):
+  Go-owned response capture, verified thin wrappers, reproducible target
+  binaries, platform wheels, source distribution, npm packages, and the
+  APG101 stop boundary.
+- [APG101 human documentation restructuring](docs/evaluations/apg101-human-documentation-restructuring.md):
+  concise landing-page onboarding, frozen task-oriented documentation owners,
+  preserved phase archaeology, explicit v0.6-public/v0.7-candidate status, and
+  the APG102 stop boundary.
 - [APG41 readiness evaluation](docs/evaluations/apg41-v0-4-readiness-and-pre-release-smoke.md):
   retained provisional dispositions, candidate smoke, limitations, and the
   publication boundary.
@@ -1063,3 +1099,160 @@ commit, tag, push, or publish. Unless an authorized external mechanism actually
 completes immutable GitHub and PyPI readback, the terminal APG90 disposition is
 tracked publication preparation complete with external public finalization
 pending. No APG91 or v0.7 work is authorized.
+
+## APG94 v0.7 embeddable toolkit architecture
+
+APG94 follows terminal public v0.6.0 and accepts ADR 0051 under explicit human
+architecture authority. It freezes one root Go module with public domain
+packages `schema`, `report`, `skills`, `envsnap`, and `hotspot`, plus
+`cmd/apgr` and private `internal/` implementation. JACA imports public packages
+in-process and owns all orchestration; APG never imports JACA. Initial Git may
+remain a native exact-argv child process without shell interpretation.
+
+Current Python reporting is the APG95 byte/schema/error oracle. The CLI uses a
+strangler migration with one semantic owner per migrated action. Python v0.7
+uses supported-target binary wheels, npm uses scoped launcher
+`@knowledge-forge-ai/apgr` with platform packages, and all ecosystems share one
+version and binary/corpus identity.
+
+The skill resolver is structured, model-free, deterministic, fail-closed on
+budget, and materially conserves context through an isolated agent discovery
+root. Environment v1 uses typed allowlists, canonical JSON, owner-only no-churn
+storage, non-secret values, and in-process resolution; `.flakes` remains
+authority until APG98 parity and separate cutover. Hotspot v1 reports only
+qualified metrics, explicit unavailable values, confidence, stable JSON, and no
+v0.7 churn history. APG101 owns the later human README restructure.
+
+APG95 through APG103 are frozen but separately authorized. APG94 adds no
+`go.mod`, Go code, dependency, skill, projection, maturity change, version,
+package artifact, README rewrite, publication, deployment, JACA, `.flakes`, or
+Nix change. Current state remains 39/39/39, 14 stable / 25 provisional, 9,504
+description bytes, 9,492 characters, zero malformed, and version 0.6.0.
+
+## APG95 Go reporting library vertical slice
+
+APG95 implements the first Accepted ADR 0051 slice as one root Go 1.25 module.
+Public `schema` and `report` packages expose in-memory Show, Diff, Operational,
+ParseRecords, and optional Append behavior. Exact-argv native Git and atomic
+publication mechanics remain private under `internal/`; the module has no
+third-party dependency.
+
+During APG95, the maintained Python report implementation remained the active
+CLI and compatibility oracle. Differential fixtures bind accepted canonical bytes and
+rejected failure classes, while Go invariants cover cancellation, drift,
+real-index preservation, defensive copies, concurrent reuse, locks,
+transactions, modes, and link safety. An external disposable Go module imports
+and uses `report` without APG internals, Python, `cmd/apgr`, or a shell at the
+consumer boundary.
+
+Observed Python publication supersession removes an ops-only primary without
+copying its record into the later Git primary. APG95 preserves those oracle
+bytes and records the APG94 architecture's “absorbs” wording discrepancy.
+Version remains 0.6.0 and the skill/context invariants remain unchanged. APG95
+adds no CLI, route migration, version injection, skill/environment/hotspot
+implementation, packaging, JACA, `.flakes`, Nix, release, or publication work.
+The operator terminally accepted the reviewed APG95 closeout candidate
+after dispatcher finalization was blocked on entry dirt overlap, without
+source-byte drift.
+
+## APG96 Go CLI foundation and Python report migration bridge
+
+APG96 adds `cmd/apgr` as a thin adapter over the public Go `report` package,
+with private `internal/cli` and `internal/buildinfo` owners. It implements
+show, diff, operational/ops, path, recovery, stable build information, the
+three supported binary targets, and deterministic release-like linker
+injection from the Python `VERSION` and canonical skill-metadata identity.
+
+Python keeps APGR configuration, repository, project, and outbox resolution,
+then delegates every normal report route and all three historical report names
+to Go with exact argv and no shell. The frozen `libexec/agent_report` owner is
+test-oracle-only; a missing Go bridge fails without semantic fallback. Legacy
+`GIT_SHOW_REPORT_ROOT` remains private compatibility logic, while canonical
+routes use the explicit Python-resolved outbox.
+
+APG96 preserves accepted report bytes and the removal-without-copying ops-only
+supersession rule. Version and skill/context invariants remain unchanged. Final
+wheel/npm binaries remain APG100 work.
+
+## APG97 deterministic skill context bundles
+
+APG97 embeds the existing 39 canonical skill leaves directly into the public
+Go `skills` package and self-verifies the embedded projection against the
+established corpus fingerprint. Strict request/result/manifest schemas,
+versioned source-backed selection and informational composition tables,
+order-invariant identities, and fail-closed byte budgets implement the ADR
+0051 context contract without prompt interpretation or implicit profile chains.
+
+Verified results materialize exactly selected direct regular skills plus one
+canonical manifest through owner-only staging and atomic publication. Go owns
+list/context/resolve/materialize consumer semantics; Python list/context and
+new resolve/materialize routes delegate to Go while project/user/global/
+flatten maintenance remains Python-owned. External Go consumption and isolated
+selected-only Codex discovery are qualified. Version and the 39/39/39,
+14/25, 9,504-byte, 9,492-character, and 9,527-ceiling invariants remain
+unchanged. APG97 grants no APG98 or successor authority.
+
+## APG98 portable environment snapshots
+
+APG98 adds the provider-neutral public Go `envsnap` package with strict v1
+profiles and snapshots, explicit-map capture, deterministic fingerprints,
+owner-only interprocess-locked no-churn storage, verified load and staleness,
+and default-isolated or explicit-overlay resolution. Go exposes profile-check,
+snapshot, show, resolve, and exact-argv run adapters; Python delegates the
+`env` family without reimplementing semantics.
+
+Bounded fixtures source-bind the current `.flakes` validators, snapshot,
+parser-safe runner, and prompt hook while preserving intentional APG JSON,
+explicit-map, sensitive-name, isolation, staleness, and locking differences.
+The thin-hook cutover contract is documented but not activated. Version and
+skill/context invariants remain unchanged. APG99 is recommended but separately
+authorized.
+
+## APG99 structural hotspot analyzer
+
+APG99 adds the provider-neutral public Go `hotspot` package and
+`apgr analyze hotspots`. Exact root-relative inventory, direct stable reads,
+mandatory file/byte/time bounds, cancellation, symlink refusal, and drift
+detection produce canonical `apg.hotspot-report/v1` JSON without executing
+source, shells, plugins, configuration, or Git history. Python delegates the
+command through the exact-argv Go bridge and has no analysis fallback.
+
+Go receives AST-derived statements, owners, cyclomatic complexity, nesting,
+and package/init regions. Every other frozen surface receives only its exact
+or bounded structural capability; unsupported semantic metrics remain
+explicitly unavailable. Report-local ranking uses the frozen
+35/25/15/15/10 weights, capability-separated integer percentiles, visible
+available weight and confidence, and deterministic ordering. Terminal output
+is concise, Markdown is a deterministic detailed view, and JSON remains the
+machine authority. Growth/churn is deferred.
+
+APG99 changes no skill, maturity, version, JACA, `.flakes`, Nix, packaging,
+release, deployment, or active target state. APG99 is terminal and preserved
+by APG100.
+
+## APG100 complete Go strangler and multi-ecosystem distribution
+
+APG100 advances the single editable release authority to `0.7.0`, moves
+response capture to a private Go owner, completes thin verified Python
+delegation, and assembles reproducible Go, platform-wheel, source-distribution,
+and npm candidate artifacts without publication. One canonical binary manifest
+and one coordinated distribution manifest bind version, target, hash, corpus,
+and build identity across ecosystems.
+
+Repository and host maintenance remains Python-owned. The legacy project skill
+projection adapter remains compatibility-only; Go resolve/materialize remains
+portable authority. The v0.7 public candidate excludes the old Python report
+oracle and consumer skill module while preserving historical v0.6
+reconstruction. APG101 subsequently began under separate authorization.
+
+## APG101 human documentation restructuring
+
+APG101 preserves APG100's accepted runtime and local distribution state while
+replacing the root phase ledger with a concise landing page in the frozen
+v0.7 information architecture. `docs/README.md` owns task-oriented navigation,
+the architecture-frozen reference and guide paths are current, and the former
+README chronology remains under `docs/history/releases-and-phases.md`.
+Published v0.6.0 and the unpublished, locally qualified v0.7.0 release
+candidate are explicit. APG101 changes no runtime, package, version, skill,
+maturity, JACA, Nix, active integration, or publication state. APG102 remains
+separately authorized.

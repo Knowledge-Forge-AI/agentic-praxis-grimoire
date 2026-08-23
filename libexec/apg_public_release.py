@@ -10,6 +10,7 @@ import json
 import os
 from pathlib import Path, PurePosixPath
 import re
+import shutil
 import stat
 import subprocess
 import sys
@@ -1242,6 +1243,209 @@ AUDITED_CRITICAL = tuple(
     )
 )
 
+# Keep the published v0.6 surface independent from the mutable current
+# development surface.  The v0.6 policy is historical evidence, not the
+# authority for the v0.7 source candidate.
+HISTORICAL_V06_WRAPPERS = tuple(AUDITED_WRAPPERS)
+HISTORICAL_V06_HELPERS = tuple(AUDITED_HELPERS)
+HISTORICAL_V06_TESTS = tuple(AUDITED_TESTS)
+HISTORICAL_V06_CRITICAL = tuple(AUDITED_CRITICAL)
+HISTORICAL_V06_LICENSING = tuple(AUDITED_LICENSING)
+HISTORICAL_V06_PROJECTIONS = tuple(AUDITED_PROJECTIONS)
+HISTORICAL_V06_SKILLS = tuple(AUDITED_SKILLS)
+HISTORICAL_V06_CATEGORIES = tuple(sorted(ALLOWED_CATEGORIES))
+HISTORICAL_V06_SURFACE_SHA256 = (
+    "40edfbe25f52fae4f15f2801525ce2c50cee5f360b02191393a431ca25f76b51"
+)
+
+# These are retained compatibility wrappers, not the old Python report
+# implementation.  The latter is deliberately omitted from the v0.7 source
+# projection and remains available only in the development checkout/tests.
+V07_WRAPPERS = tuple(HISTORICAL_V06_WRAPPERS)
+V07_HELPERS = tuple(
+    sorted(
+        {
+            *(
+                path
+                for path in HISTORICAL_V06_HELPERS
+                if not path.startswith("libexec/agent_report/")
+                and path != "src/agentic_praxis_grimoire/skills.py"
+            ),
+            # v0.7's source distribution, Go build, and npm packer are release
+            # maintenance owners, not runtime semantic implementations.
+            "libexec/apg_distribution_candidate.py",
+            "libexec/apg_distribution_candidate_archives.py",
+            "libexec/apg_distribution_candidate_contract.py",
+            "libexec/apg_go_build.py",
+            "libexec/apg_npm_distribution.py",
+            "libexec/apg_phase_commit_message.py",
+            "libexec/apg_python_build_backend.py",
+            "src/agentic_praxis_grimoire/go_bridge.py",
+        }
+    )
+)
+V07_TESTS = tuple(
+    sorted(
+        {
+            *(
+                path
+                for path in HISTORICAL_V06_TESTS
+                if not (
+                    path.startswith("src/test/unit/python/agentic-praxis-grimoire/libexec/agent_report/")
+                    or path.startswith("src/test/int/python/agentic-praxis-grimoire/libexec/agent_report/")
+                    or path.startswith("src/test/unit/bash/append-operational-report.")
+                    or path.startswith("src/test/unit/bash/git-show-report.")
+                    or path in {
+                        "src/test/int/python/agentic-praxis-grimoire/bin/append-operational-report.int.test.py",
+                        "src/test/int/python/agentic-praxis-grimoire/bin/git-diff-report.int.test.py",
+                        "src/test/int/python/agentic-praxis-grimoire/bin/git-show-report.int.test.py",
+                        "src/test/int/python/agentic-praxis-grimoire/src/agentic_praxis_grimoire/reports.int.test.py",
+                        "src/test/int/python/agentic-praxis-grimoire/libexec/apg_test.int.test.py",
+                        "src/test/unit/python/agentic-praxis-grimoire/src/agentic_praxis_grimoire/skills.unit.test.py",
+                    }
+                )
+            ),
+            "npm/test/launcher.test.cjs",
+            "src/test/int/python/agentic-praxis-grimoire/bin/apg-build-go-cli.int.test.py",
+            "src/test/int/python/agentic-praxis-grimoire/docs/environment-snapshots.int.test.py",
+            "src/test/int/python/agentic-praxis-grimoire/skills/css-language-profile/SKILL.int.test.py",
+            "src/test/int/python/agentic-praxis-grimoire/src/test/support/apg_css_candidate_contract.int.test.py",
+            "src/test/unit/python/agentic-praxis-grimoire/docs/evaluations/apg98-portable-environment-snapshots-and-resolution.unit.test.py",
+            "src/test/unit/python/agentic-praxis-grimoire/docs/provenance.unit.test.py",
+            "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_distribution_candidate.unit.test.py",
+            "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_go_build.unit.test.py",
+            "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_npm_distribution.unit.test.py",
+            "src/test/unit/python/agentic-praxis-grimoire/src/agentic_praxis_grimoire/go_bridge.unit.test.py",
+            "src/test/unit/python/agentic-praxis-grimoire/src/test/fixtures/apg60-css-reentry-contract.json.unit.test.py",
+            "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_actual_retained_surface_contract.unit.test.py",
+            "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_candidate_actual_lifecycle_contract.unit.test.py",
+            "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_candidate_current_state_contract.unit.test.py",
+            "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_candidate_decision_contract.unit.test.py",
+            "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_candidate_history_contract.unit.test.py",
+            "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_candidate_lifecycle_schema_contract.unit.test.py",
+            "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_candidate_narrative_state_contract.unit.test.py",
+            "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_candidate_phase_history_contract.unit.test.py",
+            "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_candidate_required_role_registry.unit.test.py",
+            "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_candidate_surface_contract.unit.test.py",
+            "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_candidate_traceability_contract.unit.test.py",
+            "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_css_evidence_retention_contract.unit.test.py",
+            "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_exact_read_contract.unit.test.py",
+            "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_live_owner_binding_contract.unit.test.py",
+            "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_pinned_root_contract.unit.test.py",
+            "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_python_source_binding_contract.unit.test.py",
+            "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_repository_absence_contract.unit.test.py",
+            "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_repository_import_contract.unit.test.py",
+            "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_repository_import_descriptor_contract.unit.test.py",
+            "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_repository_path_contract.unit.test.py",
+            "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_repository_projection_contract.unit.test.py",
+            "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_repository_snapshot_contract.unit.test.py",
+            "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_skill_set_contract.unit.test.py",
+            "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_worker_temp_cleanup_contract.unit.test.py",
+            "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_worker_temp_contract.unit.test.py",
+            "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_worker_temp_root_binding_contract.unit.test.py",
+        }
+    )
+)
+# These exact public-projected tests consume publication-excluded development
+# history or private source oracles. The private canonical gate continues to
+# run them; the release-shaped candidate cannot truthfully reconstruct those
+# inputs. Keep this node-level list narrower than the public test entrypoints.
+V07_PUBLIC_VALIDATION_DESELECTIONS = tuple(
+    sorted(
+        {
+            "src/test/int/python/agentic-praxis-grimoire/skills/css-language-profile/SKILL.int.test.py::test_candidate_fixture_debt_and_repository_lifecycle_agree",
+            "src/test/int/python/agentic-praxis-grimoire/skills/css-language-profile/SKILL.int.test.py::test_disposable_rollback_reconstructs_preintegration_owners",
+            "src/test/int/python/agentic-praxis-grimoire/src/agentic_praxis_grimoire/cli.int.test.py::test_python_skill_bridge_matches_oracle_and_routes_new_go_surfaces",
+            "src/test/int/python/agentic-praxis-grimoire/src/test/support/apg_css_candidate_contract.int.test.py::test_apg59_and_live_counts_preserve_css_rejection_across_growth",
+            "src/test/int/python/agentic-praxis-grimoire/src/test/support/apg_css_candidate_contract.int.test.py::test_apg60a_revision_preserves_exact_unrelated_contract_semantics",
+            "src/test/int/python/agentic-praxis-grimoire/src/test/support/apg_css_candidate_contract.int.test.py::test_exact_apg58_apg59_history_and_live_integrated_surface",
+            "src/test/int/python/agentic-praxis-grimoire/src/test/support/apg_css_candidate_contract.int.test.py::test_raw_apg59_revert_restores_candidate_and_fails_closure",
+        }
+    )
+)
+V07_CRITICAL = tuple(
+    sorted(
+        set(HISTORICAL_V06_CRITICAL)
+        | {
+            "cmd/apgr/main.go",
+            "go.mod",
+            "internal/atomicfile/atomicfile.go",
+            "internal/buildinfo/buildinfo.go",
+            "internal/cli/analyze.go",
+            "internal/cli/cli.go",
+            "internal/cli/env.go",
+            "internal/cli/legacy.go",
+            "internal/cli/operational.go",
+            "internal/cli/publication.go",
+            "internal/cli/report.go",
+            "internal/cli/skills.go",
+            "internal/cli/source.go",
+            "internal/gitexec/gitexec.go",
+            "internal/response/response.go",
+            "libexec/apg_go_build.py",
+            "npm/README.md",
+            "npm/templates/launcher/index.js",
+            "npm/templates/launcher/package.json",
+            "npm/templates/platform/package.json",
+            "report/append.go",
+            "report/doc.go",
+            "report/service.go",
+            "src/agentic_praxis_grimoire/go_bridge.py",
+        }
+    )
+)
+V07_LICENSING = tuple(HISTORICAL_V06_LICENSING)
+V07_PROJECTIONS = tuple(HISTORICAL_V06_PROJECTIONS)
+V07_SKILLS = tuple(HISTORICAL_V06_SKILLS)
+V07_CATEGORIES = tuple(HISTORICAL_V06_CATEGORIES)
+
+# Source-only test oracles and generated/local output never enter the
+# release-shaped v0.7 candidate. The compatibility wrappers above are not
+# excluded because they invoke the Go owner through the normal bridge.
+V07_EXCLUDED_PREFIXES = (
+    "libexec/agent_report/",
+    "report/testdata/",
+    "src/test/int/python/agentic-praxis-grimoire/libexec/agent_report/",
+    "src/test/unit/python/agentic-praxis-grimoire/libexec/agent_report/",
+)
+V07_EXCLUDED_PATHS = frozenset(
+    {
+        "src/test/int/python/agentic-praxis-grimoire/bin/append-operational-report.int.test.py",
+        "src/test/int/python/agentic-praxis-grimoire/bin/git-diff-report.int.test.py",
+        "src/test/int/python/agentic-praxis-grimoire/bin/git-show-report.int.test.py",
+        "src/test/int/python/agentic-praxis-grimoire/src/agentic_praxis_grimoire/reports.int.test.py",
+        "src/test/int/python/agentic-praxis-grimoire/libexec/apg_test.int.test.py",
+        "src/agentic_praxis_grimoire/skills.py",
+        "src/test/unit/python/agentic-praxis-grimoire/src/agentic_praxis_grimoire/skills.unit.test.py",
+        "src/test/unit/bash/append-operational-report.unit.test.bats",
+        "src/test/unit/bash/git-show-report.unit.test.bats",
+    }
+)
+V07_GENERATED_PATHS = frozenset(
+    {
+        "bin/apgr-darwin-arm64",
+        "bin/apgr-linux-amd64",
+        "bin/apgr-linux-arm64",
+    }
+)
+V07_GENERATED_PREFIXES = (
+    ".scratch/",
+    ".venv/",
+    ".pytest_cache/",
+    "build/",
+    "dist/",
+    "node_modules/",
+)
+V07_GENERATED_SUFFIXES = (
+    ".pyc",
+    ".pyo",
+    ".whl",
+    ".tar",
+    ".tar.gz",
+    ".tgz",
+    ".zip",
+)
+
 POST_V04_WRAPPERS = (
     APG53_V05_WRAPPERS | APG54_V05_WRAPPERS | APG82_V05_WRAPPERS
     | APG83_V05_WRAPPERS | APG84_V05_WRAPPERS
@@ -1779,21 +1983,43 @@ def safe_policy_path(value: str) -> bool:
 def audited_policy_surfaces(version: str) -> tuple[dict[str, tuple[str, ...]], ...]:
     """Return exact policy surfaces allowed for one public release version."""
 
-    current = {
-        "required_helpers": AUDITED_HELPERS,
-        "required_licensing_files": AUDITED_LICENSING,
-        "required_projections": AUDITED_PROJECTIONS,
-        "required_skills": AUDITED_SKILLS,
-        "required_test_entrypoints": AUDITED_TESTS,
-        "required_wrappers": AUDITED_WRAPPERS,
-        "critical_files": AUDITED_CRITICAL,
-        "validation_categories": tuple(sorted(ALLOWED_CATEGORIES)),
+    historical_v06 = {
+        "required_helpers": HISTORICAL_V06_HELPERS,
+        "required_licensing_files": HISTORICAL_V06_LICENSING,
+        "required_projections": HISTORICAL_V06_PROJECTIONS,
+        "required_skills": HISTORICAL_V06_SKILLS,
+        "required_test_entrypoints": HISTORICAL_V06_TESTS,
+        "required_wrappers": HISTORICAL_V06_WRAPPERS,
+        "critical_files": HISTORICAL_V06_CRITICAL,
+        "validation_categories": HISTORICAL_V06_CATEGORIES,
+    }
+    historical_v06_digest = hashlib.sha256(
+        json.dumps(
+            historical_v06,
+            ensure_ascii=True,
+            separators=(",", ":"),
+            sort_keys=True,
+        ).encode("utf-8")
+    ).hexdigest()
+    if historical_v06_digest != HISTORICAL_V06_SURFACE_SHA256:
+        fail("historical public v0.6.0 policy surface changed")
+    current_v07 = {
+        "required_helpers": V07_HELPERS,
+        "required_licensing_files": V07_LICENSING,
+        "required_projections": V07_PROJECTIONS,
+        "required_skills": V07_SKILLS,
+        "required_test_entrypoints": V07_TESTS,
+        "required_wrappers": V07_WRAPPERS,
+        "critical_files": V07_CRITICAL,
+        "validation_categories": V07_CATEGORIES,
     }
     if not SEMVER.fullmatch(version):
         fail("public release policy identity is malformed or unsupported")
     core = version.split("+", 1)[0].split("-", 1)[0]
+    if core == "0.7.0":
+        return (current_v07,)
     if core == "0.6.0":
-        return (current,)
+        return (historical_v06,)
     if core == "0.5.0":
         historical_v05 = {
             "required_helpers": HISTORICAL_V05_HELPERS,
@@ -1871,6 +2097,7 @@ def load_policy(
     repository: Repository,
     *,
     expected_surfaces: Sequence[dict[str, tuple[str, ...]]] | None = None,
+    allow_v07_compatibility: bool = False,
 ) -> dict[str, object]:
     raw = committed_bytes(repository, POLICY_PATH)
     if len(raw) > 256 * 1024:
@@ -1900,6 +2127,11 @@ def load_policy(
     if not set(value["validation_categories"]).issubset(ALLOWED_CATEGORIES):
         fail("public release policy contains an unknown validation category")
     allowed_surfaces = tuple(expected_surfaces or audited_policy_surfaces("0.6.0"))
+    if allow_v07_compatibility and any(
+        surface == audited_policy_surfaces("0.6.0")[0]
+        for surface in allowed_surfaces
+    ):
+        allowed_surfaces = (*allowed_surfaces, audited_policy_surfaces("0.7.0")[0])
     if not any(
         all(tuple(value[key]) == expected for key, expected in surface.items())
         for surface in allowed_surfaces
@@ -1936,6 +2168,47 @@ def tree_entries(repository: Repository, *, excluded_prefix: bytes = b"") -> tup
             fail(f"unsupported public Git entry: {path.decode('utf-8', 'replace')}")
         entries.append(Entry(mode, kind, oid, path))
     return tuple(sorted(entries, key=lambda entry: entry.path))
+
+
+def is_v07_candidate_path(path: str | bytes) -> bool:
+    """Return whether one source path belongs in the v0.7 public candidate."""
+
+    display = (
+        path.decode("utf-8", "surrogateescape")
+        if isinstance(path, bytes)
+        else path
+    )
+    if (
+        display == "private"
+        or display.startswith("private/")
+        or display in V07_EXCLUDED_PATHS
+        or display in V07_GENERATED_PATHS
+    ):
+        return False
+    if any(display.startswith(prefix) for prefix in V07_EXCLUDED_PREFIXES):
+        return False
+    if any(display.startswith(prefix) for prefix in V07_GENERATED_PREFIXES):
+        return False
+    if display.endswith(V07_GENERATED_SUFFIXES):
+        return False
+    if any(part == "__pycache__" or part.endswith(".egg-info") for part in display.split("/")):
+        return False
+    return True
+
+
+def public_candidate_entries(
+    repository: Repository,
+    version: str,
+    *,
+    excluded_prefix: bytes = b"",
+) -> tuple[Entry, ...]:
+    """Return the exact tree entries eligible for one source candidate."""
+
+    entries = tree_entries(repository, excluded_prefix=excluded_prefix)
+    core = version.split("+", 1)[0].split("-", 1)[0]
+    if core != "0.7.0":
+        return entries
+    return tuple(entry for entry in entries if is_v07_candidate_path(entry.path))
 
 
 def entry_bytes(repository: Repository, entry: Entry) -> bytes:
@@ -2018,9 +2291,35 @@ def validate_public_symlinks(repository: Repository, entries: Sequence[Entry]) -
         resolve_committed(target_path, frozenset({entry_path}))
 
 
-def build_manifest(repository: Repository) -> dict[str, object]:
-    policy = load_policy(repository)
-    entries = tree_entries(repository, excluded_prefix=b"private/")
+def repository_version(repository: Repository) -> str:
+    """Read the editable version when present, with fixture-safe fallback."""
+
+    try:
+        value = committed_bytes(
+            repository,
+            "src/agentic_praxis_grimoire/VERSION",
+        ).decode("ascii").strip()
+        validate_version(value)
+    except (ToolError, InvocationError, UnicodeDecodeError):
+        return "0.6.0"
+    return value
+
+
+def build_manifest(
+    repository: Repository,
+    version: str | None = None,
+) -> dict[str, object]:
+    selected_version = version or repository_version(repository)
+    policy = load_policy(
+        repository,
+        expected_surfaces=audited_policy_surfaces(selected_version),
+        allow_v07_compatibility=True,
+    )
+    entries = public_candidate_entries(
+        repository,
+        selected_version,
+        excluded_prefix=b"private/",
+    )
     validate_critical(entries, policy)
     validate_public_symlinks(repository, entries)
     rendered: list[dict[str, object]] = []
@@ -2050,10 +2349,14 @@ def validate_public_release_surface(repository: Repository, version: str) -> Non
         repository,
         expected_surfaces=audited_policy_surfaces(version),
     )
-    entries = tree_entries(repository)
-    validate_versioned_policy_exclusions(entries, version)
-    if any(entry.path == b"private" or entry.path.startswith(b"private/") for entry in entries):
+    all_entries = tree_entries(repository)
+    validate_versioned_policy_exclusions(all_entries, version)
+    if any(
+        entry.path == b"private" or entry.path.startswith(b"private/")
+        for entry in all_entries
+    ):
         fail("public release must not track private/")
+    entries = public_candidate_entries(repository, version)
     validate_critical(entries, policy)
     validate_public_symlinks(repository, entries)
 
@@ -2065,6 +2368,14 @@ def validate_versioned_policy_exclusions(
     """Reject future owners from immutable historical public trees."""
 
     core = version.split("+", 1)[0].split("-", 1)[0]
+    if core == "0.7.0":
+        for entry in entries:
+            if not is_v07_candidate_path(entry.path):
+                fail(
+                    "public v0.7.0 contains a publication-excluded path: "
+                    + entry.display_path
+                )
+        return
     if core == "0.5.0":
         paths = {entry.display_path for entry in entries}
         for path in HISTORICAL_V05_FORBIDDEN_FUTURE_OWNERS:
@@ -2412,8 +2723,9 @@ def build_candidate(
     policy = load_policy(
         source,
         expected_surfaces=audited_policy_surfaces(version),
+        allow_v07_compatibility=True,
     )
-    entries = tree_entries(source, excluded_prefix=b"private/")
+    entries = public_candidate_entries(source, version, excluded_prefix=b"private/")
     validate_versioned_policy_exclusions(entries, version)
     validate_critical(entries, policy)
     validate_public_symlinks(source, entries)
@@ -2480,6 +2792,7 @@ def build_candidate(
 
 
 MARKDOWN_LINK = re.compile(r"(?<!!)\[[^\]]*\]\(([^)]+)\)|!\[[^\]]*\]\(([^)]+)\)")
+HUMAN_MARKDOWN_LINK_EXCLUDED_PREFIXES = (b"hotspot/testdata/classification/",)
 
 
 def validate_markdown_links(repository: Repository) -> None:
@@ -2514,6 +2827,8 @@ def validate_markdown_links(repository: Repository) -> None:
             destination = "/".join(normalized)
             if destination == "private" or destination.startswith("private/"):
                 fail(f"public Markdown links into private/: {entry.display_path}")
+            if entry.path.startswith(HUMAN_MARKDOWN_LINK_EXCLUDED_PREFIXES):
+                continue
             prefix = destination.rstrip("/").encode("utf-8", "surrogateescape")
             if prefix not in paths and not any(path.startswith(prefix + b"/") for path in paths):
                 fail(f"broken public Markdown link in {entry.display_path}: {decoded}")
@@ -2595,6 +2910,12 @@ def validate_categories(
         if python_tests and all(
             "/agentic-praxis-grimoire/" in path for path in python_tests
         ):
+            deselections = (
+                V07_PUBLIC_VALIDATION_DESELECTIONS
+                if tuple(python_tests)
+                == tuple(path for path in V07_TESTS if path.endswith(".py"))
+                else ()
+            )
             run_checked_command(
                 [
                     sys.executable,
@@ -2604,6 +2925,11 @@ def validate_categories(
                     "--import-mode=importlib",
                     "-o",
                     "python_files=*.test.py",
+                    *(
+                        argument
+                        for node_id in deselections
+                        for argument in ("--deselect", node_id)
+                    ),
                     *python_tests,
                 ],
                 candidate.root,
@@ -2655,8 +2981,25 @@ def isolated_validation_environment(
         locations["PYTEST_DEBUG_TEMPROOT"]
     )
     environment["PYTHONPYCACHEPREFIX"] = str(locations["PYTHONPYCACHEPREFIX"])
+    inherited_site_packages = [
+        p
+        for p in sys.path
+        if p
+        and not any(
+            p.startswith(str(prefix))
+            for prefix in (candidate.root, base.root)
+        )
+    ]
+    try:
+        import pytest  # type: ignore[import-not-found]
+
+        pytest_dir = str(Path(pytest.__file__).resolve().parent.parent)
+        if pytest_dir not in inherited_site_packages:
+            inherited_site_packages.append(pytest_dir)
+    except Exception:
+        pass
     environment["PYTHONPATH"] = os.pathsep.join(
-        (str(candidate.root / "src"), str(candidate.root))
+        (str(candidate.root / "src"), str(candidate.root), *inherited_site_packages)
     )
     environment["PWD"] = str(candidate.root)
     environment.pop("OLDPWD", None)
@@ -2716,11 +3059,23 @@ def check_candidate(
     policy = load_policy(
         source,
         expected_surfaces=audited_policy_surfaces(version),
+        allow_v07_compatibility=True,
     )
-    source_entries = tree_entries(source, excluded_prefix=b"private/")
-    candidate_entries = tree_entries(candidate)
-    validate_versioned_policy_exclusions(source_entries, version)
-    validate_versioned_policy_exclusions(candidate_entries, version)
+    source_entries = public_candidate_entries(
+        source, version, excluded_prefix=b"private/"
+    )
+    candidate_entries = public_candidate_entries(candidate, version)
+    core = version.split("+", 1)[0].split("-", 1)[0]
+    if core == "0.7.0":
+        # The development source may retain publication-excluded oracle files,
+        # but a v0.7 release candidate must not project them.  Inspect the
+        # unfiltered candidate tree so the check cannot pass merely because
+        # the projection filter hid an excluded path.
+        candidate_all_entries = tree_entries(candidate)
+        validate_versioned_policy_exclusions(candidate_all_entries, version)
+    else:
+        validate_versioned_policy_exclusions(source_entries, version)
+        validate_versioned_policy_exclusions(candidate_entries, version)
     validate_critical(source_entries, policy)
     validate_critical(candidate_entries, policy)
     validate_public_symlinks(source, source_entries)
@@ -2815,6 +3170,7 @@ def parser() -> argparse.ArgumentParser:
     subcommands = root.add_subparsers(dest="operation", required=True)
     manifest = subcommands.add_parser("manifest", help="render the committed non-private projection manifest")
     manifest.add_argument("--source", default=str(Path(__file__).resolve().parent.parent))
+    manifest.add_argument("--version")
     manifest.add_argument("--format", choices=("text", "json"), default="text")
     build = subcommands.add_parser("build", help="build one deterministic local squashed candidate")
     for option in ("source", "base", "output", "version", "release-date", "author-name", "author-email"):
@@ -2832,7 +3188,11 @@ def main(argv: Sequence[str] | None = None) -> int:
     try:
         if arguments.operation == "manifest":
             repository = resolve_repository(arguments.source, "source")
-            sys.stdout.write(render_manifest(build_manifest(repository), arguments.format))
+            sys.stdout.write(
+                render_manifest(
+                    build_manifest(repository, arguments.version), arguments.format
+                )
+            )
             return 0
         version = validate_version(arguments.version)
         source = resolve_repository(arguments.source, "source")

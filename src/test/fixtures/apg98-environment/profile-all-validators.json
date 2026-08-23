@@ -1,0 +1,116 @@
+{
+  "schema_version": "apg.environment-profile/v1",
+  "profile_id": "fixture-all-validators",
+  "entries": [
+    {
+      "name": "APG98_BOOL",
+      "validator": "bool",
+      "max_bytes": 8,
+      "required": true,
+      "default": "true",
+      "description": "Synthetic boolean fixture value"
+    },
+    {
+      "name": "APG98_COMMAND",
+      "validator": "command",
+      "max_bytes": 128,
+      "required": true,
+      "description": "Synthetic command text; never executed"
+    },
+    {
+      "name": "APG98_HOST",
+      "validator": "host",
+      "max_bytes": 255,
+      "required": true,
+      "default": "service.fixture.invalid",
+      "description": "Synthetic host-like value"
+    },
+    {
+      "name": "APG98_INTEGER",
+      "validator": "integer",
+      "max_bytes": 16,
+      "required": true,
+      "default": "-7",
+      "description": "Synthetic signed integer"
+    },
+    {
+      "name": "APG98_OPTIONAL",
+      "validator": "token",
+      "max_bytes": 64,
+      "required": false,
+      "default": "optional-default",
+      "description": "Omitted to exercise optional-missing state"
+    },
+    {
+      "name": "APG98_PATH",
+      "validator": "path",
+      "max_bytes": 1024,
+      "required": true,
+      "default": "/fixture/apg98/root",
+      "description": "Synthetic path-like value"
+    },
+    {
+      "name": "APG98_PATH_LIST",
+      "validator": "path_list",
+      "max_bytes": 2048,
+      "required": true,
+      "default": "/fixture/apg98/bin:/fixture/apg98/sbin",
+      "description": "Synthetic colon-separated paths"
+    },
+    {
+      "name": "APG98_PORT",
+      "validator": "port",
+      "max_bytes": 5,
+      "required": true,
+      "default": "4312",
+      "description": "Synthetic TCP port"
+    },
+    {
+      "name": "APG98_RAW_SAFE",
+      "validator": "raw_safe",
+      "max_bytes": 256,
+      "required": true,
+      "default": "fixture text with spaces",
+      "description": "Synthetic control-free scalar"
+    },
+    {
+      "name": "APG98_LEXEM",
+      "validator": "token",
+      "max_bytes": 64,
+      "required": true,
+      "default": "alpha-1",
+      "description": "Synthetic lexical token"
+    },
+    {
+      "name": "APG98_LEXEM_LIST",
+      "validator": "token_list",
+      "max_bytes": 128,
+      "required": true,
+      "default": "alpha,beta-2",
+      "description": "Synthetic comma-separated token list"
+    },
+    {
+      "name": "APG98_URI",
+      "validator": "uri",
+      "max_bytes": 512,
+      "required": true,
+      "default": "https://service.fixture.invalid/api",
+      "description": "Synthetic URI"
+    },
+    {
+      "name": "APG98_URI_OR_PATH",
+      "validator": "uri_or_path",
+      "max_bytes": 512,
+      "required": true,
+      "default": "/fixture/apg98/endpoint",
+      "description": "Synthetic URI-or-path value"
+    },
+    {
+      "name": "SSH_AUTH_SOCK",
+      "validator": "path",
+      "max_bytes": 1024,
+      "required": false,
+      "description": "Capability socket path; not credential material"
+    }
+  ]
+}

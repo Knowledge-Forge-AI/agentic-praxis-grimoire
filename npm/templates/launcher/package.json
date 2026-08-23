@@ -1,0 +1,24 @@
+{
+  "name": "__APG_LAUNCHER_NAME__",
+  "version": "__APG_VERSION__",
+  "description": "The Agentic Praxis Grimoire command launcher.",
+  "license": "AGPL-3.0-or-later",
+  "main": "index.js",
+  "bin": {
+    "apgr": "index.js"
+  },
+  "files": [
+    "index.js",
+    "LICENSE",
+    "NOTICE",
+    "COMMERCIAL-LICENSE.md"
+  ],
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "optionalDependencies": {
+    "@knowledge-forge-ai/apgr-darwin-arm64": "__APG_VERSION__",
+    "@knowledge-forge-ai/apgr-linux-arm64": "__APG_VERSION__",
+    "@knowledge-forge-ai/apgr-linux-x64": "__APG_VERSION__"
+  }
+}

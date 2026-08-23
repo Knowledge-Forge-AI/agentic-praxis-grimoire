@@ -6,6 +6,7 @@ from __future__ import annotations
 import json
 import os
 from pathlib import Path
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -59,6 +60,30 @@ HISTORICAL_V02_SKILLS = tuple(
 
 
 class APGPublicReleaseUnitTests(APGPublicReleaseCaseMixin, unittest.TestCase):
+    def test_live_committed_v07_manifest_exercises_complete_policy_projection(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            source = Path(temporary) / "source"
+            subprocess.run(
+                [
+                    "git",
+                    "clone",
+                    "--quiet",
+                    "--no-hardlinks",
+                    str(REPOSITORY_ROOT),
+                    str(source),
+                ],
+                check=True,
+            )
+            repository = release.resolve_repository(source, "source")
+            manifest = release.build_manifest(repository, "0.7.0")
+
+        paths = {entry["path"] for entry in manifest["entries"]}
+        self.assertGreater(len(paths), 1000)
+        self.assertIn("cmd/apgr/main.go", paths)
+        self.assertIn("hotspot/testdata/classification/sample.md", paths)
+        self.assertFalse(any(path == "private" or path.startswith("private/") for path in paths))
+        self.assertEqual(manifest["canonical_public_identity"], "agentic-praxis-grimoire")
+
     def test_prominent_public_guidance_matches_current_skill_topology(self) -> None:
         surface = json.loads(
             (REPOSITORY_ROOT / "release" / "public-surface.json").read_text(
@@ -69,9 +94,16 @@ class APGPublicReleaseUnitTests(APGPublicReleaseCaseMixin, unittest.TestCase):
         self.assertEqual(len(surface["required_projections"]), 39)
         expected = {
             "README.md": (
-                "thirty-nine canonical skills",
-                "fourteen stable rows and twenty-five provisional",
-                "thirty-nine relative symbolic links",
+                "39 canonical agent skills",
+                "APG has 39 canonical leaves: 14 stable and 25 provisional",
+                "39 canonical / 39 catalog / 39 projections / 39\n  discoverable",
+            ),
+            "skills/README.md": (
+                "thirty-nine canonical skills: fourteen\nstable rows and twenty-five provisional rows",
+                "39 canonical skills, 39 catalog rows, and 39 projections,\nwith fourteen stable and twenty-five provisional rows",
+            ),
+            "docs/history/releases-and-phases.md": (
+                "thirty-nine relative symbolic links contain no\n  independent skill content",
             ),
             "AGENTS.md": (
                 "thirty-nine skill owners, fourteen stable\n  and twenty-five provisional",
@@ -85,6 +117,71 @@ class APGPublicReleaseUnitTests(APGPublicReleaseCaseMixin, unittest.TestCase):
             for fragment in fragments:
                 with self.subTest(path=relative, fragment=fragment):
                     self.assertIn(fragment, source)
+
+    def test_v07_surface_separates_historical_python_oracles(self) -> None:
+        historical = release.audited_policy_surfaces("0.6.0")[0]
+        current = release.audited_policy_surfaces("0.7.0")[0]
+
+        self.assertEqual(len(current["required_skills"]), 39)
+        self.assertEqual(len(current["required_projections"]), 39)
+        self.assertIn("libexec/agent_report/diff.py", historical["required_helpers"])
+        self.assertNotIn("libexec/agent_report/diff.py", current["required_helpers"])
+        self.assertIn("src/agentic_praxis_grimoire/skills.py", historical["required_helpers"])
+        self.assertNotIn("src/agentic_praxis_grimoire/skills.py", current["required_helpers"])
+        for path in (
+            "libexec/apg_distribution_candidate.py",
+            "libexec/apg_npm_distribution.py",
+            "libexec/apg_python_build_backend.py",
+        ):
+            self.assertIn(path, current["required_helpers"])
+        for path in (
+            "go.mod",
+            "cmd/apgr/main.go",
+            "internal/response/response.go",
+            "libexec/apg_go_build.py",
+            "npm/templates/launcher/index.js",
+            "src/agentic_praxis_grimoire/go_bridge.py",
+        ):
+            self.assertIn(path, current["critical_files"])
+
+    def test_historical_v06_surface_is_snapshot_not_current_tuple_alias(self) -> None:
+        original = release.AUDITED_HELPERS
+        try:
+            release.AUDITED_HELPERS = (*original, "libexec/future-owner.py")
+            historical = release.audited_policy_surfaces("0.6.0")[0]
+        finally:
+            release.AUDITED_HELPERS = original
+        self.assertNotIn("libexec/future-owner.py", historical["required_helpers"])
+        self.assertEqual(
+            release.HISTORICAL_V06_SURFACE_SHA256,
+            "40edfbe25f52fae4f15f2801525ce2c50cee5f360b02191393a431ca25f76b51",
+        )
+
+    def test_v07_candidate_path_filter_keeps_npm_and_excludes_oracles(self) -> None:
+        retained = (
+            "bin/apgr",
+            "go.mod",
+            "npm/launcher/package.json",
+            "skills/example/SKILL.md",
+        )
+        excluded = (
+            "libexec/agent_report/diff.py",
+            "report/testdata/python_oracle.py",
+            "src/agentic_praxis_grimoire/skills.py",
+            "src/test/int/python/agentic-praxis-grimoire/libexec/apg_test.int.test.py",
+            "src/test/unit/python/agentic-praxis-grimoire/src/agentic_praxis_grimoire/skills.unit.test.py",
+            "bin/apgr-darwin-arm64",
+            "dist/example.whl",
+            ".scratch/local.txt",
+            "out/example.zip",
+            "private/evaluation.txt",
+        )
+        for path in retained:
+            with self.subTest(path=path):
+                self.assertTrue(release.is_v07_candidate_path(path))
+        for path in excluded:
+            with self.subTest(path=path):
+                self.assertFalse(release.is_v07_candidate_path(path))
 
     def test_public_symlink_validation_accepts_contained_links_and_rejects_unsafe_targets(self) -> None:
         repository = release.Repository(Path("repo"), "a" * 40, "b" * 40)
@@ -295,6 +392,33 @@ class APGPublicReleaseUnitTests(APGPublicReleaseCaseMixin, unittest.TestCase):
             ):
                 release.validate_markdown_links(repository)
 
+    def test_markdown_link_validation_excludes_only_hotspot_testdata(self) -> None:
+        repository = release.Repository(Path("repo"), "a" * 40, "b" * 40)
+        fixture = release.Entry(
+            "100644",
+            "blob",
+            "c" * 40,
+            b"hotspot/testdata/classification/sample.md",
+        )
+        human_doc = release.Entry("100644", "blob", "d" * 40, b"docs/README.md")
+
+        with (
+            mock.patch.object(release, "tree_entries", return_value=(fixture,)),
+            mock.patch.object(release, "entry_bytes", return_value=b"[fixture](target)"),
+        ):
+            release.validate_markdown_links(repository)
+
+        with (
+            mock.patch.object(
+                release,
+                "tree_entries",
+                return_value=(fixture, human_doc),
+            ),
+            mock.patch.object(release, "entry_bytes", return_value=b"[broken](missing.md)"),
+            self.assertRaisesRegex(release.ToolError, "docs/README.md"),
+        ):
+            release.validate_markdown_links(repository)
+
     def test_private_policy_and_category_validation_cover_configured_boundaries(self) -> None:
         repository = release.Repository(Path("repo"), "a" * 40, "b" * 40)
         entry = release.Entry("100755", "blob", "c" * 40, b"bin/tool")
@@ -338,9 +462,10 @@ class APGPublicReleaseUnitTests(APGPublicReleaseCaseMixin, unittest.TestCase):
             environment = release.isolated_validation_environment(Path(temporary), candidate, base)
             self.assertEqual(environment["PWD"], "candidate")
             self.assertEqual(environment["APG12_PUBLIC_V01_ROOT"], "base")
-            self.assertEqual(
-                environment["PYTHONPATH"],
-                os.pathsep.join(("candidate/src", "candidate")),
+            self.assertTrue(
+                environment["PYTHONPATH"].startswith(
+                    os.pathsep.join(("candidate/src", "candidate"))
+                )
             )
             pytest_root = Path(environment["PYTEST_DEBUG_TEMPROOT"])
             worker_root = Path(environment["TMPDIR"])
@@ -420,6 +545,33 @@ class APGPublicReleaseUnitTests(APGPublicReleaseCaseMixin, unittest.TestCase):
             release.validate_categories(repository, repository, policy, {})
         self.assertEqual(command.call_args_list[0].args[0], ["bats", "legacy.test.bats"])
         self.assertEqual(command.call_args_list[1].args[0], [sys.executable, "legacy.test.py"])
+
+    def test_v07_public_validation_deselects_only_publication_excluded_cases(self) -> None:
+        repository = release.Repository(Path("repo"), "a" * 40, "b" * 40)
+        policy = {
+            "validation_categories": ["configured-tests"],
+            "required_wrappers": [],
+            "required_helpers": [],
+            "required_test_entrypoints": list(release.V07_TESTS),
+        }
+        with mock.patch.object(release, "run_checked_command") as command:
+            release.validate_categories(repository, repository, policy, {})
+        arguments = command.call_args.args[0]
+        observed = [
+            arguments[index + 1]
+            for index, value in enumerate(arguments)
+            if value == "--deselect"
+        ]
+        self.assertEqual(observed, list(release.V07_PUBLIC_VALIDATION_DESELECTIONS))
+        self.assertEqual(observed, sorted(set(observed)))
+        for node_id in observed:
+            self.assertIn(node_id.split("::", 1)[0], release.V07_TESTS)
+
+    def test_v07_public_test_sources_do_not_trigger_confidentiality_scan(self) -> None:
+        for relative_path in release.V07_TESTS:
+            content = (REPOSITORY_ROOT / relative_path).read_text(encoding="utf-8")
+            for marker in release.LOCAL_PATH_MARKERS:
+                self.assertNotIn(marker, content, relative_path)
 
     def test_require_unchanged_and_confidentiality_failures_are_bounded(self) -> None:
         repository = release.Repository(Path("repo"), "a" * 40, "b" * 40)

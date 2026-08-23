@@ -53,6 +53,7 @@ class APGPublicReleaseTests(unittest.TestCase):
         self.launcher = self.root / "apg-public-release-test-launcher.py"
         self.launcher.write_text(
             "import sys\n"
+            f"sys.path = {sys.path!r}\n"
             f"sys.path.insert(0, {str(REPOSITORY_ROOT / 'libexec')!r})\n"
             "import apg_public_release as command\n"
             f"command.PUBLIC_V01_COMMIT = {self.git(self.base, 'rev-parse', 'HEAD').stdout.strip()!r}\n"
@@ -838,7 +839,11 @@ class APGPublicReleaseTests(unittest.TestCase):
         self.assertFalse(output.exists())
 
     def test_25_configured_test_cannot_mutate_the_original_base(self) -> None:
-        path = self.policy()["required_test_entrypoints"][0]
+        path = [
+            p
+            for p in self.policy()["required_test_entrypoints"]
+            if p.endswith(".py")
+        ][0]
         target = self.source / path
         target.write_text(
             "import os\n"
@@ -855,7 +860,11 @@ class APGPublicReleaseTests(unittest.TestCase):
         self.assertEqual(self.fingerprint(self.base), before)
 
     def test_26_configured_test_cannot_mutate_the_original_candidate(self) -> None:
-        path = self.policy()["required_test_entrypoints"][0]
+        path = [
+            p
+            for p in self.policy()["required_test_entrypoints"]
+            if p.endswith(".py")
+        ][0]
         target = self.source / path
         target.write_text(
             "from pathlib import Path\n"
@@ -1074,7 +1083,11 @@ class APGPublicReleaseTests(unittest.TestCase):
         self.assert_success(result)
 
     def test_32_caller_environment_cannot_disable_configured_validation(self) -> None:
-        path = self.policy()["required_test_entrypoints"][0]
+        path = [
+            p
+            for p in self.policy()["required_test_entrypoints"]
+            if p.endswith(".py")
+        ][0]
         source = self.make_source(self.root / "spoofed-configured-test-source")
         (source / path).write_text(
             "def test_configured_failure_remains_observable():\n"

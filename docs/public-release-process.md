@@ -510,3 +510,57 @@ records. Public construction remains a normal single-parent release from the
 live v0.5.0 line. When public Git/tag/GitHub/PyPI operations are outside the
 dispatcher boundary, APG90 stops at an exact same-phase operator handoff and
 does not claim publication.
+
+APG93 provides the external publication authority boundary. Following
+dispatcher pre-final review acceptance and operator execution of the hardened
+packet, public v0.6.0 was published to GitHub and PyPI. Live readback confirmed
+release commit `d37727d5c928f542cbee89b1be1979d4046c4d65`, annotated tag
+`v0.6.0` (object `eedcacf685bea32612f534e174bc5c12592c56a0`), 3 GitHub Release
+assets matching APG90 hashes, successful Trusted Publishing, matching PyPI 0.6.0
+distribution hashes, and isolated package readback reporting version 0.6.0 with
+the exact 39-skill context. Historical v0.5.0 and prior tags remain intact.
+
+APG102 keeps public-candidate validation broad while classifying seven exact
+pytest node IDs as private-development evidence rather than release-source
+authority. Those nodes require excluded source oracles, private source-binding
+owners, or development-only Git history; the canonical private unit/integration
+gate still runs them. The public checker deselects only those exact nodes and
+continues to run every other test in their three owning files, so a whole-file
+exclusion cannot hide an ordinary public regression. Qualified TypeScript and
+Node executable bindings remain required inputs to the isolated public check.
+
+APG102 also establishes the authoritative v0.7.0 release asset and publication
+contract. `libexec/apg_distribution_candidate_contract.py` defines the single
+machine-readable inventory of the ten GitHub Release assets and their roles (one
+manifest, one checksum file, three platform Python wheels, one Python sdist,
+three npm platform packages, and one npm launcher package).
+
+The v0.7 PyPI release workflow (`.github/workflows/release.yml`) runs on
+published GitHub Releases, enforces OIDC Trusted Publishing (`id-token: write`,
+environment `pypi`), verifies repository and `v0.7.0` tag identity, and
+safely distinguishes the four Python distribution artifacts from all other release
+assets. It checks the three platform wheels (`darwin/arm64`, `linux/amd64`,
+`linux/arm64`) and normalized sdist against `SHA256SUMS`, rejects missing,
+duplicate, renamed, universal `py3-none-any`, or mismatched Python artifacts,
+and publishes only the verified distribution directory without tokens or
+rebuilding.
+
+For the four new scoped npm packages (`@knowledge-forge-ai/apgr-darwin-arm64`,
+`@knowledge-forge-ai/apgr-linux-x64`, `@knowledge-forge-ai/apgr-linux-arm64`, and
+`@knowledge-forge-ai/apgr`), APG102 defines the first-publication and steady-state
+authority:
+1. **First-release bootstrap**: operator-owned interactive publication using
+   exact prequalified package tarballs with `--access public`.
+2. **Ordering**: platform packages publish strictly before the launcher package
+   so optional dependencies resolve immediately upon install.
+3. **Live readback**: every package receives immediate post-publish verification
+   of name, version, and integrity digest.
+4. **Fail-closed classification**: partial or mismatched registry state halts
+   publication without destructive unpublishing or force-overwriting.
+5. **Credential safety**: no auth tokens are embedded in arguments, logs, or
+   tracked files; bootstrap uses operator ambient authentication.
+6. **Steady-state transition**: once the packages exist on npm, the maintainer
+   configures GitHub Actions OIDC Trusted Publishing on npmjs.com for each
+   package, enabling tokenless OIDC provenance publication for subsequent
+   releases.
+

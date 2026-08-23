@@ -37,13 +37,15 @@ def test_release_workflow_verifies_exact_assets_before_trusted_publish() -> None
     assert verify["env"] == {"GH_TOKEN": "${{ github.token }}"}
     assert "actions/checkout" not in WORKFLOW.read_text(encoding="utf-8")
     assert "secrets." not in WORKFLOW.read_text(encoding="utf-8")
-    assert "v0.6.0" in script
+    assert "v0.7.0" in script
+    assert "0.7.0" in script
     assert "Knowledge-Forge-AI/agentic-praxis-grimoire" in script
-    assert "agentic_praxis_grimoire-0.6.0-py3-none-any.whl" in script
-    assert "agentic_praxis_grimoire-0.6.0.tar.gz" in script
+    assert "apg-distribution-manifest.json" in script
+    assert ".python.wheels" in script
+    assert ".python.sdist" in script
+    assert "py3-none-any" not in script
     assert "SHA256SUMS" in script
     assert ".release.assets" in script
-    assert "sha256sum --check --strict" in script
     assert "verified-dist" in script
     assert "release-assets" not in publish.get("with", {}).get("packages-dir", "")
     assert publish == {
@@ -51,3 +53,4 @@ def test_release_workflow_verifies_exact_assets_before_trusted_publish() -> None
         "uses": f"pypa/gh-action-pypi-publish@{PYPA_PUBLISH_COMMIT}",
         "with": {"packages-dir": "verified-dist"},
     }
+

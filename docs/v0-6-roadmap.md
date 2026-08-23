@@ -1,7 +1,7 @@
 # Agentic Praxis Grimoire v0.6 Scope Record
 
-Status: APG90 publication preparation in progress. APG85 through APG89 are
-accepted under their phase records; see [the v0.6 architecture
+Status: complete; v0.6.0 published on GitHub and PyPI under APG93. APG85 through
+APG90 and APG93 are accepted under their phase records; see [the v0.6 architecture
 contract](architecture/v0-6-skill-ownership-and-context-budget.md).
 
 ## Purpose
@@ -148,5 +148,20 @@ explicit project selection remains authoritative.
 Provider work does not stage, commit, tag, push, publish, deploy, or mutate
 active APGR state. If public GitHub and PyPI finalization remains outside the
 dispatcher boundary, the APG90 tracked result is an exact same-phase external-
-publication handoff rather than a publication claim. No APG91 or v0.7 work is
-authorized.
+publication handoff rather than a publication claim.
+
+## APG91–APG93 publication execution and live readback
+
+APG91 diagnosed initial runner environment binding issues during publication.
+APG92 proved the frozen APG90 release content exact, hardened the operator
+publication packet, pinned validation python, resolved tool bindings, passed
+unit tests, and committed the hardened packet.
+
+APG93 established the external publication authority boundary. Following
+dispatcher pre-final review acceptance and operator execution of
+`finalize-public-release.sh --execute`, public v0.6.0 was published to GitHub
+and PyPI. Live readback confirmed release commit `d37727d5`, annotated tag
+`v0.6.0`, 3 GitHub Release assets matching APG90 hashes, successful Trusted
+Publishing, matching PyPI 0.6.0 distribution hashes, and isolated package
+readback reporting version 0.6.0 with the exact 39-skill context. No Nix or
+active APGR deployment occurred; v0.6 is complete.

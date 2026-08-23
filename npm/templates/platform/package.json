@@ -1,0 +1,22 @@
+{
+  "name": "__APG_PLATFORM_NAME__",
+  "version": "__APG_VERSION__",
+  "description": "The Agentic Praxis Grimoire native executable for __APG_TARGET__.",
+  "license": "AGPL-3.0-or-later",
+  "files": [
+    "bin/apgr",
+    "bin/apgr.binary-manifest.json",
+    "LICENSE",
+    "NOTICE",
+    "COMMERCIAL-LICENSE.md"
+  ],
+  "os": [
+    "__APG_OS__"
+  ],
+  "cpu": [
+    "__APG_CPU__"
+  ],
+  "engines": {
+    "node": ">=22.0.0"
+  }
+}

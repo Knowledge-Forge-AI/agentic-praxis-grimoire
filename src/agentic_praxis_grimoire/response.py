@@ -1,28 +1,24 @@
-"""Atomic, numbered APGR final-response capture.
+"""Compatibility adapter for the Go-owned APGR response recorder.
 
-The response recorder deliberately owns only the response artifact contract.  It
-does not select a project, discover a repository, or interpret Markdown.  The
-caller supplies a project/phase identity and one byte-preserving input source;
-this module returns the one path it created.
+The Python module preserves the supported callable names and input-selection
+surface, but it does not allocate response numbers, create directories, lock
+files, or publish artifacts. Those consequence-bearing operations belong to
+the private Go response owner and are reached through :mod:`go_bridge`.
 """
 
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
-from contextlib import contextmanager
-import importlib
-import fcntl
 import os
 from pathlib import Path
 import re
-import secrets
 import stat
 import sys
-import time
-from typing import BinaryIO, Iterator
+from typing import BinaryIO
 
+from . import go_bridge
 from .config import ConfigError, resolve_outbox_root
-from .paths import PathContractError, outbox_phase_path
+from .paths import PathContractError, outbox_phase_path, validate_project_phase
 
 
 MAX_COMPONENT_LENGTH = 128
@@ -30,18 +26,18 @@ MAX_RESPONSE_NUMBER = 999
 MAX_RESPONSE_BYTES = 8 * 1024 * 1024
 LOCK_NAME = ".response.lock"
 TEMP_GLOB = ".response-write.*.tmp"
+# Retained scalar names for callers that inspected the former Python owner;
+# lock acquisition itself is no longer performed in this module.
 LOCK_TIMEOUT_SECONDS = 10.0
 LOCK_POLL_SECONDS = 0.01
 
-_COMPONENT = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 _RESERVATION = re.compile(
     r"^\.([A-Za-z0-9][A-Za-z0-9._-]*)\.([0-9]{3})\.response\.md\.reservation\.([A-Za-z0-9_-]+)$"
 )
-_TEMPORARY = re.compile(r"^\.response-write\.[A-Za-z0-9_-]+\.tmp$")
 
 
 class ResponseError(RuntimeError):
-    """A response artifact could not be created or inspected safely."""
+    """A Go-owned response artifact could not be created or inspected safely."""
 
 
 class ResponseUsageError(ResponseError, ValueError):
@@ -53,171 +49,12 @@ class ResponseInputError(ResponseError):
 
 
 class ResponseAllocationError(ResponseError):
-    """No response number could be reserved in the bounded phase range."""
-
-
-def _shared_component_validator():
-    """Return an optional package-owned component validator.
-
-    APGR's path module is introduced alongside the CLI by the parent work unit.
-    Keeping this lookup lazy lets this module remain independently usable while
-    ensuring a later shared validator is authoritative when present.  Both
-    names are accepted so the response owner does not need to edit that module.
-    """
-
-    package = __package__
-    if not package:
-        return None
-    try:
-        paths = importlib.import_module(f"{package}.paths")
-    except ModuleNotFoundError as error:
-        if error.name != f"{package}.paths":
-            raise
-        return None
-    for name in ("validate_component", "validate_identifier"):
-        validator = getattr(paths, name, None)
-        if callable(validator):
-            return validator
-    return None
-
-
-def _validate_component(value: str, label: str) -> str:
-    """Validate one project/phase path component using the shared owner if available."""
-
-    if not isinstance(value, str):
-        raise ResponseUsageError(f"{label} is unsafe")
-    validator = _shared_component_validator()
-    if validator is not None:
-        try:
-            validated = validator(value)
-        except (TypeError, ValueError, OSError) as error:
-            raise ResponseUsageError(f"{label} is unsafe") from error
-        if not isinstance(validated, str) or validated != value:
-            raise ResponseUsageError(f"{label} is unsafe")
-        return validated
-    if (
-        len(value) > MAX_COMPONENT_LENGTH
-        or value in {".", ".."}
-        or _COMPONENT.fullmatch(value) is None
-    ):
-        raise ResponseUsageError(f"{label} is unsafe")
-    return value
-
-
-def _lstat(path: Path) -> os.stat_result | None:
-    try:
-        return path.lstat()
-    except FileNotFoundError:
-        return None
-    except OSError as error:
-        raise ResponseError(f"could not inspect response path: {path.name}") from error
-
-
-def _lexists(path: Path) -> bool:
-    return _lstat(path) is not None
-
-
-def _ensure_directory(path: Path, *, private: bool) -> None:
-    """Create or validate a directory without following a symlink."""
-
-    metadata = _lstat(path)
-    if metadata is None:
-        try:
-            path.mkdir(parents=True, mode=0o700)
-        except FileExistsError:
-            metadata = _lstat(path)
-        except OSError as error:
-            raise ResponseError("could not create response directory") from error
-        else:
-            metadata = _lstat(path)
-    if metadata is None or stat.S_ISLNK(metadata.st_mode) or not stat.S_ISDIR(metadata.st_mode):
-        raise ResponseError("response directory is unsafe")
-    if metadata.st_uid != os.getuid():
-        raise ResponseError("response directory owner is unsafe")
-    if private and stat.S_IMODE(metadata.st_mode) != 0o700:
-        raise ResponseError("response directory permissions must be 0700")
-
-
-def phase_directory(
-    outbox_root: str | os.PathLike[str], project: str, phase: str
-) -> Path:
-    """Return and create the private ``<outbox>/<project>/<phase>`` directory."""
-
-    project = _validate_component(project, "project")
-    phase = _validate_component(phase, "phase")
-    try:
-        phase_path = outbox_phase_path(outbox_root, project, phase)
-    except PathContractError as error:
-        raise ResponseUsageError(str(error)) from error
-    root = phase_path.parent.parent
-    _ensure_directory(root, private=False)
-    project_path = phase_path.parent
-    _ensure_directory(project_path, private=True)
-    _ensure_directory(phase_path, private=True)
-    return phase_path
-
-
-def _response_path(phase_dir: Path, phase: str, number: int) -> Path:
-    return phase_dir / f"{phase}.{number:03d}.response.md"
-
-
-def _reservation_path(phase_dir: Path, phase: str, number: int, token: str) -> Path:
-    return phase_dir / f".{phase}.{number:03d}.response.md.reservation.{token}"
-
-
-def _write_all(fd: int, payload: bytes) -> None:
-    view = memoryview(payload)
-    offset = 0
-    while offset < len(view):
-        written = os.write(fd, view[offset:])
-        if written <= 0:
-            raise OSError("response write made no progress")
-        offset += written
-
-
-def _fsync_directory(path: Path) -> None:
-    flags = os.O_RDONLY
-    if hasattr(os, "O_DIRECTORY"):
-        flags |= os.O_DIRECTORY
-    fd = os.open(path, flags)
-    try:
-        os.fsync(fd)
-    finally:
-        os.close(fd)
-
-
-def _open_exclusive(path: Path) -> int:
-    flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL
-    if hasattr(os, "O_NOFOLLOW"):
-        flags |= os.O_NOFOLLOW
-    return os.open(path, flags, 0o600)
-
-
-def _open_lock(path: Path) -> int:
-    flags = os.O_RDWR | os.O_CREAT
-    if hasattr(os, "O_NOFOLLOW"):
-        flags |= os.O_NOFOLLOW
-    return os.open(path, flags, 0o600)
-
-
-def _remove_owned(path: Path, metadata: os.stat_result | None) -> None:
-    """Remove exactly the invocation-owned regular file, if it still exists."""
-
-    if metadata is None:
-        return
-    current = _lstat(path)
-    if current is None:
-        return
-    if (
-        current.st_dev != metadata.st_dev
-        or current.st_ino != metadata.st_ino
-        or not stat.S_ISREG(current.st_mode)
-    ):
-        raise ResponseError("response temporary artifact changed during cleanup")
-    path.unlink()
+    """The Go response owner could not reserve a bounded response number."""
 
 
 def _read_source(path: Path) -> bytes:
+    """Read a compatibility file input without following a source symlink."""
+
     flags = os.O_RDONLY
     if hasattr(os, "O_NONBLOCK"):
         flags |= os.O_NONBLOCK
@@ -251,34 +88,10 @@ def _read_source(path: Path) -> bytes:
         os.close(fd)
 
 
-def _read_input(
-    *,
-    body: bytes | bytearray | memoryview | None,
-    source: str | os.PathLike[str] | None,
-    input_path: str | os.PathLike[str] | None,
-    stdin: BinaryIO | None,
-) -> bytes:
-    if source is not None and input_path is not None:
-        raise ResponseUsageError("exactly one response input is required")
-    selected_source = source if source is not None else input_path
-    selected = sum(
-        item is not None for item in (body, selected_source, stdin)
-    )
-    if selected != 1:
-        raise ResponseUsageError("exactly one response input is required")
-    if body is not None:
-        if not isinstance(body, (bytes, bytearray, memoryview)):
-            raise ResponseInputError("response body must be bytes")
-        value = bytes(body)
-        if len(value) > MAX_RESPONSE_BYTES:
-            raise ResponseInputError("response input exceeds the 8 MiB limit")
-        return value
-    if selected_source is not None:
-        return _read_source(Path(selected_source).expanduser())
-    assert stdin is not None
+def _read_stdin(stdin: BinaryIO) -> bytes:
+    chunks: list[bytes] = []
+    total = 0
     try:
-        chunks: list[bytes] = []
-        total = 0
         while True:
             value = stdin.read(min(1024 * 1024, MAX_RESPONSE_BYTES + 1 - total))
             if not isinstance(value, (bytes, bytearray, memoryview)):
@@ -290,271 +103,92 @@ def _read_input(
                 raise ResponseInputError("response input exceeds the 8 MiB limit")
             chunks.append(chunk)
             total += len(chunk)
+    except ResponseInputError:
+        raise
     except (OSError, TypeError, ValueError) as error:
         raise ResponseInputError("could not read response stdin") from error
     return b"".join(chunks)
 
 
-@contextmanager
-def _phase_lock(phase_dir: Path) -> Iterator[None]:
-    """Serialize allocation with an advisory lock released by process exit."""
-
-    lock_path = phase_dir / LOCK_NAME
-    deadline = time.monotonic() + LOCK_TIMEOUT_SECONDS
-    fd: int | None = None
-    metadata: os.stat_result | None = None
-    while fd is None:
-        try:
-            candidate = _open_lock(lock_path)
-            current = os.fstat(candidate)
-            if (
-                not stat.S_ISREG(current.st_mode)
-                or current.st_uid != os.getuid()
-                or stat.S_IMODE(current.st_mode) != 0o600
-            ):
-                os.close(candidate)
-                raise ResponseError("response lock is unsafe")
-            try:
-                fcntl.flock(candidate, fcntl.LOCK_EX | fcntl.LOCK_NB)
-            except BlockingIOError:
-                os.close(candidate)
-                if time.monotonic() >= deadline:
-                    raise ResponseAllocationError("response phase lock remained busy")
-                time.sleep(LOCK_POLL_SECONDS)
-                continue
-            fd = candidate
-            metadata = current
-        except OSError as error:
-            raise ResponseError("could not acquire response phase lock") from error
-    try:
-        os.ftruncate(fd, 0)
-        _write_all(fd, b"response-lock-v2\n")
-        os.fsync(fd)
-        _fsync_directory(phase_dir)
-        yield
-    finally:
-        if fd is not None:
-            os.close(fd)
-
-
-def _reserve(
-    phase_dir: Path, phase: str
-) -> tuple[int, Path, os.stat_result]:
-    reserved_numbers = {
-        int(match.group(2))
-        for entry in phase_dir.iterdir()
-        if (match := _reservation_match(entry)) is not None
-        and match.group(1) == phase
-    }
-    for number in range(1, MAX_RESPONSE_NUMBER + 1):
-        destination = _response_path(phase_dir, phase, number)
-        if _lexists(destination):
-            continue
-        if number in reserved_numbers:
-            continue
-        reservation = _reservation_path(
-            phase_dir, phase, number, secrets.token_hex(12)
-        )
-        try:
-            fd = _open_exclusive(reservation)
-        except FileExistsError:
-            # Defensive collision handling for the random reservation token.
-            continue
-        try:
-            _write_all(
-                fd,
-                f"response-reservation-v1\nphase={phase}\nnumber={number:03d}\n".encode(
-                    "ascii"
-                ),
-            )
-            os.fsync(fd)
-            metadata = os.fstat(fd)
-        except OSError as error:
-            os.close(fd)
-            try:
-                reservation.unlink()
-            except OSError:
-                pass
-            raise ResponseError("could not create response reservation") from error
-        else:
-            os.close(fd)
-        try:
-            _fsync_directory(phase_dir)
-        except OSError as error:
-            try:
-                _remove_owned(reservation, metadata)
-            except (OSError, ResponseError) as cleanup_error:
-                raise ResponseError(
-                    "response reservation durability failed and cleanup was incomplete"
-                ) from cleanup_error
-            raise ResponseError(
-                "could not make response reservation durable"
-            ) from error
-        return number, reservation, metadata
-    raise ResponseAllocationError("response numbers exhausted (001..999)")
-
-
-def _write_temporary(phase_dir: Path, body: bytes) -> tuple[Path, os.stat_result]:
-    for _attempt in range(8):
-        temporary = phase_dir / f".response-write.{secrets.token_hex(12)}.tmp"
-        try:
-            fd = _open_exclusive(temporary)
-        except FileExistsError:
-            continue
-        try:
-            _write_all(fd, body)
-            os.fsync(fd)
-            metadata = os.fstat(fd)
-        except OSError as error:
-            os.close(fd)
-            try:
-                temporary.unlink()
-            except OSError:
-                pass
-            raise ResponseError("could not write response temporary file") from error
-        else:
-            os.close(fd)
-        return temporary, metadata
-    raise ResponseError("could not reserve response temporary file")
-
-
-def _clean_orphan_temporaries(phase_dir: Path) -> None:
-    """Remove only directly owned response-write temporaries under the phase lock."""
-
-    for entry in phase_dir.iterdir():
-        if _TEMPORARY.fullmatch(entry.name) is None:
-            continue
-        metadata = _lstat(entry)
-        if (
-            metadata is None
-            or stat.S_ISLNK(metadata.st_mode)
-            or not stat.S_ISREG(metadata.st_mode)
-            or metadata.st_uid != os.getuid()
-            or stat.S_IMODE(metadata.st_mode) != 0o600
-        ):
-            raise ResponseError("response temporary artifact is unsafe")
-        _remove_owned(entry, metadata)
-    _fsync_directory(phase_dir)
-
-
-def capture_response(
+def _read_input(
     *,
-    outbox_root: str | os.PathLike[str],
-    project: str,
-    phase: str,
-    body: bytes | bytearray | memoryview | None = None,
-    source: str | os.PathLike[str] | None = None,
-    input_path: str | os.PathLike[str] | None = None,
-    stdin: BinaryIO | None = None,
-) -> Path:
-    """Capture one exact response body and return its newly created path.
+    body: bytes | bytearray | memoryview | None,
+    source: str | os.PathLike[str] | None,
+    input_path: str | os.PathLike[str] | None,
+    stdin: BinaryIO | None,
+) -> bytes:
+    """Read one in-memory/stdin input for the compatibility API."""
 
-    Exactly one of ``body``, ``source``/``input_path``, or ``stdin`` must be
-    supplied.  The number allocation, reservation, same-directory temporary
-    write, atomic replacement, and reservation cleanup all occur while one
-    phase-scoped lock is held.
-    """
+    if source is not None and input_path is not None:
+        raise ResponseUsageError("exactly one response input is required")
+    selected_source = source if source is not None else input_path
+    selected = sum(item is not None for item in (body, selected_source, stdin))
+    if selected != 1:
+        raise ResponseUsageError("exactly one response input is required")
+    if body is not None:
+        if not isinstance(body, (bytes, bytearray, memoryview)):
+            raise ResponseInputError("response body must be bytes")
+        value = bytes(body)
+        if len(value) > MAX_RESPONSE_BYTES:
+            raise ResponseInputError("response input exceeds the 8 MiB limit")
+        return value
+    if selected_source is not None:
+        return _read_source(_input_path(selected_source))
+    assert stdin is not None
+    return _read_stdin(stdin)
 
-    response_body = _read_input(
-        body=body, source=source, input_path=input_path, stdin=stdin
-    )
-    phase_dir = phase_directory(outbox_root, project, phase)
-    reservation: Path | None = None
-    reservation_metadata: os.stat_result | None = None
-    temporary: Path | None = None
-    temporary_metadata: os.stat_result | None = None
-    destination: Path | None = None
-    destination_metadata: os.stat_result | None = None
+
+def _input_path(value: str | os.PathLike[str]) -> Path:
     try:
-        with _phase_lock(phase_dir):
-            _clean_orphan_temporaries(phase_dir)
-            _number, reservation, reservation_metadata = _reserve(phase_dir, phase)
-            destination = _response_path(phase_dir, phase, _number)
-            temporary, temporary_metadata = _write_temporary(phase_dir, response_body)
-            if _lexists(destination):
-                raise ResponseError("response destination appeared after reservation")
-            destination_metadata = temporary_metadata
-            try:
-                os.link(temporary, destination, follow_symlinks=False)
-            except OSError as error:
-                raise ResponseError("atomic no-overwrite response publication failed") from error
-            temporary.unlink()
-            temporary = None
-            temporary_metadata = None
-            observed = _lstat(destination)
-            if (
-                observed is None
-                or destination_metadata is None
-                or observed.st_dev != destination_metadata.st_dev
-                or observed.st_ino != destination_metadata.st_ino
-                or not stat.S_ISREG(observed.st_mode)
-            ):
-                raise ResponseError("response destination is not a regular file")
-            if stat.S_IMODE(observed.st_mode) != 0o600:
-                raise ResponseError("response destination permissions are not 0600")
-            # The exact body is now published without replacement.  From this
-            # point onward cleanup or directory-sync failures must not erase
-            # that immutable completed artifact.
-            destination_metadata = None
-            _fsync_directory(phase_dir)
-            _remove_owned(reservation, reservation_metadata)
-            reservation = None
-            reservation_metadata = None
-            _fsync_directory(phase_dir)
-            return destination
-    except Exception as error:
-        cleanup_error: Exception | None = None
-        try:
-            if temporary is not None:
-                _remove_owned(temporary, temporary_metadata)
-            if destination is not None and destination_metadata is not None:
-                _remove_owned(destination, destination_metadata)
-            if reservation is not None:
-                _remove_owned(reservation, reservation_metadata)
-            _fsync_directory(phase_dir)
-        except Exception as cleanup:
-            cleanup_error = cleanup
-        if isinstance(error, ResponseError):
-            if cleanup_error is not None:
-                error.add_note(f"response cleanup incomplete: {cleanup_error}")
-            raise
-        if cleanup_error is not None:
-            raise ResponseError("response write failed and cleanup was incomplete") from error
-        raise ResponseError("response write failed") from error
+        path = Path(value).expanduser()
+    except (OSError, RuntimeError, TypeError, ValueError) as error:
+        raise ResponseUsageError("response input path is invalid") from error
+    if not path.is_absolute():
+        path = Path.cwd() / path
+    return path
 
 
-record_response = capture_response
+def phase_directory(
+    outbox_root: str | os.PathLike[str], project: str, phase: str
+) -> Path:
+    """Return the canonical phase path without creating or inspecting it."""
 
-
-def _reservation_match(path: Path) -> re.Match[str] | None:
-    return _RESERVATION.fullmatch(path.name)
+    try:
+        validate_project_phase(project, phase)
+        return outbox_phase_path(outbox_root, project, phase)
+    except PathContractError as error:
+        raise ResponseUsageError(str(error)) from error
 
 
 def list_reservation_artifacts(phase_dir: str | os.PathLike[str]) -> tuple[Path, ...]:
-    """List valid, directly-owned reservation artifacts in one phase directory."""
+    """List reservation names without taking ownership of response mutation."""
 
     directory = Path(phase_dir)
-    metadata = _lstat(directory)
-    if metadata is None:
+    try:
+        metadata = directory.lstat()
+    except FileNotFoundError:
         return ()
-    if stat.S_ISLNK(metadata.st_mode) or not stat.S_ISDIR(metadata.st_mode):
+    except OSError as error:
+        raise ResponseError("could not inspect response phase directory") from error
+    if directory.is_symlink() or not stat.S_ISDIR(metadata.st_mode):
         raise ResponseError("response phase directory is unsafe")
-    phase = _validate_component(directory.name, "phase")
-    found = [
-        entry
-        for entry in directory.iterdir()
-        if (match := _reservation_match(entry)) is not None and match.group(1) == phase
-    ]
-    for entry in found:
-        entry_metadata = _lstat(entry)
-        if (
-            entry_metadata is None
-            or stat.S_ISLNK(entry_metadata.st_mode)
-            or not stat.S_ISREG(entry_metadata.st_mode)
-            or entry_metadata.st_uid != os.getuid()
-            or stat.S_IMODE(entry_metadata.st_mode) != 0o600
-        ):
+    phase = directory.name
+    found: list[Path] = []
+    try:
+        entries = tuple(directory.iterdir())
+    except OSError as error:
+        raise ResponseError("could not inspect response reservations") from error
+    for entry in entries:
+        match = _RESERVATION.fullmatch(entry.name)
+        if match is None or match.group(1) != phase:
+            continue
+        try:
+            entry_metadata = entry.lstat()
+        except OSError as error:
+            raise ResponseError("could not inspect response reservation") from error
+        if entry.is_symlink() or not stat.S_ISREG(entry_metadata.st_mode):
             raise ResponseError("response reservation artifact is unsafe")
+        found.append(entry)
     return tuple(sorted(found, key=lambda path: path.name))
 
 
@@ -565,57 +199,13 @@ def clean_reservation_artifact(
     project: str,
     phase: str,
 ) -> None:
-    """Remove one exact reservation artifact, refusing unrelated paths/links."""
+    """Refuse direct Python reservation deletion after the strangler cutover."""
 
-    reservation = Path(path)
-    match = _reservation_match(reservation)
-    if match is None:
-        raise ResponseUsageError("path is not a response reservation artifact")
-    try:
-        expected_parent = outbox_phase_path(outbox_root, project, phase)
-    except PathContractError as error:
-        raise ResponseUsageError(str(error)) from error
-    if reservation.parent != expected_parent or match.group(1) != phase:
-        raise ResponseUsageError("reservation path does not belong to its phase")
-    metadata = _lstat(reservation)
-    if metadata is None:
-        return
-    ancestry: list[tuple[Path, os.stat_result]] = []
-    for directory, private in (
-        (expected_parent.parent.parent, False),
-        (expected_parent.parent, True),
-        (expected_parent, True),
-    ):
-        directory_metadata = _lstat(directory)
-        if (
-            directory_metadata is None
-            or stat.S_ISLNK(directory_metadata.st_mode)
-            or not stat.S_ISDIR(directory_metadata.st_mode)
-            or directory_metadata.st_uid != os.getuid()
-            or (private and stat.S_IMODE(directory_metadata.st_mode) != 0o700)
-        ):
-            raise ResponseError("response reservation ancestry is unsafe")
-        ancestry.append((directory, directory_metadata))
-    if (
-        stat.S_ISLNK(metadata.st_mode)
-        or not stat.S_ISREG(metadata.st_mode)
-        or metadata.st_uid != os.getuid()
-        or stat.S_IMODE(metadata.st_mode) != 0o600
-    ):
-        raise ResponseError("response reservation must be a regular file")
-    for directory, expected_metadata in ancestry:
-        current = _lstat(directory)
-        if (
-            current is None
-            or (current.st_dev, current.st_ino)
-            != (expected_metadata.st_dev, expected_metadata.st_ino)
-        ):
-            raise ResponseError("response reservation ancestry changed")
-    _remove_owned(reservation, metadata)
-    _fsync_directory(reservation.parent)
+    del path, outbox_root, project, phase
+    raise ResponseError("response reservation cleanup is owned by the Go runtime")
 
 
-def _parse_main_arguments(arguments: Sequence[str]) -> tuple[str, str | None, Path | None]:
+def _parse_main_arguments(arguments: Sequence[str]) -> tuple[str, Path | None]:
     values = list(arguments)
     if values and values[0] in {"record", "capture"}:
         values.pop(0)
@@ -638,17 +228,126 @@ def _parse_main_arguments(arguments: Sequence[str]) -> tuple[str, str | None, Pa
             input_selected = True
             source_value = values.pop(0)
             if source_value != "-":
-                try:
-                    source = Path(source_value).expanduser()
-                except (OSError, RuntimeError, ValueError) as error:
-                    raise ResponseUsageError("response input path is invalid") from error
+                source = _input_path(source_value)
             continue
         if value.startswith("--"):
             raise ResponseUsageError(f"unknown response option: {value}")
         if phase is not None:
             raise ResponseUsageError("response phase was specified more than once")
         phase = value
-    return phase or "", None, source
+    return phase or "", source
+
+
+def _bridge_failure(result: go_bridge.CapturedResult) -> ResponseError:
+    detail = result.stderr.decode("utf-8", errors="replace").strip()
+    if not detail:
+        detail = "Go response runtime failed"
+    lower = detail.lower()
+    if result.returncode == 130 or "interrupted" in lower:
+        return ResponseError("response capture interrupted")
+    if any(token in lower for token in ("input", "stdin", "8 mib", "regular file")):
+        return ResponseInputError(detail)
+    if any(
+        token in lower
+        for token in (
+            "requires",
+            "invalid",
+            "exactly one",
+            "option",
+            "must be absolute",
+            "must be clean",
+        )
+    ):
+        return ResponseUsageError(detail)
+    if any(
+        token in lower
+        for token in (
+            "--project",
+            "--phase",
+            "project is ",
+            "phase is ",
+            "project must ",
+            "phase must ",
+        )
+    ):
+        return ResponseUsageError(detail)
+    if any(token in lower for token in ("lock", "number", "reservation", "contention")):
+        return ResponseAllocationError(detail)
+    return ResponseError(detail)
+
+
+def _created_path(result: go_bridge.CapturedResult) -> Path:
+    if result.returncode != 0:
+        raise _bridge_failure(result)
+    output = result.stdout.decode("utf-8", errors="strict").strip()
+    if not output or "\n" in output or "\r" in output:
+        raise ResponseError("Go response runtime returned an invalid created path")
+    try:
+        path = Path(output)
+    except (TypeError, ValueError) as error:
+        raise ResponseError("Go response runtime returned an invalid created path") from error
+    if not path.is_absolute() or path != Path(os.path.normpath(path)):
+        raise ResponseError("Go response runtime returned a non-canonical created path")
+    return path
+
+
+def capture_response(
+    *,
+    outbox_root: str | os.PathLike[str],
+    project: str,
+    phase: str,
+    body: bytes | bytearray | memoryview | None = None,
+    source: str | os.PathLike[str] | None = None,
+    input_path: str | os.PathLike[str] | None = None,
+    stdin: BinaryIO | None = None,
+    repository_root: Path | None = None,
+) -> Path:
+    """Delegate one exact response capture to the Go runtime."""
+
+    try:
+        try:
+            validate_project_phase(project, phase)
+        except PathContractError as error:
+            raise ResponseUsageError(str(error)) from error
+        if source is not None and input_path is not None:
+            raise ResponseUsageError("exactly one response input is required")
+        selected_source = source if source is not None else input_path
+        selected = sum(item is not None for item in (body, selected_source, stdin))
+        if selected != 1:
+            raise ResponseUsageError("exactly one response input is required")
+        input_bytes: bytes | None = None
+        source_path: Path | None = None
+        if body is not None:
+            if not isinstance(body, (bytes, bytearray, memoryview)):
+                raise ResponseInputError("response body must be bytes")
+            input_bytes = bytes(body)
+            if len(input_bytes) > MAX_RESPONSE_BYTES:
+                raise ResponseInputError("response input exceeds the 8 MiB limit")
+        elif stdin is not None:
+            input_bytes = _read_stdin(stdin)
+        else:
+            assert selected_source is not None
+            source_path = _input_path(selected_source)
+        outbox = Path(outbox_root).expanduser()
+        if not outbox.is_absolute() or outbox != Path(os.path.normpath(outbox)):
+            raise ResponseUsageError("outbox root must be an absolute clean path")
+        result = go_bridge.run_capture(
+            go_bridge.response_arguments(
+                repository_root=repository_root,
+                outbox_root=outbox,
+                project=project,
+                phase=phase,
+                source=source_path,
+            ),
+            repository_root=repository_root,
+            input_bytes=input_bytes,
+        )
+        return _created_path(result)
+    except go_bridge.GoBridgeError as error:
+        raise ResponseError(str(error)) from error
+
+
+record_response = capture_response
 
 
 def main(
@@ -656,10 +355,10 @@ def main(
     arguments: Sequence[str],
     repository_root: Path | None = None,
 ) -> int:
-    """CLI adapter used by the parent APGR dispatcher."""
+    """CLI adapter retaining response aliases while Go owns mutation."""
 
     try:
-        phase, _unused, source = _parse_main_arguments(arguments)
+        phase, source = _parse_main_arguments(arguments)
         if not phase:
             raise ResponseUsageError("response phase is required")
         project = options.get("project")
@@ -686,6 +385,7 @@ def main(
                 project=project,
                 phase=phase,
                 stdin=sys.stdin.buffer,
+                repository_root=repository_root,
             )
         else:
             created = capture_response(
@@ -693,12 +393,13 @@ def main(
                 project=project,
                 phase=phase,
                 source=source,
+                repository_root=repository_root,
             )
     except SystemExit:
         return 0
     except (ConfigError, PathContractError, ResponseError) as error:
         print(f"apgr response: {error}", file=sys.stderr)
-        return 2
+        return 2 if isinstance(error, (ResponseUsageError, ResponseInputError)) else 1
     print(created)
     return 0
 

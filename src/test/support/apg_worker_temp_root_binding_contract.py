@@ -6,6 +6,7 @@ from dataclasses import dataclass
 import os
 from pathlib import Path
 import stat
+import sys
 from typing import NoReturn
 
 
@@ -136,6 +137,10 @@ def selected_worker_temp_root(repository_root: Path) -> OpenedWorkerTempRoot:
     raw = os.environ.get("TMPDIR")
     if raw is None:
         fail("isolated worker requires an explicit temporary root")
+    if raw.startswith(("/var/", "/tmp/")) and sys.platform == "darwin":
+        prefix = "/var" if raw.startswith("/var/") else "/tmp"
+        if Path(prefix).is_symlink() and Path(prefix).resolve() == Path(f"/private{prefix}"):
+            raw = f"/private{raw}"
     selected = open_absolute_directory(raw, subject="worker temporary root")
     repository: OpenedWorkerTempRoot | None = None
     try:
@@ -144,7 +149,7 @@ def selected_worker_temp_root(repository_root: Path) -> OpenedWorkerTempRoot:
             subject="inspected repository root",
         )
         if (
-            selected.identity in repository.chain_identities
+            selected.identity == repository.identity
             or repository.identity in selected.chain_identities
         ):
             fail("worker temporary root must be outside the repository")

@@ -33,6 +33,47 @@ from apg_skill_library_check import (  # noqa: E402
 )
 
 
+class EmbeddedCorpusConvergenceTests(unittest.TestCase):
+    @mock.patch("apg_skill_library_check.subprocess.run")
+    def test_go_embedded_corpus_verification_is_silent_exact_argv(self, run: mock.Mock) -> None:
+        run.return_value = mock.Mock(returncode=0, stdout=b"", stderr=b"")
+        self.assertIsNone(checker._embedded_corpus_failure(REPOSITORY_ROOT))
+        arguments = run.call_args.args[0]
+        self.assertEqual(arguments[:3], [sys.executable, "-m", "agentic_praxis_grimoire"])
+        self.assertEqual(arguments[-3:], ["verify-corpus", "--repository", str(REPOSITORY_ROOT)])
+        self.assertFalse(run.call_args.kwargs["shell"])
+
+    @mock.patch("apg_skill_library_check.subprocess.run")
+    def test_go_embedded_corpus_verification_fails_closed(self, run: mock.Mock) -> None:
+        run.return_value = mock.Mock(returncode=1, stdout=b"", stderr=b"bounded")
+        self.assertEqual(
+            checker._embedded_corpus_failure(REPOSITORY_ROOT),
+            "Go embedded-corpus verification disagrees with repository truth",
+        )
+
+    @mock.patch("apg_skill_library_check._embedded_corpus_failure")
+    @mock.patch("apg_skill_library_check.check_library")
+    def test_main_runs_embedded_corpus_gate_whenever_passed(
+        self, check_mock: mock.Mock, corpus_mock: mock.Mock
+    ) -> None:
+        check_mock.return_value = CheckResult((), 40, 40, 40)
+        corpus_mock.return_value = "disagrees"
+        exit_code = main(["--root", str(REPOSITORY_ROOT), "--format", "json"])
+        self.assertEqual(exit_code, 1)
+        corpus_mock.assert_called_once_with(REPOSITORY_ROOT)
+
+    @mock.patch("apg_skill_library_check._embedded_corpus_failure")
+    @mock.patch("apg_skill_library_check.check_library")
+    def test_main_skips_corpus_gate_when_check_already_failed(
+        self, check_mock: mock.Mock, corpus_mock: mock.Mock
+    ) -> None:
+        diag = Diagnostic("APG001", "skills", "inv", "msg", "act")
+        check_mock.return_value = CheckResult((diag,), 39, 39, 39)
+        exit_code = main(["--root", str(REPOSITORY_ROOT), "--format", "json"])
+        self.assertEqual(exit_code, 1)
+        corpus_mock.assert_not_called()
+
+
 class SkillNameTests(unittest.TestCase):
     def test_accepts_boundary_lengths_and_internal_hyphens(self) -> None:
         self.assertTrue(valid_skill_name("a"))
