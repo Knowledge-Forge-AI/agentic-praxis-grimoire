@@ -1,0 +1,47 @@
+{
+  "fixture_id": "apg98-environment",
+  "fixture_status": "bounded-apg-owned-parity-evidence",
+  "created_on": "2026-08-22",
+  "source_authority": {
+    "repository": ".flakes",
+    "branch": "main",
+    "read_only": true,
+    "exact_binding": "publication-excluded APG98 source-binding evidence",
+    "execution_source_state": "fresh current-main read-only characterization",
+    "authoring_source_state": "phase-authoring baseline retained as evidence",
+    "files": [
+      {
+        "path": "nix-darwin/libexec/codex-env/allowlist.py",
+        "role": "TSV schema and twelve validator families"
+      },
+      {
+        "path": "nix-darwin/libexec/codex-env/snapshot.py",
+        "role": "shell snapshot, metadata, modes, and no-churn writer"
+      },
+      {
+        "path": "nix-darwin/libexec/codex-env/run.py",
+        "role": "parser-safe env overlay and exact-argv execution"
+      },
+      {
+        "path": "nix-darwin/shell/sh_config/common/010_env_snapshot",
+        "role": "Bash/Zsh prompt hook"
+      },
+      {
+        "path": "nix-darwin/config/codex-env/project-env-allowlist.tsv",
+        "role": "project profile source rows"
+      },
+      {
+        "path": "nix-darwin/config/codex-env/codex-sync-allowlist.tsv",
+        "role": "sync profile source rows, including SSH_AUTH_SOCK"
+      }
+    ]
+  },
+  "ownership": {
+    "owner": "APG98",
+    "expression": "independently authored fixture data and characterization",
+    "not_an_oracle": true,
+    "not_a_product_default": true,
+    "no_live_values_or_paths": true,
+    "no_cutover": true
+  }
+}

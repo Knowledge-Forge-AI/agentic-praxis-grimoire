@@ -1,0 +1,30 @@
+{
+  "profile_id": "fixture-all-validators",
+  "entries_in_canonical_name_order": [
+    "APG98_BOOL",
+    "APG98_COMMAND",
+    "APG98_HOST",
+    "APG98_INTEGER",
+    "APG98_LEXEM",
+    "APG98_LEXEM_LIST",
+    "APG98_PATH",
+    "APG98_PATH_LIST",
+    "APG98_PORT",
+    "APG98_RAW_SAFE",
+    "APG98_URI",
+    "APG98_URI_OR_PATH"
+  ],
+  "missing_optional": [
+    "APG98_OPTIONAL",
+    "SSH_AUTH_SOCK"
+  ],
+  "excluded_names": [
+    "APG98_UNLISTED"
+  ],
+  "entry_source": "capture",
+  "fingerprint_excludes": [
+    "capture_timestamp",
+    "storage_path",
+    "diagnostic_prose"
+  ]
+}

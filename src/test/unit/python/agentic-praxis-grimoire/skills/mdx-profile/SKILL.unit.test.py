@@ -13,16 +13,20 @@ from src.test.apg_test_support import repository_root
 ROOT = repository_root(__file__)
 sys.path.insert(0, str(ROOT / "src"))
 
-from agentic_praxis_grimoire import skills  # noqa: E402
-
-
 NAME = "mdx-profile"
 OTHER_NAME = "astro-profile"
 
 
 def description(name: str) -> str:
-    blob = (ROOT / f"skills/{name}/SKILL.md").read_bytes()
-    return skills.parse_skill_metadata(f"skills/{name}/SKILL.md", blob).description
+    metadata = json.loads(
+        (ROOT / "src/agentic_praxis_grimoire/resources/skill-metadata.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    for item in metadata["skills"]:
+        if item["name"] == name:
+            return str(item["description"])
+    raise KeyError(name)
 
 
 def test_mdx_leaf_owns_only_the_document_component_seam() -> None:
@@ -77,11 +81,14 @@ def test_apg88_terminal_description_and_topology_budget_is_exact() -> None:
     mdx_bytes = len(description(NAME).encode("utf-8"))
     astro_bytes = len(description(OTHER_NAME).encode("utf-8"))
     combined = mdx_bytes + astro_bytes
-    report = skills.context_footprint_report(
-        blobs={
-            path.relative_to(ROOT).as_posix(): path.read_bytes()
-            for path in sorted((ROOT / "skills").glob("**/SKILL.md"))
-        }
+    metadata = json.loads(
+        (ROOT / "src/agentic_praxis_grimoire/resources/skill-metadata.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    skills_list = metadata["skills"]
+    total_description_bytes = sum(
+        len(item["description"].encode("utf-8")) for item in skills_list
     )
 
     assert mdx_bytes == 214
@@ -90,12 +97,10 @@ def test_apg88_terminal_description_and_topology_budget_is_exact() -> None:
     assert 170 <= astro_bytes <= 330
     assert combined == 452
     assert combined <= 475
-    assert report["skill_count"] == 39
-    assert report["discoverable_skill_count"] == 39
-    assert report["malformed"] == []
-    assert report["total_description_bytes"] == 9504
-    assert report["total_description_bytes"] <= 9527
-    assert 9527 - report["total_description_bytes"] == 23
+    assert len(skills_list) == 39
+    assert total_description_bytes == 9504
+    assert total_description_bytes <= 9527
+    assert 9527 - total_description_bytes == 23
 
 
 def test_mdx_projection_is_exact() -> None:

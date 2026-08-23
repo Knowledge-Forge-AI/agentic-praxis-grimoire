@@ -39,6 +39,7 @@ PROJECTION_PREFIX = "/.agents/skills/"
 MAX_STATE_BYTES = 64 * 1024
 MAX_EXCLUDE_BYTES = 4 * 1024 * 1024
 SKILL_NAME = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
+ROOT_GO_SOURCE_NAME = re.compile(r"^[a-z][a-z0-9_]*\.go$")
 CANONICAL_NAMESPACES = frozenset({"chatgpt"})
 SKILL_SUPPORT_DIRECTORIES = frozenset(
     {"agents", "assets", "references", "scripts"}
@@ -245,6 +246,12 @@ def _canonical_leaf_paths(skills_root: Path) -> tuple[Path, ...]:
         if entry.name == "README.md":
             continue
         if entry.name not in CANONICAL_NAMESPACES:
+            if (
+                ROOT_GO_SOURCE_NAME.fullmatch(entry.name)
+                and not entry.is_symlink()
+                and stat.S_ISREG(entry.lstat().st_mode)
+            ):
+                continue
             if (
                 entry.is_symlink()
                 or not entry.is_dir()

@@ -45,6 +45,7 @@ PROFILE_ADR_STATES = frozenset(
     {"not-applicable", "Proposed", "Accepted with amendment"}
 )
 PROFILE_INTEGRATION_STATES = frozenset({"integrated", "unintegrated"})
+ROOT_GO_SOURCE_NAME = re.compile(r"[a-z][a-z0-9_]*\.go")
 
 IssueReporter = Callable[[str, str, str, str, str], None]
 NameValidator = Callable[[str], bool]
@@ -346,6 +347,8 @@ def discover_canonical_leaves(
         if entry.name == "README.md":
             continue
         if entry.name not in CANONICAL_NAMESPACES:
+            if ROOT_GO_SOURCE_NAME.fullmatch(entry.name) and _ordinary_file(entry):
+                continue
             if entry.is_dir():
                 leaves.append(entry)
                 if entry.is_symlink():

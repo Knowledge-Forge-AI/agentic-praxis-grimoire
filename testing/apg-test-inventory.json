@@ -1,205 +1,1103 @@
 {
   "coverage_sources": [
-    {"path": "src/agentic_praxis_grimoire/__init__.py", "rationale": "maintained executable Python source", "suites": ["unit", "integration", "combined"]},
-    {"path": "src/agentic_praxis_grimoire/__main__.py", "rationale": "maintained executable Python source", "suites": ["unit", "integration", "combined"]},
-    {"path": "src/agentic_praxis_grimoire/cli.py", "rationale": "maintained executable Python source", "suites": ["unit", "integration", "combined"]},
-    {"path": "src/agentic_praxis_grimoire/config.py", "rationale": "maintained executable Python source", "suites": ["unit", "integration", "combined"]},
-    {"path": "src/agentic_praxis_grimoire/paths.py", "rationale": "maintained executable Python source", "suites": ["unit", "integration", "combined"]},
-    {"path": "src/agentic_praxis_grimoire/reports.py", "rationale": "maintained executable Python source", "suites": ["unit", "integration", "combined"]},
-    {"path": "src/agentic_praxis_grimoire/resources/__init__.py", "rationale": "maintained executable Python source", "suites": ["unit", "integration", "combined"]},
-    {"path": "src/agentic_praxis_grimoire/response.py", "rationale": "maintained executable Python source", "suites": ["unit", "integration", "combined"]},
-    {"path": "src/agentic_praxis_grimoire/skills.py", "rationale": "maintained executable Python source", "suites": ["unit", "integration", "combined"]},
-    {"path": "src/agentic_praxis_grimoire/version.py", "rationale": "maintained executable Python source", "suites": ["unit", "integration", "combined"]},
-    {"path": "libexec/agent_report/__init__.py", "rationale": "maintained executable Python source", "suites": ["unit", "integration", "combined"]},
-    {"path": "libexec/agent_report/cli.py", "rationale": "maintained executable Python source", "suites": ["unit", "integration", "combined"]},
-    {"path": "libexec/agent_report/diff.py", "rationale": "maintained executable Python source", "suites": ["unit", "integration", "combined"]},
-    {"path": "libexec/agent_report/git_adapter.py", "rationale": "maintained executable Python source", "suites": ["unit", "integration", "combined"]},
-    {"path": "libexec/agent_report/models.py", "rationale": "maintained executable Python source", "suites": ["unit", "integration", "combined"]},
-    {"path": "libexec/agent_report/operational.py", "rationale": "maintained executable Python source", "suites": ["unit", "integration", "combined"]},
-    {"path": "libexec/agent_report/rendering.py", "rationale": "maintained executable Python source", "suites": ["unit", "integration", "combined"]},
-    {"path": "libexec/agent_report/safety.py", "rationale": "maintained executable Python source", "suites": ["unit", "integration", "combined"]},
-    {"path": "libexec/agent_report/show.py", "rationale": "maintained executable Python source", "suites": ["unit", "integration", "combined"]},
-    {"path": "libexec/change_size/__init__.py", "rationale": "maintained executable Python source", "suites": ["unit", "integration", "combined"]},
-    {"path": "libexec/change_size/checker.py", "rationale": "maintained executable Python source", "suites": ["unit", "integration", "combined"]},
-    {"path": "libexec/change_size/cli.py", "rationale": "maintained executable Python source", "suites": ["unit", "integration", "combined"]},
-    {"path": "libexec/change_size/git_adapter.py", "rationale": "maintained executable Python source", "suites": ["unit", "integration", "combined"]},
-    {"path": "libexec/change_size/inspection.py", "rationale": "maintained executable Python source", "suites": ["unit", "integration", "combined"]},
-    {"path": "libexec/change_size/policy.py", "rationale": "maintained executable Python source", "suites": ["unit", "integration", "combined"]},
-    {"path": "libexec/apg_phase_commit_message.py", "rationale": "maintained executable Python source", "suites": ["unit", "integration", "combined"]},
-    {"path": "libexec/apg_project_skills_commands.py", "rationale": "maintained executable Python source", "suites": ["unit", "integration", "combined"]},
-    {"path": "libexec/apg_project_skills_core.py", "rationale": "maintained executable Python source", "suites": ["unit", "integration", "combined"]},
-    {"path": "libexec/apg_public_release.py", "rationale": "maintained executable Python source", "suites": ["unit", "integration", "combined"]},
-    {"path": "libexec/apg_python_distribution.py", "rationale": "maintained executable Python source", "suites": ["unit", "integration", "combined"]},
-    {"path": "libexec/apg_python_publication.py", "rationale": "maintained executable Python source", "suites": ["unit", "integration", "combined"]},
-    {"path": "libexec/apg_record_identity.py", "rationale": "maintained executable Python source", "suites": ["unit", "integration", "combined"]},
-    {"path": "libexec/apg_skill_library_check.py", "rationale": "maintained executable Python source", "suites": ["unit", "integration", "combined"]},
-    {"path": "libexec/apg_skill_topology.py", "rationale": "maintained executable Python source", "suites": ["unit", "integration", "combined"]},
-    {"path": "libexec/apg_test.py", "rationale": "maintained executable Python source", "suites": ["unit", "integration", "combined"]},
-    {"path": "libexec/apg_user_skills.py", "rationale": "maintained executable Python source", "suites": ["unit", "integration", "combined"]},
-    {"path": "libexec/flatten_skill_symlinks.py", "rationale": "maintained executable Python source", "suites": ["unit", "integration", "combined"]},
-    {"path": "libexec/global_skills_inventory.py", "rationale": "maintained executable Python source", "suites": ["unit", "integration", "combined"]},
-    {"path": "libexec/global_skills_state.py", "rationale": "maintained executable Python source", "suites": ["unit", "integration", "combined"]},
-    {"path": "libexec/global_skills_transaction.py", "rationale": "maintained executable Python source", "suites": ["unit", "integration", "combined"]},
-    {"path": "libexec/install_global_skills.py", "rationale": "maintained executable Python source", "suites": ["unit", "integration", "combined"]},
-    {"path": "libexec/skill_projection_state.py", "rationale": "maintained executable Python source", "suites": ["unit", "integration", "combined"]}
+    {
+      "path": "libexec/apg_distribution_candidate.py",
+      "rationale": "maintained executable Python source",
+      "suites": [
+        "unit",
+        "integration",
+        "combined"
+      ]
+    },
+    {
+      "path": "libexec/apg_distribution_candidate_archives.py",
+      "rationale": "maintained executable Python source",
+      "suites": [
+        "unit",
+        "integration",
+        "combined"
+      ]
+    },
+    {
+      "path": "libexec/apg_distribution_candidate_contract.py",
+      "rationale": "maintained executable Python source",
+      "suites": [
+        "unit",
+        "integration",
+        "combined"
+      ]
+    },
+    {
+      "path": "libexec/apg_go_build.py",
+      "rationale": "maintained executable Python source",
+      "suites": [
+        "unit",
+        "integration",
+        "combined"
+      ]
+    },
+    {
+      "path": "libexec/apg_npm_distribution.py",
+      "rationale": "maintained executable Python source",
+      "suites": [
+        "unit",
+        "integration",
+        "combined"
+      ]
+    },
+    {
+      "path": "libexec/apg_phase_commit_message.py",
+      "rationale": "maintained executable Python source",
+      "suites": [
+        "unit",
+        "integration",
+        "combined"
+      ]
+    },
+    {
+      "path": "libexec/apg_project_skills_commands.py",
+      "rationale": "maintained executable Python source",
+      "suites": [
+        "unit",
+        "integration",
+        "combined"
+      ]
+    },
+    {
+      "path": "libexec/apg_project_skills_core.py",
+      "rationale": "maintained executable Python source",
+      "suites": [
+        "unit",
+        "integration",
+        "combined"
+      ]
+    },
+    {
+      "path": "libexec/apg_public_release.py",
+      "rationale": "maintained executable Python source",
+      "suites": [
+        "unit",
+        "integration",
+        "combined"
+      ]
+    },
+    {
+      "path": "libexec/apg_python_build_backend.py",
+      "rationale": "maintained executable Python source",
+      "suites": [
+        "unit",
+        "integration",
+        "combined"
+      ]
+    },
+    {
+      "path": "libexec/apg_python_distribution.py",
+      "rationale": "maintained executable Python source",
+      "suites": [
+        "unit",
+        "integration",
+        "combined"
+      ]
+    },
+    {
+      "path": "libexec/apg_python_publication.py",
+      "rationale": "maintained executable Python source",
+      "suites": [
+        "unit",
+        "integration",
+        "combined"
+      ]
+    },
+    {
+      "path": "libexec/apg_record_identity.py",
+      "rationale": "maintained executable Python source",
+      "suites": [
+        "unit",
+        "integration",
+        "combined"
+      ]
+    },
+    {
+      "path": "libexec/apg_skill_library_check.py",
+      "rationale": "maintained executable Python source",
+      "suites": [
+        "unit",
+        "integration",
+        "combined"
+      ]
+    },
+    {
+      "path": "libexec/apg_skill_topology.py",
+      "rationale": "maintained executable Python source",
+      "suites": [
+        "unit",
+        "integration",
+        "combined"
+      ]
+    },
+    {
+      "path": "libexec/apg_test.py",
+      "rationale": "maintained executable Python source",
+      "suites": [
+        "unit",
+        "integration",
+        "combined"
+      ]
+    },
+    {
+      "path": "libexec/apg_user_skills.py",
+      "rationale": "maintained executable Python source",
+      "suites": [
+        "unit",
+        "integration",
+        "combined"
+      ]
+    },
+    {
+      "path": "libexec/change_size/__init__.py",
+      "rationale": "maintained executable Python source",
+      "suites": [
+        "unit",
+        "integration",
+        "combined"
+      ]
+    },
+    {
+      "path": "libexec/change_size/checker.py",
+      "rationale": "maintained executable Python source",
+      "suites": [
+        "unit",
+        "integration",
+        "combined"
+      ]
+    },
+    {
+      "path": "libexec/change_size/cli.py",
+      "rationale": "maintained executable Python source",
+      "suites": [
+        "unit",
+        "integration",
+        "combined"
+      ]
+    },
+    {
+      "path": "libexec/change_size/git_adapter.py",
+      "rationale": "maintained executable Python source",
+      "suites": [
+        "unit",
+        "integration",
+        "combined"
+      ]
+    },
+    {
+      "path": "libexec/change_size/inspection.py",
+      "rationale": "maintained executable Python source",
+      "suites": [
+        "unit",
+        "integration",
+        "combined"
+      ]
+    },
+    {
+      "path": "libexec/change_size/policy.py",
+      "rationale": "maintained executable Python source",
+      "suites": [
+        "unit",
+        "integration",
+        "combined"
+      ]
+    },
+    {
+      "path": "libexec/flatten_skill_symlinks.py",
+      "rationale": "maintained executable Python source",
+      "suites": [
+        "unit",
+        "integration",
+        "combined"
+      ]
+    },
+    {
+      "path": "libexec/global_skills_inventory.py",
+      "rationale": "maintained executable Python source",
+      "suites": [
+        "unit",
+        "integration",
+        "combined"
+      ]
+    },
+    {
+      "path": "libexec/global_skills_state.py",
+      "rationale": "maintained executable Python source",
+      "suites": [
+        "unit",
+        "integration",
+        "combined"
+      ]
+    },
+    {
+      "path": "libexec/global_skills_transaction.py",
+      "rationale": "maintained executable Python source",
+      "suites": [
+        "unit",
+        "integration",
+        "combined"
+      ]
+    },
+    {
+      "path": "libexec/install_global_skills.py",
+      "rationale": "maintained executable Python source",
+      "suites": [
+        "unit",
+        "integration",
+        "combined"
+      ]
+    },
+    {
+      "path": "libexec/skill_projection_state.py",
+      "rationale": "maintained executable Python source",
+      "suites": [
+        "unit",
+        "integration",
+        "combined"
+      ]
+    },
+    {
+      "path": "src/agentic_praxis_grimoire/__init__.py",
+      "rationale": "maintained executable Python source",
+      "suites": [
+        "unit",
+        "integration",
+        "combined"
+      ]
+    },
+    {
+      "path": "src/agentic_praxis_grimoire/__main__.py",
+      "rationale": "maintained executable Python source",
+      "suites": [
+        "unit",
+        "integration",
+        "combined"
+      ]
+    },
+    {
+      "path": "src/agentic_praxis_grimoire/cli.py",
+      "rationale": "maintained executable Python source",
+      "suites": [
+        "unit",
+        "integration",
+        "combined"
+      ]
+    },
+    {
+      "path": "src/agentic_praxis_grimoire/config.py",
+      "rationale": "maintained executable Python source",
+      "suites": [
+        "unit",
+        "integration",
+        "combined"
+      ]
+    },
+    {
+      "path": "src/agentic_praxis_grimoire/go_bridge.py",
+      "rationale": "maintained executable Python source",
+      "suites": [
+        "unit",
+        "integration",
+        "combined"
+      ]
+    },
+    {
+      "path": "src/agentic_praxis_grimoire/paths.py",
+      "rationale": "maintained executable Python source",
+      "suites": [
+        "unit",
+        "integration",
+        "combined"
+      ]
+    },
+    {
+      "path": "src/agentic_praxis_grimoire/reports.py",
+      "rationale": "maintained executable Python source",
+      "suites": [
+        "unit",
+        "integration",
+        "combined"
+      ]
+    },
+    {
+      "path": "src/agentic_praxis_grimoire/resources/__init__.py",
+      "rationale": "maintained executable Python source",
+      "suites": [
+        "unit",
+        "integration",
+        "combined"
+      ]
+    },
+    {
+      "path": "src/agentic_praxis_grimoire/response.py",
+      "rationale": "maintained executable Python source",
+      "suites": [
+        "unit",
+        "integration",
+        "combined"
+      ]
+    },
+    {
+      "path": "src/agentic_praxis_grimoire/version.py",
+      "rationale": "maintained executable Python source",
+      "suites": [
+        "unit",
+        "integration",
+        "combined"
+      ]
+    }
   ],
   "excluded_python_launchers": [
-    {"path": "bin/apgr", "reason": "thin import and exit adapter"},
-    {"path": "bin/apg-check-phase-commit-message", "reason": "thin import and exit adapter"},
-    {"path": "bin/apg-check-change-size", "reason": "thin import and exit adapter"},
-    {"path": "bin/apg-check-record-identity", "reason": "thin import and exit adapter"},
-    {"path": "bin/apg-check-skill-library", "reason": "thin import and exit adapter"},
-    {"path": "bin/apg-build-python-release-bundle", "reason": "thin import and exit adapter"},
-    {"path": "bin/apg-project-skills", "reason": "thin import and exit adapter"},
-    {"path": "bin/apg-public-release", "reason": "thin import and exit adapter"},
-    {"path": "bin/apg-normalize-python-sdist", "reason": "thin import and exit adapter"},
-    {"path": "bin/apg-test", "reason": "thin import and exit adapter"},
-    {"path": "bin/apg-user-skills", "reason": "thin import and exit adapter"},
-    {"path": "bin/append-operational-report", "reason": "thin import and exit adapter"},
-    {"path": "bin/git-diff-report", "reason": "thin import and exit adapter"},
-    {"path": "bin/git-show-report", "reason": "thin import and exit adapter"},
-    {"path": "bin/flatten-skill-symlinks", "reason": "thin import and exit adapter"},
-    {"path": "bin/install-global-skills", "reason": "thin import and exit adapter"}
+    {
+      "path": "bin/apgr",
+      "reason": "thin import and exit adapter"
+    },
+    {
+      "path": "bin/apg-build-go-cli",
+      "reason": "thin import and exit adapter"
+    },
+    {
+      "path": "bin/apg-check-phase-commit-message",
+      "reason": "thin import and exit adapter"
+    },
+    {
+      "path": "bin/apg-check-change-size",
+      "reason": "thin import and exit adapter"
+    },
+    {
+      "path": "bin/apg-check-record-identity",
+      "reason": "thin import and exit adapter"
+    },
+    {
+      "path": "bin/apg-check-skill-library",
+      "reason": "thin import and exit adapter"
+    },
+    {
+      "path": "bin/apg-build-python-release-bundle",
+      "reason": "thin import and exit adapter"
+    },
+    {
+      "path": "bin/apg-project-skills",
+      "reason": "thin import and exit adapter"
+    },
+    {
+      "path": "bin/apg-public-release",
+      "reason": "thin import and exit adapter"
+    },
+    {
+      "path": "bin/apg-normalize-python-sdist",
+      "reason": "thin import and exit adapter"
+    },
+    {
+      "path": "bin/apg-test",
+      "reason": "thin import and exit adapter"
+    },
+    {
+      "path": "bin/apg-user-skills",
+      "reason": "thin import and exit adapter"
+    },
+    {
+      "path": "bin/append-operational-report",
+      "reason": "thin import and exit adapter"
+    },
+    {
+      "path": "bin/git-diff-report",
+      "reason": "thin import and exit adapter"
+    },
+    {
+      "path": "bin/git-show-report",
+      "reason": "thin import and exit adapter"
+    },
+    {
+      "path": "bin/flatten-skill-symlinks",
+      "reason": "thin import and exit adapter"
+    },
+    {
+      "path": "bin/install-global-skills",
+      "reason": "thin import and exit adapter"
+    }
   ],
   "schema_version": 2,
   "tests": [
-    {"owner": ".github/workflows/release.yml", "path": "src/test/unit/python/agentic-praxis-grimoire/.github/workflows/release.yml.unit.test.py", "suite": "unit"},
-    {"owner": "src/agentic_praxis_grimoire/cli.py", "path": "src/test/unit/python/agentic-praxis-grimoire/src/agentic_praxis_grimoire/cli.unit.test.py", "suite": "unit"},
-    {"owner": "src/agentic_praxis_grimoire/config.py", "path": "src/test/unit/python/agentic-praxis-grimoire/src/agentic_praxis_grimoire/config.unit.test.py", "suite": "unit"},
-    {"owner": "src/agentic_praxis_grimoire/paths.py", "path": "src/test/unit/python/agentic-praxis-grimoire/src/agentic_praxis_grimoire/paths.unit.test.py", "suite": "unit"},
-    {"owner": "src/agentic_praxis_grimoire/reports.py", "path": "src/test/unit/python/agentic-praxis-grimoire/src/agentic_praxis_grimoire/reports.unit.test.py", "suite": "unit"},
-    {"owner": "src/agentic_praxis_grimoire/response.py", "path": "src/test/unit/python/agentic-praxis-grimoire/src/agentic_praxis_grimoire/response.unit.test.py", "suite": "unit"},
-    {"owner": "src/agentic_praxis_grimoire/skills.py", "path": "src/test/unit/python/agentic-praxis-grimoire/src/agentic_praxis_grimoire/skills.unit.test.py", "suite": "unit"},
-    {"owner": "src/agentic_praxis_grimoire/version.py", "path": "src/test/unit/python/agentic-praxis-grimoire/src/agentic_praxis_grimoire/version.unit.test.py", "suite": "unit"},
-    {"owner": "src/agentic_praxis_grimoire/response.py", "path": "src/test/int/python/agentic-praxis-grimoire/src/agentic_praxis_grimoire/response.int.test.py", "suite": "integration"},
-    {"owner": "src/agentic_praxis_grimoire/reports.py", "path": "src/test/int/python/agentic-praxis-grimoire/src/agentic_praxis_grimoire/reports.int.test.py", "suite": "integration"},
-    {"owner": "src/agentic_praxis_grimoire/cli.py", "path": "src/test/int/python/agentic-praxis-grimoire/src/agentic_praxis_grimoire/cli.int.test.py", "suite": "integration"},
-    {"owner": "docs/evaluations/apg41-v0-4-readiness-and-pre-release-smoke.md", "path": "src/test/unit/python/agentic-praxis-grimoire/docs/evaluations/apg41-v0-4-readiness-and-pre-release-smoke.unit.test.py", "suite": "unit"},
-    {"owner": "docs/evaluations/apg42-v0-4-release-publication-and-active-deployment.md", "path": "src/test/unit/python/agentic-praxis-grimoire/docs/evaluations/apg42-v0-4-release-publication-and-active-deployment.unit.test.py", "suite": "unit"},
-    {"owner": "docs/provenance.md", "path": "src/test/unit/python/agentic-praxis-grimoire/docs/provenance.unit.test.py", "suite": "unit"},
-    {"owner": "docs/specs/go-testing-component-profiles.md", "path": "src/test/unit/python/agentic-praxis-grimoire/docs/specs/go-testing-component-profiles.unit.test.py", "suite": "unit"},
-    {"owner": "libexec/agent_report/cli.py", "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/agent_report/cli.unit.test.py", "suite": "unit"},
-    {"owner": "libexec/agent_report/operational.py", "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/agent_report/operational.unit.test.py", "suite": "unit"},
-    {"owner": "libexec/agent_report/rendering.py", "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/agent_report/rendering.unit.test.py", "suite": "unit"},
-    {"owner": "libexec/agent_report/safety.py", "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/agent_report/safety.unit.test.py", "suite": "unit"},
-    {"owner": "libexec/agent_report/show.py", "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/agent_report/show.unit.test.py", "suite": "unit"},
-    {"owner": "libexec/change_size/policy.py", "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/change_size/policy.unit.test.py", "suite": "unit"},
-    {"owner": "libexec/change_size/checker.py", "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/change_size/checker.unit.test.py", "suite": "unit"},
-    {"owner": "libexec/change_size/cli.py", "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/change_size/cli.unit.test.py", "suite": "unit"},
-    {"owner": "libexec/change_size/git_adapter.py", "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/change_size/git_adapter.unit.test.py", "suite": "unit"},
-    {"owner": "libexec/apg_phase_commit_message.py", "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_phase_commit_message.unit.test.py", "suite": "unit"},
-    {"owner": "libexec/apg_project_skills_commands.py", "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_project_skills_commands.unit.test.py", "suite": "unit"},
-    {"owner": "libexec/apg_project_skills_core.py", "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_project_skills_core.unit.test.py", "suite": "unit"},
-    {"owner": "libexec/apg_public_release.py", "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_public_release.unit.test.py", "suite": "unit"},
-    {"owner": "libexec/apg_python_distribution.py", "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_python_distribution.unit.test.py", "suite": "unit"},
-    {"owner": "libexec/apg_python_publication.py", "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_python_publication.unit.test.py", "suite": "unit"},
-    {"owner": "libexec/apg_record_identity.py", "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_record_identity.unit.test.py", "suite": "unit"},
-    {"owner": "libexec/apg_skill_library_check.py", "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_skill_library_check.unit.test.py", "suite": "unit"},
-    {"owner": "libexec/apg_skill_topology.py", "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_skill_topology.unit.test.py", "suite": "unit"},
-    {"owner": "libexec/apg_test.py", "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_test.unit.test.py", "suite": "unit"},
-    {"owner": "libexec/apg_user_skills.py", "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_user_skills.unit.test.py", "suite": "unit"},
-    {"owner": "libexec/flatten_skill_symlinks.py", "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/flatten_skill_symlinks.unit.test.py", "suite": "unit"},
-    {"owner": "libexec/global_skills_inventory.py", "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/global_skills_inventory.unit.test.py", "suite": "unit"},
-    {"owner": "libexec/global_skills_state.py", "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/global_skills_state.unit.test.py", "suite": "unit"},
-    {"owner": "libexec/global_skills_transaction.py", "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/global_skills_transaction.unit.test.py", "suite": "unit"},
-    {"owner": "libexec/install_global_skills.py", "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/install_global_skills.unit.test.py", "suite": "unit"},
-    {"owner": "skills/chatgpt/chatgpt-manager-workflow/SKILL.md", "path": "src/test/unit/python/agentic-praxis-grimoire/skills/chatgpt/chatgpt-manager-workflow/SKILL.unit.test.py", "suite": "unit"},
-    {"owner": "skills/chatgpt/composing-approved-roadmap-assignments/SKILL.md", "path": "src/test/unit/python/agentic-praxis-grimoire/skills/chatgpt/composing-approved-roadmap-assignments/SKILL.unit.test.py", "suite": "unit"},
-    {"owner": "skills/astro-profile/SKILL.md", "path": "src/test/unit/python/agentic-praxis-grimoire/skills/astro-profile/SKILL.unit.test.py", "suite": "unit"},
-    {"owner": "skills/css-language-profile/SKILL.md", "path": "src/test/unit/python/agentic-praxis-grimoire/skills/css-language-profile/SKILL.unit.test.py", "suite": "unit"},
-    {"owner": "skills/dockerfile-profile/SKILL.md", "path": "src/test/unit/python/agentic-praxis-grimoire/skills/dockerfile-profile/SKILL.unit.test.py", "suite": "unit"},
-    {"owner": "skills/go-cmp-test-profile/SKILL.md", "path": "src/test/unit/python/agentic-praxis-grimoire/skills/go-cmp-test-profile/SKILL.unit.test.py", "suite": "unit"},
-    {"owner": "skills/go-test-profile/SKILL.md", "path": "src/test/unit/python/agentic-praxis-grimoire/skills/go-test-profile/SKILL.unit.test.py", "suite": "unit"},
-    {"owner": "skills/gomock-test-profile/SKILL.md", "path": "src/test/unit/python/agentic-praxis-grimoire/skills/gomock-test-profile/SKILL.unit.test.py", "suite": "unit"},
-    {"owner": "skills/implementing-with-test-discipline/SKILL.md", "path": "src/test/unit/python/agentic-praxis-grimoire/skills/implementing-with-test-discipline/SKILL.unit.test.py", "suite": "unit"},
-    {"owner": "skills/javascript-language-profile/SKILL.md", "path": "src/test/unit/python/agentic-praxis-grimoire/skills/javascript-language-profile/SKILL.unit.test.py", "suite": "unit"},
-    {"owner": "skills/jsx-language-profile/SKILL.md", "path": "src/test/unit/python/agentic-praxis-grimoire/skills/jsx-language-profile/SKILL.unit.test.py", "suite": "unit"},
-    {"owner": "skills/markdown-language-profile/SKILL.md", "path": "src/test/unit/python/agentic-praxis-grimoire/skills/markdown-language-profile/SKILL.unit.test.py", "suite": "unit"},
-    {"owner": "skills/mdx-profile/SKILL.md", "path": "src/test/unit/python/agentic-praxis-grimoire/skills/mdx-profile/SKILL.unit.test.py", "suite": "unit"},
-    {"owner": "skills/nodejs-runtime-profile/SKILL.md", "path": "src/test/unit/python/agentic-praxis-grimoire/skills/nodejs-runtime-profile/SKILL.unit.test.py", "suite": "unit"},
-    {"owner": "skills/typescript-language-profile/SKILL.md", "path": "src/test/unit/python/agentic-praxis-grimoire/skills/typescript-language-profile/SKILL.unit.test.py", "suite": "unit"},
-    {"owner": "skills/minitest-test-profile/SKILL.md", "path": "src/test/unit/python/agentic-praxis-grimoire/skills/minitest-test-profile/SKILL.unit.test.py", "suite": "unit"},
-    {"owner": "skills/nix-test-profile/SKILL.md", "path": "src/test/unit/python/agentic-praxis-grimoire/skills/nix-test-profile/SKILL.unit.test.py", "suite": "unit"},
-    {"owner": "skills/planning-repository-work/SKILL.md", "path": "src/test/unit/python/agentic-praxis-grimoire/skills/planning-repository-work/SKILL.unit.test.py", "suite": "unit"},
-    {"owner": "skills/pytest-test-profile/SKILL.md", "path": "src/test/unit/python/agentic-praxis-grimoire/skills/pytest-test-profile/SKILL.unit.test.py", "suite": "unit"},
-    {"owner": "skills/react-component-profile/SKILL.md", "path": "src/test/unit/python/agentic-praxis-grimoire/skills/react-component-profile/SKILL.unit.test.py", "suite": "unit"},
-    {"owner": "skills/reviewing-and-verifying-repository-work/SKILL.md", "path": "src/test/unit/python/agentic-praxis-grimoire/skills/reviewing-and-verifying-repository-work/SKILL.unit.test.py", "suite": "unit"},
-    {"owner": "skills/vagrantfile-profile/SKILL.md", "path": "src/test/unit/python/agentic-praxis-grimoire/skills/vagrantfile-profile/SKILL.unit.test.py", "suite": "unit"},
-    {"owner": "skills/vitest-test-profile/SKILL.md", "path": "src/test/unit/python/agentic-praxis-grimoire/skills/vitest-test-profile/SKILL.unit.test.py", "suite": "unit"},
-    {"owner": "src/test/support/apg_css_evidence_retention_contract.py", "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_css_evidence_retention_contract.unit.test.py", "suite": "unit"},
-    {"owner": "src/test/support/apg_css_profile_candidate_contract.py", "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_css_profile_candidate_contract.unit.test.py", "suite": "unit"},
-    {"owner": "src/test/support/apg_css_profile_fixture_contract.py", "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_css_profile_fixture_contract.unit.test.py", "suite": "unit"},
-    {"owner": "src/test/support/apg_javascript_candidate_contract.py", "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_javascript_candidate_contract.unit.test.py", "suite": "unit"},
-    {"owner": "src/test/support/apg_javascript_fixture_contract.py", "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_javascript_fixture_contract.unit.test.py", "suite": "unit"},
-    {"owner": "src/test/support/apg_markdown_candidate_contract.py", "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_markdown_candidate_contract.unit.test.py", "suite": "unit"},
-    {"owner": "src/test/support/apg_markdown_clause_guard_contract.py", "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_markdown_clause_guard_contract.unit.test.py", "suite": "unit"},
-    {"owner": "src/test/support/apg_markdown_polarity_guard_contract.py", "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_markdown_polarity_guard_contract.unit.test.py", "suite": "unit"},
-    {"owner": "src/test/support/apg_markdown_register_contract.py", "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_markdown_register_contract.unit.test.py", "suite": "unit"},
-    {"owner": "src/test/support/apg_markdown_token_guard_contract.py", "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_markdown_token_guard_contract.unit.test.py", "suite": "unit"},
-    {"owner": "src/test/support/apg_markdown_vocabulary_contract.py", "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_markdown_vocabulary_contract.unit.test.py", "suite": "unit"},
-    {"owner": "src/test/support/apg_nodejs_candidate_contract.py", "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_nodejs_candidate_contract.unit.test.py", "suite": "unit"},
-    {"owner": "src/test/support/apg_nodejs_fixture_contract.py", "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_nodejs_fixture_contract.unit.test.py", "suite": "unit"},
-    {"owner": "src/test/support/apg_typescript_candidate_contract.py", "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_typescript_candidate_contract.unit.test.py", "suite": "unit"},
-    {"owner": "src/test/support/apg_typescript_fixture_contract.py", "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_typescript_fixture_contract.unit.test.py", "suite": "unit"},
-    {"owner": "src/test/fixtures/apg60-css-reentry-contract.json", "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/fixtures/apg60-css-reentry-contract.json.unit.test.py", "suite": "unit"},
-    {"owner": "src/test/support/apg_actual_retained_surface_contract.py", "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_actual_retained_surface_contract.unit.test.py", "suite": "unit"},
-    {"owner": "src/test/support/apg_candidate_actual_lifecycle_contract.py", "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_candidate_actual_lifecycle_contract.unit.test.py", "suite": "unit"},
-    {"owner": "src/test/support/apg_candidate_history_contract.py", "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_candidate_history_contract.unit.test.py", "suite": "unit"},
-    {"owner": "src/test/support/apg_candidate_lifecycle_schema_contract.py", "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_candidate_lifecycle_schema_contract.unit.test.py", "suite": "unit"},
-    {"owner": "src/test/support/apg_candidate_decision_contract.py", "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_candidate_decision_contract.unit.test.py", "suite": "unit"},
-    {"owner": "src/test/support/apg_candidate_narrative_state_contract.py", "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_candidate_narrative_state_contract.unit.test.py", "suite": "unit"},
-    {"owner": "src/test/support/apg_candidate_phase_history_contract.py", "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_candidate_phase_history_contract.unit.test.py", "suite": "unit"},
-    {"owner": "src/test/support/apg_candidate_surface_contract.py", "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_candidate_surface_contract.unit.test.py", "suite": "unit"},
-    {"owner": "src/test/support/apg_candidate_current_state_contract.py", "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_candidate_current_state_contract.unit.test.py", "suite": "unit"},
-    {"owner": "src/test/support/apg_candidate_traceability_contract.py", "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_candidate_traceability_contract.unit.test.py", "suite": "unit"},
-    {"owner": "src/test/support/apg_css_candidate_contract.py", "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_css_candidate_contract.unit.test.py", "suite": "unit"},
-    {"owner": "src/test/support/apg_candidate_required_role_registry.py", "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_candidate_required_role_registry.unit.test.py", "suite": "unit"},
-    {"owner": "src/test/support/apg_exact_read_contract.py", "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_exact_read_contract.unit.test.py", "suite": "unit"},
-    {"owner": "src/test/support/apg_pinned_root_contract.py", "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_pinned_root_contract.unit.test.py", "suite": "unit"},
-    {"owner": "src/test/support/apg_live_owner_binding_contract.py", "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_live_owner_binding_contract.unit.test.py", "suite": "unit"},
-    {"owner": "src/test/support/apg_python_source_binding_contract.py", "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_python_source_binding_contract.unit.test.py", "suite": "unit"},
-    {"owner": "src/test/support/apg_repository_import_cache_contract.py", "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_repository_import_cache_contract.unit.test.py", "suite": "unit"},
-    {"owner": "src/test/support/apg_repository_import_contract.py", "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_repository_import_contract.unit.test.py", "suite": "unit"},
-    {"owner": "src/test/support/apg_repository_import_descriptor_contract.py", "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_repository_import_descriptor_contract.unit.test.py", "suite": "unit"},
-    {"owner": "src/test/support/apg_repository_absence_contract.py", "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_repository_absence_contract.unit.test.py", "suite": "unit"},
-    {"owner": "src/test/support/apg_repository_path_contract.py", "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_repository_path_contract.unit.test.py", "suite": "unit"},
-    {"owner": "src/test/support/apg_repository_projection_contract.py", "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_repository_projection_contract.unit.test.py", "suite": "unit"},
-    {"owner": "src/test/support/apg_repository_snapshot_contract.py", "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_repository_snapshot_contract.unit.test.py", "suite": "unit"},
-    {"owner": "src/test/support/apg_worker_temp_contract.py", "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_worker_temp_contract.unit.test.py", "suite": "unit"},
-    {"owner": "src/test/support/apg_worker_temp_root_binding_contract.py", "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_worker_temp_root_binding_contract.unit.test.py", "suite": "unit"},
-    {"owner": "src/test/support/apg_worker_temp_cleanup_contract.py", "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_worker_temp_cleanup_contract.unit.test.py", "suite": "unit"},
-    {"owner": "src/test/support/apg_skill_set_contract.py", "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_skill_set_contract.unit.test.py", "suite": "unit"},
-    {"owner": "bin/apg-check-phase-commit-message", "path": "src/test/int/python/agentic-praxis-grimoire/bin/apg-check-phase-commit-message.int.test.py", "suite": "integration"},
-    {"owner": "bin/apg-check-change-size", "path": "src/test/int/python/agentic-praxis-grimoire/bin/apg-check-change-size.int.test.py", "suite": "integration"},
-    {"owner": "bin/apg-check-record-identity", "path": "src/test/int/python/agentic-praxis-grimoire/bin/apg-check-record-identity.int.test.py", "suite": "integration"},
-    {"owner": "bin/apg-check-skill-library", "path": "src/test/int/python/agentic-praxis-grimoire/bin/apg-check-skill-library.int.test.py", "suite": "integration"},
-    {"owner": "bin/apg-project-skills", "path": "src/test/int/python/agentic-praxis-grimoire/bin/apg-project-skills.int.test.py", "suite": "integration"},
-    {"owner": "bin/apg-public-release", "path": "src/test/int/python/agentic-praxis-grimoire/bin/apg-public-release.int.test.py", "suite": "integration"},
-    {"owner": "bin/apg-build-python-release-bundle", "path": "src/test/int/python/agentic-praxis-grimoire/bin/apg-build-python-release-bundle.int.test.py", "suite": "integration"},
-    {"owner": ".github/workflows/release.yml", "path": "src/test/int/python/agentic-praxis-grimoire/.github/workflows/release.yml.int.test.py", "suite": "integration"},
-    {"owner": "bin/apg-normalize-python-sdist", "path": "src/test/int/python/agentic-praxis-grimoire/bin/apg-normalize-python-sdist.int.test.py", "suite": "integration"},
-    {"owner": "libexec/apg_python_distribution.py", "path": "src/test/int/python/agentic-praxis-grimoire/libexec/apg_python_distribution.int.test.py", "suite": "integration"},
-    {"owner": "bin/apg-test", "path": "src/test/int/python/agentic-praxis-grimoire/bin/apg-test.int.test.py", "suite": "integration"},
-    {"owner": "bin/apg-user-skills", "path": "src/test/int/python/agentic-praxis-grimoire/bin/apg-user-skills.int.test.py", "suite": "integration"},
-    {"owner": "bin/append-operational-report", "path": "src/test/int/python/agentic-praxis-grimoire/bin/append-operational-report.int.test.py", "suite": "integration"},
-    {"owner": "bin/git-diff-report", "path": "src/test/int/python/agentic-praxis-grimoire/bin/git-diff-report.int.test.py", "suite": "integration"},
-    {"owner": "bin/git-show-report", "path": "src/test/int/python/agentic-praxis-grimoire/bin/git-show-report.int.test.py", "suite": "integration"},
-    {"owner": "bin/flatten-skill-symlinks", "path": "src/test/int/python/agentic-praxis-grimoire/bin/flatten-skill-symlinks.int.test.py", "suite": "integration"},
-    {"owner": "bin/install-global-skills", "path": "src/test/int/python/agentic-praxis-grimoire/bin/install-global-skills.int.test.py", "suite": "integration"},
-    {"owner": "libexec/apg_project_skills_commands.py", "path": "src/test/int/python/agentic-praxis-grimoire/libexec/apg_project_skills_commands.int.test.py", "suite": "integration"},
-    {"owner": "libexec/apg_project_skills_core.py", "path": "src/test/int/python/agentic-praxis-grimoire/libexec/apg_project_skills_core.int.test.py", "suite": "integration"},
-    {"owner": "libexec/apg_public_release.py", "path": "src/test/int/python/agentic-praxis-grimoire/libexec/apg_public_release.int.test.py", "suite": "integration"},
-    {"owner": "libexec/apg_skill_topology.py", "path": "src/test/int/python/agentic-praxis-grimoire/libexec/apg_skill_topology.int.test.py", "suite": "integration"},
-    {"owner": "libexec/apg_test.py", "path": "src/test/int/python/agentic-praxis-grimoire/libexec/apg_test.int.test.py", "suite": "integration"},
-    {"owner": "libexec/apg_user_skills.py", "path": "src/test/int/python/agentic-praxis-grimoire/libexec/apg_user_skills.int.test.py", "suite": "integration"},
-    {"owner": "libexec/global_skills_inventory.py", "path": "src/test/int/python/agentic-praxis-grimoire/libexec/global_skills_inventory.int.test.py", "suite": "integration"},
-    {"owner": "libexec/global_skills_state.py", "path": "src/test/int/python/agentic-praxis-grimoire/libexec/global_skills_state.int.test.py", "suite": "integration"},
-    {"owner": "libexec/global_skills_transaction.py", "path": "src/test/int/python/agentic-praxis-grimoire/libexec/global_skills_transaction.int.test.py", "suite": "integration"},
-    {"owner": "skills/css-language-profile/SKILL.md", "path": "src/test/int/python/agentic-praxis-grimoire/skills/css-language-profile/SKILL.int.test.py", "suite": "integration"},
-    {"owner": "skills/javascript-language-profile/SKILL.md", "path": "src/test/int/python/agentic-praxis-grimoire/skills/javascript-language-profile/SKILL.int.test.py", "suite": "integration"},
-    {"owner": "skills/markdown-language-profile/SKILL.md", "path": "src/test/int/python/agentic-praxis-grimoire/skills/markdown-language-profile/SKILL.int.test.py", "suite": "integration"},
-    {"owner": "skills/nodejs-runtime-profile/SKILL.md", "path": "src/test/int/python/agentic-praxis-grimoire/skills/nodejs-runtime-profile/SKILL.int.test.py", "suite": "integration"},
-    {"owner": "skills/typescript-language-profile/SKILL.md", "path": "src/test/int/python/agentic-praxis-grimoire/skills/typescript-language-profile/SKILL.int.test.py", "suite": "integration"},
-    {"owner": "src/test/support/apg_css_candidate_contract.py", "path": "src/test/int/python/agentic-praxis-grimoire/src/test/support/apg_css_candidate_contract.int.test.py", "suite": "integration"}
+    {
+      "owner": ".github/workflows/release.yml",
+      "path": "src/test/int/python/agentic-praxis-grimoire/.github/workflows/release.yml.int.test.py",
+      "suite": "integration"
+    },
+    {
+      "owner": "bin/apg-build-go-cli",
+      "path": "src/test/int/python/agentic-praxis-grimoire/bin/apg-build-go-cli.int.test.py",
+      "suite": "integration"
+    },
+    {
+      "owner": "bin/apg-build-python-release-bundle",
+      "path": "src/test/int/python/agentic-praxis-grimoire/bin/apg-build-python-release-bundle.int.test.py",
+      "suite": "integration"
+    },
+    {
+      "owner": "bin/apg-check-change-size",
+      "path": "src/test/int/python/agentic-praxis-grimoire/bin/apg-check-change-size.int.test.py",
+      "suite": "integration"
+    },
+    {
+      "owner": "bin/apg-check-phase-commit-message",
+      "path": "src/test/int/python/agentic-praxis-grimoire/bin/apg-check-phase-commit-message.int.test.py",
+      "suite": "integration"
+    },
+    {
+      "owner": "bin/apg-check-record-identity",
+      "path": "src/test/int/python/agentic-praxis-grimoire/bin/apg-check-record-identity.int.test.py",
+      "suite": "integration"
+    },
+    {
+      "owner": "bin/apg-check-skill-library",
+      "path": "src/test/int/python/agentic-praxis-grimoire/bin/apg-check-skill-library.int.test.py",
+      "suite": "integration"
+    },
+    {
+      "owner": "bin/apg-normalize-python-sdist",
+      "path": "src/test/int/python/agentic-praxis-grimoire/bin/apg-normalize-python-sdist.int.test.py",
+      "suite": "integration"
+    },
+    {
+      "owner": "bin/apg-project-skills",
+      "path": "src/test/int/python/agentic-praxis-grimoire/bin/apg-project-skills.int.test.py",
+      "suite": "integration"
+    },
+    {
+      "owner": "bin/apg-public-release",
+      "path": "src/test/int/python/agentic-praxis-grimoire/bin/apg-public-release.int.test.py",
+      "suite": "integration"
+    },
+    {
+      "owner": "bin/apg-test",
+      "path": "src/test/int/python/agentic-praxis-grimoire/bin/apg-test.int.test.py",
+      "suite": "integration"
+    },
+    {
+      "owner": "bin/apg-user-skills",
+      "path": "src/test/int/python/agentic-praxis-grimoire/bin/apg-user-skills.int.test.py",
+      "suite": "integration"
+    },
+    {
+      "owner": "bin/flatten-skill-symlinks",
+      "path": "src/test/int/python/agentic-praxis-grimoire/bin/flatten-skill-symlinks.int.test.py",
+      "suite": "integration"
+    },
+    {
+      "owner": "bin/install-global-skills",
+      "path": "src/test/int/python/agentic-praxis-grimoire/bin/install-global-skills.int.test.py",
+      "suite": "integration"
+    },
+    {
+      "owner": "docs/environment-snapshots.md",
+      "path": "src/test/int/python/agentic-praxis-grimoire/docs/environment-snapshots.int.test.py",
+      "suite": "integration"
+    },
+    {
+      "owner": "libexec/apg_project_skills_commands.py",
+      "path": "src/test/int/python/agentic-praxis-grimoire/libexec/apg_project_skills_commands.int.test.py",
+      "suite": "integration"
+    },
+    {
+      "owner": "libexec/apg_project_skills_core.py",
+      "path": "src/test/int/python/agentic-praxis-grimoire/libexec/apg_project_skills_core.int.test.py",
+      "suite": "integration"
+    },
+    {
+      "owner": "libexec/apg_public_release.py",
+      "path": "src/test/int/python/agentic-praxis-grimoire/libexec/apg_public_release.int.test.py",
+      "suite": "integration"
+    },
+    {
+      "owner": "libexec/apg_distribution_candidate.py",
+      "path": "src/test/int/python/agentic-praxis-grimoire/libexec/apg_distribution_candidate.int.test.py",
+      "suite": "integration"
+    },
+    {
+      "owner": "libexec/apg_python_distribution.py",
+      "path": "src/test/int/python/agentic-praxis-grimoire/libexec/apg_python_distribution.int.test.py",
+      "suite": "integration"
+    },
+    {
+      "owner": "libexec/apg_skill_topology.py",
+      "path": "src/test/int/python/agentic-praxis-grimoire/libexec/apg_skill_topology.int.test.py",
+      "suite": "integration"
+    },
+    {
+      "owner": "libexec/apg_user_skills.py",
+      "path": "src/test/int/python/agentic-praxis-grimoire/libexec/apg_user_skills.int.test.py",
+      "suite": "integration"
+    },
+    {
+      "owner": "libexec/global_skills_inventory.py",
+      "path": "src/test/int/python/agentic-praxis-grimoire/libexec/global_skills_inventory.int.test.py",
+      "suite": "integration"
+    },
+    {
+      "owner": "libexec/global_skills_state.py",
+      "path": "src/test/int/python/agentic-praxis-grimoire/libexec/global_skills_state.int.test.py",
+      "suite": "integration"
+    },
+    {
+      "owner": "libexec/global_skills_transaction.py",
+      "path": "src/test/int/python/agentic-praxis-grimoire/libexec/global_skills_transaction.int.test.py",
+      "suite": "integration"
+    },
+    {
+      "owner": "skills/css-language-profile/SKILL.md",
+      "path": "src/test/int/python/agentic-praxis-grimoire/skills/css-language-profile/SKILL.int.test.py",
+      "suite": "integration"
+    },
+    {
+      "owner": "skills/javascript-language-profile/SKILL.md",
+      "path": "src/test/int/python/agentic-praxis-grimoire/skills/javascript-language-profile/SKILL.int.test.py",
+      "suite": "integration"
+    },
+    {
+      "owner": "skills/markdown-language-profile/SKILL.md",
+      "path": "src/test/int/python/agentic-praxis-grimoire/skills/markdown-language-profile/SKILL.int.test.py",
+      "suite": "integration"
+    },
+    {
+      "owner": "skills/nodejs-runtime-profile/SKILL.md",
+      "path": "src/test/int/python/agentic-praxis-grimoire/skills/nodejs-runtime-profile/SKILL.int.test.py",
+      "suite": "integration"
+    },
+    {
+      "owner": "skills/typescript-language-profile/SKILL.md",
+      "path": "src/test/int/python/agentic-praxis-grimoire/skills/typescript-language-profile/SKILL.int.test.py",
+      "suite": "integration"
+    },
+    {
+      "owner": "src/agentic_praxis_grimoire/cli.py",
+      "path": "src/test/int/python/agentic-praxis-grimoire/src/agentic_praxis_grimoire/cli.int.test.py",
+      "suite": "integration"
+    },
+    {
+      "owner": "src/agentic_praxis_grimoire/response.py",
+      "path": "src/test/int/python/agentic-praxis-grimoire/src/agentic_praxis_grimoire/response.int.test.py",
+      "suite": "integration"
+    },
+    {
+      "owner": "src/test/support/apg_css_candidate_contract.py",
+      "path": "src/test/int/python/agentic-praxis-grimoire/src/test/support/apg_css_candidate_contract.int.test.py",
+      "suite": "integration"
+    },
+    {
+      "owner": ".github/workflows/release.yml",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/.github/workflows/release.yml.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "docs/evaluations/apg41-v0-4-readiness-and-pre-release-smoke.md",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/docs/evaluations/apg41-v0-4-readiness-and-pre-release-smoke.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "docs/evaluations/apg42-v0-4-release-publication-and-active-deployment.md",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/docs/evaluations/apg42-v0-4-release-publication-and-active-deployment.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "docs/evaluations/apg98-portable-environment-snapshots-and-resolution.md",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/docs/evaluations/apg98-portable-environment-snapshots-and-resolution.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "docs/provenance.md",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/docs/provenance.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "docs/specs/go-testing-component-profiles.md",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/docs/specs/go-testing-component-profiles.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "libexec/apg_distribution_candidate.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_distribution_candidate.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "libexec/apg_go_build.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_go_build.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "libexec/apg_npm_distribution.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_npm_distribution.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "libexec/apg_phase_commit_message.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_phase_commit_message.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "libexec/apg_project_skills_commands.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_project_skills_commands.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "libexec/apg_project_skills_core.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_project_skills_core.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "libexec/apg_public_release.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_public_release.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "libexec/apg_python_distribution.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_python_distribution.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "libexec/apg_python_publication.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_python_publication.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "libexec/apg_record_identity.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_record_identity.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "libexec/apg_skill_library_check.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_skill_library_check.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "libexec/apg_skill_topology.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_skill_topology.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "libexec/apg_test.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_test.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "libexec/apg_user_skills.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_user_skills.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "libexec/change_size/checker.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/change_size/checker.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "libexec/change_size/cli.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/change_size/cli.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "libexec/change_size/git_adapter.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/change_size/git_adapter.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "libexec/change_size/policy.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/change_size/policy.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "libexec/flatten_skill_symlinks.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/flatten_skill_symlinks.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "libexec/global_skills_inventory.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/global_skills_inventory.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "libexec/global_skills_state.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/global_skills_state.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "libexec/global_skills_transaction.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/global_skills_transaction.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "libexec/install_global_skills.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/install_global_skills.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "skills/astro-profile/SKILL.md",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/skills/astro-profile/SKILL.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "skills/chatgpt/chatgpt-manager-workflow/SKILL.md",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/skills/chatgpt/chatgpt-manager-workflow/SKILL.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "skills/chatgpt/composing-approved-roadmap-assignments/SKILL.md",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/skills/chatgpt/composing-approved-roadmap-assignments/SKILL.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "skills/css-language-profile/SKILL.md",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/skills/css-language-profile/SKILL.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "skills/dockerfile-profile/SKILL.md",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/skills/dockerfile-profile/SKILL.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "skills/go-cmp-test-profile/SKILL.md",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/skills/go-cmp-test-profile/SKILL.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "skills/go-test-profile/SKILL.md",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/skills/go-test-profile/SKILL.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "skills/gomock-test-profile/SKILL.md",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/skills/gomock-test-profile/SKILL.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "skills/implementing-with-test-discipline/SKILL.md",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/skills/implementing-with-test-discipline/SKILL.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "skills/javascript-language-profile/SKILL.md",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/skills/javascript-language-profile/SKILL.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "skills/jsx-language-profile/SKILL.md",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/skills/jsx-language-profile/SKILL.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "skills/markdown-language-profile/SKILL.md",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/skills/markdown-language-profile/SKILL.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "skills/mdx-profile/SKILL.md",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/skills/mdx-profile/SKILL.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "skills/minitest-test-profile/SKILL.md",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/skills/minitest-test-profile/SKILL.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "skills/nix-test-profile/SKILL.md",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/skills/nix-test-profile/SKILL.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "skills/nodejs-runtime-profile/SKILL.md",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/skills/nodejs-runtime-profile/SKILL.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "skills/planning-repository-work/SKILL.md",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/skills/planning-repository-work/SKILL.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "skills/pytest-test-profile/SKILL.md",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/skills/pytest-test-profile/SKILL.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "skills/react-component-profile/SKILL.md",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/skills/react-component-profile/SKILL.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "skills/reviewing-and-verifying-repository-work/SKILL.md",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/skills/reviewing-and-verifying-repository-work/SKILL.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "skills/typescript-language-profile/SKILL.md",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/skills/typescript-language-profile/SKILL.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "skills/vagrantfile-profile/SKILL.md",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/skills/vagrantfile-profile/SKILL.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "skills/vitest-test-profile/SKILL.md",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/skills/vitest-test-profile/SKILL.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "src/agentic_praxis_grimoire/cli.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/agentic_praxis_grimoire/cli.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "src/agentic_praxis_grimoire/config.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/agentic_praxis_grimoire/config.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "src/agentic_praxis_grimoire/go_bridge.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/agentic_praxis_grimoire/go_bridge.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "src/agentic_praxis_grimoire/paths.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/agentic_praxis_grimoire/paths.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "src/agentic_praxis_grimoire/reports.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/agentic_praxis_grimoire/reports.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "src/agentic_praxis_grimoire/response.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/agentic_praxis_grimoire/response.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "src/agentic_praxis_grimoire/version.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/agentic_praxis_grimoire/version.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "src/test/fixtures/apg60-css-reentry-contract.json",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/fixtures/apg60-css-reentry-contract.json.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "src/test/support/apg_actual_retained_surface_contract.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_actual_retained_surface_contract.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "src/test/support/apg_candidate_actual_lifecycle_contract.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_candidate_actual_lifecycle_contract.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "src/test/support/apg_candidate_current_state_contract.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_candidate_current_state_contract.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "src/test/support/apg_candidate_decision_contract.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_candidate_decision_contract.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "src/test/support/apg_candidate_history_contract.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_candidate_history_contract.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "src/test/support/apg_candidate_lifecycle_schema_contract.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_candidate_lifecycle_schema_contract.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "src/test/support/apg_candidate_narrative_state_contract.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_candidate_narrative_state_contract.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "src/test/support/apg_candidate_phase_history_contract.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_candidate_phase_history_contract.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "src/test/support/apg_candidate_required_role_registry.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_candidate_required_role_registry.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "src/test/support/apg_candidate_surface_contract.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_candidate_surface_contract.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "src/test/support/apg_candidate_traceability_contract.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_candidate_traceability_contract.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "src/test/support/apg_css_candidate_contract.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_css_candidate_contract.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "src/test/support/apg_css_evidence_retention_contract.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_css_evidence_retention_contract.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "src/test/support/apg_css_profile_candidate_contract.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_css_profile_candidate_contract.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "src/test/support/apg_css_profile_fixture_contract.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_css_profile_fixture_contract.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "src/test/support/apg_exact_read_contract.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_exact_read_contract.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "src/test/support/apg_javascript_candidate_contract.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_javascript_candidate_contract.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "src/test/support/apg_javascript_fixture_contract.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_javascript_fixture_contract.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "src/test/support/apg_live_owner_binding_contract.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_live_owner_binding_contract.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "src/test/support/apg_markdown_candidate_contract.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_markdown_candidate_contract.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "src/test/support/apg_markdown_clause_guard_contract.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_markdown_clause_guard_contract.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "src/test/support/apg_markdown_polarity_guard_contract.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_markdown_polarity_guard_contract.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "src/test/support/apg_markdown_register_contract.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_markdown_register_contract.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "src/test/support/apg_markdown_token_guard_contract.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_markdown_token_guard_contract.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "src/test/support/apg_markdown_vocabulary_contract.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_markdown_vocabulary_contract.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "src/test/support/apg_nodejs_candidate_contract.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_nodejs_candidate_contract.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "src/test/support/apg_nodejs_fixture_contract.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_nodejs_fixture_contract.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "src/test/support/apg_pinned_root_contract.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_pinned_root_contract.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "src/test/support/apg_python_source_binding_contract.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_python_source_binding_contract.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "src/test/support/apg_repository_absence_contract.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_repository_absence_contract.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "src/test/support/apg_repository_import_cache_contract.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_repository_import_cache_contract.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "src/test/support/apg_repository_import_contract.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_repository_import_contract.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "src/test/support/apg_repository_import_descriptor_contract.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_repository_import_descriptor_contract.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "src/test/support/apg_repository_path_contract.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_repository_path_contract.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "src/test/support/apg_repository_projection_contract.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_repository_projection_contract.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "src/test/support/apg_repository_snapshot_contract.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_repository_snapshot_contract.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "src/test/support/apg_skill_set_contract.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_skill_set_contract.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "src/test/support/apg_typescript_candidate_contract.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_typescript_candidate_contract.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "src/test/support/apg_typescript_fixture_contract.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_typescript_fixture_contract.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "src/test/support/apg_worker_temp_cleanup_contract.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_worker_temp_cleanup_contract.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "src/test/support/apg_worker_temp_contract.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_worker_temp_contract.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "src/test/support/apg_worker_temp_root_binding_contract.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_worker_temp_root_binding_contract.unit.test.py",
+      "suite": "unit"
+    }
   ]
 }

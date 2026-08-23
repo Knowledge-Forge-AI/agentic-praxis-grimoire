@@ -1,0 +1,22 @@
+{
+  "profile_id": "fixture-all-validators",
+  "environment": {
+    "APG98_BOOL": "yes",
+    "APG98_COMMAND": "fixture-tool --mode safe",
+    "APG98_HOST": "service.fixture.invalid",
+    "APG98_INTEGER": "-12",
+    "APG98_PATH": "/fixture/apg98/root",
+    "APG98_PATH_LIST": "/fixture/apg98/bin:/fixture/apg98/sbin",
+    "APG98_PORT": "4312",
+    "APG98_RAW_SAFE": "fixture value with spaces and # punctuation",
+    "APG98_LEXEM": "alpha_1",
+    "APG98_LEXEM_LIST": "alpha,beta-2",
+    "APG98_URI": "https://service.fixture.invalid/api",
+    "APG98_URI_OR_PATH": "/fixture/apg98/endpoint",
+    "APG98_UNLISTED": "must-not-be-captured"
+  },
+  "intentionally_omitted": [
+    "APG98_OPTIONAL",
+    "SSH_AUTH_SOCK"
+  ]
+}

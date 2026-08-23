@@ -867,6 +867,17 @@ class APGCheckSkillLibraryTests(unittest.TestCase):
         (self.root / "skills" / "notes.txt").write_text("unexpected\n")
         self.assertIn("APG003", self.result_codes())
 
+    def test_skills_root_go_package_source_is_accepted(self) -> None:
+        (self.root / "skills" / "corpus.go").write_text("package skills\n")
+        result = self.run_checker(self.root)
+        self.assertEqual(result.returncode, 0, result)
+
+    def test_symlinked_skills_root_go_package_source_is_rejected(self) -> None:
+        target = self.root / "outside.go"
+        target.write_text("package skills\n")
+        (self.root / "skills" / "corpus.go").symlink_to(target)
+        self.assertIn("APG003", self.result_codes())
+
     def test_text_diagnostic_paths_escape_control_characters(self) -> None:
         unexpected = self.root / "skills" / "bad\nname"
         unexpected.write_text("unexpected\n", encoding="utf-8")

@@ -13,16 +13,20 @@ from src.test.apg_test_support import repository_root
 ROOT = repository_root(__file__)
 sys.path.insert(0, str(ROOT / "src"))
 
-from agentic_praxis_grimoire import skills  # noqa: E402
-
-
 NAME = "jsx-language-profile"
 OTHER_NAME = "react-component-profile"
 
 
 def description(name: str) -> str:
-    blob = (ROOT / f"skills/{name}/SKILL.md").read_bytes()
-    return skills.parse_skill_metadata(f"skills/{name}/SKILL.md", blob).description
+    metadata = json.loads(
+        (ROOT / "src/agentic_praxis_grimoire/resources/skill-metadata.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    for item in metadata["skills"]:
+        if item["name"] == name:
+            return str(item["description"])
+    raise KeyError(name)
 
 
 def test_jsx_leaf_owns_only_library_independent_syntax_and_transform() -> None:
@@ -84,24 +88,25 @@ def test_apg87_description_pair_stays_byte_stable_in_apg88() -> None:
     jsx_bytes = len(description(NAME).encode("utf-8"))
     react_bytes = len(description(OTHER_NAME).encode("utf-8"))
     combined = jsx_bytes + react_bytes
-    report = skills.context_footprint_report(
-        blobs={
-            path.relative_to(ROOT).as_posix(): path.read_bytes()
-            for path in sorted((ROOT / "skills").glob("**/SKILL.md"))
-        }
+    metadata = json.loads(
+        (ROOT / "src/agentic_praxis_grimoire/resources/skill-metadata.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    skills_list = metadata["skills"]
+    total_description_bytes = sum(
+        len(item["description"].encode("utf-8")) for item in skills_list
     )
 
     assert 170 <= jsx_bytes <= 330
     assert 170 <= react_bytes <= 330
     assert combined == 516
     assert 340 <= combined <= 651
-    assert report["skill_count"] == 39
-    assert report["discoverable_skill_count"] == 39
-    assert report["malformed"] == []
-    assert report["total_description_bytes"] == 9504
-    assert report["total_description_bytes"] <= 9527
-    assert report["total_description_bytes"] - 7967 == 1537
-    assert 9527 - report["total_description_bytes"] == 23
+    assert len(skills_list) == 39
+    assert total_description_bytes == 9504
+    assert total_description_bytes <= 9527
+    assert total_description_bytes - 7967 == 1537
+    assert 9527 - total_description_bytes == 23
 
 
 def test_jsx_projection_is_exact() -> None:

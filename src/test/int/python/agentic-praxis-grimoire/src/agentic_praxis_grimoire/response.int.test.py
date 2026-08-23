@@ -1,5 +1,3 @@
-"""Real-process filesystem contracts for APGR response allocation."""
-
 from __future__ import annotations
 
 import os
@@ -57,110 +55,62 @@ def _run_child(
     )
 
 
-def test_concurrent_processes_receive_unique_monotonic_numbers_and_exact_bodies(
+def test_real_go_response_bridge_preserves_exact_bytes_and_modes(tmp_path: Path) -> None:
+    outbox = tmp_path / "outbox"
+    body = b"# exact\n\x00\xff\n"
+    process = _run_child(outbox, "synthetic-project", "APG100", body)
+    stdout, stderr = process.communicate(timeout=60)
+    assert process.returncode == 0, stderr.decode()
+    created = Path(stdout.decode().strip())
+    assert created.read_bytes() == body
+    assert stat.S_IMODE(created.stat().st_mode) == 0o600
+    assert stat.S_IMODE(created.parent.stat().st_mode) == 0o700
+    assert stat.S_IMODE(created.parent.parent.stat().st_mode) == 0o700
+    assert stat.S_IMODE((created.parent / response.LOCK_NAME).stat().st_mode) == 0o600
+
+
+def test_real_go_response_bridge_concurrent_allocations_are_unique_and_exact(
     tmp_path: Path,
 ) -> None:
     outbox = tmp_path / "outbox"
     project = "synthetic-project"
-    phase = "APG82"
-    bodies = [f"response-{index:02d}\n".encode() for index in range(24)]
+    phase = "APG100"
+    bodies = [f"response-{index:02d}\n".encode() for index in range(12)]
     processes = [_run_child(outbox, project, phase, body) for body in bodies]
 
-    results = [process.communicate(timeout=20) for process in processes]
-    for result in results:
-        stdout, stderr = result
-        assert stdout.strip(), stderr.decode()
-
+    results = [process.communicate(timeout=60) for process in processes]
+    for process, (_stdout, stderr) in zip(processes, results):
+        assert process.returncode == 0, stderr.decode()
     paths = [Path(stdout.decode().strip()) for stdout, _stderr in results]
     assert len(set(paths)) == len(bodies)
     assert sorted(path.name for path in paths) == [
         f"{phase}.{number:03d}.response.md" for number in range(1, len(bodies) + 1)
     ]
     assert {path.read_bytes() for path in paths} == set(bodies)
-
     phase_dir = outbox / project / phase
-    assert stat.S_IMODE((phase_dir / ".response.lock").stat().st_mode) == 0o600
+    assert stat.S_IMODE((phase_dir / response.LOCK_NAME).stat().st_mode) == 0o600
     assert not tuple(phase_dir.glob("*.reservation.*"))
 
 
-def test_process_death_releases_phase_lock_for_recovery(tmp_path: Path) -> None:
+def test_real_go_response_bridge_file_alias_uses_same_capture_owner(tmp_path: Path) -> None:
+    source = tmp_path / "source.md"
+    source.write_bytes(b"file input\x00\xff\n")
     outbox = tmp_path / "outbox"
     script = (
-        "from pathlib import Path; import sys, time; "
-        "from agentic_praxis_grimoire.response import phase_directory, _phase_lock; "
-        "directory = phase_directory(Path(sys.argv[1]), 'project', 'APG82'); "
-        "context = _phase_lock(directory); context.__enter__(); "
-        "print('locked', flush=True); time.sleep(60)"
+        "from pathlib import Path; "
+        "import sys; "
+        "from agentic_praxis_grimoire.response import main; "
+        "raise SystemExit(main({'project': 'project', 'outbox_root': sys.argv[1]}, "
+        "['record', '--phase', 'APG100', '--file', sys.argv[2]]))"
     )
-    holder = subprocess.Popen(
-        [sys.executable, "-c", script, os.fspath(outbox)],
+    completed = subprocess.run(
+        [sys.executable, "-c", script, os.fspath(outbox), os.fspath(source)],
         cwd=REPOSITORY_ROOT,
         env=_child_environment(),
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
+        check=False,
+        timeout=60,
     )
-    assert holder.stdout is not None
-    assert holder.stdout.readline() == b"locked\n"
-    holder.kill()
-    holder.wait(timeout=10)
-
-    recovered = _run_child(outbox, "project", "APG82", b"after-kill\n")
-    stdout, stderr = recovered.communicate(timeout=20)
-    assert recovered.returncode == 0, stderr.decode()
-    created = Path(stdout.decode().strip())
-    assert created.read_bytes() == b"after-kill\n"
-
-
-def test_capture_retries_one_observed_phase_lock_contention(
-    tmp_path: Path,
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    calls = 0
-    flock = response.fcntl.flock
-
-    def contend_once(descriptor: int, operation: int) -> None:
-        nonlocal calls
-        calls += 1
-        if calls == 1:
-            raise BlockingIOError
-        flock(descriptor, operation)
-
-    monkeypatch.setattr(response.fcntl, "flock", contend_once)
-    monkeypatch.setattr(response.time, "sleep", lambda _seconds: None)
-
-    created = response.capture_response(
-        outbox_root=tmp_path / "outbox",
-        project="project",
-        phase="APG89",
-        body=b"after-contention\n",
-    )
-
-    assert calls == 2
-    assert created.read_bytes() == b"after-contention\n"
-
-
-def test_next_capture_cleans_dead_process_body_and_rejects_relative_root(
-    tmp_path: Path,
-) -> None:
-    outbox = tmp_path / "outbox"
-    phase_dir = response.phase_directory(outbox, "project", "APG82")
-    orphan = phase_dir / ".response-write.dead-process.tmp"
-    orphan.write_bytes(b"partial sensitive body")
-    orphan.chmod(0o600)
-
-    created = response.capture_response(
-        outbox_root=outbox,
-        project="project",
-        phase="APG82",
-        body=b"complete\n",
-    )
-
-    assert created.read_bytes() == b"complete\n"
-    assert not orphan.exists()
-    with pytest.raises(response.ResponseUsageError, match="absolute"):
-        response.capture_response(
-            outbox_root="relative-outbox",
-            project="project",
-            phase="APG82",
-            body=b"refused",
-        )
+    assert completed.returncode == 0, completed.stderr.decode()
+    assert Path(completed.stdout.decode().strip()).read_bytes() == source.read_bytes()

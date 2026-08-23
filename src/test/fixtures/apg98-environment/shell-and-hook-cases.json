@@ -1,0 +1,69 @@
+{
+  "source_behavior": {
+    "shell_detection_precedence": ["ZSH_VERSION", "BASH_VERSION", "SHELL-basename"],
+    "recognized_shells": ["bash", "zsh"],
+    "unknown_shell": "no-shell-detected",
+    "mode_defaults": {
+      "sync": {
+        "allowlist": "codex-sync-allowlist.tsv",
+        "context": "global",
+        "metadata": true,
+        "output": "<home>/.codex/runtime/shell-env/latest.<shell>.env"
+      },
+      "env-file": {
+        "allowlist": "project-env-allowlist.tsv",
+        "context": "required",
+        "metadata": false,
+        "output": "required"
+      }
+    },
+    "snapshot": {
+      "export_line_style": "export NAME=<shell-quoted-value>",
+      "missing_empty": "required-fails-optional-skips",
+      "same_content": "no-rewrite",
+      "directory_mode": "0700",
+      "file_mode": "0600",
+      "metadata_fields": [
+        "allowlist_path",
+        "content_sha256",
+        "context",
+        "entries",
+        "generated_at",
+        "mode",
+        "output_path",
+        "rejected",
+        "shell",
+        "skipped_missing"
+      ]
+    }
+  },
+  "run_behavior": {
+    "comments_and_blanks": true,
+    "plain_and_export_assignments": true,
+    "duplicate_assignment": "last-wins",
+    "overlay": "inherited-base-plus-snapshot-values",
+    "argv": "exact-vector",
+    "shell": "never-invoked"
+  },
+  "prompt_hook": {
+    "bash": {
+      "registration": "one PROMPT_COMMAND entry, prepended without duplicates",
+      "refresh": "immediate and each prompt",
+      "failure": "silent non-fatal"
+    },
+    "zsh": {
+      "registration": "add-zsh-hook precmd after removing duplicate",
+      "refresh": "immediate and each precmd",
+      "failure": "silent non-fatal"
+    },
+    "missing_command": "silent no-op"
+  },
+  "apg_intentional_differences": [
+    "JSON is canonical; shell export text is not stored by APG.",
+    "APG capture receives an explicit map; it does not read ambient process state.",
+    "APG adds a profile-directory interprocess lock.",
+    "APG fingerprints content independently of timestamp and storage path; staleness is explicit and no-churn is required.",
+    "APG refuses sensitive names while deliberately permitting SSH_AUTH_SOCK as a capability path.",
+    "APG defaults to Isolated resolution; Overlay is explicit."
+  ]
+}

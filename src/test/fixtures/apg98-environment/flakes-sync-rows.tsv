@@ -1,0 +1,33 @@
+name	validator	max_bytes	required	default	description
+PATH	path_list	8192	true	/fixture/apg98/bin:/fixture/apg98/sbin	Synthetic executable search path
+MANPATH	raw_safe	8192	false	/fixture/apg98/man	Synthetic manual search path
+INFOPATH	raw_safe	8192	false	/fixture/apg98/info	Synthetic info search path
+SHELL	path	1024	false	/fixture/apg98/bin/bash	Synthetic shell path
+TERM	token	128	false	fixture-terminal	Synthetic terminal type
+LANG	token	128	false	en_US.UTF-8	Synthetic locale
+LC_ALL	token	128	false		Synthetic locale override
+LC_CTYPE	token	128	false		Synthetic character locale
+LC_COLLATE	token	128	false		Synthetic collation locale
+LC_MESSAGES	token	128	false		Synthetic message locale
+NIX_PATH	path_list	4096	false	/fixture/apg98/nixpkgs	Synthetic Nix search path
+NIX_PROFILES	path_list	4096	false	/fixture/apg98/profile	Synthetic Nix profile path
+NIX_SSL_CERT_FILE	path	1024	false	/fixture/apg98/certs/ca.pem	Synthetic certificate path
+NIXPKGS_ALLOW_UNFREE	bool	8	false	1	Synthetic boolean selector
+PYTHONPYCACHEPREFIX	path	2048	false	/fixture/apg98/cache	Synthetic Python cache path
+JAVA_HOME	path	1024	false	/fixture/apg98/jdk	Synthetic JDK root
+SDKMAN_DIR	path	1024	false	/fixture/apg98/sdkman	Synthetic SDK manager root
+PYENV_ROOT	path	1024	false	/fixture/apg98/pyenv	Synthetic Python manager root
+RBENV_ROOT	path	1024	false	/fixture/apg98/rbenv	Synthetic Ruby manager root
+NVM_DIR	path	1024	false	/fixture/apg98/nvm	Synthetic Node manager root
+PNPM_HOME	path	1024	false	/fixture/apg98/pnpm	Synthetic package-manager root
+HOMEBREW_PREFIX	path	1024	false	/fixture/apg98/homebrew	Synthetic package prefix
+HOMEBREW_CELLAR	path	1024	false	/fixture/apg98/homebrew/cellar	Synthetic package cellar
+HOMEBREW_REPOSITORY	path	1024	false	/fixture/apg98/homebrew/repository	Synthetic package repository
+DOCKER_HOST	uri	1024	false	unix:///fixture/apg98/docker.sock	Synthetic container endpoint
+DOCKER_CONTEXT	token	128	false	fixture-context	Synthetic container context
+ORBSTACK_SHELL	token	128	false	fixture-marker	Synthetic shell marker
+SSH_AUTH_SOCK	path	1024	false		Capability socket path, not a secret value
+GPG_TTY	path	1024	false	/fixture/apg98/tty	Synthetic terminal path
+EDITOR	command	512	false	fixture-editor --safe	Synthetic editor command text
+VISUAL	command	512	false	fixture-visual	Synthetic visual command text
+PAGER	command	512	false	fixture-pager --plain	Synthetic pager command text

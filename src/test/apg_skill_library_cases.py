@@ -351,7 +351,10 @@ class CompleteCheckerBoundaryTests(unittest.TestCase):
             0,
             0,
         )
-        with mock.patch.object(checker, "check_library", return_value=passing):
+        with (
+            mock.patch.object(checker, "check_library", return_value=passing),
+            mock.patch.object(checker, "_embedded_corpus_failure", return_value=None),
+        ):
             self.assertEqual(main(["--root", ".", "--format", "json"]), 0)
         with mock.patch.object(checker, "check_library", return_value=failing):
             self.assertEqual(main(["--root", ".", "--format", "text"]), 1)

@@ -11,6 +11,7 @@ import os
 from pathlib import Path
 import re
 import stat
+import subprocess
 import sys
 from typing import Sequence
 
@@ -66,11 +67,55 @@ EXTERNAL_DESTINATION = re.compile(r"^[A-Za-z][A-Za-z0-9+.-]*:")
 
 
 def context_footprint_report(*, blobs: dict[str, bytes]) -> dict[str, object]:
-    """Load the canonical package measurement owner only when the gate runs."""
+    """Measure repository metadata for the governance gate.
 
-    from agentic_praxis_grimoire.skills import context_footprint_report as measure
+    Portable consumer discovery is Go-owned.  This deliberately narrow local
+    measurement reuses the checker's accepted frontmatter grammar so the
+    release-shaped source tree does not retain the old Python consumer module.
+    """
 
-    return measure(blobs=blobs)
+    rows: list[dict[str, object]] = []
+    malformed: list[dict[str, str]] = []
+    for relative_path, blob in sorted(blobs.items()):
+        parsed = parse_frontmatter(blob)
+        names = parsed.values("name")
+        descriptions = parsed.values("description")
+        if (
+            not parsed.starts_at_byte_one
+            or not parsed.terminated
+            or len(names) != 1
+            or len(descriptions) != 1
+        ):
+            malformed.append(
+                {
+                    "path": relative_path,
+                    "error": "metadata is not one accepted name/description frontmatter pair",
+                }
+            )
+            continue
+        description = descriptions[0]
+        rows.append(
+            {
+                "name": names[0],
+                "description": description,
+                "bytes": len(description.encode("utf-8")),
+                "characters": len(description),
+                "relative_path": relative_path,
+            }
+        )
+    rows.sort(key=lambda row: (-int(row["bytes"]), str(row["name"])))
+    total_bytes = sum(int(row["bytes"]) for row in rows)
+    total_characters = sum(int(row["characters"]) for row in rows)
+    return {
+        "skill_count": len(rows),
+        "discoverable_skill_count": len(rows),
+        "total_bytes": total_bytes,
+        "total_characters": total_characters,
+        "total_description_bytes": total_bytes,
+        "total_description_characters": total_characters,
+        "skills": rows,
+        "malformed": malformed,
+    }
 
 
 @dataclass(frozen=True)
@@ -1073,6 +1118,48 @@ def check_library(root: Path) -> CheckResult:
     return CheckResult(ordered, len(canonical_leaves), len(rows), projections)
 
 
+def _embedded_corpus_failure(root: Path) -> str | None:
+    """Require the private Go CLI to bind checkout bytes to its embedded corpus."""
+
+    if not (root / "cmd" / "apgr").is_dir() and not (root / "internal" / "skills").is_dir():
+        return None
+    environment = dict(os.environ)
+    environment.pop("APGR_GO_BINARY", None)
+    source = os.fspath(root / "src")
+    inherited = environment.get("PYTHONPATH")
+    environment["PYTHONPATH"] = source if not inherited else os.pathsep.join((source, inherited))
+    environment["PYTHONDONTWRITEBYTECODE"] = "1"
+    try:
+        completed = subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "agentic_praxis_grimoire",
+                "skills",
+                "verify-corpus",
+                "--repository",
+                os.fspath(root),
+            ],
+            cwd=root,
+            env=environment,
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=False,
+            shell=False,
+            timeout=120,
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return "Go embedded-corpus verification could not run"
+    if completed.returncode != 0:
+        return "Go embedded-corpus verification disagrees with repository truth"
+    if completed.stdout or completed.stderr:
+        text = (completed.stderr + completed.stdout).decode("utf-8", errors="replace").strip()
+        if text:
+            return f"Go embedded-corpus verification produced unexpected output: {text}"
+    return None
+
+
 def _summary(result: CheckResult) -> dict[str, int]:
     return {
         "canonical_skills": result.canonical_skills,
@@ -1152,7 +1239,25 @@ def main(arguments: Sequence[str] | None = None) -> int:
     parser = build_parser()
     options = parser.parse_args(arguments)
     default_root = Path(__file__).resolve(strict=True).parent.parent
-    result = check_library(options.root if options.root is not None else default_root)
+    root = options.root if options.root is not None else default_root
+    result = check_library(root)
+    if result.passed:
+        failure = _embedded_corpus_failure(Path(root))
+        if failure is not None:
+            result = CheckResult(
+                (
+                    Diagnostic(
+                        "APG041",
+                        "skills",
+                        "go-embedded-corpus-identity",
+                        failure,
+                        "restore the exact canonical skill bodies and Go embedded corpus identity",
+                    ),
+                ),
+                result.canonical_skills,
+                result.catalog_rows,
+                result.projections,
+            )
     output = render_json(result) if options.format == "json" else render_text(result)
     sys.stdout.write(output)
     return 0 if result.passed else 1

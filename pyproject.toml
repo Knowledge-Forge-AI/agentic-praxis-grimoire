@@ -1,6 +1,7 @@
 [build-system]
-requires = ["setuptools==83.0.0"]
-build-backend = "setuptools.build_meta"
+requires = []
+build-backend = "apg_python_build_backend"
+backend-path = ["libexec"]
 
 [project]
 name = "agentic-praxis-grimoire"
@@ -43,4 +44,6 @@ namespaces = false
 agentic_praxis_grimoire = [
   "VERSION",
   "resources/skill-metadata.json",
+  "bin/apgr",
+  "bin/apgr.binary-manifest.json",
 ]

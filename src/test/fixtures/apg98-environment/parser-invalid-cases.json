@@ -1,0 +1,37 @@
+[
+  {
+    "case_id": "unsupported-shell-line",
+    "line": "unset APG98_LEXEM",
+    "expected": "reject-unsupported-line"
+  },
+  {
+    "case_id": "invalid-name",
+    "line": "1APG98=value",
+    "expected": "reject-invalid-name"
+  },
+  {
+    "case_id": "missing-assignment",
+    "line": "APG98_LEXEM",
+    "expected": "reject-unsupported-line"
+  },
+  {
+    "case_id": "malformed-quote",
+    "line": "APG98_COMMAND='unterminated",
+    "expected": "reject-unsupported-line"
+  },
+  {
+    "case_id": "nul-byte",
+    "text_escape": "APG98_LEXEM=value\\u0000tail",
+    "expected": "reject-nul"
+  },
+  {
+    "case_id": "carriage-return",
+    "text_escape": "APG98_LEXEM=value\\rnext",
+    "expected": "reject-cr"
+  },
+  {
+    "case_id": "duplicate-last-wins",
+    "lines": ["APG98_LEXEM=first", "export APG98_LEXEM=last"],
+    "expected": "last-assignment-wins"
+  }
+]

@@ -1,0 +1,16 @@
+#!/usr/bin/env python3
+"""Build one deterministic release-like APGR Go CLI binary."""
+
+from __future__ import annotations
+
+from pathlib import Path
+import sys
+
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "libexec"))
+
+from apg_go_build import main  # noqa: E402
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

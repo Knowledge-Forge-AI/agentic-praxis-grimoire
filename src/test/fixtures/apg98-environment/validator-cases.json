@@ -1,0 +1,50 @@
+{
+  "bool": {
+    "accepted": ["0", "yes", "TRUE"],
+    "rejected": ["maybe", "2", ""]
+  },
+  "command": {
+    "accepted": ["", "fixture-tool --safe"],
+    "rejected": ["fixture\u0000tool", "fixture\ncommand"]
+  },
+  "host": {
+    "accepted": ["service.fixture.invalid", "fixture:4312"],
+    "rejected": ["bad host", ""]
+  },
+  "integer": {
+    "accepted": ["-12", "0", "42"],
+    "rejected": ["+1", "1.0", ""]
+  },
+  "path": {
+    "accepted": ["/fixture/apg98/root", "relative fixture path"],
+    "rejected": ["", "   "]
+  },
+  "path_list": {
+    "accepted": ["/fixture/apg98/bin:/fixture/apg98/sbin", "relative:fixture"],
+    "rejected": ["/fixture/apg98/bin::/fixture/apg98/sbin", ""]
+  },
+  "port": {
+    "accepted": ["1", "4312", "65535"],
+    "rejected": ["0", "65536", "-1", "fixture"]
+  },
+  "raw_safe": {
+    "accepted": ["", "fixture text with spaces"],
+    "rejected": ["null", "fixture\nvalue"]
+  },
+  "token": {
+    "accepted": ["alpha_1", "beta-2", "gamma.value"],
+    "rejected": ["bad token", ""]
+  },
+  "token_list": {
+    "accepted": ["alpha,beta-2", "single"],
+    "rejected": ["alpha,,beta", "bad token", ""]
+  },
+  "uri": {
+    "accepted": ["https://service.fixture.invalid/api", "mailto:fixture@invalid"],
+    "rejected": ["service.fixture.invalid", ":bad"]
+  },
+  "uri_or_path": {
+    "accepted": ["https://service.fixture.invalid/api", "/fixture/apg98/endpoint"],
+    "rejected": ["", "   "]
+  }
+}

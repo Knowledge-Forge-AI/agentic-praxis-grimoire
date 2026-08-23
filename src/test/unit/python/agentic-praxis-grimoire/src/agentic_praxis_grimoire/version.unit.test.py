@@ -21,8 +21,8 @@ from agentic_praxis_grimoire.version import version  # noqa: E402
 
 def test_version_is_read_from_the_single_package_resource() -> None:
     resource = ROOT / "src/agentic_praxis_grimoire/VERSION"
-    assert resource.read_text(encoding="utf-8") == "0.6.0\n"
-    assert VERSION == "0.6.0"
+    assert resource.read_text(encoding="utf-8") == "0.7.0\n"
+    assert VERSION == "0.7.0"
     assert __version__ == VERSION
     assert version() == VERSION
     metadata = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))

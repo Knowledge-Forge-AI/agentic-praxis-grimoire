@@ -42,6 +42,50 @@ class APGPublicReleaseBoundaryTests(unittest.TestCase):
                 with self.assertRaisesRegex(release.ToolError, "policy identity"):
                     release.audited_policy_surfaces(version)
 
+    def test_v07_projection_filters_python_oracles_but_preserves_v06(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="apg-public-v07-surface-") as temporary:
+            root = Path(temporary) / "source"
+            release.run_git(root.parent, ["init", "-q", "-b", "main", str(root)])
+            release.run_git(root, ["config", "user.name", "APG Test"])
+            release.run_git(root, ["config", "user.email", "apg@example.invalid"])
+            for relative, content in {
+                "go.mod": "module example.invalid/apgr\n",
+                "npm/launcher/package.json": "{}\n",
+                "skills/example/SKILL.md": "---\nname: example\ndescription: fixture\n---\n",
+                "libexec/agent_report/diff.py": "# historical oracle\n",
+                "report/testdata/python_oracle.py": "# historical oracle\n",
+                "src/agentic_praxis_grimoire/skills.py": "# retired consumer\n",
+                "dist/example.whl": "generated\n",
+                ".scratch/local.txt": "local\n",
+            }.items():
+                target = root / relative
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_text(content, encoding="utf-8")
+            release.run_git(root, ["add", "."])
+            release.run_git(root, ["commit", "-q", "-m", "source"])
+            repository = release.resolve_repository(root, "source")
+
+            historical = {
+                entry.display_path
+                for entry in release.public_candidate_entries(repository, "0.6.0")
+            }
+            current = {
+                entry.display_path
+                for entry in release.public_candidate_entries(repository, "0.7.0")
+            }
+            for path in (
+                "libexec/agent_report/diff.py",
+                "report/testdata/python_oracle.py",
+                "src/agentic_praxis_grimoire/skills.py",
+                "dist/example.whl",
+                ".scratch/local.txt",
+            ):
+                with self.subTest(path=path):
+                    self.assertIn(path, historical)
+                    self.assertNotIn(path, current)
+            self.assertIn("npm/launcher/package.json", current)
+            self.assertIn("go.mod", current)
+
     def test_real_git_repository_resolution_tree_and_blob_boundaries(self) -> None:
         with tempfile.TemporaryDirectory(prefix="apg-public-git-") as temporary:
             root = Path(temporary) / "repository"

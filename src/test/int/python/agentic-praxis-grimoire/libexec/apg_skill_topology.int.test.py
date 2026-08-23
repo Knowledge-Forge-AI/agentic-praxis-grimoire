@@ -523,6 +523,7 @@ class APGSkillTopologyIntegrationTests(unittest.TestCase):
         shape_root = self.fixture.root / "canonical-shape"
         shape_skills = shape_root / "skills"
         shape_skills.mkdir(parents=True)
+        (shape_skills / "corpus.go").write_text("package skills\n")
         (shape_skills / "unexpected.txt").write_text("unexpected\n")
         direct_target = shape_root / "direct-target"
         direct_target.mkdir()

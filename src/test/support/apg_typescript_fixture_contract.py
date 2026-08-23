@@ -5,7 +5,9 @@ from __future__ import annotations
 import json
 import os
 from pathlib import Path
+import shutil
 import subprocess
+import sys
 from typing import Any, NoReturn
 
 
@@ -300,9 +302,12 @@ def validate_fixture_projection(
 
 
 def compiler_command(fixture_root: Path) -> tuple[str, ...]:
-    override = os.environ.get("APG_TYPESCRIPT_TSC")
+    override = os.environ.get("APG_TYPESCRIPT_TSC") or shutil.which("tsc")
     executable = Path(override) if override else fixture_root / "node_modules/.bin/tsc"
     if not executable.is_file():
+        pytest_mod = sys.modules.get("pytest")
+        if pytest_mod is not None:
+            pytest_mod.skip("exact TypeScript compiler is unavailable; set APG_TYPESCRIPT_TSC")
         fail("exact TypeScript compiler is unavailable; set APG_TYPESCRIPT_TSC")
     return (str(executable),)
 

@@ -14,7 +14,18 @@ from .version import version
 
 
 COMMAND = "apgr"
-FAMILIES = ("check", "skills", "test", "report", "response", "release")
+FAMILIES = (
+    "build-info",
+    "check",
+    "skills",
+    "test",
+    "env",
+    "analyze",
+    "report",
+    "response",
+    "release",
+)
+_ENV_STORAGE_COMMANDS = frozenset({"snapshot", "show", "resolve", "run"})
 HELP = """usage: apgr [global-options] <command> ...
 
 Agentic Praxis Grimoire command line interface.
@@ -22,15 +33,18 @@ Agentic Praxis Grimoire command line interface.
 global options:
   --help                 show this help
   --version              show the APGR version
-  --apgr-home PATH       override APGR_HOME for report/response configuration
+  --apgr-home PATH       override APGR_HOME for report/response/environment configuration
   --project-root PATH    select an APG Git worktree
   --outbox-root PATH     override configured report/response outbox root
   --project NAME         explicit report/response project identity
 
 commands:
+  build-info             show the packaged Go runtime identity
   check                  repository policy checks
   skills                 skill discovery, context, and projection commands
   test                   configured repository test runner
+  env                    portable environment profile and snapshot commands
+  analyze                read-only structural hotspot analysis
   report                 terminal Git and operational report publication;
                          a new primary type supersedes the prior current primary
   response               immutable numbered response capture
@@ -96,10 +110,29 @@ def legacy_main(
 ) -> int:
     """Invoke one maintained historical command in-process."""
 
+    values = list(arguments or [])
+    report_commands = {
+        "git-show-report",
+        "git-diff-report",
+        "append-operational-report",
+    }
     root = repository_root or discover_repository(Path.cwd())
     if root is None:
+        if command in report_commands:
+            print(f"{command}: not inside a git repository", file=sys.stderr)
+            return 1
         raise CliError(f"{command} requires an Agentic Praxis Grimoire repository")
-    values = list(arguments or [])
+    if command in report_commands:
+        from . import go_bridge
+
+        try:
+            return go_bridge.run(
+                go_bridge.legacy_arguments(command, root, values),
+                repository_root=root,
+            )
+        except go_bridge.GoBridgeError as error:
+            print(f"{command}: {error}", file=sys.stderr)
+            return 1
     owners: dict[str, tuple[str, str]] = {
         "apg-check-change-size": ("change_size.cli", "run"),
         "apg-check-phase-commit-message": ("apg_phase_commit_message", "main"),
@@ -113,9 +146,6 @@ def legacy_main(
         "apg-user-skills": ("apg_user_skills", "main"),
         "install-global-skills": ("install_global_skills", "main"),
         "flatten-skill-symlinks": ("flatten_skill_symlinks", "main"),
-        "git-show-report": ("agent_report.cli", "git_show_main"),
-        "git-diff-report": ("agent_report.cli", "git_diff_main"),
-        "append-operational-report": ("agent_report.cli", "append_operational_main"),
     }
     try:
         module_name, function_name = owners[command]
@@ -185,12 +215,82 @@ def _repository_route(
         return legacy_main(command, tail, root)
 
 
+def _environment_has_storage_root(arguments: Sequence[str]) -> bool:
+    """Return whether env-owned options already contain a storage root."""
+
+    for argument in arguments:
+        if argument == "--":
+            return False
+        if argument == "--storage-root":
+            return True
+    return False
+
+
+def _environment_route(options: dict[str, str], arguments: list[str]) -> int:
+    """Delegate environment commands to Go with an explicit storage root."""
+
+    if not arguments:
+        raise CliError("env requires a command")
+
+    values = list(arguments)
+    if values[0] in _ENV_STORAGE_COMMANDS and not _environment_has_storage_root(values):
+        from .paths import PathContractError, resolve_global_home
+
+        try:
+            storage_root = resolve_global_home(options.get("apgr_home"))
+        except PathContractError as error:
+            raise CliError("environment storage root is invalid") from error
+        values[1:1] = ["--storage-root", os.fspath(storage_root)]
+
+    from . import go_bridge
+
+    try:
+        return go_bridge.run(["env", *values], repository_root=None)
+    except go_bridge.GoBridgeError:
+        # Do not surface source-checkout/compiler details at the environment
+        # boundary: the Go owner is responsible for values-safe diagnostics.
+        print("apgr env: Go environment bridge unavailable", file=sys.stderr)
+        return 1
+
+
+def _dispatch_analyze(options: dict[str, str], arguments: list[str]) -> int:
+    if not arguments or arguments[0] != "hotspots":
+        raise CliError("analyze requires the hotspots command")
+    if any(key in options for key in ("apgr_home", "outbox_root", "project")):
+        raise CliError("analyze accepts only --project-root from Python global options")
+    explicit = options.get("project_root")
+    if explicit is None:
+        try:
+            root = Path.cwd().resolve(strict=True)
+        except (OSError, RuntimeError, ValueError) as error:
+            raise CliError("analysis root is unavailable") from error
+        if not root.is_dir():
+            raise CliError("analysis root must be a directory")
+    else:
+        root = _repository_root(options)
+        if root is None:
+            raise CliError("analysis root is unavailable")
+    from . import go_bridge
+
+    return go_bridge.run(
+        ["--repository", os.fspath(root), "analyze", *arguments],
+        repository_root=root,
+    )
+
+
 def _dispatch(options: dict[str, str], arguments: list[str]) -> int:
     if not arguments:
         raise CliError("a command is required")
     family = arguments.pop(0)
     if family not in FAMILIES:
         raise CliError(f"unknown command family: {family}")
+
+    if family == "build-info":
+        if arguments:
+            raise CliError("build-info takes no arguments")
+        from . import go_bridge
+
+        return go_bridge.run(["build-info"], repository_root=None)
 
     if family == "check":
         if not arguments:
@@ -209,10 +309,13 @@ def _dispatch(options: dict[str, str], arguments: list[str]) -> int:
         if not arguments:
             raise CliError("skills requires a command")
         action = arguments.pop(0)
-        if action in {"list", "context-report"}:
-            from . import skills
+        if action in {"list", "context-report", "resolve", "materialize", "verify-corpus"}:
+            from . import go_bridge
 
-            return skills.main(action, arguments)
+            return go_bridge.run(
+                ["skills", action, *arguments],
+                repository_root=None,
+            )
         owner = {
             "project": "apg-project-skills",
             "user": "apg-user-skills",
@@ -225,6 +328,10 @@ def _dispatch(options: dict[str, str], arguments: list[str]) -> int:
 
     if family == "test":
         return _repository_route("apg-test", arguments, options)
+    if family == "env":
+        return _environment_route(options, arguments)
+    if family == "analyze":
+        return _dispatch_analyze(options, arguments)
     if family == "release":
         if not arguments or arguments.pop(0) != "public":
             raise CliError("release requires the public command")

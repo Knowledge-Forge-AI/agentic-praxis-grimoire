@@ -7,10 +7,11 @@ from pathlib import Path
 import sys
 
 
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "libexec"))
+_root = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(_root / "src"))
 
-from agent_report.cli import git_diff_main  # noqa: E402
+from agentic_praxis_grimoire.cli import legacy_main  # noqa: E402
 
 
 if __name__ == "__main__":
-    raise SystemExit(git_diff_main())
+    raise SystemExit(legacy_main("git-diff-report", sys.argv[1:]))
