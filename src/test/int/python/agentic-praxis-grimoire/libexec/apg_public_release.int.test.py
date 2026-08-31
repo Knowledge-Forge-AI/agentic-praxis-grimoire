@@ -37,7 +37,7 @@ class APGPublicReleaseBoundaryTests(unittest.TestCase):
             with self.subTest(version=version):
                 surfaces = release.audited_policy_surfaces(version)
                 self.assertEqual(surfaces[0]["required_skills"], expected)
-        for version in ("invalid", "0.5.1", "0.6.1"):
+        for version in ("invalid", "0.5.1", "0.6.1", "0.8.1"):
             with self.subTest(version=version):
                 with self.assertRaisesRegex(release.ToolError, "policy identity"):
                     release.audited_policy_surfaces(version)
@@ -57,6 +57,7 @@ class APGPublicReleaseBoundaryTests(unittest.TestCase):
                 "src/agentic_praxis_grimoire/skills.py": "# retired consumer\n",
                 "dist/example.whl": "generated\n",
                 ".scratch/local.txt": "local\n",
+                "private/secret.txt": "private\n",
             }.items():
                 target = root / relative
                 target.parent.mkdir(parents=True, exist_ok=True)
@@ -73,6 +74,10 @@ class APGPublicReleaseBoundaryTests(unittest.TestCase):
                 entry.display_path
                 for entry in release.public_candidate_entries(repository, "0.7.0")
             }
+            additive = {
+                entry.display_path
+                for entry in release.public_candidate_entries(repository, "0.8.0")
+            }
             for path in (
                 "libexec/agent_report/diff.py",
                 "report/testdata/python_oracle.py",
@@ -85,6 +90,22 @@ class APGPublicReleaseBoundaryTests(unittest.TestCase):
                     self.assertNotIn(path, current)
             self.assertIn("npm/launcher/package.json", current)
             self.assertIn("go.mod", current)
+            for path in (
+                "libexec/agent_report/diff.py",
+                "report/testdata/python_oracle.py",
+                "src/agentic_praxis_grimoire/skills.py",
+                "dist/example.whl",
+                ".scratch/local.txt",
+            ):
+                with self.subTest(v08_excluded_path=path):
+                    self.assertNotIn(path, additive)
+            for path in (
+                "npm/launcher/package.json",
+                "go.mod",
+            ):
+                with self.subTest(v08_path=path):
+                    self.assertIn(path, additive)
+            self.assertNotIn("private/secret.txt", additive)
 
     def test_real_git_repository_resolution_tree_and_blob_boundaries(self) -> None:
         with tempfile.TemporaryDirectory(prefix="apg-public-git-") as temporary:

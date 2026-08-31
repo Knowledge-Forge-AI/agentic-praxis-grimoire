@@ -13,7 +13,7 @@ dictating an orchestration workflow.
 APG includes:
 
 - reusable Go packages for schemas, reports, skill bundles, environment
-  snapshots, and hotspot analysis;
+  snapshots, hotspot analysis, and context-footprint records;
 - the `apgr` command-line interface;
 - 39 canonical agent skills that can be selected for one task;
 - canonical reporting and evidence formats;
@@ -62,16 +62,17 @@ churn, choose a model, or advance a roadmap.
 
 ## Quick start
 
-The latest published release is **v0.6.0**. The source tree currently contains
-a locally qualified **v0.7.0 release candidate** that is not yet published to
-GitHub, PyPI, npm, or Go-module readback.
+The latest published release is **v0.7.0**. The source tree contains the
+**v0.8.0 work-stage candidate**; it is not yet published to GitHub, PyPI, npm,
+or Go-module readback.
 
-To try the v0.7 candidate safely from a source checkout, use Go 1.25:
+To try the work-stage candidate safely from a source checkout, use Go 1.25:
 
 ```sh
 go run ./cmd/apgr --help
 go run ./cmd/apgr skills list
 go run ./cmd/apgr skills context-report
+go run ./cmd/apgr footprint --help
 ```
 
 These commands read the embedded corpus and do not modify a global skill root.
@@ -85,15 +86,14 @@ go run ./cmd/apgr --repository "$PWD" analyze hotspots \
 The scanner requires an absolute physical repository path, stays beneath that
 root, and does not follow symlinks.
 
-For the published v0.6 Python release:
+For the published v0.7 Python release:
 
 ```sh
-python -m pip install "agentic-praxis-grimoire==0.6.0"
+python -m pip install "agentic-praxis-grimoire==0.7.0"
 apgr --version
 ```
 
-Do not use a v0.7 PyPI or npm install command yet. Publication belongs to the
-later release phase.
+The v0.8.0 candidate is not yet available from a public package registry.
 
 ## Install and consumption choices
 
@@ -113,8 +113,9 @@ Its public root packages are:
 - `skills` — embedded corpus, deterministic resolution, and isolated
   materialization;
 - `envsnap` — strict profiles, snapshots, storage, loading, and resolution;
-  and
-- `hotspot` — bounded structural analysis, stable models, and renderers.
+- `hotspot` — bounded structural analysis, stable models, and renderers; and
+- `footprint` — deterministic context-footprint records, comparisons,
+  projections, measurements, and versioned component/control registries.
 
 JACA-style consumers should import these packages directly. See the
 [Go library reference](docs/reference/go-library.md).
@@ -129,6 +130,7 @@ apgr report ...
 apgr skills ...
 apgr env ...
 apgr analyze hotspots ...
+apgr footprint measure|compare|project ...
 apgr response ...
 ```
 
@@ -141,34 +143,34 @@ and compatibility routes are documented separately in the
 The Python distribution remains `agentic-praxis-grimoire`, with the `apgr`
 console entry point and `python -m agentic_praxis_grimoire`.
 
-In the v0.7 packaging model, portable commands delegate to a verified bundled
-Go binary. Python continues to own APG repository and host maintenance where
-that behavior is intentionally not portable. The v0.7 platform wheels and
-source distribution are locally qualified candidate artifacts, not live PyPI
-packages.
+Portable commands delegate to a verified bundled Go binary. Python continues
+to own APG repository and host maintenance where that behavior is intentionally
+not portable. The published v0.7 platform wheels and source distribution remain
+the latest public Python surface; v0.8.0 packaging is a work-stage candidate.
 
 ### npm
 
-The accepted v0.7 candidate architecture defines:
+The published v0.7 architecture defines:
 
 - `@knowledge-forge-ai/apgr`;
 - `@knowledge-forge-ai/apgr-darwin-arm64`;
 - `@knowledge-forge-ai/apgr-linux-x64`; and
 - `@knowledge-forge-ai/apgr-linux-arm64`.
 
-These packages are not published yet. The JavaScript launcher selects and
-verifies a same-version platform package, forwards exact arguments with no
-shell, and owns no APG semantics.
+The v0.7 packages are the latest published npm surface. The v0.8.0 candidate is
+not published. The JavaScript launcher selects and verifies a same-version
+platform package, forwards exact arguments with no shell, and owns no APG
+semantics.
 
 ### Nix and host integration
 
 Nix, shell composition, and host activation are consumer layers. They may
-package or activate APG, but they do not own APG runtime semantics. This
-documentation phase changes no Nix configuration, `.flakes` state, active
-installation, or host integration.
+package or activate APG, but they do not own APG runtime semantics. There is
+no APGR-local Nix release gate for the v0.8.0 candidate, and this work changes
+no Nix configuration, active installation, or host integration.
 
-See [APG v0.7 distribution](docs/distribution.md) for the target matrix,
-artifact architecture, verification, and publication boundary.
+See [APG distribution](docs/distribution.md) for the target matrix, artifact
+architecture, verification, and publication boundary.
 
 ## Core concepts
 
@@ -195,6 +197,22 @@ APG measures descriptions, bodies, fixed prompt overhead, and initial context
 in bytes. It fails closed on an exceeded bound rather than truncating a
 description or silently dropping a skill. Provider-specific tokenization and
 provider limits remain consumer-owned.
+
+### Context footprints
+
+The additive `footprint` package measures selected descriptions, selected
+bodies, support material, prompt overhead, and complete materialized bundles as
+separate components. Its records use the versioned
+`apg.context-footprint/v1`, `apg.context-comparison/v1`, and
+`apg.context-projection/v1` schemas. Canonical bytes and domain-separated
+fingerprints are deterministic; unavailable metrics remain unavailable and are
+never represented as zero. APGR bundle accounting is not provider prompt
+accounting or JACA total-context accounting.
+
+Footprint operations are provider-neutral and do not execute tokenizers,
+providers, credentials, routes, retries, or workflow transitions. Provider-
+specific observations may be supplied as explicitly identified metrics, or
+recorded as unavailable.
 
 ### Evidence and reporting
 
@@ -251,10 +269,12 @@ APG never imports JACA or accepts JACA protocol types. A JACA adapter passes a
 `context.Context` and structured APG requests, then translates returned APG
 models and bytes into JACA-owned evidence.
 
-The public module is ready for this integration shape, but real cross-consumer
-JACA qualification remains future readiness work. This documentation phase
-does not modify JACA. See the
-[APG–JACA integration boundary](docs/architecture/apg-jaca-integration.md).
+APG102 qualified this integration shape through a disposable JACA-owned adapter
+without modifying JACA or creating a production dependency. The published
+v0.7.0 package is available for exact-version consumer qualification. The v0.8
+footprint records remain an additive work-stage candidate; any JACA adoption
+still belongs to a JACA-owned adapter and separately qualified consumer work.
+See the [APG–JACA integration boundary](docs/architecture/apg-jaca-integration.md).
 
 ## Documentation
 
@@ -273,20 +293,22 @@ Start with the [task-oriented documentation index](docs/README.md).
 
 ## Project status
 
-- Latest published release: **v0.6.0**
-- Development version: **v0.7.0 release candidate**
+- Latest published release: **v0.7.0**
+- Development version: **v0.8.0 work-stage candidate**
 - Candidate corpus: **39 canonical / 39 catalog / 39 projections / 39
   discoverable**
 - Maturity: **14 stable / 25 provisional**
-- Readiness: **qualified for APG103 publication**
-- Publication: pending separately authorized APG103 publication and immutable
-  readback
+- Skill-candidate decision: **zero new skills**; RepoMap and Theme Forge queues
+  remain deferred
+- CXT2B diagnostic importer: **deferred and non-blocking**
+- Readiness: **implementation and qualification candidate pending dispatcher
+  pre-final review**
+- Publication: **v0.8.0 has not been published**; Git finalization and
+  immutable external readback remain closeout actions
 
-The exact v0.7 candidate is locally qualified across Go, Python, npm, JACA,
-selected-only agent discovery, all three target binaries, historical
-reconstruction, and rollback, but no v0.7 GitHub release, PyPI release, npm
-release, or Go module readback exists yet. See the
-[v0.7 roadmap](docs/v0-7-roadmap.md),
+The published v0.7.0 release remains the historical base for this candidate.
+Its public package and module surfaces are not changed by the v0.8 work-stage
+candidate. See the [v0.7 roadmap](docs/v0-7-roadmap.md),
 [status index](docs/status/README.md), [skill catalog](skills/README.md), and
 [known language-profile debt](docs/governance/language-profile-known-debt.md).
 

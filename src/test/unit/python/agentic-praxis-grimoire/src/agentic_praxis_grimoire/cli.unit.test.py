@@ -24,18 +24,20 @@ from agentic_praxis_grimoire import __main__ as module_main  # noqa: E402
 def test_help_and_version_are_checkout_independent(capsys: pytest.CaptureFixture[str]) -> None:
     assert cli.main(["--help"]) == 0
     help_text = capsys.readouterr().out
-    for family in ("check", "skills", "test", "env", "report", "response", "release"):
+    for family in (
+        "check", "skills", "footprint", "test", "env", "report", "response", "release"
+    ):
         assert family in help_text
 
     assert cli.main(["--version"]) == 0
-    assert capsys.readouterr().out == "apgr 0.7.0\n"
+    assert capsys.readouterr().out == "apgr 0.8.0\n"
 
 
 def test_python_module_entry_point_routes_the_same_version_contract(
     capsys: pytest.CaptureFixture[str],
 ) -> None:
     assert module_main.main(["--version"]) == 0
-    assert capsys.readouterr().out == "apgr 0.7.0\n"
+    assert capsys.readouterr().out == "apgr 0.8.0\n"
     completed = subprocess.run(
         [sys.executable, "-m", "agentic_praxis_grimoire", "--version"],
         cwd=REPOSITORY_ROOT,
@@ -47,7 +49,7 @@ def test_python_module_entry_point_routes_the_same_version_contract(
         check=False,
     )
     assert completed.returncode == 0, completed.stderr
-    assert completed.stdout == "apgr 0.7.0\n"
+    assert completed.stdout == "apgr 0.8.0\n"
 
 
 @pytest.mark.parametrize(
@@ -134,6 +136,25 @@ def test_build_info_delegates_to_go_without_python_fallback(
     )
     assert cli.main(["build-info"]) == 19
     assert observed == [(["build-info"], None)]
+
+
+def test_footprint_delegates_exact_tail_to_go_without_python_fallback(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from agentic_praxis_grimoire import go_bridge
+
+    observed: list[tuple[list[str], Path | None]] = []
+    monkeypatch.setattr(
+        go_bridge,
+        "run",
+        lambda arguments, *, repository_root: observed.append(
+            (list(arguments), repository_root)
+        )
+        or 37,
+    )
+    tail = ["measure", "--format", "json", "--", "literal"]
+    assert cli.main(["footprint", *tail]) == 37
+    assert observed == [(["footprint", *tail], None)]
 
 
 def test_hotspot_analysis_delegates_exact_tail_to_go_without_python_fallback(

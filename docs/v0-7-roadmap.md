@@ -231,7 +231,9 @@ APG102 terminal status: the exact v0.7.0 release candidate is reproducible
 across three Go targets, three Python wheels and one source distribution, and
 the npm launcher plus three platform packages. Every target binary receives a
 real disposable runtime smoke. Direct, Python, and npm host paths share one
-binary; current JACA consumes the public Go packages in process; a real
+binary; a disposable JACA-owned adapter consumed the public Go packages in
+process during APG102 readiness without modifying JACA or creating a
+production dependency; a real
 selected-only Codex probe excludes the global APG corpus; exact v0.6
 reconstruction and isolated rollback pass; and the canonical broad gate is
 green. Publication-excluded packets bind the precise candidate and APG103
@@ -265,10 +267,10 @@ green.
 
 ## Current stop
 
-APG97 is the current complete candidate under dispatcher-owned finalization.
-It implements only the accepted deterministic skill/context bundle slice and
-leaves version 0.6.0 and the 39/39/39, 14/25, 9,504-byte, 9,492-character, and
-9,527-ceiling invariants unchanged. APG98 is the frozen next phase but begins
-only under a separately authorized dispatcher assignment. No environment,
-hotspot, response, final packaging, JACA, `.flakes`, Nix, release, publication,
-or successor implementation is authorized by this record.
+APG102 is the current complete readiness result. It qualifies the exact v0.7.0
+release candidate across the accepted package, target, JACA, discovery,
+historical, and rollback boundaries without publishing or deploying it. APG103
+is the frozen next phase and begins only under a separately authorized
+dispatcher assignment. No tag, registry artifact, immutable external readback,
+Nix handoff, deployment, active host mutation, or successor implementation is
+authorized by this record.

@@ -10,11 +10,12 @@ start with the [root README](../README.md).
   start, consumption choices, and release status.
 - [APGR CLI reference](reference/cli.md) — command families, exit behavior,
   build information, bridge rules, and safety boundaries.
-- [APG v0.7 distribution](distribution.md) — supported targets and locally
-  qualified Python/npm candidate architecture.
+- [APG distribution](distribution.md) — supported targets, the v0.7 public
+  baseline, and the v0.8 candidate package architecture.
 
-The latest published release is v0.6.0. The development tree is a locally
-qualified v0.7.0 release candidate; v0.7 packages are not yet published.
+The latest published release is v0.7.0. The development tree contains a
+v0.8.0 work-stage candidate; v0.8 packages and release artifacts are not yet
+published.
 
 ## Use the CLI
 
@@ -27,11 +28,14 @@ qualified v0.7.0 release candidate; v0.7 packages are not yet published.
 ## Embed the Go library
 
 - [Go library reference](reference/go-library.md) maps the public `schema`,
-  `report`, `skills`, `envsnap`, and `hotspot` packages.
+  `report`, `skills`, `envsnap`, `hotspot`, and additive `footprint` packages.
 - [APG–JACA integration boundary](architecture/apg-jaca-integration.md)
   defines the direct-import contract and the one-way dependency rule.
 - [v0.7 embeddable toolkit architecture](architecture/v0-7-embeddable-toolkit.md)
   is the complete product architecture.
+- [v0.8 context-footprint and skill-inventory contract](architecture/v0-8-context-footprint-and-skill-inventory.md)
+  owns the additive APGR program boundary, capacity decisions, and JACA
+  handoff pointer.
 
 ## Select skills and build task context
 
@@ -65,12 +69,11 @@ qualified v0.7.0 release candidate; v0.7 packages are not yet published.
 - [Hotspot analysis](guides/hotspot-analysis.md) documents traversal limits,
   capability levels, metrics, rankings, JSON, and renderers.
 
-Growth and churn analysis is not part of the v0.7 capability.
+Growth and churn analysis is not part of the v0.8 footprint capability.
 
 ## Understand distribution and installation
 
-- [APG v0.7 distribution](distribution.md) is the primary package and target
-  owner.
+- [APG distribution](distribution.md) is the primary package and target owner.
 - [Public release process](public-release-process.md) defines candidate,
   validation, and publication boundaries.
 - [User-scoped skill integration](user-scoped-skill-integration.md) covers
@@ -83,8 +86,11 @@ Growth and churn analysis is not part of the v0.7 capability.
 - [v0.7 embeddable toolkit architecture](architecture/v0-7-embeddable-toolkit.md)
   defines consumer-facing APIs, schemas, and ownership.
 
-Real JACA cross-consumer qualification remains owned by the later v0.7
-readiness phase.
+APG102 completed disposable JACA cross-consumer qualification without changing
+JACA or creating a production dependency. The published v0.7.0 package is now
+available for exact-version consumer qualification. The v0.8 footprint surface
+remains a candidate until its release and any JACA adoption remains
+JACA-owned and separately qualified.
 
 ## Review architecture and decisions
 
@@ -108,7 +114,9 @@ readiness phase.
 
 ## Check release status
 
-- [v0.7 roadmap](v0-7-roadmap.md) owns the current release sequence.
+- [v0.7 roadmap](v0-7-roadmap.md) preserves the published release sequence.
+- [v0.8 roadmap](v0-8-roadmap.md) records the active additive
+  context-footprint and skill-inventory work-stage sequence.
 - [Project roadmap](roadmap.md) provides the durable cross-release ledger.
 - [Status index](status/README.md) lists terminal phase exit records.
 - [Public release process](public-release-process.md) owns publication

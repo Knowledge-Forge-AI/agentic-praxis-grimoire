@@ -18,6 +18,7 @@ FAMILIES = (
     "build-info",
     "check",
     "skills",
+    "footprint",
     "test",
     "env",
     "analyze",
@@ -42,6 +43,7 @@ commands:
   build-info             show the packaged Go runtime identity
   check                  repository policy checks
   skills                 skill discovery, context, and projection commands
+  footprint              context-footprint measurement, comparison, and projection commands
   test                   configured repository test runner
   env                    portable environment profile and snapshot commands
   analyze                read-only structural hotspot analysis
@@ -325,6 +327,11 @@ def _dispatch(options: dict[str, str], arguments: list[str]) -> int:
         if owner is None:
             raise CliError("unknown skills command")
         return _repository_route(owner, arguments, options)
+
+    if family == "footprint":
+        from . import go_bridge
+
+        return go_bridge.run(["footprint", *arguments], repository_root=None)
 
     if family == "test":
         return _repository_route("apg-test", arguments, options)

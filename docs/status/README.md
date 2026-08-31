@@ -210,3 +210,5 @@ mechanical checker.
 - [`00149 — APG100 Complete Go Strangler and Multi-Ecosystem Distribution Exit`](2026/08/22/00149-apg100-complete-go-strangler-and-multi-ecosystem-distribution-exit.md)
 - [`00150 — APG101 Human Documentation and README Restructuring Exit`](2026/08/22/00150-apg101-human-documentation-restructuring-exit.md)
 - [`00151 — APG102 Cross-Consumer v0.7 Release Readiness Exit`](2026/08/22/00151-apg102-cross-consumer-v0-7-release-readiness-exit.md)
+- [`00152 — APG103 v0.7 Public Publication and Readback Exit`](2026/08/30/00152-apg103-v0-7-public-publication-and-readback-exit.md)
+- [`00153 — APG104 v0.8 Context-Footprint Implementation Candidate Exit`](2026/08/30/00153-apg104-v0-8-context-footprint-implementation-candidate-exit.md)

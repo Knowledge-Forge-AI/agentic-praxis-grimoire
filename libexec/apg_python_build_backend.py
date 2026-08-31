@@ -30,7 +30,10 @@ PROJECT_NAME = "agentic-praxis-grimoire"
 DIST_NAME = "agentic_praxis_grimoire"
 MODULE = "github.com/Knowledge-Forge-AI/agentic-praxis-grimoire"
 SUPPORTED_TARGETS = ("darwin/arm64", "linux/amd64", "linux/arm64")
-DEFAULT_EPOCH = 1_787_270_400
+# The editable backend defaults to the current release epoch. Historical
+# source archives retain their own backend value, and the historical build
+# helper binds v0.6 explicitly.
+DEFAULT_EPOCH = 1_788_134_400
 MANIFEST_SCHEMA = "apg.binary-manifest/v1"
 
 # The Python distribution is a thin compatibility front door.  Keep this
@@ -442,7 +445,16 @@ def _sdist_paths(root: Path) -> tuple[Path, ...]:
         path = root / relative
         _direct_file(path, relative)
         selected.append(path)
-    roots = ("cmd", "envsnap", "hotspot", "internal", "report", "schema", "skills")
+    roots = (
+        "cmd",
+        "envsnap",
+        "footprint",
+        "hotspot",
+        "internal",
+        "report",
+        "schema",
+        "skills",
+    )
     for name in roots:
         directory = root / name
         if not directory.is_dir() or directory.is_symlink():

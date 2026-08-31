@@ -33,7 +33,7 @@ def _artifact_root(tmp_path: Path, *, tamper: str | None = None) -> Path:
             digest = "0" * 64
         manifest = {
             "schema_version": distribution.MANIFEST_SCHEMA,
-            "version": "0.7.0",
+            "version": "0.8.0",
             "target": {
                 "go_target": target.go_target,
                 "goos": target.os_name,
@@ -54,7 +54,7 @@ def _artifact_root(tmp_path: Path, *, tamper: str | None = None) -> Path:
                 "corpus_fingerprint": CORPUS,
                 "schema_version": distribution.BUILD_INFO_SCHEMA,
                 "target": target.go_target,
-                "version": "0.7.0",
+                "version": "0.8.0",
             },
             "corpus_fingerprint": CORPUS,
             "module_path": distribution.MODULE_PATH,
@@ -82,9 +82,9 @@ def test_builds_exact_four_reproducible_packages_with_shared_contract(tmp_path: 
     assert [record.filename for record in records] == [record.filename for record in repeated]
     for record in records:
         assert (first / record.filename).read_bytes() == (second / record.filename).read_bytes()
-    assert distribution.check_packages(first, version="0.7.0")
+    assert distribution.check_packages(first, version="0.8.0")
 
-    launcher = next(path for path in first.glob("*.tgz") if "apgr-0.7.0" in path.name and "darwin" not in path.name and "linux" not in path.name)
+    launcher = next(path for path in first.glob("*.tgz") if "apgr-0.8.0" in path.name and "darwin" not in path.name and "linux" not in path.name)
     with tarfile.open(launcher, mode="r:gz") as archive:
         names = {member.name for member in archive}
     assert names == {
@@ -100,12 +100,12 @@ def test_platform_metadata_has_exact_restrictions_and_no_runtime_hooks(tmp_path:
     output = tmp_path / "bundle"
     distribution.build_packages(ROOT, _artifact_root(tmp_path), output, work_root=tmp_path)
     platform = output / distribution.npm_tarball_name(
-        "@knowledge-forge-ai/apgr-linux-x64", "0.7.0"
+        "@knowledge-forge-ai/apgr-linux-x64", "0.8.0"
     )
     members, contents = distribution._archive_members(platform)
     metadata = distribution._archive_package_json(contents, platform)
     assert metadata["name"] == "@knowledge-forge-ai/apgr-linux-x64"
-    assert metadata["version"] == "0.7.0"
+    assert metadata["version"] == "0.8.0"
     assert metadata["os"] == ["linux"]
     assert metadata["cpu"] == ["x64"]
     assert "scripts" not in metadata
@@ -292,7 +292,7 @@ def _rewrite_tarball(
 def test_launcher_tarball_contract_refusals_are_complete(tmp_path: Path) -> None:
     bundle = tmp_path / "bundle"
     distribution.build_packages(ROOT, _artifact_root(tmp_path), bundle, work_root=tmp_path)
-    launcher = bundle / distribution.npm_tarball_name(distribution.LAUNCHER_NAME, "0.7.0")
+    launcher = bundle / distribution.npm_tarball_name(distribution.LAUNCHER_NAME, "0.8.0")
     _, contents = distribution._archive_members(launcher)
     original = json.loads(contents["package/package.json"])
     cases: list[tuple[dict[str, object], str]] = []
@@ -330,7 +330,7 @@ def test_platform_tarball_contract_refusals_are_complete(tmp_path: Path) -> None
     bundle = tmp_path / "bundle"
     distribution.build_packages(ROOT, _artifact_root(tmp_path), bundle, work_root=tmp_path)
     platform = bundle / distribution.npm_tarball_name(
-        "@knowledge-forge-ai/apgr-linux-x64", "0.7.0"
+        "@knowledge-forge-ai/apgr-linux-x64", "0.8.0"
     )
     _, contents = distribution._archive_members(platform)
     original = json.loads(contents["package/package.json"])
@@ -352,7 +352,7 @@ def test_platform_tarball_contract_refusals_are_complete(tmp_path: Path) -> None
     value["apg"] = {}
     package_cases.append((value, "package identity"))
     value = dict(original)
-    value["version"] = "0.8.0"
+    value["version"] = "0.7.0"
     package_cases.append((value, "binary identity"))
 
     for index, (package, message) in enumerate(package_cases):
@@ -439,14 +439,14 @@ def test_preflight_publication_tarballs_and_manifest_disagreement(tmp_path: Path
     artifacts = _artifact_root(tmp_path)
     records = distribution.build_packages(ROOT, artifacts, bundle, work_root=tmp_path)
 
-    preflight = distribution.preflight_publication_tarballs(bundle, "0.7.0")
+    preflight = distribution.preflight_publication_tarballs(bundle, "0.8.0")
     assert [r.name for r in preflight] == list(distribution.PUBLICATION_ORDER)
 
     manifest = {
         "npm": {
             "launcher": {
                 "name": "@knowledge-forge-ai/apgr",
-                "filename": "knowledge-forge-ai-apgr-0.7.0.tgz",
+                "filename": "knowledge-forge-ai-apgr-0.8.0.tgz",
                 "sha256": next(r.sha256 for r in records if r.name == "@knowledge-forge-ai/apgr"),
                 "size_bytes": next(r.size_bytes for r in records if r.name == "@knowledge-forge-ai/apgr"),
             },
@@ -462,23 +462,23 @@ def test_preflight_publication_tarballs_and_manifest_disagreement(tmp_path: Path
             ],
         }
     }
-    checked = distribution.preflight_publication_tarballs(bundle, "0.7.0", manifest=manifest)
+    checked = distribution.preflight_publication_tarballs(bundle, "0.8.0", manifest=manifest)
     assert len(checked) == 4
 
     tampered_manifest = json.loads(json.dumps(manifest))
     tampered_manifest["npm"]["launcher"]["sha256"] = "0" * 64
     with pytest.raises(distribution.NpmDistributionError, match="disagrees with distribution manifest"):
-        distribution.preflight_publication_tarballs(bundle, "0.7.0", manifest=tampered_manifest)
+        distribution.preflight_publication_tarballs(bundle, "0.8.0", manifest=tampered_manifest)
 
     tampered_size = json.loads(json.dumps(manifest))
     tampered_size["npm"]["launcher"]["size_bytes"] = 999999
     with pytest.raises(distribution.NpmDistributionError, match="disagrees with distribution manifest"):
-        distribution.preflight_publication_tarballs(bundle, "0.7.0", manifest=tampered_size)
+        distribution.preflight_publication_tarballs(bundle, "0.8.0", manifest=tampered_size)
 
     incomplete_bundle = tmp_path / "incomplete"
     incomplete_bundle.mkdir()
     with pytest.raises(distribution.NpmDistributionError, match="missing npm tarball"):
-        distribution.preflight_publication_tarballs(incomplete_bundle, "0.7.0")
+        distribution.preflight_publication_tarballs(incomplete_bundle, "0.8.0")
 
 
 def test_classify_registry_state_and_fail_closed_plan() -> None:
@@ -580,4 +580,3 @@ def test_verify_credential_safety() -> None:
 
     with pytest.raises(distribution.NpmDistributionError, match="credential safety violation"):
         distribution.verify_credential_safety(["npm", "publish"], {"NODE_AUTH_TOKEN": "secret_token"})
-

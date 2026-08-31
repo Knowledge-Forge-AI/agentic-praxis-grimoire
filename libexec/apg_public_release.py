@@ -1399,6 +1399,65 @@ V07_PROJECTIONS = tuple(HISTORICAL_V06_PROJECTIONS)
 V07_SKILLS = tuple(HISTORICAL_V06_SKILLS)
 V07_CATEGORIES = tuple(HISTORICAL_V06_CATEGORIES)
 
+# v0.8 is an additive source candidate.  These policy tuples intentionally
+# have their own identity instead of mutating the v0.7 snapshot or reusing its
+# candidate-path oracle.  The v0.7 wrappers, helpers, skills, projections, and
+# validation categories remain unchanged; only the v0.8 footprint owners and
+# release-facing records are added to the critical-file contract.
+V08_WRAPPERS = tuple(V07_WRAPPERS)
+V08_HELPERS = tuple(V07_HELPERS)
+V08_TESTS = tuple(
+    sorted(
+        set(V07_TESTS)
+        | {
+            "footprint/comparison_test.go",
+            "footprint/flow_test.go",
+            "footprint/footprint_test.go",
+            "footprint/json_test.go",
+            "footprint/projection_test.go",
+            "footprint/registry_test.go",
+            "internal/cli/footprint_test.go",
+            "skills/footprint_test.go",
+            "testing/fixtures/external_consumer/consumer_test.go",
+        }
+    )
+)
+V08_CRITICAL = tuple(
+    sorted(
+        set(V07_CRITICAL)
+        | {
+            "docs/adr/2026/08/0052-v0-8-context-footprint-and-skill-inventory.md",
+            "docs/architecture/v0-8-context-footprint-and-skill-inventory.md",
+            "docs/evaluations/apg104-v0-8-context-footprint-and-skill-inventory.md",
+            "docs/reference/cli.md",
+            "docs/reference/go-library.md",
+            "docs/distribution.md",
+            "docs/v0-8-roadmap.md",
+            "docs/status/2026/08/30/00152-apg103-v0-7-public-publication-and-readback-exit.md",
+            "docs/status/2026/08/30/00153-apg104-v0-8-context-footprint-implementation-candidate-exit.md",
+            "footprint/compare.go",
+            "footprint/doc.go",
+            "footprint/errors.go",
+            "footprint/json.go",
+            "footprint/measure.go",
+            "footprint/project.go",
+            "footprint/testdata/record.golden.json",
+            "footprint/types.go",
+            "footprint/validation.go",
+            "internal/cli/footprint.go",
+            "skills/footprint.go",
+            "release/v0.8.0-notes.md",
+            "testing/fixtures/external_consumer/README.md",
+            "testing/fixtures/external_consumer/fixture-go.mod",
+            "testing/fixtures/external_consumer/main.go",
+        }
+    )
+)
+V08_LICENSING = tuple(V07_LICENSING)
+V08_PROJECTIONS = tuple(V07_PROJECTIONS)
+V08_SKILLS = tuple(V07_SKILLS)
+V08_CATEGORIES = tuple(V07_CATEGORIES)
+
 # Source-only test oracles and generated/local output never enter the
 # release-shaped v0.7 candidate. The compatibility wrappers above are not
 # excluded because they invoke the Go owner through the normal bridge.
@@ -2013,9 +2072,21 @@ def audited_policy_surfaces(version: str) -> tuple[dict[str, tuple[str, ...]], .
         "critical_files": V07_CRITICAL,
         "validation_categories": V07_CATEGORIES,
     }
+    current_v08 = {
+        "required_helpers": V08_HELPERS,
+        "required_licensing_files": V08_LICENSING,
+        "required_projections": V08_PROJECTIONS,
+        "required_skills": V08_SKILLS,
+        "required_test_entrypoints": V08_TESTS,
+        "required_wrappers": V08_WRAPPERS,
+        "critical_files": V08_CRITICAL,
+        "validation_categories": V08_CATEGORIES,
+    }
     if not SEMVER.fullmatch(version):
         fail("public release policy identity is malformed or unsupported")
     core = version.split("+", 1)[0].split("-", 1)[0]
+    if core == "0.8.0":
+        return (current_v08,)
     if core == "0.7.0":
         return (current_v07,)
     if core == "0.6.0":
@@ -2098,6 +2169,7 @@ def load_policy(
     *,
     expected_surfaces: Sequence[dict[str, tuple[str, ...]]] | None = None,
     allow_v07_compatibility: bool = False,
+    allow_v08_compatibility: bool = False,
 ) -> dict[str, object]:
     raw = committed_bytes(repository, POLICY_PATH)
     if len(raw) > 256 * 1024:
@@ -2132,6 +2204,11 @@ def load_policy(
         for surface in allowed_surfaces
     ):
         allowed_surfaces = (*allowed_surfaces, audited_policy_surfaces("0.7.0")[0])
+    if allow_v08_compatibility and any(
+        surface == audited_policy_surfaces("0.7.0")[0]
+        for surface in allowed_surfaces
+    ):
+        allowed_surfaces = (*allowed_surfaces, audited_policy_surfaces("0.8.0")[0])
     if not any(
         all(tuple(value[key]) == expected for key, expected in surface.items())
         for surface in allowed_surfaces
@@ -2196,6 +2273,32 @@ def is_v07_candidate_path(path: str | bytes) -> bool:
     return True
 
 
+def is_v08_candidate_path(path: str | bytes) -> bool:
+    """Return whether one source path belongs in the v0.8 public candidate."""
+
+    display = (
+        path.decode("utf-8", "surrogateescape")
+        if isinstance(path, bytes)
+        else path
+    )
+    if (
+        display == "private"
+        or display.startswith("private/")
+        or display in V07_EXCLUDED_PATHS
+        or display in V07_GENERATED_PATHS
+    ):
+        return False
+    if any(display.startswith(prefix) for prefix in V07_EXCLUDED_PREFIXES):
+        return False
+    if any(display.startswith(prefix) for prefix in V07_GENERATED_PREFIXES):
+        return False
+    if display.endswith(V07_GENERATED_SUFFIXES):
+        return False
+    if any(part == "__pycache__" or part.endswith(".egg-info") for part in display.split("/")):
+        return False
+    return True
+
+
 def public_candidate_entries(
     repository: Repository,
     version: str,
@@ -2206,6 +2309,8 @@ def public_candidate_entries(
 
     entries = tree_entries(repository, excluded_prefix=excluded_prefix)
     core = version.split("+", 1)[0].split("-", 1)[0]
+    if core == "0.8.0":
+        return tuple(entry for entry in entries if is_v08_candidate_path(entry.path))
     if core != "0.7.0":
         return entries
     return tuple(entry for entry in entries if is_v07_candidate_path(entry.path))
@@ -2314,6 +2419,7 @@ def build_manifest(
         repository,
         expected_surfaces=audited_policy_surfaces(selected_version),
         allow_v07_compatibility=True,
+        allow_v08_compatibility=True,
     )
     entries = public_candidate_entries(
         repository,
@@ -2368,6 +2474,14 @@ def validate_versioned_policy_exclusions(
     """Reject future owners from immutable historical public trees."""
 
     core = version.split("+", 1)[0].split("-", 1)[0]
+    if core == "0.8.0":
+        for entry in entries:
+            if not is_v08_candidate_path(entry.path):
+                fail(
+                    "public v0.8.0 contains a publication-excluded path: "
+                    + entry.display_path
+                )
+        return
     if core == "0.7.0":
         for entry in entries:
             if not is_v07_candidate_path(entry.path):
@@ -2724,6 +2838,7 @@ def build_candidate(
         source,
         expected_surfaces=audited_policy_surfaces(version),
         allow_v07_compatibility=True,
+        allow_v08_compatibility=True,
     )
     entries = public_candidate_entries(source, version, excluded_prefix=b"private/")
     validate_versioned_policy_exclusions(entries, version)
@@ -3060,6 +3175,7 @@ def check_candidate(
         source,
         expected_surfaces=audited_policy_surfaces(version),
         allow_v07_compatibility=True,
+        allow_v08_compatibility=True,
     )
     source_entries = public_candidate_entries(
         source, version, excluded_prefix=b"private/"

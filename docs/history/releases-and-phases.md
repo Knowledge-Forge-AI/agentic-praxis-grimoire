@@ -1343,3 +1343,50 @@ the locally qualified, unpublished v0.7.0 release candidate and changes no
 runtime, package, version, skill, maturity, JACA, Nix, or publication state.
 See the
 [APG101 evaluation](../evaluations/apg101-human-documentation-restructuring.md).
+
+## APG102 cross-consumer v0.7 release readiness
+
+APG102 qualifies the v0.7 candidate across the first-party Go, Python, and npm
+surfaces, target runtimes, historical reconstruction, selected-only discovery,
+and an independent external consumer fixture. It binds the ten-asset
+publication inventory and the public/registry readback sequence while keeping
+Nix as a non-activating consumer handoff. Its terminal phase-local state was a
+qualified but unpublished v0.7.0 candidate; the later APG103 publication
+record preserves that chronology.
+
+See the [APG102 evaluation](../evaluations/apg102-cross-consumer-v0-7-release-readiness.md)
+and [APG102 exit](../status/2026/08/22/00151-apg102-cross-consumer-v0-7-release-readiness-exit.md).
+
+## APG103 v0.7 public publication and readback
+
+APG103 completed the public v0.7.0 handoff. The public Knowledge Forge
+repository now has the append-only `v0.7.0` release commit
+`718344778e937629b8db7e164ae600a95142c05d` and its annotated `v0.7.0` tag,
+with public v0.6.0 as the sole release parent. The GitHub release readback
+confirmed the ten expected assets: one distribution manifest, one checksum
+manifest, three platform Python wheels, one Python source distribution, three
+platform npm packages, and one npm launcher package. Go module, PyPI, and npm
+registry readback confirmed the published v0.7.0 identities and integrity
+values.
+
+The APG100, APG101, and APG102 entries above retain their historical
+pre-publication wording; APG103 is the forward closure rather than a rewrite
+of those earlier records. No Nix activation, host mutation, or global APGR
+installation occurred.
+
+## APG104 v0.8 context-footprint implementation candidate
+
+APG104 is the current bounded APGR v0.8 delivery phase. Its CAP0 result keeps
+the historical description-integrity control, separates discovery and bundle
+cost surfaces, selects no new skill candidate, and defers the optional Caveman
+importer. Its CXT0 result freezes an additive `footprint` package and strict,
+deterministic, reference-preserving footprint, comparison, and projection
+records with fail-closed units, evidence, availability, fidelity, sensitivity,
+retention, and omission semantics.
+
+At this historical snapshot implementation and qualification remain in
+progress. The v0.8 candidate is not a release: deterministic artifacts,
+independent-consumer evidence, and dispatcher-owned pre-final review remain
+before any public publication. APG104 preserves v0.1.0 through v0.7.0
+reconstruction, does not modify JACA, and limits Nix to a read-only consumer
+handoff.

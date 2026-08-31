@@ -15,13 +15,13 @@ from src.test.apg_test_support import repository_root
 
 REPOSITORY_ROOT = repository_root(__file__)
 WORKFLOW = REPOSITORY_ROOT / ".github" / "workflows" / "release.yml"
-WHEEL_DARWIN = "agentic_praxis_grimoire-0.7.0-py3-none-macosx_11_0_arm64.whl"
-WHEEL_LINUX_X64 = "agentic_praxis_grimoire-0.7.0-py3-none-manylinux_2_17_x86_64.whl"
-WHEEL_LINUX_ARM64 = "agentic_praxis_grimoire-0.7.0-py3-none-manylinux_2_17_aarch64.whl"
+WHEEL_DARWIN = "agentic_praxis_grimoire-0.8.0-py3-none-macosx_11_0_arm64.whl"
+WHEEL_LINUX_X64 = "agentic_praxis_grimoire-0.8.0-py3-none-manylinux_2_17_x86_64.whl"
+WHEEL_LINUX_ARM64 = "agentic_praxis_grimoire-0.8.0-py3-none-manylinux_2_17_aarch64.whl"
 WHEELS = [WHEEL_DARWIN, WHEEL_LINUX_X64, WHEEL_LINUX_ARM64]
-SDIST = "agentic_praxis_grimoire-0.7.0.tar.gz"
+SDIST = "agentic_praxis_grimoire-0.8.0.tar.gz"
 EXPECTED_PYTHON_DIST = [*WHEELS, SDIST]
-NPM_TARBALL = "knowledge-forge-ai-apgr-0.7.0.tgz"
+NPM_TARBALL = "knowledge-forge-ai-apgr-0.8.0.tgz"
 MANIFEST_NAME = "apg-distribution-manifest.json"
 
 
@@ -38,7 +38,7 @@ def _fixture(
     manifest_corrupt_wheel_hash: bool = False,
     manifest_corrupt_version: bool = False,
     manifest_missing_wheel: bool = False,
-    tag: str = "v0.7.0",
+    tag: str = "v0.8.0",
     extra_wheel: bool = False,
     extra_sdist: bool = False,
     universal_wheel: bool = False,
@@ -79,7 +79,7 @@ def _fixture(
 
     manifest_obj = {
         "schema_version": "apg.distribution-manifest/v1",
-        "version": "0.6.0" if manifest_corrupt_version else "0.7.0",
+        "version": "0.7.0" if manifest_corrupt_version else "0.8.0",
         "python": {
             "package": "agentic-praxis-grimoire",
             "wheels": wheels_manifest,
@@ -118,12 +118,12 @@ def _fixture(
         (assets / "unexpected.whl").write_bytes(b"extra wheel")
         release_assets.append({"id": 101, "name": "unexpected.whl"})
     if universal_wheel:
-        universal_name = "agentic_praxis_grimoire-0.7.0-py3-none-any.whl"
+        universal_name = "agentic_praxis_grimoire-0.8.0-py3-none-any.whl"
         (assets / universal_name).write_bytes(b"universal wheel")
         release_assets.append({"id": 102, "name": universal_name})
     if extra_sdist:
-        (assets / "agentic_praxis_grimoire-0.7.0-extra.tar.gz").write_bytes(b"extra sdist")
-        release_assets.append({"id": 103, "name": "agentic_praxis_grimoire-0.7.0-extra.tar.gz"})
+        (assets / "agentic_praxis_grimoire-0.8.0-extra.tar.gz").write_bytes(b"extra sdist")
+        release_assets.append({"id": 103, "name": "agentic_praxis_grimoire-0.8.0-extra.tar.gz"})
     if duplicate_asset:
         release_assets.append({"id": 104, "name": WHEEL_DARWIN})
     if omit_asset:
@@ -156,7 +156,7 @@ def _run(
     manifest_corrupt_wheel_hash: bool = False,
     manifest_corrupt_version: bool = False,
     manifest_missing_wheel: bool = False,
-    tag: str = "v0.7.0",
+    tag: str = "v0.8.0",
     extra_wheel: bool = False,
     extra_sdist: bool = False,
     universal_wheel: bool = False,
@@ -295,4 +295,3 @@ def test_verification_step_rejects_unexpected_release_identity(
     result = _run(tmp_path, **arguments)
 
     assert result.returncode != 0
-

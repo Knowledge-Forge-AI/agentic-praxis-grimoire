@@ -144,6 +144,8 @@ than erasing the earlier decision.
   — Accepted with amendment
 - [`0051 — v0.7 Embeddable Toolkit Architecture and Roadmap`](2026/08/0051-v0-7-embeddable-toolkit-architecture-and-roadmap.md)
   — Accepted
+- [`0052 — v0.8 Context Footprint and Skill Inventory`](2026/08/0052-v0-8-context-footprint-and-skill-inventory.md)
+  — Accepted
 
 APG14 adds no ADR. The v0.2.0 release applies the accepted licensing, roadmap,
 distribution, lineage, and maturity decisions in ADRs 0005, 0006, 0009, and
@@ -645,3 +647,25 @@ hotspot capability reporting, a human documentation information architecture,
 and the bounded APG95 through APG103 sequence. APG94 adds no module, code,
 dependency, skill, maturity change, version, distribution, publication,
 deployment, JACA/`.flakes`/Nix change, or successor implementation.
+
+APG104 accepts ADR 0052 and records the canonical delivery phase for the
+additive APGR v0.8 context-footprint and skill-inventory slice. `APGR-CAP0` and
+`APGR-CXT0` are independent program-entry labels within APG104, not phase IDs.
+CAP0 re-attests the live public v0.7 baseline of 39 skills with 14 stable and
+25 provisional, 9,504 description bytes, 9,492 description characters, and the
+preserved 9,527-byte historical integrity limit with 23 bytes of headroom. Its
+separate accounting records 483,778 semantic-body bytes, 495,319 full-skill
+bytes, and 13,074 repository-only support bytes under corpus fingerprint
+`0509803b3c12e0366917a341c9d56945d7966897953415acf0c997254e1331c`.
+CAP0 adds no 250-byte/default discovery guard, keeps versioned controls and
+stable IDs, leaves the candidate count at zero, and defers candidate queues.
+CXT0 freezes the additive footprint package and versioned footprint,
+comparison, projection, component-registry, and capacity-control-mapping
+schemas with strict one-LF integer JSON, explicit missing states,
+domain-separated `fp`/`cmp`/`proj` SHA-256 identities, exact comparisons, and
+source-bound refusal projections. Sensitivity and retention labels remain
+`public`/`internal`/`confidential`/`restricted` and
+`ephemeral`/`task_scoped`/`retained`/`immutable`; JACA and providers gain no
+ownership. ADR 0052 is Accepted with compatibility and forward-only rollback;
+architecture is complete while implementation remains in progress, with no
+v0.8 test or release claim.

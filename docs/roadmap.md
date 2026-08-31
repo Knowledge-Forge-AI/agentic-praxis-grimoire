@@ -2213,8 +2213,9 @@ authorized.
 
 APG102 qualifies the exact v0.7.0 candidate across reproducible Go, Python,
 and npm artifacts; direct and installed command parity; real execution of all
-three supported target binaries; self-contained source rebuild; current JACA
-public-package imports; selected-only Codex discovery; environment resolution
+three supported target binaries; self-contained source rebuild; public-package
+imports exercised through a disposable JACA-owned adapter that created no
+production JACA dependency; selected-only Codex discovery; environment resolution
 with separate secret injection; hotspot structured consumption; exact v0.6
 reconstruction; and isolated package rollback.
 
@@ -2225,3 +2226,53 @@ surfaces are green. Exact publication inputs and immutable readback steps are
 bound in publication-excluded APG103 handoff evidence. APG102 changes no skill,
 maturity, target, package name, accepted public schema, active root, Nix state,
 tag, registry, or publication state. APG103 remains separately authorized.
+
+## APGR v0.8 context-footprint and skill-inventory program
+
+The [v0.8 architecture contract](architecture/v0-8-context-footprint-and-skill-inventory.md)
+integrates the APGR-owned capacity, selection-identity, footprint, projection,
+qualification, and consumer-boundary dispositions. The
+[v0.8 roadmap](v0-8-roadmap.md) makes only `APGR-CAP0` and `APGR-CXT0` eligible
+for separate architecture or read-only-measurement starts. The direct bounded
+operator assignment now authorizes APG104's implementation campaign, but it
+does not grant automatic successor authority. APG103 has already closed the
+v0.7 publication and readback handoff; APG104 is the current additive v0.8
+candidate and remains unpublished pending qualification and the dispatcher's
+pre-final review.
+
+## APG103 v0.7 public publication and readback
+
+APG103 completed the previously prepared v0.7 publication handoff. The public
+`v0.7.0` annotated tag resolves to release commit
+`718344778e937629b8db7e164ae600a95142c05d` in the Knowledge Forge public
+repository, with the accepted public `v0.6.0` release as its sole parent. The
+public GitHub release contains the ten expected assets: one distribution
+manifest, one checksum manifest, three platform Python wheels, one Python
+source distribution, three platform npm packages, and one npm launcher
+package. Public Go module, PyPI, and npm readback completed for the v0.7.0
+identities and integrity values.
+
+The earlier APG100, APG101, and APG102 entries intentionally describe the
+candidate as unpublished because that was their phase-local state. APG103
+updates the current release state without rewriting those historical entries.
+The v0.7.0 release is the exact public base for APG104. No Nix activation or
+host/profile mutation occurred; Nix remains a consumer-side handoff only.
+
+## APG104 v0.8 context-footprint implementation candidate
+
+APG104 is the canonical semantic delivery phase for the bounded APGR v0.8
+program. CAP0 retains the historical 9,527-byte integrity control, separates
+description, body, support, and materialized-bundle accounting, selects zero
+new skill candidates, and defers the optional Caveman importer. CXT0 freezes
+the additive `footprint` architecture, strict versioned records, deterministic
+domain-separated fingerprints, unit-safe comparisons, and reference-preserving
+projections with explicit unavailable, sensitivity, retention, fidelity, and
+omission states.
+
+Implementation and integration are in progress. Focused and complete
+qualification, deterministic release construction, independent consumer
+qualification, and the dispatcher-owned pre-final review remain required
+before any v0.8 publication. APG104 does not change the v0.7 public release,
+modify JACA, activate Nix, or authorize a successor phase. The optional
+importer and any skill-candidate work remain non-blocking and deferred unless
+their stated evidence gates pass.

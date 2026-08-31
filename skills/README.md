@@ -11,6 +11,13 @@ pytest, Minitest, Vitest, and GoMock test profiles, Dockerfile and Vagrantfile
 profiles, the Bash-to-Python conversion skill, the native Go and go-cmp test
 profiles, the Nix test profile, the Markdown language profile, and the
 TypeScript language profile.
+
+The v0.8 CAP0 decision adds no skill. RepoMap and Theme Forge candidate queues
+remain deferred because no candidate has the required reusable ownership,
+bounded materialization cost, anti-circularity evidence, external positive
+cases, and compatibility justification. The catalog therefore remains 39
+canonical leaves, 39 catalog rows, and 39 checked-in projections with fourteen
+stable and twenty-five provisional rows.
 APG13
 individually reviewed and promoted the six v0.2 catalog entries to `stable`
 after repeated real use,
