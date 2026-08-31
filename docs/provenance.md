@@ -2108,3 +2108,39 @@ tables, fixtures, or diagnostics are copied. Source versions are calibration
 evidence rather than project dependency requirements; mutable behavior is
 refresh-gated in each leaf. No dependency or notice obligation is added. This
 is bounded factual evidence, not legal advice.
+
+## APG103 v0.7 publication provenance
+
+APG103 records live public release evidence for the v0.7.0 publication. The
+public Knowledge Forge repository's annotated `v0.7.0` tag object
+`d27d4c4d8cd3127d069abdf62c52bfd042f85ab3` resolves to public release commit
+`718344778e937629b8db7e164ae600a95142c05d`, with public v0.6.0 as its sole
+release parent. GitHub, the Go module proxy, PyPI, and npm were read as
+external publication surfaces; the ten-asset inventory and published package
+integrity values were compared to the release contract. These public objects
+are release evidence, not a replacement for semantic phase identity.
+
+No private checkout, credential, local path, or unpublished operational payload
+is copied into the public provenance record. Nix was not activated or mutated;
+its role remains a read-only consumer handoff. This is bounded publication
+evidence, not legal advice.
+
+## APG104 v0.8 context-footprint provenance
+
+APG104's CAP0 and CXT0 decisions are independently authored APG expression
+derived from the accepted v0.8 architecture contract, the current public
+v0.7.0 boundary, and bounded measurements of the APG skill corpus. The
+historical 9,527-byte integrity control and prior v0.1.0 through v0.7.0
+release identities are preserved as distinct evidence. No provider runtime,
+credential mechanism, JACA control protocol, Nix activation, or third-party
+engine is adopted.
+
+The additive footprint, comparison, projection, component-registry, and
+capacity-mapping schemas, their canonical serialization rules, unit and
+availability semantics, source-preserving projection rules, and refusal
+boundaries are APG-authored. The Agent-Skunkworks proposal corpus is advisory
+input only; no proposal text, implementation, fixture, or private evidence is
+copied into the candidate. Zero new skill candidates are selected and the
+optional external importer is deferred because its required identity, rights,
+fixture, safety, and consumer-value evidence is absent. This is bounded
+architecture and implementation provenance, not legal advice.

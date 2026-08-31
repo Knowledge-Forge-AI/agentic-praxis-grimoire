@@ -19,7 +19,24 @@ import zlib
 COMMAND = "apg-normalize-python-sdist"
 V05_RELEASE_EPOCH = 1_700_000_000
 V06_RELEASE_EPOCH = 1_787_270_400
-RELEASE_EPOCHS = (V05_RELEASE_EPOCH, V06_RELEASE_EPOCH)
+# Release epochs are named policy values, rather than an arbitrary
+# SOURCE_DATE_EPOCH accepted by the normalizer.  Keep the v0.5/v0.6 values
+# immutable for historical reconstruction and add the public v0.7/v0.8
+# values as additive policy entries.
+V07_RELEASE_EPOCH = 1_787_529_600
+V08_RELEASE_EPOCH = 1_788_134_400
+RELEASE_EPOCHS = (
+    V05_RELEASE_EPOCH,
+    V06_RELEASE_EPOCH,
+    V07_RELEASE_EPOCH,
+    V08_RELEASE_EPOCH,
+)
+RELEASE_EPOCH_BY_VERSION = {
+    "0.5.0": V05_RELEASE_EPOCH,
+    "0.6.0": V06_RELEASE_EPOCH,
+    "0.7.0": V07_RELEASE_EPOCH,
+    "0.8.0": V08_RELEASE_EPOCH,
+}
 # The gzip header is the tighter of the gzip uint32 and tar timestamp bounds.
 MAX_ARCHIVE_MTIME = 0xFFFFFFFF
 _BLOCK_SIZE = 512
@@ -28,6 +45,20 @@ _ZERO_BLOCK = b"\0" * _BLOCK_SIZE
 
 class NormalizationError(ValueError):
     """Raised when an input archive cannot be safely normalized."""
+
+
+def release_epoch(version: str) -> int:
+    """Return the exact reproducible archive epoch for a released version."""
+
+    if not isinstance(version, str):
+        raise NormalizationError("release version must be a string")
+    core = version.split("+", 1)[0].split("-", 1)[0]
+    try:
+        return RELEASE_EPOCH_BY_VERSION[core]
+    except KeyError as error:
+        raise NormalizationError(
+            f"no reproducible release epoch is defined for version {version!r}"
+        ) from error
 
 
 @dataclass(frozen=True)

@@ -26,6 +26,9 @@ Commands:
   skills context-report report embedded discovery context
   skills resolve        resolve one strict structured bundle request
   skills materialize    materialize one previously resolved bundle
+  footprint measure     measure a strict footprint request
+  footprint compare     compare two canonical footprint records
+  footprint project     create a bounded source-bound projection
   env profile-check     validate one canonical environment profile
   env snapshot          capture and store a canonical environment snapshot
   env show              show snapshot metadata and entry names
@@ -100,6 +103,8 @@ func RunWithInput(ctx context.Context, arguments []string, stdin io.Reader, stdo
 		err = runReport(ctx, configuration, tail[1:], stdout)
 	case "skills":
 		err = runSkills(ctx, tail[1:], stdin, stdout)
+	case "footprint":
+		err = runFootprint(ctx, tail[1:], stdin, stdout)
 	case "env":
 		err = runEnv(ctx, tail[1:], stdin, stdout, stderr)
 	case "analyze":

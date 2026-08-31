@@ -217,10 +217,20 @@ def test_rejects_non_integer_or_out_of_range_epoch(tmp_path: Path) -> None:
             distribution.normalize_archive(source, tmp_path / f"{epoch}.tar.gz", epoch)
 
 
-def test_cli_epoch_preserves_v05_and_binds_v06() -> None:
+def test_cli_epoch_preserves_historical_values_and_binds_v08() -> None:
     assert distribution.V05_RELEASE_EPOCH == 1_700_000_000
     assert distribution.V06_RELEASE_EPOCH == 1_787_270_400
+    assert distribution.V07_RELEASE_EPOCH == 1_787_529_600
+    assert distribution.V08_RELEASE_EPOCH == 1_788_134_400
     assert distribution._epoch_argument("1700000000") == distribution.V05_RELEASE_EPOCH
     assert distribution._epoch_argument("1787270400") == distribution.V06_RELEASE_EPOCH
+    assert distribution._epoch_argument("1787529600") == distribution.V07_RELEASE_EPOCH
+    assert distribution._epoch_argument("1788134400") == distribution.V08_RELEASE_EPOCH
+    assert distribution.release_epoch("0.5.0") == distribution.V05_RELEASE_EPOCH
+    assert distribution.release_epoch("0.6.0") == distribution.V06_RELEASE_EPOCH
+    assert distribution.release_epoch("0.7.0") == distribution.V07_RELEASE_EPOCH
+    assert distribution.release_epoch("0.8.0+build.1") == distribution.V08_RELEASE_EPOCH
     with pytest.raises(argparse.ArgumentTypeError, match="release epoch"):
         distribution._epoch_argument("1700000001")
+    with pytest.raises(distribution.NormalizationError, match="no reproducible release epoch"):
+        distribution.release_epoch("0.9.0")

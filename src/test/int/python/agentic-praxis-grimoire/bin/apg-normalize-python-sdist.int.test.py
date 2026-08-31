@@ -156,7 +156,7 @@ def test_wrapper_rejects_archive_and_argument_error_boundaries(tmp_path: Path) -
         "1700000001",
     )
     assert wrong_release_epoch.returncode == 2
-    assert "release epoch must be one of 1700000000, 1787270400 seconds" in wrong_release_epoch.stderr
+    assert "release epoch must be one of 1700000000, 1787270400, 1787529600, 1788134400 seconds" in wrong_release_epoch.stderr
 
     cases = (
         ("parent", (("../escape.txt", "file"),), "parent"),

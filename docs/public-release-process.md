@@ -564,3 +564,54 @@ authority:
    package, enabling tokenless OIDC provenance publication for subsequent
    releases.
 
+## APG103 v0.7 public publication and readback
+
+APG103 closed the v0.7 publication handoff. The public `v0.7.0` release is
+present on the Knowledge Forge public repository: its annotated `v0.7.0` tag
+resolves to public release commit
+`718344778e937629b8db7e164ae600a95142c05d`, whose sole public-release parent is
+the accepted `v0.6.0` release. GitHub release readback found the ten expected
+release assets: one distribution manifest, one checksum manifest, three
+platform Python wheels, one Python source distribution, three platform npm
+packages, and one npm launcher package. The Go module, PyPI distribution, and
+the four npm package identities and integrity values were also read back from
+their public registries.
+
+This closes the earlier APG100, APG101, and APG102 wording that described
+v0.7.0 as an unpublished candidate. Those records remain historical accounts
+of their phase-local state; they are not a current publication claim. The
+v0.7.0 public tree and release lineage remain the exact base for the next
+candidate. No Nix activation or host mutation was part of APG103; Nix remains
+a consumer-side handoff only.
+
+## APGR v0.8 candidate and publication boundary
+
+The v0.8 release candidate retains the ten-asset shape established by v0.7.0:
+one manifest, one `SHA256SUMS` file, three platform Python wheels, one
+normalized source distribution, three platform npm packages, and one npm
+launcher package. The exact filenames, bytes, and hashes are candidate-bound
+and must be generated from the reviewed source and the public v0.7.0 base.
+No candidate asset or prepared packet is itself a published release.
+
+The immutable sequence is ordered as follows: complete the bounded CAP0/CXT0
+and implementation work; run the focused and release qualification gates;
+build the candidate, manifest, checksums, and independent consumer fixture;
+obtain the dispatcher-owned pre-final review; let the dispatcher finalize the
+development source; build from that exact source and the exact public v0.7.0
+base; publish the expected branch, annotated tag, release assets, Python
+packages, and npm packages in dependency order; and finally perform fresh
+immutable public and registry readback. Irreversible publication does not
+precede the pre-final review.
+
+The v0.8 npm packet adds a required negative metadata check. Package tarballs
+and fresh registry metadata must contain no private checkout reference,
+absolute local filesystem path, development-only identity, credential, or
+mutable local source reference in manifest, provenance, or npm metadata fields
+(including `_resolved` and `_from` when present). Any such observation stops
+the packet and invalidates the corresponding readback; public package URLs and
+integrity values are accepted only when they are the expected public values.
+
+Nix is not a v0.8 release artifact or activation path. Any Nix work is limited
+to a read-only consumer handoff and qualification record. It must not activate
+a host, change `.flakes`, install globally, mutate a profile, or become a
+prerequisite for the first-party APGR release.

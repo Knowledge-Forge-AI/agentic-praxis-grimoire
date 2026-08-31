@@ -24,6 +24,9 @@ apgr skills list
 apgr skills context-report
 apgr skills resolve
 apgr skills materialize
+apgr footprint measure
+apgr footprint compare
+apgr footprint project
 apgr env profile-check
 apgr env snapshot
 apgr env show
@@ -109,6 +112,37 @@ flatten maintenance remains Python-owned, and no migrated consumer route has a
 Python semantic fallback. The public contracts and operator syntax are
 documented in [Deterministic Skill Context Bundles](../guides/skill-context-bundles.md).
 
+## Context-footprint commands
+
+The `footprint` family is the CLI adapter for the public Go `footprint`
+package:
+
+```text
+apgr footprint measure ...
+apgr footprint compare ...
+apgr footprint project ...
+```
+
+`measure` emits a canonical `apg.context-footprint/v1` record from explicit
+local inputs. `compare` emits an integer-only
+`apg.context-comparison/v1` result for compatible control and treatment
+records. `project` emits a source-bound `apg.context-projection/v1` record with
+fidelity and omission disclosure. Each command supports `--help` for its
+current input and output contract and writes structured output suitable for
+capture by a caller-owned process.
+
+The commands do not execute providers or tokenizers, contact a registry, read
+credentials, select routes, or account for a provider or JACA's total context.
+Missing or unavailable observations remain explicit; they are not coerced to
+zero. Unknown schema versions, fields, units, mappings, malformed input,
+noncanonical bytes, incompatible comparisons, and consequence-bearing
+projection omissions fail closed.
+
+The Python `footprint` command family forwards its exact argument tail to this
+Go owner and has no Python semantic fallback. An installed v0.7 package does
+not provide the v0.8 footprint commands; the v0.8 candidate is a source and
+release-candidate surface until publication.
+
 ## Environment and hotspot analysis
 
 `apgr env` validates strict environment profiles, captures explicit
@@ -143,4 +177,4 @@ contains an independent response mutation implementation.
 
 The target-specific binary manifest, Python wheels and source distribution,
 npm launcher and platform packages, offline qualification, and unsupported
-target behavior are documented in [APG v0.7 Distribution](../distribution.md).
+target behavior are documented in [APG Distribution](../distribution.md).

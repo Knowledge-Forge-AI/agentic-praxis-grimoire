@@ -1,6 +1,11 @@
-# APG v0.7 Distribution
+# APG Distribution
 
-APG v0.7 has one editable release-version authority:
+The latest published APG release is v0.7.0. The v0.8.0 implementation is a
+work-stage release candidate and is not yet published to GitHub, Go module
+readback, PyPI, or npm. This document describes the v0.8 candidate surfaces
+while preserving the v0.7.0 public baseline.
+
+APG has one editable release-version authority:
 `src/agentic_praxis_grimoire/VERSION`. Release-like Go builds receive that
 value and the canonical skill-corpus fingerprint through linker injection.
 The Python and npm builders read the same file; generated package metadata is
@@ -8,12 +13,13 @@ never an additional version authority.
 
 ## Runtime ownership
 
-Go owns portable report, skill bundle, environment snapshot, hotspot, and
-response-capture semantics. Python is a thin compatibility front door for
-those command families. Python remains the intentional repository or host
-maintenance owner for change-size, phase-commit-message, record-identity,
-test orchestration, public-release preparation, user and global skill
-maintenance, flattening, and the legacy project-local symlink projection.
+Go owns portable report, skill bundle, environment snapshot, hotspot,
+response-capture, and context-footprint semantics. Python is a thin
+compatibility front door for those command families. Python remains the
+intentional repository or host maintenance owner for change-size,
+phase-commit-message, record-identity, test orchestration, public-release
+preparation, user and global skill maintenance, flattening, and the legacy
+project-local symlink projection.
 
 `check skill-library` retains Python topology, catalog, and projection checks,
 then requires the private Go CLI to compare the checked-out metadata and every
@@ -28,7 +34,10 @@ Each supported target has one canonical `apgr` byte sequence and one canonical
 `apg.binary-manifest/v1` document. The manifest binds the APG version, module,
 Go target, Python and npm target mappings, binary basename, byte size, SHA-256,
 corpus fingerprint, build flags, and build-information schema. It contains no
-time, local path, host, user, or random value.
+time, local path, host, user, or random value. The v0.8 candidate additionally
+exposes the public `footprint` package and its three context-footprint schema
+families; those identities are versioned independently from the binary
+manifest.
 
 The supported matrix is:
 
@@ -55,9 +64,11 @@ never downloads or searches `PATH` for an unrelated `apgr`.
 
 The v0.7 source distribution contains Go source, the canonical skills, the
 thin Python source, the dependency-free build backend, packaging helpers,
-metadata, and licenses. It contains no prebuilt executable. Building a wheel
-from the extracted source distribution requires a supported host and a local
-Go 1.25 toolchain; the resulting installed wheel does not require Go.
+metadata, and licenses. The v0.8 candidate adds the footprint source and
+corresponding public API documentation. Source distributions contain no
+prebuilt executable. Building a wheel from an extracted source distribution
+requires a supported host and a local Go 1.25 toolchain; the resulting
+installed wheel does not require Go.
 Unsupported build targets fail explicitly.
 
 ## npm distributions
@@ -99,6 +110,10 @@ source build uses the current checkout's version and corpus and is removed after
 the invocation. Installed wheels always use their bundled binary and never
 require a runtime compiler or network access.
 
-APG100 prepares a local v0.7.0 release candidate only. Tagging, GitHub, PyPI,
-npm publication, Nix integration, deployment, and activation remain outside
-this contract.
+The v0.7.0 release is the public baseline for this candidate. The v0.8.0
+candidate remains unpublished until the dispatcher-owned pre-final review and
+closeout publication sequence complete. No APGR-local Nix gate, host
+activation, global installation, or Nix configuration mutation is part of this
+candidate. A public v0.8 release must retain the v0.7 single-parent lineage,
+publish only reviewed assets, and pass fresh external readback before it is
+described as released.

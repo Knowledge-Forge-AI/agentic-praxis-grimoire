@@ -14,11 +14,81 @@ consumers import root packages directly; they do not import `cmd/apgr` or any
 | `skills` | Embedded corpus, deterministic bundle resolution, and isolated materialization | [Skill context bundles](../guides/skill-context-bundles.md) |
 | `envsnap` | Strict profiles, canonical snapshots, storage, loading, and resolution | [Environment snapshots](../guides/environment-snapshots.md) |
 | `hotspot` | Bounded structural analysis, stable results, and renderers | [Hotspot analysis](../guides/hotspot-analysis.md) |
+| `footprint` | Deterministic context-footprint records, comparisons, measurements, projections, and component/control registries | [Context footprints](#context-footprints) |
 
 APG exposes no orchestration package. A consumer supplies context, structured
 requests, repository or storage authority, and its own lifecycle decisions.
 The [APG–JACA boundary](../architecture/apg-jaca-integration.md) is the
 controlling integration contract.
+
+## Context footprints
+
+The additive `footprint` package is a provider-neutral data and validation
+owner. It measures explicit local inputs, compares compatible observations, and
+creates source-bound projections. It does not execute a provider or tokenizer,
+select a route, handle credentials, or own workflow or JACA authority.
+
+The public schema identities are:
+
+| Identity | Purpose |
+| --- | --- |
+| `apg.context-footprint/v1` | Canonical footprint records |
+| `apg.context-comparison/v1` | Treatment-minus-control comparisons |
+| `apg.context-projection/v1` | Bounded source-bound projections |
+| `apg.context-component-registry/v1` | Closed measurable-component registry |
+| `apg.capacity-control-mapping/v1` | Versioned component-to-control mapping |
+
+The primary operations accept `context.Context` and return a value or error:
+
+```go
+record, err := footprint.Measure(ctx, footprint.MeasureRequest{...})
+comparison, err := footprint.Compare(ctx, footprint.CompareRequest{...})
+projection, err := footprint.Project(ctx, footprint.ProjectRequest{...})
+```
+
+`Record` (also named `Footprint`) contains an `Observation`, named
+`Component` measurements, source references, and sensitivity/retention labels.
+`Metric` carries an explicit unit and an `available` or `unavailable` state;
+an unavailable metric has a reason and no value, while an available zero is a
+valid measurement. Built-in units include bytes, UTF-8 characters, and named
+provider-token units. APGR measures bytes and characters locally; callers must
+supply provider-token observations explicitly, and no unit conversion is
+performed implicitly.
+
+`Compare` requires matching observation dimensions and two available metrics in
+the same unit. It returns an integer treatment-minus-control `Delta`, binds the
+selected component, and retains both input record fingerprints. A unit,
+workload, method, harness, provider, tokenizer, repetition, study-design, or
+availability mismatch fails closed.
+
+`Project` retains the canonical source fingerprint, source schema, and source
+size. It records `exact`, `lossless_structural`, or `summarized_lossy` fidelity
+and sorted omitted fields. Authority, security, failure, diagnostic, finding,
+refusal, uncertainty, unavailable-state, source-binding, sensitivity, and
+retention content cannot be omitted; sensitivity and retention cannot be
+downgraded.
+
+`DefaultComponentRegistry` and `DefaultControlMapping` return the complete
+code-owned registries. `ValidateRecord`, `ValidateComparison`,
+`ValidateProjection`, `ValidateComponentRegistry`, and
+`ValidateControlMapping` validate in-memory values without publication or
+external I/O.
+
+### Canonical bytes and identities
+
+`CanonicalJSON` and the `MarshalRecord`, `MarshalComparison`,
+`MarshalProjection`, `MarshalComponentRegistry`, and `MarshalControlMapping`
+helpers emit compact UTF-8 JSON with deterministic field ordering, normalized
+set-like fields, and exactly one trailing LF. `DecodeRecord`,
+`DecodeComparison`, and `DecodeProjection` accept only canonical bytes and
+reject malformed JSON, unknown versions or fields, duplicate fields, invalid
+UTF-8, trailing data, noncanonical ordering, invalid mappings, and missing
+required values.
+
+`FingerprintRecord`, `FingerprintComparison`, and `FingerprintProjection`
+produce domain-separated SHA-256 identities with `fp-sha256:`,
+`cmp-sha256:`, and `proj-sha256:` prefixes. Registry and control-mapping
+identities use the `fp-sha256:` domain with their own schema identity.
 
 ## Reporting
 
@@ -82,8 +152,10 @@ embeddable Go reporting core.
 
 ## Related command and distribution surfaces
 
-The [APGR CLI reference](cli.md) documents command adapters, path and recovery
-operations, build information, and Python delegation. The
-[distribution contract](../distribution.md) documents supported targets and
-the locally qualified v0.7 Python/npm architecture. The v0.7 candidate is not
-published; cross-consumer readiness and publication remain later phases.
+The [APGR CLI reference](cli.md) documents command adapters, footprint
+operations, path and recovery operations, build information, and Python
+delegation. The [distribution contract](../distribution.md) documents
+supported targets, the published v0.7 baseline, and the v0.8 work-stage
+candidate architecture. The v0.8 candidate is not published; dispatcher
+pre-final review, Git finalization, and immutable external readback remain
+release-boundary actions.

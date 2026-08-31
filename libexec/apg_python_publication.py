@@ -9,6 +9,7 @@ making the current VERSION authority historical again.
 
 from __future__ import annotations
 
+from contextlib import contextmanager
 from dataclasses import dataclass
 from email.message import Message
 from email.parser import BytesParser
@@ -56,7 +57,10 @@ def _canonical_target_tags() -> dict[str, str]:
 
 
 TARGET_TAGS = _canonical_target_tags()
-EPOCH = getattr(distribution, "V07_RELEASE_EPOCH", distribution.V06_RELEASE_EPOCH)
+# ``EPOCH`` is the current release policy alias. Historical reconstruction
+# uses the named v0.6 value explicitly below; it must not silently inherit the
+# current release epoch.
+EPOCH = distribution.V08_RELEASE_EPOCH
 HISTORICAL_V06_VERSION = "0.6.0"
 HISTORICAL_V06_WHEEL_NAME = (
     f"{DIST_NAME}-{HISTORICAL_V06_VERSION}-py3-none-any.whl"
@@ -451,6 +455,8 @@ def _validate_sdist_sources(path: Path, *, version: str) -> None:
         _fail("sdist does not contain the complete Go/Python build source")
     if not any(name.startswith(root + "skills/") and name.endswith("/SKILL.md") for name in names):
         _fail("sdist does not contain canonical skill source")
+    if not any(name.startswith(root + "footprint/") and name.endswith(".go") for name in names):
+        _fail("sdist does not contain canonical footprint source")
 
 
 def validate_distributions(
@@ -469,6 +475,12 @@ def validate_distributions(
         historical = True
     source_root = source or Path(__file__).resolve().parent.parent
     selected_layout = layout(source_root, historical=historical)
+    try:
+        selected_epoch = distribution.release_epoch(selected_layout.version)
+    except distribution.NormalizationError as error:
+        raise PublicationError(
+            "publication version has no reproducible release epoch"
+        ) from error
     expected_wheel = (
         HISTORICAL_V06_WHEEL_NAME
         if historical
@@ -479,7 +491,7 @@ def validate_distributions(
     with tempfile.TemporaryDirectory(prefix=".apg-normalization-check-", dir=sdist.parent) as temporary:
         normalized = Path(temporary) / sdist.name
         try:
-            distribution.normalize_archive(sdist, normalized, EPOCH)
+            distribution.normalize_archive(sdist, normalized, selected_epoch)
         except distribution.NormalizationError as error:
             raise PublicationError("normalized sdist cannot be revalidated") from error
         if normalized.read_bytes() != sdist.read_bytes():
@@ -639,6 +651,21 @@ def _build_once(source: Path, root: Path, python: Path, seed: str) -> Path:
     return final
 
 
+@contextmanager
+def _release_epoch_environment(epoch: int):
+    """Bind build helpers to one named release epoch for this process."""
+
+    previous = os.environ.get("SOURCE_DATE_EPOCH")
+    os.environ["SOURCE_DATE_EPOCH"] = str(epoch)
+    try:
+        yield
+    finally:
+        if previous is None:
+            os.environ.pop("SOURCE_DATE_EPOCH", None)
+        else:
+            os.environ["SOURCE_DATE_EPOCH"] = previous
+
+
 def _compare(first: Path, second: Path, names: Sequence[str] | None = None) -> None:
     selected = tuple(names or sorted(entry.name for entry in first.iterdir()))
     for name in selected:
@@ -672,8 +699,15 @@ def build_bundle(
     if any((work / f"build-{seed}").exists() for seed in ("a", "b")):
         _fail("publication build roots must not already exist")
     selected_layout = layout(source_root)
-    first = _build_once(source_root, work, python, "a")
-    second = _build_once(source_root, work, python, "b")
+    try:
+        selected_epoch = distribution.release_epoch(selected_layout.version)
+    except distribution.NormalizationError as error:
+        raise PublicationError(
+            "publication version has no reproducible release epoch"
+        ) from error
+    with _release_epoch_environment(selected_epoch):
+        first = _build_once(source_root, work, python, "a")
+        second = _build_once(source_root, work, python, "b")
     _compare(first, second, selected_layout.artifact_names)
     expected = set(selected_layout.artifact_names)
     if {entry.name for entry in first.iterdir()} != expected:
@@ -714,7 +748,7 @@ def build_historical_bundle(
             "PATH": os.environ.get("PATH", "/usr/bin:/bin"),
             "PYTHONDONTWRITEBYTECODE": "1",
             "PYTHONHASHSEED": "0",
-            "SOURCE_DATE_EPOCH": str(EPOCH),
+            "SOURCE_DATE_EPOCH": str(distribution.V06_RELEASE_EPOCH),
             "TMPDIR": os.fspath(build_root),
             "TZ": "UTC",
         }
@@ -732,7 +766,11 @@ def build_historical_bundle(
         _regular(wheel, "historical wheel")
         _regular(sdist, "historical sdist")
         (final / HISTORICAL_V06_WHEEL_NAME).write_bytes(wheel.read_bytes())
-        distribution.normalize_archive(sdist, final / HISTORICAL_V06_SDIST_NAME, EPOCH)
+        distribution.normalize_archive(
+            sdist,
+            final / HISTORICAL_V06_SDIST_NAME,
+            distribution.V06_RELEASE_EPOCH,
+        )
         (final / "SHA256SUMS").write_bytes(checksum_bytes(final, historical=True))
     _compare(first_root / "publication", second_root / "publication", HISTORICAL_V06_BUNDLE_NAMES)
     os.replace(first_root / "publication", output)
@@ -744,7 +782,7 @@ def parser() -> Any:
 
     command = argparse.ArgumentParser(
         prog=COMMAND,
-        description="Build or validate deterministic v0.7 Python platform distributions.",
+        description="Build or validate deterministic v0.8 Python platform distributions.",
     )
     subcommands = command.add_subparsers(dest="subcommand", required=True)
     build = subcommands.add_parser("build", help="build three wheels and one sdist twice")
@@ -757,7 +795,7 @@ def parser() -> Any:
     historical.add_argument("--output", required=True, type=Path)
     historical.add_argument("--work-root", required=True, type=Path)
     historical.add_argument("--python", default=Path(sys.executable), type=Path)
-    check = subcommands.add_parser("check", help="validate one exact v0.7 bundle")
+    check = subcommands.add_parser("check", help="validate one exact v0.8 bundle")
     check.add_argument("--bundle", required=True, type=Path)
     historical_check = subcommands.add_parser("check-v06", help="validate one historical v0.6 bundle")
     historical_check.add_argument("--bundle", required=True, type=Path)

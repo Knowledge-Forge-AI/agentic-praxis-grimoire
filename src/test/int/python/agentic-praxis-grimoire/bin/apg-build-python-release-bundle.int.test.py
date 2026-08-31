@@ -81,7 +81,11 @@ def _historical_bundle(root: Path) -> Path:
             archive.addfile(info, BytesIO(metadata))
     raw = root / "raw.tar.gz"
     raw.write_bytes(payload.getvalue())
-    distribution.normalize_archive(raw, bundle / publication.HISTORICAL_V06_SDIST_NAME, publication.EPOCH)
+    distribution.normalize_archive(
+        raw,
+        bundle / publication.HISTORICAL_V06_SDIST_NAME,
+        distribution.V06_RELEASE_EPOCH,
+    )
     raw.unlink()
     (bundle / publication.CHECKSUM_NAME).write_bytes(
         publication.checksum_bytes(bundle, historical=True)

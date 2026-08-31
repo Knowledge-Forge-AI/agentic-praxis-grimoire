@@ -151,6 +151,11 @@ prerequisite, never a fabricated fact.
 - [v0.7 roadmap](docs/v0-7-roadmap.md): reporting, CLI, context, environment,
   analysis, packaging, documentation, readiness, and publication slices without
   automatic successor authority.
+- [v0.8 architecture contract](docs/architecture/v0-8-context-footprint-and-skill-inventory.md):
+  APGR-owned capacity, selection identity, footprint, projection, qualification,
+  and JACA consumer-handoff boundaries without implementation authority.
+- [v0.8 roadmap](docs/v0-8-roadmap.md): CAP0 and CXT0 architecture entries and
+  dependency-ordered additive successors without automatic start authority.
 - [APG85 architecture evaluation](docs/evaluations/apg85-v0-6-architecture-discoverability-and-context-budget.md):
   budget derivation from measured evidence, enforcement ownership, and the
   stated-but-unenforced limitation boundary.
@@ -194,6 +199,10 @@ prerequisite, never a fabricated fact.
   concise landing-page onboarding, frozen task-oriented documentation owners,
   preserved phase archaeology, explicit v0.6-public/v0.7-candidate status, and
   the APG102 stop boundary.
+- [APG104 v0.8 context-footprint and skill-inventory delivery](docs/evaluations/apg104-v0-8-context-footprint-and-skill-inventory.md):
+  CAP0/CXT0 capacity and footprint contracts, additive package ownership,
+  fail-closed evidence boundaries, and the current implementation/pre-final
+  review boundary.
 - [APG41 readiness evaluation](docs/evaluations/apg41-v0-4-readiness-and-pre-release-smoke.md):
   retained provisional dispositions, candidate smoke, limitations, and the
   publication boundary.
@@ -1256,3 +1265,32 @@ Published v0.6.0 and the unpublished, locally qualified v0.7.0 release
 candidate are explicit. APG101 changes no runtime, package, version, skill,
 maturity, JACA, Nix, active integration, or publication state. APG102 remains
 separately authorized.
+
+## APG103 v0.7 public publication and readback
+
+APG103 completed the v0.7.0 public publication handoff. The annotated public
+`v0.7.0` tag resolves to release commit
+`718344778e937629b8db7e164ae600a95142c05d` with public v0.6.0 as its sole
+release parent. The ten-asset GitHub release, Go module, PyPI distribution,
+and four npm package surfaces were read back from their public registries.
+Earlier APG100 through APG102 candidate wording remains historical to those
+phase-local states and is not a current unpublished-release assertion. No Nix
+activation, host/profile mutation, or global APGR installation occurred.
+
+## APG104 v0.8 context-footprint implementation candidate
+
+APG104 is the current canonical semantic phase for the bounded APGR v0.8
+delivery campaign. CAP0 retains the historical 9,527-byte integrity control,
+separates discovery and materialization cost surfaces, selects zero new skill
+candidates, and defers the optional external importer. CXT0 freezes the
+additive `footprint` package, strict versioned records, deterministic
+domain-separated fingerprints, unit-safe comparisons, and
+reference-preserving projections with explicit unavailable, sensitivity,
+retention, fidelity, and omission handling.
+
+Implementation and qualification remain in progress. No v0.8 release,
+publication, deployment, JACA mutation, or host/Nix activation is authorized
+by this repository instruction. The candidate requires focused and complete
+qualification, the independent public-consumer fixture, and the
+dispatcher-owned pre-final review before any closeout publication. Any future
+successor still requires separate authority.

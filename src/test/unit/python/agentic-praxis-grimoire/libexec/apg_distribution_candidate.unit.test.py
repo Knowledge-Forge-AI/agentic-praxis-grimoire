@@ -23,7 +23,7 @@ sys.path.insert(0, str(ROOT / "libexec"))
 import apg_distribution_candidate as candidate  # noqa: E402
 
 
-VERSION = "0.7.0"
+VERSION = "0.8.0"
 
 
 def _source(tmp_path: Path) -> tuple[Path, str]:
@@ -143,6 +143,7 @@ def _sdist(root: Path) -> Path:
         f"{prefix}/src/agentic_praxis_grimoire/VERSION": (VERSION + "\n").encode("ascii"),
         f"{prefix}/libexec/apg_go_build.py": b"# go builder\n",
         f"{prefix}/libexec/apg_python_build_backend.py": b"# backend\n",
+        f"{prefix}/footprint/doc.go": b"package footprint\n",
         f"{prefix}/skills/example/SKILL.md": b"# canonical\n",
     }
     with path.open("wb") as stream:
@@ -531,7 +532,7 @@ def test_distribution_binary_manifest_refusal_matrix_is_complete(tmp_path: Path)
     original = json.loads(_binary_manifest("linux/amd64", binary, corpus))
     mutations = (
         ("schema_version", "unknown/v1", "schema"),
-        ("version", "0.8.0", "version"),
+        ("version", "0.7.0", "version"),
         ("target", dict(candidate.TARGET_BY_GO["darwin/arm64"]), "target"),
         ("target", {**original["target"], "npm_cpu": "arm64"}, "target mapping"),
         ("binary_name", "wrong", "binary name"),
@@ -784,7 +785,7 @@ def test_distribution_sdist_refusals_are_complete(tmp_path: Path) -> None:
         ("writable", {"add": (f"{prefix}/writable", b"data", 0o666, tarfile.REGTYPE)}, "world-writable"),
         ("binary", {"add": (f"{prefix}/src/bin/apgr", b"binary", 0o755, tarfile.REGTYPE)}, "prebuilt Go binary"),
         ("incomplete", {"remove": f"{prefix}/go.mod"}, "complete Go/Python/skill"),
-        ("version", {"replace": (f"{prefix}/src/agentic_praxis_grimoire/VERSION", b"0.8.0\n")}, "VERSION differs"),
+        ("version", {"replace": (f"{prefix}/src/agentic_praxis_grimoire/VERSION", b"0.7.0\n")}, "VERSION differs"),
     )
     for name, arguments, message in cases:
         path = tmp_path / name / original.name
@@ -820,7 +821,7 @@ def test_distribution_npm_refusals_are_complete(tmp_path: Path) -> None:
     value["apg"] = {}
     launcher_cases.append(("identity", value, "bound to the corpus"))
     value = dict(launcher_json)
-    value["version"] = "0.8.0"
+    value["version"] = "0.7.0"
     launcher_cases.append(("version", value, "package identity"))
     for name, package, message in launcher_cases:
         path = tmp_path / f"launcher-{name}.tgz"
@@ -933,4 +934,3 @@ def test_authoritative_release_asset_inventory_and_roles() -> None:
         assert classified == expected
 
     assert candidate.classify_release_asset("unknown.whl", VERSION) is None
-
