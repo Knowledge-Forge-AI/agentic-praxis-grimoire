@@ -18,12 +18,20 @@ import json
 import os
 from pathlib import Path
 import platform
+import posixpath
+import re
 import stat
 import sys
 import tarfile
 import tempfile
 from typing import Any, Mapping
+from urllib.parse import urlsplit
 import zipfile
+
+try:
+    import tomllib
+except ImportError:
+    import tomli as tomllib  # type: ignore[no-redef]
 
 
 PROJECT_NAME = "agentic-praxis-grimoire"
@@ -33,8 +41,9 @@ SUPPORTED_TARGETS = ("darwin/arm64", "linux/amd64", "linux/arm64")
 # The editable backend defaults to the current release epoch. Historical
 # source archives retain their own backend value, and the historical build
 # helper binds v0.6 explicitly.
-DEFAULT_EPOCH = 1_788_134_400
+DEFAULT_EPOCH = 1_788_393_600
 MANIFEST_SCHEMA = "apg.binary-manifest/v1"
+PUBLIC_REPOSITORY_URL = "https://github.com/Knowledge-Forge-AI/agentic-praxis-grimoire"
 
 # The Python distribution is a thin compatibility front door.  Keep this
 # allowlist explicit so a legacy consumer module cannot enter a public wheel
@@ -344,15 +353,98 @@ def _binary_for_build(
 
 def _metadata(root: Path) -> bytes:
     version = _version(root)
-    return (
-        "Metadata-Version: 2.4\n"
-        f"Name: {PROJECT_NAME}\n"
-        f"Version: {version}\n"
-        "Summary: Bounded language, tooling, and agent workflow guidance for Agentic Praxis Grimoire.\n"
-        "Requires-Python: >=3.10\n"
-        "License-Expression: AGPL-3.0-or-later\n"
-        "Requires-Dist: tomli>=2.0.1; python_version < \"3.11\"\n\n"
-    ).encode("utf-8")
+    readme_path = _direct_file(root / "README.md", "README.md")
+    readme_text = readme_path.read_text(encoding="utf-8")
+    if not readme_text.strip():
+        raise BackendError("README.md is empty; package description is required")
+    try:
+        parsed_pyproject = tomllib.loads(
+            (root / "pyproject.toml").read_text(encoding="utf-8")
+        )
+        pyproject = parsed_pyproject["project"]
+    except (KeyError, OSError, TypeError, tomllib.TOMLDecodeError) as error:
+        raise BackendError("pyproject.toml project metadata is unavailable") from error
+    if not isinstance(pyproject, dict):
+        raise BackendError("pyproject.toml project metadata is malformed")
+    urls = pyproject.get("urls")
+    if not isinstance(urls, dict):
+        raise BackendError("pyproject.toml project URLs are malformed")
+    license_files = _license_files(root, pyproject)
+    header_lines = [
+        "Metadata-Version: 2.4",
+        f"Name: {PROJECT_NAME}",
+        f"Version: {version}",
+        f"Summary: {pyproject['description']}",
+        f"Author: {pyproject['authors'][0]['name']}",
+        f"License-Expression: {pyproject['license']}",
+        f"Project-URL: Source, {urls['Source']}",
+        f"Project-URL: Documentation, {urls['Documentation']}",
+        f"Project-URL: Issues, {urls['Issues']}",
+        f"Project-URL: Changelog, {urls['Changelog']}",
+        f"Project-URL: Commercial Licensing, {urls['Commercial Licensing']}",
+    ]
+    header_lines.extend(f"License-File: {name}" for name in license_files)
+    for classifier in pyproject["classifiers"]:
+        header_lines.append(f"Classifier: {classifier}")
+    header_lines.append(f"Requires-Python: {pyproject['requires-python']}")
+    header_lines.append("Description-Content-Type: text/markdown")
+    for dep in pyproject["dependencies"]:
+        header_lines.append(f"Requires-Dist: {dep}")
+    header = "\n".join(header_lines) + "\n\n"
+    return (header + _package_readme(readme_text, version)).encode("utf-8")
+
+
+def _license_files(root: Path, project: Mapping[str, Any]) -> tuple[str, ...]:
+    values = project.get("license-files")
+    if not isinstance(values, list) or not values or any(
+        not isinstance(value, str) or not value for value in values
+    ):
+        raise BackendError("project license-files metadata is malformed")
+    result: list[str] = []
+    for value in values:
+        relative = Path(value)
+        if relative.is_absolute() or ".." in relative.parts:
+            raise BackendError(f"project license file path is unsafe: {value}")
+        _direct_file(root / relative, value)
+        result.append(relative.as_posix())
+    return tuple(result)
+
+
+_MARKDOWN_LINK = re.compile(r"(?P<prefix>\]\()(?P<target><[^>\n]+>|[^)\s]+)")
+
+
+def _package_readme(readme_text: str, version: str) -> str:
+    """Resolve repository-relative README links for package registries.
+
+    The source README remains repository-relative for GitHub.  Package
+    registries render it outside that checkout, so relative links are pinned to
+    the source tag represented by the package version.  The tag may be pending
+    publication during source qualification; the local release projection
+    validates the target paths separately.
+    """
+
+    base = f"{PUBLIC_REPOSITORY_URL}/blob/v{version}/"
+
+    def replace(match: re.Match[str]) -> str:
+        raw_target = match.group("target")
+        wrapped = raw_target.startswith("<") and raw_target.endswith(">")
+        target = raw_target[1:-1] if wrapped else raw_target
+        parsed = urlsplit(target)
+        if parsed.scheme or parsed.netloc or not parsed.path:
+            return match.group(0)
+        path = posixpath.normpath(parsed.path)
+        if path == "." or path.startswith("../") or path == "..":
+            raise BackendError(f"README link escapes the repository root: {target}")
+        resolved = f"{base}{path}"
+        if parsed.query:
+            resolved += f"?{parsed.query}"
+        if parsed.fragment:
+            resolved += f"#{parsed.fragment}"
+        if wrapped:
+            resolved = f"<{resolved}>"
+        return f"{match.group('prefix')}{resolved}"
+
+    return _MARKDOWN_LINK.sub(replace, readme_text)
 
 
 def _dist_info(root: Path) -> str:
@@ -381,9 +473,11 @@ def _wheel_entries(root: Path, binary: BinaryIdentity) -> dict[str, tuple[bytes,
         b"[console_scripts]\napgr = agentic_praxis_grimoire.__main__:main\n",
         0o644,
     )
-    for license_name in ("LICENSE", "NOTICE", "COMMERCIAL-LICENSE.md"):
+    project = tomllib.loads((root / "pyproject.toml").read_text(encoding="utf-8"))["project"]
+    if not isinstance(project, dict):
+        raise BackendError("pyproject.toml project metadata is malformed")
+    for license_name in _license_files(root, project):
         license_path = root / license_name
-        _direct_file(license_path, license_name)
         entries[f"{info}/licenses/{license_name}"] = (license_path.read_bytes(), 0o644)
     return entries
 
@@ -483,7 +577,7 @@ def _sdist_paths(root: Path) -> tuple[Path, ...]:
 
 
 def _sdist_metadata(root: Path) -> bytes:
-    return _metadata(root).replace(b"Summary:", b"Summary:")
+    return _metadata(root)
 
 
 def _write_sdist(root: Path, output_directory: Path) -> str:

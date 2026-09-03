@@ -15,7 +15,7 @@ sys.path.insert(0, str(ROOT / "libexec"))
 
 import apg_npm_distribution as distribution  # noqa: E402
 
-
+CURRENT_VERSION = distribution.version_authority(ROOT)
 CORPUS = "a" * 64
 
 
@@ -33,7 +33,7 @@ def _artifact_root(tmp_path: Path, *, tamper: str | None = None) -> Path:
             digest = "0" * 64
         manifest = {
             "schema_version": distribution.MANIFEST_SCHEMA,
-            "version": "0.8.0",
+            "version": CURRENT_VERSION,
             "target": {
                 "go_target": target.go_target,
                 "goos": target.os_name,
@@ -54,7 +54,7 @@ def _artifact_root(tmp_path: Path, *, tamper: str | None = None) -> Path:
                 "corpus_fingerprint": CORPUS,
                 "schema_version": distribution.BUILD_INFO_SCHEMA,
                 "target": target.go_target,
-                "version": "0.8.0",
+                "version": CURRENT_VERSION,
             },
             "corpus_fingerprint": CORPUS,
             "module_path": distribution.MODULE_PATH,
@@ -82,14 +82,15 @@ def test_builds_exact_four_reproducible_packages_with_shared_contract(tmp_path: 
     assert [record.filename for record in records] == [record.filename for record in repeated]
     for record in records:
         assert (first / record.filename).read_bytes() == (second / record.filename).read_bytes()
-    assert distribution.check_packages(first, version="0.8.0")
+    assert distribution.check_packages(first, version=CURRENT_VERSION)
 
-    launcher = next(path for path in first.glob("*.tgz") if "apgr-0.8.0" in path.name and "darwin" not in path.name and "linux" not in path.name)
+    launcher = next(path for path in first.glob("*.tgz") if f"apgr-{CURRENT_VERSION}" in path.name and "darwin" not in path.name and "linux" not in path.name)
     with tarfile.open(launcher, mode="r:gz") as archive:
         names = {member.name for member in archive}
     assert names == {
         "package/package.json",
         "package/index.js",
+        "package/README.md",
         "package/LICENSE",
         "package/NOTICE",
         "package/COMMERCIAL-LICENSE.md",
@@ -100,18 +101,38 @@ def test_platform_metadata_has_exact_restrictions_and_no_runtime_hooks(tmp_path:
     output = tmp_path / "bundle"
     distribution.build_packages(ROOT, _artifact_root(tmp_path), output, work_root=tmp_path)
     platform = output / distribution.npm_tarball_name(
-        "@knowledge-forge-ai/apgr-linux-x64", "0.8.0"
+        "@knowledge-forge-ai/apgr-linux-x64", CURRENT_VERSION
     )
     members, contents = distribution._archive_members(platform)
     metadata = distribution._archive_package_json(contents, platform)
     assert metadata["name"] == "@knowledge-forge-ai/apgr-linux-x64"
-    assert metadata["version"] == "0.8.0"
+    assert metadata["version"] == CURRENT_VERSION
     assert metadata["os"] == ["linux"]
     assert metadata["cpu"] == ["x64"]
     assert "scripts" not in metadata
     assert "dependencies" not in metadata
     assert members["package/bin/apgr"].mode & 0o111
     assert not members["package/bin/apgr"].mode & 0o002
+
+
+def test_all_npm_tarballs_carry_discovery_metadata_and_readme(tmp_path: Path) -> None:
+    output = tmp_path / "bundle"
+    records = distribution.build_packages(ROOT, _artifact_root(tmp_path), output, work_root=tmp_path)
+    assert len(records) == 4
+    for record in records:
+        archive_path = output / record.filename
+        _, contents = distribution._archive_members(archive_path)
+        metadata = distribution._archive_package_json(contents, archive_path)
+        assert metadata["version"] == CURRENT_VERSION
+        assert metadata["description"]
+        assert metadata["license"] == "AGPL-3.0-or-later"
+        assert metadata["repository"]["url"].startswith("git+https://github.com/")
+        assert metadata["homepage"].startswith("https://")
+        assert metadata["bugs"]["url"].startswith("https://")
+        assert metadata["keywords"]
+        readme = contents["package/README.md"]
+        assert readme.strip()
+        assert b"__APG_" not in readme
 
 
 def test_manifest_tamper_and_missing_identity_fail_closed(tmp_path: Path) -> None:
@@ -292,7 +313,7 @@ def _rewrite_tarball(
 def test_launcher_tarball_contract_refusals_are_complete(tmp_path: Path) -> None:
     bundle = tmp_path / "bundle"
     distribution.build_packages(ROOT, _artifact_root(tmp_path), bundle, work_root=tmp_path)
-    launcher = bundle / distribution.npm_tarball_name(distribution.LAUNCHER_NAME, "0.8.0")
+    launcher = bundle / distribution.npm_tarball_name(distribution.LAUNCHER_NAME, CURRENT_VERSION)
     _, contents = distribution._archive_members(launcher)
     original = json.loads(contents["package/package.json"])
     cases: list[tuple[dict[str, object], str]] = []
@@ -330,7 +351,7 @@ def test_platform_tarball_contract_refusals_are_complete(tmp_path: Path) -> None
     bundle = tmp_path / "bundle"
     distribution.build_packages(ROOT, _artifact_root(tmp_path), bundle, work_root=tmp_path)
     platform = bundle / distribution.npm_tarball_name(
-        "@knowledge-forge-ai/apgr-linux-x64", "0.8.0"
+        "@knowledge-forge-ai/apgr-linux-x64", CURRENT_VERSION
     )
     _, contents = distribution._archive_members(platform)
     original = json.loads(contents["package/package.json"])
@@ -386,6 +407,21 @@ def test_platform_tarball_contract_refusals_are_complete(tmp_path: Path) -> None
     with pytest.raises(distribution.NpmDistributionError, match="unsafe archive member"):
         distribution.validate_tarball(writable)
 
+    missing_readme = tmp_path / "platform-missing-readme.tgz"
+    _rewrite_tarball(platform, missing_readme, remove="package/README.md")
+    with pytest.raises(distribution.NpmDistributionError, match="unexpected package members"):
+        distribution.validate_tarball(missing_readme)
+
+    empty_readme = tmp_path / "platform-empty-readme.tgz"
+    _rewrite_tarball(platform, empty_readme, replace=("package/README.md", b"   \n"))
+    with pytest.raises(distribution.NpmDistributionError, match="README.md is empty"):
+        distribution.validate_tarball(empty_readme)
+
+    unrendered = tmp_path / "platform-unrendered-readme.tgz"
+    _rewrite_tarball(platform, unrendered, replace=("package/README.md", b"Placeholder __APG_VERSION__"))
+    with pytest.raises(distribution.NpmDistributionError, match="unrendered placeholders"):
+        distribution.validate_tarball(unrendered)
+
 
 def test_artifact_and_version_path_refusals_are_complete(tmp_path: Path) -> None:
     with pytest.raises(distribution.NpmDistributionError, match="absolute clean path"):
@@ -439,14 +475,14 @@ def test_preflight_publication_tarballs_and_manifest_disagreement(tmp_path: Path
     artifacts = _artifact_root(tmp_path)
     records = distribution.build_packages(ROOT, artifacts, bundle, work_root=tmp_path)
 
-    preflight = distribution.preflight_publication_tarballs(bundle, "0.8.0")
+    preflight = distribution.preflight_publication_tarballs(bundle, CURRENT_VERSION)
     assert [r.name for r in preflight] == list(distribution.PUBLICATION_ORDER)
 
     manifest = {
         "npm": {
             "launcher": {
                 "name": "@knowledge-forge-ai/apgr",
-                "filename": "knowledge-forge-ai-apgr-0.8.0.tgz",
+                "filename": f"knowledge-forge-ai-apgr-{CURRENT_VERSION}.tgz",
                 "sha256": next(r.sha256 for r in records if r.name == "@knowledge-forge-ai/apgr"),
                 "size_bytes": next(r.size_bytes for r in records if r.name == "@knowledge-forge-ai/apgr"),
             },
@@ -462,23 +498,23 @@ def test_preflight_publication_tarballs_and_manifest_disagreement(tmp_path: Path
             ],
         }
     }
-    checked = distribution.preflight_publication_tarballs(bundle, "0.8.0", manifest=manifest)
+    checked = distribution.preflight_publication_tarballs(bundle, CURRENT_VERSION, manifest=manifest)
     assert len(checked) == 4
 
     tampered_manifest = json.loads(json.dumps(manifest))
     tampered_manifest["npm"]["launcher"]["sha256"] = "0" * 64
     with pytest.raises(distribution.NpmDistributionError, match="disagrees with distribution manifest"):
-        distribution.preflight_publication_tarballs(bundle, "0.8.0", manifest=tampered_manifest)
+        distribution.preflight_publication_tarballs(bundle, CURRENT_VERSION, manifest=tampered_manifest)
 
     tampered_size = json.loads(json.dumps(manifest))
     tampered_size["npm"]["launcher"]["size_bytes"] = 999999
     with pytest.raises(distribution.NpmDistributionError, match="disagrees with distribution manifest"):
-        distribution.preflight_publication_tarballs(bundle, "0.8.0", manifest=tampered_size)
+        distribution.preflight_publication_tarballs(bundle, CURRENT_VERSION, manifest=tampered_size)
 
     incomplete_bundle = tmp_path / "incomplete"
     incomplete_bundle.mkdir()
     with pytest.raises(distribution.NpmDistributionError, match="missing npm tarball"):
-        distribution.preflight_publication_tarballs(incomplete_bundle, "0.8.0")
+        distribution.preflight_publication_tarballs(incomplete_bundle, CURRENT_VERSION)
 
 
 def test_classify_registry_state_and_fail_closed_plan() -> None:
@@ -580,3 +616,24 @@ def test_verify_credential_safety() -> None:
 
     with pytest.raises(distribution.NpmDistributionError, match="credential safety violation"):
         distribution.verify_credential_safety(["npm", "publish"], {"NODE_AUTH_TOKEN": "secret_token"})
+
+
+def test_template_readme_parameterization_across_versions() -> None:
+    _, _, _, launcher_readme, platform_readme = distribution._load_templates(ROOT)
+    for ver in ("0.8.1", "0.8.2", "0.9.0", "0.10.0", "0.8.2-rc.1"):
+        rendered_launcher = launcher_readme.decode("utf-8").replace("__APG_VERSION__", ver).encode("utf-8")
+        assert b"__APG_" not in rendered_launcher
+        assert f"@knowledge-forge-ai/apgr@{ver}".encode("utf-8") in rendered_launcher
+
+        target = distribution.TARGETS[0]
+        rendered_platform = (
+            platform_readme.decode("utf-8")
+            .replace("__APG_PLATFORM_NAME__", target.package_name)
+            .replace("__APG_TARGET__", target.go_target)
+            .replace("__APG_OS__", target.os_name)
+            .replace("__APG_CPU__", target.cpu)
+            .replace("__APG_VERSION__", ver)
+            .encode("utf-8")
+        )
+        assert b"__APG_" not in rendered_platform
+        assert f"@knowledge-forge-ai/apgr@{ver}".encode("utf-8") in rendered_platform

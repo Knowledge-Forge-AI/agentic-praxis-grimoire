@@ -4,321 +4,432 @@
 
 ## What is Agentic Praxis Grimoire?
 
-Agentic Praxis Grimoire (APG) is a provider-neutral toolkit and skill corpus
-for bounded agent engineering. It gives coding-agent systems reusable,
-deterministic primitives for selecting task guidance, collecting evidence,
-resolving curated environments, and inspecting repository structure without
-dictating an orchestration workflow.
+Agentic Praxis Grimoire (APGR) is a provider-neutral toolkit and skill corpus
+for bounded agent engineering. It provides coding-agent platforms, LLM
+harnesses, and agentic workflows with deterministic primitives for selecting
+task-scoped guidance, collecting immutable evidence, capturing curated
+environments, inspecting repository structures, and measuring context footprints
+without dictating an orchestration workflow.
 
-APG includes:
+APGR includes:
 
-- reusable Go packages for schemas, reports, skill bundles, environment
-  snapshots, hotspot analysis, and context-footprint records;
-- the `apgr` command-line interface;
-- 39 canonical agent skills that can be selected for one task;
-- canonical reporting and evidence formats;
-- thin Python and npm compatibility/distribution adapters; and
-- repository-maintenance tools used to develop APG itself.
+- **39 canonical agent skills** across 14 stable and 25 provisional leaves;
+- **Context-footprint accounting** for measuring, comparing, and projecting
+  context budgets across descriptions, bodies, and support material;
+- **Reusable Go packages** for schemas, canonical reports, skill bundles,
+  strict environment snapshots, structural hotspot analysis, and footprint
+  accounting;
+- **The `apgr` command-line interface** for direct terminal and script use;
+- **Thin Python and npm distribution adapters** providing binary-backed
+  compatibility without rewriting portable logic; and
+- **Deterministic verification tooling** ensuring reproducible outputs and
+  uncompromising safety boundaries.
 
-APG is not an autonomous orchestrator. It does not choose a model, reviewer,
-roadmap, retry policy, or authorization boundary. Orchestrators such as Joint
-Agentic Command Aegis (JACA) decide when and how to invoke APG.
+### Who is APGR for?
 
-## Why use APG?
+- **AI Agent System Engineers**: Embed deterministic skills and context
+  accounting directly into agent runtimes and harnesses.
+- **Coding Agent Platform Teams**: Supply bounded, task-specific instructions
+  to coding models rather than dumping exhaustive, token-heavy global prompts.
+- **Tool and Harness Authors**: Leverage strict, allowlisted environment
+  snapshots and structural hotspot analysis to prepare clean agent workspaces.
+- **Auditors and Evaluators**: Verify exact, canonical operational records,
+  evidence bundles, and cryptographic hashes.
 
-APG separates reusable engineering mechanics from provider and workflow
-policy. That makes the mechanics easier to embed, test, reproduce, and audit.
+### What APGR is not
 
-- **Small task context.** Select only the relevant skills instead of injecting
-  a global corpus into every agent session.
-- **Deterministic evidence.** Produce canonical Git, diff, and operational
-  records with stable identities.
-- **Embeddable primitives.** Call public Go packages in-process without
-  launching `apgr`, Python, or a shell.
-- **Explicit environment inputs.** Capture an allowlisted, non-secret
-  environment and resolve it with recorded provenance.
-- **Honest structural signals.** Rank repository hotspots while distinguishing
-  deep metrics, structural metrics, and unavailable capabilities.
-- **One portable semantic owner.** Keep portable behavior in Go while Python
-  and npm remain thin compatibility front doors.
+APGR is an engineering toolkit, **not** an autonomous agent or orchestrator.
+It does not:
+- Select models, prompt templates, or inference providers;
+- Make autonomous decisions about retries, task loops, or self-healing;
+- Act as a background daemon or cloud service; or
+- Execute arbitrary code or mutate system configuration outside caller-specified
+  targets.
 
-## Concrete use cases
+Orchestrators such as Joint Agentic Command Aegis (JACA) or custom agent
+frameworks invoke APGR as an in-process library or CLI subprocess.
 
-Use APG to:
+## Core capabilities
 
-- expose the Markdown and pytest guidance needed for one coding task, and
-  nothing else;
-- generate deterministic commit or worktree evidence for a review;
-- consume report records directly from a Go service or JACA adapter;
-- capture a curated build environment once and resolve it in-process later;
-- identify complex or structurally important files before a bounded refactor;
-- use the same `apgr` interface from a source checkout, Go build, Python
-  package, or npm package; and
-- retain APG-specific repository checks without moving portable semantics back
-  into Python.
+- **Task-scoped skill selection**: Resolve only the guidance relevant to the
+  immediate task rather than injecting global instruction sets into every
+  session.
+- **Context-footprint accounting**: Measure exact byte and UTF-8 character sizes
+  of prompts, skill bodies, and support documents with versioned
+  `apg.context-footprint/v1` schemas; compare compatible records; and create
+  source-bound projections with explicit fidelity and omission disclosure.
+- **Deterministic evidence**: Produce canonical Show, Diff, and Operational
+  records with stable domain-separated cryptographic digests.
+- **Strict environment snapshots**: Capture allowlisted, non-secret environment
+  variables and resolve isolated or overlay execution environments with recorded
+  provenance.
+- **Structural hotspot analysis**: Rank complex or structurally critical files
+  before bounded refactoring while clearly separating deep metrics, structural
+  metrics, and unavailable capabilities.
+- **Portable Go core**: Portable logic is authored in standalone, dependency-free
+  Go packages; Python and npm packages serve as thin, verified distribution
+  front doors.
 
-APG does not generate autonomous refactoring plans, analyze Git growth or
-churn, choose a model, or advance a roadmap.
+### Skill corpus and maturity
+
+APG has 39 canonical leaves: 14 stable and 25 provisional. Canonical Markdown
+under `skills/` is the maintained body authority; embedded metadata and package
+resources are verified projections of it:
+
+- Corpus topology: **39 canonical / 39 catalog / 39 projections / 39
+  discoverable**
+- Maturity: **14 stable / 25 provisional**
 
 ## Quick start
 
-The latest published release is **v0.7.0**. The source tree contains the
-**v0.8.0 work-stage candidate**; it is not yet published to GitHub, PyPI, npm,
-or Go-module readback.
+The public release remains **v0.8.0** on Git and the Go module proxy. GitHub
+Releases, PyPI, and npm do not contain v0.8.1. This documentation covers the
+prepared v0.8.1 source candidate; it is not a publication claim.
 
-To try the work-stage candidate safely from a source checkout, use Go 1.25:
+### Source checkout first
+
+Run these commands from the physical root of your prepared v0.8.1 source
+checkout. A fresh public clone currently retrieves the v0.8.0 release line,
+not this unpublished candidate:
 
 ```sh
-go run ./cmd/apgr --help
+go run ./cmd/apgr --version
 go run ./cmd/apgr skills list
-go run ./cmd/apgr skills context-report
-go run ./cmd/apgr footprint --help
 ```
 
-These commands read the embedded corpus and do not modify a global skill root.
-To scan the current checkout without executing its source:
+The prepared source candidate is pending the separate source-freeze and
+production qualification boundary. Do not use an unpublished registry version
+as a dependency or claim that these commands prove publication.
+
+### Supported platforms
+
+The prepared distribution targets include:
+- **macOS Apple Silicon**: `darwin/arm64`
+- **Linux x86_64**: `linux/amd64` (`linux/x64`)
+- **Linux ARM64**: `linux/arm64`
+
+### First use
+
+The examples below use a small source-checkout runner. Set `APGR_BIN` to an
+installed native Go/npm executable when one is available; otherwise the helper
+builds and runs the checkout's Go command. Each input file is absolute and
+owner-only (`0600`) because the CLI treats the records as caller-owned data.
+
+<!-- apgr-example: source-cli-skills -->
 
 ```sh
-go run ./cmd/apgr --repository "$PWD" analyze hotspots \
-  --include-path cmd/apgr --format terminal
+set -eu
+
+apgr() {
+  if [ -n "${APGR_BIN:-}" ]; then
+    "$APGR_BIN" "$@"
+  else
+    go run ./cmd/apgr "$@"
+  fi
+}
+
+apgr skills list
 ```
 
-The scanner requires an absolute physical repository path, stays beneath that
-root, and does not follow symlinks.
-
-For the published v0.7 Python release:
+<!-- apgr-example: source-cli-hotspots -->
 
 ```sh
-python -m pip install "agentic-praxis-grimoire==0.7.0"
-apgr --version
+set -eu
+
+apgr() {
+  if [ -n "${APGR_BIN:-}" ]; then
+    "$APGR_BIN" "$@"
+  else
+    go run ./cmd/apgr "$@"
+  fi
+}
+
+apgr --repository "$PWD" analyze hotspots --include-path cmd/apgr
 ```
 
-The v0.8.0 candidate is not yet available from a public package registry.
+The Python frontend uses a different global root option for this command:
+`apgr --project-root "$PWD" analyze hotspots --include-path cmd/apgr`.
+The skills and footprint commands below use the same arguments on both frontends.
 
-## Install and consumption choices
+<!-- apgr-example: source-cli-footprint -->
 
-### Go library
+```sh
+set -eu
 
-The module path is:
+apgr() {
+  if [ -n "${APGR_BIN:-}" ]; then
+    "$APGR_BIN" "$@"
+  else
+    go run ./cmd/apgr "$@"
+  fi
+}
 
-```text
-github.com/Knowledge-Forge-AI/agentic-praxis-grimoire
+tmp_root="${TMPDIR:-/tmp}"
+tmp_root="${tmp_root%/}"
+workdir="$(mktemp -d "$tmp_root/apgr-readme.XXXXXX")"
+workdir="$(cd "$workdir" && pwd -P)"
+trap 'rm -rf "$workdir"' EXIT
+request="$workdir/request.json"
+treatment_request="$workdir/treatment-request.json"
+control="$workdir/control.json"
+treatment="$workdir/treatment.json"
+comparison="$workdir/comparison.json"
+projection="$workdir/projection.json"
+
+python3 - "$request" "$treatment_request" <<'PY'
+import json
+import pathlib
+import sys
+
+base = {
+    "schema_version": "apg.context-footprint/v1",
+    "observation": {
+        "harness": "cli",
+        "method": "direct",
+        "provider": "local",
+        "quality": "verified",
+        "repetitions": 1,
+        "study_design": "single_run",
+        "tokenizer": "none",
+        "variant": "first-use",
+        "workload": "skill-body",
+        "availability": "available",
+        "basis": "direct_measurement",
+    },
+    "components": [{
+        "kind": "selected_body",
+        "name": "implementing-with-test-discipline",
+        "unit": "bytes",
+        "text": "Write a failing test before writing production code.\n",
+    }],
+    "sensitivity": "public",
+    "retention": "ephemeral",
+}
+treatment = json.loads(json.dumps(base))
+treatment["components"][0]["text"] += "Keep the test focused.\n"
+for path, value in zip(sys.argv[1:], (base, treatment)):
+    pathlib.Path(path).write_text(json.dumps(value) + "\n", encoding="utf-8")
+PY
+chmod 600 "$request" "$treatment_request"
+
+apgr footprint measure --input "$request" > "$control"
+apgr footprint measure --input "$treatment_request" > "$treatment"
+chmod 600 "$control" "$treatment"
+apgr footprint compare --control "$control" --treatment "$treatment" > "$comparison"
+apgr footprint project --source "$treatment" --fidelity exact > "$projection"
+chmod 600 "$comparison" "$projection"
+
+python3 - "$control" "$comparison" "$projection" <<'PY'
+import json
+import pathlib
+import sys
+
+control, comparison, projection = (json.loads(pathlib.Path(p).read_text()) for p in sys.argv[1:])
+assert control["schema_version"] == "apg.context-footprint/v1"
+assert comparison["schema_version"] == "apg.context-comparison/v1"
+assert comparison["delta"] > 0
+assert projection["schema_version"] == "apg.context-projection/v1"
+assert projection["fidelity"] == "exact"
+assert projection["omitted_fields"] == []
+print("footprint measure, compare, and project examples passed")
+PY
 ```
 
-Its public root packages are:
+## Context-footprint walkthrough
 
-- `schema` — shared version and envelope constants;
-- `report` — canonical Show, Diff, Operational, parsing, and optional
-  publication APIs;
-- `skills` — embedded corpus, deterministic resolution, and isolated
-  materialization;
-- `envsnap` — strict profiles, snapshots, storage, loading, and resolution;
-- `hotspot` — bounded structural analysis, stable models, and renderers; and
-- `footprint` — deterministic context-footprint records, comparisons,
-  projections, measurements, and versioned component/control registries.
+The `footprint` subsystem enables principled, reproducible accounting of agent
+context budgets. It treats context as a scarce, measurable resource with distinct
+components and explicitly tracks unavailable metrics rather than reporting
+misleading zeroes.
 
-JACA-style consumers should import these packages directly. See the
-[Go library reference](docs/reference/go-library.md).
+### 1. Measure (`apgr footprint measure`)
 
-### Go CLI
+Measure converts a strict measurement request into a validated `apg.context-footprint/v1`
+canonical record with exact byte and character metrics. It accepts `--stdin` or `--input FILE`
+(requiring an absolute, clean, owner-only `0600` file):
 
-`cmd/apgr` exposes these principal command families:
+The marked [first-use fence](#first-use) above is the executable owner for
+this walkthrough. It creates complete disposable fixtures, runs all three
+footprint actions, and asserts the schema, positive comparison delta, exact
+projection fidelity, and empty omission disclosure.
 
-```text
-apgr build-info
-apgr report ...
-apgr skills ...
-apgr env ...
-apgr analyze hotspots ...
-apgr footprint measure|compare|project ...
-apgr response ...
+Key principles of measurement:
+- **Separation of components**: Selected descriptions, selected bodies, support
+  material, repository references, and provider prompt overhead are measured as
+  distinct components.
+- **Honest metrics**: Bytes and UTF-8 characters are measured locally.
+  Provider-specific token estimates are marked explicitly as unavailable unless
+  an observed value is provided by the caller.
+
+### 2. Compare (`apgr footprint compare`)
+
+Compare computes treatment-minus-control deltas between two context footprint
+records using the `apg.context-comparison/v1` schema. Both records must be
+clean, owner-only `0600` files with matching observation dimensions:
+
+The same executable fence runs `footprint compare` with absolute `0600`
+records and checks the canonical comparison output.
+
+Comparison outputs highlight:
+- Net byte and character changes per component;
+- Added or removed components; and
+- Deterministic comparison digests (`cmp-sha256:...`).
+
+### 3. Project (`apgr footprint project`)
+
+Project creates a bounded, source-bound canonical projection retaining source
+identity, fidelity level, and explicit omission disclosure using the
+`apg.context-projection/v1` schema:
+
+The same executable fence runs `footprint project` with an exact fidelity
+request and checks the source-bound projection fields. A projection records
+fidelity and omitted fields; it is not a capacity estimate or an exhaustion
+control.
+
+Projection discloses structural fidelity and omitted fields; it creates a
+deterministic, source-bound representation rather than a capacity estimate.
+
+## Go library integration
+
+APGR is designed to be imported directly into Go applications and orchestration
+adapters.
+
+<!-- apgr-example: go-library -->
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"log"
+
+	"github.com/Knowledge-Forge-AI/agentic-praxis-grimoire/footprint"
+	"github.com/Knowledge-Forge-AI/agentic-praxis-grimoire/skills"
+)
+
+func main() {
+	ctx := context.Background()
+
+	// Deterministically resolve a curated skill bundle
+	req := skills.BundleRequest{
+		SchemaVersion:    skills.BundleRequestSchemaV1,
+		ExplicitSkillIDs: []string{"implementing-with-test-discipline"},
+		Consumer: skills.Consumer{
+			Kind:                skills.ConsumerGo,
+			MaterializationForm: skills.MaterializationInMemory,
+			ProviderConstraints: []string{"in_process_library"},
+		},
+	}
+	result, err := skills.Resolve(ctx, req)
+	if err != nil {
+		log.Fatalf("failed to resolve skills: %v", err)
+	}
+
+	// Calculate its deterministic context footprint record
+	record, err := skills.Footprint(req, result)
+	if err != nil {
+		log.Fatalf("failed to calculate footprint: %v", err)
+	}
+
+	fmt.Printf("Resolved %d skills; footprint components: %d\n",
+		len(result.SelectedSkillIDs), len(record.Components))
+
+	// Create a source-bound projection with fidelity and omission disclosure
+	proj, err := footprint.Project(ctx, footprint.ProjectRequest{
+		Source:   record,
+		Fidelity: footprint.FidelityLosslessStructural,
+	})
+	if err != nil {
+		log.Fatalf("failed to project footprint: %v", err)
+	}
+
+	fmt.Printf("Projected fidelity: %s; canonical digest: %s\n",
+		proj.Fidelity, proj.CanonicalSourceDigest)
+}
 ```
 
-The CLI is an adapter over the same Go owners. Repository-maintenance commands
-and compatibility routes are documented separately in the
-[CLI reference](docs/reference/cli.md).
+See the [Go library reference](docs/reference/go-library.md) for full package
+documentation.
 
-### Python
+## Upgrade guidance and release recovery
 
-The Python distribution remains `agentic-praxis-grimoire`, with the `apgr`
-console entry point and `python -m agentic_praxis_grimoire`.
+### Upgrading from v0.7.0 to the prepared v0.8.1 source
 
-Portable commands delegate to a verified bundled Go binary. Python continues
-to own APG repository and host maintenance where that behavior is intentionally
-not portable. The published v0.7 platform wheels and source distribution remain
-the latest public Python surface; v0.8.0 packaging is a work-stage candidate.
+The v0.8 series introduces the complete context-footprint subsystem (`footprint`
+Go package introduced in v0.8.0 and `apgr footprint` CLI command family), refined
+skill metadata, and multi-surface distribution packages with packaged
+documentation and rich project metadata.
 
-### npm
+- **Go Consumers**: Keep released consumers on the exact published version they
+  already qualify. To exercise the prepared source, use a checkout-local Go
+  module and the source-build path above; do not add an unpublished `v0.8.1`
+  requirement.
+- **CLI / Python / npm Users**: Use the source-checkout command while v0.8.1
+  remains pending freeze and publication. Registry installation is deferred.
 
-The published v0.7 architecture defines:
+### Truthful v0.8.0 release status & v0.8.1 recovery
 
-- `@knowledge-forge-ai/apgr`;
-- `@knowledge-forge-ai/apgr-darwin-arm64`;
-- `@knowledge-forge-ai/apgr-linux-x64`; and
-- `@knowledge-forge-ai/apgr-linux-arm64`.
+During the initial publication of v0.8.0 on 2026-08-31:
+- Git commit `fc0fd99b41d24951d7db3535402c46ef9c671143` was pushed to `main`;
+- Annotated tag `v0.8.0` was pushed; and
+- The Go module proxy (`proxy.golang.org`) successfully indexed and authenticated
+  `v0.8.0`.
 
-The v0.7 packages are the latest published npm surface. The v0.8.0 candidate is
-not published. The JavaScript launcher selects and verifies a same-version
-platform package, forwards exact arguments with no shell, and owns no APG
-semantics.
+However, downstream publication to GitHub Releases, PyPI, and npm was not completed
+due to credential and interactive TTY requirements. In strict adherence to
+public-registry immutability and zero-overwrite policies:
+- The immutable `v0.8.0` tag and Go proxy entries are preserved as historical
+  immutable predecessor state without force-pushing, retagging, or deletion.
+- **v0.8.1** is a prepared multi-surface recovery candidate pending source freeze
+  and publication. It is not published to GitHub Releases, PyPI, or npm, and no
+  release page, package install, or module requirement should imply otherwise.
 
-### Nix and host integration
+For technical details, see the [v0.8.1 release notes](release/v0.8.1-notes.md)
+and [qualification exit record](docs/status/2026/09/03/00154-apg107-108-v081-qualification-and-recovery-exit.md).
 
-Nix, shell composition, and host activation are consumer layers. They may
-package or activate APG, but they do not own APG runtime semantics. There is
-no APGR-local Nix release gate for the v0.8.0 candidate, and this work changes
-no Nix configuration, active installation, or host integration.
+## Security and trust boundaries
 
-See [APG distribution](docs/distribution.md) for the target matrix, artifact
-architecture, verification, and publication boundary.
+APGR is engineered with strict operational boundaries:
 
-## Core concepts
+- **No Shell Execution**: Subprocess adapters execute binaries directly using
+  exact argument vectors (`execve`), never passing strings through a shell.
+- **Secret-Rejecting Environment Snapshots**: Environment profiles enforce strict
+  allowlists. Secret-like variables (containing tokens, keys, passwords, or
+  credentials) are rejected fail-closed.
+- **Filesystem Isolation**: Materialized skill bundles and scratch operations are
+  confined to caller-owned, disposable directories. APGR never mutates user-global
+  skill roots or configuration without explicit flags.
+- **Zero Telemetry / Offline Operation**: All local commands operate completely
+  offline with no telemetry, tracking, or unexpected network requests.
+- **Reproducible Builds**: All distribution archives, Go binaries, and package
+  manifests are bit-for-bit reproducible under fixed release epochs.
 
-### Canonical skill corpus
+## Documentation index
 
-APG has 39 canonical leaves: 14 stable and 25 provisional. Canonical Markdown
-under `skills/` is the maintained body authority; embedded metadata and
-package resources are verified projections of it.
-
-### Explicit, task-scoped selection
-
-The structured resolver uses explicit skill IDs and closed, versioned facts.
-It selects only exact owners. Composition edges describe relationships among
-already selected skills; they never create an implicit mandatory profile
-chain.
-
-Resolved bundles can remain in memory or be materialized beneath a
-caller-owned, disposable root. APG never injects a bundle into a global skill
-root. See [skill context bundles](docs/guides/skill-context-bundles.md).
-
-### Reproducible context budgets
-
-APG measures descriptions, bodies, fixed prompt overhead, and initial context
-in bytes. It fails closed on an exceeded bound rather than truncating a
-description or silently dropping a skill. Provider-specific tokenization and
-provider limits remain consumer-owned.
-
-### Context footprints
-
-The additive `footprint` package measures selected descriptions, selected
-bodies, support material, prompt overhead, and complete materialized bundles as
-separate components. Its records use the versioned
-`apg.context-footprint/v1`, `apg.context-comparison/v1`, and
-`apg.context-projection/v1` schemas. Canonical bytes and domain-separated
-fingerprints are deterministic; unavailable metrics remain unavailable and are
-never represented as zero. APGR bundle accounting is not provider prompt
-accounting or JACA total-context accounting.
-
-Footprint operations are provider-neutral and do not execute tokenizers,
-providers, credentials, routes, retries, or workflow transitions. Provider-
-specific observations may be supplied as explicitly identified metrics, or
-recorded as unavailable.
-
-### Evidence and reporting
-
-Canonical report records carry versioned schemas, stable IDs, deterministic
-bytes, and caller-owned evidence copies. The Go API supports in-memory use;
-optional outbox publication adds owner-only paths, bounded locking, recovery,
-and atomic replacement. See the [reporting reference](docs/reference/go-library.md#reporting).
-
-### Environment snapshots
-
-Environment profiles are strict and allowlisted. Secret-like names are
-rejected, snapshot storage is owner-only, and canonical JSON records values
-with validators and provenance. `Isolated` resolution starts empty;
-`Overlay` explicitly adds a caller-owned base. See the
-[environment snapshot guide](docs/guides/environment-snapshots.md).
-
-### Hotspot analysis
-
-The analyzer reports deep Go metrics and honest structural or unavailable
-capability levels for other supported surfaces. It does not execute target
-source, follow symlinks, or inspect Git history. Rankings are deterministic
-within one report. See the [hotspot guide](docs/guides/hotspot-analysis.md).
-
-### Strangler and compatibility architecture
-
-Portable report, skill, environment, hotspot, and response behavior has one Go
-semantic owner. Python and npm adapters locate, verify, and invoke that owner.
-APG-specific repository or host maintenance remains Python-owned where the
-boundary is explicit.
-
-### Provider neutrality and safety boundaries
-
-APG has no model or provider selection authority. Normal Go process adapters
-use exact argument vectors and no shell. Task skills use isolated roots rather
-than global context injection. Environment snapshots reject secret-like names.
-Report and response publication use bounded path, mode, locking, and atomicity
-checks. These are concrete safety properties, not a claim of formal security
-assurance.
-
-## JACA and library integration
-
-APG supplies deterministic engineering primitives and guidance. JACA supplies
-orchestration: attempts, sequencing, provider selection, retries,
-authorization, evidence lifecycle, and decisions about what to do next.
-
-The intended dependency points one way:
-
-```text
-JACA-owned adapter
-    -> APG public Go package
-```
-
-APG never imports JACA or accepts JACA protocol types. A JACA adapter passes a
-`context.Context` and structured APG requests, then translates returned APG
-models and bytes into JACA-owned evidence.
-
-APG102 qualified this integration shape through a disposable JACA-owned adapter
-without modifying JACA or creating a production dependency. The published
-v0.7.0 package is available for exact-version consumer qualification. The v0.8
-footprint records remain an additive work-stage candidate; any JACA adoption
-still belongs to a JACA-owned adapter and separately qualified consumer work.
-See the [APG–JACA integration boundary](docs/architecture/apg-jaca-integration.md).
-
-## Documentation
-
-Start with the [task-oriented documentation index](docs/README.md).
-
-- [CLI reference](docs/reference/cli.md)
-- [Go library reference](docs/reference/go-library.md)
-- [Skill context bundles](docs/guides/skill-context-bundles.md)
-- [Environment snapshots](docs/guides/environment-snapshots.md)
-- [Hotspot analysis](docs/guides/hotspot-analysis.md)
-- [Distribution and packaging](docs/distribution.md)
-- [APG–JACA integration](docs/architecture/apg-jaca-integration.md)
-- [Project model and governance](docs/project-model.md)
-- [Roadmaps and current status](docs/roadmap.md)
-- [Development releases and phases](docs/history/releases-and-phases.md)
-
-## Project status
-
-- Latest published release: **v0.7.0**
-- Development version: **v0.8.0 work-stage candidate**
-- Candidate corpus: **39 canonical / 39 catalog / 39 projections / 39
-  discoverable**
-- Maturity: **14 stable / 25 provisional**
-- Skill-candidate decision: **zero new skills**; RepoMap and Theme Forge queues
-  remain deferred
-- CXT2B diagnostic importer: **deferred and non-blocking**
-- Readiness: **implementation and qualification candidate pending dispatcher
-  pre-final review**
-- Publication: **v0.8.0 has not been published**; Git finalization and
-  immutable external readback remain closeout actions
-
-The published v0.7.0 release remains the historical base for this candidate.
-Its public package and module surfaces are not changed by the v0.8 work-stage
-candidate. See the [v0.7 roadmap](docs/v0-7-roadmap.md),
-[status index](docs/status/README.md), [skill catalog](skills/README.md), and
-[known language-profile debt](docs/governance/language-profile-known-debt.md).
+- [Task-Oriented Documentation Index](docs/README.md)
+- [CLI Reference](docs/reference/cli.md)
+- [Go Library Reference](docs/reference/go-library.md)
+- [Skill Context Bundles Guide](docs/guides/skill-context-bundles.md)
+- [Environment Snapshots Guide](docs/guides/environment-snapshots.md)
+- [Hotspot Analysis Guide](docs/guides/hotspot-analysis.md)
+- [Distribution and Packaging](docs/distribution.md)
+- [APG–JACA Integration Architecture](docs/architecture/apg-jaca-integration.md)
+- [Context Footprint & Skill Inventory](docs/architecture/v0-8-context-footprint-and-skill-inventory.md)
+- [Project Model & Governance](docs/project-model.md)
+- [Provenance Policy](docs/provenance.md)
+- [Status and Exit Records](docs/status/README.md)
+- [Release Notes (v0.8.1)](release/v0.8.1-notes.md)
 
 ## Contributing and licensing
 
-Read [CONTRIBUTING.md](CONTRIBUTING.md) before proposing changes. Contributors
-must follow the project's authority, provenance, testing, and review
-boundaries, and contribution may require the
-[Contributor License Agreement](CLA.md).
+Read [CONTRIBUTING.md](CONTRIBUTING.md) before submitting contributions.
+Contributions require adherence to the project contribution terms in
+[CLA.md](CLA.md).
 
-APG is available under [GNU GPLv3](LICENSE) or a separately negotiated
-commercial license. Required third-party notices are recorded in
-[NOTICE](NOTICE).
+Agentic Praxis Grimoire is free software licensed under the
+**GNU Affero General Public License v3.0 or later** ([AGPL-3.0-or-later](LICENSE)).
+Commercial licensing options and enterprise support are available from the
+Project Steward at [Knowledge Forge AI](https://www.knowledge-forge.ai).
+
+Third-party copyright notices and attributions are recorded in [NOTICE](NOTICE).

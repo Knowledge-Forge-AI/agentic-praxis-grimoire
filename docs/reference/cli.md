@@ -139,9 +139,9 @@ noncanonical bytes, incompatible comparisons, and consequence-bearing
 projection omissions fail closed.
 
 The Python `footprint` command family forwards its exact argument tail to this
-Go owner and has no Python semantic fallback. An installed v0.7 package does
-not provide the v0.8 footprint commands; the v0.8 candidate is a source and
-release-candidate surface until publication.
+Go owner and has no Python semantic fallback. The prepared v0.8.1 source
+contains these commands; packaged v0.8.1 availability remains pending source
+freeze and publication.
 
 ## Environment and hotspot analysis
 

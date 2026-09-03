@@ -1390,3 +1390,37 @@ independent-consumer evidence, and dispatcher-owned pre-final review remain
 before any public publication. APG104 preserves v0.1.0 through v0.7.0
 reconstruction, does not modify JACA, and limits Nix to a read-only consumer
 handoff.
+
+## APG105 v0.8.0 publication preflight and partial prefix
+
+APG105 prepared the public publication of v0.8.0. During the initial publication
+sequence on 2026-08-31, Git commit `fc0fd99b41d24951d7db3535402c46ef9c671143` and
+annotated tag `v0.8.0` were pushed to the public GitHub repository, and the Go
+module proxy indexed `v0.8.0`. However, publication to GitHub Releases, PyPI, and
+npm halted due to interactive TTY and credential requirements, creating a
+partial-prefix state.
+
+In accordance with strict public immutability policy, the published Git ref, tag,
+and Go proxy entries are preserved unchanged as historical predecessor state.
+
+## APG106 TTY publication executor qualification
+
+APG106 developed and qualified the fail-closed publication executor designed to
+operate safely within an interactive terminal session. It resolved review findings
+surrounding Go module resolution, `.info` extension tolerance, and remote readback
+classification.
+
+## APG107 v0.8.1 qualification and release recovery
+
+APG107 qualified v0.8.1 as the complete, synchronized release of the v0.8 product
+line. It audited and updated human-facing documentation, README landing pages,
+Python package metadata, and npm package READMEs. Two disjoint constructions
+verified byte-for-byte reproducibility across all ten release assets, preserved
+v0.1.0 through v0.8.0 historical reconstruction, and qualified external consumers.
+
+## APG108 v0.8.1 publication executor and repository metadata
+
+APG108 adapted the fail-closed publication executor to v0.8.1 and the APG107
+authority packet. It established repository About metadata reconciliation
+(description, homepage, topics) and deterministic state classification, ensuring
+clean forward-only release execution while treating v0.8.0 as an immutable predecessor.

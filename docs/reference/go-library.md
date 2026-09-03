@@ -155,7 +155,7 @@ embeddable Go reporting core.
 The [APGR CLI reference](cli.md) documents command adapters, footprint
 operations, path and recovery operations, build information, and Python
 delegation. The [distribution contract](../distribution.md) documents
-supported targets, the published v0.7 baseline, and the v0.8 work-stage
-candidate architecture. The v0.8 candidate is not published; dispatcher
-pre-final review, Git finalization, and immutable external readback remain
-release-boundary actions.
+supported targets, the multi-registry packaging model, and the prepared v0.8.1
+candidate architecture. The source candidate adds the public `footprint`
+package alongside the existing core Go packages; released-package availability
+remains pending source freeze and publication.

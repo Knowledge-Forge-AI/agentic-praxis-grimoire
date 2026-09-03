@@ -9,9 +9,9 @@ phase IDs. The direct bounded operator assignment authorizes the dependency-
 ordered v0.8 program through candidate qualification and, only after dispatcher
 pre-final acceptance, closeout publication and immutable readback.
 
-The live public release is v0.7.0. The additive v0.8 source candidate is
-implemented and source-qualified; it does not claim publication, deployment,
-or active consumer cutover.
+v0.8.1 is the active release line completing the v0.8 context-footprint
+program across all distribution registries, recovering from the v0.8.0 Git/Go
+prefix.
 
 The normative product and ownership decisions are in the
 [v0.8 context-footprint and skill-inventory contract](architecture/v0-8-context-footprint-and-skill-inventory.md).

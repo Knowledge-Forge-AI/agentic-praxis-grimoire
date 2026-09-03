@@ -375,7 +375,7 @@ def _load_artifact(artifact: Artifact) -> tuple[bytes, bytes, dict[str, Any]]:
     return binary_bytes, manifest_bytes, identity
 
 
-def _load_templates(root: Path) -> tuple[dict[str, Any], dict[str, Any], bytes]:
+def _load_templates(root: Path) -> tuple[dict[str, Any], dict[str, Any], bytes, bytes, bytes]:
     templates = root / "npm" / "templates"
     try:
         launcher = _parse_manifest(
@@ -391,11 +391,26 @@ def _load_templates(root: Path) -> tuple[dict[str, Any], dict[str, Any], bytes]:
         launcher_source = _read_direct(
             templates / LAUNCHER_SOURCE, "launcher source template"
         )
+        launcher_readme_path = templates / "launcher" / "README.md"
+        if not launcher_readme_path.is_file():
+            raise NpmDistributionError("launcher README template is missing")
+        launcher_readme = _read_direct(launcher_readme_path, "launcher README template")
+        if not launcher_readme.strip():
+            raise NpmDistributionError("launcher README template is empty")
+
+        platform_readme_path = templates / "platform" / "README.md"
+        if not platform_readme_path.is_file():
+            raise NpmDistributionError("platform README template is missing")
+        platform_readme = _read_direct(platform_readme_path, "platform README template")
+        if not platform_readme.strip():
+            raise NpmDistributionError("platform README template is empty")
+        if b"__APG_VERSION__" not in launcher_readme or b"__APG_VERSION__" not in platform_readme:
+            raise NpmDistributionError("npm README templates must bind the package version")
     except NpmDistributionError:
         raise
     if launcher.get("version") != "__APG_VERSION__" or platform.get("version") != "__APG_VERSION__":
         raise NpmDistributionError("npm package template has an unexpected version authority")
-    return launcher, platform, launcher_source
+    return launcher, platform, launcher_source, launcher_readme, platform_readme
 
 
 def _package_json(
@@ -453,6 +468,7 @@ def _package_files(
     binary: bytes | None,
     manifest: bytes | None,
     source_root: Path,
+    readme: bytes | None = None,
 ) -> Path:
     root.mkdir(parents=True, exist_ok=False, mode=0o700)
     _write_file(root / "package.json", package_json, 0o644)
@@ -462,6 +478,8 @@ def _package_files(
         _write_file(root / "bin" / BINARY_BASENAME, binary, 0o755)
     if manifest is not None:
         _write_file(root / "bin" / "apgr.binary-manifest.json", manifest, 0o644)
+    if readme is not None:
+        _write_file(root / "README.md", readme, 0o644)
     for name in LICENSE_FILES:
         _write_file(root / name, _read_direct(source_root / name, name), 0o644)
     return root
@@ -562,12 +580,19 @@ def build_packages(
     if len(corpus_values) != 1:
         raise NpmDistributionError("target binary manifests disagree on corpus fingerprint")
     corpus = next(iter(corpus_values))
-    launcher_template, platform_template, launcher_source = _load_templates(source_root)
+    launcher_template, platform_template, launcher_source, launcher_readme, platform_readme = _load_templates(source_root)
     output = _ensure_empty_output(output)
     work = _directory(work_root or output.parent, "npm work directory", create=True)
     staged: list[tuple[Path, str, str | None]] = []
     with tempfile.TemporaryDirectory(prefix="apgr-npm-", dir=work) as temporary:
         staging = Path(temporary)
+        rendered_launcher_readme = (
+            launcher_readme.decode("utf-8")
+            .replace("__APG_VERSION__", version)
+            .encode("utf-8")
+        )
+        if b"__APG_" in rendered_launcher_readme:
+            raise NpmDistributionError("npm launcher README template placeholders were not rendered")
         launcher_dir = _package_files(
             staging / "launcher",
             package_json=_package_json(
@@ -581,12 +606,24 @@ def build_packages(
             binary=None,
             manifest=None,
             source_root=source_root,
+            readme=rendered_launcher_readme,
         )
         launcher_tgz = staging / npm_tarball_name(LAUNCHER_NAME, version)
         _pack_directory(launcher_dir, launcher_tgz)
         staged.append((launcher_tgz, LAUNCHER_NAME, None))
         for target in TARGETS:
             binary, manifest_bytes, identity = loaded[target.go_target]
+            rendered_platform_readme = (
+                platform_readme.decode("utf-8")
+                .replace("__APG_PLATFORM_NAME__", target.package_name)
+                .replace("__APG_TARGET__", target.go_target)
+                .replace("__APG_OS__", target.os_name)
+                .replace("__APG_CPU__", target.cpu)
+                .replace("__APG_VERSION__", version)
+                .encode("utf-8")
+            )
+            if b"__APG_" in rendered_platform_readme:
+                raise NpmDistributionError("npm platform README template placeholders were not rendered")
             package_dir = _package_files(
                 staging / target.slug,
                 package_json=_package_json(
@@ -601,6 +638,7 @@ def build_packages(
                 binary=binary,
                 manifest=manifest_bytes,
                 source_root=source_root,
+                readme=rendered_platform_readme,
             )
             tgz = staging / npm_tarball_name(target.package_name, version)
             _pack_directory(package_dir, tgz)
@@ -660,6 +698,10 @@ def validate_tarball(path: Path, *, version: str | None = None) -> PackageRecord
     if version is not None and package_version != version:
         raise NpmDistributionError(f"{path.name} package version differs")
     expected = {"package/package.json", "package/LICENSE", "package/NOTICE", "package/COMMERCIAL-LICENSE.md"}
+    # Current package tooling requires a useful README for every maintained
+    # version. Historic releases are reconstructed with their historical
+    # source/tooling rather than weakening this current contract.
+    expected.add("package/README.md")
     target: str | None = None
     if name == LAUNCHER_NAME:
         expected.add("package/index.js")
@@ -725,6 +767,12 @@ def validate_tarball(path: Path, *, version: str | None = None) -> PackageRecord
     for member in expected:
         if member not in members:
             raise NpmDistributionError(f"{path.name} is missing {member}")
+    if "package/README.md" in expected:
+        readme_bytes = contents.get("package/README.md", b"")
+        if not readme_bytes.strip():
+            raise NpmDistributionError(f"{path.name} README.md is empty")
+        if b"__APG_" in readme_bytes:
+            raise NpmDistributionError(f"{path.name} README.md has unrendered placeholders")
     data = path.read_bytes()
     return PackageRecord(name, package_version, target, path.name, hashlib.sha256(data).hexdigest(), len(data))
 
@@ -967,4 +1015,3 @@ def main(arguments: list[str] | None = None) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

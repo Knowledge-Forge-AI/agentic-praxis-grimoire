@@ -1,9 +1,9 @@
 # APG Distribution
 
-The latest published APG release is v0.7.0. The v0.8.0 implementation is a
-work-stage release candidate and is not yet published to GitHub, Go module
-readback, PyPI, or npm. This document describes the v0.8 candidate surfaces
-while preserving the v0.7.0 public baseline.
+The current public APG release is **v0.8.0** on Git and the Go module proxy.
+GitHub Releases, PyPI, and npm do not contain v0.8.1. This document describes
+the prepared v0.8.1 distribution source and its qualification contract; the
+candidate remains pending source freeze and publication.
 
 APG has one editable release-version authority:
 `src/agentic_praxis_grimoire/VERSION`. Release-like Go builds receive that
@@ -62,10 +62,9 @@ The wrapper verifies the manifest, version, host target, corpus, size, hash,
 build information, direct-file type, and executable mode before launch. It
 never downloads or searches `PATH` for an unrelated `apgr`.
 
-The v0.7 source distribution contains Go source, the canonical skills, the
+The source distribution contains Go source, the canonical skills, the
 thin Python source, the dependency-free build backend, packaging helpers,
-metadata, and licenses. The v0.8 candidate adds the footprint source and
-corresponding public API documentation. Source distributions contain no
+the footprint subsystem, metadata, and licenses. Source distributions contain no
 prebuilt executable. Building a wheel from an extracted source distribution
 requires a supported host and a local Go 1.25 toolchain; the resulting
 installed wheel does not require Go.
@@ -110,10 +109,10 @@ source build uses the current checkout's version and corpus and is removed after
 the invocation. Installed wheels always use their bundled binary and never
 require a runtime compiler or network access.
 
-The v0.7.0 release is the public baseline for this candidate. The v0.8.0
-candidate remains unpublished until the dispatcher-owned pre-final review and
-closeout publication sequence complete. No APGR-local Nix gate, host
-activation, global installation, or Nix configuration mutation is part of this
-candidate. A public v0.8 release must retain the v0.7 single-parent lineage,
-publish only reviewed assets, and pass fresh external readback before it is
-described as released.
+The prepared v0.8.1 source preserves the public v0.8.0 Git commit and tag as
+immutable historical predecessor state and is intended to form a single-parent
+child after source freeze. No APGR-local Nix gate, host activation, global
+installation, or Nix configuration mutation is part of this phase.
+Multi-registry publication remains a later operation requiring fail-closed
+readback across Git, GitHub Releases, PyPI, npm, and Go. This source phase does
+not establish those final publication identities or registry observations.

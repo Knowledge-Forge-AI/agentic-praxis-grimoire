@@ -2236,9 +2236,8 @@ qualification, and consumer-boundary dispositions. The
 for separate architecture or read-only-measurement starts. The direct bounded
 operator assignment now authorizes APG104's implementation campaign, but it
 does not grant automatic successor authority. APG103 has already closed the
-v0.7 publication and readback handoff; APG104 is the current additive v0.8
-candidate and remains unpublished pending qualification and the dispatcher's
-pre-final review.
+v0.7 publication and readback handoff; the v0.8 product line advances through
+v0.8.1 release recovery.
 
 ## APG103 v0.7 public publication and readback
 
@@ -2276,3 +2275,21 @@ before any v0.8 publication. APG104 does not change the v0.7 public release,
 modify JACA, activate Nix, or authorize a successor phase. The optional
 importer and any skill-candidate work remain non-blocking and deferred unless
 their stated evidence gates pass.
+
+## APG105 v0.8.0 publication preflight and partial prefix
+
+APG105 prepared the v0.8.0 release. Publication reached Git and the Go module proxy
+before stopping prior to downstream completion on GitHub Releases, PyPI, and npm.
+The public v0.8.0 Git commit and tag are preserved as immutable historical predecessor state.
+
+## APG106 TTY publication executor qualification
+
+APG106 qualified the fail-closed publication executor, resolving Go module `.info`
+extension tolerance and remote readback classification.
+
+## APG107 and APG108 v0.8.1 qualification and release recovery
+
+APG107 qualifies v0.8.1 as the complete, synchronized release of the v0.8 product
+line with audited human-facing documentation, verified project URLs, npm READMEs,
+and deterministic two-build evidence. APG108 delivers the publication executor
+and repository metadata reconciliation.

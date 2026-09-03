@@ -147,8 +147,10 @@ class APGPublicReleaseUnitTests(APGPublicReleaseCaseMixin, unittest.TestCase):
     def test_v08_surface_is_additive_and_inherits_v07_exclusion_rules(self) -> None:
         current = release.audited_policy_surfaces("0.7.0")[0]
         v08 = release.audited_policy_surfaces("0.8.0")[0]
+        v081 = release.audited_policy_surfaces("0.8.1")[0]
 
         self.assertTrue(set(current["critical_files"]).issubset(v08["critical_files"]))
+        self.assertTrue(set(v08["critical_files"]).issubset(v081["critical_files"]))
         for path in (
             "footprint/doc.go",
             "footprint/json.go",
@@ -159,6 +161,7 @@ class APGPublicReleaseUnitTests(APGPublicReleaseCaseMixin, unittest.TestCase):
         ):
             self.assertIn(path, v08["critical_files"])
         self.assertEqual(v08["required_skills"], current["required_skills"])
+        self.assertEqual(v081["required_skills"], v08["required_skills"])
         self.assertFalse(release.is_v08_candidate_path("libexec/agent_report/diff.py"))
         self.assertFalse(release.is_v08_candidate_path("dist/example.whl"))
         self.assertFalse(release.is_v08_candidate_path("private/evaluation.txt"))
@@ -169,12 +172,14 @@ class APGPublicReleaseUnitTests(APGPublicReleaseCaseMixin, unittest.TestCase):
                 encoding="utf-8"
             )
         )
-        for key, expected in v08.items():
+        for key, expected in v081.items():
             self.assertEqual(policy[key], list(expected))
 
         private = release.Entry("100644", "blob", "a" * 40, b"private/secret.txt")
         with self.assertRaisesRegex(release.ToolError, "publication-excluded"):
             release.validate_versioned_policy_exclusions((private,), "0.8.0")
+        with self.assertRaisesRegex(release.ToolError, "publication-excluded"):
+            release.validate_versioned_policy_exclusions((private,), "0.8.1")
 
     def test_historical_v06_surface_is_snapshot_not_current_tuple_alias(self) -> None:
         original = release.AUDITED_HELPERS

@@ -6,7 +6,7 @@ backend-path = ["libexec"]
 [project]
 name = "agentic-praxis-grimoire"
 dynamic = ["version"]
-description = "Bounded language, tooling, and agent workflow guidance for Agentic Praxis Grimoire."
+description = "Provider-neutral skills and deterministic tooling for bounded agent engineering: context bundles, evidence, environment snapshots, hotspot analysis, and footprint records."
 readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.10"
 license = "AGPL-3.0-or-later"
@@ -24,6 +24,13 @@ classifiers = [
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
 ]
+
+[project.urls]
+Source = "https://github.com/Knowledge-Forge-AI/agentic-praxis-grimoire"
+Documentation = "https://www.knowledge-forge.ai/agentic-praxis-grimoire/"
+Issues = "https://github.com/Knowledge-Forge-AI/agentic-praxis-grimoire/issues"
+Changelog = "https://github.com/Knowledge-Forge-AI/agentic-praxis-grimoire/releases"
+"Commercial Licensing" = "https://www.knowledge-forge.ai"
 
 [project.scripts]
 apgr = "agentic_praxis_grimoire.__main__:main"

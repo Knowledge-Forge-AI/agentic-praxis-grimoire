@@ -2,7 +2,7 @@
 
 Agentic Praxis Grimoire accepts contributions only under the project contribution terms in [CLA.md](CLA.md).
 
-Contributors retain copyright in their contributions. By submitting a contribution, the contributor grants Samuel Leighton Lair, as Agentic Praxis Grimoire project steward, broad copyright and patent rights to use, modify, distribute,sublicense, and relicense the contribution as part of RepoMap, including under AGPL-3.0-or-later and commercial licenses.
+Contributors retain copyright in their contributions. By submitting a contribution, the contributor grants Samuel Leighton Lair, as Agentic Praxis Grimoire project steward, broad copyright and patent rights to use, modify, distribute, sublicense, and relicense the contribution as part of Agentic Praxis Grimoire, including under AGPL-3.0-or-later and commercial licenses.
 
 Contributions must be original work or submitted with authority from the copyright owner. Do not submit code, documentation, generated output, or other content unless you have the right to provide it under these terms.
 

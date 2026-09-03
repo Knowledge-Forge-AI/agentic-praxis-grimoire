@@ -60,7 +60,7 @@ TARGET_TAGS = _canonical_target_tags()
 # ``EPOCH`` is the current release policy alias. Historical reconstruction
 # uses the named v0.6 value explicitly below; it must not silently inherit the
 # current release epoch.
-EPOCH = distribution.V08_RELEASE_EPOCH
+EPOCH = distribution.V081_RELEASE_EPOCH
 HISTORICAL_V06_VERSION = "0.6.0"
 HISTORICAL_V06_WHEEL_NAME = (
     f"{DIST_NAME}-{HISTORICAL_V06_VERSION}-py3-none-any.whl"
@@ -124,20 +124,19 @@ def _directory(path: Path, label: str) -> Path:
 
 
 def _executable(path: Path) -> Path:
-    absolute = path.absolute()
     try:
-        target = absolute.resolve(strict=True)
+        target = path.resolve(strict=True)
         target_status = target.stat()
-        parent = absolute.parent.resolve(strict=True)
+        parent = target.parent.resolve(strict=True)
     except OSError as error:
         raise PublicationError("publication Python is unavailable") from error
     if (
-        parent != absolute.parent
+        parent != target.parent
         or not stat.S_ISREG(target_status.st_mode)
-        or not os.access(absolute, os.X_OK)
+        or not os.access(target, os.X_OK)
     ):
         _fail("publication Python must resolve from one real directory to an executable")
-    return absolute
+    return target
 
 
 def _source_version(source: Path) -> str:

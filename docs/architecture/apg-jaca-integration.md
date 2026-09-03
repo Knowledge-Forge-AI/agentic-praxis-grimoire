@@ -116,9 +116,10 @@ after applying its own protected-data policy.
 
 ## Versioned JACA consumer handoff — revision 1
 
-This section is the canonical APGR-published handoff for JACA. It defines what
-JACA may consume and what evidence must cross the boundary. It does not create
-a JACA dependency or claim a production landing.
+This section is the canonical APGR handoff contract for JACA. It defines what
+JACA may consume and what evidence must cross the boundary. It does not assert
+that the candidate is currently published, create a JACA dependency, or claim
+a production landing.
 
 ### Package and released-version gate
 
@@ -131,11 +132,11 @@ it does not import `cmd/apgr`, an APG `internal/` package, Python, or npm.
 
 Production use requires an exact published semantic version and matching module
 sums. A mutable branch, private source copy, development `replace`, or local
-checkout is not a released dependency. The latest published release is
-v0.7.0, which supplies the five-package direct-import boundary. The v0.8.0
-`footprint` package and projection schemas are present in the work-stage
-candidate but are not yet a published JACA dependency. JACA must not create a
-permanent private lookalike and later call it the APGR schema.
+checkout is not a released dependency. Public v0.8.0 remains the released
+baseline; v0.8.1 is the prepared candidate for the six-package direct-import
+boundary including `footprint` and remains pending source freeze and
+publication. JACA must not consume the candidate as a released dependency or
+create a permanent private lookalike and later call it the APGR schema.
 
 The corresponding JACA program entries remain JACA-owned. `JACA-APG0` and
 `CTX-DOCS` are documentation-only prerequisites and receive no implementation
