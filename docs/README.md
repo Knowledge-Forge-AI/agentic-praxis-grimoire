@@ -10,12 +10,12 @@ start with the [root README](../README.md).
   start, consumption choices, and release status.
 - [APGR CLI reference](reference/cli.md) — command families, exit behavior,
   build information, bridge rules, and safety boundaries.
-- [APG distribution](distribution.md) — supported targets, the v0.7 public
-  baseline, and the v0.8 candidate package architecture.
+- [APG distribution](distribution.md) — supported targets, multi-registry
+  distribution, and the complete v0.8.1 package architecture.
 
-The latest published release is v0.7.0. The development tree contains a
-v0.8.0 work-stage candidate; v0.8 packages and release artifacts are not yet
-published.
+Documentation covers the prepared **v0.8.1** multi-surface release candidate,
+while the current published Go module release remains at immutable **v0.8.0**
+pending final source freeze and publication execution.
 
 ## Use the CLI
 
@@ -87,10 +87,11 @@ Growth and churn analysis is not part of the v0.8 footprint capability.
   defines consumer-facing APIs, schemas, and ownership.
 
 APG102 completed disposable JACA cross-consumer qualification without changing
-JACA or creating a production dependency. The published v0.7.0 package is now
-available for exact-version consumer qualification. The v0.8 footprint surface
-remains a candidate until its release and any JACA adoption remains
-JACA-owned and separately qualified.
+JACA or creating a production dependency. The prepared v0.8.1 source contains
+the complete `footprint` package alongside `schema`, `report`, `skills`,
+`envsnap`, and `hotspot`; public v0.8.0 remains the released baseline while
+source freeze and publication are pending. Any downstream JACA adoption
+remains JACA-owned and separately qualified.
 
 ## Review architecture and decisions
 

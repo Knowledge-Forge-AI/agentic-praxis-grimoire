@@ -1,6 +1,6 @@
-# APGR v0.8.0 independent consumer fixture
+# APGR v0.8.1 independent consumer fixture
 
-This is an independent Go module for the APGR v0.8.0 public-consumer gate. It
+This is an independent Go module for the APGR v0.8.1 public-consumer gate. It
 requires the exact public module version in `fixture-go.mod` and imports only the
 published `footprint` and `skills` packages. There is deliberately no
 `replace`, source copy, internal package, private checkout, provider runtime,

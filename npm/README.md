@@ -1,7 +1,7 @@
 # APGR npm distribution source
 
 This directory owns the source templates and deterministic local packer for
-the four release-candidate packages:
+the four official v0.8.1 npm packages:
 
 - `@knowledge-forge-ai/apgr` — the dependency-free launcher;
 - `@knowledge-forge-ai/apgr-darwin-arm64`;

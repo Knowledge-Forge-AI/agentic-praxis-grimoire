@@ -2144,3 +2144,28 @@ copied into the candidate. Zero new skill candidates are selected and the
 optional external importer is deferred because its required identity, rights,
 fixture, safety, and consumer-value evidence is absent. This is bounded
 architecture and implementation provenance, not legal advice.
+
+## APG106 technical correction provenance
+
+APG106 preserves the frozen v0.8.0 candidate lineage and applies seven technical
+corrections under `private/releases/v0.8.0/apg106/` to ensure fail-closed publication
+execution from an interactive terminal without mutating public Git refs or registry
+surfaces prematurely. The technical correction is independently authored APG
+infrastructure code and verified against the committed tree. All predecessor public
+surfaces and historical evidence are preserved without erasure. This is bounded
+infrastructure provenance, not legal advice.
+
+## APG107 and APG108 v0.8.1 qualification and release recovery provenance
+
+APG107 and APG108 resolve the partial-prefix release state of v0.8.0 where git commit
+`fc0fd99b41d24951d7db3535402c46ef9c671143`, tag `v0.8.0`, and the Go module proxy
+were published while GitHub Releases, PyPI, and npm remained unpublished. To uphold
+public-registry immutability without forcing or rewriting tags, v0.8.1 is qualified as
+the clean forward release on all surfaces.
+
+APG107 qualifies the public candidate with human-facing documentation, verified
+project URLs, npm package READMEs, exit records, and canonical authority manifests.
+APG108 delivers the fail-closed publication executor with repository metadata
+reconciliation (description, homepage, topics) and deterministic state machine.
+All code, documentation, and metadata are project-authored. This is bounded release
+and provenance evidence, not legal advice.

@@ -8,6 +8,7 @@ import gzip
 import hashlib
 import json
 import os
+import shutil
 import stat
 import subprocess
 import sys
@@ -100,10 +101,10 @@ def _historical_wheel(path: Path) -> None:
 
 def test_version_and_target_layout_are_derived_from_the_single_authority() -> None:
     assert publication.VERSION == (REPOSITORY_ROOT / "src/agentic_praxis_grimoire/VERSION").read_text().strip()
-    assert publication.VERSION == "0.8.0"
+    assert publication.VERSION == "0.8.1"
     assert len(publication.WHEEL_NAMES) == 3
-    assert all(name.startswith("agentic_praxis_grimoire-0.8.0-py3-none-") for name in publication.WHEEL_NAMES)
-    assert publication.SDIST_NAME == "agentic_praxis_grimoire-0.8.0.tar.gz"
+    assert all(name.startswith("agentic_praxis_grimoire-0.8.1-py3-none-") for name in publication.WHEEL_NAMES)
+    assert publication.SDIST_NAME == "agentic_praxis_grimoire-0.8.1.tar.gz"
     assert "py3-none-any" not in " ".join(publication.WHEEL_NAMES)
     assert publication.TARGET_TAGS == backend.TARGET_TAGS
 
@@ -123,7 +124,7 @@ def test_backend_wheel_is_thin_platform_specific_and_recorded(tmp_path: Path) ->
         assert "agentic_praxis_grimoire/skills.py" not in names
         assert "agentic_praxis_grimoire/bin/apgr" in names
         assert "agentic_praxis_grimoire/bin/apgr.binary-manifest.json" in names
-        wheel_text = archive.read(f"agentic_praxis_grimoire-0.8.0.dist-info/WHEEL").decode()
+        wheel_text = archive.read(f"agentic_praxis_grimoire-0.8.1.dist-info/WHEEL").decode()
         assert "Root-Is-Purelib: false\n" in wheel_text
         assert f"Tag: py3-none-{backend.TARGET_TAGS[identity.target]}\n" in wheel_text
         mode = archive.getinfo("agentic_praxis_grimoire/bin/apgr").external_attr >> 16
@@ -135,7 +136,7 @@ def test_backend_sdist_contains_source_but_no_binary_or_legacy_consumer(tmp_path
     path = tmp_path / filename
     with tarfile.open(path, "r:gz") as archive:
         names = set(archive.getnames())
-    root = "agentic_praxis_grimoire-0.8.0/"
+    root = "agentic_praxis_grimoire-0.8.1/"
     assert root + "go.mod" in names
     assert root + "libexec/apg_python_build_backend.py" in names
     assert root + "libexec/apg_go_build.py" in names
@@ -167,7 +168,7 @@ def test_extracted_sdist_builds_the_same_host_wheel_bytes(tmp_path: Path) -> Non
     sdist_name = backend._write_sdist(REPOSITORY_ROOT, tmp_path)
     with tarfile.open(tmp_path / sdist_name, "r:gz") as archive:
         archive.extractall(extracted_root, filter="data")
-    extracted = extracted_root / "agentic_praxis_grimoire-0.8.0"
+    extracted = extracted_root / "agentic_praxis_grimoire-0.8.1"
     target = backend._host_target()
     direct_name = backend.build_wheel(str(direct), {"build-target": target})
     code = (
@@ -284,7 +285,7 @@ def test_binary_manifest_identity_refusals_are_complete(tmp_path: Path) -> None:
                 binary,
                 source=REPOSITORY_ROOT,
                 target="darwin/arm64",
-                version="0.8.0",
+                version="0.8.1",
             )
 
     # Extra key
@@ -297,7 +298,7 @@ def test_binary_manifest_identity_refusals_are_complete(tmp_path: Path) -> None:
             binary,
             source=REPOSITORY_ROOT,
             target="darwin/arm64",
-            version="0.8.0",
+            version="0.8.1",
         )
 
     # Missing key
@@ -363,13 +364,13 @@ def test_publication_path_and_metadata_refusals_are_explicit(tmp_path: Path) -> 
     malformed_source = tmp_path / "source"
     version = malformed_source / "src/agentic_praxis_grimoire/VERSION"
     version.parent.mkdir(parents=True)
-    version.write_text("0.8.0 candidate\n", encoding="ascii")
+    version.write_text("0.8.1 candidate\n", encoding="ascii")
     with pytest.raises(publication.PublicationError, match="malformed"):
         publication._source_version(malformed_source)
 
     with pytest.raises(publication.PublicationError, match="metadata"):
         publication._metadata_contract(
-            b"Name: wrong\nVersion: 0.8.0\nRequires-Python: >=3.10\nLicense-Expression: AGPL-3.0-or-later\n\n",
+            b"Name: wrong\nVersion: 0.8.1\nRequires-Python: >=3.10\nLicense-Expression: AGPL-3.0-or-later\n\n",
             "fixture",
         )
 
@@ -387,7 +388,7 @@ def test_wheel_metadata_archive_refusals_are_explicit(tmp_path: Path) -> None:
         publication._wheel_metadata(missing)
 
     duplicate = tmp_path / "duplicate.whl"
-    metadata_name = "agentic_praxis_grimoire-0.8.0.dist-info/METADATA"
+    metadata_name = "agentic_praxis_grimoire-0.8.1.dist-info/METADATA"
     with pytest.warns(UserWarning, match="Duplicate name"):
         with zipfile.ZipFile(duplicate, "w") as archive:
             archive.writestr(metadata_name, b"first")
@@ -421,13 +422,13 @@ def test_sdist_structure_and_comparison_refusals_are_explicit(tmp_path: Path) ->
         publication._sdist_metadata(wrong_root)
 
     incomplete = tmp_path / "incomplete.tar.gz"
-    root = "agentic_praxis_grimoire-0.8.0"
+    root = "agentic_praxis_grimoire-0.8.1"
     with tarfile.open(incomplete, "w:gz") as archive:
         info = tarfile.TarInfo(f"{root}/PKG-INFO")
         info.size = 0
         archive.addfile(info, BytesIO())
     with pytest.raises(publication.PublicationError, match="complete Go/Python"):
-        publication._validate_sdist_sources(incomplete, version="0.8.0")
+        publication._validate_sdist_sources(incomplete, version="0.8.1")
 
     required_only = tmp_path / "required-only.tar.gz"
     required = (
@@ -443,7 +444,7 @@ def test_sdist_structure_and_comparison_refusals_are_explicit(tmp_path: Path) ->
             info.size = 0
             archive.addfile(info, BytesIO())
     with pytest.raises(publication.PublicationError, match="canonical skill"):
-        publication._validate_sdist_sources(required_only, version="0.8.0")
+        publication._validate_sdist_sources(required_only, version="0.8.1")
 
     without_footprint = tmp_path / "without-footprint.tar.gz"
     with tarfile.open(without_footprint, "w:gz") as archive:
@@ -452,7 +453,7 @@ def test_sdist_structure_and_comparison_refusals_are_explicit(tmp_path: Path) ->
             info.size = 0
             archive.addfile(info, BytesIO())
     with pytest.raises(publication.PublicationError, match="canonical footprint"):
-        publication._validate_sdist_sources(without_footprint, version="0.8.0")
+        publication._validate_sdist_sources(without_footprint, version="0.8.1")
 
     with_footprint = tmp_path / "with-footprint.tar.gz"
     with tarfile.open(with_footprint, "w:gz") as archive:
@@ -460,7 +461,7 @@ def test_sdist_structure_and_comparison_refusals_are_explicit(tmp_path: Path) ->
             info = tarfile.TarInfo(f"{root}/{relative}")
             info.size = 0
             archive.addfile(info, BytesIO())
-    publication._validate_sdist_sources(with_footprint, version="0.8.0")
+    publication._validate_sdist_sources(with_footprint, version="0.8.1")
 
     first = tmp_path / "first"
     second = tmp_path / "second"
@@ -482,8 +483,8 @@ def test_release_workflow_targets_current_version_and_tag() -> None:
         (REPOSITORY_ROOT / ".github/workflows/release.yml").read_text(encoding="utf-8")
     )
     command = workflow["jobs"]["publish"]["steps"][0]["run"]
-    assert "expected_tag=v0.8.0" in command
-    assert "expected_version=0.8.0" in command
+    assert "expected_tag=v0.8.1" in command
+    assert "expected_version=0.8.1" in command
 
 
 def test_backend_manifest_and_configuration_refusals_are_complete(tmp_path: Path) -> None:
@@ -538,3 +539,129 @@ def test_backend_manifest_and_configuration_refusals_are_complete(tmp_path: Path
         backend._dist_info_from_entries({})
     with pytest.raises(backend.BackendError, match="release contract"):
         backend.build_editable(str(tmp_path))
+
+
+def test_metadata_generation_across_versions(tmp_path: Path) -> None:
+    # Build a cheap fixture root
+    root = tmp_path / "fake-pkg"
+    root.mkdir()
+    shutil.copy2(REPOSITORY_ROOT / "pyproject.toml", root / "pyproject.toml")
+    (root / "README.md").write_text(
+        "# Test Package\n"
+        "Description goes here.\n\n"
+        "See [the docs](docs/README.md), [the license](LICENSE), and "
+        "[the anchor](#details).\n",
+        encoding="utf-8",
+    )
+    for license_name in ("LICENSE", "NOTICE", "COMMERCIAL-LICENSE.md"):
+        (root / license_name).write_text(f"{license_name}\n", encoding="utf-8")
+    src_dir = root / "src" / "agentic_praxis_grimoire"
+    src_dir.mkdir(parents=True)
+
+    changelog = backend.tomllib.loads((root / "pyproject.toml").read_text())["project"]["urls"]["Changelog"]
+    for ver in ("0.8.1", "0.8.2", "0.9.0", "0.10.0", "0.8.2-rc.1"):
+        (src_dir / "VERSION").write_text(f"{ver}\n", encoding="utf-8")
+        meta = backend._metadata(root).decode("utf-8")
+        assert "Metadata-Version: 2.4" in meta
+        assert f"Version: {ver}" in meta
+        assert f"Project-URL: Changelog, {changelog}" in meta
+        assert "Project-URL: Source, https://github.com/Knowledge-Forge-AI/agentic-praxis-grimoire" in meta
+        assert "License-File: LICENSE" in meta
+        assert "License-File: NOTICE" in meta
+        assert "License-File: COMMERCIAL-LICENSE.md" in meta
+        assert "Description-Content-Type: text/markdown" in meta
+        assert "# Test Package\nDescription goes here." in meta
+        assert f"](https://github.com/Knowledge-Forge-AI/agentic-praxis-grimoire/blob/v{ver}/docs/README.md)" in meta
+        assert f"](https://github.com/Knowledge-Forge-AI/agentic-praxis-grimoire/blob/v{ver}/LICENSE)" in meta
+        assert "]( #details)" not in meta
+        assert "](#details)" in meta
+
+
+def test_metadata_missing_or_empty_readme_fails(tmp_path: Path) -> None:
+    root = tmp_path / "fake-pkg"
+    root.mkdir()
+    shutil.copy2(REPOSITORY_ROOT / "pyproject.toml", root / "pyproject.toml")
+    src_dir = root / "src" / "agentic_praxis_grimoire"
+    src_dir.mkdir(parents=True)
+    (src_dir / "VERSION").write_text("0.8.2\n", encoding="utf-8")
+
+    # Missing README
+    with pytest.raises(backend.BackendError, match="README.md"):
+        backend._metadata(root)
+
+    # Empty README
+    (root / "README.md").write_text("   \n", encoding="utf-8")
+    with pytest.raises(backend.BackendError, match="README.md is empty"):
+        backend._metadata(root)
+
+
+def test_sdist_metadata_matches_wheel_metadata_and_license_projection() -> None:
+    metadata = backend._metadata(REPOSITORY_ROOT)
+    assert backend._sdist_metadata(REPOSITORY_ROOT) == metadata
+    assert b"License-File: LICENSE\n" in metadata
+    assert b"License-File: NOTICE\n" in metadata
+    assert b"License-File: COMMERCIAL-LICENSE.md\n" in metadata
+    assert b"](docs/" not in metadata
+    assert b"](release/" not in metadata
+    assert b"](LICENSE)" not in metadata
+
+
+@pytest.mark.parametrize(
+    ("project_text", "diagnostic"),
+    [
+        ("[project", "metadata is unavailable"),
+        ("[build-system]\n", "metadata is unavailable"),
+        ('project = "invalid"\n', "metadata is malformed"),
+        ('[project]\nurls = "invalid"\n', "URLs are malformed"),
+    ],
+)
+def test_metadata_rejects_unusable_project_owner(
+    tmp_path: Path, project_text: str, diagnostic: str
+) -> None:
+    version = tmp_path / "src/agentic_praxis_grimoire/VERSION"
+    version.parent.mkdir(parents=True)
+    version.write_text("0.8.1\n", encoding="ascii")
+    (tmp_path / "README.md").write_text("# Package\n", encoding="utf-8")
+    (tmp_path / "pyproject.toml").write_text(project_text, encoding="utf-8")
+    with pytest.raises(backend.BackendError, match=diagnostic):
+        backend._metadata(tmp_path)
+
+
+@pytest.mark.parametrize("values", [None, [], [""], [17]])
+def test_license_metadata_rejects_missing_or_invalid_file_declarations(
+    tmp_path: Path, values: object
+) -> None:
+    with pytest.raises(backend.BackendError, match="license-files metadata is malformed"):
+        backend._license_files(tmp_path, {"license-files": values})
+
+
+@pytest.mark.parametrize("name", ["../LICENSE", "/LICENSE"])
+def test_license_metadata_refuses_paths_outside_package_root(
+    tmp_path: Path, name: str
+) -> None:
+    with pytest.raises(backend.BackendError, match="license file path is unsafe"):
+        backend._license_files(tmp_path, {"license-files": [name]})
+
+
+def test_declared_license_file_must_exist(tmp_path: Path) -> None:
+    with pytest.raises(backend.BackendError, match="LICENSE"):
+        backend._license_files(tmp_path, {"license-files": ["LICENSE"]})
+
+
+def test_package_links_preserve_query_fragment_and_external_targets() -> None:
+    source = (
+        "[guide](<docs/guide.md?view=1#details>) "
+        "[web](https://example.invalid/guide) [local](#details)"
+    )
+    projected = backend._package_readme(source, "0.10.0")
+    assert projected == (
+        "[guide](<https://github.com/Knowledge-Forge-AI/agentic-praxis-grimoire/"
+        "blob/v0.10.0/docs/guide.md?view=1#details>) "
+        "[web](https://example.invalid/guide) [local](#details)"
+    )
+
+
+@pytest.mark.parametrize("target", ["../LICENSE", "docs/../../LICENSE", "."])
+def test_package_links_refuse_repository_escape(target: str) -> None:
+    with pytest.raises(backend.BackendError, match="link escapes the repository root"):
+        backend._package_readme(f"[license]({target})", "0.8.1")

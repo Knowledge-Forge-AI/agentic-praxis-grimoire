@@ -23,7 +23,7 @@ sys.path.insert(0, str(ROOT / "libexec"))
 import apg_distribution_candidate as candidate  # noqa: E402
 
 
-VERSION = "0.8.0"
+VERSION = "0.8.1"
 
 
 def _source(tmp_path: Path) -> tuple[Path, str]:
@@ -269,7 +269,7 @@ def _npm_artifacts(tmp_path: Path, corpus: str, binaries: dict[str, bytes]) -> P
         root,
         "@knowledge-forge-ai/apgr",
         VERSION,
-        {"package.json": launcher_json, "index.js": b"'use strict';\n", **licenses},
+        {"package.json": launcher_json, "index.js": b"'use strict';\n", "README.md": b"# README\n", **licenses},
     )
     for mapping in candidate.TARGETS:
         target = mapping["go_target"]
@@ -303,6 +303,7 @@ def _npm_artifacts(tmp_path: Path, corpus: str, binaries: dict[str, bytes]) -> P
                 "package.json": package_json,
                 "bin/apgr": binaries[target],
                 "bin/apgr.binary-manifest.json": manifest,
+                "README.md": b"# README\n",
                 **licenses,
             },
         )

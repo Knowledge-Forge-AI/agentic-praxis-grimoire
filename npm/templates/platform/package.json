@@ -3,9 +3,27 @@
   "version": "__APG_VERSION__",
   "description": "The Agentic Praxis Grimoire native executable for __APG_TARGET__.",
   "license": "AGPL-3.0-or-later",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Knowledge-Forge-AI/agentic-praxis-grimoire.git"
+  },
+  "homepage": "https://www.knowledge-forge.ai/agentic-praxis-grimoire/",
+  "bugs": {
+    "url": "https://github.com/Knowledge-Forge-AI/agentic-praxis-grimoire/issues"
+  },
+  "keywords": [
+    "agent-skills",
+    "ai-agents",
+    "cli",
+    "context-engineering",
+    "developer-tools",
+    "golang",
+    "reproducible-builds"
+  ],
   "files": [
     "bin/apgr",
     "bin/apgr.binary-manifest.json",
+    "README.md",
     "LICENSE",
     "NOTICE",
     "COMMERCIAL-LICENSE.md"

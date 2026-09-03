@@ -14,13 +14,15 @@ The labels are program entries, not phase identities. This contract is
 additive, selects no new skill, and changes no provider, security-policy, JACA,
 or host state.
 
-The current release facts remain:
+The current release facts are:
 
-- v0.7.0 is the live public release;
-- the v0.7 public Go boundary is `schema`, `report`, `skills`, `envsnap`, and
-  `hotspot`; and
-- the v0.8 source candidate adds the `footprint` package and remains
-  unpublished pending dispatcher pre-final review and closeout.
+- public v0.8.0 remains the released Git and Go-module baseline;
+- GitHub Releases, PyPI, and npm do not contain v0.8.1;
+- the prepared v0.8.1 source contains the additive `footprint` package and the
+  six-package Go boundary (`schema`, `report`, `skills`, `envsnap`, `hotspot`,
+  and `footprint`); and
+- source freeze, final asset reconstruction, and registry publication remain
+  separate successor boundaries over immutable public v0.8.0.
 
 [Accepted ADR 0051](../adr/2026/08/0051-v0-7-embeddable-toolkit-architecture-and-roadmap.md)
 continues to own that v0.7 package architecture. V0.8 work is additive unless
@@ -92,7 +94,9 @@ JACA or to a provider.
 APG104 records the bounded v0.8 program under the direct operator assignment.
 CAP0, CXT0, CXT1, CXT2A, CXT3, CXT4, Q1 fixture authoring, and source/distribution
 integration are implemented in the work-stage candidate. This contract does
-not claim v0.8 publication, deployment, or public-registry readback.
+not claim v0.8.1 publication, deployment, or public-registry readback. The
+candidate's final commit and asset identities belong to the later source-freeze
+phase and are intentionally not recorded here.
 
 ## CAP0 contract
 

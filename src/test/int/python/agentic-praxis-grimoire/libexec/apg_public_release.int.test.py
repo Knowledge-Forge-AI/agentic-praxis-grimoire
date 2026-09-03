@@ -33,11 +33,14 @@ class APGPublicReleaseBoundaryTests(unittest.TestCase):
             ("0.4.0-rc.1", release.HISTORICAL_V04_SKILLS),
             ("0.5.0", release.HISTORICAL_V05_SKILLS),
             ("0.6.0", release.AUDITED_SKILLS),
+            ("0.7.0", release.V07_SKILLS),
+            ("0.8.0", release.V08_SKILLS),
+            ("0.8.1", release.V081_SKILLS),
         ):
             with self.subTest(version=version):
                 surfaces = release.audited_policy_surfaces(version)
                 self.assertEqual(surfaces[0]["required_skills"], expected)
-        for version in ("invalid", "0.5.1", "0.6.1", "0.8.1"):
+        for version in ("invalid", "0.5.1", "0.6.1", "0.8.2"):
             with self.subTest(version=version):
                 with self.assertRaisesRegex(release.ToolError, "policy identity"):
                     release.audited_policy_surfaces(version)
