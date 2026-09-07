@@ -101,10 +101,10 @@ def _historical_wheel(path: Path) -> None:
 
 def test_version_and_target_layout_are_derived_from_the_single_authority() -> None:
     assert publication.VERSION == (REPOSITORY_ROOT / "src/agentic_praxis_grimoire/VERSION").read_text().strip()
-    assert publication.VERSION == "0.8.1"
+    assert publication.VERSION == "0.9.0"
     assert len(publication.WHEEL_NAMES) == 3
-    assert all(name.startswith("agentic_praxis_grimoire-0.8.1-py3-none-") for name in publication.WHEEL_NAMES)
-    assert publication.SDIST_NAME == "agentic_praxis_grimoire-0.8.1.tar.gz"
+    assert all(name.startswith("agentic_praxis_grimoire-0.9.0-py3-none-") for name in publication.WHEEL_NAMES)
+    assert publication.SDIST_NAME == "agentic_praxis_grimoire-0.9.0.tar.gz"
     assert "py3-none-any" not in " ".join(publication.WHEEL_NAMES)
     assert publication.TARGET_TAGS == backend.TARGET_TAGS
 
@@ -124,7 +124,7 @@ def test_backend_wheel_is_thin_platform_specific_and_recorded(tmp_path: Path) ->
         assert "agentic_praxis_grimoire/skills.py" not in names
         assert "agentic_praxis_grimoire/bin/apgr" in names
         assert "agentic_praxis_grimoire/bin/apgr.binary-manifest.json" in names
-        wheel_text = archive.read(f"agentic_praxis_grimoire-0.8.1.dist-info/WHEEL").decode()
+        wheel_text = archive.read(f"agentic_praxis_grimoire-{publication.VERSION}.dist-info/WHEEL").decode()
         assert "Root-Is-Purelib: false\n" in wheel_text
         assert f"Tag: py3-none-{backend.TARGET_TAGS[identity.target]}\n" in wheel_text
         mode = archive.getinfo("agentic_praxis_grimoire/bin/apgr").external_attr >> 16
@@ -136,7 +136,7 @@ def test_backend_sdist_contains_source_but_no_binary_or_legacy_consumer(tmp_path
     path = tmp_path / filename
     with tarfile.open(path, "r:gz") as archive:
         names = set(archive.getnames())
-    root = "agentic_praxis_grimoire-0.8.1/"
+    root = f"agentic_praxis_grimoire-{publication.VERSION}/"
     assert root + "go.mod" in names
     assert root + "libexec/apg_python_build_backend.py" in names
     assert root + "libexec/apg_go_build.py" in names
@@ -168,7 +168,7 @@ def test_extracted_sdist_builds_the_same_host_wheel_bytes(tmp_path: Path) -> Non
     sdist_name = backend._write_sdist(REPOSITORY_ROOT, tmp_path)
     with tarfile.open(tmp_path / sdist_name, "r:gz") as archive:
         archive.extractall(extracted_root, filter="data")
-    extracted = extracted_root / "agentic_praxis_grimoire-0.8.1"
+    extracted = extracted_root / f"agentic_praxis_grimoire-{publication.VERSION}"
     target = backend._host_target()
     direct_name = backend.build_wheel(str(direct), {"build-target": target})
     code = (
@@ -285,7 +285,7 @@ def test_binary_manifest_identity_refusals_are_complete(tmp_path: Path) -> None:
                 binary,
                 source=REPOSITORY_ROOT,
                 target="darwin/arm64",
-                version="0.8.1",
+                version=publication.VERSION,
             )
 
     # Extra key
@@ -298,7 +298,7 @@ def test_binary_manifest_identity_refusals_are_complete(tmp_path: Path) -> None:
             binary,
             source=REPOSITORY_ROOT,
             target="darwin/arm64",
-            version="0.8.1",
+            version=publication.VERSION,
         )
 
     # Missing key
@@ -388,7 +388,7 @@ def test_wheel_metadata_archive_refusals_are_explicit(tmp_path: Path) -> None:
         publication._wheel_metadata(missing)
 
     duplicate = tmp_path / "duplicate.whl"
-    metadata_name = "agentic_praxis_grimoire-0.8.1.dist-info/METADATA"
+    metadata_name = f"agentic_praxis_grimoire-{publication.VERSION}.dist-info/METADATA"
     with pytest.warns(UserWarning, match="Duplicate name"):
         with zipfile.ZipFile(duplicate, "w") as archive:
             archive.writestr(metadata_name, b"first")
@@ -422,13 +422,13 @@ def test_sdist_structure_and_comparison_refusals_are_explicit(tmp_path: Path) ->
         publication._sdist_metadata(wrong_root)
 
     incomplete = tmp_path / "incomplete.tar.gz"
-    root = "agentic_praxis_grimoire-0.8.1"
+    root = f"agentic_praxis_grimoire-{publication.VERSION}"
     with tarfile.open(incomplete, "w:gz") as archive:
         info = tarfile.TarInfo(f"{root}/PKG-INFO")
         info.size = 0
         archive.addfile(info, BytesIO())
     with pytest.raises(publication.PublicationError, match="complete Go/Python"):
-        publication._validate_sdist_sources(incomplete, version="0.8.1")
+        publication._validate_sdist_sources(incomplete, version=publication.VERSION)
 
     required_only = tmp_path / "required-only.tar.gz"
     required = (
@@ -444,7 +444,7 @@ def test_sdist_structure_and_comparison_refusals_are_explicit(tmp_path: Path) ->
             info.size = 0
             archive.addfile(info, BytesIO())
     with pytest.raises(publication.PublicationError, match="canonical skill"):
-        publication._validate_sdist_sources(required_only, version="0.8.1")
+        publication._validate_sdist_sources(required_only, version=publication.VERSION)
 
     without_footprint = tmp_path / "without-footprint.tar.gz"
     with tarfile.open(without_footprint, "w:gz") as archive:
@@ -453,7 +453,7 @@ def test_sdist_structure_and_comparison_refusals_are_explicit(tmp_path: Path) ->
             info.size = 0
             archive.addfile(info, BytesIO())
     with pytest.raises(publication.PublicationError, match="canonical footprint"):
-        publication._validate_sdist_sources(without_footprint, version="0.8.1")
+        publication._validate_sdist_sources(without_footprint, version=publication.VERSION)
 
     with_footprint = tmp_path / "with-footprint.tar.gz"
     with tarfile.open(with_footprint, "w:gz") as archive:
@@ -461,7 +461,7 @@ def test_sdist_structure_and_comparison_refusals_are_explicit(tmp_path: Path) ->
             info = tarfile.TarInfo(f"{root}/{relative}")
             info.size = 0
             archive.addfile(info, BytesIO())
-    publication._validate_sdist_sources(with_footprint, version="0.8.1")
+    publication._validate_sdist_sources(with_footprint, version=publication.VERSION)
 
     first = tmp_path / "first"
     second = tmp_path / "second"
@@ -483,8 +483,8 @@ def test_release_workflow_targets_current_version_and_tag() -> None:
         (REPOSITORY_ROOT / ".github/workflows/release.yml").read_text(encoding="utf-8")
     )
     command = workflow["jobs"]["publish"]["steps"][0]["run"]
-    assert "expected_tag=v0.8.1" in command
-    assert "expected_version=0.8.1" in command
+    assert "expected_tag=v0.9.0" in command
+    assert "expected_version=0.9.0" in command
 
 
 def test_backend_manifest_and_configuration_refusals_are_complete(tmp_path: Path) -> None:
@@ -665,3 +665,49 @@ def test_package_links_preserve_query_fragment_and_external_targets() -> None:
 def test_package_links_refuse_repository_escape(target: str) -> None:
     with pytest.raises(backend.BackendError, match="link escapes the repository root"):
         backend._package_readme(f"[license]({target})", "0.8.1")
+
+
+def test_publication_epoch_alias_tracks_v090_release() -> None:
+    assert publication.EPOCH == distribution.V09_RELEASE_EPOCH
+    assert publication.EPOCH == distribution.release_epoch(publication.VERSION)
+
+
+def test_package_metadata_has_durable_v090_wording() -> None:
+    metadata = backend._metadata(REPOSITORY_ROOT).decode("utf-8")
+    assert "This documentation covers 0.9.0" in metadata
+    assert "Once this version is published" in metadata
+    assert "Active development is proceeding on the" not in metadata
+    assert "unpublished source candidate" not in metadata
+
+
+# Keep this public surface list aligned with the APG116 wording audit.
+@pytest.mark.parametrize("relative_path", [
+    "README.md",
+    "release/v0.9.0-notes.md",
+    "docs/distribution.md",
+    "docs/README.md",
+    "docs/reference/cli.md",
+    "docs/reference/go-library.md",
+    "npm/README.md",
+    "npm/templates/launcher/README.md",
+    "npm/templates/platform/README.md",
+    "testing/fixtures/external_consumer/README.md",
+    "testing/fixtures/xo_consumer/README.md",
+])
+def test_audited_package_surfaces_have_durable_release_wording(relative_path: str) -> None:
+    text = " ".join((REPOSITORY_ROOT / relative_path).read_text().split())
+    if relative_path.startswith("npm/templates/"):
+        assert "Once this version is published" in text
+    elif relative_path == "docs/reference/cli.md":
+        assert "0.9.0 interface described here" in text
+    else:
+        assert "This documentation covers 0.9.0" in text
+    lowered = text.lower()
+    for stale in (
+        "documentation covers the published **v0.8.1**",
+        "active development proceeding on the",
+        "active development is proceeding on the",
+        "candidate release notes (v0.9.0)",
+        "unpublished source candidate",
+    ):
+        assert stale not in lowered

@@ -267,6 +267,17 @@ def _npm_members(path: Path) -> tuple[dict[str, tarfile.TarInfo], dict[str, byte
     return members, contents
 
 
+def _version_tuple(version: str) -> tuple[int, ...]:
+    core = version.split("+", 1)[0].split("-", 1)[0]
+    parts: list[int] = []
+    for piece in core.split("."):
+        if piece.isdigit():
+            parts.append(int(piece))
+        else:
+            break
+    return tuple(parts)
+
+
 def _validate_npm_package(
     path: Path,
     *,
@@ -282,7 +293,7 @@ def _validate_npm_package(
     if not isinstance(name, str) or package.get("version") != version:
         _fail(f"npm {path.name} package identity is not exact")
     expected_files = {"package/package.json", *(f"package/{license_name}" for license_name in LICENSE_FILES)}
-    if version >= "0.8.1" or "package/README.md" in contents:
+    if _version_tuple(version) >= (0, 8, 1) or "package/README.md" in contents:
         expected_files.add("package/README.md")
     target: str | None = None
     binary_record: dict[str, Any] | None = None

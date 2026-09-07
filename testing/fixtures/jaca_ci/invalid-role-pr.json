@@ -1,0 +1,18 @@
+{
+  "schema": "apgr-ci-illustrative-fixture-v1",
+  "fixture_id": "invalid-role-pr",
+  "local_run_id": "ci1-invalid-role-apg",
+  "repository": "example/apgr-fixture",
+  "pull_request_number": 109,
+  "base_ref": "refs/heads/main",
+  "base_object": "2222222222222222222222222222222222222222",
+  "head_repository": "example/apgr-fixture",
+  "head_ref": "refs/heads/topic/invalid-role",
+  "head_object": "1111111111111111111111111111111111111111",
+  "changed_paths": [
+    "libexec/apg_test.py"
+  ],
+  "source_policy": "jaca-ci1-source-policy-v1",
+  "workflow_model": "jaca-ci1-pr-fast-workflow-model-v1",
+  "invalid_role": "apg-unknown-role"
+}

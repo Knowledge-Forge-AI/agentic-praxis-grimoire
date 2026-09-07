@@ -16,6 +16,8 @@ or host state.
 
 The current release facts are:
 
+*(Post-phase note, 2026-09-06: v0.8.1 publication, readback, and private repository reconciliation completed in phases APG107 and APG108; see `private/releases/v0.8.1/reconciliation1-evidence/` and [v0.9 Roadmap](../v0-9-roadmap.md). The contemporaneous phase-local status below is preserved as historical record.)*
+
 - public v0.8.0 remains the released Git and Go-module baseline;
 - GitHub Releases, PyPI, and npm do not contain v0.8.1;
 - the prepared v0.8.1 source contains the additive `footprint` package and the

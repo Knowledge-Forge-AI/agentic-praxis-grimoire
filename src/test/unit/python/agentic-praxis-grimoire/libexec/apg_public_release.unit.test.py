@@ -172,14 +172,62 @@ class APGPublicReleaseUnitTests(APGPublicReleaseCaseMixin, unittest.TestCase):
                 encoding="utf-8"
             )
         )
-        for key, expected in v081.items():
-            self.assertEqual(policy[key], list(expected))
+        self.assertTrue(set(v081["critical_files"]).issubset(policy["critical_files"]))
+        self.assertTrue(set(v081["required_test_entrypoints"]).issubset(policy["required_test_entrypoints"]))
 
         private = release.Entry("100644", "blob", "a" * 40, b"private/secret.txt")
         with self.assertRaisesRegex(release.ToolError, "publication-excluded"):
             release.validate_versioned_policy_exclusions((private,), "0.8.0")
         with self.assertRaisesRegex(release.ToolError, "publication-excluded"):
             release.validate_versioned_policy_exclusions((private,), "0.8.1")
+
+    def test_v09_surface_is_additive_and_inherits_v08_exclusion_rules(self) -> None:
+        v081 = release.audited_policy_surfaces("0.8.1")[0]
+        v09 = release.audited_policy_surfaces("0.9.0")[0]
+
+        self.assertTrue(set(v081["critical_files"]).issubset(v09["critical_files"]))
+        for path in (
+            "docs/architecture/jaca-ci-handoff.md",
+            "docs/architecture/jaca-xo-handoff.md",
+            "docs/status/2026/09/06/00159-apg114-v090-integrated-source-qualification-exit.md",
+            "docs/v0-9-roadmap.md",
+            "release/v0.9.0-notes.md",
+            "testing/fixtures/jaca_ci/drift-pr.json",
+            "testing/fixtures/jaca_ci/invalid-role-pr.json",
+            "testing/fixtures/jaca_ci/sample-summary-fail.json",
+            "testing/fixtures/jaca_ci/sample-summary-pass.json",
+            "testing/fixtures/jaca_ci/valid-apg-pr.json",
+            "testing/fixtures/xo_consumer/README.md",
+            "testing/fixtures/xo_consumer/adapter.go",
+            "testing/fixtures/xo_consumer/fixture-go.mod",
+        ):
+            self.assertIn(path, v09["critical_files"])
+        self.assertIn(
+            "testing/fixtures/xo_consumer/adapter_test.go",
+            v09["required_test_entrypoints"],
+        )
+        self.assertEqual(v09["required_skills"], v081["required_skills"])
+        self.assertFalse(release.is_v09_candidate_path("libexec/agent_report/diff.py"))
+        self.assertFalse(release.is_v09_candidate_path("report/testdata/python_oracle.py"))
+        self.assertFalse(release.is_v09_candidate_path("dist/example.whl"))
+        self.assertFalse(release.is_v09_candidate_path("private/evaluation.txt"))
+        self.assertTrue(release.is_v09_candidate_path("testing/fixtures/xo_consumer/adapter.go"))
+        self.assertTrue(release.is_v09_candidate_path("docs/architecture/jaca-ci-handoff.md"))
+
+        policy = json.loads(
+            (REPOSITORY_ROOT / "release" / "public-surface.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        for key, expected in v09.items():
+            self.assertEqual(policy[key], list(expected))
+
+        private = release.Entry("100644", "blob", "a" * 40, b"private/secret.txt")
+        oracle = release.Entry("100644", "blob", "b" * 40, b"report/testdata/python_oracle.py")
+        with self.assertRaisesRegex(release.ToolError, "publication-excluded"):
+            release.validate_versioned_policy_exclusions((private,), "0.9.0")
+        with self.assertRaisesRegex(release.ToolError, "publication-excluded"):
+            release.validate_versioned_policy_exclusions((oracle,), "0.9.0")
 
     def test_historical_v06_surface_is_snapshot_not_current_tuple_alias(self) -> None:
         original = release.AUDITED_HELPERS

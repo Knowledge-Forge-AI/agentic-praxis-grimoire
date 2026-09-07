@@ -30,7 +30,7 @@ def _host_target() -> str:
 def test_identity_uses_python_version_and_metadata_resource() -> None:
     version, corpus = builder.identities(ROOT)
     resource = ROOT / "src/agentic_praxis_grimoire/resources/skill-metadata.json"
-    assert version == "0.8.1"
+    assert version == "0.9.0"
     assert corpus == hashlib.sha256(resource.read_bytes()).hexdigest()
 
 
@@ -49,19 +49,19 @@ def test_release_like_host_build_is_injected_and_reproducible(tmp_path: Path) ->
     second = tmp_path / "second" / "apgr"
     first_result = builder.build(ROOT, target, first)
     second_result = builder.build(ROOT, target, second)
-    assert first_result["version"] == "0.8.1"
+    assert first_result["version"] == "0.9.0"
     assert first_result["sha256"] == second_result["sha256"]
     assert first.read_bytes() == second.read_bytes()
     version = subprocess.run(
         [first, "--version"], check=True, stdout=subprocess.PIPE, text=True
     )
-    assert version.stdout == "apgr 0.8.1\n"
+    assert version.stdout == "apgr 0.9.0\n"
     built = subprocess.run(
         [first, "build-info"], check=True, stdout=subprocess.PIPE, text=True,
         env={"APGR_VERSION": "runtime-override", "APGR_CORPUS": "runtime-override"},
     )
     info = json.loads(built.stdout)
-    assert info["version"] == "0.8.1"
+    assert info["version"] == "0.9.0"
     assert info["corpus_fingerprint"] == first_result["corpus_fingerprint"]
     assert info["embedded_corpus_fingerprint"] == first_result["corpus_fingerprint"]
     assert info["corpus_fingerprint_verified"] is True

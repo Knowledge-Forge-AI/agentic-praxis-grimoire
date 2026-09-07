@@ -133,6 +133,7 @@ def test_all_npm_tarballs_carry_discovery_metadata_and_readme(tmp_path: Path) ->
         readme = contents["package/README.md"]
         assert readme.strip()
         assert b"__APG_" not in readme
+        assert b"Once this version is published" in readme
 
 
 def test_manifest_tamper_and_missing_identity_fail_closed(tmp_path: Path) -> None:
@@ -624,6 +625,7 @@ def test_template_readme_parameterization_across_versions() -> None:
         rendered_launcher = launcher_readme.decode("utf-8").replace("__APG_VERSION__", ver).encode("utf-8")
         assert b"__APG_" not in rendered_launcher
         assert f"@knowledge-forge-ai/apgr@{ver}".encode("utf-8") in rendered_launcher
+        assert b"Once this version is published" in rendered_launcher
 
         target = distribution.TARGETS[0]
         rendered_platform = (
@@ -637,3 +639,15 @@ def test_template_readme_parameterization_across_versions() -> None:
         )
         assert b"__APG_" not in rendered_platform
         assert f"@knowledge-forge-ai/apgr@{ver}".encode("utf-8") in rendered_platform
+        assert b"Once this version is published" in rendered_platform
+
+
+def test_npm_readme_and_templates_have_durable_conditional_installation_wording() -> None:
+    npm_readme = (ROOT / "npm/README.md").read_text(encoding="utf-8")
+    assert "This documentation covers 0.9.0" in npm_readme
+    assert "Once this version is published" in npm_readme
+
+    for template_rel in ("npm/templates/launcher/README.md", "npm/templates/platform/README.md"):
+        content = (ROOT / template_rel).read_text(encoding="utf-8")
+        assert "Once this version is published" in content
+        assert "__APG_VERSION__" in content

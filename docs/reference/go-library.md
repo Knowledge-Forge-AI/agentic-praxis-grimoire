@@ -27,6 +27,17 @@ The additive `footprint` package is a provider-neutral data and validation
 owner. It measures explicit local inputs, compares compatible observations, and
 creates source-bound projections. It does not execute a provider or tokenizer,
 select a route, handle credentials, or own workflow or JACA authority.
+Accounting is governed by three strict principles:
+1. **Source-bound observations, not capacity forecasts**: Footprints record explicit
+   measurements and source-bound projections, not predictive capacity models or
+   exhaustion guarantees.
+2. **Unavailable is not zero (`unavailable != 0`)**: Missing or unavailable metrics
+   remain explicit with stated reasons and nil values; they are not coerced to zero.
+   An available zero is a measured observation; an unavailable metric is an unmeasured boundary.
+3. **Component separation (overlap is not additive)**: Selected descriptions, selected
+   bodies, support material, repository references, and provider prompt overhead are
+   measured as distinct components. Because prompt templates and harnesses overlap in
+   structure, component metrics cannot be summed across boundaries without accounting.
 
 The public schema identities are:
 
@@ -89,6 +100,41 @@ required values.
 produce domain-separated SHA-256 identities with `fp-sha256:`,
 `cmp-sha256:`, and `proj-sha256:` prefixes. Registry and control-mapping
 identities use the `fp-sha256:` domain with their own schema identity.
+
+### JACA XO consumer compatibility pattern
+
+External Go orchestrators such as Joint Agentic Command Aegis Executive Orchestrator
+(JACA XO) consume `skills`, `footprint`, and supporting `schema` behind a caller-owned
+internal adapter, as demonstrated and verified in `testing/fixtures/xo_consumer/`:
+
+- **Caller DTO containment**: The caller defines its own data transfer objects
+  (`CallerSkillEvidence`, `CallerFootprintEvidence`, `CallerComponentEvidence`,
+  `CallerSourceReference`, `CallerComparisonDelta`, `CallerProjectionEvidence`). The
+  internal adapter translates between APGR domain types and caller DTOs, ensuring
+  zero APGR types leak into caller method signatures or public struct fields.
+- **Pure in-memory execution**: Operations execute entirely in memory without
+  spawning subprocesses (`os/exec` is strictly absent from the dependency tree).
+- **Context cancellation & error sentinels**: Cancelled contexts return `ctx.Err()`
+  or wrap `footprint.ErrContextCancelled`, and domain sentinels are preserved
+  (`footprint.ErrUnitMismatch`, `footprint.ErrConsequenceBearingOmissionRefused`,
+  `skills.ErrBudgetExceeded`).
+- **Metric availability & budgets**: Unavailable metrics (such as prompt overhead
+  without caller observation) remain explicit with reason preserved and nil value;
+  they are never coerced to zero (`unavailable != 0`). Explicit zero budgets fail
+  closed with `skills.ErrBudgetExceeded`.
+- **Dual-lane verification**: Clean dual-lane conformance has been qualified across
+  Lane A (published v0.8.1 baseline via public Go proxy) and Lane B (exact development
+  candidate via local replace).
+
+> [!IMPORTANT]
+> **Boundary of Authority**:
+> - **APGR-local conformance != JACA registration**: Conformance is qualified on
+>   Darwin arm64 under APG114, but downstream runner registration in JACA CI
+>   (`tools/ci/evidence.go`) and production XO adoption (`xo/src/main/go`) are
+>   consumer-owned in JACA and remain pending.
+> - **XO fixture != production adapter or security proof**: The caller-owned adapter
+>   fixture in `testing/fixtures/xo_consumer/` qualifies APGR Go package compatibility,
+>   but is not JACA's production adapter, and passive DTOs do not enforce workflow security.
 
 ## Reporting
 
@@ -155,7 +201,9 @@ embeddable Go reporting core.
 The [APGR CLI reference](cli.md) documents command adapters, footprint
 operations, path and recovery operations, build information, and Python
 delegation. The [distribution contract](../distribution.md) documents
-supported targets, the multi-registry packaging model, and the prepared v0.8.1
-candidate architecture. The source candidate adds the public `footprint`
-package alongside the existing core Go packages; released-package availability
-remains pending source freeze and publication.
+supported targets, the multi-registry packaging model, and the package
+architecture. The published v0.8.1 release includes the public `footprint`
+package alongside the core Go packages (`schema`, `report`, `skills`, `envsnap`, `hotspot`).
+This documentation covers 0.9.0, retaining full backward compatibility with
+v0.8.1 across all six public Go packages. Registry installation of 0.9.0 is
+available once that version is published.

@@ -37,8 +37,8 @@ def test_release_workflow_verifies_exact_assets_before_trusted_publish() -> None
     assert verify["env"] == {"GH_TOKEN": "${{ github.token }}"}
     assert "actions/checkout" not in WORKFLOW.read_text(encoding="utf-8")
     assert "secrets." not in WORKFLOW.read_text(encoding="utf-8")
-    assert "v0.8.1" in script
-    assert "0.8.1" in script
+    assert "v0.9.0" in script
+    assert "0.9.0" in script
     assert "Knowledge-Forge-AI/agentic-praxis-grimoire" in script
     assert "apg-distribution-manifest.json" in script
     assert ".python.wheels" in script

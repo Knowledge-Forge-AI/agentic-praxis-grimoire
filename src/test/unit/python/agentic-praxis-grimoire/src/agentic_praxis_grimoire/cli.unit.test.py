@@ -30,18 +30,18 @@ def test_help_and_version_are_checkout_independent(capsys: pytest.CaptureFixture
         assert family in help_text
 
     assert cli.main(["--version"]) == 0
-    assert capsys.readouterr().out == "apgr 0.8.1\n"
+    assert capsys.readouterr().out == "apgr 0.9.0\n"
 
 
 def test_python_module_entry_point_routes_the_same_version_contract(
     capsys: pytest.CaptureFixture[str],
 ) -> None:
     assert module_main.main(["--version"]) == 0
-    assert capsys.readouterr().out == "apgr 0.8.1\n"
+    assert capsys.readouterr().out == "apgr 0.9.0\n"
     completed = subprocess.run(
         [sys.executable, "-m", "agentic_praxis_grimoire", "--version"],
         cwd=REPOSITORY_ROOT,
-        env={"PYTHONPATH": str(REPOSITORY_ROOT / "src"), **os.environ},
+        env={**os.environ, "PYTHONPATH": os.pathsep.join(filter(None, (str(REPOSITORY_ROOT / "src"), os.environ.get("PYTHONPATH"))))},
         stdin=subprocess.DEVNULL,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
@@ -49,7 +49,7 @@ def test_python_module_entry_point_routes_the_same_version_contract(
         check=False,
     )
     assert completed.returncode == 0, completed.stderr
-    assert completed.stdout == "apgr 0.8.1\n"
+    assert completed.stdout == "apgr 0.9.0\n"
 
 
 @pytest.mark.parametrize(

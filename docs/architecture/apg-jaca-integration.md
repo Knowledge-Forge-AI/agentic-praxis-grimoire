@@ -132,11 +132,29 @@ it does not import `cmd/apgr`, an APG `internal/` package, Python, or npm.
 
 Production use requires an exact published semantic version and matching module
 sums. A mutable branch, private source copy, development `replace`, or local
-checkout is not a released dependency. Public v0.8.0 remains the released
-baseline; v0.8.1 is the prepared candidate for the six-package direct-import
-boundary including `footprint` and remains pending source freeze and
-publication. JACA must not consume the candidate as a released dependency or
-create a permanent private lookalike and later call it the APGR schema.
+checkout is not a released dependency. Public v0.8.1 is the published release
+providing the six-package direct-import boundary including `footprint` (`schema`,
+`report`, `skills`, `envsnap`, `hotspot`, `footprint`). CI integration and
+validation handoff for private development channel qualification is specified
+in the [JACA CI Integration Handoff](jaca-ci-handoff.md). XO-facing library
+consumption compatibility is detailed in the [JACA XO Compatibility Handoff](jaca-xo-handoff.md).
+JACA must not consume an unreleased candidate as a released dependency or create a permanent private
+lookalike and later call it the APGR schema.
+
+> [!IMPORTANT]
+> **Separation of Authority and Truth Boundaries**:
+> - **APGR-local qualification != JACA registration**: Conformance of the CI summary
+>   interface and role taxonomy is qualified on Darwin arm64 under APG114, but
+>   downstream runner registration in JACA CI (`tools/ci/evidence.go`) is consumer-owned
+>   in JACA and remains pending.
+> - **XO fixture != production adapter or security proof**: The caller-owned adapter
+>   fixture in `testing/fixtures/xo_consumer/` illustrates DTO containment for Go
+>   consumption, but is not JACA's production adapter (which belongs in `xo/src/main/go`),
+>   and passive DTOs are not a workflow security proof.
+> - **Footprint principles**: Context footprint measurements and projections are
+>   source-bound observations, not capacity forecasts. Unavailable metrics remain
+>   explicit with stated reasons and nil values (`unavailable != 0`). Distinct components
+>   measure descriptions, bodies, and support material; overlap is not additive.
 
 The corresponding JACA program entries remain JACA-owned. `JACA-APG0` and
 `CTX-DOCS` are documentation-only prerequisites and receive no implementation
