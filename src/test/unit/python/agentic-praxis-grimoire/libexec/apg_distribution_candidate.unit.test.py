@@ -23,7 +23,7 @@ sys.path.insert(0, str(ROOT / "libexec"))
 import apg_distribution_candidate as candidate  # noqa: E402
 
 
-VERSION = "0.8.1"
+VERSION = "0.9.0"
 
 
 def _source(tmp_path: Path) -> tuple[Path, str]:
@@ -38,7 +38,7 @@ def _source(tmp_path: Path) -> tuple[Path, str]:
     return root, candidate._sha256(corpus_bytes)
 
 
-def _binary_manifest(target: str, binary: bytes, corpus: str) -> bytes:
+def _binary_manifest(target: str, binary: bytes, corpus: str, version: str = VERSION) -> bytes:
     return candidate.canonical_json(
         {
             "binary_name": candidate.BINARY_NAME,
@@ -47,7 +47,7 @@ def _binary_manifest(target: str, binary: bytes, corpus: str) -> bytes:
                 "corpus_fingerprint": corpus,
                 "schema_version": candidate.BUILD_INFO_SCHEMA,
                 "target": target,
-                "version": VERSION,
+                "version": version,
             },
             "build_info_schema": candidate.BUILD_INFO_SCHEMA,
             "corpus_fingerprint": corpus,
@@ -56,7 +56,7 @@ def _binary_manifest(target: str, binary: bytes, corpus: str) -> bytes:
             "sha256": candidate._sha256(binary),
             "size_bytes": len(binary),
             "target": dict(candidate.TARGET_BY_GO[target]),
-            "version": VERSION,
+            "version": version,
         }
     )
 
@@ -935,3 +935,52 @@ def test_authoritative_release_asset_inventory_and_roles() -> None:
         assert classified == expected
 
     assert candidate.classify_release_asset("unknown.whl", VERSION) is None
+
+
+@pytest.mark.parametrize("version,required", [
+    ("0.8.0", False), ("0.8.1", True), ("0.9.0", True),
+    ("0.9.1", True), ("0.10.0", True),
+])
+def test_npm_package_readme_requirement_semver_regression(
+    tmp_path: Path, version: str, required: bool,
+) -> None:
+    """Historical archives remain readable; later releases require a README."""
+    _, corpus = _source(tmp_path)
+    go_root, binaries = _go_artifacts(tmp_path, corpus)
+    records, _ = candidate._load_go_artifacts(go_root, version=VERSION, corpus=corpus)
+    mapping = candidate.TARGETS[0]
+    target = mapping["go_target"]
+    manifest = _binary_manifest(target, binaries[target], corpus, version=version)
+    build_identity = json.loads(manifest)["build_identity"]
+    package = {
+        "name": mapping["npm_package"], "version": version,
+        "os": [mapping["npm_os"]], "cpu": [mapping["npm_cpu"]],
+        "apg": {
+            "binary_manifest_schema": candidate.BINARY_MANIFEST_SCHEMA,
+            "target": target, "corpus_fingerprint": corpus,
+            "binary_basename": "apgr", "manifest_file": "bin/apgr.binary-manifest.json",
+            "build_identity": build_identity,
+        },
+    }
+    target_binaries = {target: {
+        **records[target], "build_identity": build_identity,
+        "manifest": {**records[target]["manifest"],
+                     "sha256": candidate._sha256(manifest), "payload": manifest},
+    }}
+    contents = {
+        "package.json": candidate.canonical_json(package),
+        "bin/apgr": binaries[target], "bin/apgr.binary-manifest.json": manifest,
+        **{name: name.encode("ascii") for name in candidate.LICENSE_FILES},
+    }
+    archive = _tgz(tmp_path, mapping["npm_package"], version, contents)
+    arguments = dict(version=version, corpus=corpus, binaries=target_binaries)
+    if required:
+        with pytest.raises(candidate.DistributionCandidateError, match="unexpected or missing"):
+            candidate._validate_npm_package(archive, **arguments)
+    else:
+        assert candidate._validate_npm_package(archive, **arguments)["version"] == version
+    with_readme = tmp_path / "with-readme"
+    with_readme.mkdir()
+    archive = _tgz(with_readme, mapping["npm_package"], version,
+                   {**contents, "README.md": b"# APGR runtime package\n"})
+    assert candidate._validate_npm_package(archive, **arguments)["version"] == version

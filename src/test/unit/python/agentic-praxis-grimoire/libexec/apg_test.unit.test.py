@@ -235,7 +235,7 @@ def test_inventory_detects_missing_stale_wrong_mirror_and_legacy_tests(
     apg_test.validate_inventory(tmp_path, inventory)
 
     (tmp_path / "libexec/extra.py").write_text("value = 2\n", encoding="utf-8")
-    with pytest.raises(apg_test.ToolError, match="coverage source inventory differs"):
+    with pytest.raises(apg_test.PolicyCheckError, match="coverage source inventory differs"):
         apg_test.validate_inventory(tmp_path, inventory)
     (tmp_path / "libexec/extra.py").unlink()
 
@@ -248,12 +248,12 @@ def test_inventory_detects_missing_stale_wrong_mirror_and_legacy_tests(
     original = tmp_path / minimal_inventory()["tests"][0]["path"]
     original.unlink()
     write_inventory(tmp_path, value)
-    with pytest.raises(apg_test.ToolError, match="disagrees with owner"):
+    with pytest.raises(apg_test.PolicyCheckError, match="disagrees with owner"):
         apg_test.validate_inventory(tmp_path, apg_test.load_inventory(tmp_path))
 
     legacy = tmp_path / "src/test/unit/python/legacy.test.py"
     legacy.write_text("value = 1\n", encoding="utf-8")
-    with pytest.raises(apg_test.ToolError, match="stale legacy"):
+    with pytest.raises(apg_test.PolicyCheckError, match="stale legacy"):
         apg_test.validate_inventory(tmp_path, apg_test.load_inventory(tmp_path))
 
 
@@ -1425,7 +1425,7 @@ def test_artifact_directory_is_fresh_and_rejects_unsafe_override(
     apg_test._cleanup_artifacts(first)
     apg_test._cleanup_artifacts(second)
     monkeypatch.setenv("APG_TEST_ARTIFACT_ROOT", "relative")
-    with pytest.raises(apg_test.ToolError, match="absolute real directory"):
+    with pytest.raises(apg_test.InvocationError, match="absolute real directory"):
         apg_test._artifact_directory(REPOSITORY_ROOT)
 
 
@@ -1737,3 +1737,872 @@ def test_main_maps_combined_name_and_returns_bounded_error(
 
     monkeypatch.setattr(apg_test, "run", failing)
     assert apg_test.main(["unit"]) == 1
+
+
+def test_resolve_source_commit_returns_head_commit_hash_or_fails(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    commit = apg_test.resolve_source_commit(REPOSITORY_ROOT)
+    assert len(commit) == 40
+    assert all(c in "0123456789abcdef" for c in commit.lower())
+
+    class DummyProcess:
+        returncode = 1
+        stdout = ""
+        stderr = "fatal: not a git repository"
+
+    monkeypatch.setattr(apg_test.subprocess, "run", lambda *args, **kwargs: DummyProcess())
+    with pytest.raises(apg_test.ToolError, match="resolve source commit"):
+        apg_test.resolve_source_commit(tmp_path)
+
+    class MalformedProcess:
+        returncode = 0
+        stdout = "short\n"
+        stderr = ""
+
+    monkeypatch.setattr(apg_test.subprocess, "run", lambda *args, **kwargs: MalformedProcess())
+    with pytest.raises(apg_test.ToolError, match="invalid commit hash"):
+        apg_test.resolve_source_commit(tmp_path)
+
+
+def test_write_summary_creates_mode_private_payload(tmp_path: Path) -> None:
+    summary_file = tmp_path / "subdir" / "summary.json"
+    apg_test.write_summary(
+        summary_file,
+        suite="policy",
+        test_status="pass",
+        gate_status="pass",
+        source_commit="a" * 40,
+    )
+    assert summary_file.is_file()
+    assert oct(stat.S_IMODE(summary_file.stat().st_mode)) == "0o600"
+    payload = json.loads(summary_file.read_text(encoding="utf-8"))
+    assert payload == {
+        "version": 1,
+        "subproject": "apg",
+        "suite": "policy",
+        "test_status": "pass",
+        "gate_status": "pass",
+        "source_commit": "a" * 40,
+    }
+
+
+def test_run_policy_executes_validators_and_fails_on_defect(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    class GoodSkillResult:
+        passed = True
+
+    class GoodRecordResult:
+        passed = True
+
+    monkeypatch.setattr(apg_test, "load_inventory", lambda _root: None)
+    monkeypatch.setattr(apg_test, "validate_inventory", lambda _root, _inv: None)
+    monkeypatch.setattr(apg_test, "dependency_versions", lambda: None)
+    monkeypatch.setattr("apg_skill_library_check.check_library", lambda _root: GoodSkillResult())
+    monkeypatch.setattr("apg_skill_library_check._embedded_corpus_failure", lambda _root: None)
+    monkeypatch.setattr("apg_record_identity.check_records", lambda _root: GoodRecordResult())
+
+    apg_test.run_policy(REPOSITORY_ROOT)
+
+    class BadSkillResult:
+        passed = False
+
+    monkeypatch.setattr("apg_skill_library_check.check_library", lambda _root: BadSkillResult())
+    with pytest.raises(apg_test.ToolError, match="skill library policy check failed"):
+        apg_test.run_policy(REPOSITORY_ROOT)
+
+    monkeypatch.setattr("apg_skill_library_check.check_library", lambda _root: GoodSkillResult())
+    monkeypatch.setattr("apg_skill_library_check._embedded_corpus_failure", lambda _root: "drift")
+    with pytest.raises(apg_test.ToolError, match="corpus identity check failed"):
+        apg_test.run_policy(REPOSITORY_ROOT)
+
+    class BadRecordResult:
+        passed = False
+
+    monkeypatch.setattr("apg_skill_library_check._embedded_corpus_failure", lambda _root: None)
+    monkeypatch.setattr("apg_record_identity.check_records", lambda _root: BadRecordResult())
+    with pytest.raises(apg_test.ToolError, match="record identity policy check failed"):
+        apg_test.run_policy(REPOSITORY_ROOT)
+
+
+def test_main_policy_and_summary_file(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    summary_path = tmp_path / "ci" / "summary.json"
+    called = []
+
+    def mock_policy(_root: Path) -> None:
+        called.append("policy")
+
+    monkeypatch.setattr(apg_test, "run_policy", mock_policy)
+    monkeypatch.setattr(apg_test, "resolve_source_commit", lambda _root: "c" * 40)
+
+    exit_code = apg_test.main(["policy", "--summary-file", str(summary_path)])
+    assert exit_code == 0
+    assert called == ["policy"]
+    payload = json.loads(summary_path.read_text(encoding="utf-8"))
+    assert payload["test_status"] == "pass"
+    assert payload["suite"] == "policy"
+    assert payload["source_commit"] == "c" * 40
+
+    def failing_run(*args: object, **kwargs: object) -> None:
+        raise apg_test.ToolError("failure injected")
+
+    fail_summary = tmp_path / "ci" / "fail-summary.json"
+    monkeypatch.setattr(apg_test, "run", failing_run)
+    exit_code = apg_test.main(["unit", "--summary-file", str(fail_summary)])
+    assert exit_code == 1
+    fail_payload = json.loads(fail_summary.read_text(encoding="utf-8"))
+    assert fail_payload["test_status"] == "fail"
+    assert fail_payload["gate_status"] == "fail"
+    assert fail_payload["suite"] == "unit"
+
+    gate_summary = tmp_path / "ci" / "gate-summary.json"
+
+    def gate_fail_run(*args: object, **kwargs: object) -> None:
+        raise apg_test.GateShortfallError("coverage fell below gate")
+
+    monkeypatch.setattr(apg_test, "run", gate_fail_run)
+    exit_code = apg_test.main(["unit", "--summary-file", str(gate_summary)])
+    assert exit_code == 1
+    gate_payload = json.loads(gate_summary.read_text(encoding="utf-8"))
+    assert gate_payload["test_status"] == "pass"
+    assert gate_payload["gate_status"] == "fail"
+
+    inv_summary = tmp_path / "ci" / "inv-summary.json"
+
+    def inv_fail_run(*args: object, **kwargs: object) -> None:
+        raise apg_test.InvocationError("bad workers")
+
+    monkeypatch.setattr(apg_test, "run", inv_fail_run)
+    exit_code = apg_test.main(["unit", "--summary-file", str(inv_summary)])
+    assert exit_code == 1
+    inv_payload = json.loads(inv_summary.read_text(encoding="utf-8"))
+    assert inv_payload["test_status"] == "error"
+    assert inv_payload["gate_status"] == "error"
+
+    interrupt_summary = tmp_path / "ci" / "interrupt-summary.json"
+
+    def interrupt_run(*args: object, **kwargs: object) -> None:
+        raise KeyboardInterrupt()
+
+    monkeypatch.setattr(apg_test, "run", interrupt_run)
+    exit_code = apg_test.main(["unit", "--summary-file", str(interrupt_summary)])
+    assert exit_code == 130
+    int_payload = json.loads(interrupt_summary.read_text(encoding="utf-8"))
+    assert int_payload["test_status"] == "error"
+    assert int_payload["gate_status"] == "error"
+
+
+def test_main_argparse_error_writes_summary_when_requested(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    monkeypatch.setattr(apg_test, "resolve_source_commit", lambda _root: "d" * 40)
+    summary_path = tmp_path / "ci" / "cli-error.json"
+    with pytest.raises(SystemExit) as exc_info:
+        apg_test.main(["invalid-role", "--summary-file", str(summary_path)])
+    assert exc_info.value.code != 0
+    assert summary_path.is_file()
+    payload = json.loads(summary_path.read_text(encoding="utf-8"))
+    assert payload["suite"] == "unknown"
+    assert payload["test_status"] == "error"
+    assert payload["gate_status"] == "error"
+    assert payload["source_commit"] == "d" * 40
+
+
+def test_main_omits_summary_when_commit_cannot_be_resolved(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    def broken_commit(_root: Path) -> str:
+        raise apg_test.ToolError("git unavailable")
+
+    monkeypatch.setattr(apg_test, "resolve_source_commit", broken_commit)
+    monkeypatch.setattr(apg_test, "run", lambda *args, **kwargs: None)
+    summary_path = tmp_path / "ci" / "no-commit.json"
+    exit_code = apg_test.main(["unit", "--summary-file", str(summary_path)])
+    assert exit_code == 1
+    assert not summary_path.exists()
+
+
+def test_parser_accepts_policy_and_summary_file() -> None:
+    parser = apg_test.parser()
+    args = parser.parse_args(["policy", "--summary-file", "reports/summary.json"])
+    assert args.suite == "policy"
+    assert args.summary_file == Path("reports/summary.json")
+
+
+def test_main_harness_policy_and_assertion_error_summary(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    monkeypatch.setattr(apg_test, "resolve_source_commit", lambda _root: "e" * 40)
+
+    # HarnessError -> test_status: "error", gate_status: "error"
+    harness_summary = tmp_path / "ci" / "harness-summary.json"
+    def harness_fail_run(*args: object, **kwargs: object) -> None:
+        raise apg_test.HarnessError("worker crashed or manifest invalid")
+    monkeypatch.setattr(apg_test, "run", harness_fail_run)
+    exit_code = apg_test.main(["unit", "--summary-file", str(harness_summary)])
+    assert exit_code == 1
+    harness_payload = json.loads(harness_summary.read_text(encoding="utf-8"))
+    assert harness_payload["test_status"] == "error"
+    assert harness_payload["gate_status"] == "error"
+
+    # PolicyCheckError -> test_status: "fail", gate_status: "fail"
+    policy_summary = tmp_path / "ci" / "policy-fail-summary.json"
+    def policy_fail_run(*args: object, **kwargs: object) -> None:
+        raise apg_test.PolicyCheckError("corpus mismatch")
+    monkeypatch.setattr(apg_test, "run_policy", policy_fail_run)
+    exit_code = apg_test.main(["policy", "--summary-file", str(policy_summary)])
+    assert exit_code == 1
+    policy_payload = json.loads(policy_summary.read_text(encoding="utf-8"))
+    assert policy_payload["test_status"] == "fail"
+    assert policy_payload["gate_status"] == "fail"
+
+    # TestAssertionError -> test_status: "fail", gate_status: "fail"
+    assert_summary = tmp_path / "ci" / "assert-fail-summary.json"
+    def assert_fail_run(*args: object, **kwargs: object) -> None:
+        raise apg_test.TestAssertionError("test failed")
+    monkeypatch.setattr(apg_test, "run", assert_fail_run)
+    exit_code = apg_test.main(["unit", "--summary-file", str(assert_summary)])
+    assert exit_code == 1
+    assert_payload = json.loads(assert_summary.read_text(encoding="utf-8"))
+    assert assert_payload["test_status"] == "fail"
+    assert assert_payload["gate_status"] == "fail"
+
+
+def test_main_summary_write_failure_preserves_exit_code_and_emits_diagnostic(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    monkeypatch.setattr(apg_test, "resolve_source_commit", lambda _root: "f" * 40)
+    summary_path = tmp_path / "ci" / "summary.json"
+
+    def disk_full(*args: object, **kwargs: object) -> None:
+        raise OSError("No space left on device")
+
+    monkeypatch.setattr(apg_test, "write_summary", disk_full)
+
+    # 1. Successful test run with failed summary write -> exits 1
+    monkeypatch.setattr(apg_test, "run", lambda *args, **kwargs: None)
+    exit_code = apg_test.main(["unit", "--summary-file", str(summary_path)])
+    assert exit_code == 1
+    captured = capsys.readouterr()
+    assert "failed to write summary file" in captured.err
+
+    # 2. Failing test run (GateShortfallError) with failed summary write -> exits 1
+    monkeypatch.setattr(
+        apg_test, "run", lambda *args, **kwargs: (_ for _ in ()).throw(apg_test.GateShortfallError("coverage fail"))
+    )
+    exit_code = apg_test.main(["unit", "--summary-file", str(summary_path)])
+    assert exit_code == 1
+    captured = capsys.readouterr()
+    assert "failed to write summary file" in captured.err
+
+
+def test_main_stale_summary_invalidation_and_safety(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    summary_path = tmp_path / "ci" / "stale-summary.json"
+
+    # Pre-populate valid APGR v1 summary
+    apg_test.write_summary(
+        summary_path,
+        suite="unit",
+        test_status="pass",
+        gate_status="pass",
+        source_commit="1" * 40,
+    )
+    assert summary_path.is_file()
+
+    # Commit cannot be resolved at runtime -> stale summary must be removed
+    monkeypatch.setattr(
+        apg_test,
+        "resolve_source_commit",
+        lambda _root: (_ for _ in ()).throw(apg_test.ToolError("no git")),
+    )
+    monkeypatch.setattr(apg_test, "run", lambda *args, **kwargs: None)
+    exit_code = apg_test.main(["unit", "--summary-file", str(summary_path)])
+    assert exit_code == 1
+    assert not summary_path.exists()
+
+    # Safety: Foreign file should NOT be unlinked by invalidate()
+    foreign_path = tmp_path / "ci" / "foreign.json"
+    foreign_path.write_text('{"subproject": "other", "version": 1}', encoding="utf-8")
+    dest_foreign = apg_test.admit_summary_destination(REPOSITORY_ROOT, foreign_path)
+    with pytest.raises(apg_test.InvocationError, match="not a recognized APGR receipt"):
+        dest_foreign.invalidate()
+    assert foreign_path.is_file()
+
+    # Corrupt or non-json file should also NOT be unlinked
+    corrupt_path = tmp_path / "ci" / "corrupt.txt"
+    corrupt_path.write_text("not json", encoding="utf-8")
+    dest_corrupt = apg_test.admit_summary_destination(REPOSITORY_ROOT, corrupt_path)
+    with pytest.raises(apg_test.InvocationError, match="not a recognized APGR receipt"):
+        dest_corrupt.invalidate()
+    assert corrupt_path.is_file()
+
+
+def test_summary_path_confinement(
+    tmp_path: Path,
+) -> None:
+    fake_repo = tmp_path / "repo"
+    fake_repo.mkdir()
+    fake_git = fake_repo / ".git"
+    fake_git.mkdir()
+    fake_docs = fake_repo / "docs"
+    fake_docs.mkdir()
+
+    # Path inside .git/
+    with pytest.raises(apg_test.InvocationError, match="summary file cannot target Git metadata"):
+        apg_test.admit_summary_destination(fake_repo, fake_git / "summary.json")
+
+    # Path inside repo that is not gitignored
+    with pytest.raises(apg_test.InvocationError, match="summary file inside repository must be gitignored"):
+        apg_test.admit_summary_destination(fake_repo, fake_docs / "forbidden-summary.json")
+
+    # Path outside repo is allowed
+    outside = tmp_path / "outside" / "summary.json"
+    dest_outside = apg_test.admit_summary_destination(fake_repo, outside)
+    assert dest_outside.resolved_target == outside.resolve()
+
+
+def test_summary_git_head_drift_detection(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    # First call at entry returns c1, subsequent call at exit returns c2
+    commits = iter(["a" * 40, "b" * 40])
+    monkeypatch.setattr(apg_test, "resolve_source_commit", lambda _root: next(commits))
+    monkeypatch.setattr(apg_test, "run", lambda *args, **kwargs: None)
+
+    summary_path = tmp_path / "ci" / "drift-summary.json"
+    # Pre-populate a summary to verify it gets invalidated
+    apg_test.write_summary(
+        summary_path,
+        suite="unit",
+        test_status="pass",
+        gate_status="pass",
+        source_commit="a" * 40,
+    )
+    assert summary_path.is_file()
+
+    exit_code = apg_test.main(["unit", "--summary-file", str(summary_path)])
+    assert exit_code == 1
+    captured = capsys.readouterr()
+    assert "git HEAD drifted during execution" in captured.err
+    assert not summary_path.exists()
+
+
+def test_pytest_exit_code_mappings(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    class StubProcess:
+        def __init__(self, code: int):
+            self.returncode = code
+
+    # Code 1 -> TestAssertionError (requires worker manifest validation)
+    art1 = tmp_path / "artifacts1"
+    art1.mkdir()
+    monkeypatch.setattr(apg_test, "validate_worker_manifest", lambda *_args: None)
+    monkeypatch.setattr(apg_test.subprocess, "run", lambda *_args, **_kwargs: StubProcess(1))
+    with pytest.raises(apg_test.TestAssertionError, match="status 1"):
+        apg_test._run_pytest(REPOSITORY_ROOT, "unit", 2, art1)
+
+    # For codes 2, 3, 4, 5, validate_worker_manifest must NOT be called
+    def fail_if_manifest_called(*_args, **_kwargs):
+        raise AssertionError("validate_worker_manifest was unexpectedly called")
+
+    monkeypatch.setattr(apg_test, "validate_worker_manifest", fail_if_manifest_called)
+
+    # Code 2 -> KeyboardInterrupt
+    art2 = tmp_path / "artifacts2"
+    art2.mkdir()
+    monkeypatch.setattr(apg_test.subprocess, "run", lambda *_args, **_kwargs: StubProcess(2))
+    with pytest.raises(KeyboardInterrupt):
+        apg_test._run_pytest(REPOSITORY_ROOT, "unit", 2, art2)
+
+    # Code 3 -> HarnessError
+    art3 = tmp_path / "artifacts3"
+    art3.mkdir()
+    monkeypatch.setattr(apg_test.subprocess, "run", lambda *_args, **_kwargs: StubProcess(3))
+    with pytest.raises(apg_test.HarnessError, match="status 3"):
+        apg_test._run_pytest(REPOSITORY_ROOT, "unit", 2, art3)
+
+    # Code 4 -> InvocationError
+    art4 = tmp_path / "artifacts4"
+    art4.mkdir()
+    monkeypatch.setattr(apg_test.subprocess, "run", lambda *_args, **_kwargs: StubProcess(4))
+    with pytest.raises(apg_test.InvocationError, match="status 4"):
+        apg_test._run_pytest(REPOSITORY_ROOT, "unit", 2, art4)
+
+    # Code 5 -> InvocationError
+    art5 = tmp_path / "artifacts5"
+    art5.mkdir()
+    monkeypatch.setattr(apg_test.subprocess, "run", lambda *_args, **_kwargs: StubProcess(5))
+    with pytest.raises(apg_test.InvocationError, match="collected no tests"):
+        apg_test._run_pytest(REPOSITORY_ROOT, "unit", 2, art5)
+
+
+def test_javascript_engine_prerequisite_failure_raises_invocation_error(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    monkeypatch.delenv("APG_JAVASCRIPT_NODE", raising=False)
+    with pytest.raises(apg_test.InvocationError, match="JavaScript test prerequisite is unavailable"):
+        apg_test._javascript_engine_binding(tmp_path)
+
+
+def test_node_profile_cleanup_error_inherits_harness_error() -> None:
+    assert issubclass(apg_test.NodeProfileCleanupError, apg_test.HarnessError)
+
+
+def test_entry_time_summary_invalidation_unlinks_stale_file(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    stale_summary = tmp_path / "ci" / "stale-summary.json"
+    apg_test.write_summary(
+        stale_summary,
+        suite="policy",
+        test_status="pass",
+        gate_status="pass",
+        source_commit="d" * 40,
+    )
+    assert stale_summary.is_file()
+
+    monkeypatch.setattr(apg_test, "resolve_source_commit", lambda _root: "d" * 40)
+    # Simulate an early abort or unhandled exception during run
+    def bomb(*_args, **_kwargs):
+        raise RuntimeError("simulated sudden crash")
+
+    monkeypatch.setattr(apg_test, "run_policy", bomb)
+    with pytest.raises(RuntimeError, match="simulated sudden crash"):
+        apg_test.main(["policy", "--summary-file", str(stale_summary)])
+
+    # Stale summary must have been invalidated at entry before run_policy crashed
+    assert not stale_summary.exists()
+
+
+def test_admit_summary_destination_refuses_tracked_and_git_metadata_and_preserves_bytes(
+    tmp_path: Path,
+) -> None:
+    # 1. Tracked valid receipt inside repository cannot be admitted
+    sample_receipt = REPOSITORY_ROOT / "testing" / "fixtures" / "jaca_ci" / "sample-summary-pass.json"
+    assert sample_receipt.is_file()
+    sha_before = hashlib.sha256(sample_receipt.read_bytes()).hexdigest()
+    with pytest.raises(apg_test.InvocationError, match="cannot target tracked file"):
+        apg_test.admit_summary_destination(REPOSITORY_ROOT, sample_receipt)
+    assert hashlib.sha256(sample_receipt.read_bytes()).hexdigest() == sha_before
+
+    # 2. Tracked non-receipt code file cannot be admitted
+    code_file = REPOSITORY_ROOT / "libexec" / "apg_test.py"
+    code_sha = hashlib.sha256(code_file.read_bytes()).hexdigest()
+    with pytest.raises(apg_test.InvocationError, match="cannot target tracked file"):
+        apg_test.admit_summary_destination(REPOSITORY_ROOT, code_file)
+    assert hashlib.sha256(code_file.read_bytes()).hexdigest() == code_sha
+
+    # 3. Receipt-shaped file inside .git cannot be admitted
+    fake_repo = tmp_path / "repo"
+    fake_repo.mkdir()
+    fake_git = fake_repo / ".git"
+    fake_git.mkdir()
+    git_receipt = fake_git / "receipt.json"
+    git_receipt.write_text(json.dumps({
+        "version": 1, "subproject": "apg", "suite": "policy",
+        "test_status": "pass", "gate_status": "pass", "source_commit": "e" * 40,
+    }), encoding="utf-8")
+    git_receipt_sha = hashlib.sha256(git_receipt.read_bytes()).hexdigest()
+    with pytest.raises(apg_test.InvocationError, match="cannot target Git metadata"):
+        apg_test.admit_summary_destination(fake_repo, git_receipt)
+    assert git_receipt.is_file()
+    assert hashlib.sha256(git_receipt.read_bytes()).hexdigest() == git_receipt_sha
+
+    # 4. Output symlink targeting protected content cannot be admitted
+    symlink_target = tmp_path / "link-to-tracked.json"
+    symlink_target.symlink_to(sample_receipt)
+    with pytest.raises(apg_test.InvocationError, match="cannot target a symlink"):
+        apg_test.admit_summary_destination(REPOSITORY_ROOT, symlink_target)
+    assert symlink_target.is_symlink()
+    assert hashlib.sha256(sample_receipt.read_bytes()).hexdigest() == sha_before
+
+
+def test_destination_invalidate_preserves_foreign_and_corrupt_files(
+    tmp_path: Path,
+) -> None:
+    # Foreign non-receipt JSON file at admitted path raises InvocationError and is preserved
+    foreign_file = tmp_path / "foreign.json"
+    foreign_file.write_text('{"notes": "unrelated data"}', encoding="utf-8")
+    dest = apg_test.admit_summary_destination(REPOSITORY_ROOT, foreign_file)
+    with pytest.raises(apg_test.InvocationError, match="not a recognized APGR receipt"):
+        dest.invalidate()
+    assert foreign_file.is_file()
+    assert foreign_file.read_text(encoding="utf-8") == '{"notes": "unrelated data"}'
+
+    # Foreign text file is preserved
+    text_file = tmp_path / "notes.txt"
+    text_file.write_text("plain text", encoding="utf-8")
+    dest_text = apg_test.admit_summary_destination(REPOSITORY_ROOT, text_file)
+    with pytest.raises(apg_test.InvocationError, match="not a recognized APGR receipt"):
+        dest_text.invalidate()
+    assert text_file.is_file()
+
+
+def test_destination_invalidate_permission_error_raises_invocation_error(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    stale_summary = tmp_path / "stale.json"
+    apg_test.write_summary(
+        stale_summary,
+        suite="policy",
+        test_status="pass",
+        gate_status="pass",
+        source_commit="f" * 40,
+    )
+    dest = apg_test.admit_summary_destination(REPOSITORY_ROOT, stale_summary)
+    def fail_unlink(*_args, **_kwargs):
+        raise PermissionError("read-only filesystem")
+    monkeypatch.setattr(Path, "unlink", fail_unlink)
+    with pytest.raises(apg_test.InvocationError, match="failed to invalidate stale summary"):
+        dest.invalidate()
+
+
+def test_early_flag_scanning_ignores_flags_as_filenames() -> None:
+    suite, summary_file = apg_test._scan_early_args(["policy", "--summary-file", "--workers", "8"])
+    assert suite == "policy"
+    assert summary_file is None
+
+    suite, summary_file = apg_test._scan_early_args(["unit", "--summary-file=--workers", "8"])
+    assert suite == "unit"
+    assert summary_file is None
+
+    suite, summary_file = apg_test._scan_early_args(["integration", "--summary-file", "valid.json"])
+    assert suite == "integration"
+    assert summary_file == Path("valid.json")
+
+
+def test_combined_coverage_harness_error_dominance_and_outcomes(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    # 1. Union _combine_coverage raises HarnessError -> reports error/error, not fail/fail
+    mock_cr = apg_test.ComponentResult(tmp_path / "fake.cov", {}, apg_test.CoverageCounts(100, 100, 50, 50))
+    mock_inv = apg_test.Inventory(coverage_sources={}, excluded_launchers={}, tests={})
+    monkeypatch.setattr(apg_test, "load_inventory", lambda _root: mock_inv)
+    monkeypatch.setattr(apg_test, "validate_inventory", lambda _r, _i: None)
+    monkeypatch.setattr(apg_test, "dependency_versions", lambda: None)
+    monkeypatch.setattr(apg_test, "requires_typescript_compiler", lambda _i: False)
+    monkeypatch.setattr(apg_test, "requires_javascript_engine", lambda _i: False)
+    monkeypatch.setattr(apg_test, "requires_node_profile_runtimes", lambda _i: False)
+    monkeypatch.setattr(apg_test, "_run_pytest", lambda *_args, **_kwargs: (tmp_path / "fake.cov", {}))
+    monkeypatch.setattr(apg_test, "validate_coverage_report", lambda *_args: None)
+    monkeypatch.setattr(apg_test, "coverage_counts", lambda *_args: apg_test.CoverageCounts(100, 100, 50, 50))
+    monkeypatch.setattr(apg_test, "enforce_threshold", lambda *_args: None)
+    monkeypatch.setattr(apg_test, "resolve_source_commit", lambda _r: "a" * 40)
+
+    summary_file = tmp_path / "ci" / "merge-harness-error.json"
+
+    monkeypatch.setattr(
+        apg_test,
+        "_combine_coverage",
+        lambda *_args, **_kwargs: (_ for _ in ()).throw(apg_test.HarnessError("merge failed")),
+    )
+    exit_code = apg_test.main(["unit-integration", "--summary-file", str(summary_file)])
+    assert exit_code == 1
+    payload = json.loads(summary_file.read_text(encoding="utf-8"))
+    assert payload["test_status"] == "error"
+    assert payload["gate_status"] == "error"
+    assert payload["suite"] == "combined"
+
+    # 2. Simultaneous component GateShortfallError and union HarnessError: HarnessError dominates!
+    summary_dom = tmp_path / "ci" / "dom-summary.json"
+    component_count = 0
+    def shortfall_then_pass(*args, **kwargs):
+        nonlocal component_count
+        component_count += 1
+        if component_count == 1:
+            raise apg_test.GateShortfallError("unit coverage shortfall")
+
+    monkeypatch.setattr(apg_test, "enforce_threshold", shortfall_then_pass)
+    exit_code = apg_test.main(["unit-integration", "--summary-file", str(summary_dom)])
+    assert exit_code == 1
+    dom_payload = json.loads(summary_dom.read_text(encoding="utf-8"))
+    assert dom_payload["test_status"] == "error"
+    assert dom_payload["gate_status"] == "error"
+
+
+def test_main_help_leaves_existing_summary_untouched(
+    tmp_path: Path,
+) -> None:
+    existing_receipt = tmp_path / "existing-summary.json"
+    apg_test.write_summary(
+        existing_receipt,
+        suite="policy",
+        test_status="pass",
+        gate_status="pass",
+        source_commit="b" * 40,
+    )
+    content_before = existing_receipt.read_bytes()
+    with pytest.raises(SystemExit) as exc:
+        apg_test.main(["--help", "--summary-file", str(existing_receipt)])
+    assert exc.value.code == 0
+    assert existing_receipt.read_bytes() == content_before
+
+
+def test_summary_destination_and_admission_branches(tmp_path: Path) -> None:
+    # 1. Target does not exist -> invalidate() returns None
+    nonexistent = tmp_path / "does_not_exist.json"
+    dest_nonexistent = apg_test.admit_summary_destination(REPOSITORY_ROOT, nonexistent)
+    dest_nonexistent.invalidate()
+
+    # 2. Target is directory -> invalidate() raises InvocationError
+    target_dir = tmp_path / "dir_target"
+    target_dir.mkdir()
+    dest_dir = apg_test.SummaryDestination(target_dir, target_dir.resolve(), REPOSITORY_ROOT)
+    with pytest.raises(apg_test.InvocationError, match="cannot target a directory"):
+        dest_dir.invalidate()
+
+    # 3. Target is a symlink to an APGR receipt -> admitted fails, and direct invalidate() guards against unlinking symlink
+    backing_receipt = tmp_path / "backing.json"
+    apg_test.write_summary(
+        backing_receipt,
+        suite="policy",
+        test_status="pass",
+        gate_status="pass",
+        source_commit="1" * 40,
+    )
+    symlink_receipt = tmp_path / "symlink_receipt.json"
+    symlink_receipt.symlink_to(backing_receipt)
+    with pytest.raises(apg_test.InvocationError, match="cannot target a symlink"):
+        apg_test.admit_summary_destination(REPOSITORY_ROOT, symlink_receipt)
+    dest_symlink = apg_test.SummaryDestination(symlink_receipt, symlink_receipt.resolve(), REPOSITORY_ROOT)
+    with pytest.raises(apg_test.InvocationError, match="cannot target a symlink"):
+        dest_symlink.invalidate()
+    assert symlink_receipt.is_symlink()
+    assert backing_receipt.is_file()
+
+    # 4. _is_apgr_receipt branches:
+    # 4a. Oversized
+    big_file = tmp_path / "big.json"
+    big_file.write_bytes(b"x" * (1024 * 1024 + 1))
+    assert not apg_test._is_apgr_receipt(big_file)
+
+    # 4b. Not a dict
+    arr_file = tmp_path / "arr.json"
+    arr_file.write_text("[1, 2, 3]", encoding="utf-8")
+    assert not apg_test._is_apgr_receipt(arr_file)
+
+    # 4c. Version != 1
+    v_file = tmp_path / "v.json"
+    v_file.write_text(json.dumps({
+        "version": 2, "subproject": "apg", "suite": "policy",
+        "test_status": "pass", "gate_status": "pass", "source_commit": "1" * 40,
+    }), encoding="utf-8")
+    assert not apg_test._is_apgr_receipt(v_file)
+
+    # 4d. Subproject != "apg"
+    sub_file = tmp_path / "sub.json"
+    sub_file.write_text(json.dumps({
+        "version": 1, "subproject": "other", "suite": "policy",
+        "test_status": "pass", "gate_status": "pass", "source_commit": "1" * 40,
+    }), encoding="utf-8")
+    assert not apg_test._is_apgr_receipt(sub_file)
+
+    # 4e. Invalid suite
+    suite_file = tmp_path / "suite.json"
+    suite_file.write_text(json.dumps({
+        "version": 1, "subproject": "apg", "suite": "bad_suite",
+        "test_status": "pass", "gate_status": "pass", "source_commit": "1" * 40,
+    }), encoding="utf-8")
+    assert not apg_test._is_apgr_receipt(suite_file)
+
+    # 4f. Invalid test_status
+    ts_file = tmp_path / "ts.json"
+    ts_file.write_text(json.dumps({
+        "version": 1, "subproject": "apg", "suite": "policy",
+        "test_status": "invalid", "gate_status": "pass", "source_commit": "1" * 40,
+    }), encoding="utf-8")
+    assert not apg_test._is_apgr_receipt(ts_file)
+
+    # 4g. Invalid gate_status
+    gs_file = tmp_path / "gs.json"
+    gs_file.write_text(json.dumps({
+        "version": 1, "subproject": "apg", "suite": "policy",
+        "test_status": "pass", "gate_status": "invalid", "source_commit": "1" * 40,
+    }), encoding="utf-8")
+    assert not apg_test._is_apgr_receipt(gs_file)
+
+    # 4h. Invalid commit (wrong length / non-hex)
+    com_file = tmp_path / "com.json"
+    com_file.write_text(json.dumps({
+        "version": 1, "subproject": "apg", "suite": "policy",
+        "test_status": "pass", "gate_status": "pass", "source_commit": "not_40_hex",
+    }), encoding="utf-8")
+    assert not apg_test._is_apgr_receipt(com_file)
+
+    nonhex_file = tmp_path / "nonhex.json"
+    nonhex_file.write_text(json.dumps({
+        "version": 1, "subproject": "apg", "suite": "policy",
+        "test_status": "pass", "gate_status": "pass", "source_commit": "z" * 40,
+    }), encoding="utf-8")
+    assert not apg_test._is_apgr_receipt(nonhex_file)
+
+    # 5. admit_summary_destination branches:
+    # 5a. target is directory
+    with pytest.raises(apg_test.InvocationError, match="cannot target a directory"):
+        apg_test.admit_summary_destination(REPOSITORY_ROOT, target_dir)
+
+    # 5b. target is repository root
+    with pytest.raises(apg_test.InvocationError, match="cannot target repository root"):
+        apg_test.admit_summary_destination(REPOSITORY_ROOT, REPOSITORY_ROOT)
+
+    # 5c. raw target has .git
+    with pytest.raises(apg_test.InvocationError, match="cannot target Git metadata"):
+        apg_test.admit_summary_destination(REPOSITORY_ROOT, Path(".git") / "test.json")
+
+    # 5d. resolved target inside git metadata
+    with pytest.raises(apg_test.InvocationError, match="cannot target Git metadata"):
+        apg_test.admit_summary_destination(REPOSITORY_ROOT, REPOSITORY_ROOT / ".git" / "test.json")
+
+
+def test_main_summary_file_equals_syntax_and_write_failure(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    # 1. --summary-file=path syntax
+    eq_summary = tmp_path / "eq-summary.json"
+    exit_code = apg_test.main(["policy", f"--summary-file={eq_summary}"])
+    assert exit_code == 0
+    assert eq_summary.is_file()
+
+    # 2. --summary-file= with empty value attempts directory target and exits 1
+    exit_code_empty = apg_test.main(["policy", "--summary-file="])
+    assert exit_code_empty == 1
+
+    # 3. _write_admitted disk failure
+    dest_write_fail = tmp_path / "write-fail.json"
+    def bomb_write(*args, **kwargs):
+        raise OSError("write failed")
+    monkeypatch.setattr(apg_test, "write_summary", bomb_write)
+    exit_code_fail = apg_test.main(["policy", "--summary-file", str(dest_write_fail)])
+    assert exit_code_fail == 1
+    assert "failed to write summary file" in capsys.readouterr().err
+
+
+def test_keyboard_interrupt_with_invalidation_failure_exits_130(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    summary_path = tmp_path / "ci" / "summary.json"
+    apg_test.write_summary(
+        summary_path,
+        suite="policy",
+        test_status="pass",
+        gate_status="pass",
+        source_commit="0" * 40,
+    )
+    monkeypatch.setattr(apg_test, "run_policy", lambda _root: (_ for _ in ()).throw(KeyboardInterrupt()))
+    commits = iter(["0" * 40, "1" * 40])
+    monkeypatch.setattr(apg_test, "resolve_source_commit", lambda _r: next(commits))
+    original_invalidate = apg_test.SummaryDestination.invalidate
+    call_count = 0
+    def failing_invalidate(self):
+        nonlocal call_count
+        call_count += 1
+        if call_count > 1:
+            raise apg_test.InvocationError("disk read-only on unlinking")
+        original_invalidate(self)
+    monkeypatch.setattr(apg_test.SummaryDestination, "invalidate", failing_invalidate)
+
+    exit_code = apg_test.main(["policy", "--summary-file", str(summary_path)])
+    assert exit_code == 130
+    captured = capsys.readouterr()
+    assert "interrupted" in captured.err
+    assert "git HEAD drifted during execution" in captured.err
+    assert "disk read-only on unlinking" in captured.err
+
+
+def test_admit_summary_destination_inverse_alias_and_dual_boundary(
+    tmp_path: Path,
+) -> None:
+    # 1. Inverse alias: in-repository tracked symlink pointing to an outside receipt
+    repo = tmp_path / "disposable-repo"
+    repo.mkdir()
+    apg_test.subprocess.run(["git", "init"], cwd=repo, check=True, capture_output=True)
+    apg_test.subprocess.run(["git", "config", "user.email", "test@example.com"], cwd=repo, check=True)
+    apg_test.subprocess.run(["git", "config", "user.name", "Test"], cwd=repo, check=True)
+
+    outside_receipt = tmp_path / "outside-receipt.json"
+    apg_test.write_summary(
+        outside_receipt,
+        suite="policy",
+        test_status="pass",
+        gate_status="pass",
+        source_commit="3" * 40,
+    )
+    outside_sha = hashlib.sha256(outside_receipt.read_bytes()).hexdigest()
+
+    tracked_link = repo / "tracked-link.json"
+    tracked_link.symlink_to(outside_receipt)
+    apg_test.subprocess.run(["git", "add", "tracked-link.json"], cwd=repo, check=True)
+    apg_test.subprocess.run(["git", "commit", "-m", "add tracked link"], cwd=repo, check=True, capture_output=True)
+
+    # Admission must refuse the in-repo tracked symlink
+    with pytest.raises(apg_test.InvocationError, match="cannot target a symlink"):
+        apg_test.admit_summary_destination(repo, tracked_link)
+    # Refusal preserves link, outside receipt, and git index
+    assert tracked_link.is_symlink()
+    assert hashlib.sha256(outside_receipt.read_bytes()).hexdigest() == outside_sha
+    ls_check = apg_test.subprocess.run(["git", "ls-files", "--error-unmatch", "tracked-link.json"], cwd=repo, capture_output=True)
+    assert ls_check.returncode == 0
+    status_check = apg_test.subprocess.run(["git", "status", "--porcelain"], cwd=repo, capture_output=True, text=True)
+    assert status_check.stdout.strip() == ""
+
+    # 2. Positive test: ordinary fresh gitignored destination under repository is admitted and written
+    (repo / ".gitignore").write_text(".test-reports/\n")
+    report_dest = repo / ".test-reports" / "apg" / "policy" / "summary.json"
+    report_dest.parent.mkdir(parents=True, exist_ok=True)
+    dest_ignored = apg_test.admit_summary_destination(repo, report_dest)
+    dest_ignored.invalidate()
+    dest_ignored.write(
+        suite="policy",
+        test_status="pass",
+        gate_status="pass",
+        source_commit="3" * 40,
+    )
+    assert report_dest.is_file()
+    assert apg_test._is_apgr_receipt(report_dest)
+
+    # 3. Positive test: ordinary fresh outside scratch destination is admitted and written
+    outside_scratch = tmp_path / "fresh-scratch.json"
+    dest_scratch = apg_test.admit_summary_destination(repo, outside_scratch)
+    dest_scratch.invalidate()
+    dest_scratch.write(
+        suite="policy",
+        test_status="pass",
+        gate_status="pass",
+        source_commit="3" * 40,
+    )
+    assert outside_scratch.is_file()
+    assert apg_test._is_apgr_receipt(outside_scratch)
+
+    # 4. Fail-closed git tracking probe: timeout raises InvocationError
+    from unittest.mock import patch
+    def fail_timeout(*args, **kwargs):
+        raise apg_test.subprocess.TimeoutExpired(cmd=["git", "ls-files"], timeout=5)
+
+    with patch.object(apg_test.subprocess, "run", side_effect=fail_timeout):
+        with pytest.raises(apg_test.InvocationError, match="timed out"):
+            apg_test.admit_summary_destination(repo, report_dest)

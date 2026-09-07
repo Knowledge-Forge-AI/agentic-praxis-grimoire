@@ -13,11 +13,17 @@ This package is a lightweight, zero-dependency Node.js launcher. It contains no 
 3. Verifies the prebuilt Go binary and its companion `apg.binary-manifest/v1` integrity manifest.
 4. Executes the verified binary with exact arguments, inherited stdio, and `shell: false`.
 
-All operational behavior, skill resolution, and reporting logic reside exclusively in the verified Go binary.
+All operational behavior, skill resolution, footprint accounting, and reporting logic reside exclusively in the verified Go binary.
+
+## Package Contents and Dispatch Boundaries
+
+The launcher and platform packages execute runtime command families (`skills`, `footprint`, `env`, `analyze hotspots`, `report`, `response`).
+
+These packages do **not** carry repository maintenance runners, policy checks, or test suites. The CI qualification runner (`apgr test`) requires an APGR Git source checkout and the developer toolchain (Python 3.11+, pytest stack, Git 2.40+, Go 1.25+).
 
 ## Installation
 
-Install globally via npm:
+Once this version is published, install globally via npm:
 
 ```sh
 npm install -g @knowledge-forge-ai/apgr@__APG_VERSION__
@@ -30,6 +36,8 @@ Or execute directly via `npx`:
 npx @knowledge-forge-ai/apgr@__APG_VERSION__ --version
 ```
 
+*Note on candidate versions*: Prior to publication, unpublished candidate releases are not available on npm; test candidate features directly from an APGR Git checkout.
+
 ## Supported Platforms
 
 - `darwin/arm64` (macOS Apple Silicon) -> `@knowledge-forge-ai/apgr-darwin-arm64`
@@ -37,6 +45,7 @@ npx @knowledge-forge-ai/apgr@__APG_VERSION__ --version
 - `linux/arm64` (Linux aarch64) -> `@knowledge-forge-ai/apgr-linux-arm64`
 
 Requirements: Node.js `>=22.0.0`.
+Developer qualification gate status: Darwin arm64 passed the [integrated source qualification](https://github.com/Knowledge-Forge-AI/agentic-praxis-grimoire/blob/v__APG_VERSION__/docs/status/2026/09/06/00159-apg114-v090-integrated-source-qualification-exit.md). Developer qualification on Linux x86_64 remains pending.
 
 ## License
 

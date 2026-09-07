@@ -8,6 +8,18 @@ still requires human review.
 
 ## Roadmap policy
 
+APG115 prepared v0.9.0 release source after APG114 integrated qualification.
+APG116's [wording amendment](evaluations/apg116-v090-release-wording-amendment.md)
+corrects a package-facing defect found at the first release qualification gate.
+Qualification of the amended committed source, product publication and host
+promotion remain separate boundaries; no final release bundle is claimed.
+APG117's [prerequisite evaluation](evaluations/apg117-v090-release-qualification-prerequisites.md)
+records incomplete qualification after pre-final review and closeout amendment.
+The unavailable strict PyPI renderer limits description rendering only; APG116
+and the v0.8.1 correction also deferred that check. The build/test toolchain was
+present but unused. Candidate and publication qualification remain incomplete;
+the missing renderer does not prevent the other required work.
+
 The human maintainer retains ultimate roadmap authority. ChatGPT may advance
 successive bounded phases only within a human-approved task or preapproved
 roadmap envelope and must stop at its defined boundary. Codex recommendations,
@@ -2293,3 +2305,25 @@ APG107 qualifies v0.8.1 as the complete, synchronized release of the v0.8 produc
 line with audited human-facing documentation, verified project URLs, npm READMEs,
 and deterministic two-build evidence. APG108 delivers the publication executor
 and repository metadata reconciliation.
+
+The v0.8.1 product is published across all four distribution channels (GitHub Releases,
+PyPI, npm, and Go proxy). Reconciliation completed in run
+`APGR-V081-RECONCILE1--20260906T173602166416Z`.
+
+## APGR v0.9 Program — CI-First Foundation and Backlog Ordering
+
+The active development program is ordered by the [v0.9 Roadmap](v0-9-roadmap.md).
+v0.9 prioritizes JACA CI qualification support, JACA XO compatibility, and cross-release
+backlog disposition across future v0.10 (Theme Forge) and v0.11 (Repo Map) candidates.
+v0.9 is active development, not a published release.
+
+## APG118 v0.9.0 release bundle qualification
+
+APG118 built paired APG116 candidates and all ten assets, and completed source,
+rendering, installed-consumer, Go, and inert publisher checks. Full public
+validation found a private local path in the APG113 public exit. A bounded
+correction preserves that exit's historical result; disposition is
+`V090_SOURCE_AMENDMENT_REQUIRES_QUALIFICATION`. Corrected-source release
+qualification remains pending. APG117 is unchanged. Dispatcher review and
+closeout remain pending; no public publication or successor is authorized.
+See the [APG118 evaluation](evaluations/apg118-v090-release-bundle-qualification.md).

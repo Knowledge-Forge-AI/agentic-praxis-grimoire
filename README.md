@@ -82,31 +82,44 @@ resources are verified projections of it:
 
 ## Quick start
 
-The public release remains **v0.8.0** on Git and the Go module proxy. GitHub
-Releases, PyPI, and npm do not contain v0.8.1. This documentation covers the
-prepared v0.8.1 source candidate; it is not a publication claim.
+This documentation covers 0.9.0. The previous published release baseline is
+**v0.8.1** on Git, GitHub Releases, PyPI, npm, and the Go module proxy. Once
+this version is published, packages are available from standard registries;
+prior to publication, capabilities can be exercised directly from an APGR Git
+source checkout.
 
 ### Source checkout first
 
-Run these commands from the physical root of your prepared v0.8.1 source
-checkout. A fresh public clone currently retrieves the v0.8.0 release line,
-not this unpublished candidate:
+Run these commands from the root of your APGR source checkout:
 
 ```sh
 go run ./cmd/apgr --version
 go run ./cmd/apgr skills list
 ```
 
-The prepared source candidate is pending the separate source-freeze and
-production qualification boundary. Do not use an unpublished registry version
-as a dependency or claim that these commands prove publication.
+### Supported platforms and developer qualification gate
 
-### Supported platforms
-
-The prepared distribution targets include:
+Prebuilt distribution runtime targets include:
 - **macOS Apple Silicon**: `darwin/arm64`
 - **Linux x86_64**: `linux/amd64` (`linux/x64`)
 - **Linux ARM64**: `linux/arm64`
+
+**Developer qualification gate status**: Darwin arm64 is fully qualified (APG114 / Exit `00159`).
+The Linux developer qualification gate is currently pending: the `policy` suite is
+pending runner qualification, and `unit`, `integration`, and `combined` (`unit-integration`)
+suites are blocked by whole-inventory preflight binding Darwin arm64 Nix store digests.
+
+### Prerequisites and dispatch boundaries
+
+- **Core runtime commands**: `cmd/apgr` and the thin distribution wrappers execute
+  the portable Go command families (`skills`, `footprint`, `env`, `analyze hotspots`,
+  `report`, `response`).
+- **Repository test runner**: Running `apgr test` (including `--summary-file` and the
+  `policy` mechanical role) is a repository maintenance workflow requiring an APGR Git
+  source checkout and the developer toolchain (Python 3.11+, pytest, coverage,
+  pytest-cov, pytest-xdist, Git 2.40+, Go 1.25+).
+- **Bare packages**: Prebuilt native binaries (`cmd/apgr`) and bare wheels / npm packages
+  do **not** carry the test runner or test suites.
 
 ### First use
 
@@ -242,6 +255,20 @@ context budgets. It treats context as a scarce, measurable resource with distinc
 components and explicitly tracks unavailable metrics rather than reporting
 misleading zeroes.
 
+Key principles of context accounting:
+- **Source-bound observations, not capacity forecasts**: Footprints record explicit
+  measurements and source-bound projections, not predictive capacity models or
+  exhaustion guarantees.
+- **Unavailable is not zero (`unavailable != 0`)**: Bytes and UTF-8 characters
+  are measured locally. Provider-specific token estimates remain explicitly marked
+  as unavailable with stated reasons and nil values unless an observed value is
+  supplied by the caller. An available zero is a measured fact; an unavailable
+  metric is an unmeasured boundary.
+- **Component separation (overlap is not additive)**: Selected descriptions, selected
+  bodies, support material, repository references, and provider prompt overhead are
+  measured as distinct components. Because prompt templates and harnesses overlap in
+  structure, component metrics cannot be naïvely summed across boundaries without accounting.
+
 ### 1. Measure (`apgr footprint measure`)
 
 Measure converts a strict measurement request into a validated `apg.context-footprint/v1`
@@ -252,14 +279,6 @@ The marked [first-use fence](#first-use) above is the executable owner for
 this walkthrough. It creates complete disposable fixtures, runs all three
 footprint actions, and asserts the schema, positive comparison delta, exact
 projection fidelity, and empty omission disclosure.
-
-Key principles of measurement:
-- **Separation of components**: Selected descriptions, selected bodies, support
-  material, repository references, and provider prompt overhead are measured as
-  distinct components.
-- **Honest metrics**: Bytes and UTF-8 characters are measured locally.
-  Provider-specific token estimates are marked explicitly as unavailable unless
-  an observed value is provided by the caller.
 
 ### 2. Compare (`apgr footprint compare`)
 
@@ -352,41 +371,88 @@ func main() {
 See the [Go library reference](docs/reference/go-library.md) for full package
 documentation.
 
-## Upgrade guidance and release recovery
+### JACA XO compatibility pattern
 
-### Upgrading from v0.7.0 to the prepared v0.8.1 source
+Downstream Go consumers (such as the Joint Agentic Command Aegis Executive Orchestrator,
+JACA XO) consume `skills`, `footprint`, and supporting `schema` behind a caller-owned
+internal adapter, as modeled in `testing/fixtures/xo_consumer/`:
 
-The v0.8 series introduces the complete context-footprint subsystem (`footprint`
-Go package introduced in v0.8.0 and `apgr footprint` CLI command family), refined
-skill metadata, and multi-surface distribution packages with packaged
-documentation and rich project metadata.
+- **Caller DTO containment**: External callers define their own data transfer objects
+  (`CallerSkillEvidence`, `CallerFootprintEvidence`, `CallerComponentEvidence`,
+  `CallerSourceReference`, `CallerComparisonDelta`, `CallerProjectionEvidence`). The
+  internal adapter translates between APGR domain types and caller DTOs, ensuring
+  zero APGR types leak into caller method signatures or public struct fields.
+- **Pure in-memory execution**: Execution requires no subprocess invocation (`os/exec`)
+  or network calls.
+- **Context propagation & error sentinels**: Cancelled contexts return `ctx.Err()`
+  or wrap `footprint.ErrContextCancelled`, while domain errors retain documented sentinels
+  (`footprint.ErrUnitMismatch`, `footprint.ErrConsequenceBearingOmissionRefused`,
+  `skills.ErrBudgetExceeded`).
+- **Dual-lane verification**: Qualified across Lane A (published v0.8.1 baseline via Go proxy)
+  and Lane B (exact development candidate via local replace).
 
-- **Go Consumers**: Keep released consumers on the exact published version they
-  already qualify. To exercise the prepared source, use a checkout-local Go
-  module and the source-build path above; do not add an unpublished `v0.8.1`
-  requirement.
-- **CLI / Python / npm Users**: Use the source-checkout command while v0.8.1
-  remains pending freeze and publication. Registry installation is deferred.
+> [!IMPORTANT]
+> **Separation of Authority**:
+> - **APGR-local conformance != JACA registration**: APGR-local qualification is completed
+>   on Darwin arm64 under APG114, but runner registration in JACA CI (`tools/ci/evidence.go`)
+>   is consumer-owned and pending.
+> - **XO fixture != production adapter or security proof**: The caller-owned adapter
+>   fixture in `testing/fixtures/xo_consumer/` qualifies APGR Go package compatibility,
+>   but is not JACA's production adapter (which belongs in `xo/src/main/go`), and passive DTOs
+>   are not a workflow security proof.
 
-### Truthful v0.8.0 release status & v0.8.1 recovery
+### v0.9 CI qualification summary interface
 
-During the initial publication of v0.8.0 on 2026-08-31:
-- Git commit `fc0fd99b41d24951d7db3535402c46ef9c671143` was pushed to `main`;
-- Annotated tag `v0.8.0` was pushed; and
-- The Go module proxy (`proxy.golang.org`) successfully indexed and authenticated
-  `v0.8.0`.
+For CI pipelines qualifying APGR from a Git source checkout with the developer toolchain,
+`apgr test <suite> --summary-file <path>` emits strict 6-field machine-readable JSON:
 
-However, downstream publication to GitHub Releases, PyPI, and npm was not completed
-due to credential and interactive TTY requirements. In strict adherence to
-public-registry immutability and zero-overwrite policies:
-- The immutable `v0.8.0` tag and Go proxy entries are preserved as historical
-  immutable predecessor state without force-pushing, retagging, or deletion.
-- **v0.8.1** is a prepared multi-surface recovery candidate pending source freeze
-  and publication. It is not published to GitHub Releases, PyPI, or npm, and no
-  release page, package install, or module requirement should imply otherwise.
+```json
+{
+  "version": 1,
+  "subproject": "apg",
+  "suite": "policy",
+  "test_status": "pass",
+  "gate_status": "pass",
+  "source_commit": "1111111111111111111111111111111111111111"
+}
+```
 
-For technical details, see the [v0.8.1 release notes](release/v0.8.1-notes.md)
-and [qualification exit record](docs/status/2026/09/03/00154-apg107-108-v081-qualification-and-recovery-exit.md).
+Suites include `policy` (mechanical repository and corpus checks), `unit`, `integration`,
+and `unit-integration` (`combined`). Note that `apgr test` requires an APGR Git checkout
+and developer toolchain; bare wheel/npm native packages do not carry the full runner.
+`combined` is the receipt suite name, and `apg-dev-gate` is a JACA role alias;
+pass `unit-integration` to the CLI. The synthetic commit above illustrates the
+shape: real receipts bind entry HEAD, with a separate inventory needed for
+uncommitted tested bytes. See the [CI handoff](docs/architecture/jaca-ci-handoff.md)
+for pinned test, Node, and TypeScript prerequisites. An installed Python frontend
+can dispatch through that checkout; the native/npm binary cannot run `test`.
+
+## Upgrade guidance and release status
+
+### Upgrading from v0.8.1 to 0.9.0
+
+This documentation covers 0.9.0. The v0.9 series introduces the CI-first qualification interface (`--summary-file`, `policy` role)
+and qualified Go library consumption patterns for XO adapters.
+
+- **Production Consumers**: Once this version is published, upgrade to 0.9.0 across supported package registries. Prior to publication, production consumers remain on the published, frozen **v0.8.1** release.
+- **Go Consumers**: All public Go APIs in `schema`, `report`, `skills`, `envsnap`, `hotspot`,
+  and `footprint` are fully backward-compatible with v0.8.1. Once this version is published, require `github.com/Knowledge-Forge-AI/agentic-praxis-grimoire v0.9.0`. Prior to publication, candidate features can be
+  evaluated using a local `replace` directive pointing to an APGR source checkout.
+- **CLI / Python / npm Users**: Once this version is published, install or upgrade via `pip install agentic-praxis-grimoire==0.9.0`
+  or `npm install -g @knowledge-forge-ai/apgr@0.9.0`. Prior to publication, use published v0.8.1 packages (`pip install agentic-praxis-grimoire==0.8.1`,
+  `npm install -g @knowledge-forge-ai/apgr@0.8.1`) or run from a Git source checkout.
+
+### Preserved predecessor: v0.8.1
+
+The **v0.8.1** release is the frozen predecessor across Git, GitHub Releases, PyPI,
+npm, and the Go module proxy:
+- Public Git commit: `565f924aa8fda9551da8732cceb5708db069e127`
+- Public Git tree: `1ec7a01ca252a63cc869caf4e5bbe152fb6d2868`
+- Annotated tag: `b6b3e996536ac89e1a58912caf3b3cb9c251dbd7`
+
+Historical `v0.8.0` is preserved as immutable predecessor state. For technical details,
+see the [v0.8.1 release notes](release/v0.8.1-notes.md) and
+[v0.9.0 release notes](release/v0.9.0-notes.md).
 
 ## Security and trust boundaries
 
@@ -415,10 +481,14 @@ APGR is engineered with strict operational boundaries:
 - [Hotspot Analysis Guide](docs/guides/hotspot-analysis.md)
 - [Distribution and Packaging](docs/distribution.md)
 - [APG–JACA Integration Architecture](docs/architecture/apg-jaca-integration.md)
+- [JACA CI Integration Handoff](docs/architecture/jaca-ci-handoff.md)
+- [JACA XO Compatibility Handoff](docs/architecture/jaca-xo-handoff.md)
 - [Context Footprint & Skill Inventory](docs/architecture/v0-8-context-footprint-and-skill-inventory.md)
+- [v0.9 Roadmap](docs/v0-9-roadmap.md)
 - [Project Model & Governance](docs/project-model.md)
 - [Provenance Policy](docs/provenance.md)
 - [Status and Exit Records](docs/status/README.md)
+- [Release Notes (v0.9.0)](release/v0.9.0-notes.md)
 - [Release Notes (v0.8.1)](release/v0.8.1-notes.md)
 
 ## Contributing and licensing

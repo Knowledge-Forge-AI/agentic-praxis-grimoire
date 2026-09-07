@@ -1,9 +1,12 @@
 # APG Distribution
 
-The current public APG release is **v0.8.0** on Git and the Go module proxy.
-GitHub Releases, PyPI, and npm do not contain v0.8.1. This document describes
-the prepared v0.8.1 distribution source and its qualification contract; the
-candidate remains pending source freeze and publication.
+This documentation covers 0.9.0. The previous public APG release is **v0.8.1**
+on Git, GitHub Releases, PyPI, npm, and the Go module proxy (public release commit
+`565f924aa8fda9551da8732cceb5708db069e127`, annotated tag
+`b6b3e996536ac89e1a58912caf3b3cb9c251dbd7`). Once this version is published,
+distribution packages are available across standard registries. This document
+describes the shared distribution architecture and the v0.9.0 source qualification
+contract; v0.8.1 remains the published baseline until separately authorized publication.
 
 APG has one editable release-version authority:
 `src/agentic_praxis_grimoire/VERSION`. Release-like Go builds receive that
@@ -11,15 +14,22 @@ value and the canonical skill-corpus fingerprint through linker injection.
 The Python and npm builders read the same file; generated package metadata is
 never an additional version authority.
 
-## Runtime ownership
+## Runtime ownership and dispatch boundaries
 
 Go owns portable report, skill bundle, environment snapshot, hotspot,
 response-capture, and context-footprint semantics. Python is a thin
 compatibility front door for those command families. Python remains the
 intentional repository or host maintenance owner for change-size,
-phase-commit-message, record-identity, test orchestration, public-release
-preparation, user and global skill maintenance, flattening, and the legacy
-project-local symlink projection.
+phase-commit-message, record-identity, test orchestration (`apgr test`),
+public-release preparation, user and global skill maintenance, flattening,
+and the legacy project-local symlink projection.
+
+Importantly, `apgr test` (including `--summary-file` and the `policy` mechanical role)
+is a repository maintenance workflow requiring an APGR Git source checkout and
+the developer toolchain (Python 3.11+, pytest stack, Git 2.40+, Go 1.25+). The
+prebuilt native Go binary (`bin/apgr`), bare wheels, and npm platform packages do
+**not** carry the test runner or test suites (`libexec/apg_test.py` and `src/test/`
+are intentionally excluded from binary distribution packages).
 
 `check skill-library` retains Python topology, catalog, and projection checks,
 then requires the private Go CLI to compare the checked-out metadata and every
@@ -46,6 +56,12 @@ The supported matrix is:
 | `darwin/arm64` | `macosx_11_0_arm64` | `@knowledge-forge-ai/apgr-darwin-arm64` |
 | `linux/amd64` | `manylinux_2_17_x86_64` | `@knowledge-forge-ai/apgr-linux-x64` |
 | `linux/arm64` | `manylinux_2_17_aarch64` | `@knowledge-forge-ai/apgr-linux-arm64` |
+
+While prebuilt runtime distribution targets include `darwin/arm64`, `linux/amd64`,
+and `linux/arm64`, developer / CI qualification on Linux x86_64 remains pending:
+the `policy` suite is pending runner qualification, and `unit`/`integration`/`combined`
+suites are blocked by whole-inventory preflight binding Darwin arm64 Nix store digests.
+macOS Apple Silicon (`darwin/arm64`) is fully qualified (APG114 / Exit `00159`).
 
 Builds use Go 1.25, `CGO_ENABLED=0`, trimmed source paths, disabled VCS
 stamping, and an empty controlled Go build ID. The distribution pipeline builds
@@ -109,10 +125,10 @@ source build uses the current checkout's version and corpus and is removed after
 the invocation. Installed wheels always use their bundled binary and never
 require a runtime compiler or network access.
 
-The prepared v0.8.1 source preserves the public v0.8.0 Git commit and tag as
-immutable historical predecessor state and is intended to form a single-parent
-child after source freeze. No APGR-local Nix gate, host activation, global
-installation, or Nix configuration mutation is part of this phase.
-Multi-registry publication remains a later operation requiring fail-closed
-readback across Git, GitHub Releases, PyPI, npm, and Go. This source phase does
-not establish those final publication identities or registry observations.
+The preceding **v0.8.1** release is frozen across Git, GitHub Releases,
+PyPI, npm, and the Go module proxy. This documentation covers 0.9.0. Once this
+version is published, package downloads and registry entries become active across
+ecosystems. Prior to publication, no unavailable candidate downloads or registry
+packages are advertised or published for v0.9.0. Multi-registry publication
+requires separately authorized fail-closed readback
+across Git, GitHub Releases, PyPI, npm, and Go.

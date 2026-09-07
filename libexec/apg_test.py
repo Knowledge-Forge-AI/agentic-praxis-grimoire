@@ -106,16 +106,36 @@ class ToolError(Exception):
     """A bounded invocation, inventory, test, or coverage failure."""
 
 
-class JavascriptQualificationError(ToolError):
+class InvocationError(ToolError):
+    """A bounded invocation or prerequisite configuration failure."""
+
+
+class JavascriptQualificationError(InvocationError):
     """A bounded JavaScript qualification failure with no captured streams."""
 
 
-class NodeProfileQualificationError(ToolError):
+class NodeProfileQualificationError(InvocationError):
     """A bounded Node-profile qualification failure with no captured streams."""
 
 
-class NodeProfileCleanupError(ToolError):
+class HarnessError(ToolError):
+    """A bounded test harness or worker infrastructure failure."""
+
+
+class NodeProfileCleanupError(HarnessError):
     """A bounded Node-profile cleanup failure with no raw path or stream data."""
+
+
+class GateShortfallError(ToolError):
+    """A bounded coverage gate shortfall where tests passed but thresholds were not met."""
+
+
+class PolicyCheckError(ToolError):
+    """A bounded repository policy verification failure."""
+
+
+class TestAssertionError(ToolError):
+    """A test assertion failure during pytest execution."""
 
 
 @dataclass(frozen=True)
@@ -402,6 +422,18 @@ def fail(message: str) -> NoReturn:
     raise ToolError(message)
 
 
+def fail_invocation(message: str) -> NoReturn:
+    raise InvocationError(message)
+
+
+def fail_harness(message: str) -> NoReturn:
+    raise HarnessError(message)
+
+
+def fail_policy(message: str) -> NoReturn:
+    raise PolicyCheckError(message)
+
+
 def _unique_object(pairs: Sequence[tuple[str, object]]) -> dict[str, object]:
     result: dict[str, object] = {}
     for key, value in pairs:
@@ -413,10 +445,10 @@ def _unique_object(pairs: Sequence[tuple[str, object]]) -> dict[str, object]:
 
 def _relative_path(value: object, field: str) -> str:
     if not isinstance(value, str) or not value:
-        fail(f"inventory {field} must be a nonempty string")
+        fail_invocation(f"inventory {field} must be a nonempty string")
     path = PurePosixPath(value)
     if path.is_absolute() or ".." in path.parts or str(path) != value:
-        fail(f"inventory {field} is not a normalized relative path: {value}")
+        fail_invocation(f"inventory {field} is not a normalized relative path: {value}")
     return value
 
 
@@ -426,67 +458,67 @@ def load_inventory(root: Path) -> Inventory:
         raw = (root / INVENTORY_PATH).read_text(encoding="utf-8")
         value = json.loads(raw, object_pairs_hook=_unique_object)
     except (OSError, UnicodeError, ValueError) as error:
-        fail(f"test inventory is unreadable or malformed: {error}")
+        fail_invocation(f"test inventory is unreadable or malformed: {error}")
     if not isinstance(value, dict) or set(value) != {
         "coverage_sources",
         "excluded_python_launchers",
         "schema_version",
         "tests",
     }:
-        fail("test inventory has unknown or missing top-level fields")
+        fail_invocation("test inventory has unknown or missing top-level fields")
     if value["schema_version"] != 2:
-        fail("test inventory schema_version must be 2")
+        fail_invocation("test inventory schema_version must be 2")
 
     coverage_sources: dict[str, tuple[str, ...]] = {}
     source_entries = value["coverage_sources"]
     if not isinstance(source_entries, list) or not source_entries:
-        fail("test inventory coverage_sources must be a nonempty array")
+        fail_invocation("test inventory coverage_sources must be a nonempty array")
     for entry in source_entries:
         if not isinstance(entry, dict) or set(entry) != {"path", "rationale", "suites"}:
-            fail("coverage source entry has unknown or missing fields")
+            fail_invocation("coverage source entry has unknown or missing fields")
         path = _relative_path(entry["path"], "source path")
         rationale = entry["rationale"]
         if not isinstance(rationale, str) or not rationale.strip():
-            fail(f"coverage source rationale is invalid: {path}")
+            fail_invocation(f"coverage source rationale is invalid: {path}")
         suites = entry["suites"]
         if (
             not isinstance(suites, list)
             or suites != ["unit", "integration", "combined"]
         ):
-            fail(f"coverage source suites are invalid: {path}")
+            fail_invocation(f"coverage source suites are invalid: {path}")
         if path in coverage_sources:
-            fail(f"duplicate coverage source: {path}")
+            fail_invocation(f"duplicate coverage source: {path}")
         coverage_sources[path] = tuple(suites)
 
     excluded_launchers: dict[str, str] = {}
     launcher_entries = value["excluded_python_launchers"]
     if not isinstance(launcher_entries, list):
-        fail("excluded_python_launchers must be an array")
+        fail_invocation("excluded_python_launchers must be an array")
     for entry in launcher_entries:
         if not isinstance(entry, dict) or set(entry) != {"path", "reason"}:
-            fail("launcher entry has unknown or missing fields")
+            fail_invocation("launcher entry has unknown or missing fields")
         path = _relative_path(entry["path"], "launcher path")
         reason = entry["reason"]
         if not isinstance(reason, str) or not reason.strip():
-            fail(f"launcher exclusion lacks a rationale: {path}")
+            fail_invocation(f"launcher exclusion lacks a rationale: {path}")
         if path in excluded_launchers:
-            fail(f"duplicate launcher exclusion: {path}")
+            fail_invocation(f"duplicate launcher exclusion: {path}")
         excluded_launchers[path] = reason
 
     tests: dict[str, tuple[str, str]] = {}
     test_entries = value["tests"]
     if not isinstance(test_entries, list) or not test_entries:
-        fail("test inventory tests must be a nonempty array")
+        fail_invocation("test inventory tests must be a nonempty array")
     for entry in test_entries:
         if not isinstance(entry, dict) or set(entry) != {"owner", "path", "suite"}:
-            fail("test entry has unknown or missing fields")
+            fail_invocation("test entry has unknown or missing fields")
         path = _relative_path(entry["path"], "test path")
         owner = _relative_path(entry["owner"], "production owner")
         suite = entry["suite"]
         if suite not in {"unit", "integration"}:
-            fail(f"test suite is invalid: {path}")
+            fail_invocation(f"test suite is invalid: {path}")
         if path in tests:
-            fail(f"duplicate mirrored test: {path}")
+            fail_invocation(f"duplicate mirrored test: {path}")
         tests[path] = (owner, suite)
     return Inventory(coverage_sources, excluded_launchers, tests)
 
@@ -515,13 +547,13 @@ def validate_inventory(root: Path, inventory: Inventory) -> None:
     if actual_sources != declared_sources:
         missing = sorted(actual_sources - declared_sources)
         stale = sorted(declared_sources - actual_sources)
-        fail(f"coverage source inventory differs: missing={missing}; stale={stale}")
+        fail_policy(f"coverage source inventory differs: missing={missing}; stale={stale}")
     actual_launchers = set()
     for path in (root / "bin").iterdir():
         if path.is_file() and path.read_bytes().startswith(b"#!/usr/bin/env python3\n"):
             actual_launchers.add(path.relative_to(root).as_posix())
     if actual_launchers != set(inventory.excluded_launchers):
-        fail("Python launcher exclusions differ from the executable inventory")
+        fail_policy("Python launcher exclusions differ from the executable inventory")
 
     actual_tests = {
         path.relative_to(root).as_posix()
@@ -531,20 +563,20 @@ def validate_inventory(root: Path, inventory: Inventory) -> None:
     if actual_tests != set(inventory.tests):
         missing = sorted(actual_tests - set(inventory.tests))
         stale = sorted(set(inventory.tests) - actual_tests)
-        fail(f"mirrored test inventory differs: missing={missing}; stale={stale}")
+        fail_policy(f"mirrored test inventory differs: missing={missing}; stale={stale}")
     legacy = sorted(
         path.relative_to(root).as_posix()
         for base in (root / "src/test/unit/python", root / "src/test/int/python")
         for path in base.glob("*.py")
     )
     if legacy:
-        fail(f"stale legacy Python test path remains: {legacy}")
+        fail_policy(f"stale legacy Python test path remains: {legacy}")
     for path, (owner, suite) in inventory.tests.items():
         if not (root / owner).is_file():
-            fail(f"mirrored test production owner is missing: {owner}")
+            fail_policy(f"mirrored test production owner is missing: {owner}")
         expected = _expected_test_path(owner, suite)
         if path != expected:
-            fail(f"mirrored test path disagrees with owner: {path}; expected {expected}")
+            fail_policy(f"mirrored test path disagrees with owner: {path}; expected {expected}")
 
 
 def dependency_versions() -> dict[str, str]:
@@ -554,9 +586,9 @@ def dependency_versions() -> dict[str, str]:
         try:
             actual = metadata.version(distribution)
         except metadata.PackageNotFoundError:
-            fail(f"required test dependency is not installed: {distribution}=={expected}")
+            fail_invocation(f"required test dependency is not installed: {distribution}=={expected}")
         if actual != expected:
-            fail(
+            fail_invocation(
                 f"test dependency version mismatch: {distribution}=={actual}; "
                 f"expected {expected}"
             )
@@ -573,7 +605,7 @@ def validate_typescript_compiler(root: Path) -> str:
     """Require the exact externally provisioned compiler used by maintained tests."""
     raw = os.environ.get("APG_TYPESCRIPT_TSC")
     if not raw:
-        fail(
+        fail_invocation(
             "TypeScript test prerequisite is unavailable: set APG_TYPESCRIPT_TSC "
             "to an absolute executable typescript@7.0.2 tsc installed outside "
             "the repository checkout"
@@ -585,7 +617,7 @@ def validate_typescript_compiler(root: Path) -> str:
         or not executable.is_file()
         or not os.access(executable, os.X_OK)
     ):
-        fail(
+        fail_invocation(
             "APG_TYPESCRIPT_TSC must name an absolute regular executable "
             "typescript@7.0.2 tsc outside the repository checkout"
         )
@@ -593,9 +625,9 @@ def validate_typescript_compiler(root: Path) -> str:
         resolved_executable = executable.resolve(strict=True)
         resolved_root = root.resolve(strict=True)
     except OSError as error:
-        fail(f"TypeScript compiler prerequisite path could not be resolved: {error}")
+        fail_invocation(f"TypeScript compiler prerequisite path could not be resolved: {error}")
     if resolved_executable == resolved_root or resolved_root in resolved_executable.parents:
-        fail("APG_TYPESCRIPT_TSC must be installed outside the repository checkout")
+        fail_invocation("APG_TYPESCRIPT_TSC must be installed outside the repository checkout")
     try:
         completed = subprocess.run(
             [str(executable), "--version"],
@@ -607,10 +639,10 @@ def validate_typescript_compiler(root: Path) -> str:
             env={**os.environ, "NO_COLOR": "1"},
         )
     except (OSError, subprocess.TimeoutExpired) as error:
-        fail(f"TypeScript compiler prerequisite could not be executed: {error}")
+        fail_invocation(f"TypeScript compiler prerequisite could not be executed: {error}")
     version = completed.stdout.strip()
     if completed.returncode != 0 or version != EXPECTED_TYPESCRIPT_VERSION:
-        fail(
+        fail_invocation(
             "TypeScript compiler version mismatch: "
             f"observed {version or '<no version>'}; expected {EXPECTED_TYPESCRIPT_VERSION}"
         )
@@ -1210,7 +1242,7 @@ def _javascript_engine_binding(root: Path) -> JavascriptEngineBinding:
     """Resolve and validate one direct engine path without returning a loose path."""
     raw = os.environ.get("APG_JAVASCRIPT_NODE")
     if not raw:
-        fail(
+        fail_invocation(
             "JavaScript test prerequisite is unavailable: set APG_JAVASCRIPT_NODE "
             "to the absolute regular Node v22.22.2 executable outside the repository"
         )
@@ -1221,7 +1253,7 @@ def _javascript_engine_binding(root: Path) -> JavascriptEngineBinding:
         or not executable.is_file()
         or not os.access(executable, os.X_OK)
     ):
-        fail(
+        fail_invocation(
             "APG_JAVASCRIPT_NODE must name an absolute regular executable "
             "Node v22.22.2 outside the repository checkout"
         )
@@ -1229,20 +1261,20 @@ def _javascript_engine_binding(root: Path) -> JavascriptEngineBinding:
         resolved_executable = executable.resolve(strict=True)
         resolved_root = root.resolve(strict=True)
     except OSError as error:
-        fail(f"JavaScript engine prerequisite path could not be resolved: {error}")
+        fail_invocation(f"JavaScript engine prerequisite path could not be resolved: {error}")
     if resolved_executable == resolved_root or resolved_root in resolved_executable.parents:
-        fail("APG_JAVASCRIPT_NODE must be installed outside the repository checkout")
+        fail_invocation("APG_JAVASCRIPT_NODE must be installed outside the repository checkout")
     if resolved_executable != executable:
-        fail(
+        fail_invocation(
             "APG_JAVASCRIPT_NODE must name a direct resolved executable path "
             "without symlinked path components"
         )
     if EXPECTED_JAVASCRIPT_ENGINE_ROOT not in resolved_executable.parents:
-        fail("APG_JAVASCRIPT_NODE must name the approved immutable Nix-store engine")
+        fail_invocation("APG_JAVASCRIPT_NODE must name the approved immutable Nix-store engine")
     try:
         before = resolved_executable.lstat()
     except OSError as error:
-        fail(f"JavaScript engine prerequisite identity could not be read: {error}")
+        fail_invocation(f"JavaScript engine prerequisite identity could not be read: {error}")
     before_identity: tuple[int, int, int, int, int, int, int] = (
         before.st_dev,
         before.st_ino,
@@ -1253,14 +1285,14 @@ def _javascript_engine_binding(root: Path) -> JavascriptEngineBinding:
         before.st_mtime_ns,
     )
     if before.st_uid != EXPECTED_JAVASCRIPT_ENGINE_UID:
-        fail("APG_JAVASCRIPT_NODE must be owned by root")
+        fail_invocation("APG_JAVASCRIPT_NODE must be owned by root")
     try:
         with resolved_executable.open("rb") as stream:
             executable_sha256 = hashlib.file_digest(stream, "sha256").hexdigest()
     except OSError as error:
-        fail(f"JavaScript engine prerequisite content could not be read: {error}")
+        fail_invocation(f"JavaScript engine prerequisite content could not be read: {error}")
     if executable_sha256 != EXPECTED_JAVASCRIPT_ENGINE_SHA256:
-        fail("JavaScript engine executable digest mismatch")
+        fail_invocation("JavaScript engine executable digest mismatch")
     try:
         completed = _run_javascript_process(
             [
@@ -1273,7 +1305,7 @@ def _javascript_engine_binding(root: Path) -> JavascriptEngineBinding:
             environment={**os.environ, "NO_COLOR": "1"},
         )
     except (OSError, subprocess.TimeoutExpired) as error:
-        fail(f"JavaScript engine prerequisite could not be executed: {error}")
+        fail_invocation(f"JavaScript engine prerequisite could not be executed: {error}")
     try:
         after = resolved_executable.lstat()
         after_identity = (
@@ -1287,28 +1319,28 @@ def _javascript_engine_binding(root: Path) -> JavascriptEngineBinding:
         )
         after_resolved = resolved_executable.resolve(strict=True)
     except OSError as error:
-        fail(f"JavaScript engine prerequisite changed during validation: {error}")
+        fail_invocation(f"JavaScript engine prerequisite changed during validation: {error}")
     if after_identity != before_identity or after_resolved != resolved_executable:
-        fail("JavaScript engine prerequisite changed during validation")
+        fail_invocation("JavaScript engine prerequisite changed during validation")
     try:
         with resolved_executable.open("rb") as stream:
             after_sha256 = hashlib.file_digest(stream, "sha256").hexdigest()
     except OSError as error:
-        fail(f"JavaScript engine prerequisite changed during validation: {error}")
+        fail_invocation(f"JavaScript engine prerequisite changed during validation: {error}")
     if after_sha256 != EXPECTED_JAVASCRIPT_ENGINE_SHA256:
-        fail("JavaScript engine prerequisite changed during validation")
+        fail_invocation("JavaScript engine prerequisite changed during validation")
     identity = completed.stdout.strip()
     if (
         completed.returncode != 0
         or completed.stderr != ""
         or identity != EXPECTED_JAVASCRIPT_ENGINE
     ):
-        fail(
+        fail_invocation(
             "JavaScript engine identity mismatch; expected "
             f"{EXPECTED_JAVASCRIPT_ENGINE}"
         )
     if os.environ.get("APG_JAVASCRIPT_NODE") != raw:
-        fail("JavaScript engine environment binding changed during validation")
+        fail_invocation("JavaScript engine environment binding changed during validation")
     return JavascriptEngineBinding(
         path=resolved_executable,
         file_identity=before_identity,
@@ -1329,7 +1361,7 @@ def invoke_javascript_engine(
     """Run one semantic or syntax subprocess through one pre/post exact binding."""
     before = _javascript_engine_binding(root)
     if os.environ.get("APG_JAVASCRIPT_NODE") != os.fspath(before.path):
-        fail("JavaScript engine path changed before invocation")
+        fail_invocation("JavaScript engine path changed before invocation")
     try:
         completed = _run_javascript_process(
             [os.fspath(before.path), *arguments],
@@ -1345,10 +1377,10 @@ def invoke_javascript_engine(
             output_contract_id,
         )
     if os.environ.get("APG_JAVASCRIPT_NODE") != os.fspath(before.path):
-        fail("JavaScript engine path changed after invocation")
+        fail_invocation("JavaScript engine path changed after invocation")
     after = _javascript_engine_binding(root)
     if after != before:
-        fail("JavaScript engine binding changed across invocation")
+        fail_invocation("JavaScript engine binding changed across invocation")
     result = _validate_javascript_output(
         output_contract_id,
         completed.returncode,
@@ -1376,12 +1408,12 @@ def coverage_counts(report: dict[str, object], paths: Sequence[str]) -> Coverage
     """Aggregate exact counts for a reviewed source set."""
     files = report.get("files")
     if not isinstance(files, dict):
-        fail("coverage JSON has no files object")
+        fail_harness("coverage JSON has no files object")
     statement_covered = statement_total = branch_covered = branch_total = 0
     for path in paths:
         entry = files.get(path)
         if not isinstance(entry, dict) or not isinstance(entry.get("summary"), dict):
-            fail(f"coverage data omits required source: {path}")
+            fail_harness(f"coverage data omits required source: {path}")
         summary = entry["summary"]
         try:
             counts = tuple(
@@ -1394,9 +1426,9 @@ def coverage_counts(report: dict[str, object], paths: Sequence[str]) -> Coverage
                 )
             )
         except KeyError:
-            fail(f"coverage counts are malformed for source: {path}")
+            fail_harness(f"coverage counts are malformed for source: {path}")
         if any(not isinstance(count, int) or isinstance(count, bool) for count in counts):
-            fail(f"coverage counts are malformed for source: {path}")
+            fail_harness(f"coverage counts are malformed for source: {path}")
         covered_lines, num_statements, covered_branches, num_branches = counts
         if (
             covered_lines < 0
@@ -1406,13 +1438,13 @@ def coverage_counts(report: dict[str, object], paths: Sequence[str]) -> Coverage
             or num_branches < 0
             or covered_branches > num_branches
         ):
-            fail(f"coverage counts are impossible for source: {path}")
+            fail_harness(f"coverage counts are impossible for source: {path}")
         statement_covered += covered_lines
         statement_total += num_statements
         branch_covered += covered_branches
         branch_total += num_branches
     if statement_total <= 0 or branch_total <= 0:
-        fail("coverage source target has zero statements or branches")
+        fail_harness("coverage source target has zero statements or branches")
     return CoverageCounts(
         statement_covered,
         statement_total,
@@ -1425,23 +1457,23 @@ def validate_coverage_report(report: dict[str, object], declared: set[str]) -> N
     """Reject missing, foreign, or non-file coverage measurements."""
     files = report.get("files")
     if not isinstance(files, dict):
-        fail("coverage JSON has no files object")
+        fail_harness("coverage JSON has no files object")
     measured = set(files)
     if measured != declared:
         missing = sorted(declared - measured)
         foreign = sorted(measured - declared)
-        fail(f"coverage source set differs: missing={missing}; foreign={foreign}")
+        fail_harness(f"coverage source set differs: missing={missing}; foreign={foreign}")
 
 
 def enforce_threshold(counts: CoverageCounts, statement: int, branch: int) -> None:
     """Enforce exact integer ratios without display rounding."""
     if counts.statements_covered * 100 < statement * counts.statements_total:
-        fail(
+        raise GateShortfallError(
             "statement coverage gate failed: "
             f"{counts.statements_covered}/{counts.statements_total} < {statement}%"
         )
     if counts.branches_covered * 100 < branch * counts.branches_total:
-        fail(
+        raise GateShortfallError(
             "branch coverage gate failed: "
             f"{counts.branches_covered}/{counts.branches_total} < {branch}%"
         )
@@ -1452,7 +1484,7 @@ def _artifact_directory(root: Path) -> ArtifactDirectory:
     if configured:
         parent = Path(configured)
         if not parent.is_absolute() or not parent.is_dir() or parent.is_symlink():
-            fail("APG_TEST_ARTIFACT_ROOT must be an absolute real directory")
+            fail_invocation("APG_TEST_ARTIFACT_ROOT must be an absolute real directory")
     else:
         parent = Path(tempfile.gettempdir())
     artifact = Path(tempfile.mkdtemp(prefix="apg-test-", dir=parent))
@@ -1468,10 +1500,10 @@ def _cleanup_artifacts(ownership: ArtifactDirectory) -> None:
         return
     status = path.stat()
     if (status.st_dev, status.st_ino) != (ownership.device, ownership.inode):
-        fail("artifact directory identity changed before cleanup")
+        fail_harness("artifact directory identity changed before cleanup")
     if hasattr(os, "getuid"):
         if status.st_uid != os.getuid() or status.st_mode & 0o077:
-            fail("artifact directory ownership or mode changed before cleanup")
+            fail_harness("artifact directory ownership or mode changed before cleanup")
     shutil.rmtree(path)
 
 
@@ -1479,17 +1511,17 @@ def _read_manifest(path: Path, run_id: str, suite: str) -> list[dict[str, object
     try:
         lines = path.read_text(encoding="utf-8").splitlines()
     except (OSError, UnicodeError) as error:
-        fail(f"run manifest is unreadable: {path.name}: {error}")
+        fail_harness(f"run manifest is unreadable: {path.name}: {error}")
     events: list[dict[str, object]] = []
     for line in lines:
         try:
             event = json.loads(line, object_pairs_hook=_unique_object)
         except (ValueError, json.JSONDecodeError) as error:
-            fail(f"run manifest is malformed: {path.name}: {error}")
+            fail_harness(f"run manifest is malformed: {path.name}: {error}")
         if not isinstance(event, dict):
-            fail(f"run manifest event is not an object: {path.name}")
+            fail_harness(f"run manifest event is not an object: {path.name}")
         if event.get("run_id") != run_id or event.get("suite") != suite:
-            fail(f"run manifest contains foreign or stale evidence: {path.name}")
+            fail_harness(f"run manifest contains foreign or stale evidence: {path.name}")
         events.append(event)
     return events
 
@@ -1516,14 +1548,14 @@ def validate_worker_manifest(
             "test-result",
             "controller-complete",
         }:
-            fail("worker manifest contains an unexpected event")
+            fail_harness("worker manifest contains an unexpected event")
         by_kind.setdefault(str(kind), []).append(event)
     collections: list[tuple[str, ...]] = []
     for kind in ("worker-start", "collection", "worker-complete", "node-down"):
         members = by_kind.get(kind, [])
         observed = [event.get("worker") for event in members]
         if len(observed) != workers or set(observed) != expected_workers:
-            fail(f"worker manifest {kind} set is incomplete or duplicated")
+            fail_harness(f"worker manifest {kind} set is incomplete or duplicated")
         if kind == "collection":
             for event in members:
                 node_ids = event.get("node_ids")
@@ -1533,19 +1565,19 @@ def validate_worker_manifest(
                     or any(not isinstance(nodeid, str) for nodeid in node_ids)
                     or len(set(node_ids)) != len(node_ids)
                 ):
-                    fail("worker collection evidence is malformed or empty")
+                    fail_harness("worker collection evidence is malformed or empty")
                 collections.append(tuple(node_ids))
         elif kind == "worker-complete":
             if any(event.get("exitstatus") != 0 for event in members):
-                fail("worker completion evidence reports failure")
+                fail_harness("worker completion evidence reports failure")
         elif kind == "node-down":
             if any(
                 event.get("error") is not False or event.get("exitstatus") != 0
                 for event in members
             ):
-                fail("worker node-down evidence reports a crash or incomplete exit")
+                fail_harness("worker node-down evidence reports a crash or incomplete exit")
     if any(collection != collections[0] for collection in collections[1:]):
-        fail("xdist workers did not collect identical node IDs")
+        fail_harness("xdist workers did not collect identical node IDs")
     selected = set(collections[0])
     prefix = selected_root.rstrip("/") + "/"
     if any(
@@ -1553,16 +1585,16 @@ def validate_worker_manifest(
         and not nodeid.partition("::")[0].startswith(prefix)
         for nodeid in selected
     ):
-        fail("worker collection contains a node outside the selected root")
+        fail_harness("worker collection contains a node outside the selected root")
     result_events = by_kind.get("test-result", [])
     result_nodes = [event.get("nodeid") for event in result_events]
     if len(result_nodes) != len(selected) or set(result_nodes) != selected:
-        fail("every selected node must have exactly one terminal result")
+        fail_harness("every selected node must have exactly one terminal result")
     if any(event.get("outcome") not in {"passed", "failed", "skipped"} for event in result_events):
-        fail("worker manifest terminal result is malformed")
+        fail_harness("worker manifest terminal result is malformed")
     controller = by_kind.get("controller-complete", [])
     if len(controller) != 1 or controller[0].get("exitstatus") != 0:
-        fail("controller completion evidence reports failure")
+        fail_harness("controller completion evidence reports failure")
     if measured_contexts is not None:
         expected_contexts = {
             f"apg-worker:{run_id}:{worker}" for worker in expected_workers
@@ -1575,7 +1607,7 @@ def validate_worker_manifest(
         if observed_contexts != expected_contexts:
             missing = sorted(expected_contexts - measured_contexts)
             foreign = sorted(observed_contexts - expected_contexts)
-            fail(
+            fail_harness(
                 "worker coverage contribution differs: "
                 f"missing={missing}; foreign={foreign}"
             )
@@ -1589,20 +1621,20 @@ def validate_child_manifest(
     grouped: dict[str, list[dict[str, object]]] = {}
     for event in events:
         if event.get("event") not in {"child-start", "child-complete"}:
-            fail("child manifest contains an unexpected event")
+            fail_harness("child manifest contains an unexpected event")
         process_id = event.get("process_id")
         context = event.get("context")
         if not isinstance(process_id, str) or not process_id or not isinstance(context, str):
-            fail("child manifest event is malformed")
+            fail_harness("child manifest event is malformed")
         grouped.setdefault(process_id, []).append(event)
     for process_id, process_events in grouped.items():
         kinds = [event["event"] for event in process_events]
         contexts = {event["context"] for event in process_events}
         if kinds.count("child-start") != 1 or kinds.count("child-complete") != 1:
-            fail(f"required Python child did not start and complete exactly once: {process_id}")
+            fail_harness(f"required Python child did not start and complete exactly once: {process_id}")
         expected_context = f"apg-child:{run_id}:{process_id}"
         if contexts != {expected_context}:
-            fail(f"required Python child has no observable coverage contribution: {process_id}")
+            fail_harness(f"required Python child has no observable coverage contribution: {process_id}")
     expected_contexts = {
         f"apg-child:{run_id}:{process_id}" for process_id in grouped
     }
@@ -1616,11 +1648,11 @@ def validate_child_manifest(
         foreign = sorted(observed_contexts - expected_contexts)
         if missing:
             process_ids = [context.rsplit(":", 1)[1] for context in missing]
-            fail(
+            fail_harness(
                 "required Python child has no observable coverage contribution: "
                 + ", ".join(process_ids)
             )
-        fail(
+        fail_harness(
             "child coverage contribution differs: "
             f"missing={missing}; foreign={foreign}"
         )
@@ -1634,7 +1666,7 @@ def _coverage_contexts(data_file: Path) -> set[str]:
         data.read()
         return set(data.measured_contexts())
     except Exception as error:
-        fail(f"coverage contexts are unreadable: {data_file.name}: {error}")
+        fail_harness(f"coverage contexts are unreadable: {data_file.name}: {error}")
     finally:
         data.close(force=True)
 
@@ -1699,7 +1731,7 @@ def _run_pytest(
     child_manifest = artifacts / f"{suite}.children.jsonl"
     existing = set(artifacts.iterdir())
     if existing:
-        fail(f"{suite} coverage artifact directory contains unexpected data")
+        fail_harness(f"{suite} coverage artifact directory contains unexpected data")
     for manifest in (worker_manifest, child_manifest):
         descriptor = os.open(manifest, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
         os.close(descriptor)
@@ -1752,6 +1784,14 @@ def _run_pytest(
         check=False,
     )
     if result.returncode != 0:
+        if result.returncode == 2:
+            raise KeyboardInterrupt()
+        if result.returncode == 4:
+            raise InvocationError(f"{suite} pytest commandline usage error with status 4")
+        if result.returncode == 5:
+            raise InvocationError(f"{suite} pytest collected no tests (status 5)")
+        if result.returncode == 3:
+            raise HarnessError(f"{suite} pytest internal failure with status 3")
         validate_worker_manifest(
             worker_manifest,
             run_id,
@@ -1759,9 +1799,11 @@ def _run_pytest(
             workers,
             (UNIT_ROOT if suite == "unit" else INTEGRATION_ROOT).as_posix(),
         )
-        fail(f"{suite} pytest run failed with status {result.returncode}")
+        if result.returncode == 1:
+            raise TestAssertionError(f"{suite} pytest run failed with status 1")
+        raise HarnessError(f"{suite} pytest run failed with status {result.returncode}")
     if not data_file.is_file() or not json_file.is_file():
-        fail(f"{suite} coverage output is incomplete")
+        raise HarnessError(f"{suite} coverage output is incomplete")
     measured_contexts = _coverage_contexts(data_file)
     validate_worker_manifest(
         worker_manifest,
@@ -1776,18 +1818,20 @@ def _run_pytest(
     )
     expected = _component_artifacts(artifacts, suite)
     if set(artifacts.iterdir()) != expected:
-        fail(f"{suite} coverage left unexpected data")
+        fail_harness(f"{suite} coverage left unexpected data")
     try:
         report = json.loads(json_file.read_text(encoding="utf-8"))
     except (OSError, UnicodeError, ValueError) as error:
-        fail(f"{suite} coverage JSON is unreadable: {error}")
+        fail_harness(f"{suite} coverage JSON is unreadable: {error}")
     if not isinstance(report, dict):
-        fail(f"{suite} coverage JSON is not an object")
+        fail_harness(f"{suite} coverage JSON is not an object")
     return data_file, report
 
 
 def _combine_coverage(root: Path, data_files: Sequence[Path], output: Path) -> dict[str, object]:
-    from coverage import Coverage, CoverageData
+    """Combine coverage data files into an aggregate report without cross-test leakage."""
+    from coverage import Coverage
+    from coverage.data import CoverageData
 
     combined = CoverageData(basename=str(output))
     try:
@@ -1797,7 +1841,7 @@ def _combine_coverage(root: Path, data_files: Sequence[Path], output: Path) -> d
                 data.read()
                 combined.update(data)
             except Exception as error:
-                fail(f"coverage data could not be combined: {path.name}: {error}")
+                fail_harness(f"coverage data could not be combined: {path.name}: {error}")
             finally:
                 data.close(force=True)
         combined.write()
@@ -1815,9 +1859,9 @@ def _combine_coverage(root: Path, data_files: Sequence[Path], output: Path) -> d
     try:
         value = json.loads(json_file.read_text(encoding="utf-8"))
     except (OSError, UnicodeError, ValueError) as error:
-        fail(f"combined coverage JSON is unreadable: {error}")
+        fail_harness(f"combined coverage JSON is unreadable: {error}")
     if not isinstance(value, dict):
-        fail("combined coverage JSON is not an object")
+        fail_harness("combined coverage JSON is not an object")
     return value
 
 
@@ -1831,7 +1875,7 @@ def run(
 ) -> None:
     """Validate inventory, run selected suites, and enforce exact gates."""
     if workers < 1 or workers > 64:
-        fail("workers must be between 1 and 64")
+        raise InvocationError("workers must be between 1 and 64")
     inventory = load_inventory(root)
     validate_inventory(root, inventory)
     dependency_versions()
@@ -1848,6 +1892,10 @@ def run(
         selected = ("unit", "integration") if suite == "combined" else (suite,)
         results: dict[str, ComponentResult] = {}
         errors: list[str] = []
+        has_invocation_error = False
+        has_harness_error = False
+        has_assertion_error = False
+        has_gate_error = False
         invocation_id = secrets.token_hex(16)
         for selected_suite in selected:
             try:
@@ -1871,16 +1919,36 @@ def run(
                 results[selected_suite] = ComponentResult(data_file, report, counts)
                 try:
                     enforce_threshold(counts, *THRESHOLDS[selected_suite])
+                except GateShortfallError as error:
+                    errors.append(f"{selected_suite}: {error}")
+                    has_gate_error = True
                 except ToolError as error:
                     errors.append(f"{selected_suite}: {error}")
+                    has_harness_error = True
                 else:
                     print(
                         f"PASS {selected_suite}: statements "
                         f"{counts.statements_covered}/{counts.statements_total}; branches "
                         f"{counts.branches_covered}/{counts.branches_total}"
                     )
+            except InvocationError as error:
+                errors.append(f"{selected_suite}: {error}")
+                has_invocation_error = True
+            except HarnessError as error:
+                errors.append(f"{selected_suite}: {error}")
+                has_harness_error = True
+            except PolicyCheckError as error:
+                errors.append(f"{selected_suite}: {error}")
+                has_assertion_error = True
+            except TestAssertionError as error:
+                errors.append(f"{selected_suite}: {error}")
+                has_assertion_error = True
+            except GateShortfallError as error:
+                errors.append(f"{selected_suite}: {error}")
+                has_gate_error = True
             except ToolError as error:
                 errors.append(f"{selected_suite}: {error}")
+                has_harness_error = True
         if suite == "combined" and set(results) == {"unit", "integration"}:
             try:
                 report = _combine_coverage(
@@ -1892,8 +1960,24 @@ def run(
                 paths = sorted(inventory.coverage_sources)
                 counts = coverage_counts(report, paths)
                 enforce_threshold(counts, *THRESHOLDS["combined"])
+            except InvocationError as error:
+                errors.append(f"combined: {error}")
+                has_invocation_error = True
+            except HarnessError as error:
+                errors.append(f"combined: {error}")
+                has_harness_error = True
+            except PolicyCheckError as error:
+                errors.append(f"combined: {error}")
+                has_assertion_error = True
+            except GateShortfallError as error:
+                errors.append(f"combined: {error}")
+                has_gate_error = True
+            except TestAssertionError as error:
+                errors.append(f"combined: {error}")
+                has_assertion_error = True
             except ToolError as error:
                 errors.append(f"combined: {error}")
+                has_harness_error = True
             else:
                 print(
                     "PASS combined union: statements "
@@ -1901,13 +1985,361 @@ def run(
                     f"{counts.branches_covered}/{counts.branches_total}"
                 )
         if errors:
-            fail("; ".join(errors))
+            if has_invocation_error:
+                raise InvocationError("; ".join(errors))
+            if has_harness_error:
+                raise HarnessError("; ".join(errors))
+            if has_assertion_error:
+                raise TestAssertionError("; ".join(errors))
+            if has_gate_error:
+                raise GateShortfallError("; ".join(errors))
+            raise ToolError("; ".join(errors))
         completed = True
     finally:
         if not completed and keep_artifacts_on_failure:
             print(f"{COMMAND}: retained failure artifacts: {artifacts}", file=sys.stderr)
         else:
-            _cleanup_artifacts(artifact_ownership)
+            try:
+                _cleanup_artifacts(artifact_ownership)
+            except Exception as cleanup_error:
+                if not completed or errors:
+                    print(
+                        f"{COMMAND}: artifact directory cleanup warning: {cleanup_error}",
+                        file=sys.stderr,
+                    )
+                else:
+                    raise
+
+
+def resolve_source_commit(root: Path) -> str:
+    """Resolve the Git commit object ID of HEAD at execution time for the repository root."""
+    try:
+        completed = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            cwd=root,
+            check=False,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            timeout=10,
+        )
+    except (OSError, subprocess.TimeoutExpired) as error:
+        fail(f"resolve source commit: {error}")
+    if completed.returncode != 0:
+        fail(f"resolve source commit: {completed.stderr.strip() or 'git command failed'}")
+    commit = completed.stdout.strip()
+    if len(commit) != 40 or not all(c in "0123456789abcdefABCDEF" for c in commit):
+        fail(f"resolve source commit: invalid commit hash {commit}")
+    return commit
+
+
+def write_summary(
+    path: Path,
+    *,
+    suite: str,
+    test_status: str,
+    gate_status: str,
+    source_commit: str,
+) -> None:
+    """Atomically write mode-private JACA CI qualification summary JSON."""
+    payload = {
+        "version": 1,
+        "subproject": "apg",
+        "suite": suite,
+        "test_status": test_status,
+        "gate_status": gate_status,
+        "source_commit": source_commit,
+    }
+    content = (json.dumps(payload, indent=2) + "\n").encode("utf-8")
+    resolved_path = path.resolve()
+    resolved_path.parent.mkdir(parents=True, exist_ok=True)
+    tmp_path = resolved_path.with_name(f".{resolved_path.name}.tmp.{secrets.token_hex(8)}")
+    try:
+        descriptor = os.open(tmp_path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+        try:
+            with open(descriptor, "wb", closefd=True) as stream:
+                stream.write(content)
+        except BaseException:
+            try:
+                os.close(descriptor)
+            except OSError:
+                pass
+            raise
+        tmp_path.replace(resolved_path)
+    finally:
+        if tmp_path.exists():
+            try:
+                tmp_path.unlink()
+            except OSError:
+                pass
+
+
+@dataclass(frozen=True)
+class SummaryDestination:
+    """Admitted destination for JACA CI qualification summary JSON."""
+
+    target: Path
+    resolved_target: Path
+    root: Path
+
+    def invalidate(self) -> None:
+        """Safely invalidate existing APGR receipt at this admitted path.
+
+        If target exists and is a recognized 6-field APGR receipt, unlink it.
+        If target exists and is NOT a recognized APGR receipt, raise InvocationError
+        to preserve foreign files.
+        If unlinking fails, raise InvocationError.
+        """
+        if not self.target.exists() and not self.target.is_symlink():
+            return
+        if self.target.is_symlink():
+            raise InvocationError(f"summary file cannot target a symlink: {self.target}")
+        if self.target.is_dir() or self.resolved_target.is_dir():
+            raise InvocationError(f"summary file cannot target a directory: {self.target}")
+        if not _is_apgr_receipt(self.target):
+            raise InvocationError(
+                f"summary file exists and is not a recognized APGR receipt: {self.target}"
+            )
+        try:
+            self.target.unlink()
+        except OSError as error:
+            raise InvocationError(f"failed to invalidate stale summary file: {error}") from error
+
+    def write(
+        self,
+        *,
+        suite: str,
+        test_status: str,
+        gate_status: str,
+        source_commit: str,
+    ) -> None:
+        """Atomically write mode-private (0o600) summary JSON."""
+        write_summary(
+            self.target,
+            suite=suite,
+            test_status=test_status,
+            gate_status=gate_status,
+            source_commit=source_commit,
+        )
+
+
+def _is_apgr_receipt(path: Path) -> bool:
+    """Verify that path points to a strict 6-field APGR qualification receipt."""
+    try:
+        resolved = path.resolve()
+        if not resolved.is_file():
+            return False
+        content = resolved.read_bytes()
+        if len(content) > 1024 * 1024:
+            return False
+        data = json.loads(content.decode("utf-8"))
+        if not isinstance(data, dict):
+            return False
+        expected_keys = {
+            "version",
+            "subproject",
+            "suite",
+            "test_status",
+            "gate_status",
+            "source_commit",
+        }
+        if set(data.keys()) != expected_keys:
+            return False
+        if data.get("version") != 1 or data.get("subproject") != "apg":
+            return False
+        if data.get("suite") not in ("policy", "unit", "integration", "combined", "unknown"):
+            return False
+        if data.get("test_status") not in ("pass", "fail", "error"):
+            return False
+        if data.get("gate_status") not in ("pass", "fail", "error"):
+            return False
+        commit = data.get("source_commit")
+        if not isinstance(commit, str) or len(commit) != 40:
+            return False
+        if not all(c in "0123456789abcdefABCDEF" for c in commit):
+            return False
+        return True
+    except (OSError, UnicodeError, ValueError):
+        return False
+
+
+def _git_metadata_paths(root: Path) -> set[Path]:
+    """Resolve actual Git metadata directory paths for root, supporting linked worktrees."""
+    paths: set[Path] = set()
+    for flag in ("--git-dir", "--git-common-dir"):
+        try:
+            completed = subprocess.run(
+                ["git", "rev-parse", flag],
+                cwd=root,
+                check=False,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.DEVNULL,
+                text=True,
+                timeout=5,
+            )
+            if completed.returncode == 0 and completed.stdout.strip():
+                git_path = Path(completed.stdout.strip())
+                if not git_path.is_absolute():
+                    git_path = (root / git_path).resolve()
+                else:
+                    git_path = git_path.resolve()
+                paths.add(git_path)
+        except (OSError, subprocess.TimeoutExpired):
+            pass
+    return paths
+
+
+def admit_summary_destination(root: Path, target: Path) -> SummaryDestination:
+    """Verify target summary path is safe from overwriting repo code or Git authority."""
+    if ".git" in target.parts or target.name == ".git":
+        raise InvocationError(f"summary file cannot target Git metadata: {target}")
+
+    if target.is_symlink():
+        raise InvocationError(f"summary file cannot target a symlink: {target}")
+
+    resolved_root = root.resolve(strict=True)
+    norm_root = Path(os.path.normpath(str(root)))
+
+    raw_target = target if target.is_absolute() else (Path.cwd() / target)
+    lexical_target = Path(os.path.normpath(str(raw_target)))
+    addressed_in_parent = lexical_target.parent.resolve() / lexical_target.name
+
+    if addressed_in_parent.is_symlink():
+        raise InvocationError(f"summary file cannot target a symlink: {target}")
+
+    resolved_target = target.resolve()
+
+    for path_rep in (lexical_target, addressed_in_parent, resolved_target):
+        if ".git" in path_rep.parts or path_rep.name == ".git":
+            raise InvocationError(f"summary file cannot target Git metadata: {target}")
+
+    for git_meta in _git_metadata_paths(resolved_root):
+        for path_rep in (lexical_target, addressed_in_parent, resolved_target):
+            if path_rep == git_meta or git_meta in path_rep.parents:
+                raise InvocationError(f"summary file cannot target Git metadata: {target}")
+
+    if (
+        resolved_target == resolved_root
+        or lexical_target == resolved_root
+        or lexical_target == norm_root
+        or addressed_in_parent == resolved_root
+    ):
+        raise InvocationError(f"summary file cannot target repository root: {target}")
+
+    if (
+        target.is_dir()
+        or lexical_target.is_dir()
+        or addressed_in_parent.is_dir()
+        or (resolved_target.exists() and resolved_target.is_dir())
+    ):
+        raise InvocationError(f"summary file cannot target a directory: {target}")
+
+    in_repo_rels: list[Path] = []
+    if resolved_root in resolved_target.parents:
+        in_repo_rels.append(resolved_target.relative_to(resolved_root))
+    if resolved_root in addressed_in_parent.parents:
+        rel_addressed = addressed_in_parent.relative_to(resolved_root)
+        if rel_addressed not in in_repo_rels:
+            in_repo_rels.append(rel_addressed)
+    if resolved_root in lexical_target.parents:
+        rel_lex = lexical_target.relative_to(resolved_root)
+        if rel_lex not in in_repo_rels:
+            in_repo_rels.append(rel_lex)
+    elif norm_root in lexical_target.parents:
+        rel_lex = lexical_target.relative_to(norm_root)
+        if rel_lex not in in_repo_rels:
+            in_repo_rels.append(rel_lex)
+
+    for rel in in_repo_rels:
+        try:
+            tracked_proc = subprocess.run(
+                ["git", "ls-files", "--error-unmatch", str(rel)],
+                cwd=resolved_root,
+                check=False,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                timeout=5,
+            )
+            if tracked_proc.returncode == 0:
+                raise InvocationError(
+                    f"summary file inside repository cannot target tracked file: {target}"
+                )
+        except subprocess.TimeoutExpired as error:
+            raise InvocationError(
+                f"git ls-files timed out probing summary destination: {target}"
+            ) from error
+        except OSError as error:
+            raise InvocationError(
+                f"failed to probe git tracking status: {error}"
+            ) from error
+
+        try:
+            ignored_proc = subprocess.run(
+                ["git", "check-ignore", "-q", str(rel)],
+                cwd=resolved_root,
+                check=False,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                timeout=5,
+            )
+            is_ignored = (ignored_proc.returncode == 0)
+        except (OSError, subprocess.TimeoutExpired):
+            is_ignored = False
+
+        if not is_ignored:
+            raise InvocationError(
+                f"summary file inside repository must be gitignored: {target}"
+            )
+
+    return SummaryDestination(target, resolved_target, resolved_root)
+
+
+def _scan_early_args(raw_args: Sequence[str]) -> tuple[str, Path | None]:
+    """Scan raw CLI arguments early for suite and summary-file path without raising."""
+    summary_file_early: Path | None = None
+    suite_early: str = "unknown"
+    idx = 0
+    while idx < len(raw_args):
+        token = raw_args[idx]
+        if token in ("unit", "integration", "unit-integration", "policy"):
+            suite_early = "combined" if token == "unit-integration" else token
+        elif token == "--summary-file":
+            if idx + 1 < len(raw_args) and not raw_args[idx + 1].startswith("-"):
+                summary_file_early = Path(raw_args[idx + 1])
+                idx += 1
+            else:
+                summary_file_early = None
+        elif token.startswith("--summary-file="):
+            val = token.split("=", 1)[1]
+            if val and not val.startswith("-"):
+                summary_file_early = Path(val)
+            else:
+                summary_file_early = None
+        idx += 1
+    return suite_early, summary_file_early
+
+
+def run_policy(root: Path) -> None:
+    """Execute inventory validation, skill library check, and record identity check."""
+    inventory = load_inventory(root)
+    validate_inventory(root, inventory)
+    dependency_versions()
+
+    import apg_skill_library_check
+    import apg_record_identity
+
+    skill_result = apg_skill_library_check.check_library(root)
+    if not skill_result.passed:
+        raise PolicyCheckError("skill library policy check failed")
+    corpus_failure = apg_skill_library_check._embedded_corpus_failure(root)
+    if corpus_failure is not None:
+        raise PolicyCheckError(f"skill library corpus identity check failed: {corpus_failure}")
+
+    record_result = apg_record_identity.check_records(root)
+    if not record_result.passed:
+        raise PolicyCheckError("record identity policy check failed")
+
+    print("PASS policy: inventory, skill-library, and record-identity checks passed")
 
 
 def parser() -> argparse.ArgumentParser:
@@ -1915,31 +2347,148 @@ def parser() -> argparse.ArgumentParser:
         prog=COMMAND,
         description="Run APG pytest suites with xdist and exact coverage gates.",
     )
-    value.add_argument("suite", choices=("unit", "integration", "unit-integration"))
+    value.add_argument(
+        "suite",
+        choices=("unit", "integration", "unit-integration", "policy"),
+    )
     value.add_argument("--workers", type=int, default=8)
     value.add_argument("--keep-artifacts-on-failure", action="store_true")
     value.add_argument(
         "--verify-failure-mode",
         choices=("worker-crash", "missing-child"),
     )
+    value.add_argument(
+        "--summary-file",
+        type=Path,
+        default=None,
+        help="write machine-readable JACA CI qualification summary JSON",
+    )
     return value
 
 
 def main(arguments: Sequence[str] | None = None) -> int:
-    args = parser().parse_args(arguments)
-    suite = "combined" if args.suite == "unit-integration" else args.suite
+    raw_args = list(sys.argv[1:] if arguments is None else arguments)
+    suite_early, summary_file_early = _scan_early_args(raw_args)
+
     root = Path(__file__).resolve(strict=True).parent.parent
     try:
-        run(
-            suite,
-            args.workers,
-            root,
-            keep_artifacts_on_failure=args.keep_artifacts_on_failure,
-            failure_mode=args.verify_failure_mode,
-        )
-    except ToolError as error:
+        entry_commit = resolve_source_commit(root)
+    except ToolError:
+        entry_commit = None
+
+    try:
+        args = parser().parse_args(arguments)
+    except SystemExit as exc:
+        if exc.code != 0 and summary_file_early is not None:
+            try:
+                early_dest = admit_summary_destination(root, summary_file_early)
+                early_dest.invalidate()
+                if entry_commit is not None:
+                    early_dest.write(
+                        suite=suite_early,
+                        test_status="error",
+                        gate_status="error",
+                        source_commit=entry_commit,
+                    )
+            except InvocationError:
+                pass
+        raise
+
+    suite = "combined" if args.suite == "unit-integration" else args.suite
+    destination: SummaryDestination | None = None
+    if args.summary_file is not None:
+        try:
+            destination = admit_summary_destination(root, args.summary_file)
+            destination.invalidate()
+        except InvocationError as error:
+            print(f"{COMMAND}: {error}", file=sys.stderr)
+            return 1
+
+    def _write_admitted(test_status: str, gate_status: str) -> bool:
+        if destination is None:
+            return True
+
+        def _safe_invalidate() -> None:
+            try:
+                destination.invalidate()
+            except InvocationError as error:
+                print(f"{COMMAND}: {error}", file=sys.stderr)
+
+        if entry_commit is None:
+            print(f"{COMMAND}: resolve source commit: git unavailable", file=sys.stderr)
+            _safe_invalidate()
+            return False
+        try:
+            exit_commit = resolve_source_commit(root)
+        except ToolError as error:
+            print(f"{COMMAND}: {error}", file=sys.stderr)
+            _safe_invalidate()
+            return False
+        if exit_commit != entry_commit:
+            print(
+                f"{COMMAND}: git HEAD drifted during execution (entry {entry_commit} != exit {exit_commit})",
+                file=sys.stderr,
+            )
+            _safe_invalidate()
+            return False
+        try:
+            destination.write(
+                suite=suite,
+                test_status=test_status,
+                gate_status=gate_status,
+                source_commit=exit_commit,
+            )
+            return True
+        except Exception as error:
+            print(
+                f"{COMMAND}: failed to write summary file {destination.target}: {error}",
+                file=sys.stderr,
+            )
+            _safe_invalidate()
+            return False
+
+    try:
+        if suite == "policy":
+            run_policy(root)
+        else:
+            run(
+                suite,
+                args.workers,
+                root,
+                keep_artifacts_on_failure=args.keep_artifacts_on_failure,
+                failure_mode=args.verify_failure_mode,
+            )
+        if not _write_admitted("pass", "pass"):
+            return 1
+        return 0
+    except GateShortfallError as error:
+        _write_admitted("pass", "fail")
         print(f"{COMMAND}: {error}", file=sys.stderr)
         return 1
+    except InvocationError as error:
+        _write_admitted("error", "error")
+        print(f"{COMMAND}: {error}", file=sys.stderr)
+        return 1
+    except HarnessError as error:
+        _write_admitted("error", "error")
+        print(f"{COMMAND}: {error}", file=sys.stderr)
+        return 1
+    except PolicyCheckError as error:
+        _write_admitted("fail", "fail")
+        print(f"{COMMAND}: {error}", file=sys.stderr)
+        return 1
+    except TestAssertionError as error:
+        _write_admitted("fail", "fail")
+        print(f"{COMMAND}: {error}", file=sys.stderr)
+        return 1
+    except ToolError as error:
+        _write_admitted("fail", "fail")
+        print(f"{COMMAND}: {error}", file=sys.stderr)
+        return 1
+    except KeyboardInterrupt:
+        _write_admitted("error", "error")
+        print(f"{COMMAND}: interrupted", file=sys.stderr)
+        return 130
     return 0
 
 

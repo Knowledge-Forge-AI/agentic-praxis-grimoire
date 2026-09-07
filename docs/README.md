@@ -11,15 +11,18 @@ start with the [root README](../README.md).
 - [APGR CLI reference](reference/cli.md) — command families, exit behavior,
   build information, bridge rules, and safety boundaries.
 - [APG distribution](distribution.md) — supported targets, multi-registry
-  distribution, and the complete v0.8.1 package architecture.
+  distribution, and the complete package architecture.
+- [Release notes (v0.9.0)](../release/v0.9.0-notes.md) — version highlights,
+  platform status, and publication prerequisites.
 
-Documentation covers the prepared **v0.8.1** multi-surface release candidate,
-while the current published Go module release remains at immutable **v0.8.0**
-pending final source freeze and publication execution.
+This documentation covers 0.9.0 and its CI-first interfaces. Once this version
+is published, its packages are available through the documented registries.
 
 ## Use the CLI
 
 - [APGR CLI reference](reference/cli.md) is the primary command owner.
+- `apgr test` (including `--summary-file` and the `policy` mechanical role)
+  provides the v0.9 CI qualification interface in APGR Git source checkouts.
 - [Public release process](public-release-process.md) covers maintainer-only
   candidate construction and publication boundaries.
 - [Structured project defaults](structured-project-phase-defaults.md) covers
@@ -87,11 +90,13 @@ Growth and churn analysis is not part of the v0.8 footprint capability.
   defines consumer-facing APIs, schemas, and ownership.
 
 APG102 completed disposable JACA cross-consumer qualification without changing
-JACA or creating a production dependency. The prepared v0.8.1 source contains
+JACA or creating a production dependency. The published v0.8.1 release contains
 the complete `footprint` package alongside `schema`, `report`, `skills`,
-`envsnap`, and `hotspot`; public v0.8.0 remains the released baseline while
-source freeze and publication are pending. Any downstream JACA adoption
-remains JACA-owned and separately qualified.
+`envsnap`, and `hotspot`. [JACA CI Integration Handoff](architecture/jaca-ci-handoff.md)
+specifies qualification entry points for JACA CI, and [JACA XO Compatibility Handoff](architecture/jaca-xo-handoff.md)
+qualifies APGR-owned Go library consumption for JACA XO. Downstream JACA CI registration
+and production XO adoption remain consumer-owned and pending; APGR-local qualification
+does not equal JACA registration, and the XO consumer fixture is not JACA's production adapter.
 
 ## Review architecture and decisions
 
@@ -115,9 +120,11 @@ remains JACA-owned and separately qualified.
 
 ## Check release status
 
-- [v0.7 roadmap](v0-7-roadmap.md) preserves the published release sequence.
-- [v0.8 roadmap](v0-8-roadmap.md) records the active additive
-  context-footprint and skill-inventory work-stage sequence.
+- [Release notes (v0.9.0)](../release/v0.9.0-notes.md) cover this version and its publication prerequisites.
+- [Release notes (v0.8.1)](../release/v0.8.1-notes.md) preserves the published frozen baseline.
+- [v0.7 roadmap](v0-7-roadmap.md) preserves the published v0.7 release sequence.
+- [v0.8 roadmap](v0-8-roadmap.md) records the completed v0.8.1 context-footprint program.
+- [v0.9 roadmap](v0-9-roadmap.md) defines the active CI-first development program.
 - [Project roadmap](roadmap.md) provides the durable cross-release ledger.
 - [Status index](status/README.md) lists terminal phase exit records.
 - [Public release process](public-release-process.md) owns publication

@@ -1477,6 +1477,41 @@ V081_PROJECTIONS = tuple(V08_PROJECTIONS)
 V081_SKILLS = tuple(V08_SKILLS)
 V081_CATEGORIES = tuple(V08_CATEGORIES)
 
+V09_WRAPPERS = tuple(V081_WRAPPERS)
+V09_HELPERS = tuple(V081_HELPERS)
+V09_TESTS = tuple(
+    sorted(
+        set(V081_TESTS)
+        | {
+            "testing/fixtures/xo_consumer/adapter_test.go",
+        }
+    )
+)
+V09_CRITICAL = tuple(
+    sorted(
+        set(V081_CRITICAL)
+        | {
+            "docs/architecture/jaca-ci-handoff.md",
+            "docs/architecture/jaca-xo-handoff.md",
+            "docs/status/2026/09/06/00159-apg114-v090-integrated-source-qualification-exit.md",
+            "docs/v0-9-roadmap.md",
+            "release/v0.9.0-notes.md",
+            "testing/fixtures/jaca_ci/drift-pr.json",
+            "testing/fixtures/jaca_ci/invalid-role-pr.json",
+            "testing/fixtures/jaca_ci/sample-summary-fail.json",
+            "testing/fixtures/jaca_ci/sample-summary-pass.json",
+            "testing/fixtures/jaca_ci/valid-apg-pr.json",
+            "testing/fixtures/xo_consumer/README.md",
+            "testing/fixtures/xo_consumer/adapter.go",
+            "testing/fixtures/xo_consumer/fixture-go.mod",
+        }
+    )
+)
+V09_LICENSING = tuple(V081_LICENSING)
+V09_PROJECTIONS = tuple(V081_PROJECTIONS)
+V09_SKILLS = tuple(V081_SKILLS)
+V09_CATEGORIES = tuple(V081_CATEGORIES)
+
 # Source-only test oracles and generated/local output never enter the
 # release-shaped v0.7 candidate. The compatibility wrappers above are not
 # excluded because they invoke the Go owner through the normal bridge.
@@ -2111,9 +2146,21 @@ def audited_policy_surfaces(version: str) -> tuple[dict[str, tuple[str, ...]], .
         "critical_files": V081_CRITICAL,
         "validation_categories": V081_CATEGORIES,
     }
+    current_v09 = {
+        "required_helpers": V09_HELPERS,
+        "required_licensing_files": V09_LICENSING,
+        "required_projections": V09_PROJECTIONS,
+        "required_skills": V09_SKILLS,
+        "required_test_entrypoints": V09_TESTS,
+        "required_wrappers": V09_WRAPPERS,
+        "critical_files": V09_CRITICAL,
+        "validation_categories": V09_CATEGORIES,
+    }
     if not SEMVER.fullmatch(version):
         fail("public release policy identity is malformed or unsupported")
     core = version.split("+", 1)[0].split("-", 1)[0]
+    if core == "0.9.0":
+        return (current_v09,)
     if core == "0.8.1":
         return (current_v081,)
     if core == "0.8.0":
@@ -2201,6 +2248,7 @@ def load_policy(
     expected_surfaces: Sequence[dict[str, tuple[str, ...]]] | None = None,
     allow_v07_compatibility: bool = False,
     allow_v08_compatibility: bool = False,
+    allow_v09_compatibility: bool = False,
 ) -> dict[str, object]:
     raw = committed_bytes(repository, POLICY_PATH)
     if len(raw) > 256 * 1024:
@@ -2243,6 +2291,19 @@ def load_policy(
             *allowed_surfaces,
             audited_policy_surfaces("0.8.0")[0],
             audited_policy_surfaces("0.8.1")[0],
+        )
+    if allow_v09_compatibility and any(
+        surface in (
+            audited_policy_surfaces("0.7.0")[0],
+            audited_policy_surfaces("0.8.0")[0],
+            audited_policy_surfaces("0.8.1")[0],
+            audited_policy_surfaces("0.9.0")[0],
+        )
+        for surface in allowed_surfaces
+    ):
+        allowed_surfaces = (
+            *allowed_surfaces,
+            audited_policy_surfaces("0.9.0")[0],
         )
     if not any(
         all(tuple(value[key]) == expected for key, expected in surface.items())
@@ -2334,6 +2395,12 @@ def is_v08_candidate_path(path: str | bytes) -> bool:
     return True
 
 
+def is_v09_candidate_path(path: str | bytes) -> bool:
+    """Preserve the existing v0.8 exclusions for the additive v0.9 surface."""
+
+    return is_v08_candidate_path(path)
+
+
 def public_candidate_entries(
     repository: Repository,
     version: str,
@@ -2344,6 +2411,8 @@ def public_candidate_entries(
 
     entries = tree_entries(repository, excluded_prefix=excluded_prefix)
     core = version.split("+", 1)[0].split("-", 1)[0]
+    if core == "0.9.0":
+        return tuple(entry for entry in entries if is_v09_candidate_path(entry.path))
     if core in {"0.8.0", "0.8.1"}:
         return tuple(entry for entry in entries if is_v08_candidate_path(entry.path))
     if core != "0.7.0":
@@ -2455,6 +2524,7 @@ def build_manifest(
         expected_surfaces=audited_policy_surfaces(selected_version),
         allow_v07_compatibility=True,
         allow_v08_compatibility=True,
+        allow_v09_compatibility=True,
     )
     entries = public_candidate_entries(
         repository,
@@ -2509,6 +2579,14 @@ def validate_versioned_policy_exclusions(
     """Reject future owners from immutable historical public trees."""
 
     core = version.split("+", 1)[0].split("-", 1)[0]
+    if core == "0.9.0":
+        for entry in entries:
+            if not is_v09_candidate_path(entry.path):
+                fail(
+                    f"public v{version} contains a publication-excluded path: "
+                    + entry.display_path
+                )
+        return
     if core in {"0.8.0", "0.8.1"}:
         for entry in entries:
             if not is_v08_candidate_path(entry.path):
@@ -2874,6 +2952,7 @@ def build_candidate(
         expected_surfaces=audited_policy_surfaces(version),
         allow_v07_compatibility=True,
         allow_v08_compatibility=True,
+        allow_v09_compatibility=True,
     )
     entries = public_candidate_entries(source, version, excluded_prefix=b"private/")
     validate_versioned_policy_exclusions(entries, version)
@@ -3211,15 +3290,16 @@ def check_candidate(
         expected_surfaces=audited_policy_surfaces(version),
         allow_v07_compatibility=True,
         allow_v08_compatibility=True,
+        allow_v09_compatibility=True,
     )
     source_entries = public_candidate_entries(
         source, version, excluded_prefix=b"private/"
     )
     candidate_entries = public_candidate_entries(candidate, version)
     core = version.split("+", 1)[0].split("-", 1)[0]
-    if core == "0.7.0":
+    if core in {"0.7.0", "0.8.0", "0.8.1", "0.9.0"}:
         # The development source may retain publication-excluded oracle files,
-        # but a v0.7 release candidate must not project them.  Inspect the
+        # but a v0.7+ release candidate must not project them.  Inspect the
         # unfiltered candidate tree so the check cannot pass merely because
         # the projection filter hid an excluded path.
         candidate_all_entries = tree_entries(candidate)

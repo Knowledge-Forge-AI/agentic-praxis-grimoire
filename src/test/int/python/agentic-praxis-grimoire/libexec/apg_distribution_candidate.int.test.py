@@ -62,7 +62,7 @@ def test_complete_release_candidate_builders_compose_in_process(
     assert len(python_paths) == 5
     assert len(npm_records) == 4
     assert manifest["schema_version"] == candidate.MANIFEST_SCHEMA
-    assert manifest["version"] == "0.8.1"
+    assert manifest["version"] == "0.9.0"
     assert len(manifest["binaries"]) == 3
     assert len(manifest["python"]["wheels"]) == 3
     assert len(manifest["npm"]["platform_packages"]) == 3

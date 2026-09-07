@@ -60,7 +60,7 @@ TARGET_TAGS = _canonical_target_tags()
 # ``EPOCH`` is the current release policy alias. Historical reconstruction
 # uses the named v0.6 value explicitly below; it must not silently inherit the
 # current release epoch.
-EPOCH = distribution.V081_RELEASE_EPOCH
+EPOCH = distribution.V09_RELEASE_EPOCH
 HISTORICAL_V06_VERSION = "0.6.0"
 HISTORICAL_V06_WHEEL_NAME = (
     f"{DIST_NAME}-{HISTORICAL_V06_VERSION}-py3-none-any.whl"
@@ -781,7 +781,7 @@ def parser() -> Any:
 
     command = argparse.ArgumentParser(
         prog=COMMAND,
-        description="Build or validate deterministic v0.8 Python platform distributions.",
+        description="Build or validate deterministic APGR Python platform distributions.",
     )
     subcommands = command.add_subparsers(dest="subcommand", required=True)
     build = subcommands.add_parser("build", help="build three wheels and one sdist twice")
@@ -794,7 +794,7 @@ def parser() -> Any:
     historical.add_argument("--output", required=True, type=Path)
     historical.add_argument("--work-root", required=True, type=Path)
     historical.add_argument("--python", default=Path(sys.executable), type=Path)
-    check = subcommands.add_parser("check", help="validate one exact v0.8 bundle")
+    check = subcommands.add_parser("check", help="validate one exact release bundle")
     check.add_argument("--bundle", required=True, type=Path)
     historical_check = subcommands.add_parser("check-v06", help="validate one historical v0.6 bundle")
     historical_check.add_argument("--bundle", required=True, type=Path)

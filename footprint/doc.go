@@ -5,4 +5,7 @@
 // providers, select routes, manage credentials, or implement workflow
 // authority. Canonical bytes are UTF-8 JSON with one trailing line feed; the
 // corresponding fingerprints are domain-separated SHA-256 identities.
+// Projections bind supplied source records; they do not forecast provider
+// capacity. Unavailable metrics carry reasons, and overlapping components
+// must not be added into a total context figure.
 package footprint

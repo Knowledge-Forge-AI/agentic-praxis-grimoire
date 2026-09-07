@@ -156,7 +156,7 @@ def test_wrapper_rejects_archive_and_argument_error_boundaries(tmp_path: Path) -
         "1700000001",
     )
     assert (
-        "release epoch must be one of 1700000000, 1787270400, 1787529600, 1788134400, 1788393600 seconds"
+        "release epoch must be one of 1700000000, 1787270400, 1787529600, 1788134400, 1788393600, 1788739200 seconds"
         in wrong_release_epoch.stderr
     )
 

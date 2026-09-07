@@ -36,11 +36,12 @@ class APGPublicReleaseBoundaryTests(unittest.TestCase):
             ("0.7.0", release.V07_SKILLS),
             ("0.8.0", release.V08_SKILLS),
             ("0.8.1", release.V081_SKILLS),
+            ("0.9.0", release.V09_SKILLS),
         ):
             with self.subTest(version=version):
                 surfaces = release.audited_policy_surfaces(version)
                 self.assertEqual(surfaces[0]["required_skills"], expected)
-        for version in ("invalid", "0.5.1", "0.6.1", "0.8.2"):
+        for version in ("invalid", "0.5.1", "0.6.1", "0.8.2", "0.9.1"):
             with self.subTest(version=version):
                 with self.assertRaisesRegex(release.ToolError, "policy identity"):
                     release.audited_policy_surfaces(version)
@@ -81,6 +82,10 @@ class APGPublicReleaseBoundaryTests(unittest.TestCase):
                 entry.display_path
                 for entry in release.public_candidate_entries(repository, "0.8.0")
             }
+            v09_candidate = {
+                entry.display_path
+                for entry in release.public_candidate_entries(repository, "0.9.0")
+            }
             for path in (
                 "libexec/agent_report/diff.py",
                 "report/testdata/python_oracle.py",
@@ -109,6 +114,35 @@ class APGPublicReleaseBoundaryTests(unittest.TestCase):
                 with self.subTest(v08_path=path):
                     self.assertIn(path, additive)
             self.assertNotIn("private/secret.txt", additive)
+            for path in (
+                "libexec/agent_report/diff.py",
+                "report/testdata/python_oracle.py",
+                "src/agentic_praxis_grimoire/skills.py",
+                "dist/example.whl",
+                ".scratch/local.txt",
+            ):
+                with self.subTest(v09_excluded_path=path):
+                    self.assertNotIn(path, v09_candidate)
+            for path in (
+                "npm/launcher/package.json",
+                "go.mod",
+            ):
+                with self.subTest(v09_path=path):
+                    self.assertIn(path, v09_candidate)
+            self.assertNotIn("private/secret.txt", v09_candidate)
+            # Candidate validation must reject an excluded committed entry,
+            # rather than silently hiding it through the projection filter.
+            projected = release.public_candidate_entries(repository, "0.9.0")
+            release.validate_versioned_policy_exclusions(projected, "0.9.0")
+            for entry in release.tree_entries(repository):
+                if entry.display_path not in v09_candidate:
+                    with self.subTest(reintroduced_path=entry.display_path):
+                        with self.assertRaisesRegex(
+                            release.ToolError, "publication-excluded path"
+                        ):
+                            release.validate_versioned_policy_exclusions(
+                                (*projected, entry), "0.9.0"
+                            )
 
     def test_real_git_repository_resolution_tree_and_blob_boundaries(self) -> None:
         with tempfile.TemporaryDirectory(prefix="apg-public-git-") as temporary:
