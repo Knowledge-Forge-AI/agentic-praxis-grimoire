@@ -25,7 +25,8 @@ import apg_public_release as release  # noqa: E402
 
 
 COMMAND = REPOSITORY_ROOT / "bin" / "apg-public-release"
-VERSION = "0.6.0-apg90.1"
+POLICY_VERSION = "0.9.0"
+VERSION = f"{POLICY_VERSION}-fixture.1"
 RELEASE_DATE = "2026-08-21T00:00:00Z"
 
 
@@ -88,7 +89,11 @@ class APGPublicReleaseTests(unittest.TestCase):
         return self.git(repo, "rev-parse", "HEAD").stdout.strip()
 
     def policy(self) -> dict[str, object]:
-        return json.loads((REPOSITORY_ROOT / "release" / "public-surface.json").read_text())
+        # Disposable historical release fixtures use their audited surface,
+        # never the expanding v0.10 development inventory.
+        value = json.loads((REPOSITORY_ROOT / "release" / "public-surface.json").read_text())
+        value.update({key: list(items) for key, items in release.audited_policy_surfaces(POLICY_VERSION)[0].items()})
+        return value
 
     def write_policy(self, repo: Path, value: dict[str, object] | None = None) -> None:
         path = repo / "release" / "public-surface.json"

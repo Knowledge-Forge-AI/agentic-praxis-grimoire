@@ -552,7 +552,7 @@ def test_apg81h_current_repository_complete_profile_lifecycle_observation() -> N
         lambda: _oracle_lifecycle_rows(REPOSITORY_ROOT),
     )
     profile_names = tuple(_oracle_profile_paths(REPOSITORY_ROOT))
-    assert len(profile_names) == 28
+    assert len(profile_names) == 34
     assert len(observed) == len(profile_names)
     explicit = {row.profile for row in observed if row.lifecycle_owners}
     assert explicit == {
@@ -565,6 +565,12 @@ def test_apg81h_current_repository_complete_profile_lifecycle_observation() -> N
         "mdx-profile",
         "nodejs-runtime-profile",
         "react-component-profile",
+        "svg-language-profile",
+        "playwright-test-profile",
+        "web-accessibility-profile",
+        "vite-build-profile",
+        "browser-runtime-profile",
+        "npm-package-manager-profile",
         "typescript-language-profile",
         "vitest-test-profile",
     }

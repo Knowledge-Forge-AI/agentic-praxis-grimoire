@@ -6,9 +6,9 @@ This roadmap defines the canonical work and dependency ordering for the
 **Agentic Praxis Grimoire (APGR) v0.9 development program**.
 
 ### 1.1 Development Baseline
-- **Release Status**: **v0.9 is active development, NOT a published release.**
-  Current runtime version strings remain authoritative until a future explicit
-  release phase; no new version tags or public releases are manufactured here.
+- **Release Status**: **v0.9.0 is publicly released** across GitHub Release,
+  PyPI, npm, and Go. APG121 records read-only terminal reconciliation and a
+  separate Nix handoff; publication does not authorize host activation.
 - **Historical entry phase**: APG110 CI qualification conformance and JACA CI handoff.
 - **Integrated Qualification Supersession**: For integrated source qualification,
   the entry development baseline (`apg110`) and intermediate defect/remediation stages
@@ -18,7 +18,7 @@ This roadmap defines the canonical work and dependency ordering for the
   qualification on Darwin arm64 under exit record `00159`. All historical
   evidence manifests, producer runs, and intermediate receipts remain preserved
   as dated evidence without rewriting prior authority records.
-- **Immutable Published Baseline**: The v0.8.1 product is published and frozen:
+- **Immutable Published Predecessor**: The v0.8.1 product remains frozen:
   - Public Git commit: `565f924aa8fda9551da8732cceb5708db069e127`
   - Public Git tree: `1ec7a01ca252a63cc869caf4e5bbe152fb6d2868`
   - Annotated tag: `b6b3e996536ac89e1a58912caf3b3cb9c251dbd7`
@@ -83,6 +83,10 @@ Per operator direction, the roadmap priority order across consumers is:
   - Vite build profile (`vite-build-profile`)
 - **Anti-Pattern Guard**: No bundling of all candidates into a single release; each
   skill must independently pass mechanical and semantic validation.
+
+> Historical schedule: the v0.11 assignment below is superseded for current
+> planning by the [Repo Map milestone roadmap](repo-map-support-roadmap.md).
+> Preserved rows record the original assignment, not a current release promise.
 
 ### 2.3 v0.11 Candidate — Repo Map Graph-Quality and Protocol Guidance
 - **Theme**: Grounded graph-quality, versioned protocol, and migration guidance.
@@ -204,19 +208,18 @@ is entry HEAD evidence, not a substitute for the tested candidate inventory.
 > supersedes prior intermediate qualification runs (APG110 through APG113) for
 > integrated source conformance on Darwin arm64. All historical producer passes,
 > intermediate candidate archives, and dated manifests are preserved as immutable
-> historical evidence rather than retroactively modified. Active release preparation
-> builds upon this integrated source qualification baseline; v0.9 remains an unpublished
-> development candidate pending separate release authorization.
+> historical evidence rather than retroactively modified. APG115 through APG120
+> preserve subsequent preparation, qualification, and recovery history. APG121
+> reconciles terminal public v0.9.0 publication without changing those records.
 
 Remaining work is separated by owner:
 
 1. APGR integrated CI/XO source qualification is addressed by APG114.
-2. APG115 prepared v0.9.0 source versions, metadata, human documentation and
-   inclusion policy. APG116 corrects permanent package-facing release wording
-   found during qualification. The amended committed source requires fresh
-   deterministic public candidate/bundle qualification before a publication
-   handoff. Attended publication/readback and optional host flake promotion
-   remain separate boundaries.
+2. APGR-side release preparation, CI/XO compatibility, qualification, and public
+   v0.9.0 publication are complete. APG121 reconciles terminal public state and
+   provides Nix adapter identity/proof evidence. Adapter updates and host
+   activation remain separate work. Linux runtime execution was not part of
+   v0.9.0 product qualification.
 3. JACA owns CI role registration, platform qualification, and production XO
    adoption. These consumer gates are not APGR runtime dependencies.
 4. Theme Forge and then Repo Map retain their later backlog decisions above.

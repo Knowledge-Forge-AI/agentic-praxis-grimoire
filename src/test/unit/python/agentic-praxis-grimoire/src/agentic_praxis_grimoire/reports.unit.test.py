@@ -170,3 +170,73 @@ def test_recovery_does_not_flatten_unexpected_programming_errors(
             ["recover", "--phase", "APG82"],
             repository,
         )
+
+
+def test_report_verify_argv_builder_with_and_without_repo(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    observed: list[tuple[list[str], Path | None]] = []
+    monkeypatch.setattr(
+        reports.go_bridge,
+        "run",
+        lambda arguments, *, repository_root: observed.append(
+            (list(arguments), repository_root)
+        ) or 0,
+    )
+    # 1. No repository, no options:
+    assert reports.main({}, ["verify", "/path/to/report.txt"], None) == 0
+    assert observed == [
+        (["report", "verify", "/path/to/report.txt"], None)
+    ]
+    observed.clear()
+
+    # 2. With repository and options:
+    repo = tmp_path / "repo"
+    assert reports.main(
+        {"project": "synthetic", "outbox_root": str(tmp_path)},
+        ["verify", "relative/report.txt"],
+        repo,
+    ) == 0
+    assert observed == [
+        (["report", "verify", "relative/report.txt"], repo)
+    ]
+    observed.clear()
+
+    # 3. Extra arguments forwarded without semantic validation by Python:
+    assert reports.main({}, ["verify", "extra", "args"], None) == 0
+    assert observed == [
+        (["report", "verify", "extra", "args"], None)
+    ]
+    observed.clear()
+
+    # 4. No arguments to verify:
+    assert reports.main({}, ["verify"], None) == 0
+    assert observed == [
+        (["report", "verify"], None)
+    ]
+
+
+def test_report_verify_bridge_failure_returns_one(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    def failure(*_args: object, **_kwargs: object) -> int:
+        raise reports.go_bridge.GoBridgeError("mock runtime launch error")
+
+    monkeypatch.setattr(reports.go_bridge, "run", failure)
+    result = reports.main({}, ["verify", "target.txt"], None)
+    assert result == 1
+    assert "apgr report: mock runtime launch error" in capsys.readouterr().err
+
+
+@pytest.mark.parametrize("action", ("help", "--help", "-h"))
+def test_report_help_action(
+    action: str, capsys: pytest.CaptureFixture[str]
+) -> None:
+    result = reports.main({}, [action], None)
+    assert result == 0
+    captured = capsys.readouterr()
+    assert captured.out == reports.HELP
+    assert "verify" in captured.out
+    assert "show" in captured.out
+    assert "--idempotent" in captured.out
+    assert captured.err == ""

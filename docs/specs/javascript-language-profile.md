@@ -11,7 +11,9 @@ defects. APG79C human-accepts exactly those four for provisional use under
 their safe restrictions. APG79D corrects the separate Test262 source-identity
 defect but leaves a report-binding limitation. APG79E human-accepts that exact
 fifth Medium item, directly verifies the report, and passes the ordinary
-product gates. All five block stable maturity. ADR 0045 is **Accepted
+product gates. All five initially blocked stable maturity. APG128's current
+qualification-maintenance candidate resolves the first four; `JS-QD-005`
+remains active and blocks stable maturity. ADR 0045 is **Accepted
 with amendment**. The lifecycle is
 `provisionally-integrated-with-known-debt`; catalog, projection, maturity,
 capability route, project selection, release, and test owners are current.
@@ -477,7 +479,10 @@ semantics; host and runtime integration; and external operational effect.
   invocation owner that validates the approved direct executable immediately
   before invocation, executes through that exact resolved path, revalidates the
   path, metadata, digest, and public identity immediately after invocation, and
-  returns the subprocess result with the bounded binding used. This is pre/post
+  returns only validated public-safe observations with the bounded binding used.
+  Raw streams and process/parser exceptions remain inside a consuming frame;
+  escaping errors use closed diagnostics raised after that frame returns.
+  This is pre/post
   identity evidence, not a claim of continuous identity during execution.
 - An implementation's behavior is **observation**, not normative authority.
 - A TC39 proposal is not current ECMAScript semantics merely because an engine
@@ -692,3 +697,22 @@ product gates green, ADR 0045 is Accepted with amendment and JavaScript is
 `provisionally-integrated-with-known-debt`. Test262 remains non-normative
 rights-only evidence, structural policy remains deferred, and stable maturity
 is blocked by `JS-QD-001` through `JS-QD-005`.
+
+## APG128 qualification maintenance
+
+The [APG128 evaluation](../evaluations/apg128-javascript-qualification-debt-consolidation.md)
+owns current qualification and its dispatcher review boundary. The compact
+CommonJS seam binds the complete two-artifact vector under the integrated Node
+owner, preserving ECMAScript selection and unresolved runtime stops. Raw stream
+custody includes identity probes and semantic invocations. The conservative
+process guard covers its named paths and runner functions, including ordinary
+and annotated module/callable aliases; it does not prove arbitrary Python
+metaprogramming safe. Four independent root-only same-type wrong-value controls
+retain their positive engine observations and source authority.
+
+Historical APG79B/C/E evidence and accepted entry objects remain unchanged.
+The current register distinguishes resolved entries from active JS-QD-005.
+JavaScript remains provisional and the general repeated-use, non-trigger,
+defect, rollback and non-author maturity requirements remain unsatisfied by
+qualification maintenance alone. No report-binding repair or promotion follows
+from APG127's verifier availability.

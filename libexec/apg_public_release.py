@@ -1363,6 +1363,36 @@ V07_PUBLIC_VALIDATION_DESELECTIONS = tuple(
         }
     )
 )
+PUBLIC_VALIDATION_DESELECTIONS_BY_VERSION: dict[str, tuple[str, ...]] = {
+    "0.2.0": (),
+    "0.3.0": (),
+    "0.4.0": (),
+    "0.5.0": (),
+    "0.6.0": (),
+    "0.7.0": V07_PUBLIC_VALIDATION_DESELECTIONS,
+    "0.8.0": V07_PUBLIC_VALIDATION_DESELECTIONS,
+    "0.8.1": V07_PUBLIC_VALIDATION_DESELECTIONS,
+    "0.9.0": V07_PUBLIC_VALIDATION_DESELECTIONS,
+    "0.10.0": V07_PUBLIC_VALIDATION_DESELECTIONS,
+}
+# None preserves historical audited selection without reading current inventory.
+# A tuple requires inventory closure over the audited files plus exactly these
+# supplemental files. Every release must make an explicit selection decision.
+PUBLIC_INVENTORY_SUPPLEMENTS_BY_VERSION: dict[str, tuple[str, ...] | None] = {
+    "0.2.0": None,
+    "0.3.0": None,
+    "0.4.0": None,
+    "0.5.0": None,
+    "0.6.0": None,
+    "0.7.0": None,
+    "0.8.0": None,
+    "0.8.1": None,
+    "0.9.0": None,
+    "0.10.0": (
+        "src/test/int/python/agentic-praxis-grimoire/libexec/apg_distribution_candidate.int.test.py",
+        "src/test/int/python/agentic-praxis-grimoire/src/agentic_praxis_grimoire/reports.int.test.py",
+    ),
+}
 V07_CRITICAL = tuple(
     sorted(
         set(HISTORICAL_V06_CRITICAL)
@@ -1512,6 +1542,140 @@ V09_PROJECTIONS = tuple(V081_PROJECTIONS)
 V09_SKILLS = tuple(V081_SKILLS)
 V09_CATEGORIES = tuple(V081_CATEGORIES)
 
+V010_WRAPPERS = tuple(V09_WRAPPERS)
+V010_HELPERS = tuple(
+    sorted(
+        set(V09_HELPERS)
+        | {
+            "libexec/apg_playwright_runtime.py",
+        }
+    )
+)
+V010_SKILLS = tuple(
+    sorted(
+        set(V09_SKILLS)
+        | {
+            "skills/browser-runtime-profile/SKILL.md",
+            "skills/npm-package-manager-profile/SKILL.md",
+            "skills/playwright-test-profile/SKILL.md",
+            "skills/svg-language-profile/SKILL.md",
+            "skills/vite-build-profile/SKILL.md",
+            "skills/web-accessibility-profile/SKILL.md",
+        }
+    )
+)
+V010_PROJECTIONS = tuple(
+    sorted(
+        f".agents/skills/{PurePosixPath(path).parent.name}"
+        for path in V010_SKILLS
+    )
+)
+V010_TESTS = tuple(
+    sorted(
+        set(V09_TESTS)
+        | {
+            "src/test/int/python/agentic-praxis-grimoire/libexec/apg_playwright_runtime.int.test.py",
+            "src/test/int/python/agentic-praxis-grimoire/libexec/apg_skill_library_check.int.test.py",
+            "src/test/int/python/agentic-praxis-grimoire/skills/playwright-test-profile/SKILL.int.test.py",
+            "src/test/int/python/agentic-praxis-grimoire/skills/web-accessibility-profile/SKILL.int.test.py",
+            "src/test/int/python/agentic-praxis-grimoire/src/test/support/apg123_browser_ui.int.test.py",
+            "src/test/int/python/agentic-praxis-grimoire/src/test/support/apg124_npm.int.test.py",
+            "src/test/int/python/agentic-praxis-grimoire/src/test/support/apg124_vite.int.test.py",
+            "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_playwright_runtime.unit.test.py",
+            "src/test/unit/python/agentic-praxis-grimoire/skills/browser-runtime-profile/SKILL.unit.test.py",
+            "src/test/unit/python/agentic-praxis-grimoire/skills/npm-package-manager-profile/SKILL.unit.test.py",
+            "src/test/unit/python/agentic-praxis-grimoire/skills/playwright-test-profile/SKILL.unit.test.py",
+            "src/test/unit/python/agentic-praxis-grimoire/skills/svg-language-profile/SKILL.unit.test.py",
+            "src/test/unit/python/agentic-praxis-grimoire/skills/vite-build-profile/SKILL.unit.test.py",
+            "src/test/unit/python/agentic-praxis-grimoire/skills/web-accessibility-profile/SKILL.unit.test.py",
+            "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg123_browser_ui.unit.test.py",
+            "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg124_npm.unit.test.py",
+            "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg124_vite.unit.test.py",
+        }
+    )
+)
+V010_CRITICAL = tuple(
+    sorted(
+        set(V09_CRITICAL)
+        | {
+            "docs/repo-map-support-roadmap.md",
+            "release/v0.10.0-notes.md",
+            "src/test/fixtures/apg123-browser-ui/family_table.json",
+            "report/verifier_scaling_test.go",
+            "report/persisted_sections.go",
+            "report/verify.go",
+            "report/verify_git.go",
+            "report/operational_validation.go",
+            "docs/evaluations/apg129-v0-10-integrated-readiness.md",
+            "docs/status/2026/09/09/00174-apg129-v0-10-integrated-readiness-exit.md",
+            "docs/adr/2026/09/0053-v0-10-discovery-capacity-and-svg.md",
+            "docs/architecture/v0-10-browser-runtime.md",
+            "docs/architecture/v0-10-browser-ui-verification.md",
+            "docs/architecture/v0-10-svg-language-profile.md",
+            "docs/architecture/v0-10-toolchain.md",
+            "docs/evaluations/apg122-v0-10-foundation-and-svg.md",
+            "docs/evaluations/apg123-v0-10-browser-ui-verification.md",
+            "docs/evaluations/apg124-v0-10-toolchain.md",
+            "docs/evaluations/apg125-v0-10-browser-runtime-and-composition.md",
+            "docs/specs/browser-runtime-profile.md",
+            "docs/specs/npm-package-manager-profile.md",
+            "docs/specs/playwright-test-profile.md",
+            "docs/specs/svg-language-profile.md",
+            "docs/specs/vite-build-profile.md",
+            "docs/specs/web-accessibility-profile.md",
+            "docs/status/2026/09/08/00167-apg122-v0-10-foundation-and-svg-exit.md",
+            "docs/status/2026/09/09/00168-apg123-v0-10-browser-ui-verification-exit.md",
+            "docs/status/2026/09/09/00169-apg124-v0-10-toolchain-exit.md",
+            "docs/status/2026/09/09/00170-apg125-v0-10-browser-runtime-and-composition-exit.md",
+            "docs/v0-10-roadmap.md",
+            "skills/apg125_composition_test.go",
+            "skills/discovery_policy.go",
+            "skills/discovery_policy_test.go",
+            "src/test/fixtures/apg122-svg/css-currentcolor.svg",
+            "src/test/fixtures/apg122-svg/destructive-optimization-control.svg",
+            "src/test/fixtures/apg122-svg/geometry-transform-negative.svg",
+            "src/test/fixtures/apg122-svg/gradient-clip-mask.svg",
+            "src/test/fixtures/apg122-svg/malformed-unsupported-tags.svg",
+            "src/test/fixtures/apg122-svg/resource-context-image-mode.svg",
+            "src/test/fixtures/apg122-svg/responsive-logo-illustration.svg",
+            "src/test/fixtures/apg122-svg/safe-optimized.svg",
+            "src/test/fixtures/apg122-svg/safe-unoptimized-source.svg",
+            "src/test/fixtures/apg122-svg/scenarios.json",
+            "src/test/fixtures/apg122-svg/sprite-cycle-direct.svg",
+            "src/test/fixtures/apg122-svg/sprite-cycle-indirect.svg",
+            "src/test/fixtures/apg122-svg/sprite-references-valid.svg",
+            "src/test/fixtures/apg122-svg/text-a11y-decorative.svg",
+            "src/test/fixtures/apg122-svg/text-a11y-meaningful.svg",
+            "src/test/fixtures/apg122-svg/unsafe-event-handler.svg",
+            "src/test/fixtures/apg122-svg/unsafe-foreignobject-script.svg",
+            "src/test/fixtures/apg122-svg/unsafe-script-control.svg",
+            "src/test/fixtures/apg122-svg/unsafe-xxe-doctype.svg",
+            "src/test/fixtures/apg123-browser-ui/README.md",
+            "src/test/fixtures/apg123-browser-ui/frame.html",
+            "src/test/fixtures/apg123-browser-ui/index.html",
+            "src/test/fixtures/apg123-browser-ui/module.js",
+            "src/test/fixtures/apg123-browser-ui/package-lock.json",
+            "src/test/fixtures/apg123-browser-ui/package.json",
+            "src/test/fixtures/apg123-browser-ui/playwright.config.js",
+            "src/test/fixtures/apg123-browser-ui/popup.html",
+            "src/test/fixtures/apg123-browser-ui/runner.mjs",
+            "src/test/fixtures/apg123-browser-ui/scenarios.json",
+            "src/test/fixtures/apg123-browser-ui/sprite.svg",
+            "src/test/fixtures/apg123-browser-ui/submodule.js",
+            "src/test/fixtures/apg123-browser-ui/supervisor.spec.js",
+            "src/test/fixtures/apg123-browser-ui/supervisor_runner.mjs",
+            "src/test/fixtures/apg123-browser-ui/worker.js",
+            "src/test/fixtures/apg125-profile-composition-scenarios.json",
+            "src/test/support/apg122_svg_contract.py",
+            "src/test/support/apg123_browser_ui.py",
+            "testing/apg-discovery-policy.json",
+        }
+    )
+)
+
+V010_LICENSING = tuple(V09_LICENSING)
+V010_CATEGORIES = tuple(V09_CATEGORIES)
+
 # Source-only test oracles and generated/local output never enter the
 # release-shaped v0.7 candidate. The compatibility wrappers above are not
 # excluded because they invoke the Go owner through the normal bridge.
@@ -1558,6 +1722,9 @@ V07_GENERATED_SUFFIXES = (
     ".tgz",
     ".zip",
 )
+V010_GENERATED_PATHS = frozenset(V07_GENERATED_PATHS)
+V010_GENERATED_PREFIXES = tuple(V07_GENERATED_PREFIXES)
+V010_GENERATED_SUFFIXES = tuple(V07_GENERATED_SUFFIXES)
 
 POST_V04_WRAPPERS = (
     APG53_V05_WRAPPERS | APG54_V05_WRAPPERS | APG82_V05_WRAPPERS
@@ -2156,9 +2323,21 @@ def audited_policy_surfaces(version: str) -> tuple[dict[str, tuple[str, ...]], .
         "critical_files": V09_CRITICAL,
         "validation_categories": V09_CATEGORIES,
     }
+    current_v010 = {
+        "required_helpers": V010_HELPERS,
+        "required_licensing_files": V010_LICENSING,
+        "required_projections": V010_PROJECTIONS,
+        "required_skills": V010_SKILLS,
+        "required_test_entrypoints": V010_TESTS,
+        "required_wrappers": V010_WRAPPERS,
+        "critical_files": V010_CRITICAL,
+        "validation_categories": V010_CATEGORIES,
+    }
     if not SEMVER.fullmatch(version):
         fail("public release policy identity is malformed or unsupported")
     core = version.split("+", 1)[0].split("-", 1)[0]
+    if core == "0.10.0":
+        return (current_v010,)
     if core == "0.9.0":
         return (current_v09,)
     if core == "0.8.1":
@@ -2249,6 +2428,7 @@ def load_policy(
     allow_v07_compatibility: bool = False,
     allow_v08_compatibility: bool = False,
     allow_v09_compatibility: bool = False,
+    allow_v010_compatibility: bool = False,
 ) -> dict[str, object]:
     raw = committed_bytes(repository, POLICY_PATH)
     if len(raw) > 256 * 1024:
@@ -2304,6 +2484,21 @@ def load_policy(
         allowed_surfaces = (
             *allowed_surfaces,
             audited_policy_surfaces("0.9.0")[0],
+        )
+    if allow_v010_compatibility and any(
+        surface in (
+            audited_policy_surfaces("0.6.0")[0],
+            audited_policy_surfaces("0.7.0")[0],
+            audited_policy_surfaces("0.8.0")[0],
+            audited_policy_surfaces("0.8.1")[0],
+            audited_policy_surfaces("0.9.0")[0],
+            audited_policy_surfaces("0.10.0")[0],
+        )
+        for surface in allowed_surfaces
+    ):
+        allowed_surfaces = (
+            *allowed_surfaces,
+            audited_policy_surfaces("0.10.0")[0],
         )
     if not any(
         all(tuple(value[key]) == expected for key, expected in surface.items())
@@ -2401,6 +2596,29 @@ def is_v09_candidate_path(path: str | bytes) -> bool:
     return is_v08_candidate_path(path)
 
 
+def is_v010_candidate_path(path: str | bytes) -> bool:
+    """Return whether one source path belongs in the v0.10 public candidate."""
+
+    display = (
+        path.decode("utf-8", "surrogateescape")
+        if isinstance(path, bytes)
+        else path
+    )
+    if (
+        display == "private"
+        or display.startswith("private/")
+        or display in V010_GENERATED_PATHS
+    ):
+        return False
+    if any(display.startswith(prefix) for prefix in V010_GENERATED_PREFIXES):
+        return False
+    if display.endswith(V010_GENERATED_SUFFIXES):
+        return False
+    if any(part == "__pycache__" or part.endswith(".egg-info") for part in display.split("/")):
+        return False
+    return True
+
+
 def public_candidate_entries(
     repository: Repository,
     version: str,
@@ -2409,15 +2627,21 @@ def public_candidate_entries(
 ) -> tuple[Entry, ...]:
     """Return the exact tree entries eligible for one source candidate."""
 
+    if not SEMVER.fullmatch(version):
+        fail("public candidate version is malformed or unsupported")
     entries = tree_entries(repository, excluded_prefix=excluded_prefix)
     core = version.split("+", 1)[0].split("-", 1)[0]
+    if core == "0.10.0":
+        return tuple(entry for entry in entries if is_v010_candidate_path(entry.path))
     if core == "0.9.0":
         return tuple(entry for entry in entries if is_v09_candidate_path(entry.path))
     if core in {"0.8.0", "0.8.1"}:
         return tuple(entry for entry in entries if is_v08_candidate_path(entry.path))
-    if core != "0.7.0":
+    if core == "0.7.0":
+        return tuple(entry for entry in entries if is_v07_candidate_path(entry.path))
+    if core in {"0.6.0", "0.5.0", "0.4.0", "0.3.0", "0.2.0"}:
         return entries
-    return tuple(entry for entry in entries if is_v07_candidate_path(entry.path))
+    fail(f"public candidate version is malformed or unsupported: {version}")
 
 
 def entry_bytes(repository: Repository, entry: Entry) -> bytes:
@@ -2525,6 +2749,7 @@ def build_manifest(
         allow_v07_compatibility=True,
         allow_v08_compatibility=True,
         allow_v09_compatibility=True,
+        allow_v010_compatibility=version is None,
     )
     entries = public_candidate_entries(
         repository,
@@ -2578,7 +2803,17 @@ def validate_versioned_policy_exclusions(
 ) -> None:
     """Reject future owners from immutable historical public trees."""
 
+    if not SEMVER.fullmatch(version):
+        fail("public release version is malformed or unsupported")
     core = version.split("+", 1)[0].split("-", 1)[0]
+    if core == "0.10.0":
+        for entry in entries:
+            if not is_v010_candidate_path(entry.path):
+                fail(
+                    f"public v{version} contains a publication-excluded path: "
+                    + entry.display_path
+                )
+        return
     if core == "0.9.0":
         for entry in entries:
             if not is_v09_candidate_path(entry.path):
@@ -2603,6 +2838,8 @@ def validate_versioned_policy_exclusions(
                     + entry.display_path
                 )
         return
+    if core == "0.6.0":
+        return
     if core == "0.5.0":
         paths = {entry.display_path for entry in entries}
         for path in HISTORICAL_V05_FORBIDDEN_FUTURE_OWNERS:
@@ -2615,12 +2852,15 @@ def validate_versioned_policy_exclusions(
             if path in paths:
                 fail(f"public v0.4.0 contains unsupported future owner: {path}")
         return
-    if core != "0.3.0":
+    if core == "0.3.0":
+        paths = {entry.display_path for entry in entries}
+        for path in HISTORICAL_V03_FORBIDDEN_REPORT_OWNERS:
+            if path in paths:
+                fail(f"public v0.3.0 contains unsupported future owner: {path}")
         return
-    paths = {entry.display_path for entry in entries}
-    for path in HISTORICAL_V03_FORBIDDEN_REPORT_OWNERS:
-        if path in paths:
-            fail(f"public v0.3.0 contains unsupported future owner: {path}")
+    if core == "0.2.0":
+        return
+    fail(f"public release version is malformed or unsupported: {version}")
 
 
 def render_manifest(manifest: dict[str, object], output_format: str) -> str:
@@ -2953,6 +3193,7 @@ def build_candidate(
         allow_v07_compatibility=True,
         allow_v08_compatibility=True,
         allow_v09_compatibility=True,
+        allow_v010_compatibility=True,
     )
     entries = public_candidate_entries(source, version, excluded_prefix=b"private/")
     validate_versioned_policy_exclusions(entries, version)
@@ -3105,11 +3346,75 @@ def run_checked_command(arguments: Sequence[str], cwd: Path, environment: dict[s
         fail(f"configured validation failed: {' '.join(arguments)}: {detail}")
 
 
+def resolve_public_validation_deselections(
+    version: str,
+    policy: dict[str, object],
+) -> tuple[str, ...]:
+    """Resolve exact public validation test deselections for one explicit version."""
+    if not isinstance(version, str):
+        fail("public release policy identity is malformed or unsupported")
+    surfaces = audited_policy_surfaces(version)
+    audited_surface = surfaces[0]
+    core = version.split("+", 1)[0].split("-", 1)[0]
+    if core not in PUBLIC_VALIDATION_DESELECTIONS_BY_VERSION:
+        fail("public release policy identity is malformed or unsupported")
+    audited_tests = audited_surface["required_test_entrypoints"]
+    if (
+        not isinstance(policy, dict)
+        or not isinstance(policy.get("required_test_entrypoints"), (list, tuple))
+    ):
+        fail("public release policy is malformed")
+    policy_tests = tuple(policy["required_test_entrypoints"])  # type: ignore[arg-type]
+    if policy_tests != audited_tests:
+        fail(
+            "public release policy required_test_entrypoints differs from the "
+            "audited schema-1 surface"
+        )
+    deselections = PUBLIC_VALIDATION_DESELECTIONS_BY_VERSION[core]
+    python_tests = {path for path in audited_tests if path.endswith(".py")}
+    for node_id in deselections:
+        node_file = node_id.split("::", 1)[0]
+        if node_file not in python_tests:
+            fail(
+                f"deselected test node {node_id} is not in the audited {core} "
+                "Python tests"
+            )
+    return deselections
+
+
+def public_python_selection(
+    candidate: Repository, version: str, audited_tests: Sequence[str]
+) -> tuple[str, ...]:
+    """Close current public Python execution over the canonical suite inventory."""
+    if not isinstance(version, str) or not SEMVER.fullmatch(version):
+        fail("public selection policy identity is malformed or unsupported")
+    core = version.split("+", 1)[0].split("-", 1)[0]
+    if core not in PUBLIC_INVENTORY_SUPPLEMENTS_BY_VERSION:
+        fail("public selection policy identity is malformed or unsupported")
+    supplements = PUBLIC_INVENTORY_SUPPLEMENTS_BY_VERSION[core]
+    if supplements is None:
+        return tuple(audited_tests)
+    import apg_test
+
+    try:
+        inventory = apg_test.load_inventory(candidate.root)
+        apg_test.validate_inventory(candidate.root, inventory)
+    except (OSError, apg_test.ToolError) as error:
+        fail(f"public inventory selection failed: {error}")
+    selected = tuple(sorted(inventory.tests))
+    if not set(audited_tests).issubset(selected):
+        fail("public inventory selection omits audited Python tests")
+    if set(selected) - set(audited_tests) != set(supplements):
+        fail("public inventory selection differs from declared supplemental Python tests")
+    return selected
+
+
 def validate_categories(
     candidate: Repository,
     base: Repository,
     policy: dict[str, object],
     environment: dict[str, str],
+    version: str,
 ) -> None:
     categories = set(policy["validation_categories"])  # type: ignore[arg-type]
     wrappers = tuple(policy["required_wrappers"])  # type: ignore[arg-type]
@@ -3139,12 +3444,8 @@ def validate_categories(
         if python_tests and all(
             "/agentic-praxis-grimoire/" in path for path in python_tests
         ):
-            deselections = (
-                V07_PUBLIC_VALIDATION_DESELECTIONS
-                if tuple(python_tests)
-                == tuple(path for path in V07_TESTS if path.endswith(".py"))
-                else ()
-            )
+            deselections = resolve_public_validation_deselections(version, policy)
+            python_tests = public_python_selection(candidate, version, python_tests)
             run_checked_command(
                 [
                     sys.executable,
@@ -3242,6 +3543,7 @@ def validate_categories_in_isolation(
     candidate: Repository,
     base: Repository,
     policy: dict[str, object],
+    version: str,
 ) -> None:
     with tempfile.TemporaryDirectory(prefix="apg-public-validation-") as temporary:
         root = Path(temporary)
@@ -3261,6 +3563,7 @@ def validate_categories_in_isolation(
                 validation_base,
                 policy,
                 environment,
+                version,
             )
         except ToolError as error:
             validation_error = error
@@ -3291,13 +3594,14 @@ def check_candidate(
         allow_v07_compatibility=True,
         allow_v08_compatibility=True,
         allow_v09_compatibility=True,
+        allow_v010_compatibility=True,
     )
     source_entries = public_candidate_entries(
         source, version, excluded_prefix=b"private/"
     )
     candidate_entries = public_candidate_entries(candidate, version)
     core = version.split("+", 1)[0].split("-", 1)[0]
-    if core in {"0.7.0", "0.8.0", "0.8.1", "0.9.0"}:
+    if core in {"0.7.0", "0.8.0", "0.8.1", "0.9.0", "0.10.0"}:
         # The development source may retain publication-excluded oracle files,
         # but a v0.7+ release candidate must not project them.  Inspect the
         # unfiltered candidate tree so the check cannot pass merely because
@@ -3379,7 +3683,7 @@ def check_candidate(
     base_before = repository_fingerprint(base)
     candidate_before = repository_fingerprint(candidate)
     try:
-        validate_categories_in_isolation(candidate, base, policy)
+        validate_categories_in_isolation(candidate, base, policy, version)
     finally:
         require_unchanged(source, source_before, "source")
         require_unchanged(base, base_before, "base")

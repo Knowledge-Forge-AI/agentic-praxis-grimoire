@@ -1,0 +1,8 @@
+{
+  "name": "lib-pkg",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "greet": "node -e \"console.log('GREETINGS_FROM_LIB_PKG')\""
+  }
+}

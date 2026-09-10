@@ -1,0 +1,157 @@
+{
+  "schema_version": "1.0.0",
+  "disclaimer": "Maintained executable Vite 8.2.2 toolchain scenarios; evidence verifies local build, serving, and configuration contracts without third-party framework or deployment claims.",
+  "toolchain": {
+    "vite_version": "8.2.2",
+    "rolldown_version": "1.2.7",
+    "node_version": "v22.22.2|darwin/arm64|12.4.254.21-node.39|1.51.0",
+    "node_sha256": "b7fff29202c2d59eeff28c53588d2832323b45cb2e854ba29bea47ade37d8359"
+  },
+  "scenarios": [
+    {
+      "id": "VITE01",
+      "name": "resolved_config",
+      "clause_ref": "VITE-02-CONFIG",
+      "description": "Verifies configuration resolution, root normalization, trailing slash on base, and publicDir defaults.",
+      "assertions": [
+        "resolved_root_exact",
+        "base_normalized",
+        "public_dir_resolved",
+        "build_command_assigned"
+      ],
+      "adverse_control": "Unnormalized base path without trailing slash is normalized; outDir resolved cleanly"
+    },
+    {
+      "id": "VITE02",
+      "name": "env_secrecy_and_exposure",
+      "clause_ref": "VITE-03-ENV",
+      "description": "Verifies that VITE_ prefixed environment variables are exposed while private secrets are strictly suppressed from client bundles.",
+      "assertions": [
+        "vite_prefix_env_exposed",
+        "secret_env_suppressed",
+        "client_bundle_secret_absent"
+      ],
+      "adverse_control": "Non-VITE_ variables in .env must not appear in loadEnv client payload or built client bundle"
+    },
+    {
+      "id": "VITE03",
+      "name": "asset_public_css_alias",
+      "clause_ref": "VITE-07-RESOLVE",
+      "description": "Verifies alias resolution, unhashed publicDir asset copying, hashed imported assets, and CSS bundling.",
+      "assertions": [
+        "alias_resolved_in_bundle",
+        "public_asset_copied_verbatim",
+        "css_processed_and_hashed"
+      ],
+      "adverse_control": "Unresolvable alias rejects build; public assets remain at root unhashed"
+    },
+    {
+      "id": "VITE04",
+      "name": "plugin_ordering_and_apply",
+      "clause_ref": "VITE-06-PLUGINS",
+      "description": "Verifies plugin pre/post ordering, conditional apply (build vs serve), and virtual module resolution.",
+      "assertions": [
+        "pre_plugin_ordered_before_post",
+        "build_plugin_applied",
+        "serve_plugin_skipped_in_build",
+        "virtual_module_resolved"
+      ],
+      "adverse_control": "Plugin applied only to serve does not execute during build; pre hooks execute before post hooks"
+    },
+    {
+      "id": "VITE05",
+      "name": "loopback_dev_fs_restrictions",
+      "clause_ref": "VITE-04-FS",
+      "description": "Verifies dev server loopback binding, strict fs allow list, and HTTP 403 rejection for denied files or traversal.",
+      "assertions": [
+        "loopback_server_bound",
+        "allowed_file_200_ok",
+        "denied_file_403_forbidden",
+        "outside_traversal_403_forbidden",
+        "server_closed_cleanly"
+      ],
+      "adverse_control": "Requesting file in server.fs.deny or traversing outside allowed directory returns HTTP 403 Forbidden"
+    },
+    {
+      "id": "VITE06",
+      "name": "hmr_module_invalidation",
+      "clause_ref": "VITE-05-HMR",
+      "description": "Verifies module graph tracking and module invalidation mechanics on the dev server.",
+      "assertions": [
+        "module_graph_entry_resolved",
+        "module_invalidation_detected",
+        "server_closed_cleanly"
+      ],
+      "adverse_control": "Cached module graph node transformResult cleared upon invalidation"
+    },
+    {
+      "id": "VITE07",
+      "name": "production_manifest",
+      "clause_ref": "VITE-08-ROLLDOWN",
+      "description": "Verifies production build with Rolldown and generation of .vite/manifest.json mapping entries to hashed files.",
+      "assertions": [
+        "manifest_json_generated",
+        "entry_mapped_to_hashed_chunk",
+        "css_assets_tracked_in_manifest"
+      ],
+      "adverse_control": "Build without manifest option omits .vite/manifest.json"
+    },
+    {
+      "id": "VITE08",
+      "name": "dynamic_import_and_library_mode",
+      "clause_ref": "VITE-09-OUTPUTS",
+      "description": "Verifies dynamic import chunk splitting and library mode building for dual ESM/CJS distributions.",
+      "assertions": [
+        "dynamic_import_chunk_split",
+        "lib_esm_format_generated",
+        "lib_cjs_format_generated"
+      ],
+      "adverse_control": "Dynamic import must produce separate chunk; library mode emits configured formats"
+    },
+    {
+      "id": "VITE09",
+      "name": "sourcemap_toggle",
+      "clause_ref": "VITE-10-SOURCEMAPS",
+      "description": "Verifies explicit sourcemap generation when enabled and total absence of map files when disabled.",
+      "assertions": [
+        "sourcemap_enabled_generates_map",
+        "sourcemap_disabled_omits_map"
+      ],
+      "adverse_control": "build.sourcemap: false must not emit any .map files or sourceMappingURL comments"
+    },
+    {
+      "id": "VITE10",
+      "name": "preview_local_only",
+      "clause_ref": "VITE-11-PREVIEW",
+      "description": "Verifies preview server loopback binding and local serving of generated production build.",
+      "assertions": [
+        "preview_loopback_bound",
+        "preview_serves_build_200_ok",
+        "preview_closed_cleanly"
+      ],
+      "adverse_control": "Preview server strictly serves built files on loopback; closes without leaking socket"
+    },
+    {
+      "id": "VITE11",
+      "name": "two_builds_determinism",
+      "clause_ref": "VITE-12-DETERMINISM",
+      "description": "Verifies bit-for-bit or SHA-256 digest identity across two consecutive builds from identical source state.",
+      "assertions": [
+        "two_builds_file_manifest_identical",
+        "two_builds_sha256_identical"
+      ],
+      "adverse_control": "Any non-deterministic artifact or timestamp variation fails the digest match"
+    },
+    {
+      "id": "VITE12",
+      "name": "misconfiguration_negatives",
+      "clause_ref": "VITE-02-CONFIG",
+      "description": "Verifies fail-closed error handling and clean rejection of missing library entry and misconfigured input options.",
+      "assertions": [
+        "missing_library_entry_refused",
+        "misconfigured_input_refused"
+      ],
+      "adverse_control": "Missing library entrypoint or broken input configuration throws descriptive UNRESOLVED_ENTRY error rather than corrupting build"
+    }
+  ]
+}

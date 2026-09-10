@@ -208,6 +208,13 @@ def test_rejects_duplicates_trailing_gzip_data_and_same_output(tmp_path: Path) -
         distribution.normalize_archive(trailing, trailing, EPOCH)
 
 
+def test_v010_archive_epoch_preserves_historical_release_epochs() -> None:
+    assert distribution.release_epoch("0.10.0") == 1_788_996_391
+    assert distribution.release_epoch("0.10.0-rc.1") == 1_788_996_391
+    assert distribution.release_epoch("0.9.0") == 1_788_739_200
+    assert distribution.release_epoch("0.8.1") == 1_788_393_600
+
+
 def test_rejects_non_integer_or_out_of_range_epoch(tmp_path: Path) -> None:
     source = tmp_path / "source.tar.gz"
     _source_archive(source, metadata=1)
@@ -239,4 +246,4 @@ def test_cli_epoch_preserves_historical_values_and_binds_v08() -> None:
     with pytest.raises(argparse.ArgumentTypeError, match="release epoch"):
         distribution._epoch_argument("1700000001")
     with pytest.raises(distribution.NormalizationError, match="no reproducible release epoch"):
-        distribution.release_epoch("0.10.0")
+        distribution.release_epoch("0.11.0")

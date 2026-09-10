@@ -37,11 +37,12 @@ class APGPublicReleaseBoundaryTests(unittest.TestCase):
             ("0.8.0", release.V08_SKILLS),
             ("0.8.1", release.V081_SKILLS),
             ("0.9.0", release.V09_SKILLS),
+            ("0.10.0", release.V010_SKILLS),
         ):
             with self.subTest(version=version):
                 surfaces = release.audited_policy_surfaces(version)
                 self.assertEqual(surfaces[0]["required_skills"], expected)
-        for version in ("invalid", "0.5.1", "0.6.1", "0.8.2", "0.9.1"):
+        for version in ("invalid", "0.5.1", "0.6.1", "0.8.2", "0.9.1", "0.10.1", "0.11.0"):
             with self.subTest(version=version):
                 with self.assertRaisesRegex(release.ToolError, "policy identity"):
                     release.audited_policy_surfaces(version)
@@ -143,6 +144,43 @@ class APGPublicReleaseBoundaryTests(unittest.TestCase):
                             release.validate_versioned_policy_exclusions(
                                 (*projected, entry), "0.9.0"
                             )
+
+            v010_candidate = {
+                entry.display_path
+                for entry in release.public_candidate_entries(repository, "0.10.0")
+            }
+            for path in (
+                "dist/example.whl",
+                ".scratch/local.txt",
+                "private/secret.txt",
+            ):
+                with self.subTest(v010_excluded_path=path):
+                    self.assertNotIn(path, v010_candidate)
+            for path in (
+                "npm/launcher/package.json",
+                "go.mod",
+                "report/testdata/python_oracle.py",
+            ):
+                with self.subTest(v010_path=path):
+                    self.assertIn(path, v010_candidate)
+            projected_v010 = release.public_candidate_entries(repository, "0.10.0")
+            release.validate_versioned_policy_exclusions(projected_v010, "0.10.0")
+            for entry in release.tree_entries(repository):
+                if entry.display_path not in v010_candidate:
+                    with self.subTest(v010_reintroduced_path=entry.display_path):
+                        with self.assertRaisesRegex(
+                            release.ToolError, "publication-excluded path"
+                        ):
+                            release.validate_versioned_policy_exclusions(
+                                (*projected_v010, entry), "0.10.0"
+                            )
+            for unsupported in ("0.10.1", "0.11.0"):
+                with self.subTest(unsupported_candidate=unsupported):
+                    with self.assertRaisesRegex(release.ToolError, "unsupported"):
+                        release.public_candidate_entries(repository, unsupported)
+                with self.subTest(unsupported_exclusions=unsupported):
+                    with self.assertRaisesRegex(release.ToolError, "unsupported"):
+                        release.validate_versioned_policy_exclusions(projected_v010, unsupported)
 
     def test_real_git_repository_resolution_tree_and_blob_boundaries(self) -> None:
         with tempfile.TemporaryDirectory(prefix="apg-public-git-") as temporary:
@@ -343,6 +381,90 @@ class APGPublicReleaseBoundaryTests(unittest.TestCase):
                 with self.assertRaisesRegex(release.ToolError, "required public path"):
                     release.validate_critical(entries[:index] + entries[index + 1 :], policy)
 
+    def test_versioned_policy_load_reconstruction_and_deselection_evidence(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="apg-versioned-evidence-") as temporary:
+            temp_dir = Path(temporary)
+            versions = ("0.7.0", "0.8.0", "0.8.1", "0.9.0", "0.10.0")
+            for version in versions:
+                with self.subTest(version=version):
+                    repo_root = temp_dir / f"repo-{version.replace('.', '_')}"
+                    release.run_git(temp_dir, ["init", "-q", "-b", "main", str(repo_root)])
+                    release.run_git(repo_root, ["config", "user.name", "APG Test"])
+                    release.run_git(repo_root, ["config", "user.email", "apg@example.invalid"])
+
+                    surface = release.audited_policy_surfaces(version)[0]
+                    policy_data = {
+                        "canonical_public_identity": "agentic-praxis-grimoire",
+                        "schema_version": 1,
+                        "excluded_prefix": "private/",
+                        **{key: list(values) for key, values in surface.items()},
+                    }
+                    policy_file = repo_root / "release" / "public-surface.json"
+                    policy_file.parent.mkdir(parents=True, exist_ok=True)
+                    policy_file.write_text(json.dumps(policy_data, indent=2), encoding="utf-8")
+
+                    release.run_git(repo_root, ["add", "release/public-surface.json"])
+                    release.run_git(repo_root, ["commit", "-q", "-m", f"Release v{version}"])
+
+                    repo = release.resolve_repository(repo_root, "evidence")
+                    loaded = release.load_policy(
+                        repo,
+                        expected_surfaces=release.audited_policy_surfaces(version),
+                    )
+                    deselections = release.resolve_public_validation_deselections(version, loaded)
+                    self.assertEqual(deselections, release.V07_PUBLIC_VALIDATION_DESELECTIONS)
+                    self.assertEqual(len(deselections), 7)
+
+                    py_tests = {p for p in loaded["required_test_entrypoints"] if p.endswith(".py")}
+                    for node_id in deselections:
+                        self.assertIn(node_id.split("::", 1)[0], py_tests)
+
+            # Historical pre-0.7 version reconstruction evidence
+            for hist_version in ("0.2.0", "0.3.0", "0.4.0", "0.5.0", "0.6.0"):
+                with self.subTest(hist_version=hist_version):
+                    repo_root = temp_dir / f"repo-hist-{hist_version.replace('.', '_')}"
+                    release.run_git(temp_dir, ["init", "-q", "-b", "main", str(repo_root)])
+                    release.run_git(repo_root, ["config", "user.name", "APG Test"])
+                    release.run_git(repo_root, ["config", "user.email", "apg@example.invalid"])
+
+                    surface = release.audited_policy_surfaces(hist_version)[0]
+                    policy_data = {
+                        "canonical_public_identity": "agentic-praxis-grimoire",
+                        "schema_version": 1,
+                        "excluded_prefix": "private/",
+                        **{key: list(values) for key, values in surface.items()},
+                    }
+                    policy_file = repo_root / "release" / "public-surface.json"
+                    policy_file.parent.mkdir(parents=True, exist_ok=True)
+                    policy_file.write_text(json.dumps(policy_data, indent=2), encoding="utf-8")
+
+                    release.run_git(repo_root, ["add", "release/public-surface.json"])
+                    release.run_git(repo_root, ["commit", "-q", "-m", f"Release v{hist_version}"])
+
+                    repo = release.resolve_repository(repo_root, "evidence")
+                    loaded = release.load_policy(
+                        repo,
+                        expected_surfaces=release.audited_policy_surfaces(hist_version),
+                    )
+                    deselections = release.resolve_public_validation_deselections(hist_version, loaded)
+                    self.assertEqual(deselections, ())
+
+            # Negatives on Git-loaded policy
+            v10_repo = temp_dir / "repo-0_10_0"
+            v10_repo_resolved = release.resolve_repository(v10_repo, "evidence")
+            v10_loaded = release.load_policy(
+                v10_repo_resolved,
+                expected_surfaces=release.audited_policy_surfaces("0.10.0"),
+            )
+            # Mismatched version identity against loaded policy
+            with self.assertRaisesRegex(release.ToolError, "differs from the audited schema-1 surface"):
+                release.resolve_public_validation_deselections("0.9.0", v10_loaded)
+            # Malformed/unknown version against loaded policy
+            for bad_ver in ("0.10", "invalid", "0.10.1", "0.11.0"):
+                with self.subTest(bad_ver=bad_ver):
+                    with self.assertRaisesRegex(release.ToolError, "malformed or unsupported"):
+                        release.resolve_public_validation_deselections(bad_ver, v10_loaded)
+
 
 class APGPublicReleaseV03PolicyTests(unittest.TestCase):
     """Exercise v0.3 policy behavior through a composed disposable fixture."""
@@ -440,11 +562,11 @@ class APGPublicReleaseV03PolicyTests(unittest.TestCase):
         candidate, built = fixture.build(
             fixture.root / "current-from-historical-v0.2",
             base=later,
-            version="0.6.0",
+            version="0.9.0",
         )
         fixture.assert_success(built)
         fixture.assert_success(
-            fixture.check_candidate(candidate, base=later, version="0.6.0")
+            fixture.check_candidate(candidate, base=later, version="0.9.0")
         )
 
     def test_build_and_check_reject_current_surface_under_v0_2_identity(self) -> None:

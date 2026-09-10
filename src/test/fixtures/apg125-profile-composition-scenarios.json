@@ -1,0 +1,372 @@
+{
+  "schema_version": 1,
+  "fixture_id": "APG125-PROFILE-COMPOSITION",
+  "fixture_version": "apg125.profile-composition/v1",
+  "authority": {
+    "phase": "APG125",
+    "selection": "explicit-only",
+    "composition_rule_version": "apg.skill-composition-rules/v1",
+    "description": "Explicit task bundles preserve each independent owner; informational composition edges never add a skill.",
+    "measurement_boundary": "UTF-8 byte measurements from the embedded corpus and actual materialized files; no provider token or context-fit claim."
+  },
+  "controls": [
+    {
+      "id": "APG125-CONTROL-SVG-ONLY",
+      "purpose": "Standalone SVG authoring and vector semantics",
+      "explicit_skill_ids": ["svg-language-profile"],
+      "expected_skill_ids": ["svg-language-profile"],
+      "excluded_neighbors": [
+        "browser-runtime-profile",
+        "css-language-profile",
+        "javascript-language-profile",
+        "jsx-language-profile",
+        "nodejs-runtime-profile",
+        "npm-package-manager-profile",
+        "playwright-test-profile",
+        "react-component-profile",
+        "typescript-language-profile",
+        "vite-build-profile",
+        "web-accessibility-profile"
+      ],
+      "insufficient_for": [
+        "APG125-COMP-01",
+        "APG125-COMP-02",
+        "APG125-COMP-06"
+      ],
+      "insufficiency": "SVG-only answers vector authoring; it cannot answer script evaluation, CSS, TypeScript, browser host, runner, or accessibility decisions in the broader tasks."
+    },
+    {
+      "id": "APG125-CONTROL-REACT-JSX-TS",
+      "purpose": "React component composition, JSX syntax, and TypeScript checking",
+      "explicit_skill_ids": [
+        "react-component-profile",
+        "jsx-language-profile",
+        "typescript-language-profile"
+      ],
+      "expected_skill_ids": [
+        "jsx-language-profile",
+        "react-component-profile",
+        "typescript-language-profile"
+      ],
+      "excluded_neighbors": [
+        "browser-runtime-profile",
+        "css-language-profile",
+        "javascript-language-profile",
+        "nodejs-runtime-profile",
+        "npm-package-manager-profile",
+        "playwright-test-profile",
+        "svg-language-profile",
+        "vite-build-profile",
+        "web-accessibility-profile"
+      ],
+      "insufficient_for": ["APG125-COMP-03"],
+      "insufficiency": "React/JSX/TypeScript answers component, syntax, and checking questions; it cannot answer CSS, browser host, or accessibility behavior in the workbench."
+    },
+    {
+      "id": "APG125-CONTROL-PLAYWRIGHT-ONLY",
+      "purpose": "Playwright runner mechanics in isolation",
+      "explicit_skill_ids": ["playwright-test-profile"],
+      "expected_skill_ids": ["playwright-test-profile"],
+      "excluded_neighbors": [
+        "browser-runtime-profile",
+        "css-language-profile",
+        "javascript-language-profile",
+        "jsx-language-profile",
+        "nodejs-runtime-profile",
+        "npm-package-manager-profile",
+        "react-component-profile",
+        "svg-language-profile",
+        "typescript-language-profile",
+        "vite-build-profile",
+        "web-accessibility-profile"
+      ],
+      "insufficient_for": [
+        "APG125-COMP-04",
+        "APG125-COMP-05",
+        "APG125-COMP-06"
+      ],
+      "insufficiency": "Playwright-only answers runner and locator mechanics; it cannot answer accessibility semantics, browser host behavior, or SVG authoring in the broader UI tasks."
+    },
+    {
+      "id": "APG125-CONTROL-NPM-ONLY",
+      "purpose": "npm package-manager and lockfile behavior",
+      "explicit_skill_ids": ["npm-package-manager-profile"],
+      "expected_skill_ids": ["npm-package-manager-profile"],
+      "excluded_neighbors": [
+        "browser-runtime-profile",
+        "css-language-profile",
+        "javascript-language-profile",
+        "jsx-language-profile",
+        "nodejs-runtime-profile",
+        "playwright-test-profile",
+        "react-component-profile",
+        "svg-language-profile",
+        "typescript-language-profile",
+        "vite-build-profile",
+        "web-accessibility-profile"
+      ],
+      "insufficient_for": ["APG125-COMP-07"],
+      "insufficiency": "npm-only answers dependency and install questions; it cannot answer Vite build behavior or Node execution semantics in the broader task."
+    },
+    {
+      "id": "APG125-CONTROL-VITE-ONLY",
+      "purpose": "Vite build and serving behavior",
+      "explicit_skill_ids": ["vite-build-profile"],
+      "expected_skill_ids": ["vite-build-profile"],
+      "excluded_neighbors": [
+        "browser-runtime-profile",
+        "css-language-profile",
+        "javascript-language-profile",
+        "jsx-language-profile",
+        "nodejs-runtime-profile",
+        "npm-package-manager-profile",
+        "playwright-test-profile",
+        "react-component-profile",
+        "svg-language-profile",
+        "typescript-language-profile",
+        "web-accessibility-profile"
+      ],
+      "insufficient_for": ["APG125-COMP-07"],
+      "insufficiency": "Vite-only answers bundling and serving questions; it cannot answer npm dependency resolution or Node process behavior in the broader task."
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "APG125-COMP-01",
+      "name": "scripted_svg",
+      "task": "Author an SVG whose paths and serialization are styled and evaluated by a browser script.",
+      "explicit_skill_ids": [
+        "svg-language-profile",
+        "css-language-profile",
+        "javascript-language-profile",
+        "browser-runtime-profile"
+      ],
+      "expected_skill_ids": [
+        "browser-runtime-profile",
+        "css-language-profile",
+        "javascript-language-profile",
+        "svg-language-profile"
+      ],
+      "excluded_neighbors": [
+        "jsx-language-profile",
+        "nodejs-runtime-profile",
+        "npm-package-manager-profile",
+        "playwright-test-profile",
+        "react-component-profile",
+        "typescript-language-profile",
+        "vite-build-profile",
+        "web-accessibility-profile"
+      ],
+      "ownership_rationale": [
+        {"skill_id": "browser-runtime-profile", "rationale": "The task observes browser host DOM, script, and event behavior for the SVG execution role."},
+        {"skill_id": "css-language-profile", "rationale": "The task includes stylesheet cascade and SVG presentation styling decisions."},
+        {"skill_id": "javascript-language-profile", "rationale": "The task includes ECMAScript script evaluation decisions."},
+        {"skill_id": "svg-language-profile", "rationale": "The task includes standalone SVG paths and serialization decisions."}
+      ],
+      "narrower_control_ids": ["APG125-CONTROL-SVG-ONLY"]
+    },
+    {
+      "id": "APG125-COMP-02",
+      "name": "typed_svg",
+      "task": "Author a typed SVG module whose vector, style, script, browser, and TypeScript boundaries are all material.",
+      "explicit_skill_ids": [
+        "svg-language-profile",
+        "css-language-profile",
+        "javascript-language-profile",
+        "browser-runtime-profile",
+        "typescript-language-profile"
+      ],
+      "expected_skill_ids": [
+        "browser-runtime-profile",
+        "css-language-profile",
+        "javascript-language-profile",
+        "svg-language-profile",
+        "typescript-language-profile"
+      ],
+      "excluded_neighbors": [
+        "jsx-language-profile",
+        "nodejs-runtime-profile",
+        "npm-package-manager-profile",
+        "playwright-test-profile",
+        "react-component-profile",
+        "vite-build-profile",
+        "web-accessibility-profile"
+      ],
+      "ownership_rationale": [
+        {"skill_id": "browser-runtime-profile", "rationale": "The typed module is executed in an established browser host and needs host API behavior."},
+        {"skill_id": "css-language-profile", "rationale": "SVG presentation styling and cascade decisions remain CSS-owned."},
+        {"skill_id": "javascript-language-profile", "rationale": "The emitted script has independent ECMAScript evaluation semantics."},
+        {"skill_id": "svg-language-profile", "rationale": "Vector paths, viewBox, and SVG serialization remain SVG-owned."},
+        {"skill_id": "typescript-language-profile", "rationale": "Static checking and type-erasure decisions are material to the typed source."}
+      ],
+      "narrower_control_ids": ["APG125-CONTROL-SVG-ONLY"]
+    },
+    {
+      "id": "APG125-COMP-03",
+      "name": "browser_react_workbench",
+      "task": "Build a React workbench in a browser with typed JSX, CSS styling, accessible behavior, and host runtime effects.",
+      "explicit_skill_ids": [
+        "react-component-profile",
+        "jsx-language-profile",
+        "typescript-language-profile",
+        "css-language-profile",
+        "browser-runtime-profile",
+        "web-accessibility-profile"
+      ],
+      "expected_skill_ids": [
+        "browser-runtime-profile",
+        "css-language-profile",
+        "jsx-language-profile",
+        "react-component-profile",
+        "typescript-language-profile",
+        "web-accessibility-profile"
+      ],
+      "excluded_neighbors": [
+        "javascript-language-profile",
+        "nodejs-runtime-profile",
+        "npm-package-manager-profile",
+        "playwright-test-profile",
+        "svg-language-profile",
+        "vite-build-profile"
+      ],
+      "ownership_rationale": [
+        {"skill_id": "browser-runtime-profile", "rationale": "The workbench depends on browser DOM, event, scheduling, and storage host behavior."},
+        {"skill_id": "css-language-profile", "rationale": "CSS cascade and styling decisions are independent of component behavior."},
+        {"skill_id": "jsx-language-profile", "rationale": "JSX element and transform syntax is material to the workbench source."},
+        {"skill_id": "react-component-profile", "rationale": "Component rendering, state, and hooks are material to the workbench."},
+        {"skill_id": "typescript-language-profile", "rationale": "Typed JSX checking and erasure are material to the source boundary."},
+        {"skill_id": "web-accessibility-profile", "rationale": "Accessible names, roles, focus, and evidence hierarchy are part of the workbench task."}
+      ],
+      "narrower_control_ids": ["APG125-CONTROL-REACT-JSX-TS"]
+    },
+    {
+      "id": "APG125-COMP-04",
+      "name": "accessible_ui_verification",
+      "task": "Verify an accessible UI using Playwright actions and the web accessibility semantic contract.",
+      "explicit_skill_ids": ["playwright-test-profile", "web-accessibility-profile"],
+      "expected_skill_ids": ["playwright-test-profile", "web-accessibility-profile"],
+      "excluded_neighbors": [
+        "browser-runtime-profile",
+        "css-language-profile",
+        "javascript-language-profile",
+        "jsx-language-profile",
+        "nodejs-runtime-profile",
+        "npm-package-manager-profile",
+        "react-component-profile",
+        "svg-language-profile",
+        "typescript-language-profile",
+        "vite-build-profile"
+      ],
+      "ownership_rationale": [
+        {"skill_id": "playwright-test-profile", "rationale": "Runner fixtures, locators, and actionability mechanics control the verification run."},
+        {"skill_id": "web-accessibility-profile", "rationale": "Accessible names, roles, focus, and semantic evidence control the UI conclusion."}
+      ],
+      "narrower_control_ids": ["APG125-CONTROL-PLAYWRIGHT-ONLY"]
+    },
+    {
+      "id": "APG125-COMP-05",
+      "name": "host_verification",
+      "task": "Verify UI behavior where Playwright runner mechanics, accessibility semantics, and browser host behavior all affect the result.",
+      "explicit_skill_ids": ["playwright-test-profile", "web-accessibility-profile", "browser-runtime-profile"],
+      "expected_skill_ids": ["browser-runtime-profile", "playwright-test-profile", "web-accessibility-profile"],
+      "excluded_neighbors": [
+        "css-language-profile",
+        "javascript-language-profile",
+        "jsx-language-profile",
+        "nodejs-runtime-profile",
+        "npm-package-manager-profile",
+        "react-component-profile",
+        "svg-language-profile",
+        "typescript-language-profile",
+        "vite-build-profile"
+      ],
+      "ownership_rationale": [
+        {"skill_id": "browser-runtime-profile", "rationale": "The verification depends on actual browser DOM, event, and host lifecycle behavior."},
+        {"skill_id": "playwright-test-profile", "rationale": "The selected test runner owns fixtures, locators, and waiting mechanics."},
+        {"skill_id": "web-accessibility-profile", "rationale": "The UI conclusion depends on accessibility semantics and focus evidence."}
+      ],
+      "narrower_control_ids": ["APG125-CONTROL-PLAYWRIGHT-ONLY"]
+    },
+    {
+      "id": "APG125-COMP-06",
+      "name": "vector_verification",
+      "task": "Verify an accessible interactive vector in a browser with Playwright, host behavior, accessibility semantics, and SVG authoring all present.",
+      "explicit_skill_ids": ["playwright-test-profile", "web-accessibility-profile", "browser-runtime-profile", "svg-language-profile"],
+      "expected_skill_ids": ["browser-runtime-profile", "playwright-test-profile", "svg-language-profile", "web-accessibility-profile"],
+      "excluded_neighbors": [
+        "css-language-profile",
+        "javascript-language-profile",
+        "jsx-language-profile",
+        "nodejs-runtime-profile",
+        "npm-package-manager-profile",
+        "react-component-profile",
+        "typescript-language-profile",
+        "vite-build-profile"
+      ],
+      "ownership_rationale": [
+        {"skill_id": "browser-runtime-profile", "rationale": "The vector is exercised through browser DOM, events, and host lifecycle behavior."},
+        {"skill_id": "playwright-test-profile", "rationale": "The selected runner owns browser test setup and interaction mechanics."},
+        {"skill_id": "svg-language-profile", "rationale": "Vector geometry, references, and SVG serialization remain independently material."},
+        {"skill_id": "web-accessibility-profile", "rationale": "Interactive vector naming, roles, and keyboard evidence are accessibility-owned."}
+      ],
+      "narrower_control_ids": [
+        "APG125-CONTROL-SVG-ONLY",
+        "APG125-CONTROL-PLAYWRIGHT-ONLY"
+      ]
+    },
+    {
+      "id": "APG125-COMP-07",
+      "name": "build_install",
+      "task": "Build and install the browser workbench with Vite, npm, and Node execution semantics independently represented.",
+      "explicit_skill_ids": ["vite-build-profile", "npm-package-manager-profile", "nodejs-runtime-profile"],
+      "expected_skill_ids": ["nodejs-runtime-profile", "npm-package-manager-profile", "vite-build-profile"],
+      "excluded_neighbors": [
+        "browser-runtime-profile",
+        "css-language-profile",
+        "javascript-language-profile",
+        "jsx-language-profile",
+        "playwright-test-profile",
+        "react-component-profile",
+        "svg-language-profile",
+        "typescript-language-profile",
+        "web-accessibility-profile"
+      ],
+      "ownership_rationale": [
+        {"skill_id": "nodejs-runtime-profile", "rationale": "Node process, module, filesystem, and execution behavior is material to the build/install task."},
+        {"skill_id": "npm-package-manager-profile", "rationale": "Dependency resolution, lockfile, and installation behavior is npm-owned."},
+        {"skill_id": "vite-build-profile", "rationale": "Bundling, asset transformation, and serving behavior is Vite-owned."}
+      ],
+      "narrower_control_ids": [
+        "APG125-CONTROL-NPM-ONLY",
+        "APG125-CONTROL-VITE-ONLY"
+      ]
+    }
+  ],
+  "negative_controls": [
+    {
+      "id": "APG125-COMP-NEG-LANGUAGE-BROWSER-RUNTIME",
+      "fact_kind": "language",
+      "fact_value": "browser-runtime",
+      "expected_error": "ErrInvalidRequest",
+      "expected_selected_skill_ids": [],
+      "rationale": "browser-runtime is a profile identity, not a structured language fact."
+    },
+    {
+      "id": "APG125-COMP-NEG-CAPABILITY-BROWSER-RUNTIME",
+      "fact_kind": "capability",
+      "fact_value": "browser-runtime",
+      "expected_error": "ErrInvalidRequest",
+      "expected_selected_skill_ids": [],
+      "rationale": "The resolver must refuse an unregistered capability alias instead of auto-loading the leaf."
+    },
+    {
+      "id": "APG125-COMP-NEG-RUNTIME-BROWSER",
+      "fact_kind": "runtime",
+      "fact_value": "browser",
+      "expected_error": null,
+      "expected_selected_skill_ids": [],
+      "expected_exclusions": ["runtime:browser"],
+      "rationale": "The accepted browser runtime fact remains intentionally unmapped and cannot select browser-runtime-profile."
+    }
+  ]
+}

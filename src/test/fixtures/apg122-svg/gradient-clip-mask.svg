@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="500" height="500">
+  <title>Gradient Fill with ClipPath and Luminance Mask Composition</title>
+  <defs>
+    <!-- Linear gradient paint server -->
+    <linearGradient id="spectrum-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ec4899" />
+      <stop offset="50%" stop-color="#8b5cf6" />
+      <stop offset="100%" stop-color="#3b82f6" />
+    </linearGradient>
+
+    <!-- Clip path: binary 1-bit boundary -->
+    <clipPath id="star-clip">
+      <polygon points="250,50 310,180 450,180 340,260 380,390 250,310 120,390 160,260 50,180 190,180" />
+    </clipPath>
+
+    <!-- Mask: luminance gradient mask (white=opaque, black=transparent) -->
+    <mask id="fade-mask" mask-type="luminance" x="0" y="0" width="500" height="500">
+      <linearGradient id="mask-lum" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#ffffff" stop-opacity="1.0" />
+        <stop offset="100%" stop-color="#000000" stop-opacity="0.0" />
+      </linearGradient>
+      <rect width="500" height="500" fill="url(#mask-lum)" />
+    </mask>
+  </defs>
+
+  <!-- Graphic using linearGradient, clipped by star-clip and masked by fade-mask -->
+  <rect width="500" height="500" fill="url(#spectrum-grad)" clip-path="url(#star-clip)" mask="url(#fade-mask)" />
+</svg>

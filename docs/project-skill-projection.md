@@ -348,7 +348,7 @@ rollback tests cover both path classes without changing target state format.
 - Project projection success does not prove Codex invocation, automatic trigger
   selection, user-global integration, skill maturity, or production readiness.
 - The default managed set follows the verified source identity: nineteen
-  skills for public v0.3.0 and thirty-nine for current development. The command
+  skills for public v0.3.0 and forty-five for current development. The command
   is not a general skill installer or package manager.
 
 APG49 adds no projection. Its matryer/is candidate is terminally deferred
@@ -469,7 +469,7 @@ advisory selection exists and no MDX/Astro projection is added.
 
 APG88 adds `.agents/skills/mdx-profile` and `.agents/skills/astro-profile` with
 exact relative targets `../../skills/mdx-profile` and
-`../../skills/astro-profile`. The default current managed set is 39. Existing
+`../../skills/astro-profile`. APG122 adds SVG; the default current managed set is 40. Existing
 six-skill and other explicit subsets retain only their recorded names and do
 not gain either profile implicitly. State version 1, containment, source
 identity, adoption, check, uninstall, and rollback behavior are unchanged; no

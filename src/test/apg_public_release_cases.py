@@ -84,6 +84,25 @@ EXPECTED_APG88_PROJECTIONS = tuple(
         for path in EXPECTED_APG88_SKILLS
     )
 )
+EXPECTED_V010_SKILLS = tuple(
+    sorted(
+        (
+            *EXPECTED_APG88_SKILLS,
+            "skills/browser-runtime-profile/SKILL.md",
+            "skills/npm-package-manager-profile/SKILL.md",
+            "skills/playwright-test-profile/SKILL.md",
+            "skills/svg-language-profile/SKILL.md",
+            "skills/vite-build-profile/SKILL.md",
+            "skills/web-accessibility-profile/SKILL.md",
+        )
+    )
+)
+EXPECTED_V010_PROJECTIONS = tuple(
+    sorted(
+        f".agents/skills/{Path(path).parent.name}"
+        for path in EXPECTED_V010_SKILLS
+    )
+)
 HISTORICAL_V02_SKILLS = tuple(
     f"skills/{name}/SKILL.md"
     for name in (
@@ -240,11 +259,27 @@ class APGPublicReleaseCaseMixin:
         ):
             self.assertIn(test, release.AUDITED_TESTS)
 
+    def test_current_audited_surface_requires_all_45_skills_for_v010(self) -> None:
+        self.assertEqual(release.V010_SKILLS, EXPECTED_V010_SKILLS)
+        self.assertEqual(
+            release.V010_PROJECTIONS,
+            EXPECTED_V010_PROJECTIONS,
+        )
+        self.assertEqual(len(release.V010_SKILLS), 45)
+        self.assertEqual(len(release.V010_PROJECTIONS), 45)
+        self.assertEqual(len(release.V010_WRAPPERS), 15)
+        self.assertEqual(len(release.V010_HELPERS), 40)
+        self.assertEqual(len(release.V010_TESTS), 162)
+        self.assertEqual(len(release.V010_CRITICAL), 468)
+        self.assertEqual(len(release.V010_LICENSING), 5)
+        self.assertEqual(len(release.V010_CATEGORIES), 13)
+
     def test_policy_surfaces_are_exactly_version_bounded(self) -> None:
         historical_v02 = release.audited_policy_surfaces("0.2.0")
         historical_v03 = release.audited_policy_surfaces("0.3.0")
         historical_v05 = release.audited_policy_surfaces("0.5.0")
         current = release.audited_policy_surfaces("0.6.0")
+        v010 = release.audited_policy_surfaces("0.10.0")
 
         self.assertEqual(historical_v02[0]["required_skills"], HISTORICAL_V02_SKILLS)
         self.assertEqual(historical_v03[0]["required_skills"], EXPECTED_V03_SKILLS)
@@ -252,6 +287,11 @@ class APGPublicReleaseCaseMixin:
         self.assertEqual(
             current[0]["required_projections"],
             EXPECTED_APG88_PROJECTIONS,
+        )
+        self.assertEqual(v010[0]["required_skills"], EXPECTED_V010_SKILLS)
+        self.assertEqual(
+            v010[0]["required_projections"],
+            EXPECTED_V010_PROJECTIONS,
         )
         self.assertIn("libexec/agent-report/common.sh", historical_v03[0]["required_helpers"])
         self.assertNotIn("bin/git-diff-report", historical_v03[0]["required_wrappers"])
@@ -261,6 +301,8 @@ class APGPublicReleaseCaseMixin:
         self.assertEqual(len(historical_v05[0]["required_projections"]), 33)
         self.assertEqual(len(current[0]["required_skills"]), 39)
         self.assertEqual(len(current[0]["required_projections"]), 39)
+        self.assertEqual(len(v010[0]["required_skills"]), 45)
+        self.assertEqual(len(v010[0]["required_projections"]), 45)
         self.assertNotIn(
             "release/v0.6.0-notes.md",
             historical_v05[0]["critical_files"],
@@ -270,6 +312,7 @@ class APGPublicReleaseCaseMixin:
         self.assertEqual(len(historical_v03), 1)
         self.assertEqual(len(historical_v05), 1)
         self.assertEqual(len(current), 1)
+        self.assertEqual(len(v010), 1)
 
     def test_historical_v0_5_excludes_every_v0_6_owner(self) -> None:
         historical = release.audited_policy_surfaces("0.5.0")[0]
@@ -405,7 +448,7 @@ class APGPublicReleaseCaseMixin:
         self.assertEqual(release.audited_policy_surfaces("0.5.0")[0], historical)
 
     def test_unknown_policy_surface_identity_fails_closed(self) -> None:
-        for version in ("0.1.0", "0.3.1", "0.5.1", "0.6.1", "1.0.0", "invalid"):
+        for version in ("0.1.0", "0.3.1", "0.5.1", "0.6.1", "0.10.1", "0.11.0", "1.0.0", "invalid"):
             with self.subTest(version=version), self.assertRaises(release.ToolError):
                 release.audited_policy_surfaces(version)
 

@@ -376,11 +376,11 @@ cost.
   an independent four-digit sequence.
 - [`docs/status/`](../status/README.md) records truthful phase exits under an
   independent five-digit sequence.
-- [`skills/`](../../skills/README.md) contains and indexes thirty-nine canonical skills:
-  fourteen stable rows and twenty-five provisional manager-assignment,
+- [`skills/`](../../skills/README.md) contains and indexes forty canonical skills:
+  fourteen stable rows and twenty-six provisional manager-assignment,
   language, database, test-profile, or conversion rows.
 - [`.agents/skills/`](../../.agents/skills/) is the checked-in Codex repository
-  discovery projection; its thirty-nine relative symbolic links contain no
+  discovery projection; its forty-five relative symbolic links contain no
   independent skill content.
 - [`docs/bootstrap-v0.1.md`](../bootstrap-v0.1.md) defines maturity,
   provisional evidence, rollback, dogfooding, and decommission gates.
@@ -1424,3 +1424,41 @@ APG108 adapted the fail-closed publication executor to v0.8.1 and the APG107
 authority packet. It established repository About metadata reconciliation
 (description, homepage, topics) and deterministic state classification, ensuring
 clean forward-only release execution while treating v0.8.0 as an immutable predecessor.
+
+## APG110–APG118 v0.9.0 preparation and qualification
+
+APG110 through APG114 established the CI summary interface and APGR-side JACA
+XO compatibility on Darwin arm64. APG115 prepared release source; APG116 amended
+package-facing wording. APG117 and APG118 preserve their incomplete qualification
+and corrected-source boundaries. Those dated outcomes remain historical evidence.
+
+## APG119–APG120 v0.9.0 publication and recovery history
+
+APG119 completed corrected-source release qualification. Its first attended
+publication attempt published public Git main and the annotated tag, then stopped
+on initial Go-proxy version-list propagation. The overwritten first terminal
+machine result remains unavailable; that stop is preserved as a manager-reported
+observation, not reconstructed successful evidence.
+
+The second attended attempt found Git and tag already exact, published the GitHub
+Release, and completed the trusted PyPI workflow. Its subsequent PyPI reader
+failed with a missing `pypi.license_expression` key. That result remains a failed
+post-publication readback, not a terminal successful attempt.
+
+APG120 corrected private operator metadata and validation and delivered a recovery
+packet. A later attended recovery published all four exact npm packages and read
+back `already_terminal_exact`. This execution is distinct from APG120's earlier
+packet-qualification closeout.
+
+## APG121 v0.9.0 read-only terminal reconciliation
+
+APG121 preserves exact terminal APG120 evidence and freshly reconciles public
+v0.9.0 across GitHub Release, PyPI, npm, and Go. Its
+[evaluation](../evaluations/apg121-v090-publication-reconciliation.md) records
+consumer verification and the disposable Nix handoff proof. It does not replay
+publication or rewrite the preceding attempt records.
+
+APGR-side JACA CI/XO compatibility is complete for this release; actual JACA
+adoption and activation remain JACA-owned. Linux runtime execution was not part
+of v0.9.0 product qualification. Nix adapter updates and host activation, Theme
+Forge, and Repo Map remain separate work without automatic successor authority.

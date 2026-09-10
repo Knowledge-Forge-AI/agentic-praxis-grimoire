@@ -1,12 +1,9 @@
 # APG Distribution
 
-This documentation covers 0.9.0. The previous public APG release is **v0.8.1**
-on Git, GitHub Releases, PyPI, npm, and the Go module proxy (public release commit
-`565f924aa8fda9551da8732cceb5708db069e127`, annotated tag
-`b6b3e996536ac89e1a58912caf3b3cb9c251dbd7`). Once this version is published,
-distribution packages are available across standard registries. This document
-describes the shared distribution architecture and the v0.9.0 source qualification
-contract; v0.8.1 remains the published baseline until separately authorized publication.
+This documentation covers v0.10.0. The preceding **v0.9.0** and **v0.8.1** releases
+remain frozen. The distribution architecture preserves the multi-registry packaging
+model and provides the 45-skill corpus. Local build and inspection do not publish
+packages.
 
 APG has one editable release-version authority:
 `src/agentic_praxis_grimoire/VERSION`. Release-like Go builds receive that
@@ -44,7 +41,7 @@ Each supported target has one canonical `apgr` byte sequence and one canonical
 `apg.binary-manifest/v1` document. The manifest binds the APG version, module,
 Go target, Python and npm target mappings, binary basename, byte size, SHA-256,
 corpus fingerprint, build flags, and build-information schema. It contains no
-time, local path, host, user, or random value. The v0.8 candidate additionally
+time, local path, host, user, or random value. APGR also
 exposes the public `footprint` package and its three context-footprint schema
 families; those identities are versioned independently from the binary
 manifest.
@@ -125,10 +122,7 @@ source build uses the current checkout's version and corpus and is removed after
 the invocation. Installed wheels always use their bundled binary and never
 require a runtime compiler or network access.
 
-The preceding **v0.8.1** release is frozen across Git, GitHub Releases,
-PyPI, npm, and the Go module proxy. This documentation covers 0.9.0. Once this
-version is published, package downloads and registry entries become active across
-ecosystems. Prior to publication, no unavailable candidate downloads or registry
-packages are advertised or published for v0.9.0. Multi-registry publication
-requires separately authorized fail-closed readback
-across Git, GitHub Releases, PyPI, npm, and Go.
+Once v0.10.0 is published, install Python with
+`pip install agentic-praxis-grimoire==0.10.0`, npm with
+`npm install -g @knowledge-forge-ai/apgr@0.10.0`, or the Go module with
+`go get github.com/Knowledge-Forge-AI/agentic-praxis-grimoire@v0.10.0`.

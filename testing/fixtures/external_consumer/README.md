@@ -1,13 +1,13 @@
 # APGR v0.8.1 independent consumer fixture
 
-This documentation covers 0.9.0 qualification. This fixture preserves the
-released v0.8.1 compatibility control lane and its checked-in requirement and
-sums. The prospective v0.9.0 lane requires separate qualification in a
-disposable copy; its exact commands and evidence are deferred until the amended
-source is committed. Once 0.9.0 is published, a separate consumer lane can
-verify that release through the public proxy without replacing this control.
+This documentation covers v0.10.0. This fixture preserves the released v0.8.1
+compatibility control lane and its checked-in requirement and sums. Once
+v0.10.0 is published, a separate disposable consumer lane can verify
+`github.com/Knowledge-Forge-AI/agentic-praxis-grimoire@v0.10.0` (requiring version
+`v0.10.0`) through the normal public proxy and checksum database, with `GOWORK=off`
+and no `replace` directive. This does not replace the checked-in v0.8.1 control.
 The historical candidate-proxy procedure below applies to the v0.8.1 release
-packet, not to v0.9.0 source preparation.
+packet.
 
 ## Preserved v0.8.1 control and historical qualification procedure
 

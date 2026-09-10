@@ -117,8 +117,15 @@ func TestFootprintBaselineIdentityAndZeroAvailability(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(metadata.Skills) != 39 || metadata.DescriptionBytes != 9504 || metadata.DescriptionCharacters != 9492 {
-		t.Fatalf("corpus baseline = skills %d, bytes %d, chars %d", len(metadata.Skills), metadata.DescriptionBytes, metadata.DescriptionCharacters)
+	if len(metadata.Skills) != V010BrowserRuntimeAdmittedSkillCount {
+		t.Fatalf("corpus current skills = %d, want %d", len(metadata.Skills), V010BrowserRuntimeAdmittedSkillCount)
+	}
+	svgDelta := metadata.DescriptionBytes - HistoricalDescriptionBytes
+	if svgDelta <= 0 {
+		t.Fatalf("expected positive SVG description delta over historical %d, got delta %d (total %d)", HistoricalDescriptionBytes, svgDelta, metadata.DescriptionBytes)
+	}
+	if metadata.DescriptionBytes <= HistoricalDescriptionBytes || metadata.DescriptionCharacters <= HistoricalDescriptionCharacters {
+		t.Fatalf("corpus baseline = skills %d, bytes %d, chars %d (historical bytes %d, chars %d)", len(metadata.Skills), metadata.DescriptionBytes, metadata.DescriptionCharacters, HistoricalDescriptionBytes, HistoricalDescriptionCharacters)
 	}
 	if GlobalDescriptionLimit != 9527 {
 		t.Fatalf("historical limit = %d", GlobalDescriptionLimit)

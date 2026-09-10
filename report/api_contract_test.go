@@ -146,6 +146,8 @@ func TestExternalModuleImportsAndUsesReport(t *testing.T) {
 import (
 	"context"
 	"os"
+	"errors"
+	"path/filepath"
 
 	"github.com/Knowledge-Forge-AI/agentic-praxis-grimoire/report"
 )
@@ -160,6 +162,19 @@ func main() {
 	if err != nil { panic(err) }
 	records, err := report.ParseRecords(result.Bytes)
 	if err != nil || len(records) != 1 || records[0].ID != result.Record.ID { panic("record round trip failed") }
+	verified, err := report.Verify(context.Background(), result.Bytes)
+	if err != nil || verified.RecordCount != 1 { panic("byte verification failed") }
+	file := filepath.Join(os.Getenv("APG127_OUTBOX"), "copy.report.txt")
+	if err := os.WriteFile(file, result.Bytes, 0644); err != nil { panic(err) }
+	verified, err = report.VerifyFile(context.Background(), file)
+	if err != nil || verified.RecordCount != 1 { panic("file verification failed") }
+	if _, err = report.Verify(context.Background(), nil); !errors.Is(err, report.ErrEmptyReport) { panic("empty classification failed") }
+	request := report.AppendRequest{OutboxRoot: os.Getenv("APG127_OUTBOX"), Project: result.Record.Project, Phase: result.Record.Phase, Record: result.Record, Policy: report.AppendIdempotent}
+	if _, err = report.Append(context.Background(), request); err != nil { panic(err) }
+	publication, err := report.Append(context.Background(), request)
+	if err != nil || publication.Disposition != report.PublishedAlreadyPresent { panic("retry failed") }
+	request.Record.Payload = append(request.Record.Payload, '\n')
+	if _, err = report.Append(context.Background(), request); !errors.Is(err, report.ErrReplayConflict) { panic("replay classification failed") }
 	_, _ = os.Stdout.Write([]byte(result.Record.ID + "\n"))
 }
 `
@@ -174,7 +189,7 @@ func main() {
 	}
 	command := exec.Command("go", "run", ".")
 	command.Dir = module
-	command.Env = append(os.Environ(), "APG95_REPOSITORY="+repository, "APG95_COMMIT="+commit)
+	command.Env = append(os.Environ(), "APG95_REPOSITORY="+repository, "APG95_COMMIT="+commit, "APG127_OUTBOX="+t.TempDir())
 	output, err := command.CombinedOutput()
 	if err != nil {
 		t.Fatalf("external consumer failed: %v\n%s", err, output)

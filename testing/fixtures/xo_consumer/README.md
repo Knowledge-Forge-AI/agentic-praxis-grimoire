@@ -1,10 +1,10 @@
 # APGR JACA XO Consumer Compatibility Fixture
 
-This documentation covers 0.9.0 qualification. The released control lane stays
-at published v0.8.1 with its checked-in requirement and sums unchanged.
-Prospective verification uses a separate disposable local module replacement;
-once 0.9.0 is published, a separate lane can verify it through the public proxy.
-This fixture is an adapter example and bounded
+This documentation covers v0.10.0. The released control lane stays at published
+v0.8.1 with its checked-in requirement and sums unchanged. Once published,
+v0.10.0 is available for a separate disposable consumer lane (requiring version
+`v0.10.0` or `@v0.10.0`) through the normal public proxy and checksum database,
+with `GOWORK=off` and no `replace` directive. This fixture is an adapter example and bounded
 compatibility evidence. It is not an activated production JACA adapter or a
 universal security proof. JACA owns registration, production integration, and
 adoption.
@@ -67,8 +67,8 @@ Expected sums in `go.sum`:
 - `github.com/Knowledge-Forge-AI/agentic-praxis-grimoire v0.8.1 h1:V71VcfVQ5/u1mii2l1IS5fzww3wy3mDTwmdN6bmFjH8=`
 - `github.com/Knowledge-Forge-AI/agentic-praxis-grimoire v0.8.1/go.mod h1:SYmdFxwFtkMr7Jp1zw5dvQ/ee6bWwE6edwmQUEQ+VuU=`
 
-### Lane B: Exact Development Candidate
-Run against the local candidate repository checkout via an invocation-local `replace` directive:
+### Lane B: Exact Source Under Qualification
+Run against the local source repository checkout via an invocation-local `replace` directive:
 ```sh
 cd $(mktemp -d)
 cp /path/to/testing/fixtures/xo_consumer/* .

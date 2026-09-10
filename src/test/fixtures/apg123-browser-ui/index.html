@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>APG123 Synthetic Browser Fixture</title>
+  <script>
+    window.__lifecycle = {
+      states: [document.readyState],
+      events: [],
+      identities: {
+        windowDocMatch: window.document === document,
+        defaultViewMatch: document.defaultView === window,
+        selfMatch: window.self === window,
+        windowMatch: window.window === window,
+      }
+    };
+    document.addEventListener('readystatechange', () => {
+      window.__lifecycle.states.push(document.readyState);
+    });
+    document.addEventListener('DOMContentLoaded', () => {
+      window.__lifecycle.events.push('DOMContentLoaded');
+    });
+    window.addEventListener('load', () => {
+      window.__lifecycle.events.push('load');
+    });
+    window.addEventListener('pageshow', () => {
+      window.__lifecycle.events.push('pageshow');
+    });
+  </script>
+  <style>
+    body { font-family: sans-serif; margin: 20px; }
+    .focus-ring-btn {
+      padding: 8px 16px;
+      font-size: 14px;
+      border: 1px solid #94a3b8;
+      background: #f8fafc;
+      color: #0f172a;
+      cursor: pointer;
+    }
+    .focus-ring-btn:focus-visible {
+      outline: 4px solid #e11d48;
+      outline-offset: 3px;
+      box-shadow: 0 0 10px #e11d48;
+      background: #ffe4e6;
+    }
+    #section-ax04 { padding: 12px; }
+    #section-ax04 button { margin: 8px; }
+    #visual-box {
+      width: 100px;
+      height: 100px;
+      background: #0088cc;
+      border: 3px solid #004488;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+    }
+    table { border-collapse: collapse; margin-top: 8px; }
+    th, td { border: 1px solid #cbd5e1; padding: 6px 12px; }
+  </style>
+</head>
+<body>
+  <!-- PW01: Strictness paired positive -->
+  <section id="section-pw01">
+    <button class="dup-btn" id="btn-1">Duplicate One</button>
+    <button class="dup-btn" id="btn-2">Duplicate Two</button>
+    <button id="single-btn">Single Target</button>
+  </section>
+
+  <!-- PW02: Delayed actionability -->
+  <section id="section-pw02">
+    <button id="delayed-btn" disabled>Delayed Button</button>
+    <button id="permanent-disabled" disabled>Permanent Disabled</button>
+  </section>
+
+  <!-- PW03: Webfirst auto-retrying -->
+  <section id="section-pw03">
+    <div id="status-box">Initial</div>
+  </section>
+
+  <!-- PW07: Frames & Popups -->
+  <section id="section-pw07">
+    <iframe id="child-frame" src="/frame.html"></iframe>
+    <a id="popup-trigger" href="/popup.html" target="_blank">Open Popup Window</a>
+  </section>
+
+  <!-- PW09: Visual Compare -->
+  <section id="section-pw09">
+    <div id="visual-box">Target</div>
+  </section>
+
+  <!-- AX01: Native button, link, form naming -->
+  <section id="section-ax01">
+    <button id="ax01-btn">Submit Order</button>
+    <a id="ax01-link" href="#" aria-label="User Profile Documentation">Profile</a>
+    <label for="ax01-input">Billing Address</label>
+    <input id="ax01-input" type="text" value="">
+  </section>
+
+  <!-- AX02: Intentional name failure -->
+  <section id="section-ax02">
+    <button id="ax02-empty-btn"></button>
+  </section>
+
+  <!-- AX03: Headings and landmarks -->
+  <section id="section-ax03">
+    <header role="banner"><h1>Site Portal</h1></header>
+    <nav aria-label="Primary Navigation">
+      <ul><li><a href="#dashboard">Dashboard</a></li></ul>
+    </nav>
+    <main>
+      <h2>Dashboard Overview</h2>
+      <section aria-labelledby="analytics-heading">
+        <h3 id="analytics-heading">Quarterly Analytics</h3>
+      </section>
+    </main>
+  </section>
+
+  <!-- AX04: Tab/focus order and visible focus ring -->
+  <section id="section-ax04">
+    <input id="ax04-first" type="text" value="start">
+    <button id="ax04-focus-target" class="focus-ring-btn" tabindex="0">Focused Button</button>
+    <input id="ax04-third" type="text" value="end">
+  </section>
+
+  <!-- AX05: Interactive keyboard focusable SVG -->
+  <section id="section-ax05">
+    <svg id="ax05-svg" role="button" tabindex="0" aria-label="Toggle dark mode" width="60" height="30">
+      <rect width="60" height="30" rx="15" fill="#334155"/>
+      <circle cx="15" cy="15" r="10" fill="#f8fafc"/>
+    </svg>
+    <div id="ax05-output">off</div>
+  </section>
+
+  <!-- AX06: Meaningful vs decorative SVG -->
+  <section id="section-ax06">
+    <svg id="ax06-meaningful" role="img" aria-label="System status operational" width="40" height="40">
+      <title>System status operational</title>
+      <circle cx="20" cy="20" r="18" fill="#16a34a"/>
+    </svg>
+    <svg id="ax06-decorative" aria-hidden="true" width="20" height="20">
+      <circle cx="10" cy="10" r="8" fill="#94a3b8"/>
+    </svg>
+  </section>
+
+  <!-- AX07: Complex information alternative -->
+  <section id="section-ax07">
+    <figure role="group" aria-labelledby="ax07-caption">
+      <svg role="img" aria-label="Quarterly distribution chart" width="300" height="80" viewBox="0 0 300 80">
+        <rect x="10" y="10" width="120" height="20" fill="#3b82f6"/>
+        <text x="140" y="25">Region Alpha 60%</text>
+        <rect x="10" y="45" width="80" height="20" fill="#10b981"/>
+        <text x="140" y="60">Region Beta 40%</text>
+      </svg>
+      <figcaption id="ax07-caption">Quarterly Regional Distribution</figcaption>
+      <table aria-label="Quarterly Regional Distribution data alternative">
+        <thead><tr><th scope="col">Region</th><th scope="col">Percentage</th></tr></thead>
+        <tbody>
+          <tr><td>Region Alpha</td><td>60%</td></tr>
+          <tr><td>Region Beta</td><td>40%</td></tr>
+        </tbody>
+      </table>
+    </figure>
+  </section>
+
+  <!-- AX08: Hidden / inert / disabled -->
+  <section id="section-ax08">
+    <button id="ax08-hidden" hidden>Hidden Button</button>
+    <div id="ax08-inert-container" inert>
+      <button id="ax08-inert-btn">Inert Button</button>
+    </div>
+    <button id="ax08-disabled" disabled>Disabled Button</button>
+  </section>
+
+  <!-- AX09: Dynamic status live region -->
+  <section id="section-ax09">
+    <div id="ax09-status" role="status" aria-live="polite"></div>
+  </section>
+
+  <!-- AX10: ARIA snapshot container -->
+  <section id="section-ax10">
+    <div id="ax10-tree">
+      <nav aria-label="Portal Nav">
+        <ul>
+          <li><a href="#feed">Feed</a></li>
+          <li><a href="#settings">Settings</a></li>
+        </ul>
+      </nav>
+      <main>
+        <h1>User Profile</h1>
+        <button>Update Avatar</button>
+      </main>
+    </div>
+  </section>
+
+  <!-- AX11: Forms validation / table / motion -->
+  <section id="section-ax11">
+    <form id="ax11-form">
+      <input id="ax11-required" type="text" required>
+    </form>
+    <table aria-label="Server Metrics">
+      <thead><tr><th scope="col">Host</th><th scope="col">Status</th></tr></thead>
+      <tbody><tr><td>node-1</td><td>Active</td></tr></tbody>
+    </table>
+  </section>
+
+  <!-- SVG01: Permitted same-origin external SVG use reference -->
+  <section id="section-svg01">
+    <svg id="svg01-target" width="48" height="48" viewBox="0 0 48 48">
+      <use id="svg01-use" href="/sprite.svg#star-symbol"></use>
+    </svg>
+  </section>
+
+  <!-- SVG02: Blocked origin SVG reference negative -->
+  <section id="section-svg02">
+    <svg id="svg02-target" width="48" height="48" viewBox="0 0 48 48">
+      <use id="svg02-use" href=""></use>
+    </svg>
+  </section>
+
+  <!-- SVG03: Blocked path SVG reference negative -->
+  <section id="section-svg03">
+    <svg id="svg03-target" width="48" height="48" viewBox="0 0 48 48">
+      <use id="svg03-use" href=""></use>
+    </svg>
+  </section>
+
+  <!-- BR02: Parser and dynamic DOM container -->
+  <section id="section-br02">
+    <div id="br02-container"></div>
+    <script id="br02-parser-script">
+      window.__br02ParserScriptRan = true;
+    </script>
+  </section>
+
+  <!-- BR03: Event flow container -->
+  <section id="section-br03">
+    <div id="br03-parent">
+      <button id="br03-target">Target Button</button>
+      <input type="checkbox" id="br03-checkbox-positive">
+      <input type="checkbox" id="br03-checkbox-canceled">
+    </div>
+  </section>
+
+  <!-- BR10: Custom elements host container -->
+  <section id="section-br10">
+    <div id="br10-host"></div>
+  </section>
+
+  <!-- BR11: Computed style and geometry elements -->
+  <section id="section-br11">
+    <div id="br11-box" style="width: 200px; height: 100px; padding: 10px; background-color: rgb(0, 128, 255); color: rgb(255, 255, 255); box-sizing: border-box; display: block; margin: 5px;">BR11 Box</div>
+    <div id="br11-scroll" style="width: 100px; height: 60px; overflow: scroll; box-sizing: border-box;">
+      <div style="height: 300px; width: 80px;">Scrollable content</div>
+    </div>
+  </section>
+
+  <script>
+    // PW02 delayed enablement
+    setTimeout(() => {
+      const delayed = document.getElementById('delayed-btn');
+      if (delayed) delayed.removeAttribute('disabled');
+    }, 80);
+
+    // PW03 delayed text change
+    setTimeout(() => {
+      const box = document.getElementById('status-box');
+      if (box) box.textContent = 'Ready State';
+    }, 80);
+
+    // AX05 SVG toggle interaction
+    let svgActive = false;
+    const svgEl = document.getElementById('ax05-svg');
+    const outEl = document.getElementById('ax05-output');
+    function toggleSvg() {
+      svgActive = !svgActive;
+      if (outEl) outEl.textContent = svgActive ? 'on' : 'off';
+    }
+    if (svgEl) {
+      svgEl.addEventListener('click', toggleSvg);
+      svgEl.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          toggleSvg();
+        }
+      });
+    }
+
+    // AX09 helper
+    window.setLiveStatus = function(msg) {
+      const el = document.getElementById('ax09-status');
+      if (el) el.textContent = msg;
+    };
+  </script>
+</body>
+</html>

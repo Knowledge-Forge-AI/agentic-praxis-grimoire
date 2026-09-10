@@ -1,0 +1,470 @@
+{
+  "schema_version": 1,
+  "authority": {
+    "phase": "APG122",
+    "status": "frozen synthetic scenario harness",
+    "contract": "apg122_svg_contract.py",
+    "disclaimer": "This harness executes bounded static and syntactic analysis using Python standard library. It makes NO claim of visual rendering proof, pixel rasterization accuracy, GPU rendering fidelity, or browser accessibility-tree computation proof."
+  },
+  "vocabulary": {
+    "selections": [
+      "selected",
+      "embedded-route",
+      "route-to-owner",
+      "non-trigger"
+    ],
+    "responses": [
+      "proceed-routine",
+      "inspect-before-judgment",
+      "bounded-local-decision",
+      "stop-and-escalate"
+    ],
+    "routes": [
+      "css-language-profile",
+      "javascript-language-profile",
+      "jsx-language-profile",
+      "react-component-profile",
+      "html-owner",
+      "security-owner",
+      "accessibility-owner",
+      "visual-validation-owner",
+      "font-owner",
+      "performance-owner",
+      "project-configuration",
+      "not-applicable"
+    ],
+    "clauses": [
+      "SVG-01-DOC-STRUCTURE",
+      "SVG-02-VIEWBOX-SIZING",
+      "SVG-03-PATHS-GEOMETRY",
+      "SVG-04-TRANSFORMS-COORDS",
+      "SVG-05-PAINT-CURRENTCOLOR",
+      "SVG-06-GRADIENTS-PATTERNS",
+      "SVG-07-DEFS-SYMBOLS-USE",
+      "SVG-08-CLIPPING-MASKING",
+      "SVG-09-TEXT-TYPOGRAPHY",
+      "SVG-10-FILTER-EFFECTS",
+      "SVG-11-DOM-INTERACTION",
+      "SVG-12-A11Y-SEMANTICS",
+      "SVG-13-SECURITY-PROCESSING",
+      "SVG-14-SERIALIZATION-OPT",
+      "SVG-15-ROUTING-BOUNDARIES"
+    ],
+    "categories": [
+      "geometry-and-sizing",
+      "sprites-and-use",
+      "sprites-and-use-negative",
+      "paint-and-masking",
+      "transforms-negative",
+      "accessibility",
+      "paint-and-theming",
+      "security-negative",
+      "resource-contexts",
+      "serialization-negative",
+      "optimization-negative",
+      "optimization-safe",
+      "boundaries",
+      "performance-limits"
+    ]
+  },
+  "rows": [
+    {
+      "id": "APG122-SVG-001",
+      "purpose": "responsive logo and illustration with scalable viewBox and nested geometry",
+      "category": "geometry-and-sizing",
+      "fixture_file": "responsive-logo-illustration.svg",
+      "selection": "selected",
+      "response": "proceed-routine",
+      "route": "not-applicable",
+      "clauses": [
+        "SVG-01-DOC-STRUCTURE",
+        "SVG-02-VIEWBOX-SIZING",
+        "SVG-03-PATHS-GEOMETRY"
+      ],
+      "invariants": [
+        "must have valid positive viewBox",
+        "must have standard preserveAspectRatio",
+        "must contain well-formed path command streams",
+        "must have zero active scripts"
+      ]
+    },
+    {
+      "id": "APG122-SVG-002",
+      "purpose": "reusable icon sprite symbol library with valid use instantiations",
+      "category": "sprites-and-use",
+      "fixture_file": "sprite-references-valid.svg",
+      "selection": "selected",
+      "response": "proceed-routine",
+      "route": "not-applicable",
+      "clauses": [
+        "SVG-07-DEFS-SYMBOLS-USE"
+      ],
+      "invariants": [
+        "must declare symbols with dedicated viewBox in defs",
+        "use references must resolve to existing symbol IDs",
+        "reference graph must be strictly acyclic"
+      ]
+    },
+    {
+      "id": "APG122-SVG-003",
+      "purpose": "sprite cycle negative control with direct self-referencing use",
+      "category": "sprites-and-use-negative",
+      "fixture_file": "sprite-cycle-direct.svg",
+      "selection": "selected",
+      "response": "stop-and-escalate",
+      "route": "not-applicable",
+      "clauses": [
+        "SVG-07-DEFS-SYMBOLS-USE"
+      ],
+      "invariants": [
+        "must detect direct self-referencing cycle #sym-direct -> #sym-direct",
+        "must reject circular reference as specification error"
+      ]
+    },
+    {
+      "id": "APG122-SVG-004",
+      "purpose": "sprite cycle negative control with indirect mutual recursion",
+      "category": "sprites-and-use-negative",
+      "fixture_file": "sprite-cycle-indirect.svg",
+      "selection": "selected",
+      "response": "stop-and-escalate",
+      "route": "not-applicable",
+      "clauses": [
+        "SVG-07-DEFS-SYMBOLS-USE"
+      ],
+      "invariants": [
+        "must detect transitive multi-hop cycle between symbol A and symbol B",
+        "must report recursive path"
+      ]
+    },
+    {
+      "id": "APG122-SVG-005",
+      "purpose": "linear gradient fill composed with clipPath and luminance mask",
+      "category": "paint-and-masking",
+      "fixture_file": "gradient-clip-mask.svg",
+      "selection": "selected",
+      "response": "proceed-routine",
+      "route": "not-applicable",
+      "clauses": [
+        "SVG-06-GRADIENTS-PATTERNS",
+        "SVG-08-CLIPPING-MASKING"
+      ],
+      "invariants": [
+        "linearGradient must have valid stops and units",
+        "clipPath reference must resolve to defined clipPath ID",
+        "mask reference must resolve to defined mask with luminance mask-type"
+      ]
+    },
+    {
+      "id": "APG122-SVG-006",
+      "purpose": "geometry transform negative control with malformed parameter syntax",
+      "category": "transforms-negative",
+      "fixture_file": "geometry-transform-negative.svg",
+      "selection": "selected",
+      "response": "stop-and-escalate",
+      "route": "not-applicable",
+      "clauses": [
+        "SVG-04-TRANSFORMS-COORDS"
+      ],
+      "invariants": [
+        "must catch malformed transform parameter counts and non-numeric tokens",
+        "must report exact invalid transform functions"
+      ]
+    },
+    {
+      "id": "APG122-SVG-007",
+      "purpose": "accessible meaningful diagram with title, desc, role=img, and aria-labelledby",
+      "category": "accessibility",
+      "fixture_file": "text-a11y-meaningful.svg",
+      "selection": "selected",
+      "response": "proceed-routine",
+      "route": "accessibility-owner",
+      "clauses": [
+        "SVG-12-A11Y-SEMANTICS"
+      ],
+      "invariants": [
+        "must be classified as meaningful",
+        "must have child title matching aria-labelledby reference",
+        "must carry role=img on root element",
+        "must satisfy WCAG 2.2 Criterion 1.1.1"
+      ]
+    },
+    {
+      "id": "APG122-SVG-008",
+      "purpose": "accessible decorative background pattern with aria-hidden=true and focusable=false",
+      "category": "accessibility",
+      "fixture_file": "text-a11y-decorative.svg",
+      "selection": "selected",
+      "response": "proceed-routine",
+      "route": "accessibility-owner",
+      "clauses": [
+        "SVG-12-A11Y-SEMANTICS"
+      ],
+      "invariants": [
+        "must be classified as decorative",
+        "must have aria-hidden=true",
+        "must have focusable=false",
+        "must omit confusing title tags"
+      ]
+    },
+    {
+      "id": "APG122-SVG-009",
+      "purpose": "theme-adaptive icon with stroke=currentColor and fill=none",
+      "category": "paint-and-theming",
+      "fixture_file": "css-currentcolor.svg",
+      "selection": "selected",
+      "response": "proceed-routine",
+      "route": "not-applicable",
+      "clauses": [
+        "SVG-05-PAINT-CURRENTCOLOR"
+      ],
+      "invariants": [
+        "must detect currentColor on stroke or fill",
+        "must avoid hardcoded theme-incompatible colors",
+        "must be responsive with standard viewBox"
+      ]
+    },
+    {
+      "id": "APG122-SVG-010",
+      "purpose": "security negative control: active script tag injection",
+      "category": "security-negative",
+      "fixture_file": "unsafe-script-control.svg",
+      "selection": "selected",
+      "response": "stop-and-escalate",
+      "route": "security-owner",
+      "clauses": [
+        "SVG-13-SECURITY-PROCESSING"
+      ],
+      "invariants": [
+        "must detect script element",
+        "must classify as critical security violation"
+      ]
+    },
+    {
+      "id": "APG122-SVG-011",
+      "purpose": "security negative control: inline event handler attribute",
+      "category": "security-negative",
+      "fixture_file": "unsafe-event-handler.svg",
+      "selection": "selected",
+      "response": "stop-and-escalate",
+      "route": "security-owner",
+      "clauses": [
+        "SVG-13-SECURITY-PROCESSING"
+      ],
+      "invariants": [
+        "must detect inline on* event handler attribute",
+        "must classify as critical security violation"
+      ]
+    },
+    {
+      "id": "APG122-SVG-012",
+      "purpose": "security negative control: foreignObject embedding active HTML script",
+      "category": "security-negative",
+      "fixture_file": "unsafe-foreignobject-script.svg",
+      "selection": "selected",
+      "response": "stop-and-escalate",
+      "route": "security-owner",
+      "clauses": [
+        "SVG-13-SECURITY-PROCESSING"
+      ],
+      "invariants": [
+        "must detect active script inside foreignObject",
+        "must flag as insecure active payload"
+      ]
+    },
+    {
+      "id": "APG122-SVG-013",
+      "purpose": "security negative control: XML external entity DOCTYPE SYSTEM declaration",
+      "category": "security-negative",
+      "fixture_file": "unsafe-xxe-doctype.svg",
+      "selection": "selected",
+      "response": "stop-and-escalate",
+      "route": "security-owner",
+      "clauses": [
+        "SVG-13-SECURITY-PROCESSING"
+      ],
+      "invariants": [
+        "must detect DOCTYPE SYSTEM entity declaration",
+        "must reject XXE vector before XML parsing"
+      ]
+    },
+    {
+      "id": "APG122-SVG-014",
+      "purpose": "SVG authored for image resource context in secure processing mode",
+      "category": "resource-contexts",
+      "fixture_file": "resource-context-image-mode.svg",
+      "selection": "selected",
+      "response": "proceed-routine",
+      "route": "not-applicable",
+      "clauses": [
+        "SVG-13-SECURITY-PROCESSING"
+      ],
+      "invariants": [
+        "must be strictly self-contained with no external hrefs",
+        "must have zero scripts or event handlers",
+        "must conform to secure processing mode requirements"
+      ]
+    },
+    {
+      "id": "APG122-SVG-015",
+      "purpose": "malformed XML and unclosed tags negative control",
+      "category": "serialization-negative",
+      "fixture_file": "malformed-unsupported-tags.svg",
+      "selection": "selected",
+      "response": "stop-and-escalate",
+      "route": "not-applicable",
+      "clauses": [
+        "SVG-01-DOC-STRUCTURE",
+        "SVG-14-SERIALIZATION-OPT"
+      ],
+      "invariants": [
+        "must detect XML parse syntax error",
+        "must report unclosed or mismatched tag"
+      ]
+    },
+    {
+      "id": "APG122-SVG-016",
+      "purpose": "destructive optimization negative control: stripped viewBox, stripped title, broken ID",
+      "category": "optimization-negative",
+      "fixture_file": "destructive-optimization-control.svg",
+      "selection": "selected",
+      "response": "stop-and-escalate",
+      "route": "not-applicable",
+      "clauses": [
+        "SVG-14-SERIALIZATION-OPT"
+      ],
+      "invariants": [
+        "must detect stripped viewBox when compared to original",
+        "must detect stripped title on meaningful graphic",
+        "must detect broken ID references"
+      ]
+    },
+    {
+      "id": "APG122-SVG-017",
+      "purpose": "safe optimization preserving viewBox, a11y, and references while stripping metadata",
+      "category": "optimization-safe",
+      "fixture_file": "safe-optimized.svg",
+      "selection": "selected",
+      "response": "proceed-routine",
+      "route": "not-applicable",
+      "clauses": [
+        "SVG-14-SERIALIZATION-OPT"
+      ],
+      "invariants": [
+        "must preserve viewBox intact",
+        "must preserve title and accessibility elements",
+        "must preserve all paint and clip ID references",
+        "must successfully reduce file byte size"
+      ]
+    },
+    {
+      "id": "APG122-SVG-018",
+      "purpose": "Routing scenario (fixture is context only, not an instance of the requested behavior): CSS styling boundary with complex external stylesheet and selector cascade",
+      "category": "boundaries",
+      "fixture_file": "responsive-logo-illustration.svg",
+      "selection": "embedded-route",
+      "response": "bounded-local-decision",
+      "route": "css-language-profile",
+      "clauses": [
+        "SVG-15-ROUTING-BOUNDARIES"
+      ],
+      "invariants": [
+        "CSS cascade and external rules route to css-language-profile"
+      ]
+    },
+    {
+      "id": "APG122-SVG-019",
+      "purpose": "Routing scenario (fixture is context only, not an instance of the requested behavior): JSX React icon component wrapper around SVG markup",
+      "category": "boundaries",
+      "fixture_file": "css-currentcolor.svg",
+      "selection": "route-to-owner",
+      "response": "proceed-routine",
+      "route": "jsx-language-profile",
+      "clauses": [
+        "SVG-15-ROUTING-BOUNDARIES"
+      ],
+      "invariants": [
+        "JSX component syntax and React props route to jsx-language-profile"
+      ]
+    },
+    {
+      "id": "APG122-SVG-020",
+      "purpose": "Routing scenario (fixture is context only, not an instance of the requested behavior): text typography and font rendering boundary with web font dependencies",
+      "category": "boundaries",
+      "fixture_file": "text-a11y-meaningful.svg",
+      "selection": "selected",
+      "response": "inspect-before-judgment",
+      "route": "font-owner",
+      "clauses": [
+        "SVG-09-TEXT-TYPOGRAPHY",
+        "SVG-15-ROUTING-BOUNDARIES"
+      ],
+      "invariants": [
+        "custom font licensing and web font availability route to font-owner"
+      ]
+    },
+    {
+      "id": "APG122-SVG-021",
+      "purpose": "Routing scenario (fixture is context only, not an instance of the requested behavior): complex multi-stage filter effects requiring visual GPU validation",
+      "category": "boundaries",
+      "fixture_file": "gradient-clip-mask.svg",
+      "selection": "selected",
+      "response": "proceed-routine",
+      "route": "visual-validation-owner",
+      "clauses": [
+        "SVG-10-FILTER-EFFECTS",
+        "SVG-15-ROUTING-BOUNDARIES"
+      ],
+      "invariants": [
+        "filter rasterization fidelity routes to visual-validation-owner"
+      ]
+    },
+    {
+      "id": "APG122-SVG-022",
+      "purpose": "ambiguous accessibility classification: missing title, aria-hidden, or role",
+      "category": "accessibility",
+      "fixture_file": "resource-context-image-mode.svg",
+      "selection": "selected",
+      "response": "inspect-before-judgment",
+      "route": "accessibility-owner",
+      "clauses": [
+        "SVG-12-A11Y-SEMANTICS"
+      ],
+      "invariants": [
+        "unlabelled SVG requires human or project determination of decorative vs meaningful"
+      ]
+    },
+    {
+      "id": "APG122-SVG-023",
+      "purpose": "Routing scenario (fixture is context only, not an instance of the requested behavior): performance boundary: oversized single-file vector payload exceeding limits",
+      "category": "performance-limits",
+      "fixture_file": "responsive-logo-illustration.svg",
+      "selection": "selected",
+      "response": "stop-and-escalate",
+      "route": "performance-owner",
+      "clauses": [
+        "SVG-14-SERIALIZATION-OPT",
+        "SVG-15-ROUTING-BOUNDARIES"
+      ],
+      "invariants": [
+        "excessive coordinate density or file size routes to performance-owner"
+      ]
+    },
+    {
+      "id": "APG122-SVG-024",
+      "purpose": "Routing scenario (fixture is context only, not an instance of the requested behavior): interactive SVG control with tabindex=0, focus visible, and keyboard access",
+      "category": "boundaries",
+      "fixture_file": "text-a11y-meaningful.svg",
+      "selection": "selected",
+      "response": "proceed-routine",
+      "route": "accessibility-owner",
+      "clauses": [
+        "SVG-11-DOM-INTERACTION",
+        "SVG-12-A11Y-SEMANTICS"
+      ],
+      "invariants": [
+        "keyboard interaction, visible focus, and accessible naming require accessibility-owner and browser verification; this fixture does not prove those behaviors"
+      ]
+    }
+  ]
+}

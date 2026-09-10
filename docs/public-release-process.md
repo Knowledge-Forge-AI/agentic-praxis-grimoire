@@ -615,3 +615,17 @@ Nix is not a v0.8 release artifact or activation path. Any Nix work is limited
 to a read-only consumer handoff and qualification record. It must not activate
 a host, change `.flakes`, install globally, mutate a profile, or become a
 prerequisite for the first-party APGR release.
+
+## v0.9.0 terminal publication reconciliation
+
+v0.9.0 is publicly released across GitHub Release, PyPI, npm, and Go. The
+[APG121 evaluation](evaluations/apg121-v090-publication-reconciliation.md)
+records read-only terminal reconciliation after the attended APG120 recovery.
+The frozen release notes, package README templates, and projection policy remain
+release inputs; current development status is recorded separately. Earlier
+partial publication attempts retain their historical outcomes.
+
+Publication completes APGR-side CI/XO delivery for this release. It does not
+activate JACA adoption or a Nix/host update. Linux runtime execution was not part
+of v0.9.0 product qualification. Later Theme Forge and Repo Map work remains
+separate roadmap scope.

@@ -1,5 +1,7 @@
 # Go Library Reference
 
+This documentation covers v0.10.0.
+
 APG's embeddable module is
 `github.com/Knowledge-Forge-AI/agentic-praxis-grimoire` at Go 1.25. Public
 consumers import root packages directly; they do not import `cmd/apgr` or any
@@ -123,8 +125,8 @@ internal adapter, as demonstrated and verified in `testing/fixtures/xo_consumer/
   they are never coerced to zero (`unavailable != 0`). Explicit zero budgets fail
   closed with `skills.ErrBudgetExceeded`.
 - **Dual-lane verification**: Clean dual-lane conformance has been qualified across
-  Lane A (published v0.8.1 baseline via public Go proxy) and Lane B (exact development
-  candidate via local replace).
+  Lane A (published v0.8.1 baseline via public Go proxy) and Lane B (exact source
+  under qualification via local replace).
 
 > [!IMPORTANT]
 > **Boundary of Authority**:
@@ -144,6 +146,30 @@ caller-supplied bytes and already parsed records entirely in memory.
 `ParseRecords` validates canonical common-envelope records, and `Append`
 optionally publishes one record under the owner-only APG outbox convention.
 
+The v0.10.0 release adds `Verify(ctx, content)` and
+`VerifyFile(ctx, path)`, returning `Verification` with a record count and
+compatibility-limited flag. Both reuse the canonical parser; file verification
+performs read-only bounded observation without outbox preparation. Empty input
+is `ErrEmptyReport`, distinct from envelope parsing's accepted empty sequence.
+Malformed/unsupported records use report error families; `ErrVerifyIO`
+distinguishes file I/O failures. Historical compatibility allowances do not
+mean that new malformed structured operational bodies may be generated.
+They also do not authorize republication: `Append` strictly validates a newly
+supplied operational record, so archived compatibility-limited bytes may verify
+successfully yet be refused when appended into another outbox.
+
+Verification checks artifact-local integrity, not external Git truth, executed
+operations or absent external relationships. Refer to the
+[reporting architecture](../agent-reporting-architecture.md#read-only-persisted-verification)
+for precise proof limits and raw-versus-rendered hash handling.
+Current-version verification requires canonical renderer equality. Changes to
+renderer bytes require versioned verification preserving accepted historical
+formats. Delimiter scanning and incremental hashing now check cancellation
+within 64 KiB work windows and at candidates. This extraction bound does not
+promise verifier-wide latency across canonical rendering and library calls.
+CLI malformed-input and I/O failures both exit 1 with different
+diagnostics, while library callers can distinguish their error families.
+
 Results contain the parsed record, exact canonical bytes, and fresh
 caller-owned evidence copies. The package does not require `cmd/apgr`, Python,
 or a shell at the consumer boundary. Report collection may execute the
@@ -157,10 +183,14 @@ patches, environment values, or caller-supplied absolute paths.
 
 ## Compatibility authority
 
-The maintained Python implementation under `libexec/agent_report/` was the
-active CLI owner and byte-level compatibility oracle through APG95. APG96 keeps
-it as a frozen, directly invoked test oracle while normal canonical and
-historical report routes delegate to the Go CLI.
+The Python implementation under `libexec/agent_report/` was the active CLI owner
+and byte-level compatibility oracle through APG95. APG96 retained it during the
+migration while normal canonical and historical routes delegated to Go. The
+optional differential test skips when that historical oracle is absent; a skip
+does not establish parity. APG127's checked-in persisted fixtures and real-file
+regressions provide maintained evidence independently of it: two fixtures were
+rendered by unchanged APG126 source; six are format regressions without an
+independently recorded earlier reporting-source renderer identity.
 
 Accepted Show, Diff, and Operational fixtures compare exact canonical bytes.
 Rejected fixtures compare stable failure families and mutation-safety
@@ -182,6 +212,21 @@ canonical record. Directories are mode 0700 and files are mode 0600. Show and
 Diff primaries supersede each other. Operational records append to an existing
 Git primary or use an ops-only primary when no Git primary exists.
 
+`AppendRequest.Policy` defaults to `AppendAlways`, preserving duplicate
+envelopes. `AppendIdempotent` returns `PublishedAlreadyPresent` when every
+retained record sharing project/phase/kind/ID has the same complete canonical
+bytes; any differing match returns `ErrReplayConflict` without replacement.
+The policy rejects unknown values before filesystem preparation. It searches
+only retained records and does not change supersession or transaction recovery.
+New operational records receive semantic validation before append framing;
+show/diff payload validation at append retains the historical contract.
+
+Source stability includes exact source bytes, basename, metadata and relations.
+Show IDs name commits and diff IDs name state evidence, so changed labels or
+native Git rendering can produce a conflict under the same ID. Callers must not
+mutate request buffers during a call. This is an explicit retry policy, not
+automatic deduplication or an execution/authorization ledger.
+
 Private locking and transaction helpers retain recoverable interruption state
 and never remove a live or foreign lock. Stale-lock recovery uses PID inspection,
 assuming a local, single-host, owner-only outbox. If an interrupted execution
@@ -202,8 +247,10 @@ The [APGR CLI reference](cli.md) documents command adapters, footprint
 operations, path and recovery operations, build information, and Python
 delegation. The [distribution contract](../distribution.md) documents
 supported targets, the multi-registry packaging model, and the package
-architecture. The published v0.8.1 release includes the public `footprint`
+architecture. The published v0.9.0 release includes the public `footprint`
 package alongside the core Go packages (`schema`, `report`, `skills`, `envsnap`, `hotspot`).
-This documentation covers 0.9.0, retaining full backward compatibility with
-v0.8.1 across all six public Go packages. Registry installation of 0.9.0 is
-available once that version is published.
+This documentation covers v0.10.0. APGR retains compatibility with v0.8.1 across all
+six public Go packages (`schema`, `report`, `skills`, `envsnap`, `hotspot`, `footprint`).
+Once published, Go consumers can require `github.com/Knowledge-Forge-AI/agentic-praxis-grimoire v0.10.0`
+(or `go get github.com/Knowledge-Forge-AI/agentic-praxis-grimoire@v0.10.0`) through the normal
+public Go proxy and checksum database.

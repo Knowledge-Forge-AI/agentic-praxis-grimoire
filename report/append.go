@@ -18,6 +18,11 @@ func Append(ctx context.Context, request AppendRequest) (Publication, error) {
 	if err := ctx.Err(); err != nil {
 		return Publication{}, err
 	}
+	switch request.Policy {
+	case AppendAlways, AppendIdempotent:
+	default:
+		return Publication{}, fmt.Errorf("%w: unknown append policy %q", ErrInvalidRequest, request.Policy)
+	}
 	if err := validateIdentifier(request.Project, "project"); err != nil {
 		return Publication{}, err
 	}
@@ -26,6 +31,11 @@ func Append(ctx context.Context, request AppendRequest) (Publication, error) {
 	}
 	if request.Record.Project != request.Project || request.Record.Phase != request.Phase {
 		return Publication{}, fmt.Errorf("%w: record identity conflicts with append request", ErrInvalidRequest)
+	}
+	if request.Record.Kind == schema.OperationalRecord {
+		if err := validateOperationalRecord(request.Record, false); err != nil {
+			return Publication{}, err
+		}
 	}
 	encoded, err := buildRecord(request.Record)
 	if err != nil {
@@ -72,18 +82,45 @@ func Append(ctx context.Context, request AppendRequest) (Publication, error) {
 			return fmt.Errorf("%w: unsupported report record type", atomicfile.ErrConflict)
 		}
 		existing := contents[target]
+		var records []Record
 		if existing != nil {
-			records, parseErr := ParseRecords(existing)
+			var parseErr error
+			records, parseErr = ParseRecords(existing)
 			if parseErr != nil {
 				return fmt.Errorf("%w: existing report structure", atomicfile.ErrUnsafe)
 			}
 			if err := validateExistingRecords(records, request.Project, request.Phase); err != nil {
 				return err
 			}
-			if request.Record.Kind == schema.OperationalRecord {
-				if err := validateAppendAssociation(request.Record, records); err != nil {
-					return err
+		}
+		if request.Record.Kind == schema.OperationalRecord {
+			if err := validateAppendAssociation(request.Record, records); err != nil {
+				return err
+			}
+		}
+		if request.Policy == AppendIdempotent {
+			hasMatch := false
+			conflict := false
+			for _, rec := range records {
+				if rec.Project == request.Record.Project &&
+					rec.Phase == request.Record.Phase &&
+					rec.Kind == request.Record.Kind &&
+					rec.ID == request.Record.ID {
+					hasMatch = true
+					recEncoded, err := buildRecord(rec)
+					if err != nil || !bytes.Equal(recEncoded, encoded) {
+						conflict = true
+						break
+					}
 				}
+			}
+			if conflict {
+				return fmt.Errorf("%w: record with identity %s already exists with differing content", ErrReplayConflict, request.Record.ID)
+			}
+			if hasMatch {
+				publication.FinalPath = filepath.Join(paths.Directory, target)
+				publication.Disposition = PublishedAlreadyPresent
+				return nil
 			}
 		}
 		combined := appendRecord(existing, encoded)

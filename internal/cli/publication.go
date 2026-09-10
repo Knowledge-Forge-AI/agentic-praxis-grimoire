@@ -9,15 +9,21 @@ import (
 	"github.com/Knowledge-Forge-AI/agentic-praxis-grimoire/report"
 )
 
-func publish(ctx context.Context, configuration config, result report.Result) (string, error) {
+func publish(ctx context.Context, configuration config, result report.Result, policy report.AppendPolicy) (report.Publication, error) {
 	if configuration.legacy {
-		return appendLegacy(ctx, configuration.outbox, configuration.project, result.Record.Phase, result.Bytes)
+		path, err := appendLegacy(ctx, configuration.outbox, configuration.project, result.Record.Phase, result.Bytes)
+		if err != nil {
+			return report.Publication{}, err
+		}
+		return report.Publication{FinalPath: path, RecordID: result.Record.ID, Disposition: report.PublishedAppend}, nil
 	}
-	publication, err := report.Append(ctx, report.AppendRequest{OutboxRoot: configuration.outbox, Project: configuration.project, Phase: result.Record.Phase, Record: result.Record})
-	if err != nil {
-		return "", err
-	}
-	return publication.FinalPath, nil
+	return report.Append(ctx, report.AppendRequest{
+		OutboxRoot: configuration.outbox,
+		Project:    configuration.project,
+		Phase:      result.Record.Phase,
+		Record:     result.Record,
+		Policy:     policy,
+	})
 }
 
 func existingRecords(configuration config, phase string) ([]report.Record, error) {

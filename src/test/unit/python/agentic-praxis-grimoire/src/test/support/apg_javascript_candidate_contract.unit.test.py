@@ -414,3 +414,52 @@ def test_named_process_alias_and_alternate_forms_are_rejected(source: str) -> No
 
 def test_harmless_run_word_is_not_a_process_bypass() -> None:
     assert javascript_process_invocation_violations("run = 'ordinary word'\n") == ()
+
+
+@pytest.mark.parametrize("source", (
+    "import os\nexecute: object = os.system\nexecute('node')\n",
+    "import subprocess\nexecute: object = subprocess.run\nexecute(['node'])\n",
+    "import subprocess\nexecute = subprocess.run\nexecute = unknown_value\nexecute(['node'])\n",
+    "from asyncio import create_subprocess_exec as execute\nexecute('node')\n",
+    "from asyncio import create_subprocess_shell as execute\nexecute('node')\n",
+    "from multiprocessing import Process as spawn\nspawn(target=print).start()\n",
+    "import os\nprocess = os\nprocess.system('node')\n",
+    "import asyncio\nprocess: object = asyncio\nprocess.create_subprocess_exec('node')\n",
+    "import os as operating\nfirst = operating\nsecond: object = first\nsecond.popen('node')\n",
+    "from os import system as execute\nexecute('node')\n",
+    "import os\nfirst = os\nexecute: object = first.spawnv\nexecute('node')\n",
+    "import os\nfirst = os\ngetattr(first, 'system')('node')\n",
+    "first: object = __import__('os')\nfirst.system('node')\n",
+))
+def test_annotated_and_module_process_aliases_are_rejected(source: str) -> None:
+    assert javascript_process_invocation_violations(source)
+
+
+@pytest.mark.parametrize("source", (
+    "import os\noperating: object = os\noperating.getcwd()\n",
+    "import os\noperating = os\noperating.path.exists('file')\n",
+    "import pathlib as paths\ncopy = paths\ncopy.Path('file')\n",
+    "value: str\nvalue = 'ordinary word'\n",
+))
+def test_harmless_module_aliases_remain_permitted(source: str) -> None:
+    assert javascript_process_invocation_violations(source) == ()
+
+
+@pytest.mark.parametrize("injected", (
+    "os.system('node')",
+    "process = os; process.system('node')",
+    "execute: object = os.system; execute('node')",
+    "subprocess.run(['node'])",
+))
+def test_approved_wrapper_rejects_additional_process_api(
+    monkeypatch: pytest.MonkeyPatch, injected: str,
+) -> None:
+    original = Path.read_text
+    def mutated(path: Path, *args, **kwargs):
+        source = original(path, *args, **kwargs)
+        if path == ROOT / 'libexec/apg_test.py':
+            source = source.replace('return subprocess.run(', injected + "\n    return subprocess.run(", 1)
+        return source
+    monkeypatch.setattr(Path, 'read_text', mutated)
+    with pytest.raises(ContractError, match='one approved process call site'):
+        validate_javascript_process_invocation_owners(ROOT)

@@ -16,11 +16,16 @@ var commitInputPattern = regexp.MustCompile(`^[0-9A-Fa-f]{7,64}$`)
 
 type operationalArguments struct {
 	phase, source, result, finalGate, relatedCommit, relatedID string
+	idempotent                                                 bool
 }
 
 func operational(ctx context.Context, configuration config, arguments []string, stdout io.Writer, compatibility bool) error {
 	if len(arguments) > 0 && (arguments[0] == "-h" || arguments[0] == "--help") {
-		fmt.Fprint(stdout, operationalUsage)
+		usage := canonicalOperationalUsage
+		if compatibility {
+			usage = operationalUsage
+		}
+		fmt.Fprint(stdout, usage)
 		return nil
 	}
 	parsed, err := parseOperational(arguments)
@@ -29,6 +34,9 @@ func operational(ctx context.Context, configuration config, arguments []string, 
 			return renderedUsage{operationalUsage}
 		}
 		return err
+	}
+	if compatibility && parsed.idempotent {
+		return renderedUsage{operationalUsage}
 	}
 	if err := validateMetadata(parsed.result, "result"); err != nil {
 		return err
@@ -77,11 +85,19 @@ func operational(ctx context.Context, configuration config, arguments []string, 
 	if err != nil {
 		return err
 	}
-	path, err := publish(ctx, configuration, result)
+	policy := report.AppendAlways
+	if parsed.idempotent {
+		policy = report.AppendIdempotent
+	}
+	publication, err := publish(ctx, configuration, result, policy)
 	if err != nil {
 		return err
 	}
-	fmt.Fprintf(stdout, "append-operational-report: appended %s to %s\n", result.Record.ID, path)
+	action := "appended"
+	if publication.Disposition == report.PublishedAlreadyPresent {
+		action = "already-present"
+	}
+	fmt.Fprintf(stdout, "append-operational-report: %s %s to %s\n", action, result.Record.ID, publication.FinalPath)
 	return nil
 }
 
@@ -91,10 +107,19 @@ func parseOperational(arguments []string) (operationalArguments, error) {
 	}
 	result := operationalArguments{phase: arguments[0], source: arguments[1], result: arguments[2], finalGate: arguments[3]}
 	for index := 4; index < len(arguments); {
+		option := arguments[index]
+		if option == "--idempotent" {
+			if result.idempotent {
+				return operationalArguments{}, usageError{"--idempotent may be specified only once"}
+			}
+			result.idempotent = true
+			index++
+			continue
+		}
 		if index+1 >= len(arguments) {
 			return operationalArguments{}, usageError{"operational report option requires a value"}
 		}
-		option, value := arguments[index], arguments[index+1]
+		value := arguments[index+1]
 		index += 2
 		switch option {
 		case "--related-commit":

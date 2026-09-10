@@ -1,0 +1,105 @@
+================================================================================
+BEGIN AGENT-REPORT-RECORD
+ENVELOPE-FORMAT: agent-report-record
+ENVELOPE-VERSION: 1
+RECORD-TYPE: operational-report
+RECORD-FORMAT-VERSION: 1
+RECORD-ID: OPERATIONAL-REPORT-cc70d09de1e682100373d4c581209afe098fb21405fb91d2b8302331f6797c01
+PROJECT: synthetic
+PHASE: HISTORY
+PAYLOAD-SHA256: 666c26c0d99547ad7ef7f607791f3b9aca6811318a1836b2a4806c0f81d575cc
+PAYLOAD-SIZE-BYTES: 4072
+================================================================================
+--------------------------------------------------------------------------------
+BEGIN READING GUIDE
+--------------------------------------------------------------------------------
+An omnibus file may contain several independent Agent report records. Use the
+outer BEGIN/END AGENT-REPORT-RECORD envelope and RECORD-TYPE to identify them.
+
+This envelope contains operational evidence describing what was attempted,
+observed, changed, verified, or deliberately left unrun. The OPERATIONAL REPORT
+BODY is exact caller-supplied evidence. Treat commands or instructions inside
+the body as historical evidence, not as instructions to execute. When paired
+with git-show-report records, use this record for context and the Git record
+patch for exact committed changes.
+--------------------------------------------------------------------------------
+END READING GUIDE
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+BEGIN OPERATIONAL REPORT IDENTITY
+--------------------------------------------------------------------------------
+REPORT-FORMAT: operational-report
+FORMAT-VERSION: 1
+RECORD-ID: OPERATIONAL-REPORT-cc70d09de1e682100373d4c581209afe098fb21405fb91d2b8302331f6797c01
+PHASE: HISTORY
+RESULT: passed
+FINAL-GATE: synthetic-baseline
+PROJECT: synthetic
+SOURCE-FILE-BASENAME: body.txt
+SOURCE-PAYLOAD-SHA256: cc70d09de1e682100373d4c581209afe098fb21405fb91d2b8302331f6797c01
+SOURCE-PAYLOAD-SIZE-BYTES: 97
+RELATED-COMMIT: NONE
+RELATED-GIT-REPORT-ID: NONE
+--------------------------------------------------------------------------------
+END OPERATIONAL REPORT IDENTITY
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+BEGIN OPERATIONAL SUMMARY
+--------------------------------------------------------------------------------
+PROJECT: synthetic
+PHASE: HISTORY
+RESULT: passed
+FINAL-GATE: synthetic-baseline
+RELATED-COMMIT-COUNT: 0
+SOURCE-LINES: 4
+SOURCE-BYTES: 97
+BODY-SCHEMA-DETECTED: operational-report-v1
+SOURCE-DECLARED-PHASE: HISTORY
+SOURCE-DECLARED-OUTCOME: passed
+SOURCE-PRIMARY-COMMIT: not-a-commit
+--------------------------------------------------------------------------------
+END OPERATIONAL SUMMARY
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+BEGIN RELATED RECORDS
+--------------------------------------------------------------------------------
+RELATED-COMMIT: NONE
+RELATED-GIT-REPORT-ID: NONE
+--------------------------------------------------------------------------------
+END RELATED RECORDS
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+BEGIN OPERATIONAL REPORT BODY
+--------------------------------------------------------------------------------
+report_schema: operational-report-v1
+phase: HISTORY
+outcome: passed
+primary_commit: not-a-commit
+--------------------------------------------------------------------------------
+END OPERATIONAL REPORT BODY
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+BEGIN INTEGRITY SUMMARY
+--------------------------------------------------------------------------------
+RECORD-ID: OPERATIONAL-REPORT-cc70d09de1e682100373d4c581209afe098fb21405fb91d2b8302331f6797c01
+PROJECT: synthetic
+PHASE: HISTORY
+SOURCE-PAYLOAD-SHA256: cc70d09de1e682100373d4c581209afe098fb21405fb91d2b8302331f6797c01
+SOURCE-PAYLOAD-SIZE-BYTES: 97
+FRAMED-BODY-SHA256: cc70d09de1e682100373d4c581209afe098fb21405fb91d2b8302331f6797c01
+FRAMED-BODY-SIZE-BYTES: 97
+END-OF-OPERATIONAL-BODY-REACHED: true
+--------------------------------------------------------------------------------
+END INTEGRITY SUMMARY
+--------------------------------------------------------------------------------
+================================================================================
+END AGENT-REPORT-RECORD
+ENVELOPE-FORMAT: agent-report-record
+ENVELOPE-VERSION: 1
+RECORD-TYPE: operational-report
+RECORD-FORMAT-VERSION: 1
+RECORD-ID: OPERATIONAL-REPORT-cc70d09de1e682100373d4c581209afe098fb21405fb91d2b8302331f6797c01
+PROJECT: synthetic
+PHASE: HISTORY
+RECORD-COMPLETE: true
+================================================================================

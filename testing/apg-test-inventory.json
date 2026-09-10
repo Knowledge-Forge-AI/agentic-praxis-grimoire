@@ -55,6 +55,15 @@
       ]
     },
     {
+      "path": "libexec/apg_playwright_runtime.py",
+      "rationale": "maintained executable Python source",
+      "suites": [
+        "unit",
+        "integration",
+        "combined"
+      ]
+    },
+    {
       "path": "libexec/apg_project_skills_commands.py",
       "rationale": "maintained executable Python source",
       "suites": [
@@ -500,6 +509,16 @@
       "suite": "integration"
     },
     {
+      "owner": "libexec/apg_distribution_candidate.py",
+      "path": "src/test/int/python/agentic-praxis-grimoire/libexec/apg_distribution_candidate.int.test.py",
+      "suite": "integration"
+    },
+    {
+      "owner": "libexec/apg_playwright_runtime.py",
+      "path": "src/test/int/python/agentic-praxis-grimoire/libexec/apg_playwright_runtime.int.test.py",
+      "suite": "integration"
+    },
+    {
       "owner": "libexec/apg_project_skills_commands.py",
       "path": "src/test/int/python/agentic-praxis-grimoire/libexec/apg_project_skills_commands.int.test.py",
       "suite": "integration"
@@ -515,13 +534,13 @@
       "suite": "integration"
     },
     {
-      "owner": "libexec/apg_distribution_candidate.py",
-      "path": "src/test/int/python/agentic-praxis-grimoire/libexec/apg_distribution_candidate.int.test.py",
+      "owner": "libexec/apg_python_distribution.py",
+      "path": "src/test/int/python/agentic-praxis-grimoire/libexec/apg_python_distribution.int.test.py",
       "suite": "integration"
     },
     {
-      "owner": "libexec/apg_python_distribution.py",
-      "path": "src/test/int/python/agentic-praxis-grimoire/libexec/apg_python_distribution.int.test.py",
+      "owner": "libexec/apg_skill_library_check.py",
+      "path": "src/test/int/python/agentic-praxis-grimoire/libexec/apg_skill_library_check.int.test.py",
       "suite": "integration"
     },
     {
@@ -570,8 +589,18 @@
       "suite": "integration"
     },
     {
+      "owner": "skills/playwright-test-profile/SKILL.md",
+      "path": "src/test/int/python/agentic-praxis-grimoire/skills/playwright-test-profile/SKILL.int.test.py",
+      "suite": "integration"
+    },
+    {
       "owner": "skills/typescript-language-profile/SKILL.md",
       "path": "src/test/int/python/agentic-praxis-grimoire/skills/typescript-language-profile/SKILL.int.test.py",
+      "suite": "integration"
+    },
+    {
+      "owner": "skills/web-accessibility-profile/SKILL.md",
+      "path": "src/test/int/python/agentic-praxis-grimoire/skills/web-accessibility-profile/SKILL.int.test.py",
       "suite": "integration"
     },
     {
@@ -580,8 +609,28 @@
       "suite": "integration"
     },
     {
+      "owner": "src/agentic_praxis_grimoire/reports.py",
+      "path": "src/test/int/python/agentic-praxis-grimoire/src/agentic_praxis_grimoire/reports.int.test.py",
+      "suite": "integration"
+    },
+    {
       "owner": "src/agentic_praxis_grimoire/response.py",
       "path": "src/test/int/python/agentic-praxis-grimoire/src/agentic_praxis_grimoire/response.int.test.py",
+      "suite": "integration"
+    },
+    {
+      "owner": "src/test/support/apg123_browser_ui.py",
+      "path": "src/test/int/python/agentic-praxis-grimoire/src/test/support/apg123_browser_ui.int.test.py",
+      "suite": "integration"
+    },
+    {
+      "owner": "src/test/support/apg124_npm.py",
+      "path": "src/test/int/python/agentic-praxis-grimoire/src/test/support/apg124_npm.int.test.py",
+      "suite": "integration"
+    },
+    {
+      "owner": "src/test/support/apg124_vite.py",
+      "path": "src/test/int/python/agentic-praxis-grimoire/src/test/support/apg124_vite.int.test.py",
       "suite": "integration"
     },
     {
@@ -637,6 +686,11 @@
     {
       "owner": "libexec/apg_phase_commit_message.py",
       "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_phase_commit_message.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "libexec/apg_playwright_runtime.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_playwright_runtime.unit.test.py",
       "suite": "unit"
     },
     {
@@ -740,6 +794,11 @@
       "suite": "unit"
     },
     {
+      "owner": "skills/browser-runtime-profile/SKILL.md",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/skills/browser-runtime-profile/SKILL.unit.test.py",
+      "suite": "unit"
+    },
+    {
       "owner": "skills/chatgpt/chatgpt-manager-workflow/SKILL.md",
       "path": "src/test/unit/python/agentic-praxis-grimoire/skills/chatgpt/chatgpt-manager-workflow/SKILL.unit.test.py",
       "suite": "unit"
@@ -815,8 +874,18 @@
       "suite": "unit"
     },
     {
+      "owner": "skills/npm-package-manager-profile/SKILL.md",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/skills/npm-package-manager-profile/SKILL.unit.test.py",
+      "suite": "unit"
+    },
+    {
       "owner": "skills/planning-repository-work/SKILL.md",
       "path": "src/test/unit/python/agentic-praxis-grimoire/skills/planning-repository-work/SKILL.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "skills/playwright-test-profile/SKILL.md",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/skills/playwright-test-profile/SKILL.unit.test.py",
       "suite": "unit"
     },
     {
@@ -835,6 +904,11 @@
       "suite": "unit"
     },
     {
+      "owner": "skills/svg-language-profile/SKILL.md",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/skills/svg-language-profile/SKILL.unit.test.py",
+      "suite": "unit"
+    },
+    {
       "owner": "skills/typescript-language-profile/SKILL.md",
       "path": "src/test/unit/python/agentic-praxis-grimoire/skills/typescript-language-profile/SKILL.unit.test.py",
       "suite": "unit"
@@ -845,8 +919,18 @@
       "suite": "unit"
     },
     {
+      "owner": "skills/vite-build-profile/SKILL.md",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/skills/vite-build-profile/SKILL.unit.test.py",
+      "suite": "unit"
+    },
+    {
       "owner": "skills/vitest-test-profile/SKILL.md",
       "path": "src/test/unit/python/agentic-praxis-grimoire/skills/vitest-test-profile/SKILL.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "skills/web-accessibility-profile/SKILL.md",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/skills/web-accessibility-profile/SKILL.unit.test.py",
       "suite": "unit"
     },
     {
@@ -887,6 +971,21 @@
     {
       "owner": "src/test/fixtures/apg60-css-reentry-contract.json",
       "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/fixtures/apg60-css-reentry-contract.json.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "src/test/support/apg123_browser_ui.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg123_browser_ui.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "src/test/support/apg124_npm.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg124_npm.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "src/test/support/apg124_vite.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg124_vite.unit.test.py",
       "suite": "unit"
     },
     {

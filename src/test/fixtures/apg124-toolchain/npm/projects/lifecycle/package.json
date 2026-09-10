@@ -1,0 +1,14 @@
+{
+  "name": "lifecycle-app",
+  "version": "1.0.0",
+  "dependencies": {
+    "dep-lifecycle": "file:../dep-lifecycle"
+  },
+  "scripts": {
+    "preinstall": "node -e \"const fs=require('fs'); fs.appendFileSync('lifecycle-order.txt', 'ROOT_PREINSTALL\\n')\"",
+    "postinstall": "node -e \"const fs=require('fs'); fs.appendFileSync('lifecycle-order.txt', 'ROOT_POSTINSTALL\\n')\"",
+    "prebuild": "node -e \"const fs=require('fs'); fs.appendFileSync('run-order.txt', 'PREBUILD\\n')\"",
+    "build": "node -e \"const fs=require('fs'); fs.appendFileSync('run-order.txt', 'BUILD\\n')\"",
+    "postbuild": "node -e \"const fs=require('fs'); fs.appendFileSync('run-order.txt', 'POSTBUILD\\n')\""
+  }
+}

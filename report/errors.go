@@ -17,4 +17,6 @@ var (
 	ErrCompatibility = errors.New("report compatibility mismatch")
 	// ErrPublication classifies lock conflicts and recoverable transactions.
 	ErrPublication = errors.New("report publication conflict")
+	// ErrReplayConflict classifies conflicting re-publications with the same identity.
+	ErrReplayConflict = errors.New("report replay conflict")
 )

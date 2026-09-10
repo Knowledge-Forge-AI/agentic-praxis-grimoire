@@ -178,6 +178,19 @@ JAVASCRIPT_QUALIFICATION_PYTHON_PATHS = (
     "src/test/support/apg_javascript_candidate_contract.py",
     "src/test/support/apg_javascript_fixture_contract.py",
 )
+# libexec/apg_test.py also runs unrelated test tools. Its reviewed JavaScript
+# and shared Node invocation subset is explicit rather than a whole-file ban.
+JAVASCRIPT_RUNNER_INVOCATION_OWNERS = {
+    "_javascript_engine_binding": "_probe_javascript_engine_identity",
+    "invoke_javascript_engine": "_execute_javascript_contract",
+    "_probe_javascript_engine_identity": "_run_javascript_process",
+    "_execute_javascript_contract": "_run_javascript_process",
+    "_consume_javascript_stream_output": None,
+    "_validate_javascript_output": "_consume_javascript_stream_output",
+    "_observe_node_profile_runtime_binding": "_probe_node_profile_runtime_identity",
+    "_probe_node_profile_runtime_identity": "_run_javascript_process",
+    "_execute_node_profile_contract": "_run_javascript_process",
+}
 TEST262_SOURCE_ROLE_KEYS = {
     "blocking_change_classes",
     "compatibility_oracle",
@@ -260,12 +273,22 @@ class _ProcessInvocationVisitor(ast.NodeVisitor):
 
     def visit_Assign(self, node: ast.Assign) -> None:
         qualified = self._qualified(node.value)
-        if qualified and _is_process_callable(qualified):
-            for target in node.targets:
-                if isinstance(target, ast.Name):
-                    self.aliases[target.id] = qualified
-                    self.violations.append(f"line {node.lineno}: alias {qualified}")
+        for target in node.targets:
+            self._bind_alias(target, qualified, node.lineno)
         self.generic_visit(node)
+
+    def visit_AnnAssign(self, node: ast.AnnAssign) -> None:
+        if node.value is not None:
+            self._bind_alias(node.target, self._qualified(node.value), node.lineno)
+        self.generic_visit(node)
+
+    def _bind_alias(self, target: ast.AST, qualified: str | None, line: int) -> None:
+        # Deliberately retain known aliases on unknown reassignment. This is a
+        # conservative source guard, not flow-sensitive Python interpretation.
+        if isinstance(target, ast.Name) and qualified:
+            self.aliases[target.id] = qualified
+            if _is_process_callable(qualified):
+                self.violations.append(f"line {line}: alias {qualified}")
 
     def visit_Call(self, node: ast.Call) -> None:
         qualified = self._qualified(node.func)
@@ -328,22 +351,28 @@ def validate_javascript_process_invocation_owners(root: Path) -> None:
     if wrapper is None:
         fail("JavaScript process wrapper is missing")
     visitor = _ProcessInvocationVisitor()
-    visitor.aliases["subprocess"] = "subprocess"
+    # Runner-wide process use for the general test harness is outside this
+    # JavaScript boundary; its imports/aliases are still inputs to these owners.
+    for statement in tree.body:
+        if not isinstance(statement, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            visitor.visit(statement)
+    module_aliases = visitor.aliases.copy()
+    visitor.violations.clear()
     visitor.visit(wrapper)
-    calls = [item for item in visitor.violations if "call subprocess.run" in item]
-    if len(calls) != 1:
+    calls = [item for item in visitor.violations if item.endswith(": call subprocess.run")]
+    if len(calls) != 1 or visitor.violations != calls:
         fail("JavaScript process wrapper must contain one approved process call site")
-    for owner in ("_javascript_engine_binding", "invoke_javascript_engine"):
+    for owner, required_call in JAVASCRIPT_RUNNER_INVOCATION_OWNERS.items():
         node = functions.get(owner)
         if node is None:
             fail(f"JavaScript invocation owner is missing: {owner}")
         nested = _ProcessInvocationVisitor()
-        nested.aliases["subprocess"] = "subprocess"
+        nested.aliases.update(module_aliases)
         nested.visit(node)
         if nested.violations:
             fail(f"{owner} contains a second direct process invocation site")
-        if not any(
-            isinstance(call.func, ast.Name) and call.func.id == "_run_javascript_process"
+        if required_call is not None and not any(
+            isinstance(call.func, ast.Name) and call.func.id == required_call
             for call in ast.walk(node)
             if isinstance(call, ast.Call)
         ):

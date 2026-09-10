@@ -79,6 +79,12 @@ func pythonCommandTest(t *testing.T, repository, commandName, outbox string, arg
 	if _, err := os.Stat(commandPath); err != nil {
 		t.Skipf("differential python oracle %s is absent in this source projection (%v)", commandPath, err)
 	}
+	oracleRoot := filepath.Join(repositoryRootForTest(t), "private", "oracles")
+	if _, err := os.Stat(filepath.Join(oracleRoot, "agent_report", "cli.py")); os.IsNotExist(err) {
+		t.Skip("optional historical Python oracle is absent; maintained persisted fixtures remain active")
+	} else if err != nil {
+		t.Fatal("cannot inspect optional historical Python oracle")
+	}
 	python, err := exec.LookPath("python3")
 	if err != nil {
 		t.Skipf("python3 is not available on PATH (%v)", err)
@@ -86,7 +92,7 @@ func pythonCommandTest(t *testing.T, repository, commandName, outbox string, arg
 	command := exec.Command(python, append([]string{commandPath, commandName}, arguments...)...)
 	command.Dir = repository
 	command.Env = filteredEnvironment("GIT_SHOW_REPORT_ROOT", "APGR_OUTBOX_ROOT")
-	command.Env = append(command.Env, "APGR_OUTBOX_ROOT="+outbox)
+	command.Env = append(command.Env, "APGR_OUTBOX_ROOT="+outbox, "APG_TEST_PYTHON_ORACLE_ROOT="+oracleRoot)
 	output, runErr := command.CombinedOutput()
 	if runErr == nil {
 		return 0, output

@@ -1,0 +1,8 @@
+{
+  "name": "cli-tool-pkg",
+  "version": "1.0.0",
+  "main": "index.js",
+  "bin": {
+    "tool-exec": "./bin/tool.js"
+  }
+}

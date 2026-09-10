@@ -11,9 +11,14 @@ task-scoped guidance, collecting immutable evidence, capturing curated
 environments, inspecting repository structures, and measuring context footprints
 without dictating an orchestration workflow.
 
+This documentation covers v0.10.0. APGR v0.10.0 includes all six provisional visual-web
+profiles, bringing the corpus to 45 canonical skills; public v0.9.0 and v0.8.1
+remain frozen historical predecessors. See the [v0.10 roadmap](docs/v0-10-roadmap.md)
+and [v0.10.0 release notes](release/v0.10.0-notes.md).
+
 APGR includes:
 
-- **39 canonical agent skills** across 14 stable and 25 provisional leaves;
+- **45 canonical agent skills** across 14 stable and 31 provisional leaves;
 - **Context-footprint accounting** for measuring, comparing, and projecting
   context budgets across descriptions, bodies, and support material;
 - **Reusable Go packages** for schemas, canonical reports, skill bundles,
@@ -72,21 +77,19 @@ frameworks invoke APGR as an in-process library or CLI subprocess.
 
 ### Skill corpus and maturity
 
-APG has 39 canonical leaves: 14 stable and 25 provisional. Canonical Markdown
+APGR v0.10.0 provides 45 canonical leaves: 14 stable and 31 provisional. Canonical Markdown
 under `skills/` is the maintained body authority; embedded metadata and package
 resources are verified projections of it:
 
-- Corpus topology: **39 canonical / 39 catalog / 39 projections / 39
+- Corpus topology: **45 canonical / 45 catalog / 45 projections / 45
   discoverable**
-- Maturity: **14 stable / 25 provisional**
+- Maturity: **14 stable / 31 provisional**
 
 ## Quick start
 
-This documentation covers 0.9.0. The previous published release baseline is
-**v0.8.1** on Git, GitHub Releases, PyPI, npm, and the Go module proxy. Once
-this version is published, packages are available from standard registries;
-prior to publication, capabilities can be exercised directly from an APGR Git
-source checkout.
+Once v0.10.0 is published, its packages can be installed from the supported
+registries using the version-pinned commands in the
+[upgrade guidance](#upgrade-guidance-and-release-status).
 
 ### Source checkout first
 
@@ -389,7 +392,7 @@ internal adapter, as modeled in `testing/fixtures/xo_consumer/`:
   (`footprint.ErrUnitMismatch`, `footprint.ErrConsequenceBearingOmissionRefused`,
   `skills.ErrBudgetExceeded`).
 - **Dual-lane verification**: Qualified across Lane A (published v0.8.1 baseline via Go proxy)
-  and Lane B (exact development candidate via local replace).
+  and Lane B (exact source under qualification via local replace).
 
 > [!IMPORTANT]
 > **Separation of Authority**:
@@ -429,18 +432,25 @@ can dispatch through that checkout; the native/npm binary cannot run `test`.
 
 ## Upgrade guidance and release status
 
-### Upgrading from v0.8.1 to 0.9.0
+### Upgrading to v0.10.0
 
-This documentation covers 0.9.0. The v0.9 series introduces the CI-first qualification interface (`--summary-file`, `policy` role)
-and qualified Go library consumption patterns for XO adapters.
+This documentation covers v0.10.0. The v0.10.0 release adds six frontend profiles,
+report verification and qualification maintenance; see the
+[v0.10.0 release notes](release/v0.10.0-notes.md). The CI-first qualification
+interface (`--summary-file`, `policy` role) and Go consumer interfaces remain.
 
-- **Production Consumers**: Once this version is published, upgrade to 0.9.0 across supported package registries. Prior to publication, production consumers remain on the published, frozen **v0.8.1** release.
-- **Go Consumers**: All public Go APIs in `schema`, `report`, `skills`, `envsnap`, `hotspot`,
-  and `footprint` are fully backward-compatible with v0.8.1. Once this version is published, require `github.com/Knowledge-Forge-AI/agentic-praxis-grimoire v0.9.0`. Prior to publication, candidate features can be
-  evaluated using a local `replace` directive pointing to an APGR source checkout.
-- **CLI / Python / npm Users**: Once this version is published, install or upgrade via `pip install agentic-praxis-grimoire==0.9.0`
-  or `npm install -g @knowledge-forge-ai/apgr@0.9.0`. Prior to publication, use published v0.8.1 packages (`pip install agentic-praxis-grimoire==0.8.1`,
-  `npm install -g @knowledge-forge-ai/apgr@0.8.1`) or run from a Git source checkout.
+Once v0.10.0 is published, use these installation commands:
+
+- **Go consumers**: Require `github.com/Knowledge-Forge-AI/agentic-praxis-grimoire v0.10.0`
+  or run `go get github.com/Knowledge-Forge-AI/agentic-praxis-grimoire@v0.10.0`.
+  Public APIs in `schema`, `report`, `skills`, `envsnap`, `hotspot`, and `footprint`
+  preserve v0.8.1 compatibility.
+- **Python users**: `pip install agentic-praxis-grimoire==0.10.0`.
+- **npm users**: `npm install -g @knowledge-forge-ai/apgr@0.10.0`.
+
+APGR-side JACA CI/XO compatibility work is complete. Actual JACA adoption and
+activation remain JACA-owned. Linux runtime execution is separate from Darwin
+qualification. Theme Forge and Repo Map remain separate roadmap scope.
 
 ### Preserved predecessor: v0.8.1
 
@@ -484,10 +494,13 @@ APGR is engineered with strict operational boundaries:
 - [JACA CI Integration Handoff](docs/architecture/jaca-ci-handoff.md)
 - [JACA XO Compatibility Handoff](docs/architecture/jaca-xo-handoff.md)
 - [Context Footprint & Skill Inventory](docs/architecture/v0-8-context-footprint-and-skill-inventory.md)
+- [v0.10 Roadmap](docs/v0-10-roadmap.md)
+- [Repo Map Support Roadmap](docs/repo-map-support-roadmap.md)
 - [v0.9 Roadmap](docs/v0-9-roadmap.md)
 - [Project Model & Governance](docs/project-model.md)
 - [Provenance Policy](docs/provenance.md)
 - [Status and Exit Records](docs/status/README.md)
+- [Release Notes (v0.10.0)](release/v0.10.0-notes.md)
 - [Release Notes (v0.9.0)](release/v0.9.0-notes.md)
 - [Release Notes (v0.8.1)](release/v0.8.1-notes.md)
 
@@ -503,3 +516,24 @@ Commercial licensing options and enterprise support are available from the
 Project Steward at [Knowledge Forge AI](https://www.knowledge-forge.ai).
 
 Third-party copyright notices and attributions are recorded in [NOTICE](NOTICE).
+
+## Qualification limitations
+
+JS-QD-005 remains active under the condition-triggered refresh policy in
+[ADR 0054](docs/adr/2026/09/0054-js-qd-005-refresh-trigger-interpretation.md).
+The [Repo Map support roadmap](docs/repo-map-support-roadmap.md)
+is a v0.10.0 deliverable with RM-S0 through RM-S5 intact.
+
+The release retains these limits:
+
+- **Skill corpus and maturity**: 45 canonical leaves across 14 stable and 31 provisional
+  profiles, under the 11,507-byte discovery integrity ceiling.
+- **Frontend profile qualification**: Desktop browser execution does not qualify the
+  Tauri embedded WebView, native host, sidecars, or assistive technology.
+- **Platform qualification gate**: macOS Apple Silicon (`darwin/arm64`) is fully qualified.
+  Linux packages receive cross-build and archive inspection; Linux runtime execution is
+  separate, and Linux developer runner qualification remains pending.
+- **Process execution guard**: Static function and process checks verify named source files
+  and bindings; dynamic metaprogramming and reflection require manual source review.
+- **Report verification**: Report verification guarantees artifact-local integrity up to
+  128 MiB; it does not attest to external Git states or operational truth.

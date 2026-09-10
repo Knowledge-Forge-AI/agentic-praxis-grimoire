@@ -715,7 +715,8 @@ def test_inverse_alias_refused_and_preserved_in_disposable_repo(
     tracked_symlink = disposable_repo / "tracked-symlink.json"
     tracked_symlink.symlink_to(outside_receipt)
     subprocess.run(["git", "add", "tracked-symlink.json"], cwd=disposable_repo, check=True)
-    subprocess.run(["git", "commit", "-m", "add tracked symlink"], cwd=disposable_repo, check=True)
+    subprocess.run(["git", "-c", "user.name=APG Test", "-c", "user.email=apg@example.invalid",
+                    "commit", "-m", "add tracked symlink"], cwd=disposable_repo, check=True)
 
     head_before = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=disposable_repo, text=True).strip()
     status_before = subprocess.check_output(["git", "status", "--porcelain"], cwd=disposable_repo, text=True).strip()
@@ -800,10 +801,14 @@ def test_real_pytest_empty_collection_exit_status_5_handling(
     import shutil
     shutil.rmtree(empty_unit)
     empty_unit.mkdir(parents=True)
+    empty_file = empty_unit / "empty.unit.test.py"
+    empty_file.write_text("# Selected file intentionally defines no tests.\n")
     art = tmp_path / "artifacts"
     art.mkdir()
     with pytest.raises(apg_test.InvocationError, match="collected no tests"):
-        apg_test._run_pytest(empty_repo, "unit", 1, art)
+        apg_test._run_pytest(
+            empty_repo, "unit", 1, art, [empty_file.relative_to(empty_repo).as_posix()]
+        )
 
 
 def test_real_bounded_sigint_process_cancellation(
@@ -811,7 +816,9 @@ def test_real_bounded_sigint_process_cancellation(
     repo_state_snapshot: None,
 ) -> None:
     import signal, time
-    sigint_repo = _clone_disposable_repo(tmp_path / "sigint-repo")
+    # Cancellation is read-only; exercise the complete current runner dependency
+    # closure instead of mixing a candidate runner with historical clone helpers.
+    sigint_repo = REPOSITORY_ROOT
     summary_file = tmp_path / "sigint-summary.json"
     environment = os.environ.copy()
     environment["PATH"] = str(Path(sys.executable).parent) + os.pathsep + environment.get("PATH", "")
@@ -869,3 +876,158 @@ def test_head_drift_in_disposable_repo(
         captured = capsys.readouterr()
         assert "git HEAD drifted during execution" in captured.err
         assert not summary_file.exists()
+
+
+@pytest.mark.parametrize("fault", (
+    "unknown-role", "missing-binding", "symlink", "ancestor-symlink", "inside-repository", "digest-drift",
+))
+def test_node_custody_refuses_real_filesystem_prerequisites_before_process_start(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, fault: str,
+) -> None:
+    """Exercise bounded failure custody across actual executable-path observations."""
+    repository = tmp_path / "repository"
+    repository.mkdir()
+    runtime = tmp_path / "runtime"
+    runtime.mkdir()
+    executable = runtime / "node"
+    executable.write_bytes(b"#!/bin/sh\nexit 91\n")
+    executable.chmod(0o755)
+    role = "primary"
+    monkeypatch.setitem(apg_test.NODE_PROFILE_RUNTIME_CONTRACTS, role, (
+        "APG_NODEJS_PRIMARY_NODE", "synthetic-identity",
+        hashlib.sha256(executable.read_bytes()).hexdigest(),
+    ))
+    binding = executable
+    if fault == "unknown-role":
+        role = str(tmp_path / "private-role-sentinel")
+    elif fault == "symlink":
+        binding = tmp_path / "node-link"
+        binding.symlink_to(executable)
+    elif fault == "ancestor-symlink":
+        alias = tmp_path / "runtime-link"
+        alias.symlink_to(runtime, target_is_directory=True)
+        binding = alias / "node"
+    elif fault == "inside-repository":
+        binding = repository / "node"
+        binding.write_bytes(executable.read_bytes())
+        binding.chmod(0o755)
+    elif fault == "digest-drift":
+        executable.write_bytes(b"#!/bin/sh\nexit 92\n")
+    monkeypatch.setenv("APG_NODEJS_PRIMARY_NODE", str(binding))
+    if fault == "missing-binding":
+        monkeypatch.delenv("APG_NODEJS_PRIMARY_NODE")
+
+    def unexpected_process(*_args: object, **_kwargs: object) -> None:
+        pytest.fail("refused prerequisite reached process execution")
+
+    monkeypatch.setattr(apg_test, "_run_javascript_process", unexpected_process)
+    with pytest.raises(apg_test.NodeProfileQualificationError) as caught:
+        apg_test._node_profile_runtime_binding(repository, role)
+    assert str(tmp_path) not in str(caught.value)
+    assert caught.value.__cause__ is None
+    assert caught.value.__context__ is None
+
+
+def test_node_profile_runtime_binding_showlocals_cannot_disclose_raw_streams(tmp_path: Path) -> None:
+    sentinel = "APG129-NODE-PROBE-SHOWLOCALS-SENTINEL"
+    encoded = sentinel.encode("utf-8").hex()
+
+    scenarios = [
+        ("nonzero", f"subprocess.CompletedProcess(args, 1, bytes.fromhex('{encoded}').decode() + '\\n', bytes.fromhex('{encoded}').decode() + '\\n')"),
+        ("stderr", f"subprocess.CompletedProcess(args, 0, '', bytes.fromhex('{encoded}').decode() + '\\n')"),
+        ("malformed_json", f"subprocess.CompletedProcess(args, 0, '{{broken:' + bytes.fromhex('{encoded}').decode() + '}}', '')"),
+        ("wrong_structure", f"subprocess.CompletedProcess(args, 0, json.dumps([bytes.fromhex('{encoded}').decode()]), '')"),
+        ("wrong_identity", f"subprocess.CompletedProcess(args, 0, json.dumps({{'identity': 'wrong-' + bytes.fromhex('{encoded}').decode(), 'execArgv': [], 'nodeOptions': False}}), '')"),
+        ("wrong_execargv", f"subprocess.CompletedProcess(args, 0, json.dumps({{'identity': expected_identity, 'execArgv': [bytes.fromhex('{encoded}').decode()], 'nodeOptions': False}}), '')"),
+        ("wrong_nodeoptions", f"subprocess.CompletedProcess(args, 0, json.dumps({{'identity': expected_identity, 'execArgv': [], 'nodeOptions': bytes.fromhex('{encoded}').decode()}}), '')"),
+        ("decoding", f"UnicodeDecodeError('utf-8', bytes.fromhex('{encoded}'), 0, 1, 'synthetic')"),
+        ("timeout", f"subprocess.TimeoutExpired(args, 10, output=bytes.fromhex('{encoded}').decode(), stderr=bytes.fromhex('{encoded}').decode())"),
+        ("start", f"OSError('spawn-failed:' + bytes.fromhex('{encoded}').decode())"),
+        ("interruption", f"KeyboardInterrupt(bytes.fromhex('{encoded}').decode())"),
+        ("parser", f"subprocess.CompletedProcess(args, 0, bytes.fromhex('{encoded}').decode() + '\\n', '')"),
+        ("post_binding", f"subprocess.CompletedProcess(args, 0, json.dumps({{'identity': expected_identity, 'execArgv': [], 'nodeOptions': False}}), '')"),
+    ]
+
+    for name, proc_expr in scenarios:
+        case_dir = tmp_path / name
+        case_dir.mkdir()
+        test_file = case_dir / f"test_node_profile_showlocals_{name}.py"
+        is_exception = any(err in proc_expr for err in ("TimeoutExpired", "OSError", "UnicodeDecodeError", "KeyboardInterrupt"))
+        is_interruption = "KeyboardInterrupt" in proc_expr
+        is_parser = name == "parser"
+        is_post_binding = name == "post_binding"
+
+        run_body = f"raise {proc_expr}" if is_exception else f"return {proc_expr}"
+        extra_setup = ""
+        if is_parser:
+            extra_setup = (
+                "    def bad_loads(raw, **kwargs):\n"
+                f"        raise RecursionError(bytes.fromhex('{encoded}').decode())\n"
+                "    monkeypatch.setattr(apg_test.json, 'loads', bad_loads)\n"
+            )
+        elif is_post_binding:
+            extra_setup = (
+                "    orig_run = fake_run\n"
+                "    def mutating_run(args, **kwargs):\n"
+                "        executable.write_bytes(b'post-probe-drift')\n"
+                "        return orig_run(args, **kwargs)\n"
+                "    monkeypatch.setattr(apg_test, '_run_javascript_process', mutating_run)\n"
+            )
+
+        call_block = (
+            "    try:\n"
+            "        apg_test._node_profile_runtime_binding(repo, 'primary')\n"
+            "    except KeyboardInterrupt:\n"
+            "        raise AssertionError('interrupted-as-expected') from None\n"
+            if is_interruption else
+            "    apg_test._node_profile_runtime_binding(repo, 'primary')\n"
+        )
+
+        test_file.write_text(
+            "import os, pathlib, subprocess, hashlib, json, sys\n"
+            f"sys.path.insert(0, {str(REPOSITORY_ROOT / 'libexec')!r})\n"
+            "import apg_test\n"
+            "def test_failure(monkeypatch, tmp_path):\n"
+            "    repo = tmp_path / 'repo'\n"
+            "    repo.mkdir()\n"
+            "    node_dir = tmp_path / 'node_dir'\n"
+            "    node_dir.mkdir()\n"
+            "    executable = node_dir / 'node'\n"
+            "    original = b'#!/bin/sh\\nexit 0\\n'\n"
+            "    executable.write_bytes(original)\n"
+            "    executable.chmod(0o755)\n"
+            "    expected_identity = 'v22.22.2|darwin/arm64|12.4.254.21-node.39|1.51.0'\n"
+            "    contract = (\n"
+            "        'APG_NODEJS_PRIMARY_NODE',\n"
+            "        expected_identity,\n"
+            "        hashlib.sha256(original).hexdigest(),\n"
+            "    )\n"
+            "    monkeypatch.setenv('APG_NODEJS_PRIMARY_NODE', str(executable))\n"
+            "    monkeypatch.setitem(apg_test.NODE_PROFILE_RUNTIME_CONTRACTS, 'primary', contract)\n"
+            f"    def fake_run(args, **kwargs):\n"
+            f"        {run_body}\n"
+            "    monkeypatch.setattr(apg_test, '_run_javascript_process', fake_run)\n"
+            f"{extra_setup}"
+            f"{call_block}",
+            encoding="utf-8",
+        )
+
+        class Capture:
+            rendered = ""
+
+            def pytest_runtest_logreport(self, report: pytest.TestReport) -> None:
+                if report.failed:
+                    self.rendered += report.longreprtext
+
+        capture = Capture()
+        basetemp = case_dir / "nested-basetemp"
+        result = pytest.main(
+            ["-q", "-l", "--basetemp", str(basetemp), str(test_file)],
+            plugins=[capture],
+        )
+        assert result == pytest.ExitCode.TESTS_FAILED
+        assert sentinel not in capture.rendered, f"Sentinel leaked in {name}: {capture.rendered}"
+        if is_interruption:
+            assert "interrupted-as-expected" in capture.rendered
+        else:
+            assert "NodeProfileQualificationError" in capture.rendered

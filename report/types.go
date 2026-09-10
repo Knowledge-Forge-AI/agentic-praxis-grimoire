@@ -66,6 +66,17 @@ type OperationalRequest struct {
 	RelatedGitReportID string
 }
 
+// AppendPolicy selects duplicate publication handling semantics.
+type AppendPolicy string
+
+const (
+	// AppendAlways always publishes the record, creating duplicates when valid.
+	AppendAlways AppendPolicy = ""
+	// AppendIdempotent prevents duplicate publications of identical records and
+	// rejects conflicting publications with the same logical identity.
+	AppendIdempotent AppendPolicy = "idempotent"
+)
+
 // AppendRequest publishes exactly one canonical record into one phase outbox.
 type AppendRequest struct {
 	// OutboxRoot is the absolute, clean owner-only outbox root.
@@ -76,6 +87,8 @@ type AppendRequest struct {
 	Phase string
 	// Record is exactly one canonical record to publish.
 	Record Record
+	// Policy selects the duplicate publication handling semantics.
+	Policy AppendPolicy
 }
 
 // Result is an in-memory canonical report result. Evidence contains fresh
@@ -99,6 +112,8 @@ const (
 	PublishedAppend PublicationDisposition = "published-append"
 	// PublishedSuperseding replaced a different primary type.
 	PublishedSuperseding PublicationDisposition = "published-superseding"
+	// PublishedAlreadyPresent indicates an identical record was already published.
+	PublishedAlreadyPresent PublicationDisposition = "published-already-present"
 )
 
 // Publication identifies the resulting primary and publication transition.

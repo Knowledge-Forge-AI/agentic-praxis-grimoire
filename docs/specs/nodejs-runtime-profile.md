@@ -211,8 +211,12 @@ requires the exact flag values, not their names.
 For a standalone CommonJS artifact the whole-file owner is
 `node-commonjs-owner`; an ECMAScript decision inside the artifact may separately
 select the JavaScript profile; the wrapper and loader result are Node-owned.
-This preserves the boundary the JavaScript profile already records and does not
-modify `JS-QD-001`.
+This preserves the boundary the JavaScript profile already records. APG128's
+qualification seam binds both retained JavaScript CommonJS artifacts to this
+integrated owner. JavaScript selection applies only to bounded ECMAScript
+decisions; absent runtime evidence still requires a stopped response and
+`stopped-required-evidence` completion. This supplies the ownership basis for
+superseding `JS-QD-001` without duplicating Node semantics into JavaScript.
 
 Observed on the runtime in §5.1: the wrapper supplies `exports`, `require`,
 `module`, `__filename`, and `__dirname`; top-level `this` is the initial

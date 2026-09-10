@@ -243,14 +243,70 @@ def validate_manifest(value: Any, *, fixture_root: Path | None = None) -> None:
         fail("FX-012 does not preserve separate goal variants")
     if len(by_id["APG78-FX-014"]["artifacts"]) != 2:
         fail("FX-014 does not preserve separate core and adapter owners")
-    commonjs = by_id["APG78-FX-011"]["artifacts"][0]
-    if commonjs["whole_file_owner"] != "node-commonjs-owner":
-        fail("CommonJS whole-file owner is incorrect")
-    if commonjs["javascript_selection"] != "selected":
-        fail("CommonJS decision-scoped JavaScript Selection is not selected")
-    cli_adapter = by_id["APG78-FX-014"]["artifacts"][1]
-    if cli_adapter["javascript_selection"] != "selected":
-        fail("CLI CommonJS adapter decision-scoped JavaScript Selection is not selected")
+    # QD001: exact CommonJS seam invariant for APG78-FX-011 and APG78-FX-014 adapter
+    commonjs_cases_to_check = (
+        ("APG78-FX-011", 0, "src/commonjs-boundary.cjs", "CommonJS"),
+        ("APG78-FX-014", 1, "src/cli-node-adapter-boundary.cjs", "CLI CommonJS adapter"),
+    )
+    for case_id, art_index, expected_path, prefix in commonjs_cases_to_check:
+        case = by_id[case_id]
+        if len(case["artifacts"]) <= art_index:
+            fail(f"{case_id} missing artifact at index {art_index}")
+        art = case["artifacts"][art_index]
+        if art["path"] != expected_path:
+            fail(f"{prefix} artifact path is incorrect: {art.get('path')}")
+        if art["whole_file_owner"] != "node-commonjs-owner":
+            fail(f"{prefix} whole-file owner is incorrect")
+        if art["host_context"] != "commonjs-wrapper":
+            fail(f"{prefix} host context must be commonjs-wrapper")
+        if art["language_contexts"] != ["expression-region"]:
+            fail(f"{prefix} language context must be expression-region")
+        if art["parse_goal"] != "unresolved" or art["goal_state"] != "unresolved":
+            fail(f"{prefix} parse goal and goal state must be unresolved")
+        if art["host_role_state"] != "unresolved":
+            fail(f"{prefix} host role state must be unresolved")
+        if art["goal_evidence_owner"] != "node-runtime-owner":
+            fail(f"{prefix} goal evidence owner must be node-runtime-owner")
+        if art["strictness_state"] != "explicit-directive-bounded-region":
+            fail(f"{prefix} strictness state is incorrect")
+        if art["javascript_selection"] != "selected":
+            fail(f"{prefix} decision-scoped JavaScript Selection is not selected")
+        if art["qualification_engine_state"] != "observed-syntax-only":
+            fail(f"{prefix} qualification engine state must be observed-syntax-only")
+        if art["artifact_class"] != "handwritten-cjs":
+            fail(f"{prefix} artifact class must be handwritten-cjs")
+        if case["completion_state"] != "stopped-required-evidence":
+            fail(f"{prefix} completion state must be stopped-required-evidence")
+        if case["source_binding_id"] != f"source::{case_id}":
+            fail(f"{prefix} source binding is not exact")
+        if not case.get("required_evidence"):
+            fail(f"{prefix} required evidence cannot be empty without Node owner")
+        if not any(r.startswith("node-runtime-owner::") for r in case.get("routes_or_obligations", [])):
+            fail(f"{prefix} must retain node-runtime-owner route")
+
+    # Preserve CLI effect-free core artifact
+    cli_core = by_id["APG78-FX-014"]["artifacts"][0]
+    if (
+        cli_core["path"] != "src/cli-core.mjs"
+        or cli_core["scenario_variant"] != "effect-free-module-core"
+        or cli_core["whole_file_owner"] != "javascript-language-profile"
+        or cli_core["parse_goal"] != "module"
+        or cli_core["host_context"] != "standalone"
+        or cli_core["language_contexts"] != ["module-body", "function-body"]
+        or cli_core["goal_state"] != "known"
+        or cli_core["goal_evidence_owner"] != "exact-node-qualification-host"
+        or cli_core["strictness_state"] != "strict"
+        or cli_core["javascript_selection"] != "selected"
+        or cli_core["host_role_state"] != "known"
+        or cli_core["qualification_engine_state"] != "observed-exact-engine"
+        or cli_core["artifact_class"] != "handwritten-mjs"
+    ):
+        fail("CLI effect-free core owner or boundary was altered")
+    for case_id, expected in COMMONJS_SEAM.items():
+        _require_seam_fields(by_id[case_id], expected["case"], f"{case_id} manifest")
+        if by_id[case_id]["artifacts"] != expected["artifacts"]:
+            fail(f"CommonJS {case_id} artifact vector mismatch")
+
     unknown = [
         item for item in by_id["APG78-FX-012"]["artifacts"]
         if item["goal_state"] == "unresolved"
@@ -300,7 +356,198 @@ def validate_manifest(value: Any, *, fixture_root: Path | None = None) -> None:
                 fail(f"fixture artifact content binding changed: {relative}")
 
 
+# APG128 independently frozen retained seam vectors; no Node runtime semantics.
+COMMONJS_SEAM = {'APG78-FX-011': {'artifacts': [{'path': 'src/commonjs-boundary.cjs',
+                                 'scenario_variant': 'row',
+                                 'artifact_class': 'handwritten-cjs',
+                                 'whole_file_owner': 'node-commonjs-owner',
+                                 'parse_goal': 'unresolved',
+                                 'host_context': 'commonjs-wrapper',
+                                 'language_contexts': ['expression-region'],
+                                 'goal_state': 'unresolved',
+                                 'goal_evidence_owner': 'node-runtime-owner',
+                                 'strictness_state': 'explicit-directive-bounded-region',
+                                 'javascript_selection': 'selected',
+                                 'host_role_state': 'unresolved',
+                                 'qualification_engine_state': 'observed-syntax-only',
+                                 'content_sha256': 'd0f684212c555de1099808929006ec52bc9c52e9133f7e41fbbbab5c0473de9a'}],
+                  'case': {'present_evidence': ['exact source bytes', 'explicit strict directive'],
+                           'required_evidence': ['exact CommonJS wrapper, bindings, resolution, and '
+                                                 'invocation'],
+                           'routes_or_obligations': ['node-runtime-owner::establish CommonJS wrapper '
+                                                     'bindings and invocation',
+                                                     'module-loader-owner::establish CommonJS resolution and '
+                                                     'loading'],
+                           'authority_ids': ['ecma262-es2026',
+                                             'node-v22.22.2-darwin-arm64-bounded-observation'],
+                           'source_binding_id': 'source::APG78-FX-011',
+                           'completion_state': 'stopped-required-evidence'},
+                  'row': {'present_evidence': ['exact source and syntax-only compilation observation'],
+                          'required_evidence': ['wrapper, bindings, resolution, and invocation'],
+                          'routes_or_obligations': ['node-runtime-owner::establish exact Node runtime '
+                                                    'decision',
+                                                    'module-loader-owner::establish exact resolution and '
+                                                    'loading decision'],
+                          'authority_ids': ['ecma262-es2026',
+                                            'node-v22.22.2-darwin-arm64-bounded-observation'],
+                          'source_binding_id': 'source::APG78-FX-011',
+                          'completion_state': 'stopped-required-evidence',
+                          'artifact_class': 'handwritten-cjs',
+                          'whole_file_owner': 'node-commonjs-owner',
+                          'parse_goal': 'unresolved',
+                          'host_context': 'commonjs-wrapper',
+                          'language_contexts': ['expression-region'],
+                          'goal_state': 'unresolved',
+                          'host_role_state': 'unresolved',
+                          'qualification_engine_state': 'observed-syntax-only',
+                          'javascript_selection': 'selected',
+                          'strictness': 'explicit-directive-bounded-region',
+                          'response': 'stop-and-escalate'},
+                  'variants': []},
+ 'APG78-FX-014': {'artifacts': [{'path': 'src/cli-core.mjs',
+                                 'scenario_variant': 'effect-free-module-core',
+                                 'artifact_class': 'handwritten-mjs',
+                                 'whole_file_owner': 'javascript-language-profile',
+                                 'parse_goal': 'module',
+                                 'host_context': 'standalone',
+                                 'language_contexts': ['module-body', 'function-body'],
+                                 'goal_state': 'known',
+                                 'goal_evidence_owner': 'exact-node-qualification-host',
+                                 'strictness_state': 'strict',
+                                 'javascript_selection': 'selected',
+                                 'host_role_state': 'known',
+                                 'qualification_engine_state': 'observed-exact-engine',
+                                 'content_sha256': '37a4476d25e101daae31be67cf99c21e8a0d5dcdc2b0300b7434a1edb8a7fdff'},
+                                {'path': 'src/cli-node-adapter-boundary.cjs',
+                                 'scenario_variant': 'commonjs-node-adapter',
+                                 'artifact_class': 'handwritten-cjs',
+                                 'whole_file_owner': 'node-commonjs-owner',
+                                 'parse_goal': 'unresolved',
+                                 'host_context': 'commonjs-wrapper',
+                                 'language_contexts': ['expression-region'],
+                                 'goal_state': 'unresolved',
+                                 'goal_evidence_owner': 'node-runtime-owner',
+                                 'strictness_state': 'explicit-directive-bounded-region',
+                                 'javascript_selection': 'selected',
+                                 'host_role_state': 'unresolved',
+                                 'qualification_engine_state': 'observed-syntax-only',
+                                 'content_sha256': '51078c7432f15a424559ad2cf7571919d9a16250400cdee2fa6310d8f6d4f778'}],
+                  'case': {'present_evidence': ['exact core and adapter-boundary bytes',
+                                                'argument and environment values supplied as data'],
+                           'required_evidence': ['Node acquisition, output, I/O, signals, and exit behavior '
+                                                 'for a working CLI conclusion'],
+                           'routes_or_obligations': ['node-runtime-owner::implement and invoke argument '
+                                                     'output I-O signal and exit adapter'],
+                           'authority_ids': ['ecma262-es2026',
+                                             'node-v22.22.2-darwin-arm64-bounded-observation'],
+                           'source_binding_id': 'source::APG78-FX-014',
+                           'completion_state': 'stopped-required-evidence'},
+                  'row': {'present_evidence': ['exact core bytes and returned messages',
+                                               'adapter source syntax'],
+                          'required_evidence': ['Node adapter wrapper and I/O invocation'],
+                          'routes_or_obligations': ['node-runtime-owner::establish exact Node runtime '
+                                                    'decision'],
+                          'authority_ids': ['ecma262-es2026',
+                                            'node-v22.22.2-darwin-arm64-bounded-observation'],
+                          'source_binding_id': 'source::APG78-FX-014',
+                          'completion_state': 'stopped-required-evidence',
+                          'artifact_class': 'per-variant',
+                          'whole_file_owner': 'per-variant',
+                          'parse_goal': 'unresolved',
+                          'host_context': 'none',
+                          'language_contexts': ['unknown'],
+                          'goal_state': 'unresolved',
+                          'host_role_state': 'unresolved',
+                          'qualification_engine_state': 'per-variant',
+                          'javascript_selection': 'per-variant',
+                          'strictness': 'per-variant',
+                          'response': 'per-variant'},
+                  'variants': [{'label': 'effect-free-module-core',
+                                'artifact_class': 'handwritten-mjs',
+                                'whole_file_owner': 'javascript-language-profile',
+                                'parse_goal': 'module',
+                                'host_context': 'standalone',
+                                'language_contexts': ['module-body', 'function-body'],
+                                'goal_state': 'known',
+                                'strictness': 'strict',
+                                'javascript_selection': 'selected',
+                                'host_role_state': 'known',
+                                'qualification_engine_state': 'observed-exact-engine',
+                                'response': 'bounded-local-decision'},
+                               {'label': 'commonjs-node-adapter',
+                                'artifact_class': 'handwritten-cjs',
+                                'whole_file_owner': 'node-commonjs-owner',
+                                'parse_goal': 'unresolved',
+                                'host_context': 'commonjs-wrapper',
+                                'language_contexts': ['expression-region'],
+                                'goal_state': 'unresolved',
+                                'strictness': 'explicit-directive-bounded-region',
+                                'javascript_selection': 'selected',
+                                'host_role_state': 'unresolved',
+                                'qualification_engine_state': 'observed-syntax-only',
+                                'response': 'stop-and-escalate'}]}}
+
+def _require_seam_fields(actual: dict[str, Any], expected: dict[str, Any], label: str) -> None:
+    for field, value in expected.items():
+        if actual.get(field) != value:
+            fail(f"CommonJS {label} {field} mismatch")
+
+
+def validate_commonjs_seam_invariant(
+    manifest: dict[str, Any],
+    scenarios: dict[str, Any],
+    observations: dict[str, Any] | None = None,
+) -> None:
+    """Bind exact retained vectors, independently of coordinated surface changes."""
+    cases = {case["id"]: case for case in manifest["cases"]}
+    rows = {row["id"]: row for row in scenarios["rows"]}
+    for case_id, expected in COMMONJS_SEAM.items():
+        if case_id not in cases or case_id not in rows:
+            fail(f"CommonJS {case_id} is missing")
+        case, row = cases[case_id], rows[case_id]
+        _require_seam_fields(case, expected["case"], f"{case_id} manifest")
+        if case["artifacts"] != expected["artifacts"]:
+            fail(f"CommonJS {case_id} artifact vector mismatch")
+        _require_seam_fields(row, expected["row"], f"{case_id} scenario")
+        if row.get("variants", []) != expected["variants"]:
+            fail(f"CommonJS {case_id} scenario variant mismatch")
+    if observations is not None:
+        _validate_commonjs_observations(observations)
+
+
+def _validate_commonjs_observations(observations: dict[str, Any]) -> None:
+    contract_ids = ("commonjs-boundary-syntax", "cli-commonjs-adapter-syntax")
+    if set(observations) != set(contract_ids):
+        fail("CommonJS observation set mismatch")
+    for contract_id in contract_ids:
+        obs = observations[contract_id]
+        if type(obs.return_code) is not int or obs.return_code != 0:
+            fail("CommonJS observation return code must be 0")
+        if obs.stdout_empty is not True or obs.stderr_empty is not True:
+            fail("CommonJS observation must be syntax-only with empty streams")
+        if obs.result is not None:
+            fail("CommonJS observation must be syntax-only without runtime execution")
+        if obs.output_contract_id != contract_id:
+            fail("CommonJS observation contract identity mismatch")
+
+
+def validate_commonjs_node_owner(node_scenarios: dict[str, Any]) -> None:
+    """Reuse Node qualification authority without copying host semantics."""
+    from apg_nodejs_candidate_contract import validate_scenarios
+
+    validate_scenarios(node_scenarios)
+    expected = {"APG80-NODE-004": "APG80-FX-002", "APG80-NODE-006": "APG80-FX-002",
+                "APG80-NODE-008": "APG80-FX-003"}
+    rows = {row["id"]: row for row in node_scenarios["rows"]}
+    for row_id, case_id in expected.items():
+        _require_seam_fields(rows[row_id], {
+            "fixture_case": case_id, "whole_file_owner": "node-commonjs-owner",
+            "selection": "selected", "completion_state": "owned-complete-nonowned-routes-open",
+        }, "integrated Node owner")
+
+
 def validate_fixture_projection(manifest: dict[str, Any], scenarios: dict[str, Any]) -> None:
+    validate_commonjs_seam_invariant(manifest, scenarios)
     fixture_ids = [case["id"] for case in manifest["cases"]]
     scenario_ids = [row["id"] for row in scenarios["rows"] if row["id"].startswith("APG78-FX-")]
     if fixture_ids != scenario_ids:

@@ -16,9 +16,11 @@ ROOT = repository_root(__file__)
 sys.path.insert(0, str(ROOT / "src/test/support"))
 
 from apg_css_profile_fixture_contract import (  # noqa: E402
+    ACTIVE_DEBT_IDS,
     APG79C_KNOWN_DEBT_SHA256,
     FixtureError,
     KNOWN_DEBT_ENTRY_SHA256,
+    RESOLVED_DEBT_IDS,
     load_known_debt,
     load_known_debt_summary,
     load_manifest,
@@ -99,11 +101,13 @@ def test_current_decision_and_lifecycle_mutations_fail() -> None:
 def test_current_known_debt_is_exact_and_human_accepted() -> None:
     value = load_known_debt(KNOWN_DEBT)
     assert validate_language_profile_known_debt(value) == {
-        "debts": 10,
+        "debts": 6,
+        "active": 6,
         "css": 5,
-        "javascript": 5,
+        "javascript": 1,
         "low": 1,
-        "medium": 9,
+        "medium": 5,
+        "resolutions": 4,
     }
     assert validate_css_known_debt(value) == {
         "debts": 5,
@@ -118,7 +122,19 @@ def test_current_known_debt_is_exact_and_human_accepted() -> None:
             ).encode("utf-8")
         ).hexdigest()
         for debt in value["debts"]
-    } == KNOWN_DEBT_ENTRY_SHA256
+    } == {did: KNOWN_DEBT_ENTRY_SHA256[did] for did in ACTIVE_DEBT_IDS}
+    assert {
+        res["debt_id"]: res["original_entry_sha256"]
+        for res in value["resolutions"]
+    } == {did: KNOWN_DEBT_ENTRY_SHA256[did] for did in RESOLVED_DEBT_IDS}
+    assert {
+        res["debt_id"]: hashlib.sha256(
+            json.dumps(
+                res["original_entry"], ensure_ascii=False, separators=(",", ":"), sort_keys=True
+            ).encode("utf-8")
+        ).hexdigest()
+        for res in value["resolutions"]
+    } == {did: KNOWN_DEBT_ENTRY_SHA256[did] for did in RESOLVED_DEBT_IDS}
 
 
 @pytest.mark.parametrize(
@@ -126,12 +142,12 @@ def test_current_known_debt_is_exact_and_human_accepted() -> None:
     (
         ("supporting CommonJS qualification machinery only", "WRONG SEMANTIC OWNER"),
         (
-            "Does not block under the explicit APG79C decision",
-            "Blocks provisional integration",
+            "| `JS-QD-001` | Medium | supporting CommonJS qualification machinery only | Superseded | APG128 |",
+            "| `JS-QD-001` | Medium | supporting CommonJS qualification machinery only | Repaired | APG128 |",
         ),
         (
-            "| `JS-QD-001` | Medium | supporting CommonJS qualification machinery only | Does not block under the explicit APG79C decision | Blocks until repaired or separately re-evaluated |",
-            "| `JS-QD-001` | Medium | supporting CommonJS qualification machinery only | Does not block under the explicit APG79C decision | Does not block stable maturity |",
+            "| `JS-QD-005` | Medium | supporting Test262 source-role and historical managed-report integrity qualification only | Does not block under the explicit APG79E decision and accepted historical APG79E report verification | Blocks |",
+            "| `JS-QD-005` | Medium | supporting Test262 source-role and historical managed-report integrity qualification only | Does not block under the explicit APG79E decision and accepted historical APG79E report verification | Does not block stable maturity |",
         ),
     ),
 )
@@ -147,7 +163,7 @@ def test_known_debt_markdown_exact_row_mutations_fail(old: str, new: str) -> Non
     "extra_row",
     (
         "| `JS-QD-001` | High | WRONG SEMANTIC OWNER | Blocks provisional integration | Does not block stable maturity |",
-        "| `JS-QD-001` | Medium | supporting CommonJS qualification machinery only | Does not block under the explicit APG79C decision | Blocks until repaired or separately re-evaluated |",
+        "| `JS-QD-001` | Medium | supporting CommonJS qualification machinery only | Superseded | APG128 |",
     ),
 )
 def test_known_debt_markdown_extra_or_duplicate_rows_fail(extra_row: str) -> None:
@@ -166,6 +182,10 @@ def test_known_debt_markdown_extra_or_duplicate_rows_fail(extra_row: str) -> Non
         "wrong-type",
         "wrong-status",
         "wrong-id-set",
+        "overlapping-id",
+        "duplicate-resolution-id",
+        "wrong-schema-version",
+        "wrong-phase",
     ),
 )
 def test_known_debt_schema_and_exact_set_fail_closed(mutation: str) -> None:
@@ -182,6 +202,14 @@ def test_known_debt_schema_and_exact_set_fail_closed(mutation: str) -> None:
         value["debts"][0]["status"] = "pending"
     elif mutation == "wrong-id-set":
         value["debts"][4]["debt_id"] = "CSS-QD-006"
+    elif mutation == "overlapping-id":
+        value["resolutions"][0]["debt_id"] = value["debts"][0]["debt_id"]
+    elif mutation == "duplicate-resolution-id":
+        value["resolutions"][1]["debt_id"] = value["resolutions"][0]["debt_id"]
+    elif mutation == "wrong-schema-version":
+        value["schema_version"] = 1
+    elif mutation == "wrong-phase":
+        value["phase"] = "APG79E"
     with pytest.raises(FixtureError):
         validate_css_known_debt(value)
 
@@ -206,16 +234,25 @@ def test_known_debt_schema_and_exact_set_fail_closed(mutation: str) -> None:
         "report-bytes-unknown",
         "missing-report-tooling-refresh",
         "css-entry-drift",
+        "missing-resolution",
+        "extra-resolution",
+        "wrong-resolution-type",
+        "wrong-original-digest",
+        "altered-original-entry",
+        "missing-evidence",
+        "wrong-evidence",
+        "wrong-resolution-phase",
     ),
 )
 def test_javascript_acceptance_and_css_preservation_fail_closed(mutation: str) -> None:
     value = deepcopy(load_known_debt(KNOWN_DEBT))
     javascript = value["debts"][-1]
+    resolution = value["resolutions"][0]
     if mutation == "missing-javascript-debt":
         value["debts"].pop()
     elif mutation == "extra-javascript-debt":
         extra = deepcopy(value["debts"][-1])
-        extra["debt_id"] = "JS-QD-005"
+        extra["debt_id"] = "JS-QD-006"
         value["debts"].append(extra)
     elif mutation == "wrong-javascript-severity":
         javascript["severity"] = "Low"
@@ -249,6 +286,24 @@ def test_javascript_acceptance_and_css_preservation_fail_closed(mutation: str) -
         javascript["refresh_condition"] = "Only the source-role record changes."
     elif mutation == "css-entry-drift":
         value["debts"][0]["known_consequence"] += " Drift."
+    elif mutation == "missing-resolution":
+        value["resolutions"].pop()
+    elif mutation == "extra-resolution":
+        extra_res = deepcopy(value["resolutions"][0])
+        extra_res["debt_id"] = "JS-QD-005"
+        value["resolutions"].append(extra_res)
+    elif mutation == "wrong-resolution-type":
+        resolution["resolution"] = "repaired"
+    elif mutation == "wrong-original-digest":
+        resolution["original_entry_sha256"] = "0" * 64
+    elif mutation == "altered-original-entry":
+        resolution["original_entry"]["known_consequence"] += " Altered."
+    elif mutation == "missing-evidence":
+        resolution["evidence"] = []
+    elif mutation == "wrong-evidence":
+        resolution["evidence"] = ["docs/wrong-evidence.md"]
+    elif mutation == "wrong-resolution-phase":
+        resolution["resolution_phase"] = "APG79C"
     with pytest.raises(FixtureError):
         validate_language_profile_known_debt(value)
 
@@ -261,8 +316,8 @@ def test_profile_rollbacks_and_public_private_summary_are_independent() -> None:
         debt for debt in value["debts"] if debt["profile"] == "javascript-language-profile"
     ]
     assert [debt["debt_id"] for debt in css] == [f"CSS-QD-{index:03d}" for index in range(1, 6)]
-    assert [debt["debt_id"] for debt in javascript] == [f"JS-QD-{index:03d}" for index in range(1, 6)]
-    assert len(css) == 5 and len(javascript) == 5
+    assert [debt["debt_id"] for debt in javascript] == ["JS-QD-005"]
+    assert len(css) == 5 and len(javascript) == 1
     validate_known_debt_profile_deactivation(
         value, "javascript-language-profile", css
     )
@@ -287,6 +342,11 @@ def test_profile_rollbacks_and_public_private_summary_are_independent() -> None:
     wrong["entry_sha256"]["JS-QD-004"] = "0" * 64
     with pytest.raises(FixtureError, match="public/private"):
         validate_known_debt_summary(wrong, value, APG79C_KNOWN_DEBT_SHA256)
+
+    altered_val = deepcopy(value)
+    altered_val["resolutions"][3]["original_entry"]["known_consequence"] += " Drift."
+    with pytest.raises(FixtureError):
+        validate_known_debt_summary(summary, altered_val, APG79C_KNOWN_DEBT_SHA256)
 
 
 @PRIVATE_KNOWN_DEBT_SUMMARY

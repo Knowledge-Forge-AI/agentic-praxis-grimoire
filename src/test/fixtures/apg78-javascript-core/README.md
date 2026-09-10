@@ -131,8 +131,14 @@ limitation.
 ## APG79E integration boundary
 
 APG79E human-accepts that exact fifth Medium supporting qualification
-limitation, directly verifies the current APG79B report, and does not claim the
+limitation, historically verified the APG79B report at integration, and does not claim the
 maintained proxy is repaired. With every ordinary product gate green, this
 fixture is maintained current evidence for the
 `provisionally-integrated-with-known-debt` profile. All five JavaScript debt
 items block stable maturity.
+
+APG131 distinguishes that accepted historical verification from current custody:
+the bounded APG129/APG130 searches did not find the original artifact in the
+configured agent-visible roots. Its absence does not invalidate APG79E. Current
+JS-QD-005 trigger interpretation and future refresh limits are recorded in the
+[known-debt register](../../../../docs/governance/language-profile-known-debt.md).

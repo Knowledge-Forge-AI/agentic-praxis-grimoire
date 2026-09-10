@@ -228,13 +228,19 @@ statements; APG's ordinary executable source cannot silently pass that case.
 
 The runner:
 
-- invoke exactly one configured test root per component suite;
+- derive each component's explicit initial test files from the validated
+  `testing/apg-test-inventory.json`, without directory-recursion discovery;
 - register and enforce strict unit and integration markers;
 - treat pytest exit code 5, no tests collected, as failure, consistent with the
   [pytest exit-code contract](https://docs.pytest.org/en/stable/reference/exit-codes.html);
 - reject collected nodes outside the selected suite root or with the wrong
   suite marker;
 - compare collected node IDs to detect duplicates;
+- require every worker's collected file set to equal the selected inventory,
+  including hidden directories, with at least one node per file and identical
+  complete ordered node collections across workers;
+- reject missing or foreign files, duplicate initial files, duplicate node IDs
+  or worker receipts, and noncanonical repository-relative path aliases;
 - verify the configured production source inventory before testing and compare
   it with the coverage report afterward;
 - fail when an expected source file is omitted unexpectedly;
@@ -299,6 +305,13 @@ their failures. Invocation-scoped manifests prove worker start, collection,
 terminal results, completion, node-down, and required Python-child coverage
 contribution. Missing, duplicate, foreign, stale, wrong-run, incomplete, and
 crash evidence fails before coverage acceptance.
+
+APG136 closes inventory-to-collection equality while preserving the worker,
+terminal-result, child-process and coverage-context accounting. Multiple nodes
+from one file remain valid. No zero-test file exception is admitted. Explicit
+initial files bypass hidden-directory recursion pruning; the repository's pytest
+configuration continues to determine node-ID root semantics. See the
+[pytest configuration contract](https://docs.pytest.org/en/stable/reference/customize.html#initialization-determining-rootdir-and-configfile).
 
 Artifacts are invocation-owned, removed after success, and removed after
 failure unless explicit bounded retention is requested. Current v0.4 configured
