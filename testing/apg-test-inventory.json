@@ -172,6 +172,15 @@
       ]
     },
     {
+      "path": "libexec/apg_staging_correction.py",
+      "rationale": "maintained executable Python source",
+      "suites": [
+        "unit",
+        "integration",
+        "combined"
+      ]
+    },
+    {
       "path": "libexec/apg_test.py",
       "rationale": "maintained executable Python source",
       "suites": [
@@ -584,6 +593,11 @@
       "suite": "integration"
     },
     {
+      "owner": "libexec/apg_staging_correction.py",
+      "path": "src/test/int/python/agentic-praxis-grimoire/libexec/apg_staging_correction.int.test.py",
+      "suite": "integration"
+    },
+    {
       "owner": "libexec/apg_user_skills.py",
       "path": "src/test/int/python/agentic-praxis-grimoire/libexec/apg_user_skills.int.test.py",
       "suite": "integration"
@@ -766,6 +780,11 @@
     {
       "owner": "libexec/apg_skill_topology.py",
       "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_skill_topology.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "libexec/apg_staging_correction.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_staging_correction.unit.test.py",
       "suite": "unit"
     },
     {

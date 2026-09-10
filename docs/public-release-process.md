@@ -688,3 +688,14 @@ release commits to public `main` is retired in favor of PR-governed integration.
    push already discloses its contents; hosted scanners cannot replace this gate.
    No force overwriting of public branches is permitted. Formal repository branch
    protection rules are scheduled for V0110-G.
+
+### Multi-channel release and Homebrew tap sequencing
+
+Under user authorization, the `Knowledge-Forge-AI/homebrew-tap` repository is added as an additive publication target alongside GitHub Release, PyPI, npm, and Go. Following squash merge of the staging PR, verification of the actual merged commit, tagging `v0.11.0`, and upload of release deliverables to GitHub Releases:
+
+1. **Release asset readback**: Read back official release deliverables and `apg-distribution-manifest.json` from the published GitHub Release for tag `v0.11.0`.
+2. **Exact formula rendering**: Render `Formula/agentic-praxis-grimoire.rb` using verified payload and binary manifest digests, validating exact checksum and member agreements.
+3. **Dedicated tap pull request**: In `Knowledge-Forge-AI/homebrew-tap`, refresh `main`, preserve concurrent changes (including Theme Forge formulas), and commit only the approved APGR formula and documentation update via standard review practice.
+4. **Post-publish install verification**: Verify `brew install` and command-line execution (`apgr --version`, `apgr --help`, `apgr skills list`, `apgr build-info`) on supported architectures.
+
+The overall v0.11.0 multi-channel release is declared complete only after all promised channels (GitHub Release, PyPI, npm, Go, Homebrew) are delivered and verified.

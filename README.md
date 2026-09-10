@@ -441,7 +441,10 @@ v0.11.0 is unreleased. Exercise candidate features from a source checkout or
 locally qualified wheel/npm artifacts; registry installation commands below
 refer to the published predecessor. The release route is public `staging` →
 pull request → squash merge to `main` → release. See the
-[release procedure](docs/public-release-process.md). Local preparation does not
+[release procedure](docs/public-release-process.md). Homebrew tap distribution
+(`brew install Knowledge-Forge-AI/tap/agentic-praxis-grimoire`) is added as an
+additive channel for v0.11.0, pending post-release tap publication. See
+[distribution documentation](docs/distribution.md). Local preparation does not
 mean a public PR has run or that branch protection is configured.
 
 ### Upgrading to v0.10.0

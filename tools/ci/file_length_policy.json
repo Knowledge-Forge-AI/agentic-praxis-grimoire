@@ -34,7 +34,7 @@
       "path": "libexec/apg_test.py",
       "rationale": "Pre-existing test execution runner and exact coverage orchestrator exceeding failure limit",
       "role": "maintained-source",
-      "sha256": "1f40b59c6b4a240623d3769724de404e83664835587273ee265e77162b2f4e2f"
+      "sha256": "a3db96a84e4092843e781f1fb00e3454c18ba74a14807ed6c0d218f8b540c482"
     },
     {
       "count": 1026,

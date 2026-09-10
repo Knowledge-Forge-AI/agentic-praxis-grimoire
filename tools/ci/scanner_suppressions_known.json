@@ -1310,6 +1310,30 @@
       "rule": "E402"
     },
     {
+      "context": "sha256:93ed309dca3d794c36fe0bf01e86d24eb5e48e1dcd3da40151b518cb1615e596",
+      "disposition": "accepted",
+      "expiry": "2026-12-31",
+      "kind": "noqa",
+      "line": 18,
+      "owner": "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_staging_correction.unit.test.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_staging_correction.unit.test.py",
+      "reason": "Import follows repository-local module-path initialization; moving it before bootstrap changes isolated execution/discovery.",
+      "review": "APGR-V0110-READINESS4 pre_final review; Decision C",
+      "rule": "E402"
+    },
+    {
+      "context": "sha256:610ae21d0467135f5fb505a2b63b45dfc6a2e1d6923ed568e32b6936b359d5d8",
+      "disposition": "accepted",
+      "expiry": "2026-12-31",
+      "kind": "noqa",
+      "line": 19,
+      "owner": "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_staging_correction.unit.test.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_staging_correction.unit.test.py",
+      "reason": "Import follows repository-local module-path initialization; moving it before bootstrap changes isolated execution/discovery.",
+      "review": "APGR-V0110-READINESS4 pre_final review; Decision C",
+      "rule": "E402"
+    },
+    {
       "context": "sha256:8d4e76e5c8021f7f038b8e009aa3b7e991a62d1549fd348802d88fd8e66d487a",
       "disposition": "accepted",
       "expiry": "2026-12-31",

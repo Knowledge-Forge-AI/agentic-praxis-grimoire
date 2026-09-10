@@ -2206,24 +2206,12 @@ def _embedded_corpus_failure(root: Path) -> str | None:
             timeout=120,
         )
     except (OSError, subprocess.TimeoutExpired) as error:
-        return f"Go embedded-corpus verification could not run: {error}"
-    if completed.returncode != 0:
-        raw_output = (completed.stderr or completed.stdout or b"").decode("utf-8", errors="replace").strip()
-        bounded_detail = raw_output[:512] if raw_output else "no error detail reported"
-        if (
-            "disagrees with the embedded canonical corpus" in raw_output
-            or "disagrees with repository truth" in raw_output
-        ):
-            return f"Go embedded-corpus verification disagrees with repository truth: {bounded_detail}"
-        return (
-            f"Go embedded-corpus verification prerequisite or execution failed "
-            f"(exit {completed.returncode}): {bounded_detail}"
-        )
-    if completed.stdout or completed.stderr:
-        text = (completed.stderr + completed.stdout).decode("utf-8", errors="replace").strip()
-        if text:
-            return f"Go embedded-corpus verification produced unexpected output: {text[:512]}"
-    return None
+        return apg_skill_topology.format_embedded_corpus_failure(1, error=error)
+    return apg_skill_topology.format_embedded_corpus_failure(
+        completed.returncode,
+        completed.stdout,
+        completed.stderr,
+    )
 
 
 def _summary(result: CheckResult) -> dict[str, int]:

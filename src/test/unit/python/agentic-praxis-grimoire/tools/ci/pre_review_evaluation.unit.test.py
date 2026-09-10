@@ -296,3 +296,192 @@ def test_evaluate_scanner_suppressions() -> None:
     status, _detail, classification = evaluate(c, 1, doc_block)
     assert status == "failed"
     assert classification == "policy-finding"
+
+
+def test_govulncheck_classification_pinned_producer_semantics() -> None:
+    config = {
+        "config": {
+            "protocol_version": "v1.0.0",
+            "scanner_name": "govulncheck",
+            "scan_level": "symbol",
+            "scan_mode": "source",
+        }
+    }
+    check = Check("govulncheck", ("govulncheck", "-json", "./..."))
+
+    # Module-only finding: 1 frame, no package, no func -> not reachable
+    stream_mod = "\n".join([
+        json.dumps(config),
+        json.dumps({"osv": {"id": "GO-MOD-1"}}),
+        json.dumps({"finding": {"osv": "GO-MOD-1", "trace": [{"module": "example.com/mod", "version": "v1.0.0"}]}}),
+    ])
+    status, detail, classification = evaluate(check, 0, stream_mod)
+    assert status == "passed"
+    assert classification == "passed"
+    assert "reachable=0" in detail
+    assert "module-package=1" in detail
+
+    # Package-only finding: 1 frame, package present, no func -> not reachable
+    stream_pkg = "\n".join([
+        json.dumps(config),
+        json.dumps({"osv": {"id": "GO-PKG-1"}}),
+        json.dumps({"finding": {"osv": "GO-PKG-1", "trace": [{"module": "example.com/mod", "package": "example.com/mod/pkg"}]}}),
+    ])
+    status, detail, classification = evaluate(check, 0, stream_pkg)
+    assert status == "passed"
+    assert classification == "passed"
+    assert "reachable=0" in detail
+
+    # Single-frame symbol finding: 1 frame with function -> reachable
+    stream_single_sym = "\n".join([
+        json.dumps(config),
+        json.dumps({"osv": {"id": "GO-SYM-1"}}),
+        json.dumps({"finding": {"osv": "GO-SYM-1", "trace": [{"module": "example.com/mod", "package": "example.com/mod/pkg", "function": "Vuln"}]}}),
+    ])
+    status, detail, classification = evaluate(check, 0, stream_single_sym)
+    assert status == "failed"
+    assert classification == "policy-finding"
+    assert "reachable=1" in detail
+
+    # Receiver symbol finding: 1 frame with receiver -> reachable
+    stream_recv = "\n".join([
+        json.dumps(config),
+        json.dumps({"osv": {"id": "GO-RECV-1"}}),
+        json.dumps({"finding": {"osv": "GO-RECV-1", "trace": [{"module": "example.com/mod", "package": "example.com/mod/pkg", "receiver": "*Type"}]}}),
+    ])
+    status, detail, classification = evaluate(check, 0, stream_recv)
+    assert status == "failed"
+    assert classification == "policy-finding"
+    assert "reachable=1" in detail
+
+    # Multi-frame call trace
+    stream_multi = "\n".join([
+        json.dumps(config),
+        json.dumps({"osv": {"id": "GO-MULTI-1"}}),
+        json.dumps({"finding": {"osv": "GO-MULTI-1", "trace": [
+            {"module": "example.com/mod", "package": "example.com/mod/pkg", "function": "Vuln"},
+            {"module": "main", "package": "main", "function": "main"},
+        ]}}),
+    ])
+    status, detail, classification = evaluate(check, 0, stream_multi)
+    assert status == "failed"
+    assert classification == "policy-finding"
+    assert "reachable=1" in detail
+
+    # Binary mode symbol presence
+    config_bin = {
+        "config": {
+            "protocol_version": "v1.0.0",
+            "scanner_name": "govulncheck",
+            "scan_level": "symbol",
+            "scan_mode": "binary",
+        }
+    }
+    stream_bin = "\n".join([
+        json.dumps(config_bin),
+        json.dumps({"osv": {"id": "GO-BIN-1"}}),
+        json.dumps({"finding": {"osv": "GO-BIN-1", "trace": [{"module": "example.com/mod", "package": "example.com/mod/pkg", "function": "Vuln"}]}}),
+    ])
+    status, detail, classification = evaluate(check, 0, stream_bin)
+    assert status == "failed"
+    assert classification == "policy-finding"
+
+
+def test_govulncheck_classification_contracts_and_errors() -> None:
+    check = Check("govulncheck", ("govulncheck", "-json", "./..."))
+
+    # Insufficient scan level (package level cannot affirm symbol reachability)
+    config_shallow = {
+        "config": {
+            "protocol_version": "v1.0.0",
+            "scanner_name": "govulncheck",
+            "scan_level": "package",
+            "scan_mode": "source",
+        }
+    }
+    status, detail, classification = evaluate(check, 0, json.dumps(config_shallow))
+    assert status == "failed"
+    assert classification == "tool-failure"
+    assert "insufficient" in detail
+
+    # Unsupported scan mode
+    config_unsupp = {
+        "config": {
+            "protocol_version": "v1.0.0",
+            "scanner_name": "govulncheck",
+            "scan_level": "symbol",
+            "scan_mode": "unknown_mode",
+        }
+    }
+    status, detail, classification = evaluate(check, 0, json.dumps(config_unsupp))
+    assert status == "failed"
+    assert classification == "tool-failure"
+    assert "unsupported" in detail
+
+    # Exit code 3 with zero findings is an operational anomaly
+    config_clean = {
+        "config": {
+            "protocol_version": "v1.0.0",
+            "scanner_name": "govulncheck",
+            "scan_level": "symbol",
+            "scan_mode": "source",
+        }
+    }
+    status, detail, classification = evaluate(check, 3, json.dumps(config_clean))
+    assert status == "failed"
+    assert classification == "tool-failure"
+    assert "exit=3 but 0 findings" in detail
+
+    # Non-0, non-3 exit code is tool failure
+    status, detail, classification = evaluate(check, 1, json.dumps(config_clean))
+    assert status == "failed"
+    assert classification == "tool-failure"
+
+    # Malformed trace (non-list trace)
+    stream_bad_trace = "\n".join([
+        json.dumps(config_clean),
+        json.dumps({"finding": {"osv": "GO-ERR-1", "trace": "not-a-list"}}),
+    ])
+    status, detail, classification = evaluate(check, 0, stream_bad_trace)
+    assert status == "failed"
+    assert classification == "tool-failure"
+
+    # Malformed frame (non-dict frame)
+    stream_bad_frame = "\n".join([
+        json.dumps(config_clean),
+        json.dumps({"finding": {"osv": "GO-ERR-2", "trace": ["not-a-dict"]}}),
+    ])
+    status, detail, classification = evaluate(check, 0, stream_bad_frame)
+    assert status == "failed"
+    assert classification == "tool-failure"
+
+
+def test_govulncheck_mixed_repeated_osvs() -> None:
+    check = Check("govulncheck", ("govulncheck", "-json", "./..."))
+    config = {
+        "config": {
+            "protocol_version": "v1.0.0",
+            "scanner_name": "govulncheck",
+            "scan_level": "symbol",
+            "scan_mode": "source",
+        }
+    }
+    # Multiple findings for same OSV (one package-only, one symbol) + another distinct module-only OSV
+    stream = "\n".join([
+        json.dumps(config),
+        json.dumps({"osv": {"id": "GO-SHARED-1"}}),
+        json.dumps({"osv": {"id": "GO-MOD-ONLY"}}),
+        json.dumps({"finding": {"osv": "GO-SHARED-1", "trace": [{"module": "mod1", "package": "pkg1"}]}}),
+        json.dumps({"finding": {"osv": "GO-SHARED-1", "trace": [{"module": "mod1", "package": "pkg1", "function": "Sym"}]}}),
+        json.dumps({"finding": {"osv": "GO-MOD-ONLY", "trace": [{"module": "mod2"}]}}),
+    ])
+    status, detail, classification = evaluate(check, 0, stream)
+    assert status == "failed"
+    assert classification == "policy-finding"
+    assert "findings=3" in detail
+    assert "unique_osv=2" in detail
+    assert "reachable=1" in detail
+    assert "reachable_osv=1" in detail
+    assert "module-package=2" in detail
+    assert "module_package_osv=1" in detail
+

@@ -29,6 +29,10 @@ def test_runtime_manifest_is_exact_and_fail_closed() -> None:
     assert runtime["platform"] == "darwin/arm64"
     assert runtime["primary_node"]["root_owned"] is True
     assert runtime["secondary_node"]["binary_member"].endswith("/bin/node")
+    assert runtime["bats"]["version"] == "1.12.0"
+    assert runtime["bats"]["root_owned"] is True
+    assert runtime["bash"]["version"] == "5.3p3"
+    assert runtime["bash"]["root_owned"] is True
 
 
 def test_runtime_manifest_rejects_duplicate_and_wrong_shape(tmp_path: Path) -> None:
@@ -53,6 +57,8 @@ def test_runtime_manifest_rejects_duplicate_and_wrong_shape(tmp_path: Path) -> N
                 "python_packages": None,
                 "npm_packages": {},
                 "browsers": None,
+                "bats": {},
+                "bash": {},
             }
         ),
         encoding="utf-8",
@@ -251,3 +257,72 @@ def test_environment_file_is_private_and_sorted(tmp_path: Path) -> None:
     write_environment(path, {"B": "two", "A": "one"})
     assert path.read_text(encoding="utf-8") == "A=one\nB=two\n"
     assert path.stat().st_mode & 0o777 == 0o600
+
+
+def test_materialize_nix_binary_uses_flake_build_and_verified_binding(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    commands: list[list[str]] = []
+    config = {
+        "bats": {
+            "source": "github:NixOS/nixpkgs/revision",
+            "attribute": "legacyPackages.aarch64-darwin.bats",
+            "sha256": "b" * 64,
+            "required_root": "/nix/store",
+            "root_owned": True,
+        }
+    }
+    monkeypatch.setattr(
+        bootstrap.shutil,
+        "which",
+        lambda name: "/nix/bin/nix" if name == "nix" else None,
+    )
+    monkeypatch.setattr(bootstrap, "_verify_binary", lambda path, **_: path)
+
+    def runner(command: list[str], **kwargs: object) -> subprocess.CompletedProcess[str]:
+        commands.append(command)
+        assert kwargs["env"] == {"HOME": "/runtime/home"}
+        return subprocess.CompletedProcess(command, 0, stdout="/nix/store/bats\n", stderr="")
+
+    result = bootstrap.materialize_nix_binary(
+        "bats",
+        "bats",
+        config,
+        environment={"HOME": "/runtime/home"},
+        runner=runner,
+    )
+    assert result == Path("/nix/store/bats/bin/bats")
+    assert commands == [
+        [
+            "/nix/bin/nix",
+            "--extra-experimental-features",
+            "nix-command flakes",
+            "build",
+            "--no-link",
+            "--print-out-paths",
+            "github:NixOS/nixpkgs/revision#legacyPackages.aarch64-darwin.bats",
+        ]
+    ]
+
+
+def test_verify_binary_rejects_symlink_and_accepts_exact_digest(tmp_path: Path) -> None:
+    target = tmp_path / "bin" / "test-bin"
+    target.parent.mkdir(parents=True)
+    target.write_bytes(b"test-binary")
+    target.chmod(0o700)
+    digest = hashlib.sha256(b"test-binary").hexdigest()
+    assert bootstrap._verify_binary(target, expected_sha256=digest, label="test-bin") == target
+    link = tmp_path / "bin" / "test-link"
+    link.symlink_to(target)
+    with pytest.raises(ValueError, match="direct executable"):
+        bootstrap._verify_binary(link, expected_sha256=digest, label="test-bin")
+
+
+def test_write_path_file_is_private_and_deduplicated(tmp_path: Path) -> None:
+    path = tmp_path / "runtime.path"
+    dir_a = tmp_path / "dir_a"
+    dir_b = tmp_path / "dir_b"
+    bootstrap.write_path_file(path, [dir_a, dir_b, dir_a])
+    assert path.read_text(encoding="utf-8") == f"{dir_a}\n{dir_b}\n"
+    assert path.stat().st_mode & 0o777 == 0o600
+

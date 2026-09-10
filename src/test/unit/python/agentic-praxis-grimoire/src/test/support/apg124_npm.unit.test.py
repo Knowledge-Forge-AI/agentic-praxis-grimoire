@@ -131,12 +131,15 @@ def test_validate_scratch_root_success_and_refusals(tmp_path: Path) -> None:
     with pytest.raises(NpmHarnessPrerequisiteError, match="ancestor must not be a symlink"):
         validate_scratch_root(child_in_sym, ROOT)
 
-    # Wrong mode refusal (e.g. 0710)
+    # Wrong mode refusal (e.g. 0500: owner-only read/execute, not 0700)
     bad_mode_scratch = tmp_path / "scratch_bad_mode"
-    bad_mode_scratch.mkdir(mode=0o710)
-    os.chmod(bad_mode_scratch, 0o710)
-    with pytest.raises(NpmHarnessPrerequisiteError, match="must be mode 0700"):
-        validate_scratch_root(bad_mode_scratch, ROOT)
+    bad_mode_scratch.mkdir(mode=0o700)
+    try:
+        os.chmod(bad_mode_scratch, 0o500)
+        with pytest.raises(NpmHarnessPrerequisiteError, match="must be mode 0700"):
+            validate_scratch_root(bad_mode_scratch, ROOT)
+    finally:
+        os.chmod(bad_mode_scratch, 0o700)
 
     repo_internal = ROOT / "src/test/fixtures"
     with pytest.raises(NpmHarnessPrerequisiteError, match="strictly outside the repository checkout"):

@@ -2348,6 +2348,27 @@ def _combine_coverage(root: Path, data_files: Sequence[Path], output: Path) -> d
     return value
 
 
+def _export_coverage_artifacts(
+    artifacts: Path,
+    export_dir: Path,
+    selected: Sequence[str],
+    suite: str,
+) -> None:
+    export_dir.mkdir(parents=True, exist_ok=True)
+    for comp in selected:
+        comp_dir = artifacts / comp
+        dest_comp = export_dir / comp
+        dest_comp.mkdir(parents=True, exist_ok=True)
+        for name in (f"{comp}.json", f"{comp}.workers.jsonl", f"{comp}.children.jsonl"):
+            src_file = comp_dir / name
+            if src_file.exists():
+                shutil.copy2(src_file, dest_comp / name)
+    if suite == "combined":
+        combined_file = artifacts / "combined.json"
+        if combined_file.exists():
+            shutil.copy2(combined_file, export_dir / "combined.json")
+
+
 def run(
     suite: str,
     workers: int,
@@ -2356,6 +2377,7 @@ def run(
     keep_artifacts_on_failure: bool = False,
     failure_mode: str | None = None,
     public_version: str | None = None,
+    export_coverage: Path | None = None,
 ) -> None:
     """Validate inventory, run selected suites, and enforce exact gates."""
     if workers < 1 or workers > 64:
@@ -2371,11 +2393,7 @@ def run(
     )
     effective_inventory = inventory
     if public_selection is not None:
-        selected_paths = {
-            path
-            for paths in public_selection.files.values()
-            for path in paths
-        }
+        selected_paths = {path for paths in public_selection.files.values() for path in paths}
         effective_inventory = Inventory(
             inventory.coverage_sources,
             inventory.excluded_launchers,
@@ -2406,6 +2424,18 @@ def run(
         has_harness_error = False
         has_assertion_error = False
         has_gate_error = False
+        def _record_error(prefix: str, err: Exception) -> None:
+            nonlocal has_invocation_error, has_harness_error, has_assertion_error, has_gate_error
+            errors.append(f"{prefix}: {err}")
+            if isinstance(err, InvocationError):
+                has_invocation_error = True
+            elif isinstance(err, GateShortfallError):
+                has_gate_error = True
+            elif isinstance(err, (PolicyCheckError, TestAssertionError)):
+                has_assertion_error = True
+            else:
+                has_harness_error = True
+
         invocation_id = secrets.token_hex(16)
         for selected_suite in selected:
             try:
@@ -2440,38 +2470,14 @@ def run(
                 )
                 counts = coverage_counts(report, paths)
                 results[selected_suite] = ComponentResult(data_file, report, counts)
-                try:
-                    enforce_threshold(counts, *THRESHOLDS[selected_suite])
-                except GateShortfallError as error:
-                    errors.append(f"{selected_suite}: {error}")
-                    has_gate_error = True
-                except ToolError as error:
-                    errors.append(f"{selected_suite}: {error}")
-                    has_harness_error = True
-                else:
-                    print(
-                        f"PASS {selected_suite}: statements "
-                        f"{counts.statements_covered}/{counts.statements_total}; branches "
-                        f"{counts.branches_covered}/{counts.branches_total}"
-                    )
-            except InvocationError as error:
-                errors.append(f"{selected_suite}: {error}")
-                has_invocation_error = True
-            except HarnessError as error:
-                errors.append(f"{selected_suite}: {error}")
-                has_harness_error = True
-            except PolicyCheckError as error:
-                errors.append(f"{selected_suite}: {error}")
-                has_assertion_error = True
-            except TestAssertionError as error:
-                errors.append(f"{selected_suite}: {error}")
-                has_assertion_error = True
-            except GateShortfallError as error:
-                errors.append(f"{selected_suite}: {error}")
-                has_gate_error = True
-            except ToolError as error:
-                errors.append(f"{selected_suite}: {error}")
-                has_harness_error = True
+                enforce_threshold(counts, *THRESHOLDS[selected_suite])
+                print(
+                    f"PASS {selected_suite}: statements "
+                    f"{counts.statements_covered}/{counts.statements_total}; branches "
+                    f"{counts.branches_covered}/{counts.branches_total}"
+                )
+            except (InvocationError, HarnessError, PolicyCheckError, TestAssertionError, GateShortfallError, ToolError) as error:
+                _record_error(selected_suite, error)
         if suite == "combined" and set(results) == {"unit", "integration"}:
             try:
                 report = _combine_coverage(
@@ -2483,24 +2489,8 @@ def run(
                 paths = sorted(inventory.coverage_sources)
                 counts = coverage_counts(report, paths)
                 enforce_threshold(counts, *THRESHOLDS["combined"])
-            except InvocationError as error:
-                errors.append(f"combined: {error}")
-                has_invocation_error = True
-            except HarnessError as error:
-                errors.append(f"combined: {error}")
-                has_harness_error = True
-            except PolicyCheckError as error:
-                errors.append(f"combined: {error}")
-                has_assertion_error = True
-            except GateShortfallError as error:
-                errors.append(f"combined: {error}")
-                has_gate_error = True
-            except TestAssertionError as error:
-                errors.append(f"combined: {error}")
-                has_assertion_error = True
-            except ToolError as error:
-                errors.append(f"combined: {error}")
-                has_harness_error = True
+            except (InvocationError, HarnessError, PolicyCheckError, TestAssertionError, GateShortfallError, ToolError) as error:
+                _record_error("combined", error)
             else:
                 print(
                     "PASS combined union: statements "
@@ -2519,6 +2509,8 @@ def run(
             raise ToolError("; ".join(errors))
         completed = True
     finally:
+        if export_coverage is not None:
+            _export_coverage_artifacts(artifacts, export_coverage, selected, suite)
         if not completed and keep_artifacts_on_failure:
             print(f"{COMMAND}: retained failure artifacts: {artifacts}", file=sys.stderr)
         else:
@@ -2658,30 +2650,19 @@ def _is_apgr_receipt(path: Path) -> bool:
         data = json.loads(content.decode("utf-8"))
         if not isinstance(data, dict):
             return False
-        expected_keys = {
-            "version",
-            "subproject",
-            "suite",
-            "test_status",
-            "gate_status",
-            "source_commit",
-        }
-        if set(data.keys()) != expected_keys:
-            return False
-        if data.get("version") != 1 or data.get("subproject") != "apg":
-            return False
-        if data.get("suite") not in ("policy", "unit", "integration", "combined", "unknown"):
-            return False
-        if data.get("test_status") not in ("pass", "fail", "error"):
-            return False
-        if data.get("gate_status") not in ("pass", "fail", "error"):
-            return False
+        expected_keys = {"version", "subproject", "suite", "test_status", "gate_status", "source_commit"}
         commit = data.get("source_commit")
-        if not isinstance(commit, str) or len(commit) != 40:
-            return False
-        if not all(c in "0123456789abcdefABCDEF" for c in commit):
-            return False
-        return True
+        return (
+            set(data.keys()) == expected_keys
+            and data.get("version") == 1
+            and data.get("subproject") == "apg"
+            and data.get("suite") in ("policy", "unit", "integration", "combined", "unknown")
+            and data.get("test_status") in ("pass", "fail", "error")
+            and data.get("gate_status") in ("pass", "fail", "error")
+            and isinstance(commit, str)
+            and len(commit) == 40
+            and all(c in "0123456789abcdefABCDEF" for c in commit)
+        )
     except (OSError, UnicodeError, ValueError):
         return False
 
@@ -2741,37 +2722,19 @@ def admit_summary_destination(root: Path, target: Path) -> SummaryDestination:
             if path_rep == git_meta or git_meta in path_rep.parents:
                 raise InvocationError(f"summary file cannot target Git metadata: {target}")
 
-    if (
-        resolved_target == resolved_root
-        or lexical_target == resolved_root
-        or lexical_target == norm_root
-        or addressed_in_parent == resolved_root
-    ):
+    if resolved_root in (resolved_target, lexical_target, addressed_in_parent) or lexical_target == norm_root:
         raise InvocationError(f"summary file cannot target repository root: {target}")
 
-    if (
-        target.is_dir()
-        or lexical_target.is_dir()
-        or addressed_in_parent.is_dir()
-        or (resolved_target.exists() and resolved_target.is_dir())
-    ):
+    if any(p.is_dir() for p in (target, lexical_target, addressed_in_parent) if p.exists()) or (resolved_target.exists() and resolved_target.is_dir()):
         raise InvocationError(f"summary file cannot target a directory: {target}")
 
     in_repo_rels: list[Path] = []
-    if resolved_root in resolved_target.parents:
-        in_repo_rels.append(resolved_target.relative_to(resolved_root))
-    if resolved_root in addressed_in_parent.parents:
-        rel_addressed = addressed_in_parent.relative_to(resolved_root)
-        if rel_addressed not in in_repo_rels:
-            in_repo_rels.append(rel_addressed)
-    if resolved_root in lexical_target.parents:
-        rel_lex = lexical_target.relative_to(resolved_root)
-        if rel_lex not in in_repo_rels:
-            in_repo_rels.append(rel_lex)
-    elif norm_root in lexical_target.parents:
-        rel_lex = lexical_target.relative_to(norm_root)
-        if rel_lex not in in_repo_rels:
-            in_repo_rels.append(rel_lex)
+    for candidate_path in (resolved_target, addressed_in_parent, lexical_target):
+        for root_cand in (resolved_root, norm_root):
+            if root_cand in candidate_path.parents:
+                rel = candidate_path.relative_to(root_cand)
+                if rel not in in_repo_rels:
+                    in_repo_rels.append(rel)
 
     for rel in in_repo_rels:
         try:
@@ -2815,6 +2778,23 @@ def admit_summary_destination(root: Path, target: Path) -> SummaryDestination:
             )
 
     return SummaryDestination(target, resolved_target, resolved_root)
+
+
+def admit_export_destination(root: Path, target: Path) -> Path:
+    """Verify target coverage export directory is safe from Git metadata and repository root."""
+    if ".git" in target.parts or target.name == ".git":
+        raise InvocationError(f"export directory cannot target Git metadata: {target}")
+    if target.is_symlink():
+        raise InvocationError(f"export directory cannot target a symlink: {target}")
+    resolved_root = root.resolve(strict=True)
+    raw_target = target if target.is_absolute() else (Path.cwd() / target)
+    resolved_target = raw_target.resolve()
+    if resolved_target == resolved_root:
+        raise InvocationError(f"export directory cannot target repository root: {target}")
+    for git_meta in _git_metadata_paths(resolved_root):
+        if resolved_target == git_meta or git_meta in resolved_target.parents:
+            raise InvocationError(f"export directory cannot target Git metadata: {target}")
+    return resolved_target
 
 
 def _scan_early_args(raw_args: Sequence[str]) -> tuple[str, Path | None]:
@@ -2896,6 +2876,12 @@ def parser() -> argparse.ArgumentParser:
         default=None,
         help="run the exact clean public projection for this release version",
     )
+    value.add_argument(
+        "--export-coverage",
+        type=Path,
+        default=None,
+        help="export retained coverage JSON artifacts to target directory",
+    )
     return value
 
 
@@ -2933,6 +2919,14 @@ def main(arguments: Sequence[str] | None = None) -> int:
         try:
             destination = admit_summary_destination(root, args.summary_file)
             destination.invalidate()
+        except InvocationError as error:
+            print(f"{COMMAND}: {error}", file=sys.stderr)
+            return 1
+
+    export_dir: Path | None = None
+    if args.export_coverage is not None:
+        try:
+            export_dir = admit_export_destination(root, args.export_coverage)
         except InvocationError as error:
             print(f"{COMMAND}: {error}", file=sys.stderr)
             return 1
@@ -2986,14 +2980,14 @@ def main(arguments: Sequence[str] | None = None) -> int:
         if suite == "policy":
             run_policy(root)
         else:
-            run(
-                suite,
-                args.workers,
-                root,
-                keep_artifacts_on_failure=args.keep_artifacts_on_failure,
-                failure_mode=args.verify_failure_mode,
-                public_version=args.public_version,
-            )
+            run_kwargs: dict[str, object] = {
+                "keep_artifacts_on_failure": args.keep_artifacts_on_failure,
+                "failure_mode": args.verify_failure_mode,
+                "public_version": args.public_version,
+            }
+            if export_dir is not None:
+                run_kwargs["export_coverage"] = export_dir
+            run(suite, args.workers, root, **run_kwargs)
         if not _write_admitted("pass", "pass"):
             return 1
         return 0
@@ -3009,15 +3003,7 @@ def main(arguments: Sequence[str] | None = None) -> int:
         _write_admitted("error", "error")
         print(f"{COMMAND}: {error}", file=sys.stderr)
         return 1
-    except PolicyCheckError as error:
-        _write_admitted("fail", "fail")
-        print(f"{COMMAND}: {error}", file=sys.stderr)
-        return 1
-    except TestAssertionError as error:
-        _write_admitted("fail", "fail")
-        print(f"{COMMAND}: {error}", file=sys.stderr)
-        return 1
-    except ToolError as error:
+    except (PolicyCheckError, TestAssertionError, ToolError) as error:
         _write_admitted("fail", "fail")
         print(f"{COMMAND}: {error}", file=sys.stderr)
         return 1

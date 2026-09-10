@@ -221,6 +221,7 @@ def _fixture(
 def _run(
     tmp_path: Path,
     *,
+    shell_executable: str | Path | None = None,
     corrupt_wheel: bool = False,
     corrupt_sdist: bool = False,
     manifest_corrupt_wheel_hash: bool = False,
@@ -446,14 +447,84 @@ print(json.dumps(value), end="")
         "RUNNER_TEMP": os.fspath(tmp_path),
         "PATH": os.fspath(commands) + os.pathsep + os.environ["PATH"],
     }
+    if shell_executable is not None:
+        target_shell = str(shell_executable)
+    else:
+        bash_bin = os.environ.get("APG_BASH")
+        if not bash_bin or not os.access(bash_bin, os.X_OK):
+            bash_bin = "bash"
+        target_shell = bash_bin
     return subprocess.run(
-        ["bash", "-c", _verification_script()],
+        [target_shell, "-c", _verification_script()],
         cwd=tmp_path,
         env=environment,
         text=True,
         capture_output=True,
         check=False,
     )
+
+
+def test_verification_step_fails_closed_under_non_bash_shell(
+    tmp_path: Path,
+) -> None:
+    sh_bin = Path("/bin/sh")
+    if not sh_bin.is_file() or not os.access(sh_bin, os.X_OK):
+        pytest.skip("/bin/sh is not available on this platform")
+
+    # Negative test: /bin/sh lacks process substitution < <(...) and must fail
+    # closed with a syntax error when provided the complete fixture environment.
+    sh_root = tmp_path / "sh_test"
+    sh_root.mkdir()
+    result = _run(sh_root, shell_executable=sh_bin)
+    assert result.returncode != 0
+    assert "syntax error" in result.stderr.lower()
+    assert "<" in result.stderr
+
+    # Control test: ensure a valid shell passes with the same fixture.
+    control_root = tmp_path / "control"
+    control_root.mkdir()
+    system_bash = Path("/bin/bash")
+    control_shell = str(system_bash) if system_bash.is_file() else None
+    control_result = _run(control_root, shell_executable=control_shell)
+    assert control_result.returncode == 0, control_result.stderr
+
+
+def test_verification_step_succeeds_under_macos_system_bash(
+    tmp_path: Path,
+) -> None:
+    system_bash = Path("/bin/bash")
+    if not system_bash.is_file() or not os.access(system_bash, os.X_OK):
+        pytest.skip("/bin/bash is not available on this platform")
+
+    marker = tmp_path / "selected_shell.marker"
+    wrapper = tmp_path / "system_bash_wrapper.sh"
+    wrapper.write_text(
+        f"#!/bin/sh\n"
+        f"version=$(\"{system_bash}\" --version | head -n 1)\n"
+        f"echo \"{system_bash} $version\" > \"{marker}\"\n"
+        f"exec \"{system_bash}\" \"$@\"\n",
+        encoding="utf-8",
+    )
+    wrapper.chmod(0o700)
+
+    result = _run(tmp_path, shell_executable=wrapper)
+    assert result.returncode == 0, result.stderr
+    assert marker.is_file()
+    marker_content = marker.read_text(encoding="utf-8").strip()
+    assert marker_content.startswith(str(system_bash))
+    assert "gnu bash" in marker_content.lower() or "version" in marker_content.lower()
+
+    verified = tmp_path / "verified-dist"
+    assert sorted(path.name for path in verified.iterdir()) == sorted(EXPECTED_PYTHON_DIST)
+    assert (verified / WHEEL_DARWIN).read_bytes() == b"exact darwin wheel bytes"
+    assert (verified / WHEEL_LINUX_X64).read_bytes() == b"exact linux x64 wheel bytes"
+    assert (verified / WHEEL_LINUX_ARM64).read_bytes() == b"exact linux arm64 wheel bytes"
+    assert (verified / SDIST).read_bytes() == b"exact normalized sdist bytes"
+    assert sorted(path.name for path in (tmp_path / "manifests").iterdir()) == [
+        "SHA256SUMS",
+        "apg-distribution-manifest.json",
+    ]
+    assert (tmp_path / "aggregate-gate" / "matrix-aggregate.json").is_file()
 
 
 def test_verification_step_selects_the_exact_checked_distribution_paths(

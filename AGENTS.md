@@ -174,10 +174,11 @@ tool extension rule resolution in codeql_policy.py, source and fixture security
 remediations (skills.go slice allocation, runner.mjs descriptor-based O_NOFOLLOW file read
 and origin reflection elimination, test permission normalization to 0o700/0o600/0o710),
 matrix receipt resilience (prescribed artifacts and honest failure receipts recording
-unavailable_artifacts in matrix_receipts.py), and linear staging correction operator
+unavailable_artifacts in matrix_receipts.py), linear staging correction operator
 discipline (stage_operator.py and apg_public_release.py update mode on staging parent
-cd525f33ba2527862670d34d01fbdfb5f267b66c, public base ancestry 250ce73a..., and PR #1
-reuse without force-push). Accounting remains 55 terminal / zero OPEN / zero invalid;
+24adef16955d6a3a3096d9765c8f09d9b6b13040, public base ancestry 250ce73a..., and PR #1
+reuse without force-push), and user-authorized Homebrew tap publication preparation
+under gemini_flash_opus_sub. Accounting remains 55 terminal / zero OPEN / zero invalid;
 inventory retains 45 canonical leaves (14 stable / 31 provisional), six active CSS/JS debts,
 and 11,142 description bytes under the 11,507-byte ceiling. This dispatch performs no
 Git publication or remote mutations; the dispatcher owns private Git publication.

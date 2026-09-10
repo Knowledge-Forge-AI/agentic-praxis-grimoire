@@ -6,7 +6,7 @@ import json
 import hashlib
 import sys
 from pathlib import Path
-from typing import Any
+from typing import Any, NamedTuple
 
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
@@ -85,8 +85,21 @@ def finding_count(policy: str, output: str) -> int:
     raise ValueError(f"unknown finding policy {policy}")
 
 
-def _govulncheck_records(output: str) -> tuple[int, int, int]:
-    """Return (all findings, reachable findings, error records) from JSONL output."""
+class GovulncheckSummary(NamedTuple):
+    findings: int
+    reachable: int
+    errors: int
+    total_osvs: int
+    reachable_osvs: int
+    module_package_osvs: int
+    module_package_records: int
+    unique_osv_ids: tuple[str, ...]
+    reachable_osv_ids: tuple[str, ...]
+    module_package_osv_ids: tuple[str, ...]
+
+
+def _govulncheck_records(output: str) -> GovulncheckSummary:
+    """Classify govulncheck JSONL output according to pinned v1.1.4 producer semantics."""
     decoder = json.JSONDecoder()
     position = 0
     records: list[dict[str, Any]] = []
@@ -104,26 +117,83 @@ def _govulncheck_records(output: str) -> tuple[int, int, int]:
         records.append(value)
     if not records:
         raise ValueError("govulncheck JSON stream is empty")
-    if not any("config" in record for record in records):
+
+    config_records = [r["config"] for r in records if "config" in r]
+    if not config_records:
         raise ValueError("govulncheck JSON stream has no configuration record")
+
+    config = config_records[0]
+    if not isinstance(config, dict):
+        raise TypeError("govulncheck config record is malformed")
+
+    scan_level = config.get("scan_level", "symbol")
+    scan_mode = config.get("scan_mode", "source")
+
+    if scan_level != "symbol":
+        raise ValueError(
+            f"govulncheck scan level '{scan_level}' is insufficient for symbol reachability; expected 'symbol'"
+        )
+    if scan_mode not in {"source", "binary"}:
+        raise ValueError(f"govulncheck scan mode '{scan_mode}' is unsupported")
+
     findings = 0
     reachable = 0
     errors = 0
+    reachable_osv_set: set[str] = set()
+    module_package_osv_set: set[str] = set()
+    all_osv_set: set[str] = set()
+
     for record in records:
         if "error" in record:
             errors += 1
+        osv = record.get("osv")
+        if isinstance(osv, dict) and osv.get("id"):
+            all_osv_set.add(str(osv["id"]))
         finding = record.get("finding")
         if finding is None:
             continue
         if not isinstance(finding, dict):
             raise TypeError("govulncheck finding record is malformed")
         findings += 1
+        finding_osv = finding.get("osv")
+        if finding_osv:
+            all_osv_set.add(str(finding_osv))
         trace = finding.get("trace", [])
         if trace is not None and not isinstance(trace, list):
             raise ValueError("govulncheck finding trace is malformed")
+
+        has_symbol_frame = False
         if trace:
+            for frame in trace:
+                if not isinstance(frame, dict):
+                    raise ValueError("govulncheck finding trace frame is malformed")
+                if frame.get("function") or frame.get("receiver"):
+                    has_symbol_frame = True
+                    break
+
+        if has_symbol_frame:
             reachable += 1
-    return findings, reachable, errors
+            if finding_osv:
+                reachable_osv_set.add(str(finding_osv))
+        else:
+            if finding_osv:
+                module_package_osv_set.add(str(finding_osv))
+
+    module_package_records = findings - reachable
+    pure_module_package_osvs = module_package_osv_set - reachable_osv_set
+
+    return GovulncheckSummary(
+        findings=findings,
+        reachable=reachable,
+        errors=errors,
+        total_osvs=len(all_osv_set),
+        reachable_osvs=len(reachable_osv_set),
+        module_package_osvs=len(pure_module_package_osvs),
+        module_package_records=module_package_records,
+        unique_osv_ids=tuple(sorted(all_osv_set)),
+        reachable_osv_ids=tuple(sorted(reachable_osv_set)),
+        module_package_osv_ids=tuple(sorted(pure_module_package_osvs)),
+    )
 
 
 def evaluate(
@@ -228,15 +298,21 @@ def evaluate(
 
     if check.name == "govulncheck":
         try:
-            finding_total, reachable, error_records = _govulncheck_records(stdout)
+            summary = _govulncheck_records(stdout)
         except (TypeError, ValueError) as error:
             return "failed", str(error), "tool-failure"
-        if error_records:
-            return "failed", f"govulncheck reported {error_records} error record(s)", "tool-failure"
+        if summary.errors:
+            return "failed", f"govulncheck reported {summary.errors} error record(s)", "tool-failure"
         if returncode not in {0, 3}:
             return "failed", f"govulncheck operational failure: exit={returncode}", "tool-failure"
-        detail = f"findings={finding_total}; reachable={reachable}; module-package={finding_total - reachable}"
-        if reachable:
+        if returncode == 3 and summary.findings == 0:
+            return "failed", "govulncheck operational failure: exit=3 but 0 findings reported", "tool-failure"
+        detail = (
+            f"exit={returncode}; findings={summary.findings} (unique_osv={summary.total_osvs}); "
+            f"reachable={summary.reachable} (reachable_osv={summary.reachable_osvs}); "
+            f"module-package={summary.module_package_records} (module_package_osv={summary.module_package_osvs})"
+        )
+        if summary.reachable:
             return "failed", detail, "policy-finding"
         return "passed", detail, "passed"
 

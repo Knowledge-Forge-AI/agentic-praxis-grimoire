@@ -17,6 +17,15 @@ import tempfile
 from typing import Mapping, NoReturn, Sequence
 from urllib.parse import unquote, urlsplit
 
+from apg_staging_correction import (
+    build_untagged_candidate,
+    check_untagged_candidate,
+    normalise_required_checks,
+    run_checked_command,
+    verify_candidate_lineage,
+)
+
+
 
 COMMAND = "apg-public-release"
 POLICY_PATH = "release/public-surface.json"
@@ -1951,6 +1960,7 @@ V011_HELPER_ADDITIONS = (
     "libexec/apg_roadmap_closure.py",
     "libexec/apg_roadmap_contract.py",
     "libexec/apg_source_capture.py",
+    "libexec/apg_staging_correction.py",
     "libexec/apg_test.py",
     "release/ci/matrix_receipts.py",
     "tools/ci/betterleaks_dispositions.py",
@@ -1994,6 +2004,7 @@ V011_TEST_ADDITIONS = (
     "src/test/int/python/agentic-praxis-grimoire/libexec/apg_roadmap_closure.int.test.py",
     "src/test/int/python/agentic-praxis-grimoire/libexec/apg_roadmap_contract.int.test.py",
     "src/test/int/python/agentic-praxis-grimoire/libexec/apg_source_capture.int.test.py",
+    "src/test/int/python/agentic-praxis-grimoire/libexec/apg_staging_correction.int.test.py",
     "src/test/int/python/agentic-praxis-grimoire/tools/ci/betterleaks_dispositions.int.test.py",
     "src/test/int/python/agentic-praxis-grimoire/tools/ci/ci_topology.int.test.py",
     "src/test/int/python/agentic-praxis-grimoire/tools/ci/file_length_policy.int.test.py",
@@ -2008,6 +2019,7 @@ V011_TEST_ADDITIONS = (
     "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_roadmap_closure.unit.test.py",
     "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_roadmap_contract.unit.test.py",
     "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_source_capture.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_staging_correction.unit.test.py",
     "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_test.unit.test.py",
     "src/test/unit/python/agentic-praxis-grimoire/release/ci/matrix_receipts.unit.test.py",
     "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg140_migration_fixture.unit.test.py",
@@ -3660,117 +3672,6 @@ def build_candidate(
     return tree, commit, tag_object
 
 
-def build_untagged_candidate(
-    source: Repository,
-    base: Repository,
-    output: Path,
-    version: str,
-    *,
-    staging_parent: str | None = None,
-    subject: str | None = None,
-) -> tuple[str, str]:
-    """Build the untagged ``staging`` candidate used by the public PR.
-
-    The projection and object-copy machinery is the same as the tagged
-    release builder, but this mode deliberately takes no release-date or
-    author override and creates neither a release branch nor a tag.  The
-    disposable candidate receives a single commit on the exact ``staging``
-    branch so GitHub can create the eventual squash commit later.
-    """
-
-    if version.split("+", 1)[0].split("-", 1)[0] != "0.11.0":
-        unsafe("untagged candidate mode is only available for v0.11.0")
-    validate_repository_separation(source, base)
-    verify_public_release_lineage(
-        base,
-        accepted_commit=PUBLIC_V01_COMMIT,
-        accepted_tree=PUBLIC_V01_TREE,
-    )
-    policy = load_policy(
-        source,
-        expected_surfaces=audited_policy_surfaces(version),
-        allow_v07_compatibility=True,
-        allow_v08_compatibility=True,
-        allow_v09_compatibility=True,
-        allow_v010_compatibility=True,
-    )
-    entries = public_candidate_entries(source, version, excluded_prefix=b"private/")
-    validate_versioned_policy_exclusions(entries, version)
-    validate_critical(entries, policy)
-    validate_public_symlinks(source, entries)
-    validate_output_path(output, source.root, base.root)
-    if staging_parent is None:
-        if not run_git(
-            base.root,
-            ["show-ref", "--verify", "--quiet", "refs/heads/staging"],
-            allow_failure=True,
-        ).returncode:
-            fail("public base already contains the staging branch")
-    else:
-        if run_git(
-            base.root,
-            ["merge-base", "--is-ancestor", base.head, staging_parent],
-            allow_failure=True,
-        ).returncode != 0:
-            fail("public base is not an ancestor of staging parent")
-    if os.path.lexists(output):
-        output.rmdir()
-    initialize_candidate(output, base)
-    metadata = text_git(
-        base.root,
-        ["show", "-s", "--format=%an%x00%ae%x00%aI", base.head],
-    ).split("\x00")
-    if len(metadata) != 3:
-        fail("public base release metadata is incomplete")
-    validate_identity(metadata[0], metadata[1])
-    validate_date(metadata[2])
-    run_git(output, ["config", "user.name", metadata[0]])
-    run_git(output, ["config", "user.email", metadata[1]])
-    for entry in entries:
-        import_object(source, output, entry.oid)
-    with tempfile.NamedTemporaryFile(prefix="apg-public-index-", delete=False) as index_file:
-        index_path = Path(index_file.name)
-    index_path.unlink()
-    try:
-        payload = b"".join(
-            entry.mode.encode("ascii") + b" " + entry.oid.encode("ascii") + b"\t" + entry.path + b"\0"
-            for entry in entries
-        )
-        environment = {"GIT_INDEX_FILE": str(index_path)}
-        run_git(
-            output,
-            ["update-index", "-z", "--index-info"],
-            input_bytes=payload,
-            extra_environment=environment,
-        )
-        tree = text_git(output, ["write-tree"], extra_environment=environment)
-    finally:
-        index_path.unlink(missing_ok=True)
-    identity_environment = {
-        "GIT_AUTHOR_NAME": metadata[0],
-        "GIT_AUTHOR_EMAIL": metadata[1],
-        "GIT_AUTHOR_DATE": metadata[2],
-        "GIT_COMMITTER_NAME": metadata[0],
-        "GIT_COMMITTER_EMAIL": metadata[1],
-        "GIT_COMMITTER_DATE": metadata[2],
-    }
-    commit_parent = staging_parent if staging_parent is not None else base.head
-    commit_subject = subject or (f"Release v{version}" if staging_parent is None else f"Release v{version} staging correction")
-    commit = text_git(
-        output,
-        ["commit-tree", tree, "-p", commit_parent, "-m", commit_subject],
-        extra_environment=identity_environment,
-    )
-    run_git(output, ["update-ref", "refs/heads/staging", commit])
-    run_git(output, ["symbolic-ref", "HEAD", "refs/heads/staging"])
-    run_git(output, ["reset", "--hard", commit])
-    if run_git(source.root, ["status", "--porcelain=v1", "-z", "--untracked-files=all"]).stdout:
-        fail("source changed during candidate construction")
-    if run_git(base.root, ["status", "--porcelain=v1", "-z", "--untracked-files=all"]).stdout:
-        fail("base changed during candidate construction")
-    return tree, commit
-
-
 MARKDOWN_LINK = re.compile(r"(?<!!)\[[^\]]*\]\(([^)]+)\)|!\[[^\]]*\]\(([^)]+)\)")
 HUMAN_MARKDOWN_LINK_EXCLUDED_PREFIXES = (b"hotspot/testdata/classification/",)
 
@@ -3837,58 +3738,6 @@ def validate_private_policy(repository: Repository, path: str | None) -> None:
         for pattern in patterns:
             if pattern in text:
                 fail(f"private validation pattern matched public path: {entry.display_path}")
-
-
-def run_checked_command(arguments: Sequence[str], cwd: Path, environment: dict[str, str] | None = None) -> None:
-    try:
-        result = subprocess.run(
-            list(arguments),
-            cwd=cwd,
-            check=False,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            env=environment or os.environ.copy(),
-        )
-    except OSError as error:
-        fail(f"configured validation could not run: {error.strerror or error}")
-    log_var = os.environ.get("APG_VALIDATION_OUTPUT_LOG")
-    if log_var:
-        log_path = Path(log_var)
-        if not log_path.is_absolute():
-            fail("validation output log path must be absolute")
-        resolved_log = log_path.resolve()
-        forbidden = [cwd.resolve(), Path(__file__).resolve().parents[1]]
-        if environment and "APG12_PUBLIC_V01_ROOT" in environment:
-            forbidden.append(Path(environment["APG12_PUBLIC_V01_ROOT"]).resolve())
-        for root in forbidden:
-            if resolved_log == root or root in resolved_log.parents or resolved_log in root.parents:
-                fail(f"validation output log path cannot overlap repository or validation roots: {resolved_log}")
-        log_payload = (
-            f"--- COMMAND: {' '.join(arguments)} ---\n"
-            f"RETURNCODE: {result.returncode}\n"
-            f"--- STDOUT ---\n"
-            f"{result.stdout.decode('utf-8', 'replace')}\n"
-            f"--- STDERR ---\n"
-            f"{result.stderr.decode('utf-8', 'replace')}\n"
-            f"--- END COMMAND ---\n"
-        ).encode("utf-8")
-        flags = os.O_WRONLY | os.O_CREAT | os.O_APPEND
-        if hasattr(os, "O_NOFOLLOW"):
-            flags |= os.O_NOFOLLOW
-        try:
-            fd = os.open(os.fspath(resolved_log), flags, 0o600)
-            try:
-                offset = 0
-                while offset < len(log_payload):
-                    offset += os.write(fd, log_payload[offset:])
-                os.fsync(fd)
-            finally:
-                os.close(fd)
-        except OSError as error:
-            fail(f"could not write validation output log: {error.strerror or error}")
-    if result.returncode:
-        detail = (result.stderr + result.stdout)[-8192:].decode("utf-8", "replace").strip()
-        fail(f"configured validation failed: {' '.join(arguments)}: {detail}")
 
 
 def resolve_public_validation_deselections(
@@ -3978,14 +3827,16 @@ def validate_categories(
             entry = next(item for item in tree_entries(candidate) if item.display_path == path)
             first_line = entry_bytes(candidate, entry).splitlines()[:1]
             if first_line and (b"/sh" in first_line[0] or b"/bash" in first_line[0]):
-                run_checked_command(["bash", "-n", path], candidate.root, environment)
+                bash_bin = environment.get("APG_BASH") or "bash"
+                run_checked_command([bash_bin, "-n", path], candidate.root, environment)
     if "python-compile" in categories:
         run_checked_command([sys.executable, "-m", "compileall", "-q", "libexec", "src/test"], candidate.root, environment)
     if "configured-tests" in categories:
         bash_tests = [path for path in tests if path.endswith(".bats")]
         python_tests = [path for path in tests if path.endswith(".py")]
         if bash_tests:
-            run_checked_command(["bats", *bash_tests], candidate.root, environment)
+            bats_bin = environment.get("APG_BATS") or "bats"
+            run_checked_command([bats_bin, *bash_tests], candidate.root, environment)
         if python_tests and all(
             "/agentic-praxis-grimoire/" in path for path in python_tests
         ):
@@ -4179,39 +4030,15 @@ def check_candidate(
     for path, expected in source_map.items():
         if candidate_map[path] != expected:
             fail(f"candidate mode, bytes, or symlink target differs: {path.decode('utf-8', 'replace')}")
-    if allow_staging_correction:
-        if not correction_parent:
-            fail("candidate correction check requires an explicit correction_parent")
-        if run_git(candidate.root, ["merge-base", "--is-ancestor", base.head, "HEAD"], allow_failure=True).returncode != 0:
-            fail("candidate release commit does not have the public base in its ancestry")
-        parent_record = text_git(candidate.root, ["rev-list", "--parents", "-n", "1", "HEAD"]).split()
-        if len(parent_record) != 2:
-            fail("candidate correction commit must have exactly one parent")
-        if parent_record[1] != correction_parent:
-            fail(f"candidate correction parent mismatch: expected {correction_parent}, got {parent_record[1]}")
-        expected_branch = "staging"
-        if text_git(candidate.root, ["branch", "--show-current"]) != expected_branch:
-            fail("candidate is on the wrong release branch")
-        actual_subject = text_git(candidate.root, ["log", "-1", "--format=%s"])
-        if correction_subject:
-            if actual_subject != correction_subject:
-                fail(f"candidate release subject is incorrect: expected {correction_subject}, got {actual_subject}")
-        else:
-            if not actual_subject or not actual_subject.strip():
-                fail("candidate release subject is empty")
-    else:
-        if text_git(candidate.root, ["rev-parse", "HEAD^"]) != base.head:
-            fail("candidate release commit does not have the public base as sole parent")
-        parent_record = text_git(candidate.root, ["rev-list", "--parents", "-n", "1", "HEAD"]).split()
-        if len(parent_record) != 2 or parent_record[1] != base.head:
-            fail("candidate release commit must have exactly one parent equal to the public base")
-        if text_git(candidate.root, ["rev-list", "--count", f"{base.head}..HEAD"]) != "1":
-            fail("candidate history must add exactly one commit after the public base")
-        expected_branch = "staging" if untagged else f"release/{version}"
-        if text_git(candidate.root, ["branch", "--show-current"]) != expected_branch:
-            fail("candidate is on the wrong release branch")
-        if text_git(candidate.root, ["log", "-1", "--format=%s"]) != f"Release v{version}":
-            fail("candidate release subject is incorrect")
+    verify_candidate_lineage(
+        candidate,
+        base,
+        version,
+        untagged=untagged,
+        allow_staging_correction=allow_staging_correction,
+        correction_parent=correction_parent,
+        correction_subject=correction_subject,
+    )
     tag = f"v{version}"
     if untagged:
         if run_git(
@@ -4282,55 +4109,7 @@ def check_candidate(
     return result
 
 
-def check_untagged_candidate(
-    source: Repository,
-    base: Repository,
-    candidate: Repository,
-    version: str,
-    private_policy: str | None = None,
-    *,
-    allow_staging_correction: bool = False,
-    correction_parent: str | None = None,
-    correction_subject: str | None = None,
-) -> dict[str, object]:
-    """Check an untagged v0.11 candidate on the exact ``staging`` branch."""
-
-    return check_candidate(
-        source,
-        base,
-        candidate,
-        version,
-        private_policy,
-        untagged=True,
-        allow_staging_correction=allow_staging_correction,
-        correction_parent=correction_parent,
-        correction_subject=correction_subject,
-    )
-
-
-def _normalise_required_checks(
-    required_checks: Mapping[str, str] | Sequence[str],
-) -> dict[str, str]:
-    """Return the supplied required-check attestation in a stable form."""
-
-    if isinstance(required_checks, Mapping):
-        items = tuple(required_checks.items())
-    elif isinstance(required_checks, str):
-        unsafe("approved required checks must be a sequence of names")
-    else:
-        items = tuple((name, "success") for name in required_checks)
-    if not items:
-        unsafe("at least one approved required check is required")
-    result: dict[str, str] = {}
-    for name, status in items:
-        if not isinstance(name, str) or not name.strip():
-            unsafe("approved required check names must be nonempty strings")
-        if not isinstance(status, str) or status != "success":
-            fail(f"approved required check did not succeed: {name}")
-        if name in result:
-            unsafe(f"approved required checks contain a duplicate: {name}")
-        result[name] = status
-    return dict(sorted(result.items()))
+_normalise_required_checks = normalise_required_checks
 
 
 def check_merged_source(

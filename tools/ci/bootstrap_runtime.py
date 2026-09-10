@@ -20,7 +20,7 @@ import stat
 import subprocess
 import sys
 import tarfile
-from collections.abc import Callable, Mapping
+from collections.abc import Callable, Iterable, Mapping
 from contextlib import AbstractContextManager
 from pathlib import Path
 from typing import Any
@@ -42,6 +42,22 @@ EXPECTED_NPM_PACKAGES = {
     "rolldown": "1.2.7",
 }
 EXPECTED_BROWSERS = ("chromium", "firefox", "webkit")
+EXPECTED_BATS = {
+    "source": "github:NixOS/nixpkgs/0921fdb3e13e40fe25fbc52b89661a9d6d32ac68",
+    "attribute": "legacyPackages.aarch64-darwin.bats",
+    "version": "1.12.0",
+    "sha256": "73278ec8adddba2bfdcfe87e50110dc866ef9ce40ff2078f7caa4a83c877244f",
+    "root_owned": True,
+    "required_root": "/nix/store",
+}
+EXPECTED_BASH = {
+    "source": "github:NixOS/nixpkgs/0921fdb3e13e40fe25fbc52b89661a9d6d32ac68",
+    "attribute": "legacyPackages.aarch64-darwin.bash",
+    "version": "5.3p3",
+    "sha256": "9325e10deef5e0d3bae8c9ab11ac1ebdd5f61dad29ae86f1b7e7cae092e2d359",
+    "root_owned": True,
+    "required_root": "/nix/store",
+}
 _ALLOWED_SYMLINK_ALIASES = {
     (Path("/tmp"), Path("/private/tmp")),
     (Path("/var"), Path("/private/var")),
@@ -78,7 +94,15 @@ def load_runtime(path: Path = RUNTIME_CONFIG) -> dict[str, Any]:
         raise ValueError("public CI runtime is only qualified for darwin/arm64")
     if document.get("runner") != "macos-15":
         raise ValueError("public CI runtime is only qualified for the macos-15 runner")
-    required = {"primary_node", "secondary_node", "python_packages", "npm_packages", "browsers"}
+    required = {
+        "primary_node",
+        "secondary_node",
+        "python_packages",
+        "npm_packages",
+        "browsers",
+        "bats",
+        "bash",
+    }
     if not required.issubset(document):
         raise ValueError("public CI runtime is missing a required section")
     python_packages = document["python_packages"]
@@ -124,6 +148,12 @@ def load_runtime(path: Path = RUNTIME_CONFIG) -> dict[str, Any]:
         )
     ):
         raise ValueError("public CI Node identities are not the qualified set")
+    bats = document.get("bats")
+    bash = document.get("bash")
+    if not isinstance(bats, dict) or bats != EXPECTED_BATS:
+        raise ValueError("public CI Bats pins are not the qualified set")
+    if not isinstance(bash, dict) or bash != EXPECTED_BASH:
+        raise ValueError("public CI Bash pins are not the qualified set")
     return document
 
 
@@ -382,6 +412,37 @@ def _direct_file(path: Path, owner: Path, label: str, *, executable: bool) -> Pa
     return path
 
 
+def _verify_binary(
+    path: Path,
+    *,
+    expected_sha256: str,
+    label: str,
+    required_root: Path | None = None,
+    required_uid: int | None = None,
+) -> Path:
+    if (
+        not path.is_absolute()
+        or path.is_symlink()
+        or not path.is_file()
+        or not os.access(path, os.X_OK)
+    ):
+        raise ValueError(f"runtime {label} binding must be a direct executable file")
+    resolved = path.resolve(strict=True)
+    if resolved != path:
+        raise ValueError(f"runtime {label} binding contains a symlinked path")
+    if required_root is not None:
+        required_root = required_root.resolve(strict=True)
+        if not _is_within(resolved, required_root):
+            raise ValueError(f"runtime {label} binding is outside the approved root")
+    info = path.lstat()
+    if required_uid is not None and info.st_uid != required_uid:
+        raise ValueError(f"runtime {label} binding ownership does not match the approved owner")
+    actual = _sha256(path)
+    if actual != expected_sha256:
+        raise ValueError(f"runtime {label} digest mismatch: expected {expected_sha256}")
+    return path
+
+
 def _verify_node(
     path: Path,
     *,
@@ -445,6 +506,54 @@ def materialize_primary_node(
         expected_sha256=str(node["sha256"]),
         required_root=Path(str(node["required_root"])),
         required_uid=0 if node.get("root_owned") else None,
+    )
+
+
+def materialize_nix_binary(
+    section_name: str,
+    binary_name: str,
+    config: Mapping[str, Any],
+    *,
+    environment: Mapping[str, str] | None = None,
+    runner: Callable[..., subprocess.CompletedProcess[str]] = subprocess.run,
+) -> Path:
+    entry = config[section_name]
+    source = str(entry["source"])
+    attribute = str(entry["attribute"])
+    nix = shutil.which("nix")
+    if nix is None:
+        raise RuntimeError(f"qualified Nix is unavailable; {section_name} cannot be provisioned")
+    output = _run(
+        [
+            nix,
+            "--extra-experimental-features",
+            "nix-command flakes",
+            "build",
+            "--no-link",
+            "--print-out-paths",
+            f"{source}#{attribute}",
+        ],
+        env=environment,
+        runner=runner,
+    )
+    paths = [Path(line.strip()) for line in output.stdout.splitlines() if line.strip()]
+    candidates = [
+        path / "bin" / binary_name
+        for path in paths
+        if (path / "bin" / binary_name).is_file()
+    ]
+    if not candidates and len(paths) == 1:
+        candidates = [paths[0] / "bin" / binary_name]
+    if len(candidates) != 1:
+        raise RuntimeError(
+            f"Nix {section_name} resolution did not produce exactly one {binary_name} binary"
+        )
+    return _verify_binary(
+        candidates[0],
+        expected_sha256=str(entry["sha256"]),
+        label=section_name,
+        required_root=Path(str(entry["required_root"])),
+        required_uid=0 if entry.get("root_owned") else None,
     )
 
 
@@ -708,6 +817,47 @@ def write_environment(
             os.close(descriptor)
 
 
+def write_path_file(
+    path: Path,
+    directories: Iterable[Path | str],
+    *,
+    repository: Path = ROOT,
+    runtime_root: Path | None = None,
+) -> None:
+    """Create one private, non-overwriting path file outside the checkout."""
+    destination = _validate_environment_output(path, repository, runtime_root)
+    lines: list[str] = []
+    seen: set[str] = set()
+    for directory in directories:
+        rendered = os.fspath(directory)
+        if "\n" in rendered or "\r" in rendered:
+            raise ValueError("path entries must not contain line breaks")
+        if rendered not in seen:
+            seen.add(rendered)
+            lines.append(rendered)
+    payload = ("\n".join(lines) + "\n").encode("utf-8")
+    flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL
+    if hasattr(os, "O_NOFOLLOW"):
+        flags |= os.O_NOFOLLOW
+    descriptor: int | None = None
+    identity: tuple[int, int] | None = None
+    try:
+        descriptor = os.open(os.fspath(destination), flags, 0o600)
+        metadata = os.fstat(descriptor)
+        identity = (metadata.st_dev, metadata.st_ino)
+        offset = 0
+        while offset < len(payload):
+            offset += os.write(descriptor, payload[offset:])
+        os.fchmod(descriptor, 0o600)
+        os.fsync(descriptor)
+    except OSError:
+        _remove_created_file(destination, identity)
+        raise
+    finally:
+        if descriptor is not None:
+            os.close(descriptor)
+
+
 def _remove_created_root(root: Path, identity: tuple[int, int] | None) -> None:
     """Clean up only the fresh runtime root whose identity was recorded."""
     if identity is None:
@@ -735,6 +885,7 @@ def main(argv: list[str] | None = None) -> int:
     )
     parser.add_argument("--root", required=True, type=Path)
     parser.add_argument("--env-file", required=True, type=Path)
+    parser.add_argument("--path-file", type=Path, default=None)
     parser.add_argument("--runtime-file", type=Path, default=RUNTIME_CONFIG)
     args = parser.parse_args(argv)
     root: Path | None = None
@@ -743,12 +894,18 @@ def main(argv: list[str] | None = None) -> int:
     try:
         config = load_runtime(args.runtime_file)
         env_path = _validate_environment_output(args.env_file, ROOT, args.root)
+        if args.path_file is not None:
+            if args.path_file == args.env_file:
+                raise ValueError("path file cannot be the same as environment file")
+            _validate_environment_output(args.path_file, ROOT, args.root)
         root = _ensure_task_root(args.root, ROOT)
         root_metadata = root.lstat()
         root_identity = (root_metadata.st_dev, root_metadata.st_ino)
         environment = _isolated_environment(root)
         primary = materialize_primary_node(config, environment=environment)
         secondary = materialize_secondary_node(config, root)
+        bats = materialize_nix_binary("bats", "bats", config, environment=environment)
+        bash = materialize_nix_binary("bash", "bash", config, environment=environment)
         python = install_python_requirements(root, config)
         package_root, tsc = install_npm_runtime(root, config, primary)
         browsers = root / "browsers"
@@ -766,8 +923,17 @@ def main(argv: list[str] | None = None) -> int:
             "APG_VITE_PACKAGE_ROOT": package_root,
             "PLAYWRIGHT_BROWSERS_PATH": browsers,
             "APGR_TEST_PYTHON": python,
+            "APG_BATS": bats,
+            "APG_BASH": bash,
         }
         write_environment(env_path, values, repository=ROOT, runtime_root=root)
+        if args.path_file is not None:
+            write_path_file(
+                args.path_file,
+                [bats.parent, bash.parent, primary.parent],
+                repository=ROOT,
+                runtime_root=root,
+            )
         print(
             json.dumps(
                 {
@@ -775,6 +941,8 @@ def main(argv: list[str] | None = None) -> int:
                     "status": "passed",
                     "primary_sha256": _sha256(primary),
                     "secondary_sha256": _sha256(secondary),
+                    "bats_sha256": _sha256(bats),
+                    "bash_sha256": _sha256(bash),
                 }
             )
         )

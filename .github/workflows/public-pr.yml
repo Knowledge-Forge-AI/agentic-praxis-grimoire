@@ -239,7 +239,7 @@
         },
         {
           "name": "Bootstrap exact disposable APGR runtime",
-          "run": "set -euo pipefail\npython3 tools/ci/bootstrap_runtime.py \\\n  --root \"${RUNNER_TEMP}/apgr-runtime\" \\\n  --env-file \"${RUNNER_TEMP}/apgr-runtime.env\"\ncat \"${RUNNER_TEMP}/apgr-runtime.env\" >> \"${GITHUB_ENV}\"\n"
+          "run": "set -euo pipefail\npython3 tools/ci/bootstrap_runtime.py \\\n  --root \"${RUNNER_TEMP}/apgr-runtime\" \\\n  --env-file \"${RUNNER_TEMP}/apgr-runtime.env\" \\\n  --path-file \"${RUNNER_TEMP}/apgr-runtime.path\"\ncat \"${RUNNER_TEMP}/apgr-runtime.env\" >> \"${GITHUB_ENV}\"\nif [ -f \"${RUNNER_TEMP}/apgr-runtime.path\" ]; then cat \"${RUNNER_TEMP}/apgr-runtime.path\" >> \"${GITHUB_PATH}\"; fi\n"
         },
         {
           "name": "Run unit and integration suite",

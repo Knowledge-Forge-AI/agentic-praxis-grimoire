@@ -161,6 +161,15 @@ export async function runPlaywrightSupervisor(browserName, scratchDir, serverOri
     }
   );
 
+  let childStdout = '';
+  let childStderr = '';
+  if (child.stdout) {
+    child.stdout.on('data', (chunk) => { childStdout += chunk.toString(); });
+  }
+  if (child.stderr) {
+    child.stderr.on('data', (chunk) => { childStderr += chunk.toString(); });
+  }
+
   const childPid = child.pid;
   const terminateChild = () => {
     try { process.kill(-childPid, 'SIGKILL'); } catch (error) {
@@ -182,21 +191,29 @@ export async function runPlaywrightSupervisor(browserName, scratchDir, serverOri
   }
 
   // Send SIGINT to process group
+  const sigintSentAt = Date.now();
   process.kill(-childPid, 'SIGINT');
 
-  const exitCode = await new Promise((resolve) => {
+  const interruptionResult = await new Promise((resolve) => {
     const timer = setTimeout(() => {
+      const elapsed = Date.now() - sigintSentAt;
       try { process.kill(-childPid, 'SIGKILL'); } catch (_) {}
-      resolve(-1);
-    }, 8000);
+      resolve({ timedOut: true, elapsed });
+    }, 15000);
     child.on('exit', (code, signal) => {
       clearTimeout(timer);
-      resolve(code !== null ? code : signal);
+      const elapsed = Date.now() - sigintSentAt;
+      resolve({ code, signal, timedOut: false, elapsed });
     });
   });
 
+  if (interruptionResult.timedOut) {
+    throw new Error(`Supervisor runner interruption timed out after ${interruptionResult.elapsed}ms. STDOUT:\n${childStdout}\nSTDERR:\n${childStderr}`);
+  }
+
+  const exitCode = interruptionResult.code !== null ? interruptionResult.code : interruptionResult.signal;
   if (exitCode !== 130) {
-    throw new Error(`Expected runner interruption exit 130, got: ${exitCode}`);
+    throw new Error(`Expected runner interruption exit 130, got: ${exitCode}. STDOUT:\n${childStdout}\nSTDERR:\n${childStderr}`);
   }
 
   // Bounded check for process group death
