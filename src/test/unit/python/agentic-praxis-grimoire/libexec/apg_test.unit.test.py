@@ -22,6 +22,8 @@ sys.path.insert(0, str(REPOSITORY_ROOT / "libexec"))
 
 import apg_test  # noqa: E402
 
+UNIT_FILES = [f"{apg_test.UNIT_ROOT.as_posix()}/owner.unit.test.py"]
+
 
 def write_inventory(root: Path, value: object) -> None:
     path = root / apg_test.INVENTORY_PATH
@@ -1287,6 +1289,307 @@ def test_actual_pytest_rendering_cannot_disclose_raw_engine_streams(tmp_path: Pa
     assert "JavascriptQualificationError" in capture.rendered
 
 
+def test_javascript_pytest_showlocals_cannot_disclose_raw_streams(tmp_path: Path) -> None:
+    sentinel = "APG128-JS-SHOWLOCALS-STREAM-SENTINEL"
+    encoded = sentinel.encode("utf-8").hex()
+
+    scenarios = [
+        ("nonzero", f"subprocess.CompletedProcess(args, 7, bytes.fromhex('{encoded}').decode() + '\\n', '')", "top-level-await"),
+        ("unexpected_stdout", f"subprocess.CompletedProcess(args, 0, bytes.fromhex('{encoded}').decode() + '\\n', '')", "commonjs-boundary-syntax"),
+        ("unexpected_stderr", f"subprocess.CompletedProcess(args, 0, '1\\n', bytes.fromhex('{encoded}').decode() + '\\n')", "top-level-await"),
+        ("malformed_json", f"subprocess.CompletedProcess(args, 0, '{{broken:' + bytes.fromhex('{encoded}').decode() + '}}', '')", "top-level-await"),
+        ("structural_mismatch", f"subprocess.CompletedProcess(args, 0, json.dumps({{'unexpected': bytes.fromhex('{encoded}').decode()}}) + '\\n', '')", "top-level-await"),
+        ("timeout", f"subprocess.TimeoutExpired(args, 10, output=bytes.fromhex('{encoded}').decode(), stderr=bytes.fromhex('{encoded}').decode())", "top-level-await"),
+        ("start_oserror", f"OSError('spawn-failed:' + bytes.fromhex('{encoded}').decode())", "top-level-await"),
+    ]
+
+    for name, proc_expr, contract_id in scenarios:
+        case_dir = tmp_path / name
+        case_dir.mkdir()
+        test_file = case_dir / f"test_javascript_showlocals_{name}.py"
+        is_exception = "TimeoutExpired" in proc_expr or "OSError" in proc_expr
+        run_body = f"raise {proc_expr}" if is_exception else f"return {proc_expr}"
+        test_file.write_text(
+            "import json, pathlib, subprocess, sys\n"
+            f"sys.path.insert(0, {str(REPOSITORY_ROOT / 'libexec')!r})\n"
+            "import apg_test\n"
+            "binding = apg_test.JavascriptEngineBinding(\n"
+            "    pathlib.Path('/external/node'), (1, 2, 3, 4, 5, 6, 7),\n"
+            "    'a' * 64, 'v22.22.2|darwin/arm64|12.4.254.21-node.39'\n"
+            ")\n"
+            "def test_failure(monkeypatch):\n"
+            "    monkeypatch.setenv('APG_JAVASCRIPT_NODE', str(binding.path))\n"
+            "    monkeypatch.setattr(apg_test, '_javascript_engine_binding', lambda root: binding)\n"
+            f"    def fake_run(args, **kwargs):\n"
+            f"        {run_body}\n"
+            "    monkeypatch.setattr(apg_test, '_run_javascript_process', fake_run)\n"
+            "    apg_test.invoke_javascript_engine(\n"
+            f"        pathlib.Path('/repo'), ['--eval', 'ignored'], cwd=pathlib.Path('/repo'),\n"
+            f"        output_contract_id={contract_id!r}\n"
+            "    )\n",
+            encoding="utf-8",
+        )
+
+        class Capture:
+            rendered = ""
+
+            def pytest_runtest_logreport(self, report: pytest.TestReport) -> None:
+                if report.failed:
+                    self.rendered += report.longreprtext
+
+        capture = Capture()
+        result = pytest.main(["-q", "-l", "--basetemp", str(test_file.parent / "nested-pytest"), str(test_file)], plugins=[capture])
+        assert result == pytest.ExitCode.TESTS_FAILED
+        assert sentinel not in capture.rendered, f"Sentinel leaked in {name}: {capture.rendered}"
+        assert "JavascriptQualificationError" in capture.rendered
+
+
+def test_javascript_engine_binding_showlocals_cannot_disclose_raw_streams(tmp_path: Path) -> None:
+    sentinel = "APG128-JS-PROBE-SENTINEL"
+    encoded = sentinel.encode("utf-8").hex()
+
+    scenarios = [
+        ("probe_mismatch", f"subprocess.CompletedProcess(args, 0, bytes.fromhex('{encoded}').decode() + '\\n', '')"),
+        ("probe_nonzero", f"subprocess.CompletedProcess(args, 1, '', bytes.fromhex('{encoded}').decode() + '\\n')"),
+        ("probe_timeout", f"subprocess.TimeoutExpired(args, 10, output=bytes.fromhex('{encoded}').decode(), stderr=bytes.fromhex('{encoded}').decode())"),
+        ("probe_oserror", f"OSError('probe failed: ' + bytes.fromhex('{encoded}').decode())"),
+    ]
+
+    for name, proc_expr in scenarios:
+        case_dir = tmp_path / name
+        case_dir.mkdir()
+        test_file = case_dir / f"test_javascript_binding_showlocals_{name}.py"
+        is_exception = "TimeoutExpired" in proc_expr or "OSError" in proc_expr
+        run_body = f"raise {proc_expr}" if is_exception else f"return {proc_expr}"
+        test_file.write_text(
+            "import os, pathlib, subprocess, hashlib, sys\n"
+            f"sys.path.insert(0, {str(REPOSITORY_ROOT / 'libexec')!r})\n"
+            "import apg_test\n"
+            "def test_failure(monkeypatch, tmp_path):\n"
+            "    repo = (tmp_path / 'repo').resolve()\n"
+            "    repo.mkdir()\n"
+            "    engine_dir = (tmp_path / 'engine').resolve()\n"
+            "    engine_dir.mkdir()\n"
+            "    engine = engine_dir / 'node'\n"
+            "    engine.write_text('#!/bin/sh\\nexit 0\\n', encoding='utf-8')\n"
+            "    engine.chmod(0o755)\n"
+            "    monkeypatch.setattr(apg_test, 'EXPECTED_JAVASCRIPT_ENGINE_ROOT', engine_dir)\n"
+            "    monkeypatch.setattr(apg_test, 'EXPECTED_JAVASCRIPT_ENGINE_UID', os.getuid())\n"
+            "    monkeypatch.setattr(apg_test, 'EXPECTED_JAVASCRIPT_ENGINE_SHA256', hashlib.sha256(engine.read_bytes()).hexdigest())\n"
+            "    monkeypatch.setenv('APG_JAVASCRIPT_NODE', str(engine))\n"
+            f"    def fake_run(args, **kwargs):\n"
+            f"        {run_body}\n"
+            "    monkeypatch.setattr(apg_test, '_run_javascript_process', fake_run)\n"
+            "    apg_test._javascript_engine_binding(repo)\n",
+            encoding="utf-8",
+        )
+
+        class Capture:
+            rendered = ""
+
+            def pytest_runtest_logreport(self, report: pytest.TestReport) -> None:
+                if report.failed:
+                    self.rendered += report.longreprtext
+
+        capture = Capture()
+        result = pytest.main(["-q", "-l", "--basetemp", str(test_file.parent / "nested-pytest"), str(test_file)], plugins=[capture])
+        assert result == pytest.ExitCode.TESTS_FAILED
+        assert sentinel not in capture.rendered, f"Sentinel leaked in probe {name}: {capture.rendered}"
+        assert "ToolError" in capture.rendered or "InvocationError" in capture.rendered
+
+
+def test_javascript_post_binding_failure_showlocals_cannot_disclose_raw_streams(tmp_path: Path) -> None:
+    sentinel = "APG128-JS-POST-BINDING-SENTINEL"
+    encoded = sentinel.encode("utf-8").hex()
+    test_file = tmp_path / "test_post_binding.py"
+    test_file.write_text(
+        "import os, pathlib, subprocess, sys\n"
+        f"sys.path.insert(0, {str(REPOSITORY_ROOT / 'libexec')!r})\n"
+        "import apg_test\n"
+        "binding = apg_test.JavascriptEngineBinding(\n"
+        "    pathlib.Path('/external/node'), (1, 2, 3, 4, 5, 6, 7),\n"
+        "    'a' * 64, 'v22.22.2|darwin/arm64|12.4.254.21-node.39'\n"
+        ")\n"
+        "def test_post_binding_fail(monkeypatch):\n"
+        "    monkeypatch.setenv('APG_JAVASCRIPT_NODE', str(binding.path))\n"
+        "    calls = 0\n"
+        "    def mock_binding(root):\n"
+        "        nonlocal calls\n"
+        "        calls += 1\n"
+        "        if calls == 1:\n"
+        "            return binding\n"
+        "        apg_test.fail_invocation('post-invocation binding drift')\n"
+        "    monkeypatch.setattr(apg_test, '_javascript_engine_binding', mock_binding)\n"
+        f"    def fake_run(args, **kwargs):\n"
+        f"        return subprocess.CompletedProcess(args, 0, bytes.fromhex('{encoded}').decode() + '\\n', '')\n"
+        "    monkeypatch.setattr(apg_test, '_run_javascript_process', fake_run)\n"
+        "    apg_test.invoke_javascript_engine(\n"
+        "        pathlib.Path('/repo'), ['--eval', 'ignored'],\n"
+        "        cwd=pathlib.Path('/repo'), output_contract_id='top-level-await'\n"
+        "    )\n",
+        encoding="utf-8",
+    )
+
+    class Capture:
+        rendered = ""
+
+        def pytest_runtest_logreport(self, report: pytest.TestReport) -> None:
+            if report.failed:
+                self.rendered += report.longreprtext
+
+    capture = Capture()
+    result = pytest.main(["-q", "-l", "--basetemp", str(test_file.parent / "nested-pytest"), str(test_file)], plugins=[capture])
+    assert result == pytest.ExitCode.TESTS_FAILED
+    assert sentinel not in capture.rendered, f"Sentinel leaked in post-binding: {capture.rendered}"
+    assert "post-invocation binding drift" in capture.rendered
+
+
+def _assert_javascript_exception_graph_clean(error: BaseException) -> None:
+    """Inspect every escaping frame, containers and retained exception attributes."""
+    import types
+    needle = bytes.fromhex("4150473132382d4558432d47524150482d53454e54494e454c").decode()
+    pending, seen = [error], set()
+    while pending:
+        value = pending.pop()
+        if id(value) in seen:
+            continue
+        seen.add(id(value))
+        if isinstance(value, (str, bytes)):
+            assert needle not in str(value)
+        elif isinstance(value, BaseException):
+            assert needle not in str(value) and needle not in repr(value)
+            pending.extend((value.args, vars(value), value.__cause__, value.__context__, value.__traceback__))
+        elif isinstance(value, types.TracebackType):
+            pending.extend((dict(value.tb_frame.f_locals), value.tb_next))
+        elif isinstance(value, dict):
+            pending.extend(value.keys())
+            pending.extend(value.values())
+        elif isinstance(value, (list, tuple, set, frozenset)):
+            pending.extend(value)
+        elif not isinstance(value, (type, types.ModuleType, types.FunctionType)) and hasattr(value, "__dict__"):
+            pending.append(vars(value))
+    assert error.__cause__ is None and error.__context__ is None
+
+
+@pytest.mark.parametrize("owner", ("semantic", "probe"))
+@pytest.mark.parametrize("fault", (
+    "nonzero", "stderr", "malformed", "structural", "timeout", "oserror", "unicode", "interrupt",
+))
+def test_javascript_exception_graph_and_traceback_locals_contain_no_raw_sentinel(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, owner: str, fault: str,
+) -> None:
+    engine = tmp_path.resolve() / "node"
+    engine.write_bytes(b"synthetic")
+    engine.chmod(0o755)
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    monkeypatch.setattr(apg_test, "EXPECTED_JAVASCRIPT_ENGINE_ROOT", engine.parent)
+    monkeypatch.setattr(apg_test, "EXPECTED_JAVASCRIPT_ENGINE_UID", os.getuid())
+    monkeypatch.setattr(apg_test, "EXPECTED_JAVASCRIPT_ENGINE_SHA256", hashlib.sha256(engine.read_bytes()).hexdigest())
+    monkeypatch.setenv("APG_JAVASCRIPT_NODE", str(engine))
+    if owner == "semantic":
+        binding = apg_test.JavascriptEngineBinding(engine, (1, 2, 3, 4, 5, 6, 7), "0" * 64, apg_test.EXPECTED_JAVASCRIPT_ENGINE)
+        monkeypatch.setattr(apg_test, "_javascript_engine_binding", lambda _root: binding)
+    def fake_run(args, **kwargs):
+        raw = bytes.fromhex("4150473132382d4558432d47524150482d53454e54494e454c").decode()
+        if fault == "timeout":
+            raise apg_test.subprocess.TimeoutExpired(args, 1, output=raw, stderr=raw)
+        if fault == "oserror":
+            raise OSError(raw)
+        if fault == "unicode":
+            raise UnicodeDecodeError("utf-8", raw.encode(), 0, 1, "synthetic")
+        if fault == "interrupt":
+            raise KeyboardInterrupt(raw)
+        output = json.dumps({"extra": raw}) if fault == "structural" else raw
+        return apg_test.subprocess.CompletedProcess(args, 1 if fault == "nonzero" else 0, output,
+                                                    raw if fault == "stderr" else "")
+    monkeypatch.setattr(apg_test, "_run_javascript_process", fake_run)
+    with pytest.raises(KeyboardInterrupt if fault == "interrupt" else apg_test.InvocationError) as caught:
+        if owner == "probe":
+            apg_test._javascript_engine_binding(repo)
+        else:
+            apg_test.invoke_javascript_engine(repo, ["--eval", "synthetic"], cwd=repo,
+                                            output_contract_id="top-level-await")
+    _assert_javascript_exception_graph_clean(caught.value)
+
+
+def test_javascript_parser_exhaustion_does_not_escape_raw_custody(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    binding = apg_test.JavascriptEngineBinding(
+        tmp_path / "node", (1, 2, 3, 4, 5, 6, 7), "0" * 64,
+        apg_test.EXPECTED_JAVASCRIPT_ENGINE,
+    )
+    monkeypatch.setenv("APG_JAVASCRIPT_NODE", str(binding.path))
+    monkeypatch.setattr(apg_test, "_javascript_engine_binding", lambda _root: binding)
+
+    def fake_run(args, **kwargs):
+        return apg_test.subprocess.CompletedProcess(
+            args, 0, bytes.fromhex("4150473132382d4558432d47524150482d53454e54494e454c").decode(), "",
+        )
+
+    def exhausted_parser(raw, **kwargs):
+        raise RecursionError(raw)
+
+    monkeypatch.setattr(apg_test, "_run_javascript_process", fake_run)
+    with monkeypatch.context() as parser_patch:
+        parser_patch.setattr(apg_test.json, "loads", exhausted_parser)
+        with pytest.raises(apg_test.JavascriptQualificationError, match="invalid structured output") as caught:
+            apg_test.invoke_javascript_engine(
+                tmp_path, ["--eval", "synthetic"], cwd=tmp_path,
+                output_contract_id="top-level-await",
+            )
+    _assert_javascript_exception_graph_clean(caught.value)
+
+
+def test_javascript_real_disposable_child_process_cannot_disclose_raw_streams(tmp_path: Path) -> None:
+    sentinel = "APG128-REAL-CHILD-STREAM-SENTINEL"
+    resolved_tmp = tmp_path.resolve()
+    engine = resolved_tmp / "node"
+    engine.write_text(
+        "#!/bin/sh\n"
+        "if [ \"$1\" = -p ]; then\n"
+        "    printf 'v22.22.2|darwin/arm64|12.4.254.21-node.39\\n'\n"
+        "    exit 0\n"
+        "fi\n"
+        f"printf '{sentinel}\\n'\n"
+        f"printf '{sentinel}\\n' >&2\n"
+        "exit 3\n",
+        encoding="utf-8",
+    )
+    engine.chmod(0o755)
+
+    test_file = resolved_tmp / "test_real_child.py"
+    test_file.write_text(
+        "import os, pathlib, hashlib, sys\n"
+        f"sys.path.insert(0, {str(REPOSITORY_ROOT / 'libexec')!r})\n"
+        "import apg_test\n"
+        f"ENGINE_PATH = pathlib.Path({str(engine)!r})\n"
+        "def test_child_failure(monkeypatch, tmp_path):\n"
+        "    repo = tmp_path / 'repo'\n"
+        "    repo.mkdir()\n"
+        "    monkeypatch.setattr(apg_test, 'EXPECTED_JAVASCRIPT_ENGINE_ROOT', ENGINE_PATH.parent)\n"
+        "    monkeypatch.setattr(apg_test, 'EXPECTED_JAVASCRIPT_ENGINE_UID', os.getuid())\n"
+        f"    monkeypatch.setattr(apg_test, 'EXPECTED_JAVASCRIPT_ENGINE_SHA256', {hashlib.sha256(engine.read_bytes()).hexdigest()!r})\n"
+        "    monkeypatch.setenv('APG_JAVASCRIPT_NODE', str(ENGINE_PATH))\n"
+        "    apg_test.invoke_javascript_engine(repo, ['--eval', 'ignored'], cwd=repo, output_contract_id='top-level-await')\n",
+        encoding="utf-8",
+    )
+
+    class Capture:
+        rendered = ""
+
+        def pytest_runtest_logreport(self, report: pytest.TestReport) -> None:
+            if report.failed:
+                self.rendered += report.longreprtext
+
+    capture = Capture()
+    result = pytest.main(["-q", "-l", "--basetemp", str(test_file.parent / "nested-pytest"), str(test_file)], plugins=[capture])
+    assert result == pytest.ExitCode.TESTS_FAILED
+    assert sentinel not in capture.rendered, f"Sentinel leaked in real child process: {capture.rendered}"
+    assert "JavascriptQualificationError" in capture.rendered
+
+
 def test_node_profile_pytest_showlocals_cannot_disclose_raw_streams(tmp_path: Path) -> None:
     sentinel = "APG81-NONSECRET-STREAM-SENTINEL"
     encoded = sentinel.encode("utf-8").hex()
@@ -1409,6 +1712,158 @@ def test_node_profile_early_pytest_showlocals_failures_cannot_disclose_raw_paths
     assert "NodeProfileQualificationError" in capture.rendered
 
 
+@pytest.mark.parametrize("fault", ["malformed_json", "timeout"])
+def test_node_probe_fault_pytest_showlocals(tmp_path: Path, fault: str) -> None:
+    sentinel = "APG129-PROBE-RENDER-SENTINEL"
+    test_path = tmp_path / f"test_probe_render_{fault}.py"
+    test_path.write_text(
+        "import pathlib, sys, subprocess, hashlib\n"
+        f"sys.path.insert(0, {str(REPOSITORY_ROOT / 'libexec')!r})\n"
+        "import apg_test\n"
+        f"RAW=bytes.fromhex({sentinel.encode().hex()!r}).decode()\n"
+        "def fake_run(*args, **kwargs):\n"
+        + ("    raise subprocess.TimeoutExpired('node', 10, output=RAW, stderr=RAW)\n"
+           if fault == "timeout" else
+           "    return subprocess.CompletedProcess('node', 0, '{bad:' + RAW, '')\n")
+        + "def test_probe(monkeypatch, tmp_path):\n"
+        "    (tmp_path / 'repository').mkdir()\n"
+        "    executable = tmp_path / 'node'\n"
+        "    executable.write_bytes(b'#!/bin/sh\\nexit 0\\n')\n"
+        "    executable.chmod(0o755)\n"
+        "    monkeypatch.setenv('APG_NODEJS_PRIMARY_NODE', str(executable))\n"
+        "    monkeypatch.setitem(apg_test.NODE_PROFILE_RUNTIME_CONTRACTS, 'primary', "
+        "('APG_NODEJS_PRIMARY_NODE', 'identity', hashlib.sha256(executable.read_bytes()).hexdigest()))\n"
+        "    monkeypatch.setattr(apg_test, '_run_javascript_process', fake_run)\n"
+        "    apg_test._node_profile_runtime_binding(tmp_path / 'repository', 'primary')\n",
+        encoding="utf-8",
+    )
+
+    class Capture:
+        rendered = ""
+
+        def pytest_runtest_logreport(self, report: pytest.TestReport) -> None:
+            if report.failed:
+                self.rendered += report.longreprtext
+
+    capture = Capture()
+    result = pytest.main(
+        ["-q", "-l", "-p", "no:cacheprovider", "--basetemp", str(tmp_path / "render-tmp"), str(test_path)],
+        plugins=[capture],
+    )
+    assert result == pytest.ExitCode.TESTS_FAILED
+    assert sentinel not in capture.rendered
+    assert "NodeProfileQualificationError" in capture.rendered
+    assert ("TimeoutExpired" if fault == "timeout" else "wrong identity") in capture.rendered
+
+
+def _assert_node_profile_exception_graph_clean(error: BaseException, needle: str) -> None:
+    """Inspect every escaping frame, container, and retained exception attribute."""
+    import types
+    pending, seen = [error], set()
+    inspected_owner_frames = 0
+    while pending:
+        value = pending.pop()
+        if id(value) in seen:
+            continue
+        seen.add(id(value))
+        if isinstance(value, (str, bytes)):
+            assert needle not in str(value)
+        elif isinstance(value, BaseException):
+            assert needle not in str(value) and needle not in repr(value)
+            pending.extend((value.args, vars(value), value.__cause__, value.__context__, value.__traceback__))
+        elif isinstance(value, types.TracebackType):
+            if value.tb_frame.f_code.co_filename == __file__:
+                # Caller-owned synthetic inputs are outside the escaping owner.
+                pending.append(value.tb_next)
+                continue
+            if value.tb_frame.f_code.co_filename == apg_test.__file__:
+                inspected_owner_frames += 1
+            f_locals = dict(value.tb_frame.f_locals)
+            for var_name, var_val in f_locals.items():
+                assert not isinstance(var_val, apg_test.subprocess.CompletedProcess), (
+                    f"CompletedProcess retained in frame local {var_name}"
+                )
+            pending.extend((f_locals, value.tb_next))
+        elif isinstance(value, dict):
+            pending.extend(value.keys())
+            pending.extend(value.values())
+        elif isinstance(value, (list, tuple, set, frozenset)):
+            pending.extend(value)
+        elif not isinstance(value, (type, types.ModuleType, types.FunctionType)) and hasattr(value, "__dict__"):
+            pending.append(vars(value))
+    assert inspected_owner_frames > 0, "exception graph audit inspected no production frames"
+    assert error.__cause__ is None and error.__context__ is None
+
+
+@pytest.mark.parametrize("fault", (
+    "nonzero", "stderr", "malformed_json", "wrong_structure", "wrong_identity",
+    "decoding", "timeout", "start", "interruption", "parser", "post_binding",
+))
+def test_node_profile_runtime_binding_exception_graph_contains_no_raw_sentinel(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, fault: str,
+) -> None:
+    sentinel = "APG129-NODE-EXC-GRAPH-SENTINEL"
+    root = tmp_path / "repo"
+    root.mkdir()
+    executable = tmp_path / "node"
+    original = b"#!/bin/sh\nexit 0\n"
+    executable.write_bytes(original)
+    executable.chmod(0o755)
+    expected_identity = "v22.22.2|darwin/arm64|12.4.254.21-node.39|1.51.0"
+    contract = (
+        "APG_NODEJS_PRIMARY_NODE",
+        expected_identity,
+        hashlib.sha256(original).hexdigest(),
+    )
+    monkeypatch.setenv("APG_NODEJS_PRIMARY_NODE", os.fspath(executable))
+    monkeypatch.setitem(apg_test.NODE_PROFILE_RUNTIME_CONTRACTS, "primary", contract)
+
+    def fake_run(args: list[str], **_kwargs: object):
+        if fault == "timeout":
+            raise apg_test.subprocess.TimeoutExpired(args, 10, output=sentinel, stderr=sentinel)
+        if fault == "start":
+            raise OSError("spawn-failed: " + sentinel)
+        if fault == "decoding":
+            raise UnicodeDecodeError("utf-8", sentinel.encode(), 0, 1, "synthetic")
+        if fault == "interruption":
+            raise KeyboardInterrupt(sentinel)
+        if fault == "nonzero":
+            return apg_test.subprocess.CompletedProcess(args, 1, sentinel, sentinel)
+        if fault == "stderr":
+            return apg_test.subprocess.CompletedProcess(args, 0, "", sentinel)
+        if fault == "malformed_json":
+            return apg_test.subprocess.CompletedProcess(args, 0, "{bad-json:" + sentinel, "")
+        if fault == "wrong_structure":
+            return apg_test.subprocess.CompletedProcess(args, 0, json.dumps([sentinel]), "")
+        if fault == "wrong_identity":
+            return apg_test.subprocess.CompletedProcess(
+                args, 0, json.dumps({"identity": "wrong-" + sentinel, "execArgv": [], "nodeOptions": False}), ""
+            )
+        if fault == "post_binding":
+            executable.write_bytes(b"modified-after-probe")
+            return apg_test.subprocess.CompletedProcess(
+                args, 0, json.dumps({"identity": expected_identity, "execArgv": [], "nodeOptions": False}), ""
+            )
+        return apg_test.subprocess.CompletedProcess(args, 0, sentinel, "")
+
+    monkeypatch.setattr(apg_test, "_run_javascript_process", fake_run)
+    if fault == "parser":
+        def exhausted_parser(raw: str, **_kwargs: object):
+            raise RecursionError(raw)
+        monkeypatch.setattr(apg_test.json, "loads", exhausted_parser)
+
+    if fault == "interruption":
+        with pytest.raises(KeyboardInterrupt) as caught:
+            apg_test._node_profile_runtime_binding(root, "primary")
+        _assert_node_profile_exception_graph_clean(caught.value, sentinel)
+    else:
+        with pytest.raises(apg_test.NodeProfileQualificationError) as caught:
+            apg_test._node_profile_runtime_binding(root, "primary")
+        _assert_node_profile_exception_graph_clean(caught.value, sentinel)
+
+
+
+
 @pytest.mark.parametrize("value", ["", "/absolute", "../escape", "a/../b", "a//b"])
 def test_inventory_paths_must_be_normalized_relative(value: str) -> None:
     with pytest.raises(apg_test.ToolError, match="normalized relative path|nonempty"):
@@ -1447,7 +1902,7 @@ def test_pytest_execution_rejects_failure_missing_and_parallel_artifacts(
         assert environment["PYTEST_DISABLE_PLUGIN_AUTOLOAD"] == "1"
         return Result()
     monkeypatch.setattr(apg_test.subprocess, "run", successful)
-    data, report = apg_test._run_pytest(REPOSITORY_ROOT, "unit", 2, tmp_path)
+    data, report = apg_test._run_pytest(REPOSITORY_ROOT, "unit", 2, tmp_path, selected_files=UNIT_FILES)
     assert data.is_file() and report == {"files": {}}
 
     class Failed:
@@ -1457,13 +1912,13 @@ def test_pytest_execution_rejects_failure_missing_and_parallel_artifacts(
     failure = tmp_path / "failure"
     failure.mkdir()
     with pytest.raises(apg_test.ToolError, match="status 5"):
-        apg_test._run_pytest(REPOSITORY_ROOT, "unit", 2, failure)
+        apg_test._run_pytest(REPOSITORY_ROOT, "unit", 2, failure, selected_files=UNIT_FILES)
 
     incomplete = tmp_path / "incomplete"
     incomplete.mkdir()
     monkeypatch.setattr(apg_test.subprocess, "run", lambda *_args, **_kwargs: Result())
     with pytest.raises(apg_test.ToolError, match="output is incomplete"):
-        apg_test._run_pytest(REPOSITORY_ROOT, "unit", 2, incomplete)
+        apg_test._run_pytest(REPOSITORY_ROOT, "unit", 2, incomplete, selected_files=UNIT_FILES)
     parallel = tmp_path / "parallel"
     parallel.mkdir()
 
@@ -1476,13 +1931,13 @@ def test_pytest_execution_rejects_failure_missing_and_parallel_artifacts(
 
     monkeypatch.setattr(apg_test.subprocess, "run", leaves_parallel)
     with pytest.raises(apg_test.ToolError, match="unexpected data"):
-        apg_test._run_pytest(REPOSITORY_ROOT, "unit", 2, parallel)
+        apg_test._run_pytest(REPOSITORY_ROOT, "unit", 2, parallel, selected_files=UNIT_FILES)
 
     foreign = tmp_path / "foreign"
     foreign.mkdir()
     (foreign / "foreign.coverage").write_bytes(b"foreign")
     with pytest.raises(apg_test.ToolError, match="contains unexpected data"):
-        apg_test._run_pytest(REPOSITORY_ROOT, "unit", 2, foreign)
+        apg_test._run_pytest(REPOSITORY_ROOT, "unit", 2, foreign, selected_files=UNIT_FILES)
 
 
 def test_pytest_execution_rejects_malformed_json(
@@ -1502,7 +1957,7 @@ def test_pytest_execution_rejects_malformed_json(
 
     monkeypatch.setattr(apg_test.subprocess, "run", malformed)
     with pytest.raises(apg_test.ToolError, match="JSON is unreadable"):
-        apg_test._run_pytest(REPOSITORY_ROOT, "unit", 2, tmp_path)
+        apg_test._run_pytest(REPOSITORY_ROOT, "unit", 2, tmp_path, selected_files=UNIT_FILES)
 
 
 def test_pytest_command_disables_worker_restart_and_uses_selected_root(tmp_path: Path) -> None:
@@ -1513,12 +1968,13 @@ def test_pytest_command_disables_worker_restart_and_uses_selected_root(tmp_path:
         tmp_path / "data",
         tmp_path / "report.json",
         "run-id",
+        [f"{apg_test.INTEGRATION_ROOT.as_posix()}/.github/workflows/release.yml.int.test.py"],
     )
     assert command[command.index("-n") + 1] == "8"
     assert "--max-worker-restart=0" in command
     assert "xdist.plugin" in command
     assert "pytest_cov.plugin" in command
-    assert command[-1].endswith("src/test/int/python/agentic-praxis-grimoire")
+    assert command[-1].endswith("/.github/workflows/release.yml.int.test.py")
 
 
 def test_mirror_path_mapping_handles_markdown_and_extensionless_owners() -> None:
@@ -1534,7 +1990,10 @@ def test_run_enforces_each_suite_then_combined_union(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     inventory = apg_test.Inventory(
-        {"libexec/tool.py": ("unit", "integration", "combined")}, {}, {}
+        {"libexec/tool.py": ("unit", "integration", "combined")}, {}, {
+            f"{apg_test.UNIT_ROOT.as_posix()}/.github/hidden.unit.test.py": ("owner", "unit"),
+            f"{apg_test.INTEGRATION_ROOT.as_posix()}/owner.int.test.py": ("owner", "integration"),
+        }
     )
     monkeypatch.setattr(apg_test, "load_inventory", lambda _root: inventory)
     monkeypatch.setattr(apg_test, "validate_inventory", lambda _root, _inventory: None)
@@ -1556,6 +2015,10 @@ def test_run_enforces_each_suite_then_combined_union(
         _root: Path, suite: str, workers: int, _artifacts: Path, **_kwargs: object
     ):
         calls.append(f"{suite}:{workers}")
+        assert _kwargs["selected_files"] == tuple(sorted(
+            path for path, (_owner, selected_suite) in inventory.tests.items()
+            if selected_suite == suite
+        ))
         return artifact_root / suite / f"{suite}.coverage", report
 
     monkeypatch.setattr(apg_test, "_run_pytest", run_suite)
@@ -1679,12 +2142,83 @@ def test_worker_manifest_requires_exact_workers_collections_results_and_clean_do
         {"event": "controller-complete", "run_id": "run", "suite": "unit", "exitstatus": 0}
     )
     manifest.write_text("".join(json.dumps(event) + "\n" for event in events), encoding="utf-8")
-    apg_test.validate_worker_manifest(manifest, "run", "unit", 2, "root")
+    apg_test.validate_worker_manifest(manifest, "run", "unit", 2, "root", ["root/test_example.py"])
 
     events.pop(-2)
     manifest.write_text("".join(json.dumps(event) + "\n" for event in events), encoding="utf-8")
     with pytest.raises(apg_test.ToolError, match="terminal result"):
-        apg_test.validate_worker_manifest(manifest, "run", "unit", 2, "root")
+        apg_test.validate_worker_manifest(manifest, "run", "unit", 2, "root", ["root/test_example.py"])
+
+
+def _collection_events(nodes: list[str]) -> list[dict[str, object]]:
+    shared = {"run_id": "collection-run", "suite": "unit"}
+    events = []
+    for worker in ("gw0", "gw1"):
+        events.extend([
+            {**shared, "event": "worker-start", "worker": worker},
+            {**shared, "event": "collection", "worker": worker, "node_ids": list(nodes)},
+            {**shared, "event": "worker-complete", "worker": worker, "exitstatus": 0},
+            {**shared, "event": "node-down", "worker": worker, "error": False, "exitstatus": 0},
+        ])
+    events.extend({**shared, "event": "test-result", "nodeid": node, "outcome": "passed"}
+                  for node in nodes)
+    events.append({**shared, "event": "controller-complete", "exitstatus": 0})
+    return events
+
+
+@pytest.mark.parametrize("fault", (
+    "none", "hidden-omitted", "ordinary-omitted", "foreign", "duplicate-node",
+    "subset", "duplicate-receipt", "worker-disagreement",
+))
+def test_worker_collection_closes_exact_inventory_files(tmp_path: Path, fault: str) -> None:
+    root = apg_test.UNIT_ROOT.as_posix()
+    files = [f"{root}/owner.unit.test.py", f"{root}/.github/workflows/release.yml.unit.test.py"]
+    # Multiple tests per file and parameter separators are valid node identities.
+    nodes = [files[0] + "::test_one[param::value]", files[0] + "::test_two", files[1] + "::test_hidden"]
+    if fault == "hidden-omitted":
+        nodes = nodes[:2]
+    elif fault == "ordinary-omitted":
+        nodes = nodes[2:]
+    elif fault == "foreign":
+        nodes.append(f"{root}/invented.unit.test.py::test_foreign")
+    elif fault == "duplicate-node":
+        nodes.append(nodes[0])
+    elif fault == "subset":
+        files.append(f"{root}/another.unit.test.py")
+        nodes = nodes[:1]
+    events = _collection_events(nodes)
+    if fault == "duplicate-receipt":
+        events.append(dict(events[1]))
+    elif fault == "worker-disagreement":
+        events[5]["node_ids"] = list(reversed(nodes))
+    manifest = tmp_path / "workers.jsonl"
+    manifest.write_text("".join(json.dumps(event) + "\n" for event in events))
+    if fault == "none":
+        apg_test.validate_worker_manifest(manifest, "collection-run", "unit", 2, root, files)
+    else:
+        with pytest.raises(apg_test.HarnessError):
+            apg_test.validate_worker_manifest(manifest, "collection-run", "unit", 2, root, files)
+
+
+@pytest.mark.parametrize("path", (
+    "root/./test.py", "root//test.py", "root/../test.py", "/root/test.py",
+    "root\\test.py", "root/C:test.py", "outside/test.py", "root/test.py\x00",
+))
+def test_collection_rejects_noncanonical_file_aliases(path: str) -> None:
+    with pytest.raises(apg_test.HarnessError):
+        apg_test.validate_collection([path + "::test_one"], "root", ["root/test.py"])
+
+
+@pytest.mark.parametrize("selection", ([], None, "root/test.py", ["root/test.py", "root/test.py"], [3]))
+def test_collection_requires_explicit_unique_file_selection(selection: object) -> None:
+    with pytest.raises(apg_test.HarnessError):
+        apg_test.validate_collection(["root/test.py::test_one"], "root", selection)
+
+
+@pytest.mark.parametrize("nodes", ([], None, [3], ["root/test.py"], ["root/test.py::"]))
+def test_collection_rejects_empty_or_malformed_node_ids(nodes: object) -> None:
+    with pytest.raises(apg_test.HarnessError):
+        apg_test.validate_collection(nodes, "root", ["root/test.py"])
 
 
 def test_required_child_manifest_needs_completion_and_coverage_context(
@@ -2116,7 +2650,7 @@ def test_pytest_exit_code_mappings(
     monkeypatch.setattr(apg_test, "validate_worker_manifest", lambda *_args: None)
     monkeypatch.setattr(apg_test.subprocess, "run", lambda *_args, **_kwargs: StubProcess(1))
     with pytest.raises(apg_test.TestAssertionError, match="status 1"):
-        apg_test._run_pytest(REPOSITORY_ROOT, "unit", 2, art1)
+        apg_test._run_pytest(REPOSITORY_ROOT, "unit", 2, art1, selected_files=UNIT_FILES)
 
     # For codes 2, 3, 4, 5, validate_worker_manifest must NOT be called
     def fail_if_manifest_called(*_args, **_kwargs):
@@ -2129,28 +2663,28 @@ def test_pytest_exit_code_mappings(
     art2.mkdir()
     monkeypatch.setattr(apg_test.subprocess, "run", lambda *_args, **_kwargs: StubProcess(2))
     with pytest.raises(KeyboardInterrupt):
-        apg_test._run_pytest(REPOSITORY_ROOT, "unit", 2, art2)
+        apg_test._run_pytest(REPOSITORY_ROOT, "unit", 2, art2, selected_files=UNIT_FILES)
 
     # Code 3 -> HarnessError
     art3 = tmp_path / "artifacts3"
     art3.mkdir()
     monkeypatch.setattr(apg_test.subprocess, "run", lambda *_args, **_kwargs: StubProcess(3))
     with pytest.raises(apg_test.HarnessError, match="status 3"):
-        apg_test._run_pytest(REPOSITORY_ROOT, "unit", 2, art3)
+        apg_test._run_pytest(REPOSITORY_ROOT, "unit", 2, art3, selected_files=UNIT_FILES)
 
     # Code 4 -> InvocationError
     art4 = tmp_path / "artifacts4"
     art4.mkdir()
     monkeypatch.setattr(apg_test.subprocess, "run", lambda *_args, **_kwargs: StubProcess(4))
     with pytest.raises(apg_test.InvocationError, match="status 4"):
-        apg_test._run_pytest(REPOSITORY_ROOT, "unit", 2, art4)
+        apg_test._run_pytest(REPOSITORY_ROOT, "unit", 2, art4, selected_files=UNIT_FILES)
 
     # Code 5 -> InvocationError
     art5 = tmp_path / "artifacts5"
     art5.mkdir()
     monkeypatch.setattr(apg_test.subprocess, "run", lambda *_args, **_kwargs: StubProcess(5))
     with pytest.raises(apg_test.InvocationError, match="collected no tests"):
-        apg_test._run_pytest(REPOSITORY_ROOT, "unit", 2, art5)
+        apg_test._run_pytest(REPOSITORY_ROOT, "unit", 2, art5, selected_files=UNIT_FILES)
 
 
 def test_javascript_engine_prerequisite_failure_raises_invocation_error(

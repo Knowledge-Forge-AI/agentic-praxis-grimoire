@@ -174,6 +174,17 @@ names globally unique, excludes namespace owners from counts, and rejects
 unknown namespaces or deeper owners. Historical public policy remains
 version-bounded rather than being reinterpreted by current development.
 
+APG122 adds the strict v0.10 selector at `testing/apg-discovery-policy.json`.
+Current checks require all 40 admitted identities, preserve the original 39
+descriptions exactly, and enforce SVG's 330-byte description reservation and
+20,480-byte complete-file limit. Diagnostics APG042–APG048 cover reservation,
+file-size, baseline preservation, identity/admission and policy failures. The
+current aggregate description ceiling is 9,857 bytes; the six-candidate
+11,507-byte bound grants no additional leaf admission. See
+[ADR 0053](adr/2026/09/0053-v0-10-discovery-capacity-and-svg.md). Historical
+fixtures retain their versioned rules. These metadata limits do not constrain
+user-authored SVG graphics or replace caller-selected context budgets.
+
 The parser deliberately does not implement general YAML or Markdown. Every
 column-zero frontmatter mapping key must contain only ASCII letters, digits,
 underscores, or hyphens followed immediately by its key-terminating colon.

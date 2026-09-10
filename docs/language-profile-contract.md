@@ -205,3 +205,57 @@ APG88 leaves the generic enforcement unchanged. MDX and Astro consume 214 and
 bytes and 23 bytes of remaining aggregate headroom. Exact APG88 topology and
 terminal arithmetic remain focused-test and phase-evidence owners rather than
 generic checker constants.
+
+APG122 adds provisional SVG under the explicitly selected v0.10 discovery
+policy in `testing/apg-discovery-policy.json`, enforced by the Go corpus and
+Python library checker. Development is 40/40/40 and 14 stable / 26 provisional,
+with 9,745 description bytes and 112 bytes remaining under the 9,857-byte
+current admission ceiling. SVG's description is 241 bytes; its complete skill
+file is 13,328 bytes under the separate 20,480-byte limit. Discovery bytes do
+not measure full materialized context. The original 39 leaves and historical
+9,527-byte ceiling remain preserved; future admissions require an explicit
+policy update. [ADR 0053](adr/2026/09/0053-v0-10-discovery-capacity-and-svg.md)
+owns this policy without changing the historical v0.6 six-profile contract.
+
+APG123 provisionally integrates `playwright-test-profile` and
+`web-accessibility-profile` alongside SVG under the explicitly selected
+`v0.10-browser-ui` discovery policy in `testing/apg-discovery-policy.json`,
+enforced by Go corpus and Python library checkers at constant-level parity.
+Development is 42/42/42 and 14 stable / 28 provisional. Original 39 descriptions
+and SVG's 241-byte description remain untouched. Each admitted profile occupies
+<= 330 description bytes under the 10,517-byte current admission ceiling
+(9,527 + 3*330), with the overall six-candidate reservation ceiling of 11,507
+bytes unchanged. The 20,480-byte complete-file ceiling applies to SVG only; the
+two new leaves have no added numeric complete-file ceiling, and caller bundle
+budgets remain unchanged as an explicit policy choice. Architecture seams remain
+distinct: SVG vector authoring; Playwright runner mechanics; accessibility
+semantics and testing hierarchy; future `browser-runtime-profile` remains absent;
+and existing CSS, JavaScript, TypeScript, JSX, and React component profiles
+remain unchanged. [ADR 0053](adr/2026/09/0053-v0-10-discovery-capacity-and-svg.md)
+owns the versioned capacity and admission amendment.
+
+
+## APG124 Toolchain admission
+
+APG124 adds provisional `vite-build-profile` and `npm-package-manager-profile`
+under the [Toolchain architecture](architecture/v0-10-toolchain.md), superseding
+APG123's current-count statements without rewriting historical evidence.
+Development is 44/44/44, 14 stable / 30 provisional, with an 11,177-byte
+admission ceiling and all prior 42 descriptions frozen. Vite owns frontend
+build/dev tooling; npm owns selected-version package management. Node keeps
+runtime/process behavior; SVG, Playwright, accessibility, language and framework
+owners remain distinct. Browser-runtime stays reserved and absent.
+APG124 is pending dispatcher pre-final review and closeout.
+
+## APG125 browser runtime and composition candidate
+
+APG124 is manager accepted as `V0100_TOOLCHAIN_SLICE_QUALIFIED`; its captured
+consumer failures and unresolved later-drift attribution remain historical evidence.
+APG125 adds the final provisional `browser-runtime-profile` and current
+`v0.10-browser-runtime` policy at 45 leaves, 14 stable / 31 provisional and
+11,507 description bytes maximum. All 44 prior descriptions remain frozen.
+The six named reservations are fully admitted; spare numeric capacity grants
+no future leaf admission. Explicit task compositions preserve adjacent owners.
+Real browser evidence is separate from actual embedded WebView qualification.
+APG125 is pending dispatcher pre-final review and closeout, with no additional
+capability, release, deployment or successor authority.

@@ -1,0 +1,8 @@
+{
+  "name": "dep-lifecycle",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "install": "node -e \"const fs=require('fs'); fs.writeFileSync('dep-witness.txt', 'DEP_LIFECYCLE_EXECUTED')\""
+  }
+}

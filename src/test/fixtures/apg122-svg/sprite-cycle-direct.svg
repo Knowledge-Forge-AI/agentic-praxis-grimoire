@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <title>Direct Self-Referencing Cycle Negative Control</title>
+  <defs>
+    <!-- Direct self-reference cycle: element uses itself -->
+    <use id="sym-direct" href="#sym-direct" x="10" y="10" />
+  </defs>
+  <use href="#sym-direct" />
+</svg>

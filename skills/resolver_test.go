@@ -30,6 +30,10 @@ func TestResolveExplicitStructuredAndNoImplicitChain(t *testing.T) {
 		want    []string
 	}{
 		{"explicit", baseRequest("planning-repository-work"), []string{"planning-repository-work"}},
+		{"explicit SVG", baseRequest("svg-language-profile"), []string{"svg-language-profile"}},
+		{"explicit Playwright", baseRequest("playwright-test-profile"), []string{"playwright-test-profile"}},
+		{"explicit accessibility", baseRequest("web-accessibility-profile"), []string{"web-accessibility-profile"}},
+		{"explicit Browser UI composition", baseRequest("svg-language-profile", "playwright-test-profile", "web-accessibility-profile"), []string{"playwright-test-profile", "svg-language-profile", "web-accessibility-profile"}},
 		{"multiple explicit", baseRequest("pytest-test-profile", "go-language-profile"), []string{"go-language-profile", "pytest-test-profile"}},
 		{"go only", withLanguage(baseRequest(), "go"), []string{"go-language-profile"}},
 		{"gomock only", withTestFramework(baseRequest(), "gomock-v0.6.0"), []string{"gomock-test-profile"}},
@@ -378,6 +382,73 @@ func TestCompositionInventoryIsCanonicalAndInformational(t *testing.T) {
 		if edge.From >= edge.To || (position > 0 && (edges[position-1].From > edge.From || (edges[position-1].From == edge.From && edges[position-1].To >= edge.To))) {
 			t.Fatalf("non-canonical edges = %#v", edges)
 		}
+	}
+}
+
+func TestResolveSVGExplicitOnlyAndCompositionWithoutAdjacentSelection(t *testing.T) {
+	// SVG language is rejected with ErrInvalidRequest (rules V1 unchanged, not mapped or accepted unmapped)
+	svgLangRequest := withLanguage(baseRequest(), "svg")
+	if _, err := Resolve(context.Background(), svgLangRequest); !errors.Is(err, ErrInvalidRequest) {
+		t.Fatalf("language='svg' must be rejected with ErrInvalidRequest, got: %v", err)
+	}
+
+	// Explicit-only selection: svg-language-profile resolves only when requested explicitly
+	svgRequest := baseRequest("svg-language-profile")
+	result, err := Resolve(context.Background(), svgRequest)
+	if err != nil {
+		t.Fatalf("explicit svg-language-profile resolve failed: %v", err)
+	}
+	if !reflect.DeepEqual(result.SelectedSkillIDs, []string{"svg-language-profile"}) {
+		t.Fatalf("selected = %v, want [svg-language-profile]", result.SelectedSkillIDs)
+	}
+
+	// Composition with CSS, JSX, React without automatic adjacent selection
+	composedRequest := baseRequest(
+		"css-language-profile",
+		"jsx-language-profile",
+		"react-component-profile",
+		"svg-language-profile",
+	)
+	composedResult, err := Resolve(context.Background(), composedRequest)
+	if err != nil {
+		t.Fatalf("composed resolve failed: %v", err)
+	}
+	wantComposed := []string{
+		"css-language-profile",
+		"jsx-language-profile",
+		"react-component-profile",
+		"svg-language-profile",
+	}
+	if !reflect.DeepEqual(composedResult.SelectedSkillIDs, wantComposed) {
+		t.Fatalf("composed selected = %v, want %v", composedResult.SelectedSkillIDs, wantComposed)
+	}
+
+	// Existing composition rules (e.g., JSX <-> React) remain intact,
+	// while SVG participates in no composition edges and pulls in no adjacent skills.
+	wantJSXReactEdge := CompositionEdge{From: "jsx-language-profile", To: "react-component-profile"}
+	if !containsEdge(composedResult.CompositionEdges, wantJSXReactEdge) {
+		t.Fatalf("expected composition edge between jsx and react, got: %#v", composedResult.CompositionEdges)
+	}
+	for _, edge := range composedResult.CompositionEdges {
+		if edge.From == "svg-language-profile" || edge.To == "svg-language-profile" {
+			t.Fatalf("unexpected composition edge involving svg-language-profile: %#v", edge)
+		}
+	}
+
+	// Structured facts for CSS, JSX, React combined with explicit SVG selection
+	factRequest := withLanguage(
+		withCapability(
+			withCapability(baseRequest("svg-language-profile"), "react-components"),
+			"jsx",
+		),
+		"css",
+	)
+	factResult, err := Resolve(context.Background(), factRequest)
+	if err != nil {
+		t.Fatalf("fact-based composed resolve failed: %v", err)
+	}
+	if !reflect.DeepEqual(factResult.SelectedSkillIDs, wantComposed) {
+		t.Fatalf("fact-based composed selected = %v, want %v", factResult.SelectedSkillIDs, wantComposed)
 	}
 }
 

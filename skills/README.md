@@ -2,30 +2,30 @@
 
 ## Current status
 
-The development catalog contains thirty-nine canonical skills: fourteen
-stable rows and twenty-five provisional rows. The provisional rows are the
+The development catalog contains forty-five canonical skills: fourteen
+stable rows and thirty-one provisional rows. The provisional rows are the
 ChatGPT-manager subrouter, approved-roadmap manager-assignment leaf, CSS,
 JavaScript, JSX, Node.js, Go, and Ruby language profiles, the React component,
-MDX, and Astro profiles, PostgreSQL and SQLite profiles,
+MDX, Astro, and SVG profiles, PostgreSQL and SQLite profiles,
 pytest, Minitest, Vitest, and GoMock test profiles, Dockerfile and Vagrantfile
 profiles, the Bash-to-Python conversion skill, the native Go and go-cmp test
-profiles, the Nix test profile, the Markdown language profile, and the
-TypeScript language profile.
+profiles, the Nix test profile, the Markdown language profile,
+the TypeScript language profile, the Playwright test profile, the web
+accessibility profile, Vite and npm profiles, and the browser runtime profile.
 
-The v0.8 CAP0 decision adds no skill. RepoMap and Theme Forge candidate queues
-remain deferred because no candidate has the required reusable ownership,
-bounded materialization cost, anti-circularity evidence, external positive
-cases, and compatibility justification. The catalog therefore remains 39
-canonical leaves, 39 catalog rows, and 39 checked-in projections with fourteen
-stable and twenty-five provisional rows.
-APG13
-individually reviewed and promoted the six v0.2 catalog entries to `stable`
-after repeated real use,
-representative non-triggers, edge or stop behavior, post-Superpowers evidence,
-complete regression, and fresh non-author review. Stability means suitability
-for routine bounded use within each recorded trigger and project boundary; it
-does not mean production warranty, universal applicability, automatic
-invocation, or comparative superiority.
+The historical v0.8 CAP0 decision added no skill. APG122 admitted SVG as
+one provisional v0.10 candidate under a versioned capacity policy; the other
+five Theme Forge candidates and Repo Map work remained deferred. Development
+contained 40 canonical leaves, 40 catalog rows and 40 checked-in projections.
+APG123's Browser/UI slice and APG124's Toolchain slice are accepted.
+APG124 is `V0100_TOOLCHAIN_SLICE_QUALIFIED`; its historical consumer failures
+and later-drift attribution limitation remain unchanged.
+APG125 adds provisional `browser-runtime-profile` under `v0.10-browser-runtime`.
+Development contains 45 canonical leaves, 45 catalog rows and 45 projections,
+with 14 stable / 31 provisional. The six-candidate ceiling is 11,507 description
+bytes, with no unused named reservation. APG126 qualified the preserved APG125 candidate after its original provider
+block. APG129 integrated readiness is in progress; all 31 provisional leaves
+retain that maturity.
 
 Public v0.2.0 appended one intentionally squashed release commit and annotated
 tag to preserved public v0.1.0 and supplied the maintainer's separately managed
@@ -385,7 +385,7 @@ ceiling.
 
 APG30 implements ADR 0022's `skills/chatgpt/<name>/` canonical owner for
 actor-qualified ChatGPT-manager leaves while retaining flat `.agents/skills/`
-discovery. The current 39/39/39 library contains thirty-seven direct children
+discovery. The current 45/45/45 library contains forty-three direct children
 and two nested ChatGPT-manager leaves. The namespace directory is not a skill.
 
 This shape follows `APG0-AGENT-SKILLS-SOURCE-01`, the public
@@ -410,6 +410,7 @@ APG0 basis.
 | [`reviewing-and-verifying-repository-work`](reviewing-and-verifying-repository-work/SKILL.md) | A bounded repository artifact, change, phase, commit, or worker result needs evidence-backed acceptance, correction, disposition, or a completion claim | `stable` |
 | [`agentic-praxis-grimoire-workflow`](agentic-praxis-grimoire-workflow/SKILL.md) | Multiple APG skills are plausible, a routing decision needs audit, or APG capability metadata may be missing or stale | `stable` |
 | [`chatgpt-manager-workflow`](chatgpt/chatgpt-manager-workflow/SKILL.md) | Selection among multiple plausible ChatGPT top-level-manager capabilities is ambiguous or a ChatGPT-manager routing decision requires audit | `provisional` |
+| [`svg-language-profile`](svg-language-profile/SKILL.md) | SVG namespaces, viewport, geometry, paint, reuse, text, naming, resources or deterministic authoring affect the decision; route general CSS, JSX, React, browser and accessibility audit questions separately | `provisional` |
 | [`synthesizing-repository-guidance`](synthesizing-repository-guidance/SKILL.md) | A dense, duplicated, mixed-scope, private, or source-derived guidance corpus needs bounded ownership and migration dispositions before rewrite | `stable` |
 | [`python-language-profile`](python-language-profile/SKILL.md) | Python-specific judgment is material to structure, complexity, public APIs, typing, concurrency, serialization, packaging, or warning and crisis thresholds beyond repository policy | `stable` |
 | [`astro-profile`](astro-profile/SKILL.md) | Astro behavior hinges on `.astro` execution, islands or client directives, server/client boundaries, content collections, routing, or integration conventions; not for adjacent component, syntax, language/runtime, build, style, accessibility, or deployment concerns | `provisional` |
@@ -432,6 +433,11 @@ APG0 basis.
 | [`go-language-profile`](go-language-profile/SKILL.md) | Go-specific judgment is material to structure, errors, context, interfaces, generics, concurrency, public APIs, reflection, unsafe, cgo, subprocesses, compatibility, or warning and crisis thresholds beyond repository policy | `provisional` |
 | [`go-test-profile`](go-test-profile/SKILL.md) | Native Go test judgment is material to package placement, subtests, helper attribution, cleanup and isolation, TestMain, parallelism, goroutine reporting, examples, benchmarks, fuzzing, caching, effective language version, or warning and crisis thresholds beyond repository policy | `provisional` |
 | [`vitest-test-profile`](vitest-test-profile/SKILL.md) | A project has already selected Vitest 4.1 and runner-specific judgment is material to configuration, projects, environments, assertions, mocks, timers, concurrency, isolation, snapshots, or coverage providers; not for test sufficiency, language or React semantics, or coverage policy | `provisional` |
+| [`playwright-test-profile`](playwright-test-profile/SKILL.md) | Playwright-specific runner judgment is material to browser automation, fixtures, locators, auto-waiting, tracing, network interception, or page interactions; not for general test discipline, component styling, or accessibility audits | `provisional` |
+| [`browser-runtime-profile`](browser-runtime-profile/SKILL.md) | Browser host DOM, lifecycle, events, scheduling, origins, fetching, storage, resources and actual browser or WebView context affect behavior | `provisional` |
+| [`vite-build-profile`](vite-build-profile/SKILL.md) | Vite-specific build/dev configuration, environment exposure, assets, plugins, serving and Rolldown behavior | `provisional` |
+| [`npm-package-manager-profile`](npm-package-manager-profile/SKILL.md) | Selected npm version, lockfiles, dependency resolution, scripts, workspaces, configuration and package contents | `provisional` |
+| [`web-accessibility-profile`](web-accessibility-profile/SKILL.md) | Web accessibility judgment is material to accessibility auditing, ARIA attributes, semantic landmarks, focus management, screen-reader semantics, or testing hierarchy; not for CSS visual styling, component layout, or Playwright runner mechanics | `provisional` |
 | [`nix-language-profile`](nix-language-profile/SKILL.md) | Nix-specific judgment is material to expressions, attribute sets, modules, derivations, flakes, overlays, purity, evaluation, store exposure, activation, remote builders, or warning and crisis thresholds beyond repository policy | `stable` |
 | [`nix-test-profile`](nix-test-profile/SKILL.md) | Nix test judgment is material to selecting which already-selected testing surface proves an exact claim, package phases, flake checks, Nixpkgs or NixOS test ownership, test-evidence qualification across sandbox, store, builder, or cache boundaries, or Nix-test-specific structural review | `provisional` |
 | [`postgresql-database-profile`](postgresql-database-profile/SKILL.md) | PostgreSQL-specific judgment is material to SQL, schemas, MVCC, transactions, locks, DDL, migrations, routines, triggers, security, backup and restore, replication, maintenance, or warning and crisis thresholds beyond repository policy | `provisional` |

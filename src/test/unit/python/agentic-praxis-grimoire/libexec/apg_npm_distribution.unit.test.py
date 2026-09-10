@@ -643,11 +643,24 @@ def test_template_readme_parameterization_across_versions() -> None:
 
 
 def test_npm_readme_and_templates_have_durable_conditional_installation_wording() -> None:
-    npm_readme = (ROOT / "npm/README.md").read_text(encoding="utf-8")
-    assert "This documentation covers 0.9.0" in npm_readme
+    npm_readme = " ".join((ROOT / "npm/README.md").read_text(encoding="utf-8").split())
+    assert "This documentation covers v0.10.0." in npm_readme
     assert "Once this version is published" in npm_readme
+    assert "@knowledge-forge-ai/apgr@0.10.0" in npm_readme
+    assert "@0.9.0" not in npm_readme
 
     for template_rel in ("npm/templates/launcher/README.md", "npm/templates/platform/README.md"):
-        content = (ROOT / template_rel).read_text(encoding="utf-8")
+        content = " ".join((ROOT / template_rel).read_text(encoding="utf-8").split())
         assert "Once this version is published" in content
         assert "__APG_VERSION__" in content
+
+
+def test_npm_readme_rejects_stale_v09_pins_and_preparation_wording() -> None:
+    npm_readme = " ".join((ROOT / "npm/README.md").read_text(encoding="utf-8").split()).casefold()
+    for stale in (
+        "publicly available on npm at **v0.9.0**",
+        "npm install @knowledge-forge-ai/apgr@0.9.0",
+        "candidate development still require",
+        "current source prepares **v0.10.0**",
+    ):
+        assert stale not in npm_readme

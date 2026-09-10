@@ -21,6 +21,8 @@ AUXILIARY_KEYS = {
 CSS_KNOWN_DEBT_IDS = tuple(f"CSS-QD-{index:03d}" for index in range(1, 6))
 JAVASCRIPT_KNOWN_DEBT_IDS = tuple(f"JS-QD-{index:03d}" for index in range(1, 6))
 KNOWN_DEBT_IDS = CSS_KNOWN_DEBT_IDS + JAVASCRIPT_KNOWN_DEBT_IDS
+ACTIVE_DEBT_IDS = CSS_KNOWN_DEBT_IDS + ("JS-QD-005",)
+RESOLVED_DEBT_IDS = tuple(f"JS-QD-{index:03d}" for index in range(1, 5))
 APG79C_KNOWN_DEBT_SHA256 = (
     "af23e96bba3c689d061e8486e5436405377558bc051bd5679e1e8dad33d4a4d4"
 )
@@ -35,6 +37,47 @@ KNOWN_DEBT_ENTRY_SHA256 = {
     "JS-QD-003": "7351a67245165d4a95d0e878f259502fc172f3cac13e4fd956bee3cca103fced",
     "JS-QD-004": "f69e2dad60efe59e5ce086d7ff221fc08ebf745768f326afd812274c8b1b4073",
     "JS-QD-005": "f7ba6098693eabc834e17c27ac5c6729b00fff3ea900eda00ae657c92966e33d",
+}
+RESOLUTIONS = {
+    "JS-QD-001": "superseded",
+    "JS-QD-002": "repaired",
+    "JS-QD-003": "repaired",
+    "JS-QD-004": "repaired",
+}
+RESOLUTION_EVIDENCE = {
+    "JS-QD-001": (
+        "docs/evaluations/apg128-javascript-qualification-debt-consolidation.md",
+        "src/test/int/python/agentic-praxis-grimoire/skills/javascript-language-profile/SKILL.int.test.py",
+        "src/test/support/apg_javascript_fixture_contract.py",
+        "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_javascript_fixture_contract.unit.test.py",
+    ),
+    "JS-QD-002": (
+        "docs/evaluations/apg128-javascript-qualification-debt-consolidation.md",
+        "libexec/apg_test.py",
+        "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_test.unit.test.py",
+    ),
+    "JS-QD-003": (
+        "docs/evaluations/apg128-javascript-qualification-debt-consolidation.md",
+        "src/test/support/apg_javascript_candidate_contract.py",
+        "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_javascript_candidate_contract.unit.test.py",
+    ),
+    "JS-QD-004": (
+        "docs/evaluations/apg128-javascript-qualification-debt-consolidation.md",
+        "libexec/apg_test.py",
+        "src/test/int/python/agentic-praxis-grimoire/skills/javascript-language-profile/SKILL.int.test.py",
+    ),
+}
+RESOLUTION_KEYS = {
+    "debt_id",
+    "evidence",
+    "original_entry",
+    "original_entry_sha256",
+    "resolution",
+    "resolution_phase",
+}
+VALID_REGISTER_STATUSES = {
+    "candidate-human-accepted-qualification-debt",
+    "current-human-accepted-qualification-debt",
 }
 KNOWN_DEBT_KEYS = {
     "accepted_phase",
@@ -124,31 +167,32 @@ def known_debt_entry_sha256(value: dict[str, Any]) -> str:
 
 
 def validate_language_profile_known_debt(value: Any) -> dict[str, int]:
-    """Validate the exact APG77D CSS and APG79C/APG79E JavaScript debt set."""
+    """Validate candidate register v2 preserving active CSS + JS005 and resolutions."""
     if not isinstance(value, dict) or set(value) != {
         "debts",
         "phase",
         "profile",
+        "resolutions",
         "schema_version",
         "status",
     }:
         fail("known-debt top-level schema is invalid")
     if (
         type(value["schema_version"]) is not int
-        or value["schema_version"] != 1
-        or value["phase"] != "APG79E"
+        or value["schema_version"] != 2
+        or value["phase"] != "APG128"
         or value["profile"] != "language-profiles"
-        or value["status"] != "current-human-accepted-qualification-debt"
+        or value["status"] not in VALID_REGISTER_STATUSES
         or not isinstance(value["debts"], list)
+        or not isinstance(value["resolutions"], list)
     ):
         fail("known-debt identity or status is invalid")
-    expected_severities = (
-        "Medium", "Medium", "Medium", "Medium", "Low",
-        "Medium", "Medium", "Medium", "Medium", "Medium",
+    expected_active_severities = (
+        "Medium", "Medium", "Medium", "Medium", "Low", "Medium",
     )
-    observed_ids: list[str] = []
+    observed_active_ids: list[str] = []
     for index, (debt, expected_id, expected_severity) in enumerate(
-        zip(value["debts"], KNOWN_DEBT_IDS, expected_severities, strict=False)
+        zip(value["debts"], ACTIVE_DEBT_IDS, expected_active_severities, strict=False)
     ):
         if not isinstance(debt, dict) or set(debt) != KNOWN_DEBT_KEYS:
             fail(f"known-debt entry {index} schema is invalid")
@@ -160,11 +204,9 @@ def validate_language_profile_known_debt(value: Any) -> dict[str, int]:
             or type(debt["blocks_stable"]) is not bool
         ):
             fail(f"known-debt entry {index} blocking fields must be booleans")
-        observed_ids.append(debt["debt_id"])
+        observed_active_ids.append(debt["debt_id"])
         css_entry = expected_id in CSS_KNOWN_DEBT_IDS
-        expected_phase = "APG77D" if css_entry else "APG79C"
-        if expected_id == "JS-QD-005":
-            expected_phase = "APG79E"
+        expected_phase = "APG77D" if css_entry else "APG79E"
         expected_profile = "css-language-profile" if css_entry else "javascript-language-profile"
         expected_blocks_stable = expected_severity == "Medium" or not css_entry
         if (
@@ -179,18 +221,64 @@ def validate_language_profile_known_debt(value: Any) -> dict[str, int]:
             fail(f"known-debt entry {index} acceptance contract is invalid")
         if known_debt_entry_sha256(debt) != KNOWN_DEBT_ENTRY_SHA256[expected_id]:
             fail(f"known-debt entry {index} content drift")
-    if len(value["debts"]) != len(KNOWN_DEBT_IDS):
+    if len(value["debts"]) != len(ACTIVE_DEBT_IDS):
         fail("known-debt set is incomplete or contains extra entries")
-    if len(observed_ids) != len(set(observed_ids)):
+    if len(observed_active_ids) != len(set(observed_active_ids)):
         fail("duplicate known-debt ID")
-    if tuple(observed_ids) != KNOWN_DEBT_IDS:
+    if tuple(observed_active_ids) != ACTIVE_DEBT_IDS:
         fail("known-debt ID set is invalid")
+
+    observed_resolution_ids: list[str] = []
+    for index, resolution in enumerate(value["resolutions"]):
+        if not isinstance(resolution, dict) or set(resolution) != RESOLUTION_KEYS:
+            fail(f"known-debt resolution {index} schema is invalid")
+        did = resolution.get("debt_id")
+        if did not in RESOLVED_DEBT_IDS:
+            fail(f"known-debt resolution {index} has unknown debt ID: {did}")
+        observed_resolution_ids.append(did)
+        if resolution["resolution_phase"] != "APG128":
+            fail(f"known-debt resolution {index} phase is invalid")
+        if resolution["resolution"] != RESOLUTIONS[did]:
+            fail(f"known-debt resolution {index} contradictory or invalid resolution")
+        if resolution["original_entry_sha256"] != KNOWN_DEBT_ENTRY_SHA256[did]:
+            fail(f"known-debt resolution {index} wrong original digest")
+        orig = resolution["original_entry"]
+        if not isinstance(orig, dict) or set(orig) != KNOWN_DEBT_KEYS:
+            fail(f"known-debt resolution {index} original entry schema is invalid")
+        if orig.get("debt_id") != did:
+            fail(f"known-debt resolution {index} original entry ID mismatch")
+        if known_debt_entry_sha256(orig) != KNOWN_DEBT_ENTRY_SHA256[did]:
+            fail(f"known-debt resolution {index} altered original entry")
+        evidence = resolution["evidence"]
+        if (
+            not isinstance(evidence, list)
+            or not evidence
+            or any(not isinstance(e, str) or not e for e in evidence)
+        ):
+            fail(f"known-debt resolution {index} absent or invalid evidence")
+        if tuple(evidence) != RESOLUTION_EVIDENCE[did]:
+            fail(f"known-debt resolution {index} contradictory or invalid evidence refs")
+
+    if len(value["resolutions"]) != len(RESOLVED_DEBT_IDS):
+        fail("known-debt resolutions set is incomplete or contains extra entries")
+    if len(observed_resolution_ids) != len(set(observed_resolution_ids)):
+        fail("duplicate resolution ID")
+    if tuple(observed_resolution_ids) != RESOLVED_DEBT_IDS:
+        fail("known-debt resolution ID set is invalid")
+
+    if set(observed_active_ids) & set(observed_resolution_ids):
+        fail("overlapping active and resolution debt ID")
+    if set(observed_active_ids) | set(observed_resolution_ids) != set(KNOWN_DEBT_IDS):
+        fail("known-debt total ID set is invalid")
+
     return {
-        "debts": len(observed_ids),
-        "css": len(CSS_KNOWN_DEBT_IDS),
-        "javascript": len(JAVASCRIPT_KNOWN_DEBT_IDS),
-        "low": expected_severities.count("Low"),
-        "medium": expected_severities.count("Medium"),
+        "debts": len(observed_active_ids),
+        "active": len(observed_active_ids),
+        "css": sum(1 for d in value["debts"] if d["profile"] == "css-language-profile"),
+        "javascript": sum(1 for d in value["debts"] if d["profile"] == "javascript-language-profile"),
+        "low": expected_active_severities.count("Low"),
+        "medium": expected_active_severities.count("Medium"),
+        "resolutions": len(observed_resolution_ids),
     }
 
 
@@ -206,19 +294,22 @@ def validate_known_debt_markdown(text: str, value: Any) -> None:
 
     metrics = validate_language_profile_known_debt(value)
     normalized = " ".join(text.split())
-    expected_rows = (
+    expected_active_rows = (
         "| `CSS-QD-001` | Medium | Independent TARGET-007 source guard | Does not block under the explicit APG77D decision | Blocks until repaired or separately re-evaluated |",
         "| `CSS-QD-002` | Medium | Exhaustive disagreement enforcement | Does not block | Blocks |",
         "| `CSS-QD-003` | Medium | Adjudication-source relevance | Does not block | Blocks |",
         "| `CSS-QD-004` | Medium | Conflicting route-stop qualification | Does not block | Blocks |",
         "| `CSS-QD-005` | Low | Empty adjudication arrays | Does not block | Does not block by itself |",
-        "| `JS-QD-001` | Medium | supporting CommonJS qualification machinery only | Does not block under the explicit APG79C decision | Blocks until repaired or separately re-evaluated |",
-        "| `JS-QD-002` | Medium | JavaScript qualification harness diagnostics only | Does not block under the APG-owned non-sensitive fixture restriction | Blocks |",
-        "| `JS-QD-003` | Medium | supporting static process-invocation qualification only | Does not block with mandatory human diff review | Blocks |",
-        "| `JS-QD-004` | Medium | supporting output-contract qualification only | Does not block with exact-value and non-author review | Blocks |",
-        "| `JS-QD-005` | Medium | supporting Test262 source-role and historical managed-report integrity qualification only | Does not block under the explicit APG79E decision and direct current-report verification | Blocks |",
+        "| `JS-QD-005` | Medium | supporting Test262 source-role and historical managed-report integrity qualification only | Does not block under the explicit APG79E decision and accepted historical APG79E report verification | Blocks |",
     )
-    if tuple(row.split("`")[1] for row in expected_rows) != KNOWN_DEBT_IDS:
+    expected_resolution_rows = (
+        "| `JS-QD-001` | Medium | supporting CommonJS qualification machinery only | Superseded | APG128 |",
+        "| `JS-QD-002` | Medium | JavaScript qualification harness diagnostics only | Repaired | APG128 |",
+        "| `JS-QD-003` | Medium | supporting static process-invocation qualification only | Repaired | APG128 |",
+        "| `JS-QD-004` | Medium | supporting output-contract qualification only | Repaired | APG128 |",
+    )
+    expected_rows = expected_active_rows + expected_resolution_rows
+    if tuple(row.split("`")[1] for row in expected_rows) != ACTIVE_DEBT_IDS + RESOLVED_DEBT_IDS:
         fail("known-debt Markdown row owner is incomplete")
     observed_rows = tuple(
         " ".join(line.split())
@@ -234,10 +325,20 @@ def validate_known_debt_markdown(text: str, value: Any) -> None:
         "9b56d503039c2907d371b37b72451b6e0b71cca41aa0cd23c074453229698827",
         "maintained proxy does not directly bind the APG79B managed-report bytes",
         "profile rollback deactivates only that profile's current entries",
+        "six active with four resolutions",
+        "dispatcher review and closeout",
     )
     if any(marker not in normalized for marker in required):
         fail("known-debt Markdown lifecycle boundary is incomplete")
-    if metrics != {"debts": 10, "css": 5, "javascript": 5, "low": 1, "medium": 9}:
+    if metrics != {
+        "debts": 6,
+        "active": 6,
+        "css": 5,
+        "javascript": 1,
+        "low": 1,
+        "medium": 5,
+        "resolutions": 4,
+    }:
         fail("known-debt Markdown metrics are inconsistent")
 
 
@@ -264,6 +365,20 @@ def validate_known_debt_summary(summary: Any, value: Any, public_sha256: str) ->
     }
     if summary != expected:
         fail("public/private known-debt summary disagreement")
+    historical_entries = {debt["debt_id"]: debt for debt in value["debts"]}
+    historical_entries.update({
+        resolution["debt_id"]: resolution["original_entry"]
+        for resolution in value["resolutions"]
+    })
+    historical_owner = {
+        "debts": [historical_entries[did] for did in KNOWN_DEBT_IDS[:-1]],
+        "phase": "APG79C",
+        "profile": "language-profiles",
+        "schema_version": 1,
+        "status": "current-human-accepted-qualification-debt",
+    }
+    if hashlib.sha256(_canonical_json(historical_owner).encode()).hexdigest() != public_sha256:
+        fail("reconstructed historical known-debt owner digest is invalid")
 
 
 def validate_known_debt_profile_deactivation(

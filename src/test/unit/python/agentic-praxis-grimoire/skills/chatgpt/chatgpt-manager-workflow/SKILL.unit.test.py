@@ -57,7 +57,10 @@ def test_general_router_has_one_subrouter_edge_and_no_manager_leaf_edge() -> Non
         ).read_text(encoding="utf-8")
     )
     names = [entry["name"] for entry in capability_map["capabilities"]]
-    assert len(names) == 37
+    assert len(names) == 43
+    assert "browser-runtime-profile" in names
+    assert "vite-build-profile" in names
+    assert "npm-package-manager-profile" in names
     assert "css-language-profile" in names
     assert "javascript-language-profile" in names
     assert "jsx-language-profile" in names

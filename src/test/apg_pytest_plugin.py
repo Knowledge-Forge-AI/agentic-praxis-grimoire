@@ -11,7 +11,7 @@ from typing import Any
 
 import pytest
 
-from libexec.apg_test import record_worker_coverage_sentinel
+from libexec.apg_test import HarnessError, record_worker_coverage_sentinel, validate_collection
 
 
 _RESULTS: dict[str, str] = {}
@@ -55,6 +55,14 @@ def pytest_collection_modifyitems(
 ) -> None:
     suite = os.environ["APG_TEST_SUITE"]
     selected_root = os.environ["APG_TEST_SELECTED_ROOT"].rstrip("/")
+    if not items:
+        # Preserve pytest's no-tests exit status; the runner rejects status 5.
+        return
+    try:
+        selected_files = json.loads(os.environ.get("APG_TEST_SELECTED_FILES", "null"))
+        validate_collection([item.nodeid for item in items], selected_root, selected_files)
+    except (ValueError, HarnessError) as error:
+        raise pytest.UsageError(f"inventory collection failed: {error}") from error
     opposite = "integration" if suite == "unit" else "unit"
     seen: set[str] = set()
     for item in items:

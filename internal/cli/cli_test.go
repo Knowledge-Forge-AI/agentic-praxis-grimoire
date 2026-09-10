@@ -12,6 +12,7 @@ import (
 
 	"github.com/Knowledge-Forge-AI/agentic-praxis-grimoire/internal/buildinfo"
 	"github.com/Knowledge-Forge-AI/agentic-praxis-grimoire/report"
+	apgskills "github.com/Knowledge-Forge-AI/agentic-praxis-grimoire/skills"
 )
 
 func runTest(t *testing.T, ctx context.Context, arguments ...string) (int, string, string) {
@@ -80,12 +81,16 @@ func TestTopLevelHelpVersionAndBuildInfo(t *testing.T) {
 }
 
 func TestSkillsListAndContextReport(t *testing.T) {
+	metadata, err := apgskills.Metadata()
+	if err != nil {
+		t.Fatal(err)
+	}
 	exit, stdout, stderr := runTest(t, context.Background(), "skills", "list")
 	if exit != 0 || stderr != "" {
 		t.Fatalf("list = %d %q", exit, stderr)
 	}
 	names := strings.Split(strings.TrimSpace(stdout), "\n")
-	if len(names) != 39 || names[0] != "agentic-praxis-grimoire-workflow" || names[len(names)-1] != "zunit-test-profile" {
+	if len(names) != apgskills.V010BrowserRuntimeAdmittedSkillCount || names[0] != "agentic-praxis-grimoire-workflow" || names[len(names)-1] != "zunit-test-profile" {
 		t.Fatalf("names = %d %q %q", len(names), names[0], names[len(names)-1])
 	}
 	exit, stdout, stderr = runTest(t, context.Background(), "skills", "context-report")
@@ -102,8 +107,12 @@ func TestSkillsListAndContextReport(t *testing.T) {
 	if err := json.Unmarshal([]byte(stdout), &report); err != nil {
 		t.Fatal(err)
 	}
-	if report.SkillCount != 39 || report.Discoverable != 39 || report.Bytes != 9504 || report.Characters != 9492 || len(report.Malformed) != 0 {
-		t.Fatalf("context = %#v", report)
+	if report.SkillCount != apgskills.V010BrowserRuntimeAdmittedSkillCount || report.Discoverable != apgskills.V010BrowserRuntimeAdmittedSkillCount ||
+		report.Bytes != int(metadata.DescriptionBytes) || report.Characters != int(metadata.DescriptionCharacters) ||
+		report.Bytes <= int(apgskills.HistoricalDescriptionBytes) || report.Characters <= int(apgskills.HistoricalDescriptionCharacters) ||
+		len(report.Malformed) != 0 {
+		t.Fatalf("context = %#v (expected %d skills, derived bytes %d, chars %d, historical %d/%d)",
+			report, apgskills.V010BrowserRuntimeAdmittedSkillCount, metadata.DescriptionBytes, metadata.DescriptionCharacters, apgskills.HistoricalDescriptionBytes, apgskills.HistoricalDescriptionCharacters)
 	}
 	for _, arguments := range [][]string{{"skills", "list", "--json", "--format", "json"}, {"skills", "list", "--format"}, {"skills", "context-report", "--format", "yaml"}} {
 		exit, _, _ = runTest(t, context.Background(), arguments...)

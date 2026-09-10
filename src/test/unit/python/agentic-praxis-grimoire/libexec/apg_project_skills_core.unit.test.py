@@ -179,7 +179,7 @@ def test_frontmatter_and_canonical_skill_discovery_enforce_exact_catalog(tmp_pat
 def test_canonical_skill_discovery_resolves_declared_direct_and_chatgpt_paths(
     tmp_path: Path,
 ) -> None:
-    assert len(core.EXPECTED_SKILLS) == 39
+    assert len(core.EXPECTED_SKILLS) == 45
     assert "chatgpt-manager-workflow" in core.EXPECTED_SKILLS
     assert "dockerfile-profile" in core.EXPECTED_SKILLS
     assert "go-cmp-test-profile" in core.EXPECTED_SKILLS
@@ -191,6 +191,7 @@ def test_canonical_skill_discovery_resolves_declared_direct_and_chatgpt_paths(
     assert "vitest-test-profile" in core.EXPECTED_SKILLS
     assert "css-language-profile" in core.EXPECTED_SKILLS
     assert "vagrantfile-profile" in core.EXPECTED_SKILLS
+    assert "browser-runtime-profile" in core.EXPECTED_SKILLS
     nested = {
         "chatgpt-manager-workflow",
         "composing-approved-roadmap-assignments",

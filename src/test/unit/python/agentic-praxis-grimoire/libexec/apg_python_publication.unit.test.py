@@ -101,10 +101,10 @@ def _historical_wheel(path: Path) -> None:
 
 def test_version_and_target_layout_are_derived_from_the_single_authority() -> None:
     assert publication.VERSION == (REPOSITORY_ROOT / "src/agentic_praxis_grimoire/VERSION").read_text().strip()
-    assert publication.VERSION == "0.9.0"
+    assert publication.VERSION == "0.10.0"
     assert len(publication.WHEEL_NAMES) == 3
-    assert all(name.startswith("agentic_praxis_grimoire-0.9.0-py3-none-") for name in publication.WHEEL_NAMES)
-    assert publication.SDIST_NAME == "agentic_praxis_grimoire-0.9.0.tar.gz"
+    assert all(name.startswith("agentic_praxis_grimoire-0.10.0-py3-none-") for name in publication.WHEEL_NAMES)
+    assert publication.SDIST_NAME == "agentic_praxis_grimoire-0.10.0.tar.gz"
     assert "py3-none-any" not in " ".join(publication.WHEEL_NAMES)
     assert publication.TARGET_TAGS == backend.TARGET_TAGS
 
@@ -483,8 +483,8 @@ def test_release_workflow_targets_current_version_and_tag() -> None:
         (REPOSITORY_ROOT / ".github/workflows/release.yml").read_text(encoding="utf-8")
     )
     command = workflow["jobs"]["publish"]["steps"][0]["run"]
-    assert "expected_tag=v0.9.0" in command
-    assert "expected_version=0.9.0" in command
+    assert "expected_tag=v0.10.0" in command
+    assert "expected_version=0.10.0" in command
 
 
 def test_backend_manifest_and_configuration_refusals_are_complete(tmp_path: Path) -> None:
@@ -667,23 +667,16 @@ def test_package_links_refuse_repository_escape(target: str) -> None:
         backend._package_readme(f"[license]({target})", "0.8.1")
 
 
-def test_publication_epoch_alias_tracks_v090_release() -> None:
-    assert publication.EPOCH == distribution.V09_RELEASE_EPOCH
+def test_publication_epoch_alias_tracks_v0100_candidate() -> None:
+    assert publication.EPOCH == distribution.V010_RELEASE_EPOCH
     assert publication.EPOCH == distribution.release_epoch(publication.VERSION)
 
 
-def test_package_metadata_has_durable_v090_wording() -> None:
-    metadata = backend._metadata(REPOSITORY_ROOT).decode("utf-8")
-    assert "This documentation covers 0.9.0" in metadata
-    assert "Once this version is published" in metadata
-    assert "Active development is proceeding on the" not in metadata
-    assert "unpublished source candidate" not in metadata
-
-
-# Keep this public surface list aligned with the APG116 wording audit.
-@pytest.mark.parametrize("relative_path", [
+# Keep this exact public surface inventory aligned with the APG116/APG134 audit.
+AUDITED_SURFACES = (
     "README.md",
     "release/v0.9.0-notes.md",
+    "release/v0.10.0-notes.md",
     "docs/distribution.md",
     "docs/README.md",
     "docs/reference/cli.md",
@@ -693,21 +686,107 @@ def test_package_metadata_has_durable_v090_wording() -> None:
     "npm/templates/platform/README.md",
     "testing/fixtures/external_consumer/README.md",
     "testing/fixtures/xo_consumer/README.md",
-])
+)
+
+OLDER_FORBIDDEN_WORDING = (
+    "documentation covers the published **v0.8.1**",
+    "active development proceeding on the",
+    "active development is proceeding on the",
+    "candidate release notes (v0.9.0)",
+    "unpublished source candidate",
+)
+
+
+def _assert_current_release_wording(text: str) -> None:
+    normalized = " ".join(text.lower().split())
+    assert "this documentation covers v0.10.0." in normalized
+    for stale in (*OLDER_FORBIDDEN_WORDING,
+        "development readiness", "development interface", "development candidate",
+        "development qualification", "documentation candidate", "preparing for v0.10.0",
+        "public v0.9.0 remains", "public v0.9 remains", "remains released",
+        "remains the released", "finalization remains pending", "candidate freeze is next",
+        "deterministic public candidate freeze", "dispatcher", "operator preflight",
+        "separate authorization is required", "no automatic successor",
+        "agentic-praxis-grimoire==0.9.0", "@knowledge-forge-ai/apgr@0.9.0",
+        "agentic-praxis-grimoire@v0.9.0", "agentic-praxis-grimoire v0.9.0",
+        "publicly available on npm at **v0.9.0**",
+    ):
+        assert stale not in normalized, stale
+
+
+def test_package_metadata_has_v0100_release_source_guidance() -> None:
+    metadata = backend._metadata(REPOSITORY_ROOT).decode("utf-8")
+    assert "Version: 0.10.0\n" in metadata
+    _assert_current_release_wording(metadata)
+    for pin in (
+        "pip install agentic-praxis-grimoire==0.10.0",
+        "npm install -g @knowledge-forge-ai/apgr@0.10.0",
+        "go get github.com/Knowledge-Forge-AI/agentic-praxis-grimoire@v0.10.0",
+    ):
+        assert pin in metadata
+    assert "Once v0.10.0 is published" in metadata
+    readme = (REPOSITORY_ROOT / "README.md").read_text(encoding="utf-8")
+    assert backend._package_readme(readme, "0.10.0") in metadata
+    assert "/blob/v0.10.0/docs/" in metadata
+    assert "](docs/" not in metadata
+    assert "](release/" not in metadata
+
+
+def test_audited_surfaces_exact_enumeration() -> None:
+    assert set(AUDITED_SURFACES) == {
+        "README.md", "release/v0.9.0-notes.md", "release/v0.10.0-notes.md",
+        "docs/distribution.md", "docs/README.md", "docs/reference/cli.md",
+        "docs/reference/go-library.md", "npm/README.md",
+        "npm/templates/launcher/README.md", "npm/templates/platform/README.md",
+        "testing/fixtures/external_consumer/README.md",
+        "testing/fixtures/xo_consumer/README.md",
+    }
+    assert len(AUDITED_SURFACES) == 12
+
+
+@pytest.mark.parametrize("relative_path", AUDITED_SURFACES)
 def test_audited_package_surfaces_have_durable_release_wording(relative_path: str) -> None:
-    text = " ".join((REPOSITORY_ROOT / relative_path).read_text().split())
+    text = " ".join((REPOSITORY_ROOT / relative_path).read_text(encoding="utf-8").split())
     if relative_path.startswith("npm/templates/"):
         assert "Once this version is published" in text
-    elif relative_path == "docs/reference/cli.md":
-        assert "0.9.0 interface described here" in text
-    else:
+        assert "__APG_VERSION__" in text
+    elif relative_path == "release/v0.9.0-notes.md":
         assert "This documentation covers 0.9.0" in text
-    lowered = text.lower()
-    for stale in (
-        "documentation covers the published **v0.8.1**",
-        "active development proceeding on the",
-        "active development is proceeding on the",
-        "candidate release notes (v0.9.0)",
-        "unpublished source candidate",
-    ):
-        assert stale not in lowered
+    else:
+        _assert_current_release_wording(text)
+    for stale in OLDER_FORBIDDEN_WORDING:
+        assert stale not in text.lower()
+    if relative_path == "release/v0.10.0-notes.md":
+        for content in (
+            "Six new provisional profiles", "45 canonical leaves",
+            "14 stable and 31 provisional", "cross-build and archive inspection",
+            "Linux runtime execution has not been established",
+            "Tauri embedded WebView", "assistive technology", "JS-QD-005",
+            "All five CSS qualification debts", "RM-S0 through RM-S5",
+        ):
+            assert content in text
+
+
+@pytest.mark.parametrize("stale", [
+    "0.10.0 development readiness", "0.10.0 development interface",
+    "v0.10.0 development candidate", "0.10.0 development qualification",
+    "Public v0.9.0 remains the released version", "v0.9.0 remains released",
+    "dispatcher Git finalization remains pending", "candidate freeze is next",
+    "separate authorization is required", "no automatic successor is dispatched",
+    "pip install agentic-praxis-grimoire==0.9.0",
+    "npm install -g @knowledge-forge-ai/apgr@0.9.0",
+    "go get github.com/Knowledge-Forge-AI/agentic-praxis-grimoire@v0.9.0",
+    *OLDER_FORBIDDEN_WORDING,
+])
+def test_release_wording_guard_rejects_stale_content(stale: str) -> None:
+    # Exercise the same guard used on real docs, with case and line-wrap variants.
+    mutated = "This documentation covers v0.10.0.\n" + stale.upper().replace(" ", "\n")
+    with pytest.raises(AssertionError):
+        _assert_current_release_wording(mutated)
+
+
+def test_release_wording_guard_allows_technical_candidates_and_history() -> None:
+    _assert_current_release_wording(
+        "This documentation covers v0.10.0. The candidate manifest binds checksums. "
+        "Historical v0.9.0 release notes preserve the prior release."
+    )

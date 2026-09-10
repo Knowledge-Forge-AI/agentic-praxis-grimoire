@@ -60,7 +60,7 @@ HISTORICAL_V02_SKILLS = tuple(
 
 
 class APGPublicReleaseUnitTests(APGPublicReleaseCaseMixin, unittest.TestCase):
-    def test_live_committed_v07_manifest_exercises_complete_policy_projection(self) -> None:
+    def test_development_manifest_refuses_historical_v07_publication(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             source = Path(temporary) / "source"
             subprocess.run(
@@ -75,14 +75,10 @@ class APGPublicReleaseUnitTests(APGPublicReleaseCaseMixin, unittest.TestCase):
                 check=True,
             )
             repository = release.resolve_repository(source, "source")
-            manifest = release.build_manifest(repository, "0.7.0")
-
-        paths = {entry["path"] for entry in manifest["entries"]}
-        self.assertGreater(len(paths), 1000)
-        self.assertIn("cmd/apgr/main.go", paths)
-        self.assertIn("hotspot/testdata/classification/sample.md", paths)
-        self.assertFalse(any(path == "private" or path.startswith("private/") for path in paths))
-        self.assertEqual(manifest["canonical_public_identity"], "agentic-praxis-grimoire")
+            # Current development admission must not become a historical public
+            # release simply because a caller supplies an old version string.
+            with self.assertRaisesRegex(release.ToolError, "audited schema-1 surface"):
+                release.build_manifest(repository, "0.7.0")
 
     def test_prominent_public_guidance_matches_current_skill_topology(self) -> None:
         surface = json.loads(
@@ -90,26 +86,26 @@ class APGPublicReleaseUnitTests(APGPublicReleaseCaseMixin, unittest.TestCase):
                 encoding="utf-8"
             )
         )
-        self.assertEqual(len(surface["required_skills"]), 39)
-        self.assertEqual(len(surface["required_projections"]), 39)
+        self.assertEqual(len(surface["required_skills"]), 45)
+        self.assertEqual(len(surface["required_projections"]), 45)
         expected = {
             "README.md": (
-                "39 canonical agent skills",
-                "APG has 39 canonical leaves: 14 stable and 25 provisional",
-                "39 canonical / 39 catalog / 39 projections / 39\n  discoverable",
+                "45 canonical agent skills",
+                "APGR v0.10.0 provides 45 canonical leaves: 14 stable and 31 provisional",
+                "45 canonical / 45 catalog / 45 projections / 45\n  discoverable",
             ),
             "skills/README.md": (
-                "thirty-nine canonical skills: fourteen\nstable rows and twenty-five provisional rows",
-                "39 canonical skills, 39 catalog rows, and 39 projections,\nwith fourteen stable and twenty-five provisional rows",
+                "forty-five canonical skills: fourteen\nstable rows and thirty-one provisional rows",
+                "45 canonical leaves, 45 catalog rows and 45 projections",
             ),
             "docs/history/releases-and-phases.md": (
-                "thirty-nine relative symbolic links contain no\n  independent skill content",
+                "forty-five relative symbolic links contain no\n  independent skill content",
             ),
             "AGENTS.md": (
-                "thirty-nine skill owners, fourteen stable\n  and twenty-five provisional",
+                "forty-five skill owners, fourteen stable\n  and thirty-one provisional",
             ),
             "docs/project-skill-projection.md": (
-                "nineteen\n  skills for public v0.3.0 and thirty-nine for current development",
+                "nineteen\n  skills for public v0.3.0 and forty-five for current development",
             ),
         }
         for relative, fragments in expected.items():
@@ -219,8 +215,13 @@ class APGPublicReleaseUnitTests(APGPublicReleaseCaseMixin, unittest.TestCase):
                 encoding="utf-8"
             )
         )
+        # Current development extends the frozen release inventory without
+        # changing the audited v0.9 publication surface.
         for key, expected in v09.items():
-            self.assertEqual(policy[key], list(expected))
+            self.assertTrue(set(expected).issubset(policy[key]), key)
+        self.assertNotIn("skills/svg-language-profile/SKILL.md", v09["required_skills"])
+        self.assertEqual(set(policy["required_skills"]), set(v09["required_skills"]) | {"skills/svg-language-profile/SKILL.md", "skills/playwright-test-profile/SKILL.md", "skills/web-accessibility-profile/SKILL.md", "skills/vite-build-profile/SKILL.md", "skills/npm-package-manager-profile/SKILL.md", "skills/browser-runtime-profile/SKILL.md"})
+        self.assertEqual(set(policy["required_projections"]), set(v09["required_projections"]) | {".agents/skills/svg-language-profile", ".agents/skills/playwright-test-profile", ".agents/skills/web-accessibility-profile", ".agents/skills/vite-build-profile", ".agents/skills/npm-package-manager-profile", ".agents/skills/browser-runtime-profile"})
 
         private = release.Entry("100644", "blob", "a" * 40, b"private/secret.txt")
         oracle = release.Entry("100644", "blob", "b" * 40, b"report/testdata/python_oracle.py")
@@ -228,6 +229,75 @@ class APGPublicReleaseUnitTests(APGPublicReleaseCaseMixin, unittest.TestCase):
             release.validate_versioned_policy_exclusions((private,), "0.9.0")
         with self.assertRaisesRegex(release.ToolError, "publication-excluded"):
             release.validate_versioned_policy_exclusions((oracle,), "0.9.0")
+
+    def test_v010_surface_adds_45_skills_and_projections_and_new_critical_files(self) -> None:
+        v09 = release.audited_policy_surfaces("0.9.0")[0]
+        v010 = release.audited_policy_surfaces("0.10.0")[0]
+
+        self.assertTrue(set(v09["critical_files"]).issubset(v010["critical_files"]))
+        self.assertTrue(set(v09["required_test_entrypoints"]).issubset(v010["required_test_entrypoints"]))
+        self.assertTrue(set(v09["required_helpers"]).issubset(v010["required_helpers"]))
+        self.assertEqual(len(v010["required_skills"]), 45)
+        self.assertEqual(len(v010["required_projections"]), 45)
+
+        new_skills = {
+            "skills/browser-runtime-profile/SKILL.md",
+            "skills/npm-package-manager-profile/SKILL.md",
+            "skills/playwright-test-profile/SKILL.md",
+            "skills/svg-language-profile/SKILL.md",
+            "skills/vite-build-profile/SKILL.md",
+            "skills/web-accessibility-profile/SKILL.md",
+        }
+        self.assertEqual(set(v010["required_skills"]) - set(v09["required_skills"]), new_skills)
+
+        # Critical v0.10 architecture, specs, evaluations, and fixtures
+        for path in (
+            "docs/architecture/v0-10-browser-runtime.md",
+            "docs/architecture/v0-10-browser-ui-verification.md",
+            "docs/architecture/v0-10-svg-language-profile.md",
+            "docs/architecture/v0-10-toolchain.md",
+            "docs/evaluations/apg122-v0-10-foundation-and-svg.md",
+            "docs/evaluations/apg123-v0-10-browser-ui-verification.md",
+            "docs/evaluations/apg124-v0-10-toolchain.md",
+            "docs/evaluations/apg125-v0-10-browser-runtime-and-composition.md",
+            "docs/v0-10-roadmap.md",
+            "src/test/fixtures/apg122-svg/scenarios.json",
+            "src/test/fixtures/apg123-browser-ui/scenarios.json",
+            "src/test/fixtures/apg125-profile-composition-scenarios.json",
+        ):
+            self.assertIn(path, v010["critical_files"])
+
+        # Policy file matches v010 surface exactly
+        policy = json.loads(
+            (REPOSITORY_ROOT / "release" / "public-surface.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        for key, expected in v010.items():
+            self.assertEqual(policy[key], list(expected), key)
+
+        # Candidate path filtering behavior
+        self.assertFalse(release.is_v010_candidate_path("private/secret.txt"))
+        self.assertFalse(release.is_v010_candidate_path("dist/example.whl"))
+        self.assertFalse(release.is_v010_candidate_path(".scratch/local.txt"))
+        self.assertFalse(release.is_v010_candidate_path("pkg/__pycache__/mod.pyc"))
+        self.assertTrue(release.is_v010_candidate_path("docs/v0-10-roadmap.md"))
+        self.assertTrue(release.is_v010_candidate_path("report/testdata/persisted/diff.report.txt"))
+
+        # Policy exclusion validation
+        private = release.Entry("100644", "blob", "a" * 40, b"private/secret.txt")
+        generated = release.Entry("100644", "blob", "b" * 40, b"dist/example.whl")
+        with self.assertRaisesRegex(release.ToolError, "publication-excluded"):
+            release.validate_versioned_policy_exclusions((private,), "0.10.0")
+        with self.assertRaisesRegex(release.ToolError, "publication-excluded"):
+            release.validate_versioned_policy_exclusions((generated,), "0.10.0")
+
+        # Fail closed on unsupported SemVer versions
+        for unsupported in ("0.10.1", "0.11.0"):
+            with self.assertRaisesRegex(release.ToolError, "unsupported"):
+                release.audited_policy_surfaces(unsupported)
+            with self.assertRaisesRegex(release.ToolError, "unsupported"):
+                release.validate_versioned_policy_exclusions((), unsupported)
 
     def test_historical_v06_surface_is_snapshot_not_current_tuple_alias(self) -> None:
         original = release.AUDITED_HELPERS
@@ -522,20 +592,23 @@ class APGPublicReleaseUnitTests(APGPublicReleaseCaseMixin, unittest.TestCase):
             ):
                 release.validate_private_policy(repository, str(policy_path))
 
+        audited_v07 = release.audited_policy_surfaces("0.7.0")[0]
+        wrapper_entries = tuple(
+            release.Entry("100755", "blob", "a" * 40, path.encode("utf-8"))
+            for path in (*audited_v07["required_wrappers"], *audited_v07["required_helpers"])
+        )
         policy = {
             "validation_categories": sorted(release.ALLOWED_CATEGORIES),
-            "required_wrappers": ["bin/tool"],
-            "required_helpers": [],
-            "required_test_entrypoints": [
-                "src/test/unit/python/agentic-praxis-grimoire/example.test.py"
-            ],
+            "required_wrappers": list(audited_v07["required_wrappers"]),
+            "required_helpers": list(audited_v07["required_helpers"]),
+            "required_test_entrypoints": list(audited_v07["required_test_entrypoints"]),
         }
         with (
             mock.patch.object(release, "run_checked_command") as command,
-            mock.patch.object(release, "tree_entries", return_value=(entry,)),
+            mock.patch.object(release, "tree_entries", return_value=wrapper_entries),
             mock.patch.object(release, "entry_bytes", return_value=b"#!/bin/sh\nsafe\n"),
         ):
-            release.validate_categories(repository, repository, policy, {"HOME": "/tmp"})
+            release.validate_categories(repository, repository, policy, {"HOME": "/tmp"}, "0.7.0")
         rendered_commands = [call.args[0] for call in command.call_args_list]
         self.assertTrue(any("pytest" in values for values in rendered_commands))
         self.assertTrue(any(values[:2] == ["bash", "-n"] for values in rendered_commands))
@@ -627,7 +700,7 @@ class APGPublicReleaseUnitTests(APGPublicReleaseCaseMixin, unittest.TestCase):
             "required_test_entrypoints": ["legacy.test.py", "legacy.test.bats"],
         }
         with mock.patch.object(release, "run_checked_command") as command:
-            release.validate_categories(repository, repository, policy, {})
+            release.validate_categories(repository, repository, policy, {}, "0.2.0")
         self.assertEqual(command.call_args_list[0].args[0], ["bats", "legacy.test.bats"])
         self.assertEqual(command.call_args_list[1].args[0], [sys.executable, "legacy.test.py"])
 
@@ -640,7 +713,7 @@ class APGPublicReleaseUnitTests(APGPublicReleaseCaseMixin, unittest.TestCase):
             "required_test_entrypoints": list(release.V07_TESTS),
         }
         with mock.patch.object(release, "run_checked_command") as command:
-            release.validate_categories(repository, repository, policy, {})
+            release.validate_categories(repository, repository, policy, {}, "0.7.0")
         arguments = command.call_args.args[0]
         observed = [
             arguments[index + 1]
@@ -676,7 +749,7 @@ class APGPublicReleaseUnitTests(APGPublicReleaseCaseMixin, unittest.TestCase):
             release, "entry_bytes", return_value=release.LOCAL_PATH_MARKERS[0].encode()
         ):
             with self.assertRaisesRegex(release.ToolError, "confidentiality"):
-                release.validate_categories(repository, repository, policy, {})
+                release.validate_categories(repository, repository, policy, {}, "0.10.0")
 
     def test_public_lineage_accepts_exact_v01_terminal_identity(self) -> None:
         commit = release.PUBLIC_V01_COMMIT
@@ -800,6 +873,165 @@ class APGPublicReleaseUnitTests(APGPublicReleaseCaseMixin, unittest.TestCase):
         self.assertTrue(any(arguments[0] == "update-index" for arguments in calls))
         self.assertTrue(any(arguments[:2] == ["symbolic-ref", "HEAD"] for arguments in calls))
 
+    def test_public_validation_deselections_all_five_versions_including_seventeen_additive_python_files(self) -> None:
+        versions = ("0.7.0", "0.8.0", "0.8.1", "0.9.0", "0.10.0")
+        for version in versions:
+            with self.subTest(version=version):
+                surface = release.audited_policy_surfaces(version)[0]
+                policy = {
+                    "required_test_entrypoints": list(surface["required_test_entrypoints"])
+                }
+                deselections = release.resolve_public_validation_deselections(version, policy)
+                self.assertEqual(deselections, release.V07_PUBLIC_VALIDATION_DESELECTIONS)
+                self.assertEqual(len(deselections), 7)
+                py_tests = {p for p in surface["required_test_entrypoints"] if p.endswith(".py")}
+                for node_id in deselections:
+                    self.assertIn(node_id.split("::", 1)[0], py_tests)
+
+        # Explicitly verify the 17 additive Python files between 0.9.0 and 0.10.0
+        v10_py = {p for p in release.V010_TESTS if p.endswith(".py")}
+        v09_py = {p for p in release.V09_TESTS if p.endswith(".py")}
+        additive_py = v10_py - v09_py
+        self.assertEqual(len(additive_py), 17)
+        self.assertEqual(len(v10_py), 151)
+        self.assertEqual(len(v09_py), 134)
+
+        # Regress that current execution includes the full inventory and seven exclusions.
+        repository = release.Repository(REPOSITORY_ROOT, "a" * 40, "b" * 40)
+        policy_v10 = {
+            "validation_categories": ["configured-tests"],
+            "required_wrappers": [],
+            "required_helpers": [],
+            "required_test_entrypoints": list(release.V010_TESTS),
+        }
+        with mock.patch.object(release, "run_checked_command") as command:
+            release.validate_categories(repository, repository, policy_v10, {}, "0.10.0")
+        arguments = command.call_args.args[0]
+        observed = [
+            arguments[index + 1]
+            for index, value in enumerate(arguments)
+            if value == "--deselect"
+        ]
+        self.assertEqual(observed, list(release.V07_PUBLIC_VALIDATION_DESELECTIONS))
+        self.assertEqual(len(observed), 7)
+        self.assertEqual(len([arg for arg in arguments if arg.startswith("src/test/") and arg.endswith(".test.py")]), 153)
+
+    def test_current_public_inventory_selection_closes_projected_files(self) -> None:
+        import apg_test
+
+        repository = release.Repository(REPOSITORY_ROOT, "a" * 40, "b" * 40)
+        audited = tuple(path for path in release.V010_TESTS if path.endswith(".py"))
+        selected = release.public_python_selection(repository, "0.10.0", audited)
+        self.assertEqual(selected, tuple(sorted(apg_test.load_inventory(REPOSITORY_ROOT).tests)))
+        self.assertEqual(len(selected), 153)
+        self.assertEqual(set(selected) - set(audited), {
+            "src/test/int/python/agentic-praxis-grimoire/libexec/apg_distribution_candidate.int.test.py",
+            "src/test/int/python/agentic-praxis-grimoire/src/agentic_praxis_grimoire/reports.int.test.py",
+        })
+        for version in ("0.7.0", "0.8.0", "0.8.1", "0.9.0"):
+            historical = tuple(path for path in release.audited_policy_surfaces(version)[0]["required_test_entrypoints"] if path.endswith(".py"))
+            with mock.patch.object(apg_test, "load_inventory", side_effect=AssertionError("historical policy must not read current inventory")):
+                self.assertEqual(release.public_python_selection(repository, version, historical), historical)
+
+    def test_current_public_inventory_selection_fails_closed(self) -> None:
+        import apg_test
+
+        repository = release.Repository(REPOSITORY_ROOT, "a" * 40, "b" * 40)
+        with mock.patch.object(apg_test, "load_inventory", side_effect=apg_test.InvocationError("invalid inventory")):
+            with self.assertRaisesRegex(release.ToolError, "public inventory selection"):
+                release.public_python_selection(repository, "0.10.0", ())
+        with self.assertRaisesRegex(release.ToolError, "audited Python tests"):
+            release.public_python_selection(repository, "0.10.0", ("foreign.test.py",))
+
+    def test_public_selection_requires_an_explicit_version_decision(self) -> None:
+        repository = release.Repository(REPOSITORY_ROOT, "a" * 40, "b" * 40)
+        for version in ("0.11.0", "0.10", "v0.10.0", None):
+            with self.subTest(version=version):
+                with self.assertRaisesRegex(release.ToolError, "selection policy"):
+                    release.public_python_selection(repository, version, ())
+
+    def test_public_selection_refuses_supplemental_inventory_drift(self) -> None:
+        import apg_test
+
+        repository = release.Repository(REPOSITORY_ROOT, "a" * 40, "b" * 40)
+        audited = tuple(path for path in release.V010_TESTS if path.endswith(".py"))
+        selected = tuple(apg_test.load_inventory(REPOSITORY_ROOT).tests)
+        supplemental = "src/test/int/python/agentic-praxis-grimoire/src/agentic_praxis_grimoire/reports.int.test.py"
+        for tests in (
+            (*selected, "src/test/int/python/agentic-praxis-grimoire/foreign.int.test.py"),
+            tuple(path for path in selected if path != supplemental),
+        ):
+            with self.subTest(tests=tests):
+                with (
+                    mock.patch.object(apg_test, "load_inventory", return_value=mock.Mock(tests=tests)),
+                    mock.patch.object(apg_test, "validate_inventory"),
+                    self.assertRaisesRegex(release.ToolError, "supplemental Python tests"),
+                ):
+                    release.public_python_selection(repository, "0.10.0", audited)
+
+    def test_public_validation_deselections_historical_noinherit(self) -> None:
+        for version in ("0.2.0", "0.3.0", "0.4.0", "0.5.0", "0.6.0"):
+            with self.subTest(historical_version=version):
+                surface = release.audited_policy_surfaces(version)[0]
+                policy = {
+                    "required_test_entrypoints": list(surface["required_test_entrypoints"])
+                }
+                deselections = release.resolve_public_validation_deselections(version, policy)
+                self.assertEqual(deselections, ())
+
+    def test_public_validation_deselections_malformed_and_unknown_identities(self) -> None:
+        policy = {"required_test_entrypoints": list(release.V07_TESTS)}
+        for malformed in ("0.7", "v0.7.0", "invalid", "", "0.7.0.0"):
+            with self.subTest(malformed=malformed):
+                with self.assertRaisesRegex(release.ToolError, "malformed or unsupported"):
+                    release.resolve_public_validation_deselections(malformed, policy)
+        for unknown in ("0.1.0", "0.6.1", "0.7.1", "0.8.2", "0.9.1", "0.10.1", "0.11.0", "1.0.0"):
+            with self.subTest(unknown=unknown):
+                with self.assertRaisesRegex(release.ToolError, "malformed or unsupported"):
+                    release.resolve_public_validation_deselections(unknown, policy)
+        with self.assertRaisesRegex(release.ToolError, "malformed or unsupported"):
+            release.resolve_public_validation_deselections(None, policy)  # type: ignore[arg-type]
+
+    def test_public_validation_deselections_mismatched_and_broad_compatibility_tuples_rejected(self) -> None:
+        with self.assertRaisesRegex(release.ToolError, "differs from the audited schema-1 surface"):
+            release.resolve_public_validation_deselections("0.7.0", {"required_test_entrypoints": []})
+        with self.assertRaisesRegex(release.ToolError, "differs from the audited schema-1 surface"):
+            release.resolve_public_validation_deselections(
+                "0.7.0",
+                {"required_test_entrypoints": list(release.V07_TESTS)[:-1]},
+            )
+        # Broad compatibility surface rejection (e.g. 0.6.0 tests with 0.7.0, or 0.9.0 tests with 0.10.0)
+        with self.assertRaisesRegex(release.ToolError, "differs from the audited schema-1 surface"):
+            release.resolve_public_validation_deselections(
+                "0.7.0",
+                {"required_test_entrypoints": list(release.AUDITED_TESTS)},
+            )
+        with self.assertRaisesRegex(release.ToolError, "differs from the audited schema-1 surface"):
+            release.resolve_public_validation_deselections(
+                "0.10.0",
+                {"required_test_entrypoints": list(release.V09_TESTS)},
+            )
+        # Malformed policy payloads
+        for invalid_policy in ({}, {"other": []}, None, "bad", {"required_test_entrypoints": None}, {"required_test_entrypoints": 7}):
+            with self.subTest(invalid_policy=invalid_policy):
+                with self.assertRaisesRegex(release.ToolError, "malformed"):
+                    release.resolve_public_validation_deselections("0.7.0", invalid_policy)  # type: ignore[arg-type]
+
+    def test_public_validation_deselections_orphan_exclusion_rejection(self) -> None:
+        policy = {"required_test_entrypoints": list(release.V07_TESTS)}
+        with mock.patch.dict(
+            release.PUBLIC_VALIDATION_DESELECTIONS_BY_VERSION,
+            {"0.7.0": ("src/test/int/python/agentic-praxis-grimoire/orphan.int.test.py::test_orphan",)},
+        ):
+            with self.assertRaisesRegex(release.ToolError, "not in the audited 0.7.0 Python tests"):
+                release.resolve_public_validation_deselections("0.7.0", policy)
+
+        with mock.patch.dict(
+            release.PUBLIC_VALIDATION_DESELECTIONS_BY_VERSION,
+            {"0.7.0": ("src/test/unit/bash/append-operational-report.unit.test.bats::test_bats",)},
+        ):
+            with self.assertRaisesRegex(release.ToolError, "not in the audited 0.7.0 Python tests"):
+                release.resolve_public_validation_deselections("0.7.0", policy)
 
 
 if __name__ == "__main__":

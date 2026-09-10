@@ -15,6 +15,23 @@ class ReportRouteError(ValueError):
     """A canonical report command is malformed or lacks repository authority."""
 
 
+HELP = """usage: apgr report <command> [options]
+
+Canonical APGR report routing and verification.
+
+commands:
+  show         publish one committed Git report
+  diff         publish one uncommitted Git report
+  operational  publish one operational report (alias: ops)
+  path         print a canonical primary path without creating it
+  recover      recover one interrupted canonical publication
+  verify       verify one persisted report file
+
+publication option (show, diff, operational/ops):
+  --idempotent  return already-present for identical retained record bytes;
+                reject a same-identity replay with differing bytes
+"""
+
 KINDS = {
     "show": "git.show.report.txt",
     "diff": "git.diff.report.txt",
@@ -59,9 +76,17 @@ def main(
     try:
         if not arguments:
             raise ReportRouteError(
-                "report requires show, diff, operational, recover, or path"
+                "report requires show, diff, operational, ops, path, recover, or verify"
             )
         action, *tail = arguments
+        if action in {"help", "-h", "--help"}:
+            sys.stdout.write(HELP)
+            return 0
+        if action == "verify":
+            return go_bridge.run(
+                ["report", "verify", *tail],
+                repository_root=repository_root,
+            )
         project = options.get("project")
         if project is None and repository_root is not None:
             project = repository_root.name
@@ -105,4 +130,4 @@ def main(
         return 1
 
 
-__all__ = ["KINDS", "ReportRouteError", "main", "report_path"]
+__all__ = ["HELP", "KINDS", "ReportRouteError", "main", "report_path"]

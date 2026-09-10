@@ -669,3 +669,17 @@ source-bound refusal projections. Sensitivity and retention labels remain
 ownership. ADR 0052 is Accepted with compatibility and forward-only rollback;
 architecture is complete while implementation remains in progress, with no
 v0.8 test or release claim.
+
+## ADR 0053 — v0.10 Discovery Capacity and SVG
+
+[ADR 0053](2026/09/0053-v0-10-discovery-capacity-and-svg.md) records the
+manager-accepted APG122 foundation and APG123's pending Browser/UI amendment.
+It preserves historical capacity identities and explicit selection while
+admitting exactly SVG, Playwright and web accessibility under the new current
+policy. The APG123 amendment awaits dispatcher pre-final and closeout.
+
+## ADR 0054 — JS-QD-005 Refresh Trigger Interpretation
+
+[ADR 0054](2026/09/0054-js-qd-005-refresh-trigger-interpretation.md) — Accepted.
+APG132 records canonical refresh-field precedence and the historical generator
+interpretation without changing the accepted debt object or stable-maturity block.

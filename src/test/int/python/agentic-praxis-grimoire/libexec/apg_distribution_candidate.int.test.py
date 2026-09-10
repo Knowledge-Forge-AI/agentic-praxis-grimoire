@@ -5,8 +5,10 @@ from __future__ import annotations
 import json
 import os
 from pathlib import Path
+import shutil
 import subprocess
 import sys
+import tarfile
 
 import pytest
 
@@ -18,6 +20,7 @@ sys.path.insert(0, os.fspath(ROOT / "libexec"))
 
 import apg_distribution_candidate as candidate  # noqa: E402
 import apg_npm_distribution as npm_distribution  # noqa: E402
+import apg_python_build_backend as python_backend  # noqa: E402
 import apg_python_publication as python_publication  # noqa: E402
 
 
@@ -62,7 +65,7 @@ def test_complete_release_candidate_builders_compose_in_process(
     assert len(python_paths) == 5
     assert len(npm_records) == 4
     assert manifest["schema_version"] == candidate.MANIFEST_SCHEMA
-    assert manifest["version"] == "0.9.0"
+    assert manifest["version"] == "0.10.0"
     assert len(manifest["binaries"]) == 3
     assert len(manifest["python"]["wheels"]) == 3
     assert len(manifest["npm"]["platform_packages"]) == 3
@@ -98,6 +101,89 @@ def test_complete_release_candidate_builders_compose_in_process(
             python_output,
             npm_output,
         )
+
+    _verify_distributions(tmp_path, python_paths, npm_records, npm_output, manifest["version"])
+
+
+def _run(argv: list[str], cwd: Path, environment: dict[str, str] | None = None) -> str:
+    result = subprocess.run(argv, cwd=cwd, env=environment, stdin=subprocess.DEVNULL,
+                            stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=False)
+    assert result.returncode == 0, f"distribution command failed: {result.stderr}"
+    return result.stdout
+
+
+def _unpack_tar(source: Path, destination: Path, prefix: str) -> None:
+    destination.mkdir(parents=True, mode=0o700)
+    with tarfile.open(source, "r:gz") as archive:
+        for member in archive.getmembers():
+            relative = Path(member.name).relative_to(prefix)
+            assert ".." not in relative.parts and not relative.is_absolute()
+            target = destination / relative
+            if member.isdir():
+                target.mkdir(parents=True, exist_ok=True)
+            else:
+                assert member.isfile()
+                stream = archive.extractfile(member)
+                assert stream is not None
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_bytes(stream.read())
+                target.chmod(member.mode)
+
+
+def _verify_wheel(wheel: Path, work: Path, fixture: Path) -> None:
+    prefix = work / "installed"
+    # Install only this locally built artifact. No dependency or index access.
+    pip = shutil.which("pip")
+    assert pip is not None, "pip is required for local wheel installation qualification"
+    _run([pip, "--python", sys.executable, "install", "--no-deps", "--no-index",
+          "--ignore-installed", f"--prefix={prefix}", str(wheel)], work.parent)
+    packages = list(prefix.glob("lib/python*/site-packages"))
+    assert len(packages) == 1
+    environment = os.environ.copy()
+    environment["PYTHONPATH"] = str(packages[0])
+    environment.pop("APGR_GO_BINARY", None)
+    console = prefix / "bin/apgr"
+    assert console.is_file()
+    for argv in ([sys.executable, "-m", "agentic_praxis_grimoire"], [str(console)]):
+        output = _run([*argv, "report", "verify", str(fixture)], work.parent, environment)
+        assert "verified 1 record" in output
+
+
+def _verify_distributions(work: Path, python_paths: tuple[Path, ...], npm_records: tuple,
+                          npm_output: Path, version: str) -> None:
+    fixture = ROOT / "report/testdata/persisted/diff.report.txt"
+    original = fixture.read_bytes()
+    original_stat = fixture.stat()
+    target = python_backend._host_target()
+    tag = python_backend.TARGET_TAGS[target]
+    wheel = next(path for path in python_paths if path.name.endswith(f"-{tag}.whl"))
+    _verify_wheel(wheel, work / "host-wheel", fixture)
+
+    sdist = next(path for path in python_paths if path.name.endswith(".tar.gz"))
+    source = work / "sdist-source"
+    _unpack_tar(sdist, source, f"{python_backend.DIST_NAME}-{version}")
+    wheel_output = work / "sdist-built-wheel"
+    wheel_output.mkdir()
+    # Invoke the backend shipped in the sdist and build its Go source. Supplying
+    # a prebuilt binary would not qualify source-distribution buildability.
+    program = "import sys; sys.path.insert(0, 'libexec'); import apg_python_build_backend as backend; print(backend.build_wheel(sys.argv[1]))"
+    _run([sys.executable, "-c", program, str(wheel_output)], source)
+    built = list(wheel_output.glob("*.whl"))
+    assert len(built) == 1
+    _verify_wheel(built[0], work / "sdist-wheel", fixture)
+
+    node = shutil.which("node")
+    assert node is not None, "Node is required for maintained npm runtime qualification"
+    packages = work / "npm-runtime/node_modules/@knowledge-forge-ai"
+    launcher = next(record for record in npm_records if record.target is None)
+    native = next(record for record in npm_records if record.target == target)
+    for record in (launcher, native):
+        _unpack_tar(npm_output / record.filename, packages / record.name.split("/")[-1], "package")
+    output = _run([node, str(packages / "apgr/index.js"), "report", "verify", str(fixture)], packages.parent)
+    assert "verified 1 record" in output
+    assert fixture.read_bytes() == original
+    after = fixture.stat()
+    assert (after.st_ino, after.st_mode, after.st_mtime_ns) == (original_stat.st_ino, original_stat.st_mode, original_stat.st_mtime_ns)
 
 
 def test_release_candidate_refusal_contracts_replay_in_isolated_process(

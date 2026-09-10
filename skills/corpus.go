@@ -59,7 +59,17 @@ func loadIndex() (corpusIndex, error) {
 	return indexValue, indexError
 }
 
+// V010BrowserUIRequireAdmittedLeaf preserves the historical admission flag.
+const V010BrowserUIRequireAdmittedLeaf = true
+
+// V010RequireAdmittedLeaf preserves backward-compatibility for historical callers.
+const V010RequireAdmittedLeaf = true
+
 func buildIndex(corpus fs.FS) (corpusIndex, error) {
+	return buildIndexWithRequirement(corpus, V010RequireAdmittedLeaf)
+}
+
+func buildIndexWithRequirement(corpus fs.FS, requireAdmitted bool) (corpusIndex, error) {
 	flat, err := fs.Glob(corpus, "*/SKILL.md")
 	if err != nil {
 		return corpusIndex{}, fmt.Errorf("%w: flat embed pattern", ErrCorpusMismatch)
@@ -70,8 +80,15 @@ func buildIndex(corpus fs.FS) (corpusIndex, error) {
 	}
 	paths := append(flat, nested...)
 	sort.Strings(paths)
-	if len(paths) != 39 {
-		return corpusIndex{}, fmt.Errorf("%w: expected 39 leaves", ErrCorpusMismatch)
+	expectedCount := HistoricalSkillCount
+	policyVersion := DiscoveryPolicyVersionV010
+	if requireAdmitted {
+		expectedCount = V010BrowserRuntimeAdmittedSkillCount
+		policyVersion = DiscoveryPolicyVersion
+	}
+	if len(paths) != expectedCount {
+		return corpusIndex{}, fmt.Errorf("%w: expected exactly %d leaves under %s discovery policy (admission required=%t), got %d",
+			ErrCorpusMismatch, expectedCount, policyVersion, requireAdmitted, len(paths))
 	}
 	index := corpusIndex{byID: map[string]SkillMetadata{}, bodyByID: map[string][]byte{}}
 	for _, relative := range paths {
@@ -93,8 +110,8 @@ func buildIndex(corpus fs.FS) (corpusIndex, error) {
 		index.descriptionCharacters += metadata.DescriptionCharacters
 	}
 	sort.Slice(index.skills, func(left, right int) bool { return index.skills[left].ID < index.skills[right].ID })
-	if index.descriptionBytes != 9504 || index.descriptionCharacters != 9492 || index.descriptionBytes > GlobalDescriptionLimit {
-		return corpusIndex{}, fmt.Errorf("%w: canonical description footprint", ErrCorpusMismatch)
+	if err := ValidateDiscoveryPolicy(policyVersion, index.skills); err != nil {
+		return corpusIndex{}, err
 	}
 	manifest := metadataManifest{SchemaVersion: 1, Skills: make([]metadataRow, 0, len(index.skills))}
 	for _, skill := range index.skills {

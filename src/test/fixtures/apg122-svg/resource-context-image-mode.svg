@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <!-- Authoring for img resource context in secure processing mode: self-contained, no external resources -->
+  <rect width="120" height="120" rx="12" fill="#3b82f6" />
+  <circle cx="60" cy="50" r="25" fill="#ffffff" />
+  <path d="M 25 100 C 25 80, 45 75, 60 75 C 75 75, 95 80, 95 100 Z" fill="#ffffff" />
+</svg>

@@ -62,12 +62,21 @@ func Operational(ctx context.Context, request OperationalRequest, existing []Rec
 }
 
 func parseOperationalSource(name string, raw []byte) (operationalSource, error) {
+	return parseOperationalSourceMode(name, raw, false)
+}
+
+func parseOperationalSourceMode(name string, raw []byte, historical bool) (operationalSource, error) {
 	fields := map[string][][]byte{
 		"report_schema":         allFields(raw, "report_schema"),
 		"phase":                 allFields(raw, "phase"),
 		"outcome":               allFields(raw, "outcome"),
 		"primary_commit":        allFields(raw, "primary commit", "primary_commit"),
 		"primary_git_report_id": allFields(raw, "primary_git_report_id"),
+	}
+	if !historical {
+		if err := validateRecognizedOperationalFields(raw, fields); err != nil {
+			return operationalSource{}, err
+		}
 	}
 	bodySchema := "free-form"
 	if schemaLine.Match(raw) {
@@ -134,7 +143,7 @@ func buildOperationalRecord(request OperationalRequest, source operationalSource
 			return Record{}, fmt.Errorf("%w: related Git report ID is absent", ErrCompatibility)
 		}
 	}
-	if err := validateOperationalBody(source, request.Phase, request.Result, related, relatedCommit, relatedID); err != nil {
+	if err := validateOperationalSemantics(source, request.Phase, request.Result, related, relatedCommit, relatedID, false); err != nil {
 		return Record{}, err
 	}
 	sourceHash := schema.SHA256(source.raw)

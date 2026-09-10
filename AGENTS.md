@@ -127,8 +127,8 @@ prerequisite, never a fabricated fact.
 - [Exit records](docs/status/README.md): phase outcomes and next authorization.
 - [Phase and record identity](docs/phase-and-record-identity.md): semantic phase
   IDs, independent sequences, durable references, and precommit finalization.
-- [Skill library](skills/README.md): thirty-nine skill owners, fourteen stable
-  and twenty-five provisional, and current scope.
+- [Skill library](skills/README.md): forty-five skill owners, fourteen stable
+  and thirty-one provisional, and current scope.
 - [Roadmap](docs/roadmap.md): completed phases and future authorization
   boundary.
 - [v0.4 roadmap](docs/v0-4-roadmap.md): dependency-ordered implementation,
@@ -1294,3 +1294,89 @@ by this repository instruction. The candidate requires focused and complete
 qualification, the independent public-consumer fixture, and the
 dispatcher-owned pre-final review before any closeout publication. Any future
 successor still requires separate authority.
+
+## APG122 v0.10 foundation and SVG candidate
+
+APG122 owns the v0.10 foundation, bounded discovery policy and provisional SVG
+vertical slice. Public v0.9.0 remains released and APG121 reconciliation is
+preserved. Current development has 40 canonical leaves, catalog rows and
+projections, with 14 stable and 26 provisional. ADR 0053 records versioned
+capacity; original 39 leaf contents and historical limits remain unchanged.
+The manager accepted APG122 as
+`V0100_FOUNDATION_SVG_VERTICAL_SLICE_QUALIFIED`; the archive transport issue
+does not reopen source qualification or authorize replay.
+No public v0.10 release, deployment, consumer mutation or successor is granted.
+
+## APG123 v0.10 browser UI verification candidate
+
+APG123 owns the provisional integration of `playwright-test-profile` and
+`web-accessibility-profile` alongside `svg-language-profile`. Public v0.9.0
+remains released. Current development has 42 canonical leaves, catalog rows,
+and projections, with 14 stable and 28 provisional rows. ADR 0053 records
+versioned capacity under policy `v0.10-browser-ui` (10,517-byte current ceiling);
+original 39 leaf contents and SVG description remain unchanged (<= 330 bytes each).
+Architecture seams remain distinct: SVG vector authoring; Playwright runner;
+accessibility semantics and testing hierarchy; future `browser-runtime-profile`
+remains absent; and existing CSS, JS, TS, JSX, and React component profiles
+remain unchanged. Browser execution enforces fail-closed prerequisites
+(`APG_JAVASCRIPT_NODE`, `APG_PLAYWRIGHT_PACKAGE_ROOT`, `APG_PLAYWRIGHT_OWNED_SCRATCH_ROOT`),
+read-only global browser cache, and scratch-only package installs across
+Chromium, Firefox, and WebKit. The candidate requires dispatcher pre-final
+review and closeout verification. No public v0.10 release, deployment,
+consumer mutation, or successor is granted.
+
+
+## APG124 accepted Toolchain slice
+
+APG123 is accepted as `V0100_BROWSER_UI_VERIFICATION_SLICE_QUALIFIED`.
+APG124 adds Vite and npm provisionally under `v0.10-toolchain`: 44 leaves,
+14 stable / 30 provisional and an 11,177-byte admission ceiling. All prior
+42 descriptions are frozen. APG124 is manager accepted as
+`V0100_TOOLCHAIN_SLICE_QUALIFIED`. Browser-runtime was unadmitted in that slice.
+Historical consumer failures and drift-attribution limitations remain intact;
+acceptance grants no publication or successor authority.
+
+## APG125 browser runtime and composition candidate
+
+APG124 is manager accepted as `V0100_TOOLCHAIN_SLICE_QUALIFIED`; its captured
+consumer failures and unresolved later-drift attribution remain historical evidence.
+APG125 adds the final provisional `browser-runtime-profile` and current
+`v0.10-browser-runtime` policy at 45 leaves, 14 stable / 31 provisional and
+11,507 description bytes maximum. All 44 prior descriptions remain frozen.
+The six named reservations are fully admitted; spare numeric capacity grants
+no future leaf admission. Explicit task compositions preserve adjacent owners.
+Real browser evidence is separate from actual embedded WebView qualification.
+The original APG125 dispatch is provider-blocked after Astra capacity failure.
+Its preserved candidate is qualified separately through APG126 after the
+dispatcher-owned independent pre-final review and terminal disposition. The original
+provider failure remains historical; preservation alone did not confer acceptance.
+No additional capability, release, deployment or successor is authorized.
+
+## APG127 reporting consolidation candidate
+
+APG126 is manager-accepted after exact-tree recovery; its original dispatcher
+aggregate remains historically blocked with `PATH_DISPOSITION_INVALID`.
+APG127 and exit 00172 deliver read-only persisted verification, shared
+operational semantic validation and opt-in exact-byte idempotent append, with
+default duplicate behavior and existing recovery preserved. Work-stage
+qualification passed; dispatcher pre-final findings are dispositioned and
+provider closeout is complete. Publication remains dispatcher-owned. At APG127 closeout, JS-QD-001 through
+JS-QD-004 were the only remaining implementation-ready consolidation group,
+without successor authority. Skill
+inventory remains 45 leaves, 14 stable and 31 provisional. See the
+[APG127 evaluation](docs/evaluations/apg127-reporting-infrastructure-consolidation.md).
+
+## APG128 JavaScript qualification-debt consolidation
+
+APG127 is manager-accepted. APG128 and exit 00173 qualify the exact two-artifact
+CommonJS seam under the Node owner, raw-stream custody, the bounded process-owner
+guard and four root-scalar controls. JS-QD-001 is superseded and JS-QD-002 through
+JS-QD-004 are repaired; historical evidence is preserved. JS-QD-005 and CSS debt
+remain unchanged. JavaScript remains provisional at 45 leaves, 14 stable / 31
+provisional and 11,142 description bytes under 11,507. Canonical component/union
+qualification passes; closeout amends evidence claims after advisory pre-final
+review. Git finalization remains dispatcher-owned.
+Zero implementation-ready items remain and integrated readiness is next, with
+the APG126 browser fallback and APG127 verifier responsiveness limitations.
+No successor or publication authority is granted. See the
+[APG128 evaluation](docs/evaluations/apg128-javascript-qualification-debt-consolidation.md).

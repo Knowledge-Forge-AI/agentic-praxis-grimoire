@@ -12,6 +12,13 @@ const (
 	factWorkClass                = "work_class"
 )
 
+// Note: SVG (svg-language-profile) is provisional and selected via
+// ExplicitSkillIDs only. The rules V1 table and accepted unmapped facts remain
+// frozen and unchanged; requests specifying language="svg" are rejected as
+// ErrInvalidRequest rather than being silently accepted or implicitly routed.
+// Composition rules V1 also remain unchanged: SVG does not pull in adjacent
+// profiles, and adjacent profiles do not pull in SVG.
+
 var selectionRulesV1 = []SelectionRule{
 	{factCapability, "apg-routing", "agentic-praxis-grimoire-workflow", "skills/README.md#APG16"},
 	{factCapability, "astro-framework", "astro-profile", "docs/architecture/v0-6-skill-ownership-and-context-budget.md#2.4"},

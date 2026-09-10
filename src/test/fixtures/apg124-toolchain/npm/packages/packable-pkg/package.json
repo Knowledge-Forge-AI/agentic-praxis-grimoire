@@ -1,0 +1,12 @@
+{
+  "name": "packable-pkg",
+  "version": "1.0.0",
+  "main": "index.js",
+  "bin": {
+    "packable-cli": "./bin/cli.js"
+  },
+  "files": [
+    "index.js",
+    "bin/"
+  ]
+}

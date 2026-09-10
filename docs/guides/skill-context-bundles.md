@@ -100,8 +100,8 @@ The complete v1 automatic mapping is:
 | work class | `worker_delegation` | `composing-bounded-worker-assignments` |
 
 The rule API also exposes the source document for each row. The following
-closed-vocabulary values are accepted but deliberately unselected because no
-unique current owner exists: capability `accessibility`; languages `c`,
+closed-vocabulary values are accepted but deliberately unselected by the frozen
+v1 mapping: capability `accessibility`; languages `c`,
 `csharp`, `java`, `kotlin`, `php`, `rust`, `swift`; repository characteristic
 `monorepo`; runtimes `browser`, `bun`, `deno`, `jvm`; test frameworks `jest`,
 `mocha`, `rspec`, `unittest`; and work class `research`. Results record those
@@ -143,10 +143,35 @@ Only edges whose two endpoints are already selected enter a bundle result.
 
 ## Budgets and identity
 
-The global corpus check remains 9,527 discovery-description bytes; the current
-39-leaf corpus occupies 9,504 bytes and 9,492 characters. Task bundle limits are
-independent and optional. A missing pointer means unbounded; a present zero is
-an exact zero limit.
+Public v0.9's historical 39-leaf corpus occupies 9,504 description bytes and
+9,492 characters under its 9,527-byte integrity allowance. Historical v0.10
+used a 9,857-byte SVG-only admission ceiling for 40 leaves; APG123 then admitted
+42 leaves under `v0.10-browser-ui` with a 10,517-byte ceiling. APG124 admitted
+44 leaves under `v0.10-toolchain` with an 11,177-byte ceiling.
+Current development v0.10 uses `v0.10-browser-runtime` under
+[ADR 0053](../adr/2026/09/0053-v0-10-discovery-capacity-and-svg.md): a
+11,507-byte admission ceiling (9,527 + 6*330) for 45 leaves, admitting
+browser-runtime alongside Vite, npm, SVG, Playwright and web accessibility.
+All six named reservations are occupied; unlisted leaves are refused even with
+numeric headroom. The equal overall reservation check is intentionally redundant. These are UTF-8
+discovery bytes, not provider tokens or full materialized context. Task bundle
+limits remain independent and optional; caller-supplied bundle budgets and
+provider-overhead accounting remain unchanged as an explicit policy choice.
+A missing pointer means unbounded; a present zero is an exact zero limit.
+
+The provisional development leaves are selected with `explicit_skill_ids`
+containing `svg-language-profile`, `playwright-test-profile`, or
+`web-accessibility-profile`, `vite-build-profile`, or
+`npm-package-manager-profile`, or `browser-runtime-profile`. The
+[Browser Runtime architecture](../architecture/v0-10-browser-runtime.md)
+owns this additive composition. The unchanged v1 rule table does not accept
+`languages: ["svg"]` or implicit runner/accessibility inclusions; such requests
+return `ErrInvalidRequest`. Explicitly select adjacent CSS, JS, TS, JSX, or
+React only when those independent decisions are present. Selection never adds
+them implicitly. Browser-runtime capability/language aliases remain unknown;
+the accepted unmapped browser runtime fact does not auto-select the new leaf.
+The APG125 versioned composition matrix compares explicit materialized bundles
+against narrower controls without treating those controls as sufficient for broader tasks.
 
 Initial-context bytes equal caller prompt overhead plus selected description
 bytes, plus selected body bytes only in eager-body mode. Overage returns exact

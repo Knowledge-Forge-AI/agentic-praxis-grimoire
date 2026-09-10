@@ -60,6 +60,12 @@ SKILLS = tuple(
             "react-component-profile",
             "ruby-language-profile",
             "sqlite-database-profile",
+            "svg-language-profile",
+            "playwright-test-profile",
+            "web-accessibility-profile",
+            "vite-build-profile",
+    "browser-runtime-profile",
+            "npm-package-manager-profile",
             "synthesizing-repository-guidance",
             "typescript-language-profile",
             "vitest-test-profile",
@@ -430,7 +436,7 @@ class APGProjectSkillsTests(unittest.TestCase):
         result = self.run_command("check")
         self.assert_success(result)
         self.assertIn("compliant", result.stdout.lower())
-        self.assertIn("39 managed", result.stdout.lower())
+        self.assertIn("45 managed", result.stdout.lower())
 
     def test_06_adopts_compatible_manual_links_without_retargeting(self) -> None:
         links = [self.create_manual_link(skill) for skill in SKILLS]

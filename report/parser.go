@@ -2,6 +2,7 @@ package report
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"regexp"
 	"strconv"
@@ -19,13 +20,22 @@ var (
 
 // ParseRecords strictly validates contiguous canonical common-envelope records.
 func ParseRecords(content []byte) ([]Record, error) {
+	return parseRecordsWithContext(context.Background(), content, nil)
+}
+
+func parseRecordsWithContext(ctx context.Context, content []byte, stats *envelopeExtractionStats) ([]Record, error) {
 	if len(content) == 0 {
 		return []Record{}, nil
 	}
 	records := []Record{}
 	offset := 0
 	for offset < len(content) {
-		record, next, err := parseRecordAt(content, offset)
+		if ctx != nil {
+			if err := ctx.Err(); err != nil {
+				return nil, err
+			}
+		}
+		record, next, err := parseRecordAtWithContext(ctx, content, offset, stats)
 		if err != nil {
 			return nil, err
 		}
@@ -36,6 +46,10 @@ func ParseRecords(content []byte) ([]Record, error) {
 }
 
 func parseRecordAt(content []byte, offset int) (Record, int, error) {
+	return parseRecordAtWithContext(context.Background(), content, offset, nil)
+}
+
+func parseRecordAtWithContext(ctx context.Context, content []byte, offset int, stats *envelopeExtractionStats) (Record, int, error) {
 	start := append(bytes.Clone(envelopeLine), []byte("\nBEGIN AGENT-REPORT-RECORD\n")...)
 	if !bytes.HasPrefix(content[offset:], start) {
 		return Record{}, offset, fmt.Errorf("%w: non-canonical record prefix", ErrCompatibility)
@@ -43,7 +57,10 @@ func parseRecordAt(content []byte, offset int) (Record, int, error) {
 	lines := make([]string, 12)
 	cursor := offset
 	for index := range lines {
-		ending := bytes.IndexByte(content[cursor:], '\n')
+		ending, err := indexByteWithContext(ctx, content[cursor:], '\n')
+		if err != nil {
+			return Record{}, offset, err
+		}
 		if ending < 0 {
 			return Record{}, offset, fmt.Errorf("%w: incomplete record header", ErrCompatibility)
 		}
@@ -82,12 +99,16 @@ func parseRecordAt(content []byte, offset int) (Record, int, error) {
 	if err != nil || payloadSize < 0 || !hex64.MatchString(values[5]) {
 		return Record{}, offset, fmt.Errorf("%w: invalid payload identity", ErrCompatibility)
 	}
-	payloadEnd := cursor + payloadSize
-	if payloadEnd > len(content) {
+	if payloadSize > len(content)-cursor {
 		return Record{}, offset, fmt.Errorf("%w: truncated record payload", ErrCompatibility)
 	}
+	payloadEnd := cursor + payloadSize
 	payload := bytes.Clone(content[cursor:payloadEnd])
-	if schema.SHA256(payload) != values[5] {
+	hash, err := sha256WithContext(ctx, payload, stats)
+	if err != nil {
+		return Record{}, offset, err
+	}
+	if hash != values[5] {
 		return Record{}, offset, fmt.Errorf("%w: payload hash mismatch", ErrCompatibility)
 	}
 	trailer := []string{string(envelopeLine), "END AGENT-REPORT-RECORD", "ENVELOPE-FORMAT: agent-report-record", "ENVELOPE-VERSION: 1"}
@@ -95,7 +116,10 @@ func parseRecordAt(content []byte, offset int) (Record, int, error) {
 	trailer = append(trailer, "RECORD-COMPLETE: true", string(envelopeLine))
 	cursor = payloadEnd
 	for _, expectedLine := range trailer {
-		ending := bytes.IndexByte(content[cursor:], '\n')
+		ending, err := indexByteWithContext(ctx, content[cursor:], '\n')
+		if err != nil {
+			return Record{}, offset, err
+		}
 		if ending < 0 || string(content[cursor:cursor+ending]) != expectedLine {
 			return Record{}, offset, fmt.Errorf("%w: invalid record trailer", ErrCompatibility)
 		}

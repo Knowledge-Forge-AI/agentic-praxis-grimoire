@@ -1,0 +1,187 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "schema_version": "1.0.0",
+  "authority": "APG124-NPM-TOOLCHAIN-SCENARIO-REGISTER",
+  "disclaimer": "Evidence confirms npm 12.0.2 package manager CLI and dependency solver contracts; makes NO live publication or external network claims.",
+  "groups": {
+    "manifest_lock": "Manifest and lockfile v3 integrity and installation contracts",
+    "dependency_topology": "Workspaces, peer dependencies, overrides, and optional platform filtering",
+    "lifecycle_execution": "Lifecycle script suppression, execution, packaging, and config precedence"
+  },
+  "scenarios": [
+    {
+      "id": "NPM01",
+      "group": "manifest_lock",
+      "clause": "NPM-04",
+      "title": "Clean Lockfile v3 CI Installation",
+      "description": "Clean npm ci succeeds against matching package-lock.json v3, writes hidden lockfile, and mutates no lockfiles",
+      "predicate_type": "deterministic",
+      "expected_outcome": "passed",
+      "assertions": [
+        "exit_code_zero",
+        "dependency_installed",
+        "hidden_lockfile_created",
+        "lockfile_unmodified"
+      ]
+    },
+    {
+      "id": "NPM02",
+      "group": "manifest_lock",
+      "clause": "NPM-04",
+      "title": "Stale Lockfile Refusal Under CI",
+      "description": "npm ci refuses to install when package.json dependencies diverge from package-lock.json, exiting non-zero with sync error",
+      "predicate_type": "negative_refusal",
+      "expected_outcome": "passed",
+      "assertions": [
+        "exit_code_nonzero",
+        "sync_error_reported",
+        "missing_dep_reported"
+      ]
+    },
+    {
+      "id": "NPM03",
+      "group": "manifest_lock",
+      "clause": "NPM-04",
+      "title": "Install Lockfile Update",
+      "description": "npm install detects added dependency in package.json and updates package-lock.json with new dependency entry",
+      "predicate_type": "mutation_verified",
+      "expected_outcome": "passed",
+      "assertions": [
+        "exit_code_zero",
+        "dependency_installed",
+        "lockfile_updated_with_new_dep"
+      ]
+    },
+    {
+      "id": "NPM04",
+      "group": "dependency_topology",
+      "clause": "NPM-07",
+      "title": "Monorepo Workspaces Install and Targeted Run",
+      "description": "Workspaces monorepo installs cross-workspace symlinks and executes targeted package script via --workspace",
+      "predicate_type": "deterministic",
+      "expected_outcome": "passed",
+      "assertions": [
+        "exit_code_zero",
+        "workspace_symlink_created",
+        "workspace_script_output_verified"
+      ]
+    },
+    {
+      "id": "NPM05",
+      "group": "dependency_topology",
+      "clause": "NPM-05",
+      "title": "Compatible Peer Dependency Resolution",
+      "description": "npm install succeeds when peer dependency declaration is satisfied by co-installed host package",
+      "predicate_type": "deterministic",
+      "expected_outcome": "passed",
+      "assertions": [
+        "exit_code_zero",
+        "peer_and_host_installed"
+      ]
+    },
+    {
+      "id": "NPM06",
+      "group": "dependency_topology",
+      "clause": "NPM-05",
+      "title": "Incompatible Peer Dependency Conflict Refusal",
+      "description": "npm install fails closed with ERESOLVE when peer dependency version requirement conflicts with installed host package",
+      "predicate_type": "negative_refusal",
+      "expected_outcome": "passed",
+      "assertions": [
+        "exit_code_nonzero",
+        "eresolve_conflict_reported"
+      ]
+    },
+    {
+      "id": "NPM07",
+      "group": "dependency_topology",
+      "clause": "NPM-06",
+      "title": "Overrides Enforcement Resolves Peer Conflict and Verifies Installed Content",
+      "description": "Manifest overrides field resolves conflicting peer dependency; harness verifies installed package version and exported content match the override",
+      "predicate_type": "deterministic",
+      "expected_outcome": "passed",
+      "assertions": [
+        "exit_code_zero",
+        "override_applied_successfully",
+        "overridden_version_verified",
+        "overridden_content_verified"
+      ]
+    },
+    {
+      "id": "NPM08",
+      "group": "dependency_topology",
+      "clause": "NPM-05",
+      "title": "Optional Dependency Platform Filtering",
+      "description": "Optional dependency with mismatched OS constraint is skipped without failing overall installation",
+      "predicate_type": "deterministic",
+      "expected_outcome": "passed",
+      "assertions": [
+        "exit_code_zero",
+        "supported_optional_installed",
+        "unsupported_optional_skipped"
+      ]
+    },
+    {
+      "id": "NPM09",
+      "group": "lifecycle_execution",
+      "clause": "NPM-08",
+      "title": "Lifecycle Script Installation Execution, Suppression, and Pre/Post Hooks",
+      "description": "Normal install executes root and dependency lifecycle scripts; --ignore-scripts suppresses install execution; explicit run under --ignore-scripts executes target while suppressing pre/post hooks",
+      "predicate_type": "paired",
+      "expected_outcome": "passed",
+      "assertions": [
+        "install_positive_lifecycle_executed",
+        "dependency_lifecycle_executed",
+        "install_lifecycle_suppressed",
+        "run_pre_post_order_verified",
+        "run_ignore_scripts_suppressed_hooks"
+      ]
+    },
+    {
+      "id": "NPM10",
+      "group": "lifecycle_execution",
+      "clause": "NPM-10",
+      "title": "Local Pack Tarball Content and Consumption",
+      "description": "npm pack --json archives allowlisted files and bin links; consumer project successfully installs generated tarball",
+      "predicate_type": "deterministic",
+      "expected_outcome": "passed",
+      "assertions": [
+        "pack_exit_code_zero",
+        "pack_files_allowlist_verified",
+        "unlisted_files_excluded",
+        "tarball_install_exit_code_zero",
+        "consumer_bin_and_module_installed"
+      ]
+    },
+    {
+      "id": "NPM11",
+      "group": "lifecycle_execution",
+      "clause": "NPM-02",
+      "title": "Configuration Precedence Across Five Layers via Registry Inspection",
+      "description": "Verifies configuration precedence hierarchy for registry (.invalid): CLI > env > project .npmrc > user .npmrc > global .npmrc",
+      "predicate_type": "precedence_verified",
+      "expected_outcome": "passed",
+      "assertions": [
+        "global_registry_read",
+        "user_overrides_global",
+        "project_overrides_user",
+        "env_overrides_project",
+        "cli_overrides_env"
+      ]
+    },
+    {
+      "id": "NPM12",
+      "group": "lifecycle_execution",
+      "clause": "NPM-09",
+      "title": "Local Binary Execution with Download Prevention",
+      "description": "npm exec executes local node_modules/.bin binary; refuses remote package downloads when binary is missing",
+      "predicate_type": "paired",
+      "expected_outcome": "passed",
+      "assertions": [
+        "local_exec_exit_code_zero",
+        "local_exec_stdout_verified",
+        "missing_binary_fails_closed"
+      ]
+    }
+  ]
+}

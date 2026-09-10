@@ -1,0 +1,8 @@
+{
+  "name": "opt-unsupported",
+  "version": "1.0.0",
+  "main": "index.js",
+  "os": [
+    "unsupported_os_nonexistent_xyz"
+  ]
+}

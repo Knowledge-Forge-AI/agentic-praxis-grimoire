@@ -23,7 +23,7 @@ sys.path.insert(0, str(ROOT / "libexec"))
 import apg_distribution_candidate as candidate  # noqa: E402
 
 
-VERSION = "0.9.0"
+VERSION = "0.10.0"
 
 
 def _source(tmp_path: Path) -> tuple[Path, str]:

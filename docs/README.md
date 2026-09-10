@@ -12,11 +12,15 @@ start with the [root README](../README.md).
   build information, bridge rules, and safety boundaries.
 - [APG distribution](distribution.md) — supported targets, multi-registry
   distribution, and the complete package architecture.
-- [Release notes (v0.9.0)](../release/v0.9.0-notes.md) — version highlights,
-  platform status, and publication prerequisites.
+- [Release notes (v0.10.0)](../release/v0.10.0-notes.md) — version highlights,
+  platform status, and compatibility limits.
+- [Release notes (v0.9.0)](../release/v0.9.0-notes.md) — preceding release
+  highlights and publication reconciliation.
 
-This documentation covers 0.9.0 and its CI-first interfaces. Once this version
-is published, its packages are available through the documented registries.
+This documentation covers v0.10.0. The retained CI-first interfaces are preserved.
+Once this version is published, its packages are available across supported
+registries. The preceding **v0.9.0** and **v0.8.1** releases remain frozen.
+The [v0.10 roadmap](v0-10-roadmap.md) consolidates the six provisional web profiles.
 
 ## Use the CLI
 
@@ -44,7 +48,7 @@ is published, its packages are available through the documented registries.
 
 - [Skill context bundles](guides/skill-context-bundles.md) documents the
   structured resolver, budgets, fingerprints, and isolated materialization.
-- [Skill catalog](../skills/README.md) lists the 39 canonical leaves and their
+- [Skill catalog](../skills/README.md) lists the 45 development canonical leaves and their
   maturity.
 - [Skill authoring and maintenance](skill-authoring-and-maintenance.md)
   documents repository-owned lifecycle and validation.
@@ -90,13 +94,18 @@ Growth and churn analysis is not part of the v0.8 footprint capability.
   defines consumer-facing APIs, schemas, and ownership.
 
 APG102 completed disposable JACA cross-consumer qualification without changing
-JACA or creating a production dependency. The published v0.8.1 release contains
+JACA or creating a production dependency. The published v0.9.0 release contains
 the complete `footprint` package alongside `schema`, `report`, `skills`,
 `envsnap`, and `hotspot`. [JACA CI Integration Handoff](architecture/jaca-ci-handoff.md)
 specifies qualification entry points for JACA CI, and [JACA XO Compatibility Handoff](architecture/jaca-xo-handoff.md)
 qualifies APGR-owned Go library consumption for JACA XO. Downstream JACA CI registration
 and production XO adoption remain consumer-owned and pending; APGR-local qualification
 does not equal JACA registration, and the XO consumer fixture is not JACA's production adapter.
+
+## Plan Repo Map support
+
+- [Repo Map support roadmap](repo-map-support-roadmap.md) separates reusable
+  v0.10 support from future protocol, graph-quality and migration gates.
 
 ## Review architecture and decisions
 
@@ -120,11 +129,12 @@ does not equal JACA registration, and the XO consumer fixture is not JACA's prod
 
 ## Check release status
 
-- [Release notes (v0.9.0)](../release/v0.9.0-notes.md) cover this version and its publication prerequisites.
+- [Release notes (v0.10.0)](../release/v0.10.0-notes.md) cover this version and its permanent release contents.
+- [Release notes (v0.9.0)](../release/v0.9.0-notes.md) preserve the frozen release description; APG121 records terminal publication.
 - [Release notes (v0.8.1)](../release/v0.8.1-notes.md) preserves the published frozen baseline.
 - [v0.7 roadmap](v0-7-roadmap.md) preserves the published v0.7 release sequence.
 - [v0.8 roadmap](v0-8-roadmap.md) records the completed v0.8.1 context-footprint program.
-- [v0.9 roadmap](v0-9-roadmap.md) defines the active CI-first development program.
+- [v0.9 roadmap](v0-9-roadmap.md) records the released CI-first program and remaining consumer-owned work.
 - [Project roadmap](roadmap.md) provides the durable cross-release ledger.
 - [Status index](status/README.md) lists terminal phase exit records.
 - [Public release process](public-release-process.md) owns publication
@@ -139,3 +149,13 @@ does not equal JACA registration, and the XO consumer fixture is not JACA's prod
 - [Status index](status/README.md) links terminal outcomes without requiring
   the landing page to act as a ledger.
 - [Roadmaps](roadmap.md) preserve dependency order and successor boundaries.
+
+## Qualification limitations
+
+The [known-debt register](governance/language-profile-known-debt.md) and
+[ADR 0054](adr/2026/09/0054-js-qd-005-refresh-trigger-interpretation.md)
+describe retained qualification limitations and condition-triggered refresh.
+The [Repo Map support roadmap](repo-map-support-roadmap.md) is a v0.10.0
+deliverable with RM-S0 through RM-S5 intact. Retained debt, qualification
+boundaries, and historical outcomes remain preserved in the architecture and
+evaluation records.

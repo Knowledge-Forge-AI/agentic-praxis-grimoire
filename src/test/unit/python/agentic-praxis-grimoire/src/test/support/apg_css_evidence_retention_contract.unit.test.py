@@ -42,19 +42,19 @@ from apg_css_evidence_retention_contract import (  # noqa: E402
 
 
 PRIVATE_SOURCE_PATHS = private_source_binding_paths(ROOT, required=False)
-if PRIVATE_SOURCE_PATHS is None:
-    pytest.skip(
-        "publication-excluded CSS evidence is unavailable",
-        allow_module_level=True,
-    )
-SCENARIOS = ROOT / PRIVATE_SOURCE_PATHS["maintained_scenario_fixture"]
-REGISTRY = ROOT / PRIVATE_SOURCE_PATHS["purpose_registry"]
-LEDGER = ROOT / PRIVATE_SOURCE_PATHS["h1_target_ledger"]
-LANE_N = ROOT / PRIVATE_SOURCE_PATHS["lane_n"]
-LANE_T2 = ROOT / PRIVATE_SOURCE_PATHS["lane_t2"]
-COMPACT = ROOT / PRIVATE_SOURCE_PATHS["compact_v3"]
+pytestmark = pytest.mark.skipif(
+    PRIVATE_SOURCE_PATHS is None,
+    reason="publication-excluded CSS evidence is unavailable",
+)
+if PRIVATE_SOURCE_PATHS is not None:
+    SCENARIOS = ROOT / PRIVATE_SOURCE_PATHS["maintained_scenario_fixture"]
+    REGISTRY = ROOT / PRIVATE_SOURCE_PATHS["purpose_registry"]
+    LEDGER = ROOT / PRIVATE_SOURCE_PATHS["h1_target_ledger"]
+    LANE_N = ROOT / PRIVATE_SOURCE_PATHS["lane_n"]
+    LANE_T2 = ROOT / PRIVATE_SOURCE_PATHS["lane_t2"]
+    COMPACT = ROOT / PRIVATE_SOURCE_PATHS["compact_v3"]
+    PROVENANCE_V2 = ROOT / PRIVATE_SOURCE_PATHS["provenance_v2"]
 KNOWN_DEBT = ROOT / "docs/governance/language-profile-known-debt.json"
-PROVENANCE_V2 = ROOT / PRIVATE_SOURCE_PATHS["provenance_v2"]
 
 
 def load_bundle() -> list[dict]:
@@ -190,8 +190,12 @@ def test_h1_target_identity_baseline_is_exact() -> None:
     assert [target["target_key"] for target in ledger["targets"]] == ["website", "theme"]
 
 
-@pytest.mark.parametrize("path", (LEDGER, REGISTRY, LANE_N, LANE_T2, COMPACT))
-def test_duplicate_json_keys_fail_closed(path: Path, tmp_path: Path) -> None:
+@pytest.mark.parametrize(
+    "binding", ("h1_target_ledger", "purpose_registry", "lane_n", "lane_t2", "compact_v3"),
+    ids=("path0", "path1", "path2", "path3", "path4"),
+)
+def test_duplicate_json_keys_fail_closed(binding: str, tmp_path: Path) -> None:
+    path = ROOT / PRIVATE_SOURCE_PATHS[binding]
     duplicate = path.read_text(encoding="utf-8").replace("{", '{"schema_version":99,', 1)
     candidate = tmp_path / path.name
     candidate.write_text(duplicate, encoding="utf-8")

@@ -16,6 +16,11 @@
       "trigger": "Bats-specific test judgment is material to evaluation, run status and output, hooks, fixtures, TAP, file descriptors, parallelism, background cleanup, or warning and crisis thresholds beyond repository policy."
     },
     {
+      "capability_class": "browser runtime profile",
+      "name": "browser-runtime-profile",
+      "trigger": "Browser host behavior depends on DOM, lifecycle, events, scheduling, origins, fetching, storage, resources, or browser versus embedded WebView evidence; select adjacent semantic owners only when material."
+    },
+    {
       "capability_class": "ChatGPT-manager workflow routing",
       "name": "chatgpt-manager-workflow",
       "trigger": "Selection among multiple plausible ChatGPT top-level-manager capabilities is ambiguous or a ChatGPT-manager routing decision requires audit."
@@ -116,9 +121,19 @@
       "trigger": "A material decision depends on Node.js-specific host behavior for an established Node execution role whose exact version, platform, flags, package scope, loader, and whole-file owner are identified."
     },
     {
+      "name": "npm-package-manager-profile",
+      "capability_class": "npm package manager profile",
+      "trigger": "Selected npm package management depends on lockfiles, dependency resolution, workspaces, scripts, configuration, installation, or package contents; not Node runtime or registry administration."
+    },
+    {
       "capability_class": "repository planning",
       "name": "planning-repository-work",
       "trigger": "An accepted objective needs dependent steps, cross-file coordination, staged risk reduction, or durable handoff."
+    },
+    {
+      "capability_class": "Playwright test profile",
+      "name": "playwright-test-profile",
+      "trigger": "Playwright-specific runner judgment is material to browser automation, fixtures, locators, auto-waiting, tracing, network interception, or page interactions; not for general test discipline, component styling, or accessibility audits."
     },
     {
       "capability_class": "PostgreSQL database profile",
@@ -156,6 +171,11 @@
       "trigger": "SQLite-specific judgment is material to SQL, transaction modes, single-writer concurrency, busy handling, journal or WAL behavior, schema rebuilds, pragmas, affinity, file ownership, backup and integrity, extensions, or warning and crisis thresholds beyond repository policy."
     },
     {
+      "capability_class": "SVG language profile",
+      "name": "svg-language-profile",
+      "trigger": "SVG-specific judgment is material to SVG syntax, viewBox, coordinates, path semantics, or transforms; not for CSS styling, JSX syntax, React components, or host document boundaries."
+    },
+    {
       "capability_class": "repository guidance synthesis",
       "name": "synthesizing-repository-guidance",
       "trigger": "A dense, duplicated, mixed-scope, private, or source-derived guidance corpus needs ownership and migration dispositions before rewrite."
@@ -171,9 +191,19 @@
       "trigger": "Vagrantfile-specific judgment is material to configuration versions and loading, machines, boxes, provider blocks, networks, synced folders, provisioners, triggers, Vagrant state, host-dependent behavior, or warning and crisis thresholds beyond repository policy."
     },
     {
+      "name": "vite-build-profile",
+      "capability_class": "Vite build profile",
+      "trigger": "Selected Vite build/dev tooling depends on configuration, modes, environment exposure, serving, plugins, assets, or Rolldown builds; not runtime or framework semantics."
+    },
+    {
       "capability_class": "Vitest test profile",
       "name": "vitest-test-profile",
       "trigger": "A project has already selected Vitest 4.1 and runner-specific judgment is material to configuration, projects, environments, assertions, mocks, timers, concurrency, isolation, snapshots, or coverage providers; not for test sufficiency, language or React semantics, or coverage policy."
+    },
+    {
+      "capability_class": "web accessibility profile",
+      "name": "web-accessibility-profile",
+      "trigger": "Web accessibility judgment is material to accessibility auditing, ARIA attributes, semantic landmarks, focus management, screen-reader semantics, or testing hierarchy; not for CSS visual styling, component layout, or Playwright runner mechanics."
     },
     {
       "capability_class": "Zsh language profile",

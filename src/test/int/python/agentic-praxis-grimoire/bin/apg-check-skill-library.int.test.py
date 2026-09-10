@@ -110,7 +110,7 @@ def assert_current_development_checker_state(
         testcase.assertEqual(
             result.stdout,
             "PASS APG skill library: "
-            "39 canonical skills, 39 catalog rows, 39 projections\n",
+            "45 canonical skills, 45 catalog rows, 45 projections\n",
         )
     elif lifecycle in {
         ("repair-required", "Proposed"),
@@ -919,6 +919,108 @@ class APGCheckSkillLibraryTests(unittest.TestCase):
         self.assertTrue(all(item["action"] for item in diagnostics))
         self.assertNotIn(str(self.root), result.stdout)
 
+
+
+class V010CapacityCommandTests(unittest.TestCase):
+    """Real CLI admission/refusal behavior across files, parsing and diagnostics."""
+
+    def test_versioned_capacity_command_boundaries(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="apg-v010-policy-") as temporary:
+            root = Path(temporary)
+            for relative in ("skills", "docs", ".agents"):
+                shutil.copytree(REPOSITORY_ROOT / relative, root / relative, symlinks=True)
+            selector = root / "testing/apg-discovery-policy.json"
+            selector.parent.mkdir()
+            selected = (REPOSITORY_ROOT / "testing/apg-discovery-policy.json").read_bytes()
+            selector.write_bytes(selected)
+            svg = root / "skills/svg-language-profile/SKILL.md"
+            original_svg = svg.read_bytes()
+            baseline = root / "skills/bash-language-profile/SKILL.md"
+            original_baseline = baseline.read_bytes()
+
+            def invoke(*arguments: str) -> subprocess.CompletedProcess[str]:
+                return subprocess.run(
+                    [str(COMMAND), "--root", str(root), "--format", "json", *arguments],
+                    capture_output=True, text=True, check=False, env=os.environ.copy(),
+                )
+
+            def refused(code: str, *arguments: str) -> None:
+                result = invoke(*arguments)
+                self.assertEqual(result.returncode, 1, result)
+                self.assertEqual(result.stderr, "")
+                self.assertIn(code, {item["code"] for item in json.loads(result.stdout)["diagnostics"]})
+
+            self.assertEqual(invoke().returncode, 0)
+            self.assertEqual(invoke("--policy", "v0.10-browser-runtime").returncode, 0)
+            refused("APG048", "--policy", "v0.10-toolchain")
+            refused("APG048", "--policy", "v0.10")
+            # Selector schema, transport shape and explicit selection fail closed.
+            for payload in (
+                b"{", b"null", b"[]", b"[1]", b"{}",
+                b'{"schema_version":1,"policy":"v0.10","extra":1}',
+                b'{"schema_version":1,"policy":"v0.10","policy":"v0.10"}',
+                b'{"schema_version":true,"policy":"v0.10"}',
+                b'{"schema_version":2,"policy":"v0.10"}',
+                b'{"schema_version":1,"policy":false}',
+                b'{"schema_version":1,"policy":""}',
+                b'{"schema_version":1,"policy":"unknown"}',
+            ):
+                with self.subTest(selector=payload):
+                    selector.write_bytes(payload)
+                    refused("APG048")
+            selector.write_bytes(selected)
+            refused("APG048", "--policy", "unknown")
+            refused("APG048", "--policy", "")
+            selector.unlink()
+            refused("APG048")
+            selector.symlink_to(root / "missing-selector")
+            refused("APG048")
+            selector.unlink()
+            selector.write_bytes(selected)
+
+            candidate = root / "skills/browser-runtime-profile/SKILL.md"
+            original_candidate = candidate.read_bytes()
+            description = re.search(rb"(?m)^description: (.+)$", original_candidate)[1]
+            # Positive boundaries count UTF-8 bytes, not Unicode characters.
+            for replacement in (b"Use when " + b"a" * 321, "Use when ".encode() + "é".encode() * 160 + b"a"):
+                candidate.write_bytes(original_candidate.replace(description, replacement))
+                self.assertEqual(invoke().returncode, 0)
+            for replacement, code in (
+                (b"Use when " + b"a" * 322, "APG042"),
+                (b"Use when " + "é".encode() * 161, "APG042"),
+                (b"", "APG048"),
+                (b"Wrong trigger", "APG048"),
+            ):
+                with self.subTest(description=replacement):
+                    candidate.write_bytes(original_candidate.replace(description, replacement))
+                    refused(code)
+            candidate.write_bytes(original_candidate)
+            svg.write_bytes(original_svg + b" " * (20480 - len(original_svg)))
+            self.assertEqual(invoke().returncode, 0)
+            svg.write_bytes(svg.read_bytes() + b" ")
+            refused("APG043")
+            svg.write_bytes(original_svg)
+
+            baseline.write_bytes(original_baseline.replace(b"description: Use when ", b"description: Use when changed "))
+            refused("APG044")
+            baseline.write_bytes(original_baseline)
+            svg.write_bytes(original_svg.replace(b"name: svg-language-profile", b"name: bash-language-profile"))
+            refused("APG048")
+            svg.write_bytes(original_svg.replace(b"name: svg-language-profile", b"name: browser-runtime-profile"))
+            refused("APG048")
+            svg.write_bytes(original_svg)
+            baseline.write_bytes(original_baseline.replace(b"name: bash-language-profile", b"name: unadmitted-profile"))
+            refused("APG047")
+            baseline.write_bytes(original_baseline)
+            svg.unlink()
+            refused("APG048")
+            svg.write_bytes(original_svg)
+            extra = root / "skills/unadmitted-profile"
+            extra.mkdir()
+            (extra / "SKILL.md").write_text(skill_text("unadmitted-profile"))
+            refused("APG045")
+            shutil.rmtree(extra)
+            self.assertEqual(invoke().returncode, 0)
 
 if __name__ == "__main__":
     unittest.main()

@@ -1,0 +1,1 @@
+module.exports = { name: "dep-b", version: "1.0.0" };

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Vector Graphic Source File -->
+<!-- Author: Design Team -->
+<!-- Description: Master emblem asset with editor comments and indentation -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-labelledby="safe-opt-title">
+  <!-- Title for screen readers -->
+  <title id="safe-opt-title">Safely Optimized Emblem</title>
+
+  <defs>
+    <!-- Background diagonal linear gradient -->
+    <linearGradient id="safe-grad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0284c7" />
+      <stop offset="100%" stop-color="#0369a1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Base emblem card -->
+  <rect width="100" height="100" rx="8" fill="url(#safe-grad)" />
+
+  <!-- Center glyph circle -->
+  <circle cx="50" cy="50" r="30" fill="#ffffff" />
+</svg>

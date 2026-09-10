@@ -8,17 +8,20 @@ still requires human review.
 
 ## Roadmap policy
 
-APG115 prepared v0.9.0 release source after APG114 integrated qualification.
-APG116's [wording amendment](evaluations/apg116-v090-release-wording-amendment.md)
-corrects a package-facing defect found at the first release qualification gate.
-Qualification of the amended committed source, product publication and host
-promotion remain separate boundaries; no final release bundle is claimed.
-APG117's [prerequisite evaluation](evaluations/apg117-v090-release-qualification-prerequisites.md)
-records incomplete qualification after pre-final review and closeout amendment.
-The unavailable strict PyPI renderer limits description rendering only; APG116
-and the v0.8.1 correction also deferred that check. The build/test toolchain was
-present but unused. Candidate and publication qualification remain incomplete;
-the missing renderer does not prevent the other required work.
+**v0.9.0 is publicly released** across GitHub Release, PyPI, npm, and Go.
+[APG121 reconciliation](evaluations/apg121-v090-publication-reconciliation.md)
+records fresh read-only terminal publication evidence and the Nix handoff.
+APG115 through APG120 remain historical preparation, qualification, and recovery
+records; their phase-local incomplete states are preserved below.
+APGR-side JACA CI/XO compatibility is complete for this release. JACA adoption
+and activation, Nix adapter updates and host activation, and later Theme Forge
+and Repo Map work remain separately owned and authorized. Linux runtime execution
+was not part of v0.9.0 product qualification.
+
+[v0.10 development](v0-10-roadmap.md) is now authorized for APG122's foundation,
+capacity policy and SVG vertical slice. The prior publication-reconciliation
+successor draft is superseded. Adapter deployment remains separately owned;
+it is not a v0.10 prerequisite. No later v0.10 slice or Repo Map work is started.
 
 The human maintainer retains ultimate roadmap authority. ChatGPT may advance
 successive bounded phases only within a human-approved task or preapproved
@@ -2312,10 +2315,14 @@ PyPI, npm, and Go proxy). Reconciliation completed in run
 
 ## APGR v0.9 Program — CI-First Foundation and Backlog Ordering
 
-The active development program is ordered by the [v0.9 Roadmap](v0-9-roadmap.md).
-v0.9 prioritizes JACA CI qualification support, JACA XO compatibility, and cross-release
-backlog disposition across future v0.10 (Theme Forge) and v0.11 (Repo Map) candidates.
-v0.9 is active development, not a published release.
+The historical v0.9 program was ordered by the [v0.9 Roadmap](v0-9-roadmap.md).
+v0.9 prioritized JACA CI qualification support, JACA XO compatibility, and cross-release
+backlog disposition across candidate support work. The current
+[Repo Map support roadmap](repo-map-support-roadmap.md) supersedes the earlier
+v0.11 assignment with explicit milestone gates; the
+[v0.10 roadmap](v0-10-roadmap.md) owns current integrated readiness.
+APG121 completed terminal v0.9.0 publication reconciliation. APG120 below
+preserves its earlier attended-recovery boundary.
 
 ## APG118 v0.9.0 release bundle qualification
 
@@ -2327,3 +2334,143 @@ correction preserves that exit's historical result; disposition is
 qualification remains pending. APG117 is unchanged. Dispatcher review and
 closeout remain pending; no public publication or successor is authorized.
 See the [APG118 evaluation](evaluations/apg118-v090-release-bundle-qualification.md).
+
+## APG119 corrected-source v0.9.0 qualification
+
+APG119 completes local qualification from the accepted APG118 source amendment.
+Independent paired constructions, complete public validation, fresh source gates,
+actual descriptions, installed and Go consumers, and production operator candidate
+preflight pass. Its work-candidate disposition is
+`V090_RELEASE_BUNDLE_QUALIFIED_FOR_OPERATOR_PREFLIGHT`. This supersedes the
+pending corrected-source qualification statement above without rewriting APG118's
+historical outcome. Dispatcher pre-final review, closeout, and development delivery
+remain pending. Attended npm authentication and publication require separate
+authority; v0.9.0 remains unpublished. No successor is authorized.
+See the [APG119 evaluation](evaluations/apg119-v090-corrected-source-release-qualification.md).
+
+## APG120 v0.9.0 publication operator recovery
+
+APG120 corrects required PyPI metadata validation and qualifies a bounded
+forward-only recovery packet. Its terminal closeout disposition is
+`V090_PUBLICATION_RECOVERY_PACKET_QUALIFIED`; dispatcher pre-final findings are
+dispositioned and scoped terminal verification passed. Live reconciliation found exact Git/tag, GitHub Release
+and Python workflow, Go, and PyPI, with npm absent. This advances the historical
+APG119 unpublished observation without redefining its product qualification.
+Product source and ten artifacts are unchanged. No public execution occurs in
+this phase; attended continuation remains separately authorized after development
+finalization. See the [APG120 evaluation](evaluations/apg120-v090-publication-operator-recovery.md).
+
+## APG121 v0.9.0 terminal publication reconciliation
+
+APG121 preserves the attended APG120 terminal result and performs fresh read-only
+registry reconciliation. v0.9.0 is publicly released across GitHub Release,
+PyPI, npm, and Go. Historical partial attempts remain partial historical records.
+The [APG121 evaluation](evaluations/apg121-v090-publication-reconciliation.md)
+records consumer and disposable Nix handoff evidence, limitations, and the
+separate adapter-update and JACA-adoption boundaries. No successor is dispatched.
+
+## APG122 — v0.10 Foundation and SVG
+
+APG122 implements the [v0.10 foundation](v0-10-roadmap.md), bounded discovery
+capacity and first SVG vertical slice. Its [evaluation](evaluations/apg122-v0-10-foundation-and-svg.md)
+is an implementation candidate pending dispatcher pre-final and closeout.
+No successor or public v0.10 publication is authorized.
+
+### APG125 — v0.10 browser runtime and composition candidate
+
+APG124 is manager accepted as `V0100_TOOLCHAIN_SLICE_QUALIFIED`, preserving its
+capture-bound consumer failures and drift limitation. APG125 is the final
+capability slice: provisional browser-runtime, exact 45-leaf admission, real
+three-engine host predicates, explicit composition/footprint and disposable
+committed-consumer dogfood. See the [evaluation](evaluations/apg125-v0-10-browser-runtime-and-composition.md)
+and exit 00170. The original dispatch is provider-blocked; APG126 owns separate
+qualification of its preserved candidate. No further v0.10 capability leaf is
+allocated. Consolidation work precedes integrated readiness under separate
+authorization. No automatic successor or public publication is granted.
+
+### APG126 — preserved candidate recovery and consolidation planning
+
+APG124 remains manager accepted. The original APG125 dispatch is provider-blocked
+following Astra capacity failure; its preserved candidate is qualified separately
+through [APG126](evaluations/apg126-preserved-browser-candidate-and-backlog-consolidation.md),
+after dispatcher independent pre-final review and terminal closeout. The
+[v0.10 consolidation roadmap](v0-10-roadmap.md) supersedes the direct transition
+from the capability slice to release preparation. No backlog implementation or
+successor is authorized by this record.
+
+### APG127 — reporting infrastructure consolidation
+
+The [APG127 candidate](evaluations/apg127-reporting-infrastructure-consolidation.md)
+implements the bounded persisted verifier, operational semantics and opt-in
+idempotency group. Work-stage qualification and provider closeout passed;
+dispatcher pre-final findings are dispositioned. Publication remains
+dispatcher-owned.
+APG126 is manager-accepted through exact-tree recovery; its original dispatcher
+aggregate remains blocked with `PATH_DISPOSITION_INVALID`. JavaScript
+qualification maintenance remains separate. No successor is authorized.
+
+## APG131 corrected readiness and Repo Map support
+
+APG131 preserves APG129 and APG130 as historical blocked outcomes and corrects
+current report-custody wording. Its [evaluation](evaluations/apg131-corrected-readiness-and-repo-map-roadmap.md)
+owns final qualification and the manager-facing debt-entry interpretation.
+The [Repo Map support roadmap](repo-map-support-roadmap.md) ships as v0.10
+candidate documentation with RM-S0 through RM-S5 gates. Historical v0.11
+assignments are superseded for current planning. No new leaf, maturity promotion,
+public release or automatic successor is authorized.
+
+## APG132 readiness disposition
+
+[APG132](evaluations/apg132-manager-trigger-interpretation-and-final-readiness.md)
+accepts APG131 technical qualification and records
+`JS_QD_005_REFRESH_NOT_TRIGGERED` under
+[ADR 0054](adr/2026/09/0054-js-qd-005-refresh-trigger-interpretation.md).
+The current readiness disposition is
+`V0100_INTEGRATED_READINESS_WITH_REPOMAP_ROADMAP_QUALIFIED`, with terminal provider closeout qualified; dispatcher
+Git finalization remains pending. APG131's dispatcher aggregate
+remains historically blocked. The [Repo Map support roadmap](repo-map-support-roadmap.md)
+is a v0.10.0 public deliverable with RM-S0 through RM-S5 intact. Zero
+`V010_READY_NOW` implementation items remain. Deterministic candidate freeze is
+next; separate authorization is required and no automatic successor is dispatched.
+
+## APG133 release freeze source blocker
+
+[APG133](evaluations/apg133-v0100-release-freeze-source-blocker.md) stopped
+before construction: release-facing APG132 documentation directs v0.10.0
+consumers to install v0.9.0. The source defect requires dispatcher disposition
+and corrected-source authority before complete candidate and bundle qualification.
+No release bundle is qualified and no publication or automatic successor occurred.
+
+## APG134 release wording amendment
+
+[APG134](evaluations/apg134-v0100-release-wording-amendment.md) corrects permanent
+v0.10.0 documentation and maintained wording tests. APG133 remains historically
+blocked, with no candidate identity to reuse. Source qualification and closeout
+verify the durable release wording and package metadata. The next deterministic
+freeze must rebuild from the resulting APG134 commit.
+
+## APG135 release freeze qualification boundary
+
+[APG135](evaluations/apg135-v0100-release-freeze-qualification-boundary.md)
+passes corrected-source preflight and constructs identical public candidates
+from APG134. Projected qualification exposes a mismatch between the current
+test selection and the maintained private-input exclusions. A stale release-
+workflow fixture also fails against frozen APG134 source; directory-based test
+collection omits that workflow file and its unit sibling. Corrected source and
+complete reconstruction require separate authority. Dependent bundle
+construction is stopped; no release bundle or publication is qualified.
+The qualification boundary requires dispatcher disposition without an automatic
+successor or direct repair of frozen release inputs.
+
+## APG136 release harness and source correction
+
+[APG136](evaluations/apg136-v0100-release-harness-source-correction.md) completes
+the historical candidate failure inventory and repairs workflow version binding,
+inventory-to-pytest collection closure and versioned public-test exclusions.
+Additional isolated test-fixture defects are corrected within the same scope.
+The final canonical source gate, public collection audit and both complete
+corrected-candidate checks pass. Terminal review adds explicit version selection
+and exact supplemental-file closure, with a fresh passing source gate. APG135 remains
+blocked; its candidates cannot be released after correction. The next separately
+authorized freeze must rebuild all inputs from finalized APG136. No release
+bundle, public publication or automatic successor is included.

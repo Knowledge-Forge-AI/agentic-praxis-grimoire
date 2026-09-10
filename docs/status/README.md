@@ -222,3 +222,27 @@ mechanical checker.
 - [`00161 — APG116 v0.9.0 release wording amendment exit`](2026/09/08/00161-apg116-v090-release-wording-amendment-exit.md)
 - [`00162 — APG117 v0.9.0 release qualification prerequisites exit`](2026/09/08/00162-apg117-v090-release-qualification-prerequisites-exit.md)
 - [`00163 — APG118 v0.9.0 Release Bundle Qualification Exit`](2026/09/08/00163-apg118-v090-release-bundle-qualification-exit.md)
+- [`00164 — APG119 v0.9.0 Corrected-Source Release Qualification Exit`](2026/09/08/00164-apg119-v090-corrected-source-release-qualification-exit.md)
+- [`00165 — APG120 v0.9.0 Publication Operator Recovery Exit`](2026/09/08/00165-apg120-v090-publication-operator-recovery-exit.md)
+- [`00166 — APG121 v0.9.0 Terminal Publication Reconciliation Exit`](2026/09/08/00166-apg121-v090-publication-reconciliation-exit.md)
+
+- [`00167 — APG122 v0.10 Foundation and SVG Exit`](2026/09/08/00167-apg122-v0-10-foundation-and-svg-exit.md)
+- [`00168 — APG123 v0.10 Browser/UI Verification Exit`](2026/09/09/00168-apg123-v0-10-browser-ui-verification-exit.md)
+- [`00169 — APG124 v0.10 Toolchain Exit`](2026/09/09/00169-apg124-v0-10-toolchain-exit.md)
+- [`00170 — APG125 v0.10 Browser Runtime and Composition Exit`](2026/09/09/00170-apg125-v0-10-browser-runtime-and-composition-exit.md)
+- [`00171 — APG126 Preserved Browser Candidate and Backlog Consolidation Exit`](2026/09/09/00171-apg126-preserved-browser-candidate-and-backlog-consolidation-exit.md)
+- [`00172 — APG127 Reporting Infrastructure Consolidation Exit`](2026/09/09/00172-apg127-reporting-infrastructure-consolidation-exit.md)
+- [`00173 — APG128 JavaScript Qualification-Debt Consolidation Exit`](2026/09/09/00173-apg128-javascript-qualification-debt-consolidation-exit.md)
+- [`00174 — APG129 v0.10 Integrated Readiness Exit`](2026/09/09/00174-apg129-v0-10-integrated-readiness-exit.md)
+
+APG130/00175 remain historically allocated to the blocked investigation without
+a public exit record.
+
+- [`00176 — APG131 Corrected Readiness and Repo Map Roadmap Exit`](2026/09/10/00176-apg131-corrected-readiness-and-repo-map-roadmap-exit.md)
+
+- [`00177 — APG132 Manager Trigger Interpretation and Final Readiness Exit`](2026/09/10/00177-apg132-manager-trigger-interpretation-and-final-readiness-exit.md)
+
+- [`00178 — APG133 v0.10.0 Release Freeze Source Blocker Exit`](2026/09/10/00178-apg133-v0100-release-freeze-source-blocker-exit.md)
+- [`00179 — APG134 v0.10.0 Release Wording Amendment Exit`](2026/09/10/00179-apg134-v0100-release-wording-amendment-exit.md)
+- [`00180 — APG135 v0.10.0 Release Freeze Qualification Boundary Exit`](2026/09/10/00180-apg135-v0100-release-freeze-qualification-boundary-exit.md)
+- [`00181 — APG136 v0.10.0 Release Harness and Source Correction Exit`](2026/09/10/00181-apg136-v0100-release-harness-source-correction-exit.md)

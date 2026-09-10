@@ -1,5 +1,7 @@
 # APGR CLI Reference
 
+This documentation covers v0.10.0.
+
 `cmd/apgr` is the canonical Go command adapter over APG's public packages and
 private path/publication adapters. Portable report, skill, environment,
 hotspot, and response semantics remain owned by their Go packages; private
@@ -20,6 +22,7 @@ apgr report operational
 apgr report ops
 apgr report path
 apgr report recover
+apgr report verify <path>
 apgr skills list
 apgr skills context-report
 apgr skills resolve
@@ -54,6 +57,33 @@ Exit classes remain 0 for success, 2 for usage, 1 for runtime/repository/
 publication failure, and 130 for keyboard interruption. SIGTERM and SIGHUP use
 the bounded runtime-failure class rather than being mislabeled as keyboard
 interruptions.
+
+## Reporting verification and retries
+
+In v0.10.0, `apgr report verify <path>` reads one
+persisted file without repository, project or outbox authority. Python forwards
+that route directly to Go before report configuration resolution. The command
+does not prepare directories, acquire publication locks, recover transactions,
+repair input or change file modes. Success prints record counts and identifies
+compatibility-limited historical validation. Empty artifacts, malformed or
+unsupported reports and I/O failures return 1 with distinct diagnostics; usage
+errors return 2. See the [library reference](go-library.md#reporting) for limits.
+
+Canonical publication accepts an opt-in flag after required positional values:
+
+```text
+apgr [global options] report show PHASE COMMIT STATUS-DOC RESULT FINAL-GATE --idempotent
+apgr [global options] report diff PHASE RESULT FINAL-GATE --idempotent [--status-doc PATH]
+apgr [global options] report ops PHASE SOURCE RESULT FINAL-GATE --idempotent [relation options]
+```
+
+Exact complete-record repeats return already-present without replacing the
+current primary. A same-identity record with differing bytes fails as a replay
+conflict. Default and historical commands still append duplicate envelopes.
+Retry only covers retained records; supersession and recovery are unchanged.
+Metadata, source basename/newline/relations and native Git rendering are part of
+record bytes. A Git upgrade can therefore turn a same-commit retry into a
+conflict. The flag does not authorize a repair, migration or new publication.
 
 ## Build information
 
@@ -157,7 +187,7 @@ projection omissions fail closed.
 
 The Python `footprint` command family forwards its exact argument tail to this
 Go owner and has no Python semantic fallback. These commands were included in
-v0.8.1 and remain available in the 0.9.0 interface described here.
+v0.8.1 and remain available in the v0.10.0 interface described here.
 
 ## CI qualification runner (`apgr test`)
 

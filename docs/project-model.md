@@ -976,3 +976,61 @@ document/component seam and Astro owns framework/project/execution placement;
 adjacent Markdown, JSX, React, TypeScript, JavaScript, and Node regions remain
 independent. Development is 39/39/39 and 14/25; public and active v0.5.0 exclude
 APG88-only owners, and explicit project subsets remain membership-stable.
+
+## APG122 SVG current ownership
+
+APG122 provisionally integrates `svg-language-profile` as an independently
+selectable language/authoring owner with its canonical leaf, projection,
+catalog, route, packaged metadata, scenario harness and phase records.
+Development is 40/40/40 and 14 stable / 26 provisional. SVG composes with
+existing CSS, JavaScript, TypeScript, JSX and React owners; broader
+accessibility, browser runtime and Playwright remain future owners. Public
+v0.9.0 remains unchanged. [ADR 0053](adr/2026/09/0053-v0-10-discovery-capacity-and-svg.md)
+owns the bounded v0.10 capacity decision and explicit-only SVG selection.
+
+## APG123 Browser/UI current ownership
+
+APG123 provisionally integrates `playwright-test-profile` and
+`web-accessibility-profile` alongside `svg-language-profile` under discovery
+policy `v0.10-browser-ui`. Development contains 42 canonical leaves, 42 catalog
+rows, and 42 checked-in projections with 14 stable and 28 provisional rows.
+Both new profiles are direct, independently selectable siblings: Playwright owns
+browser end-to-end test execution and runner mechanics; Web Accessibility owns
+accessibility auditing, ARIA attributes, semantic landmarks, and testing hierarchy.
+Architecture seams remain explicit: SVG vector authoring; Playwright runner;
+accessibility semantics and testing hierarchy; future `browser-runtime-profile`
+remains absent; and existing CSS, JavaScript, TypeScript, JSX, and React component
+profiles remain unchanged. Browser execution enforces fail-closed prerequisites
+(`APG_JAVASCRIPT_NODE`, `APG_PLAYWRIGHT_PACKAGE_ROOT`, `APG_PLAYWRIGHT_OWNED_SCRATCH_ROOT`),
+read-only global browser cache, and scratch-only package installation across
+Chromium, Firefox, and WebKit. Public v0.9.0 remains unchanged; APG123 is a
+pre-final candidate pending dispatcher pre-final review and closeout verification.
+
+
+## APG124 Toolchain admission
+
+APG124 adds provisional `vite-build-profile` and `npm-package-manager-profile`
+under the [Toolchain architecture](architecture/v0-10-toolchain.md), superseding
+APG123's current-count statements without rewriting historical evidence.
+Development is 44/44/44, 14 stable / 30 provisional, with an 11,177-byte
+admission ceiling and all prior 42 descriptions frozen. Vite owns frontend
+build/dev tooling; npm owns selected-version package management. Node keeps
+runtime/process behavior; SVG, Playwright, accessibility, language and framework
+owners remain distinct. Browser-runtime stays reserved and absent.
+APG124 is manager accepted as `V0100_TOOLCHAIN_SLICE_QUALIFIED`.
+
+## APG125 browser runtime and composition candidate
+
+APG124 is manager accepted as `V0100_TOOLCHAIN_SLICE_QUALIFIED`; its captured
+consumer failures and unresolved later-drift attribution remain historical evidence.
+APG125 adds the final provisional `browser-runtime-profile` and current
+`v0.10-browser-runtime` policy at 45 leaves, 14 stable / 31 provisional and
+11,507 description bytes maximum. All 44 prior descriptions remain frozen.
+The six named reservations are fully admitted; spare numeric capacity grants
+no future leaf admission. Explicit task compositions preserve adjacent owners.
+Real browser evidence is separate from actual embedded WebView qualification.
+The original APG125 dispatch is provider-blocked after Astra capacity failure.
+Its preserved candidate is qualified separately through APG126 after the
+dispatcher-owned independent pre-final review and terminal disposition. The original
+provider failure remains historical; preservation alone did not confer acceptance.
+No additional capability, release, deployment or successor is authorized.

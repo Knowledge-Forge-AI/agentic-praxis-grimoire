@@ -15,13 +15,25 @@ from src.test.apg_test_support import repository_root
 
 REPOSITORY_ROOT = repository_root(__file__)
 WORKFLOW = REPOSITORY_ROOT / ".github" / "workflows" / "release.yml"
-WHEEL_DARWIN = "agentic_praxis_grimoire-0.9.0-py3-none-macosx_11_0_arm64.whl"
-WHEEL_LINUX_X64 = "agentic_praxis_grimoire-0.9.0-py3-none-manylinux_2_17_x86_64.whl"
-WHEEL_LINUX_ARM64 = "agentic_praxis_grimoire-0.9.0-py3-none-manylinux_2_17_aarch64.whl"
-WHEELS = [WHEEL_DARWIN, WHEEL_LINUX_X64, WHEEL_LINUX_ARM64]
-SDIST = "agentic_praxis_grimoire-0.9.0.tar.gz"
+VERSION = (
+    REPOSITORY_ROOT / "src" / "agentic_praxis_grimoire" / "VERSION"
+).read_text(encoding="utf-8").strip()
+DEFAULT_TAG = f"v{VERSION}"
+
+
+def _distribution_filenames(version: str) -> tuple[list[str], str, str]:
+    wheel_darwin = f"agentic_praxis_grimoire-{version}-py3-none-macosx_11_0_arm64.whl"
+    wheel_linux_x64 = f"agentic_praxis_grimoire-{version}-py3-none-manylinux_2_17_x86_64.whl"
+    wheel_linux_arm64 = f"agentic_praxis_grimoire-{version}-py3-none-manylinux_2_17_aarch64.whl"
+    wheels = [wheel_darwin, wheel_linux_x64, wheel_linux_arm64]
+    sdist = f"agentic_praxis_grimoire-{version}.tar.gz"
+    npm_tarball = f"knowledge-forge-ai-apgr-{version}.tgz"
+    return wheels, sdist, npm_tarball
+
+
+WHEELS, SDIST, NPM_TARBALL = _distribution_filenames(VERSION)
+WHEEL_DARWIN, WHEEL_LINUX_X64, WHEEL_LINUX_ARM64 = WHEELS
 EXPECTED_PYTHON_DIST = [*WHEELS, SDIST]
-NPM_TARBALL = "knowledge-forge-ai-apgr-0.9.0.tgz"
 MANIFEST_NAME = "apg-distribution-manifest.json"
 
 
@@ -38,7 +50,8 @@ def _fixture(
     manifest_corrupt_wheel_hash: bool = False,
     manifest_corrupt_version: bool = False,
     manifest_missing_wheel: bool = False,
-    tag: str = "v0.9.0",
+    tag: str = DEFAULT_TAG,
+    fixture_version: str | None = None,
     extra_wheel: bool = False,
     extra_sdist: bool = False,
     universal_wheel: bool = False,
@@ -49,13 +62,17 @@ def _fixture(
     malformed_checksums: bool = False,
     include_non_python_assets: bool = True,
 ) -> tuple[Path, Path]:
+    active_version = fixture_version if fixture_version is not None else VERSION
+    active_wheels, active_sdist, active_npm = _distribution_filenames(active_version)
+    active_wheel_darwin = active_wheels[0]
+
     assets = tmp_path / "assets"
     assets.mkdir()
     asset_map: dict[str, bytes] = {
-        WHEEL_DARWIN: b"exact darwin wheel bytes",
-        WHEEL_LINUX_X64: b"exact linux x64 wheel bytes",
-        WHEEL_LINUX_ARM64: b"exact linux arm64 wheel bytes",
-        SDIST: b"exact normalized sdist bytes",
+        active_wheels[0]: b"exact darwin wheel bytes",
+        active_wheels[1]: b"exact linux x64 wheel bytes",
+        active_wheels[2]: b"exact linux arm64 wheel bytes",
+        active_sdist: b"exact normalized sdist bytes",
     }
 
     digests: dict[str, str] = {}
@@ -63,14 +80,14 @@ def _fixture(
         digests[name] = hashlib.sha256(content).hexdigest()
 
     if corrupt_wheel:
-        digests[WHEEL_DARWIN] = "0" * 64
+        digests[active_wheels[0]] = "0" * 64
     if corrupt_sdist:
-        digests[SDIST] = "0" * 64
+        digests[active_sdist] = "0" * 64
 
     wheels_manifest = [
-        {"name": WHEEL_DARWIN, "sha256": digests[WHEEL_DARWIN]},
-        {"name": WHEEL_LINUX_X64, "sha256": digests[WHEEL_LINUX_X64]},
-        {"name": WHEEL_LINUX_ARM64, "sha256": digests[WHEEL_LINUX_ARM64]},
+        {"name": active_wheels[0], "sha256": digests[active_wheels[0]]},
+        {"name": active_wheels[1], "sha256": digests[active_wheels[1]]},
+        {"name": active_wheels[2], "sha256": digests[active_wheels[2]]},
     ]
     if manifest_corrupt_wheel_hash:
         wheels_manifest[0]["sha256"] = "f" * 64
@@ -79,20 +96,20 @@ def _fixture(
 
     manifest_obj = {
         "schema_version": "apg.distribution-manifest/v1",
-        "version": "0.7.0" if manifest_corrupt_version else "0.9.0",
+        "version": "0.7.0" if manifest_corrupt_version else active_version,
         "python": {
             "package": "agentic-praxis-grimoire",
             "wheels": wheels_manifest,
             "sdist": {
-                "name": SDIST,
-                "sha256": digests[SDIST],
+                "name": active_sdist,
+                "sha256": digests[active_sdist],
             },
         },
     }
 
     if include_non_python_assets:
-        asset_map[NPM_TARBALL] = b"exact npm tarball bytes"
-        digests[NPM_TARBALL] = hashlib.sha256(asset_map[NPM_TARBALL]).hexdigest()
+        asset_map[active_npm] = b"exact npm tarball bytes"
+        digests[active_npm] = hashlib.sha256(asset_map[active_npm]).hexdigest()
         manifest_bytes = json.dumps(manifest_obj, sort_keys=True, separators=(",", ":")).encode("utf-8") + b"\n"
         asset_map[MANIFEST_NAME] = manifest_bytes
         digests[MANIFEST_NAME] = hashlib.sha256(manifest_bytes).hexdigest()
@@ -102,7 +119,7 @@ def _fixture(
 
     manifest_lines = [f"{digests[name]}  {name}" for name in sorted(asset_map)]
     if malformed_checksums:
-        manifest_lines.append(f"{digests[SDIST]}  {SDIST}")
+        manifest_lines.append(f"{digests[active_sdist]}  {active_sdist}")
 
     (assets / "SHA256SUMS").write_text(
         "\n".join(manifest_lines) + "\n",
@@ -118,17 +135,18 @@ def _fixture(
         (assets / "unexpected.whl").write_bytes(b"extra wheel")
         release_assets.append({"id": 101, "name": "unexpected.whl"})
     if universal_wheel:
-        universal_name = "agentic_praxis_grimoire-0.9.0-py3-none-any.whl"
+        universal_name = f"agentic_praxis_grimoire-{active_version}-py3-none-any.whl"
         (assets / universal_name).write_bytes(b"universal wheel")
         release_assets.append({"id": 102, "name": universal_name})
     if extra_sdist:
-        (assets / "agentic_praxis_grimoire-0.9.0-extra.tar.gz").write_bytes(b"extra sdist")
-        release_assets.append({"id": 103, "name": "agentic_praxis_grimoire-0.9.0-extra.tar.gz"})
+        extra_sdist_name = f"agentic_praxis_grimoire-{active_version}-extra.tar.gz"
+        (assets / extra_sdist_name).write_bytes(b"extra sdist")
+        release_assets.append({"id": 103, "name": extra_sdist_name})
     if duplicate_asset:
-        release_assets.append({"id": 104, "name": WHEEL_DARWIN})
+        release_assets.append({"id": 104, "name": active_wheel_darwin})
     if omit_asset:
         # remove one of the required wheels
-        release_assets = [a for a in release_assets if a["name"] != WHEEL_DARWIN]
+        release_assets = [a for a in release_assets if a["name"] != active_wheel_darwin]
 
     event = tmp_path / "event.json"
     event.write_text(
@@ -156,7 +174,8 @@ def _run(
     manifest_corrupt_wheel_hash: bool = False,
     manifest_corrupt_version: bool = False,
     manifest_missing_wheel: bool = False,
-    tag: str = "v0.9.0",
+    tag: str = DEFAULT_TAG,
+    fixture_version: str | None = None,
     extra_wheel: bool = False,
     extra_sdist: bool = False,
     universal_wheel: bool = False,
@@ -176,6 +195,7 @@ def _run(
         manifest_corrupt_version=manifest_corrupt_version,
         manifest_missing_wheel=manifest_missing_wheel,
         tag=tag,
+        fixture_version=fixture_version,
         extra_wheel=extra_wheel,
         extra_sdist=extra_sdist,
         universal_wheel=universal_wheel,
@@ -273,12 +293,17 @@ def test_verification_step_stops_on_manifest_missing_wheel(tmp_path: Path) -> No
     assert result.returncode != 0
 
 
+# These historical rejection cases assume monotonically increasing releases;
+# restoring one as VERSION requires revisiting the corresponding negative.
 @pytest.mark.parametrize(
     "arguments",
     (
         {"tag": "v0.6.0"},
         {"tag": "v0.7.1"},
         {"tag": "v0.8.1"},
+        {"tag": "v0.9.0"},
+        {"fixture_version": "0.9.0"},
+        {"fixture_version": "0.9.0", "tag": "v0.9.0"},
         {"extra_wheel": True},
         {"universal_wheel": True},
         {"extra_sdist": True},

@@ -134,8 +134,14 @@ limitation.
 ## APG79E integration boundary
 
 APG79E accepts only that exact Medium supporting qualification limitation,
-directly verifies the current APG79B report, and leaves the maintained proxy
+historically verified the APG79B report at integration, and leaves the maintained proxy
 unrepaired. All ordinary product gates pass with zero unaccepted findings; ADR
 0045 is Accepted with amendment and the candidate is
 `provisionally-integrated-with-known-debt` under `JS-QD-001` through
 `JS-QD-005`.
+
+APG131 distinguishes that accepted historical verification from current custody:
+the bounded APG129/APG130 searches did not find the original artifact in the
+configured agent-visible roots. Its absence does not invalidate APG79E. Current
+JS-QD-005 trigger interpretation and future refresh limits are recorded in the
+[known-debt register](../governance/language-profile-known-debt.md).

@@ -2169,3 +2169,61 @@ APG108 delivers the fail-closed publication executor with repository metadata
 reconciliation (description, homepage, topics) and deterministic state machine.
 All code, documentation, and metadata are project-authored. This is bounded release
 and provenance evidence, not legal advice.
+
+## APG122 SVG authoring and v0.10 capacity
+
+APG122 independently authors SVG guidance and synthetic graphics from primary
+standards and WAI documentation inspected 2026-09-08. The
+[SVG contract](architecture/v0-10-svg-language-profile.md) maps all fifteen
+clauses to source URLs, status limitations and refresh triggers. SVG 2 remains
+a Candidate Recommendation; draft accessibility mappings do not establish
+browser support. No upstream artwork, implementation, tests or prose is copied.
+
+The consumer-needs inspection informs task priorities, not universal SVG
+validity. Public guidance contains no private consumer topology and does not
+depend on publication-excluded evidence. Existing 39 skill files remain exact.
+[ADR 0053](adr/2026/09/0053-v0-10-discovery-capacity-and-svg.md) records the
+versioned capacity policy and historical measurement separation. Initial SVG
+maturity is provisional, pending dispatcher review and closeout qualification.
+
+## APG123 Browser UI and accessibility provenance
+
+APG123 independently synthesizes guidance and synthetic test harnesses from
+official Playwright v1.62 documentation and primary W3C / WAI standards
+inspected 2026-09-08 and 2026-09-09. Profile authoring and architecture contracts
+remain owned by separate profile specifications. All guidance, synthetic fixtures,
+and test assertions are project-authored; no upstream implementation, test code,
+prose, artwork, or private consumer paths are copied.
+
+Primary standard sources and status limitations:
+
+- Playwright v1.62.1 official documentation and API references.
+- W3C WAI-ARIA 1.3 (W3C Working Draft): draft roles and attributes do not guarantee universal user-agent support.
+- W3C HTML Accessibility API Mappings 1.0 (Working Draft, 2026-08-29): accessibility API mapping boundaries.
+- W3C Accessible Rich Internet Applications (WAI-ARIA) 1.2 (W3C Recommendation).
+- W3C Web Content Accessibility Guidelines (WCAG) 2.2 (Recommendation, 2024-12-12); the initial 2023 Recommendation is historical.
+- W3C Media Queries Level 5 (W3C Working Draft): prefers-reduced-motion and color-scheme evaluation.
+
+Browser execution and prerequisite boundaries:
+
+- Explicit prerequisite environment variables: `APG_JAVASCRIPT_NODE`, `APG_PLAYWRIGHT_PACKAGE_ROOT`, and `APG_PLAYWRIGHT_OWNED_SCRATCH_ROOT`.
+- Global browser binary cache (`PLAYWRIGHT_BROWSERS_PATH`) is strictly read-only.
+- Package installation (`@playwright/test` 1.62.1) occurs strictly in task-owned scratch with lifecycle scripts disabled; no global package or APGR runtime footprint is installed.
+- All three browser engines (Chromium, Firefox, WebKit) are required; any missing engine is an immediate fail-closed blocker.
+- Automated semantics and rendered checks confirm synthetic DOM, layout, focus, and accessibility node characteristics; they make NO screen reader audio or assistive technology conformance claim.
+- No claim is made that the full browser test suite has passed; launch checks establish availability evidence only. Dispatcher pre-final review and final closeout verification remain pending.
+
+## APG125 browser-runtime provenance
+
+APG125 uses original operational synthesis from the dated primary WHATWG and W3C
+sources in the [profile specification](specs/browser-runtime-profile.md), with
+RFC 6265 for the cookie port-isolation boundary. Living Standards remain mutable;
+W3C Working Drafts and Candidate Recommendation Drafts are not Recommendations.
+Their linked rights notices govern any future copying; no upstream code/prose is
+copied in this slice. Maintained synthetic loopback fixtures provide separate
+engine evidence. Navigation tests do not qualify runtime semantics.
+
+The producer corrected unverified engine assertions and overbroad storage,
+lifecycle, cancellation, permissions and resource cleanup statements in the first
+worker draft before acceptance. Exact engine/context facts come from executed
+receipts. Ordinary browser evidence never qualifies a Tauri embedded WebView.

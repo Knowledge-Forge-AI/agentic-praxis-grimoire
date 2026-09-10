@@ -6,6 +6,7 @@ import argparse
 from collections import Counter
 from dataclasses import dataclass
 from functools import partial
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -52,6 +53,834 @@ V06_PROFILE_NAMES = frozenset(
 V06_DESCRIPTION_BYTES_MINIMUM = 170
 V06_DESCRIPTION_BYTES_MAXIMUM = 330
 V06_TOTAL_DESCRIPTION_BYTES_MAXIMUM = 9527
+
+DISCOVERY_POLICY_VERSION_V010 = "v0.10"
+DISCOVERY_POLICY_VERSION_V010_BROWSER_UI = "v0.10-browser-ui"
+DISCOVERY_POLICY_VERSION_V010_TOOLCHAIN = "v0.10-toolchain"
+DISCOVERY_POLICY_VERSION_V010_BROWSER_RUNTIME = "v0.10-browser-runtime"
+DISCOVERY_POLICY_VERSION = DISCOVERY_POLICY_VERSION_V010_BROWSER_RUNTIME
+HISTORICAL_SKILL_COUNT = 39
+HISTORICAL_DESCRIPTION_BYTES = 9504
+HISTORICAL_DESCRIPTION_CHARACTERS = 9492
+HISTORICAL_GLOBAL_DESCRIPTION_LIMIT = 9527
+
+V010_MAX_RESERVATION_DESCRIPTION_BYTES = 330
+V010_CURRENT_SVG_ADMISSION_CEILING = 9857
+V010_BROWSER_UI_ADMISSION_CEILING = 10517
+V010_CURRENT_BROWSER_UI_ADMISSION_CEILING = 10517
+V010_TOOLCHAIN_ADMISSION_CEILING = 11177
+V010_CURRENT_TOOLCHAIN_ADMISSION_CEILING = 11177
+V010_BROWSER_RUNTIME_ADMISSION_CEILING = 11507
+V010_CURRENT_BROWSER_RUNTIME_ADMISSION_CEILING = 11507
+V010_OVERALL_FUTURE_CEILING = 11507
+V010_MAX_SVG_FILE_BYTES = 20480
+V010_CURRENT_ADMITTED_CANDIDATE = "svg-language-profile"
+V010_ADMITTED_SKILL_COUNT = 40
+V010_BROWSER_UI_ADMITTED_SKILL_COUNT = 42
+V010_TOOLCHAIN_ADMITTED_SKILL_COUNT = 44
+V010_BROWSER_RUNTIME_ADMITTED_SKILL_COUNT = 45
+V010_ELIGIBLE_CANDIDATES = frozenset(
+    {
+        "svg-language-profile",
+        "playwright-test-profile",
+        "web-accessibility-profile",
+        "browser-runtime-profile",
+        "npm-package-manager-profile",
+        "vite-build-profile",
+    }
+)
+V010_BROWSER_UI_ADMITTED_CANDIDATES = frozenset(
+    {
+        "svg-language-profile",
+        "playwright-test-profile",
+        "web-accessibility-profile",
+    }
+)
+V010_TOOLCHAIN_ADMITTED_CANDIDATES = frozenset(
+    {
+        "svg-language-profile",
+        "playwright-test-profile",
+        "web-accessibility-profile",
+        "vite-build-profile",
+        "npm-package-manager-profile",
+    }
+)
+V010_BROWSER_RUNTIME_ADMITTED_CANDIDATES = frozenset(
+    {
+        "svg-language-profile",
+        "playwright-test-profile",
+        "web-accessibility-profile",
+        "vite-build-profile",
+        "npm-package-manager-profile",
+        "browser-runtime-profile",
+    }
+)
+
+FROZEN_SVG_SKILL_DESCRIPTION = (
+    "Use when SVG authoring depends on namespaces, viewBox, paths, transforms, "
+    "paint, reuse, clipping, masking, text, naming, resources, or serialization; "
+    "not for general CSS, JSX, React, browser runtime, accessibility audits, or "
+    "test automation."
+)
+FROZEN_PLAYWRIGHT_SKILL_DESCRIPTION = (
+    "Use when a project selects Playwright Test and decisions depend on "
+    "configuration, fixtures, locators, waiting, isolation, parallel execution, "
+    "browser projects, network controls, or test artifacts; not for accessibility "
+    "standards or general browser/runtime semantics."
+)
+FROZEN_WEB_ACCESSIBILITY_SKILL_DESCRIPTION = (
+    "Use when web implementation decisions affect native semantics, accessible "
+    "names, keyboard and focus behavior, images/SVG, forms, dynamic content, "
+    "motion, contrast, or accessibility evidence; not for test-runner mechanics "
+    "or a claim of automated WCAG conformance."
+)
+FROZEN_VITE_SKILL_DESCRIPTION = (
+    "Use when a project selects Vite for dev serving or production building and decisions "
+    "depend on root, base, publicDir, mode, env prefixes, loopback fs limits, Rolldown bundling, "
+    "alias/CSS/plugin hooks, SSR seams, or preview."
+)
+FROZEN_NPM_SKILL_DESCRIPTION = (
+    "Use when package management decisions depend on npm CLI contracts, package.json and "
+    "lockfile v3 integrity, install versus ci execution, peer dependencies and overrides, "
+    "workspaces, script lifecycle and ignore-scripts, local pack tarballs, caching, or "
+    "publication provenance; not for Node host runtime or bundler transforms."
+)
+
+# Documented update requirement:
+# The original 39 skill identities and their exact descriptions are frozen under
+# Discovery Policy v0.10. Modifying, renaming, removing, or changing descriptions
+# of the original 39 skills constitutes reservation theft and requires formal APG
+# governance authorization and an approved specification change.
+FROZEN_ORIGINAL_39_DIGEST = (
+    "f9255d38eadff7b2bfc5ab13cd1722b8d98ac1ea974d8220475ff7067a1e8cc7"
+)
+
+ORIGINAL_39_SKILL_DESCRIPTIONS: dict[str, str] = {
+    "agentic-praxis-grimoire-workflow": (
+        "Use when an operator or manager needs to choose among multiple plausible "
+        "APG skills, audit an APG routing decision, or diagnose a missing or stale APG capability."
+    ),
+    "astro-profile": (
+        "Use when Astro behavior hinges on .astro execution, islands/client "
+        "directives, server/client boundaries, collections, routing, or "
+        "integrations; not for React, JSX, MDX, TypeScript, Node, Vite, "
+        "Starlight, CSS, accessibility, or deployment."
+    ),
+    "bash-language-profile": (
+        "Use when Bash-specific judgment is material to quoting, expansion, "
+        "arrays, pipelines, traps, subprocesses, files, portability, or warning "
+        "and crisis thresholds beyond repository policy."
+    ),
+    "bats-test-profile": (
+        "Use when Bats-specific test judgment is material to evaluation, run "
+        "status and output, hooks, fixtures, TAP, file descriptors, parallelism, "
+        "background cleanup, or warning and crisis thresholds beyond repository policy."
+    ),
+    "chatgpt-manager-workflow": (
+        "Use when selection among multiple plausible ChatGPT top-level-manager "
+        "capabilities is ambiguous or a ChatGPT-manager routing decision requires audit."
+    ),
+    "composing-approved-roadmap-assignments": (
+        "Use when a human-approved roadmap phase or explicitly approved bounded "
+        "phase sequence must become a reviewable top-level coding-agent manager "
+        "assignment with authority, scope, evidence, acceptance, stop, "
+        "reporting, and handoff boundaries."
+    ),
+    "composing-bounded-worker-assignments": (
+        "Use when internal delegation is already authorized and independently "
+        "selected, and one non-trivial worker assignment needs explicit scope, "
+        "ownership, evidence, acceptance, or return boundaries."
+    ),
+    "converting-bash-scripts-to-python": (
+        "Use when an existing Bash executable or script family needs a bounded "
+        "conversion to Python that preserves or deliberately migrates its observable contract."
+    ),
+    "css-language-profile": (
+        "Use when a material decision depends on CSS-specific static semantics "
+        "\u2014 syntax validity, selector specificity, cascade ordering, "
+        "inheritance, shorthand resets, custom-property substitution, or "
+        "value consequences \u2014 for an established CSS region whose artifact "
+        "boundary and consequence-bearing evidence are identified."
+    ),
+    "debugging-systematically": (
+        "Use when behavior is failing, inconsistent, flaky, unexplained, or "
+        "affected by multiple plausible causes."
+    ),
+    "designing-significant-changes": (
+        "Use when consequential behavior, architecture, ownership, interfaces, "
+        "data contracts, safety boundaries, or irreversible choices remain unresolved before implementation."
+    ),
+    "dockerfile-profile": (
+        "Use when Dockerfile-specific judgment is material to parser directives, "
+        "build stages, instruction forms, variable scope, build context, copies, "
+        "mounts, cache behavior, file ownership, runtime metadata, platform "
+        "behavior, or warning and crisis thresholds beyond repository policy."
+    ),
+    "go-cmp-test-profile": (
+        "Use when a repository has already selected google/go-cmp v0.7.0 and "
+        "comparison judgment is material to equality versus diff, option "
+        "composition and filters, comparers and transformers, ignores and "
+        "unexported fields, sorting, approximation, panics, diagnostic "
+        "exposure, or thresholds beyond repository policy."
+    ),
+    "go-language-profile": (
+        "Use when Go-specific judgment is material to structure, errors, "
+        "context, interfaces, generics, concurrency, public APIs, reflection, "
+        "unsafe, cgo, subprocesses, compatibility, or warning and crisis "
+        "thresholds beyond repository policy."
+    ),
+    "go-test-profile": (
+        "Use when native Go test judgment is material to package placement, "
+        "subtests, helper attribution, cleanup and isolation, TestMain, "
+        "parallelism, goroutine reporting, examples, benchmarks, fuzzing, "
+        "caching, effective language version, or warning and crisis thresholds "
+        "beyond repository policy."
+    ),
+    "gomock-test-profile": (
+        "Use when a project has already selected GoMock v0.6.0 and judgment is "
+        "material to mockgen generation, generated mocks, controller lifecycle, "
+        "expectations, call counts or order, matchers, or GoMock failure "
+        "diagnosis; not for native test lifecycle, value diffs, or Go semantics."
+    ),
+    "implementing-with-test-discipline": (
+        "Use when implementing a bugfix, new behavior, behavioral refactor, "
+        "schema or contract change, or another code change whose correctness "
+        "benefits from executable evidence."
+    ),
+    "javascript-language-profile": (
+        "Use when a material decision depends on ECMAScript language semantics "
+        "\u2014 evaluation order, lexical scope and temporal dead zones, coercion "
+        "and equality, prototypes and property descriptors, this binding, classes, "
+        "iteration, completion values, promise and async semantics, or module "
+        "live bindings \u2014 for an established JavaScript source region whose "
+        "parse goal, strictness state, and whole-file owner are identified."
+    ),
+    "jsx-language-profile": (
+        "Use when JSX-specific judgment is material to element, attribute, child, "
+        "expression, fragment, spread, file-kind, or transform semantics; not "
+        "for React behavior, TypeScript checking, JavaScript evaluation, runtime hosts, "
+        "MDX, Astro, or build tools."
+    ),
+    "markdown-language-profile": (
+        "Use when a material decision depends on the repository's actual Markdown "
+        "parser or selected-dialect document semantics, or on qualitative "
+        "Markdown document-structure policy."
+    ),
+    "mdx-profile": (
+        "Use when an MDX decision depends on the Markdown-to-JSX/component seam, "
+        "imports/exports, expressions, provider mapping, or compile/runtime split; "
+        "not for pure Markdown, JSX, React, TypeScript, JavaScript, or Astro."
+    ),
+    "minitest-test-profile": (
+        "Use when Minitest-specific judgment is material to test or spec "
+        "organization, assertions, lifecycle, mocks, stubs, fixture alternatives, "
+        "isolation, parallelism, filtering, runners, plugins, reporters, "
+        "subprocess, filesystem, or database test boundaries, or warning and "
+        "crisis thresholds beyond repository policy."
+    ),
+    "nix-language-profile": (
+        "Use when Nix-specific judgment is material to expressions, attribute sets, "
+        "modules, derivations, flakes, overlays, purity, evaluation, store exposure, "
+        "activation, remote builders, or warning and crisis thresholds beyond repository policy."
+    ),
+    "nix-test-profile": (
+        "Use when Nix test judgment is material to selecting which already-selected "
+        "testing surface can prove an exact claim, package check and install-check "
+        "behavior, flake checks, Nixpkgs or NixOS test ownership, test-evidence "
+        "qualification across sandbox, store, builder, or cache boundaries, or "
+        "Nix-test-specific structural review."
+    ),
+    "nodejs-runtime-profile": (
+        "Use when a material decision depends on Node.js-specific host behavior "
+        "\u2014 package scope and module mapping, CommonJS wrapper bindings, ESM "
+        "host metadata, specifier resolution and package exports, module identity, "
+        "process and CLI state, stdio and exit status, filesystem and path APIs, "
+        "errors, signals, timers and the event loop, child processes and workers, "
+        "or Node's exposure of network and Web-compatible APIs \u2014 for an "
+        "established Node execution role whose exact version, platform, flags, "
+        "package scope, loader, and whole-file owner are identified."
+    ),
+    "planning-repository-work": (
+        "Use when an accepted objective requires multiple dependent implementation "
+        "steps, cross-file coordination, staged risk reduction, or a durable handoff."
+    ),
+    "postgresql-database-profile": (
+        "Use when PostgreSQL-specific judgment is material to SQL, schemas, MVCC, "
+        "transactions, locks, DDL, migrations, routines, triggers, security, "
+        "backup and restore, replication, maintenance, or warning and crisis "
+        "thresholds beyond repository policy."
+    ),
+    "pytest-test-profile": (
+        "Use when pytest-specific judgment is material to discovery, collection, "
+        "assertions, fixtures, parametrization, mocks, isolation, xdist, coverage, "
+        "or warning and crisis thresholds beyond repository policy."
+    ),
+    "python-language-profile": (
+        "Use when Python implementation, design, debugging, or review needs "
+        "Python-specific judgment about structure, complexity, public APIs, typing, "
+        "concurrency, serialization, packaging, or warning and crisis thresholds "
+        "beyond repository policy."
+    ),
+    "react-component-profile": (
+        "Use when React component judgment is material to composition, props, "
+        "rendering, state, effects, hooks, context, memoization, error boundaries, "
+        "or component testing; not for JSX syntax, language typing, runner mechanics, "
+        "routing, styling, MDX, Astro, or metaframeworks."
+    ),
+    "reviewing-and-verifying-repository-work": (
+        "Use when a bounded repository artifact, change, phase, commit, or worker "
+        "result requires evidence-backed acceptance, correction, disposition, or "
+        "a completion claim."
+    ),
+    "ruby-language-profile": (
+        "Use when Ruby-specific judgment is material to structure, exceptions, "
+        "blocks, shared state, dynamic dispatch, metaprogramming, callbacks, "
+        "concurrency, gems, public compatibility, serialization, subprocesses, "
+        "or warning and crisis thresholds beyond repository policy."
+    ),
+    "sqlite-database-profile": (
+        "Use when SQLite-specific judgment is material to SQL, transaction modes, "
+        "single-writer concurrency, busy handling, journal or WAL behavior, schema "
+        "rebuilds, pragmas, affinity, file ownership, backup and integrity, "
+        "extensions, or warning and crisis thresholds beyond repository policy."
+    ),
+    "synthesizing-repository-guidance": (
+        "Use when a dense, duplicated, mixed-scope, private, or source-derived "
+        "guidance corpus needs ownership, provenance, privacy, migration, or "
+        "rejection dispositions before any rewrite."
+    ),
+    "typescript-language-profile": (
+        "Use when a material decision depends on TypeScript-specific static "
+        "semantics or type-erasure boundaries for an established source region, "
+        "after the exact compiler role, version, options, project, source kind, "
+        "and declaration environment are evidenced."
+    ),
+    "vagrantfile-profile": (
+        "Use when Vagrantfile-specific judgment is material to configuration "
+        "versions and loading, machines, boxes, provider blocks, networks, "
+        "synced folders, provisioners, triggers, Vagrant state, host-dependent "
+        "behavior, or warning and crisis thresholds beyond repository policy."
+    ),
+    "vitest-test-profile": (
+        "Use when a project has already selected Vitest 4.1 and runner-specific "
+        "judgment is material to configuration, projects, environments, assertions, "
+        "mocks, timers, concurrency, isolation, snapshots, or coverage providers; "
+        "not for test sufficiency, language or React semantics, or coverage policy."
+    ),
+    "zsh-language-profile": (
+        "Use when Zsh-specific judgment is material to option state, arrays, "
+        "expansion, globbing, autoloading, startup or interactive behavior, hooks, "
+        "modules, processes, or warning and crisis thresholds beyond repository policy."
+    ),
+    "zunit-test-profile": (
+        "Use when a repository explicitly uses the APG-verified ZUnit v0.8.2 and "
+        "Zsh 5.9.2 pair and needs ZUnit-specific judgment about runner invocation, "
+        "discovery, assertions, hooks, configuration, output, isolation, process "
+        "cleanup, compatibility, or warning and crisis thresholds beyond repository policy."
+    ),
+}
+
+
+def compute_original_39_digest(descriptions: dict[str, str]) -> str:
+    """Compute the SHA-256 digest of the 39 original skill descriptions in canonical order."""
+    lines = [f"{name}:{descriptions[name]}\n" for name in sorted(descriptions)]
+    return hashlib.sha256("".join(lines).encode("utf-8")).hexdigest()
+
+
+def validate_discovery_policy(
+    policy_version: str,
+    skills: Sequence[dict[str, object]],
+) -> list[str]:
+    """Validate skill rows against the versioned discovery capacity policy."""
+    failures: list[str] = []
+    if policy_version not in (
+        DISCOVERY_POLICY_VERSION_V010,
+        DISCOVERY_POLICY_VERSION_V010_BROWSER_UI,
+        DISCOVERY_POLICY_VERSION_V010_TOOLCHAIN,
+        DISCOVERY_POLICY_VERSION_V010_BROWSER_RUNTIME,
+    ):
+        return [f"unknown discovery policy {policy_version!r}"]
+
+    count = len(skills)
+    if policy_version == DISCOVERY_POLICY_VERSION_V010:
+        if count not in (HISTORICAL_SKILL_COUNT, V010_ADMITTED_SKILL_COUNT):
+            return [
+                f"expected {HISTORICAL_SKILL_COUNT} or {V010_ADMITTED_SKILL_COUNT} leaves under {policy_version} discovery policy, got {count}"
+            ]
+    elif policy_version == DISCOVERY_POLICY_VERSION_V010_BROWSER_UI:
+        if count != V010_BROWSER_UI_ADMITTED_SKILL_COUNT:
+            return [
+                f"expected {V010_BROWSER_UI_ADMITTED_SKILL_COUNT} leaves under {policy_version} discovery policy, got {count}"
+            ]
+    elif policy_version == DISCOVERY_POLICY_VERSION_V010_TOOLCHAIN:
+        if count != V010_TOOLCHAIN_ADMITTED_SKILL_COUNT:
+            return [
+                f"expected {V010_TOOLCHAIN_ADMITTED_SKILL_COUNT} leaves under {policy_version} discovery policy, got {count}"
+            ]
+    elif policy_version == DISCOVERY_POLICY_VERSION_V010_BROWSER_RUNTIME:
+        if count != V010_BROWSER_RUNTIME_ADMITTED_SKILL_COUNT:
+            return [
+                f"expected {V010_BROWSER_RUNTIME_ADMITTED_SKILL_COUNT} leaves under {policy_version} discovery policy, got {count}"
+            ]
+
+    by_id: dict[str, dict[str, object]] = {}
+    total_bytes = 0
+    total_characters = 0
+
+    for item in skills:
+        name = str(item.get("name") or "")
+        desc = str(item.get("description") or "")
+        if not name or not desc:
+            failures.append("malformed skill metadata with empty name or description")
+            continue
+        if not desc.startswith("Use when "):
+            failures.append(f"skill {name!r} description must begin with 'Use when '")
+
+        measured_bytes = len(desc.encode("utf-8"))
+        measured_characters = len(desc)
+
+        # Validate recorded description bytes
+        recorded_bytes = item.get("bytes")
+        if recorded_bytes is None:
+            recorded_bytes = item.get("description_bytes")
+        if recorded_bytes is not None:
+            try:
+                rec_b = int(recorded_bytes)
+                if rec_b <= 0:
+                    failures.append(f"skill {name!r} description bytes {rec_b} must be positive")
+                elif rec_b != measured_bytes:
+                    failures.append(
+                        f"skill {name!r} description bytes mismatch (recorded {rec_b}, measured {measured_bytes})"
+                    )
+            except (ValueError, TypeError):
+                failures.append(f"skill {name!r} malformed description bytes {recorded_bytes!r}")
+
+        # Validate recorded description characters
+        recorded_chars = item.get("characters")
+        if recorded_chars is None:
+            recorded_chars = item.get("description_characters")
+        if recorded_chars is not None:
+            try:
+                rec_c = int(recorded_chars)
+                if rec_c <= 0:
+                    failures.append(f"skill {name!r} description characters {rec_c} must be positive")
+                elif rec_c != measured_characters:
+                    failures.append(
+                        f"skill {name!r} description characters mismatch (recorded {rec_c}, measured {measured_characters})"
+                    )
+            except (ValueError, TypeError):
+                failures.append(f"skill {name!r} malformed description characters {recorded_chars!r}")
+
+        # Validate body measurements
+        body_val = item.get("blob_bytes")
+        if body_val is None:
+            body_val = item.get("body_bytes")
+        if body_val is None:
+            body_val = item.get("source_blob_bytes")
+        if body_val is not None:
+            try:
+                b_val = int(body_val)
+                if b_val <= 0:
+                    failures.append(f"skill {name!r} body bytes {b_val} must be positive")
+            except (ValueError, TypeError):
+                failures.append(f"skill {name!r} malformed body bytes {body_val!r}")
+
+        if name in by_id:
+            failures.append(f"duplicate skill ID {name!r}")
+        by_id[name] = item
+        total_bytes += measured_bytes
+        total_characters += measured_characters
+
+    if failures:
+        return failures
+
+    for orig_name, orig_desc in ORIGINAL_39_SKILL_DESCRIPTIONS.items():
+        if orig_name not in by_id:
+            failures.append(f"missing original 39 skill {orig_name!r}")
+            continue
+        actual_desc = str(by_id[orig_name].get("description") or "")
+        if actual_desc != orig_desc:
+            failures.append(
+                f"original 39 skill {orig_name!r} description mutated (reservation theft)"
+            )
+
+    measured_39 = {
+        name: str(by_id[name].get("description") or "")
+        for name in ORIGINAL_39_SKILL_DESCRIPTIONS
+        if name in by_id
+    }
+    if len(measured_39) == HISTORICAL_SKILL_COUNT:
+        digest = compute_original_39_digest(measured_39)
+        if digest != FROZEN_ORIGINAL_39_DIGEST:
+            failures.append(
+                f"original 39 digest mismatch: got {digest}, want {FROZEN_ORIGINAL_39_DIGEST}"
+            )
+
+    if policy_version == DISCOVERY_POLICY_VERSION_V010:
+        if count == HISTORICAL_SKILL_COUNT:
+            if (
+                total_bytes != HISTORICAL_DESCRIPTION_BYTES
+                or total_characters != HISTORICAL_DESCRIPTION_CHARACTERS
+                or total_bytes > HISTORICAL_GLOBAL_DESCRIPTION_LIMIT
+            ):
+                failures.append(
+                    f"baseline description footprint mismatch: bytes={total_bytes}, chars={total_characters}, limit={HISTORICAL_GLOBAL_DESCRIPTION_LIMIT}"
+                )
+            return failures
+
+        # count == V010_ADMITTED_SKILL_COUNT (40)
+        non_orig = [item for item in skills if str(item.get("name") or "") not in ORIGINAL_39_SKILL_DESCRIPTIONS]
+        if len(non_orig) != 1:
+            failures.append(f"expected exactly 1 admitted candidate skill, got {len(non_orig)}")
+            return failures
+
+        added = non_orig[0]
+        added_name = str(added.get("name") or "")
+        if added_name != V010_CURRENT_ADMITTED_CANDIDATE:
+            failures.append(
+                f"candidate {added_name!r} is not authorized for admission under {policy_version} discovery policy"
+            )
+        added_bytes = len(str(added.get("description") or "").encode("utf-8"))
+        if added_bytes <= 0 or added_bytes > V010_MAX_RESERVATION_DESCRIPTION_BYTES:
+            failures.append(
+                f"candidate {added_name!r} description bytes {added_bytes} exceeds reservation ceiling of {V010_MAX_RESERVATION_DESCRIPTION_BYTES}"
+            )
+        added_body = added.get("blob_bytes")
+        if added_body is None:
+            added_body = added.get("body_bytes")
+        if added_body is None:
+            added_body = added.get("source_blob_bytes")
+        if added_body is None:
+            failures.append(f"candidate {added_name!r} missing required body bytes measurement")
+        else:
+            try:
+                b_int = int(added_body)
+                if b_int <= 0:
+                    failures.append(f"candidate {added_name!r} body bytes {b_int} must be positive")
+                elif b_int > V010_MAX_SVG_FILE_BYTES:
+                    failures.append(
+                        f"candidate {added_name!r} body bytes {b_int} exceeds SVG file limit of {V010_MAX_SVG_FILE_BYTES}"
+                    )
+            except (ValueError, TypeError):
+                failures.append(f"candidate {added_name!r} malformed body bytes {added_body!r}")
+
+        if total_bytes > V010_CURRENT_SVG_ADMISSION_CEILING:
+            failures.append(
+                f"total description bytes {total_bytes} exceeds current SVG admission ceiling of {V010_CURRENT_SVG_ADMISSION_CEILING}"
+            )
+        if total_bytes > V010_OVERALL_FUTURE_CEILING:
+            failures.append(
+                f"total description bytes {total_bytes} exceeds overall future ceiling of {V010_OVERALL_FUTURE_CEILING}"
+            )
+        return failures
+
+    if policy_version == DISCOVERY_POLICY_VERSION_V010_BROWSER_UI:
+        non_orig = [item for item in skills if str(item.get("name") or "") not in ORIGINAL_39_SKILL_DESCRIPTIONS]
+        non_orig_names = {str(item.get("name") or "") for item in non_orig}
+
+        for name in sorted(non_orig_names):
+            if name not in V010_BROWSER_UI_ADMITTED_CANDIDATES:
+                failures.append(
+                    f"candidate {name!r} is not authorized for admission under {policy_version} discovery policy"
+                )
+
+        for req_name in sorted(V010_BROWSER_UI_ADMITTED_CANDIDATES):
+            if req_name not in non_orig_names:
+                failures.append(f"missing required candidate skill {req_name!r}")
+                continue
+            item = by_id[req_name]
+            desc = str(item.get("description") or "")
+            cand_bytes = len(desc.encode("utf-8"))
+            if cand_bytes <= 0 or cand_bytes > V010_MAX_RESERVATION_DESCRIPTION_BYTES:
+                failures.append(
+                    f"candidate {req_name!r} description bytes {cand_bytes} exceeds reservation ceiling of {V010_MAX_RESERVATION_DESCRIPTION_BYTES}"
+                )
+            if req_name == "svg-language-profile":
+                if desc != FROZEN_SVG_SKILL_DESCRIPTION:
+                    failures.append(
+                        "candidate 'svg-language-profile' description mutated (reservation theft)"
+                    )
+                body_val = item.get("blob_bytes")
+                if body_val is None:
+                    body_val = item.get("body_bytes")
+                if body_val is None:
+                    body_val = item.get("source_blob_bytes")
+                if body_val is None:
+                    failures.append("candidate 'svg-language-profile' missing required body bytes measurement")
+                else:
+                    try:
+                        b_int = int(body_val)
+                        if b_int <= 0:
+                            failures.append(f"candidate 'svg-language-profile' body bytes {b_int} must be positive")
+                        elif b_int > V010_MAX_SVG_FILE_BYTES:
+                            failures.append(
+                                f"candidate 'svg-language-profile' body bytes {b_int} exceeds SVG file limit of {V010_MAX_SVG_FILE_BYTES}"
+                            )
+                    except (ValueError, TypeError):
+                        failures.append(f"candidate 'svg-language-profile' malformed body bytes {body_val!r}")
+            else:
+                body_val = item.get("blob_bytes")
+                if body_val is None:
+                    body_val = item.get("body_bytes")
+                if body_val is None:
+                    body_val = item.get("source_blob_bytes")
+                if body_val is None:
+                    failures.append(f"candidate {req_name!r} missing required body bytes measurement")
+
+        if total_bytes > V010_BROWSER_UI_ADMISSION_CEILING:
+            failures.append(
+                f"total description bytes {total_bytes} exceeds current browser UI admission ceiling of {V010_BROWSER_UI_ADMISSION_CEILING}"
+            )
+        if total_bytes > V010_OVERALL_FUTURE_CEILING:
+            failures.append(
+                f"total description bytes {total_bytes} exceeds overall future ceiling of {V010_OVERALL_FUTURE_CEILING}"
+            )
+
+        return failures
+
+    if policy_version == DISCOVERY_POLICY_VERSION_V010_TOOLCHAIN:
+        non_orig = [item for item in skills if str(item.get("name") or "") not in ORIGINAL_39_SKILL_DESCRIPTIONS]
+        non_orig_names = {str(item.get("name") or "") for item in non_orig}
+
+        for name in sorted(non_orig_names):
+            if name not in V010_TOOLCHAIN_ADMITTED_CANDIDATES:
+                failures.append(
+                    f"candidate {name!r} is not authorized for admission under {policy_version} discovery policy"
+                )
+
+        for req_name in sorted(V010_TOOLCHAIN_ADMITTED_CANDIDATES):
+            if req_name not in non_orig_names:
+                failures.append(f"missing required candidate skill {req_name!r}")
+                continue
+            item = by_id[req_name]
+            desc = str(item.get("description") or "")
+            cand_bytes = len(desc.encode("utf-8"))
+            if cand_bytes <= 0 or cand_bytes > V010_MAX_RESERVATION_DESCRIPTION_BYTES:
+                failures.append(
+                    f"candidate {req_name!r} description bytes {cand_bytes} exceeds reservation ceiling of {V010_MAX_RESERVATION_DESCRIPTION_BYTES}"
+                )
+            if req_name == "svg-language-profile":
+                if desc != FROZEN_SVG_SKILL_DESCRIPTION:
+                    failures.append(
+                        "candidate 'svg-language-profile' description mutated (reservation theft)"
+                    )
+                body_val = item.get("blob_bytes")
+                if body_val is None:
+                    body_val = item.get("body_bytes")
+                if body_val is None:
+                    body_val = item.get("source_blob_bytes")
+                if body_val is None:
+                    failures.append("candidate 'svg-language-profile' missing required body bytes measurement")
+                else:
+                    try:
+                        b_int = int(body_val)
+                        if b_int <= 0:
+                            failures.append(f"candidate 'svg-language-profile' body bytes {b_int} must be positive")
+                        elif b_int > V010_MAX_SVG_FILE_BYTES:
+                            failures.append(
+                                f"candidate 'svg-language-profile' body bytes {b_int} exceeds SVG file limit of {V010_MAX_SVG_FILE_BYTES}"
+                            )
+                    except (ValueError, TypeError):
+                        failures.append(f"candidate 'svg-language-profile' malformed body bytes {body_val!r}")
+            elif req_name == "playwright-test-profile":
+                if desc != FROZEN_PLAYWRIGHT_SKILL_DESCRIPTION:
+                    failures.append(
+                        "candidate 'playwright-test-profile' description mutated (reservation theft)"
+                    )
+                body_val = item.get("blob_bytes")
+                if body_val is None:
+                    body_val = item.get("body_bytes")
+                if body_val is None:
+                    body_val = item.get("source_blob_bytes")
+                if body_val is None:
+                    failures.append(f"candidate {req_name!r} missing required body bytes measurement")
+            elif req_name == "web-accessibility-profile":
+                if desc != FROZEN_WEB_ACCESSIBILITY_SKILL_DESCRIPTION:
+                    failures.append(
+                        "candidate 'web-accessibility-profile' description mutated (reservation theft)"
+                    )
+                body_val = item.get("blob_bytes")
+                if body_val is None:
+                    body_val = item.get("body_bytes")
+                if body_val is None:
+                    body_val = item.get("source_blob_bytes")
+                if body_val is None:
+                    failures.append(f"candidate {req_name!r} missing required body bytes measurement")
+            else:
+                body_val = item.get("blob_bytes")
+                if body_val is None:
+                    body_val = item.get("body_bytes")
+                if body_val is None:
+                    body_val = item.get("source_blob_bytes")
+                if body_val is None:
+                    failures.append(f"candidate {req_name!r} missing required body bytes measurement")
+
+        if total_bytes > V010_TOOLCHAIN_ADMISSION_CEILING:
+            failures.append(
+                f"total description bytes {total_bytes} exceeds current toolchain admission ceiling of {V010_TOOLCHAIN_ADMISSION_CEILING}"
+            )
+        if total_bytes > V010_OVERALL_FUTURE_CEILING:
+            failures.append(
+                f"total description bytes {total_bytes} exceeds overall future ceiling of {V010_OVERALL_FUTURE_CEILING}"
+            )
+
+        return failures
+
+    # policy_version == DISCOVERY_POLICY_VERSION_V010_BROWSER_RUNTIME (45)
+    non_orig = [item for item in skills if str(item.get("name") or "") not in ORIGINAL_39_SKILL_DESCRIPTIONS]
+    non_orig_names = {str(item.get("name") or "") for item in non_orig}
+
+    for name in sorted(non_orig_names):
+        if name not in V010_BROWSER_RUNTIME_ADMITTED_CANDIDATES:
+            failures.append(
+                f"candidate {name!r} is not authorized for admission under {policy_version} discovery policy"
+            )
+
+    for req_name in sorted(V010_BROWSER_RUNTIME_ADMITTED_CANDIDATES):
+        if req_name not in non_orig_names:
+            failures.append(f"missing required candidate skill {req_name!r}")
+            continue
+        item = by_id[req_name]
+        desc = str(item.get("description") or "")
+        cand_bytes = len(desc.encode("utf-8"))
+        if cand_bytes <= 0 or cand_bytes > V010_MAX_RESERVATION_DESCRIPTION_BYTES:
+            failures.append(
+                f"candidate {req_name!r} description bytes {cand_bytes} exceeds reservation ceiling of {V010_MAX_RESERVATION_DESCRIPTION_BYTES}"
+            )
+        if req_name == "svg-language-profile":
+            if desc != FROZEN_SVG_SKILL_DESCRIPTION:
+                failures.append(
+                    "candidate 'svg-language-profile' description mutated (reservation theft)"
+                )
+            body_val = item.get("blob_bytes")
+            if body_val is None:
+                body_val = item.get("body_bytes")
+            if body_val is None:
+                body_val = item.get("source_blob_bytes")
+            if body_val is None:
+                failures.append("candidate 'svg-language-profile' missing required body bytes measurement")
+            else:
+                try:
+                    b_int = int(body_val)
+                    if b_int <= 0:
+                        failures.append(f"candidate 'svg-language-profile' body bytes {b_int} must be positive")
+                    elif b_int > V010_MAX_SVG_FILE_BYTES:
+                        failures.append(
+                            f"candidate 'svg-language-profile' body bytes {b_int} exceeds SVG file limit of {V010_MAX_SVG_FILE_BYTES}"
+                        )
+                except (ValueError, TypeError):
+                    failures.append(f"candidate 'svg-language-profile' malformed body bytes {body_val!r}")
+        elif req_name == "playwright-test-profile":
+            if desc != FROZEN_PLAYWRIGHT_SKILL_DESCRIPTION:
+                failures.append(
+                    "candidate 'playwright-test-profile' description mutated (reservation theft)"
+                )
+            body_val = item.get("blob_bytes")
+            if body_val is None:
+                body_val = item.get("body_bytes")
+            if body_val is None:
+                body_val = item.get("source_blob_bytes")
+            if body_val is None:
+                failures.append(f"candidate {req_name!r} missing required body bytes measurement")
+        elif req_name == "web-accessibility-profile":
+            if desc != FROZEN_WEB_ACCESSIBILITY_SKILL_DESCRIPTION:
+                failures.append(
+                    "candidate 'web-accessibility-profile' description mutated (reservation theft)"
+                )
+            body_val = item.get("blob_bytes")
+            if body_val is None:
+                body_val = item.get("body_bytes")
+            if body_val is None:
+                body_val = item.get("source_blob_bytes")
+            if body_val is None:
+                failures.append(f"candidate {req_name!r} missing required body bytes measurement")
+        elif req_name == "vite-build-profile":
+            if desc != FROZEN_VITE_SKILL_DESCRIPTION:
+                failures.append(
+                    "candidate 'vite-build-profile' description mutated (reservation theft)"
+                )
+            body_val = item.get("blob_bytes")
+            if body_val is None:
+                body_val = item.get("body_bytes")
+            if body_val is None:
+                body_val = item.get("source_blob_bytes")
+            if body_val is None:
+                failures.append(f"candidate {req_name!r} missing required body bytes measurement")
+        elif req_name == "npm-package-manager-profile":
+            if desc != FROZEN_NPM_SKILL_DESCRIPTION:
+                failures.append(
+                    "candidate 'npm-package-manager-profile' description mutated (reservation theft)"
+                )
+            body_val = item.get("blob_bytes")
+            if body_val is None:
+                body_val = item.get("body_bytes")
+            if body_val is None:
+                body_val = item.get("source_blob_bytes")
+            if body_val is None:
+                failures.append(f"candidate {req_name!r} missing required body bytes measurement")
+        else:
+            body_val = item.get("blob_bytes")
+            if body_val is None:
+                body_val = item.get("body_bytes")
+            if body_val is None:
+                body_val = item.get("source_blob_bytes")
+            if body_val is None:
+                failures.append(f"candidate {req_name!r} missing required body bytes measurement")
+
+    if total_bytes > V010_BROWSER_RUNTIME_ADMISSION_CEILING:
+        failures.append(
+            f"total description bytes {total_bytes} exceeds current browser runtime admission ceiling of {V010_BROWSER_RUNTIME_ADMISSION_CEILING}"
+        )
+    if total_bytes > V010_OVERALL_FUTURE_CEILING:
+        failures.append(
+            f"total description bytes {total_bytes} exceeds overall future ceiling of {V010_OVERALL_FUTURE_CEILING}"
+        )
+
+    return failures
+
+
+DISCOVERY_POLICY_SELECTOR = Path("testing/apg-discovery-policy.json")
+
+
+def _resolve_discovery_policy(
+    root: Path, explicit_policy: str | None = None
+) -> tuple[str | None, str | None]:
+    """Select the one current policy; historical/synthetic roots have no selector.
+
+    The current Go policy owner requires its selector. An explicit selection
+    cannot override a malformed, missing-required or conflicting selector.
+    """
+    candidate = root / DISCOVERY_POLICY_SELECTOR
+    required = (root / "skills/discovery_policy.go").exists()
+    selected = None
+    if candidate.exists() or candidate.is_symlink():
+        if not _ordinary_file(candidate):
+            return None, "policy selector must be a direct regular file"
+        try:
+            pairs = json.loads(candidate.read_text(encoding="utf-8"), object_pairs_hook=list)
+            if not isinstance(pairs, list) or any(not isinstance(p, tuple) or len(p) != 2 for p in pairs):
+                return None, "policy selector must be an object"
+            data = dict(pairs)
+            if len(data) != len(pairs) or set(data) != {"schema_version", "policy"}:
+                return None, "policy selector has duplicate, missing or unknown fields"
+            if type(data["schema_version"]) is not int or data["schema_version"] != 1:
+                return None, "unknown policy selector schema"
+            selected = data["policy"]
+            if not isinstance(selected, str) or not selected:
+                return None, "policy selector requires a policy string"
+        except (OSError, ValueError, TypeError):
+            return None, "unreadable or malformed policy selector"
+    elif required:
+        return None, "current discovery policy selector is missing"
+    if explicit_policy is not None:
+        if not isinstance(explicit_policy, str) or not explicit_policy.strip():
+            return None, "empty explicit discovery policy"
+        if selected is not None and selected != explicit_policy:
+            return None, "explicit policy conflicts with selector"
+        selected = explicit_policy
+    return selected, None
+
+
 SKILL_NAME = re.compile(r"[a-z0-9]+(?:-[a-z0-9]+)*\Z")
 TOP_LEVEL_KEY = re.compile(r"(?P<key>[A-Za-z0-9_-]+):")
 OPENING_FENCE = re.compile(r"^ {0,3}(`{3,}|~{3,})")
@@ -467,6 +1296,7 @@ def _check_frontmatter_and_body(
     text: str,
     diagnostics: list[Diagnostic],
     declared: list[tuple[str, str]],
+    policy: str | None = DISCOVERY_POLICY_VERSION,
 ) -> str:
     parsed = parse_frontmatter(data)
     if not parsed.starts_at_byte_one:
@@ -581,6 +1411,100 @@ def _check_frontmatter_and_body(
                 "sharpen the v0.6 trigger and non-trigger boundary within the frozen byte band",
                 parsed.line_for("description"),
             )
+        if policy in (
+            DISCOVERY_POLICY_VERSION_V010,
+            DISCOVERY_POLICY_VERSION_V010_BROWSER_UI,
+            DISCOVERY_POLICY_VERSION_V010_TOOLCHAIN,
+            DISCOVERY_POLICY_VERSION_V010_BROWSER_RUNTIME,
+        ):
+            if leaf.name in V010_ELIGIBLE_CANDIDATES and description_bytes > V010_MAX_RESERVATION_DESCRIPTION_BYTES:
+                _diagnostic(
+                    diagnostics,
+                    "APG042",
+                    relative,
+                    "v0-10-description-reservation",
+                    f"v0.10 candidate description is {description_bytes} UTF-8 bytes; exceeds reservation ceiling of {V010_MAX_RESERVATION_DESCRIPTION_BYTES}",
+                    "shorten the description to within the 330 UTF-8 byte reservation limit",
+                    parsed.line_for("description"),
+                )
+            if leaf.name == "svg-language-profile" and len(data) > V010_MAX_SVG_FILE_BYTES:
+                _diagnostic(
+                    diagnostics,
+                    "APG043",
+                    relative,
+                    "svg-file-size-limit",
+                    f"SVG file is {len(data)} bytes; exceeds maximum permitted size of {V010_MAX_SVG_FILE_BYTES} bytes",
+                    "reduce the SVG file size to at most 20480 bytes",
+                )
+            if leaf.name in ORIGINAL_39_SKILL_DESCRIPTIONS and description != ORIGINAL_39_SKILL_DESCRIPTIONS[leaf.name]:
+                _diagnostic(
+                    diagnostics,
+                    "APG044",
+                    relative,
+                    "original-39-description-freeze",
+                    f"description for original skill {leaf.name!r} differs from frozen original description (reservation theft)",
+                    "restore the exact frozen description for the original skill",
+                    parsed.line_for("description"),
+                )
+            if policy in (
+                DISCOVERY_POLICY_VERSION_V010_BROWSER_UI,
+                DISCOVERY_POLICY_VERSION_V010_TOOLCHAIN,
+                DISCOVERY_POLICY_VERSION_V010_BROWSER_RUNTIME,
+            ) and leaf.name == "svg-language-profile" and description != FROZEN_SVG_SKILL_DESCRIPTION:
+                _diagnostic(
+                    diagnostics,
+                    "APG044",
+                    relative,
+                    "original-39-description-freeze",
+                    f"description for SVG candidate {leaf.name!r} differs from frozen description (reservation theft)",
+                    "restore the exact frozen description for the SVG candidate",
+                    parsed.line_for("description"),
+                )
+            if policy in (
+                DISCOVERY_POLICY_VERSION_V010_TOOLCHAIN,
+                DISCOVERY_POLICY_VERSION_V010_BROWSER_RUNTIME,
+            ):
+                if leaf.name == "playwright-test-profile" and description != FROZEN_PLAYWRIGHT_SKILL_DESCRIPTION:
+                    _diagnostic(
+                        diagnostics,
+                        "APG044",
+                        relative,
+                        "original-39-description-freeze",
+                        f"description for Playwright candidate {leaf.name!r} differs from frozen description (reservation theft)",
+                        "restore the exact frozen description for the Playwright candidate",
+                        parsed.line_for("description"),
+                    )
+                elif leaf.name == "web-accessibility-profile" and description != FROZEN_WEB_ACCESSIBILITY_SKILL_DESCRIPTION:
+                    _diagnostic(
+                        diagnostics,
+                        "APG044",
+                        relative,
+                        "original-39-description-freeze",
+                        f"description for Web Accessibility candidate {leaf.name!r} differs from frozen description (reservation theft)",
+                        "restore the exact frozen description for the Web Accessibility candidate",
+                        parsed.line_for("description"),
+                    )
+            if policy == DISCOVERY_POLICY_VERSION_V010_BROWSER_RUNTIME:
+                if leaf.name == "vite-build-profile" and description != FROZEN_VITE_SKILL_DESCRIPTION:
+                    _diagnostic(
+                        diagnostics,
+                        "APG044",
+                        relative,
+                        "original-39-description-freeze",
+                        f"description for Vite candidate {leaf.name!r} differs from frozen description (reservation theft)",
+                        "restore the exact frozen description for the Vite candidate",
+                        parsed.line_for("description"),
+                    )
+                elif leaf.name == "npm-package-manager-profile" and description != FROZEN_NPM_SKILL_DESCRIPTION:
+                    _diagnostic(
+                        diagnostics,
+                        "APG044",
+                        relative,
+                        "original-39-description-freeze",
+                        f"description for NPM candidate {leaf.name!r} differs from frozen description (reservation theft)",
+                        "restore the exact frozen description for the NPM candidate",
+                        parsed.line_for("description"),
+                    )
 
     body = markdown_body(text, parsed)
     lines = visible_lines(body)
@@ -672,6 +1596,7 @@ def _check_leaf(
     leaf: Path,
     diagnostics: list[Diagnostic],
     declared: list[tuple[str, str]],
+    policy: str | None = None,
 ) -> None:
     leaf_relative = _relative(leaf, root)
     skill_file = leaf / "SKILL.md"
@@ -691,7 +1616,7 @@ def _check_leaf(
     if loaded is not None:
         data, text = loaded
         body = _check_frontmatter_and_body(
-            leaf, skill_file, skill_relative, data, text, diagnostics, declared
+            leaf, skill_file, skill_relative, data, text, diagnostics, declared, policy=policy
         )
         _check_local_links(leaf, skill_file, body, root, diagnostics)
 
@@ -1012,7 +1937,7 @@ def _check_projection(
     return len(entries)
 
 
-def check_library(root: Path) -> CheckResult:
+def check_library(root: Path, policy: str | None = None) -> CheckResult:
     """Validate root without mutation and return all deterministic diagnostics."""
 
     diagnostics: list[Diagnostic] = []
@@ -1042,10 +1967,21 @@ def check_library(root: Path) -> CheckResult:
             if leaf_name_counts[leaf.name] == 1
         }
 
+    resolved_policy, policy_error = _resolve_discovery_policy(root, policy)
+    if policy_error is not None:
+        _diagnostic(
+            diagnostics,
+            "APG048",
+            "policy",
+            "discovery-policy-resolution",
+            f"discovery policy resolution failed: {policy_error}",
+            "supply a valid discovery capacity policy or correct selector",
+        )
+
     declared: list[tuple[str, str]] = []
     for leaf in sorted(canonical_leaves, key=lambda item: item.as_posix()):
         if not leaf.is_symlink():
-            _check_leaf(root, leaf, diagnostics, declared)
+            _check_leaf(root, leaf, diagnostics, declared, policy=resolved_policy)
     for name, count in sorted(Counter(value for value, _ in declared).items()):
         if count > 1:
             for declared_name, relative in declared:
@@ -1059,7 +1995,117 @@ def check_library(root: Path) -> CheckResult:
                         "give every canonical leaf one unique matching name",
                     )
 
-    if V06_PROFILE_NAMES.intersection(canonical):
+    if resolved_policy is not None and policy_error is None:
+        skills_for_policy: list[dict[str, object]] = []
+        for leaf in sorted(canonical_leaves, key=lambda item: item.as_posix()):
+            skill_file = leaf / "SKILL.md"
+            if leaf.is_symlink() or not _ordinary_file(skill_file):
+                continue
+            try:
+                b_data = skill_file.read_bytes()
+                p_res = parse_frontmatter(b_data)
+                names = p_res.values("name")
+                descs = p_res.values("description")
+                s_name = names[0] if names else leaf.name
+                s_desc = descs[0] if descs else ""
+                skills_for_policy.append(
+                    {
+                        "name": s_name,
+                        "description": s_desc,
+                        "bytes": len(s_desc.encode("utf-8")),
+                        "characters": len(s_desc),
+                        "blob_bytes": len(b_data),
+                    }
+                )
+            except OSError:
+                continue
+
+        policy_failures = validate_discovery_policy(resolved_policy, skills_for_policy)
+        if resolved_policy == DISCOVERY_POLICY_VERSION_V010 and len(skills_for_policy) != V010_ADMITTED_SKILL_COUNT:
+            policy_failures.append("current policy requires exactly 40 admitted leaves including SVG")
+        elif resolved_policy == DISCOVERY_POLICY_VERSION_V010_BROWSER_UI and len(skills_for_policy) != V010_BROWSER_UI_ADMITTED_SKILL_COUNT:
+            policy_failures.append("current policy requires exactly 42 admitted leaves including browser UI profiles")
+        elif resolved_policy == DISCOVERY_POLICY_VERSION_V010_TOOLCHAIN and len(skills_for_policy) != V010_TOOLCHAIN_ADMITTED_SKILL_COUNT:
+            policy_failures.append("current policy requires exactly 44 admitted leaves including toolchain profiles")
+        elif resolved_policy == DISCOVERY_POLICY_VERSION_V010_BROWSER_RUNTIME and len(skills_for_policy) != V010_BROWSER_RUNTIME_ADMITTED_SKILL_COUNT:
+            policy_failures.append("current policy requires exactly 45 admitted leaves including browser runtime profile")
+        for failure in policy_failures:
+            if "unknown discovery policy" in failure:
+                _diagnostic(
+                    diagnostics,
+                    "APG048",
+                    "policy",
+                    "unknown-discovery-policy",
+                    failure,
+                    "use an authorized discovery capacity policy version",
+                )
+            elif "exceeds reservation ceiling" in failure:
+                cand_match = re.search(r"candidate '([^']+)'", failure)
+                target_loc = f"skills/{cand_match.group(1)}" if cand_match else "skills"
+                _diagnostic(
+                    diagnostics,
+                    "APG042",
+                    target_loc,
+                    "v0-10-description-reservation",
+                    failure,
+                    "shorten description to within reservation ceiling",
+                )
+            elif "exceeds SVG file limit" in failure or "body bytes" in failure:
+                _diagnostic(
+                    diagnostics,
+                    "APG043",
+                    f"skills/{V010_CURRENT_ADMITTED_CANDIDATE}",
+                    "svg-file-size-limit",
+                    failure,
+                    "reduce SVG file size to within limit",
+                )
+            elif "reservation theft" in failure or "mutated" in failure or "differs" in failure:
+                _diagnostic(
+                    diagnostics,
+                    "APG044",
+                    "skills",
+                    "original-39-description-freeze",
+                    failure,
+                    "restore exact frozen description",
+                )
+            elif "expected" in failure and "leaves" in failure:
+                _diagnostic(
+                    diagnostics,
+                    "APG045",
+                    "skills",
+                    "v0-10-capacity-count",
+                    failure,
+                    "restore expected canonical skill count",
+                )
+            elif "not authorized for admission" in failure or "unauthorized" in failure or "missing required candidate" in failure:
+                _diagnostic(
+                    diagnostics,
+                    "APG046",
+                    "skills",
+                    "v0-10-unauthorized-admission",
+                    failure,
+                    "remove unauthorized candidate or restore required candidate",
+                )
+            elif "missing original 39" in failure:
+                _diagnostic(
+                    diagnostics,
+                    "APG047",
+                    "skills",
+                    "original-39-preservation",
+                    failure,
+                    "restore all original 39 skills",
+                )
+            else:
+                _diagnostic(
+                    diagnostics,
+                    "APG048",
+                    "skills",
+                    "v0-10-discovery-policy",
+                    failure,
+                    "satisfy discovery capacity policy constraints",
+                )
+
+    if V06_PROFILE_NAMES.intersection(canonical) or V010_ELIGIBLE_CANDIDATES.intersection(canonical):
         blobs: dict[str, bytes] = {}
         for leaf in sorted(canonical_leaves, key=lambda item: item.as_posix()):
             skill_file = leaf / "SKILL.md"
@@ -1071,11 +2117,21 @@ def check_library(root: Path) -> CheckResult:
                 continue
         context_report = context_footprint_report(blobs=blobs)
         aggregate_failures: list[str] = []
+        if resolved_policy == DISCOVERY_POLICY_VERSION_V010_BROWSER_RUNTIME:
+            ceiling = V010_BROWSER_RUNTIME_ADMISSION_CEILING
+        elif resolved_policy == DISCOVERY_POLICY_VERSION_V010_TOOLCHAIN:
+            ceiling = V010_TOOLCHAIN_ADMISSION_CEILING
+        elif resolved_policy == DISCOVERY_POLICY_VERSION_V010_BROWSER_UI:
+            ceiling = V010_BROWSER_UI_ADMISSION_CEILING
+        elif resolved_policy == DISCOVERY_POLICY_VERSION_V010 or V010_CURRENT_ADMITTED_CANDIDATE in canonical:
+            ceiling = V010_CURRENT_SVG_ADMISSION_CEILING
+        else:
+            ceiling = V06_TOTAL_DESCRIPTION_BYTES_MAXIMUM
         if (
             context_report["total_description_bytes"]
-            > V06_TOTAL_DESCRIPTION_BYTES_MAXIMUM
+            > ceiling
         ):
-            aggregate_failures.append("total description bytes exceed 9527")
+            aggregate_failures.append(f"total description bytes exceed {ceiling}")
         if (
             context_report["discoverable_skill_count"]
             != context_report["skill_count"]
@@ -1090,13 +2146,14 @@ def check_library(root: Path) -> CheckResult:
                 "skills",
                 "v0-6-context-budget",
                 "; ".join(aggregate_failures),
-                "restore complete discoverable metadata and keep the canonical context report within the frozen v0.6 ceiling",
+                "restore complete discoverable metadata and keep the canonical context report within the frozen capacity ceiling",
             )
 
     rows = _check_catalog(
         root, skills / "README.md", canonical, diagnostics
     )
     projections = _check_projection(root, canonical, diagnostics)
+
     apg_skill_topology.check_router_maps(
         root,
         canonical,
@@ -1230,6 +2287,12 @@ def build_parser() -> argparse.ArgumentParser:
         default="text",
         help="deterministic output format (default: text)",
     )
+    parser.add_argument(
+        "--policy",
+        type=str,
+        default=None,
+        help="explicit discovery capacity policy version (fail-closed if unknown)",
+    )
     return parser
 
 
@@ -1240,7 +2303,7 @@ def main(arguments: Sequence[str] | None = None) -> int:
     options = parser.parse_args(arguments)
     default_root = Path(__file__).resolve(strict=True).parent.parent
     root = options.root if options.root is not None else default_root
-    result = check_library(root)
+    result = check_library(root, policy=options.policy)
     if result.passed:
         failure = _embedded_corpus_failure(Path(root))
         if failure is not None:

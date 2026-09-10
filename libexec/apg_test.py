@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 from contextlib import contextmanager
+from copy import deepcopy
 from dataclasses import dataclass
 import hashlib
 from importlib import metadata
@@ -863,6 +864,80 @@ def node_profile_invocation(root: Path, contract_id: str):
             _raise_node_profile_cleanup(safe_contract_id, cleanup_error)
 
 
+def _probe_node_profile_runtime_identity(
+    executable: Path,
+    role: str,
+    expected_identity: str,
+    *,
+    environment: dict[str, str],
+    timeout: int = 10,
+) -> tuple[str | None, str | None]:
+    """Execute the Node-profile runtime probe consuming process exceptions and raw streams."""
+    identity_expression = (
+        "JSON.stringify({identity:process.version+'|'+process.platform+'/'+process.arch+'|'"
+        "+process.versions.v8+'|'+process.versions.uv,execArgv:process.execArgv.slice(0,-2),"
+        "nodeOptions:Object.hasOwn(process.env,'NODE_OPTIONS')})"
+    )
+    try:
+        try:
+            completed = _run_javascript_process(
+                [os.fspath(executable), "-p", identity_expression],
+                cwd=None,
+                timeout=timeout,
+                environment=environment,
+            )
+        except (OSError, subprocess.TimeoutExpired, UnicodeError) as error:
+            error_name = (
+                "TimeoutExpired"
+                if isinstance(error, subprocess.TimeoutExpired)
+                else "UnicodeError"
+                if isinstance(error, UnicodeError)
+                else "OSError"
+            )
+            error = None
+            return None, f"Node-profile {role} prerequisite could not be executed: {error_name}"
+
+        return_code = completed.returncode
+        stderr = completed.stderr
+        raw_stdout = completed.stdout
+        completed = None
+
+        if return_code != 0 or stderr != "":
+            raw_stdout = ""
+            stderr = ""
+            return None, f"Node-profile {role} prerequisite changed or has the wrong identity"
+
+        try:
+            public_probe = json.loads(raw_stdout)
+        except (ToolError, TypeError, ValueError, json.JSONDecodeError, RecursionError):
+            public_probe = None
+        raw_stdout = ""
+        stderr = ""
+
+        if not isinstance(public_probe, dict):
+            public_probe = None
+            return None, f"Node-profile {role} prerequisite changed or has the wrong identity"
+
+        public_identity = public_probe.get("identity")
+        exec_argv = public_probe.get("execArgv")
+        node_options = public_probe.get("nodeOptions")
+        public_probe = None
+
+        if (
+            public_identity != expected_identity
+            or exec_argv != []
+            or node_options is not False
+        ):
+            public_identity = None
+            exec_argv = None
+            node_options = None
+            return None, f"Node-profile {role} prerequisite changed or has the wrong identity"
+
+        return public_identity, None
+    except KeyboardInterrupt:
+        return None, "interrupted"
+
+
 def _observe_node_profile_runtime_binding(
     root: Path, role: str
 ) -> NodeProfileRuntimeBinding:
@@ -904,20 +979,19 @@ def _observe_node_profile_runtime_binding(
     if digest != expected_sha256:
         fail(f"Node-profile {role} executable digest mismatch")
     identity_environment = {"NO_COLOR": "1"}
-    identity_expression = (
-        "JSON.stringify({identity:process.version+'|'+process.platform+'/'+process.arch+'|'"
-        "+process.versions.v8+'|'+process.versions.uv,execArgv:process.execArgv.slice(0,-2),"
-        "nodeOptions:Object.hasOwn(process.env,'NODE_OPTIONS')})"
+    public_identity, probe_error = _probe_node_profile_runtime_identity(
+        resolved,
+        role,
+        expected_identity,
+        environment=identity_environment,
+        timeout=10,
     )
-    try:
-        completed = _run_javascript_process(
-            [os.fspath(resolved), "-p", identity_expression],
-            cwd=None,
-            timeout=10,
-            environment=identity_environment,
-        )
-    except (OSError, subprocess.TimeoutExpired) as error:
-        fail(f"Node-profile {role} prerequisite could not be executed: {type(error).__name__}")
+    if probe_error == "interrupted":
+        raise KeyboardInterrupt()
+    if probe_error is not None and probe_error.startswith(
+        f"Node-profile {role} prerequisite could not be executed:"
+    ):
+        fail(probe_error)
     try:
         after = executable.lstat()
         after_resolved = executable.resolve(strict=True)
@@ -929,24 +1003,17 @@ def _observe_node_profile_runtime_binding(
         after.st_dev, after.st_ino, after.st_mode, after.st_uid,
         after.st_gid, after.st_size, after.st_mtime_ns,
     )
-    try:
-        public_probe = json.loads(completed.stdout)
-    except (TypeError, ValueError, json.JSONDecodeError):
-        public_probe = None
-    public_identity = public_probe.get("identity") if isinstance(public_probe, dict) else None
     if (
         after_identity != identity
         or after_resolved != resolved
         or after_digest != digest
-        or completed.returncode != 0
-        or completed.stderr != ""
+        or probe_error is not None
         or public_identity != expected_identity
-        or not isinstance(public_probe, dict)
-        or public_probe.get("execArgv") != []
-        or public_probe.get("nodeOptions") is not False
         or identity_environment != {"NO_COLOR": "1"}
         or os.environ.get(environment_name) != raw
     ):
+        public_identity = None
+        probe_error = None
         fail(f"Node-profile {role} prerequisite changed or has the wrong identity")
     return NodeProfileRuntimeBinding(role, resolved, identity, digest, expected_identity)
 
@@ -957,26 +1024,34 @@ def _node_profile_runtime_binding(root: Path, role: str) -> NodeProfileRuntimeBi
         root = None
         role = ""
         _raise_node_profile_qualification("runtime role is unknown", "runtime-binding")
+    error_kind: str | None = None
     try:
         return _observe_node_profile_runtime_binding(root, role)
     except ToolError as error:
-        safe_kind = str(error)
+        error_kind = str(error)
         root = None
         role = ""
         error = None
+    if error_kind is not None:
+        safe_kind = error_kind
+        error_kind = None
         _raise_node_profile_qualification(safe_kind, "runtime-binding")
 
 
 def validate_node_profile_runtimes(root: Path) -> tuple[str, str]:
     """Validate both exact maintained Node-profile runtime roles."""
+    error_kind: str | None = None
     try:
         bindings = tuple(
             _node_profile_runtime_binding(root, role) for role in ("primary", "secondary")
         )
     except ToolError as error:
-        safe_kind = str(error)
+        error_kind = str(error)
         root = None
         error = None
+    if error_kind is not None:
+        safe_kind = error_kind
+        error_kind = None
         _raise_node_profile_qualification(safe_kind, "runtime-roles")
     if bindings[0].path == bindings[1].path or bindings[0].executable_sha256 == bindings[1].executable_sha256:
         bindings = ()
@@ -1182,32 +1257,63 @@ def _javascript_error(kind: str, output_contract_id: str) -> NoReturn:
     )
 
 
-def _require_exact_json(
+def _check_exact_json(
     actual: object,
     expected: object,
     context: str,
-    output_contract_id: str,
-) -> None:
+) -> str | None:
     if type(actual) is not type(expected):
-        _javascript_error(f"result type mismatch at {context}", output_contract_id)
+        return f"result type mismatch at {context}"
     if isinstance(expected, dict):
         if set(actual) != set(expected):
-            _javascript_error(f"result fields mismatch at {context}", output_contract_id)
+            return f"result fields mismatch at {context}"
         for key, value in expected.items():
-            _require_exact_json(
-                actual[key], value, f"{context}.{key}", output_contract_id
-            )
-        return
+            mismatch = _check_exact_json(actual[key], value, f"{context}.{key}")
+            if mismatch is not None:
+                return mismatch
+        return None
     if isinstance(expected, list):
         if len(actual) != len(expected):
-            _javascript_error(f"result length mismatch at {context}", output_contract_id)
+            return f"result length mismatch at {context}"
         for index, value in enumerate(expected):
-            _require_exact_json(
-                actual[index], value, f"{context}[{index}]", output_contract_id
-            )
-        return
+            mismatch = _check_exact_json(actual[index], value, f"{context}[{index}]")
+            if mismatch is not None:
+                return mismatch
+        return None
     if actual != expected:
-        _javascript_error(f"result value mismatch at {context}", output_contract_id)
+        return f"result value mismatch at {context}"
+    return None
+
+
+def _consume_javascript_stream_output(
+    output_contract_id: str,
+    return_code: int,
+    stdout: str,
+    stderr: str,
+) -> tuple[object, str | None]:
+    """Parse and validate streams within a narrow frame without retaining raw data."""
+    contract = JAVASCRIPT_OUTPUT_CONTRACTS.get(output_contract_id)
+    if contract is None:
+        return None, "selected an unknown contract"
+    if return_code != contract.expected_return_code:
+        return None, "returned an unexpected status"
+    if contract.stderr_policy == "empty" and stderr != "":
+        return None, "returned unexpected stderr"
+    if contract.stdout_policy == "empty":
+        if stdout != "":
+            return None, "returned unexpected stdout"
+        return None, None
+    if contract.stdout_policy != "json-exact":
+        return None, "selected an invalid stdout policy"
+    try:
+        parsed = json.loads(stdout, object_pairs_hook=_unique_object)
+    except (ToolError, TypeError, ValueError, RecursionError):
+        return None, "returned invalid structured output"
+    mismatch = _check_exact_json(parsed, contract.expected_result, "result")
+    if mismatch is not None:
+        parsed = None
+        return None, mismatch
+    return deepcopy(contract.expected_result), None
 
 
 def _validate_javascript_output(
@@ -1217,25 +1323,105 @@ def _validate_javascript_output(
     stderr: str,
 ) -> object:
     """Validate captured streams locally and return only a closed result."""
-    contract = JAVASCRIPT_OUTPUT_CONTRACTS.get(output_contract_id)
-    if contract is None:
-        _javascript_error("selected an unknown contract", output_contract_id)
-    if return_code != contract.expected_return_code:
-        _javascript_error("returned an unexpected status", output_contract_id)
-    if contract.stderr_policy == "empty" and stderr != "":
-        _javascript_error("returned unexpected stderr", output_contract_id)
-    if contract.stdout_policy == "empty":
-        if stdout != "":
-            _javascript_error("returned unexpected stdout", output_contract_id)
-        return None
-    if contract.stdout_policy != "json-exact":
-        _javascript_error("selected an invalid stdout policy", output_contract_id)
-    try:
-        result = json.loads(stdout, object_pairs_hook=_unique_object)
-    except (TypeError, ValueError, json.JSONDecodeError):
-        _javascript_error("returned invalid structured output", output_contract_id)
-    _require_exact_json(result, contract.expected_result, "result", output_contract_id)
+    result, error_kind = _consume_javascript_stream_output(
+        output_contract_id, return_code, stdout, stderr
+    )
+    stdout = ""
+    stderr = ""
+    if error_kind is not None:
+        safe_kind = error_kind
+        safe_contract_id = output_contract_id
+        output_contract_id = ""
+        error_kind = None
+        _javascript_error(safe_kind, safe_contract_id)
     return result
+
+
+def _probe_javascript_engine_identity(
+    executable: Path,
+    environment: dict[str, str],
+    timeout: int = 10,
+) -> tuple[str | None, str | None]:
+    """Execute the identity probe in a narrow frame consuming process exceptions and raw streams."""
+    try:
+        try:
+            completed = _run_javascript_process(
+                [
+                    os.fspath(executable),
+                    "-p",
+                    "process.version+'|'+process.platform+'/'+process.arch+'|'+process.versions.v8",
+                ],
+                cwd=None,
+                timeout=timeout,
+                environment=environment,
+            )
+        except (OSError, subprocess.TimeoutExpired, UnicodeError) as error:
+            error_name = ("TimeoutExpired" if isinstance(error, subprocess.TimeoutExpired)
+                          else "UnicodeError" if isinstance(error, UnicodeError) else "OSError")
+            error = None
+            return None, f"JavaScript engine prerequisite could not be executed: {error_name}"
+
+        return_code = completed.returncode
+        stderr = completed.stderr
+        raw_identity = completed.stdout.strip()
+        completed = None
+
+        if (
+            return_code != 0
+            or stderr != ""
+            or raw_identity != EXPECTED_JAVASCRIPT_ENGINE
+        ):
+            raw_identity = ""
+            stderr = ""
+            return None, (
+                "JavaScript engine identity mismatch; expected "
+                f"{EXPECTED_JAVASCRIPT_ENGINE}"
+            )
+        return EXPECTED_JAVASCRIPT_ENGINE, None
+    except KeyboardInterrupt:
+        return None, "interrupted"
+
+
+def _execute_javascript_contract(
+    executable: Path,
+    arguments: Sequence[str],
+    *,
+    cwd: Path,
+    timeout: int,
+    environment: dict[str, str],
+    output_contract_id: str,
+) -> tuple[object, bool, bool, int, str | None]:
+    """Capture and consume raw process data returning only public-safe values or diagnostic descriptor."""
+    try:
+        contract = JAVASCRIPT_OUTPUT_CONTRACTS.get(output_contract_id)
+        if contract is None:
+            return None, False, False, 0, "selected an unknown contract"
+        try:
+            completed = _run_javascript_process(
+                [os.fspath(executable), *arguments],
+                cwd=cwd,
+                timeout=timeout,
+                environment=environment,
+            )
+        except (OSError, subprocess.TimeoutExpired, UnicodeError) as error:
+            error_name = ("TimeoutExpired" if isinstance(error, subprocess.TimeoutExpired)
+                          else "UnicodeError" if isinstance(error, UnicodeError) else "OSError")
+            error = None
+            return None, False, False, 0, f"subprocess could not be executed ({error_name})"
+
+        return_code = completed.returncode
+        stdout_empty = completed.stdout == ""
+        stderr_empty = completed.stderr == ""
+
+        result, error_kind = _consume_javascript_stream_output(
+            output_contract_id, return_code, completed.stdout, completed.stderr
+        )
+        completed = None
+        if error_kind is not None:
+            return None, stdout_empty, stderr_empty, return_code, error_kind
+        return result, stdout_empty, stderr_empty, return_code, None
+    except KeyboardInterrupt:
+        return None, False, False, 0, "interrupted"
 
 
 def _javascript_engine_binding(root: Path) -> JavascriptEngineBinding:
@@ -1293,19 +1479,13 @@ def _javascript_engine_binding(root: Path) -> JavascriptEngineBinding:
         fail_invocation(f"JavaScript engine prerequisite content could not be read: {error}")
     if executable_sha256 != EXPECTED_JAVASCRIPT_ENGINE_SHA256:
         fail_invocation("JavaScript engine executable digest mismatch")
-    try:
-        completed = _run_javascript_process(
-            [
-                str(resolved_executable),
-                "-p",
-                "process.version+'|'+process.platform+'/'+process.arch+'|'+process.versions.v8",
-            ],
-            cwd=None,
-            timeout=10,
-            environment={**os.environ, "NO_COLOR": "1"},
-        )
-    except (OSError, subprocess.TimeoutExpired) as error:
-        fail_invocation(f"JavaScript engine prerequisite could not be executed: {error}")
+    identity, probe_error = _probe_javascript_engine_identity(
+        resolved_executable,
+        environment={**os.environ, "NO_COLOR": "1"},
+        timeout=10,
+    )
+    if probe_error == "interrupted":
+        raise KeyboardInterrupt()
     try:
         after = resolved_executable.lstat()
         after_identity = (
@@ -1329,16 +1509,8 @@ def _javascript_engine_binding(root: Path) -> JavascriptEngineBinding:
         fail_invocation(f"JavaScript engine prerequisite changed during validation: {error}")
     if after_sha256 != EXPECTED_JAVASCRIPT_ENGINE_SHA256:
         fail_invocation("JavaScript engine prerequisite changed during validation")
-    identity = completed.stdout.strip()
-    if (
-        completed.returncode != 0
-        or completed.stderr != ""
-        or identity != EXPECTED_JAVASCRIPT_ENGINE
-    ):
-        fail_invocation(
-            "JavaScript engine identity mismatch; expected "
-            f"{EXPECTED_JAVASCRIPT_ENGINE}"
-        )
+    if probe_error is not None:
+        fail_invocation(probe_error)
     if os.environ.get("APG_JAVASCRIPT_NODE") != raw:
         fail_invocation("JavaScript engine environment binding changed during validation")
     return JavascriptEngineBinding(
@@ -1362,37 +1534,48 @@ def invoke_javascript_engine(
     before = _javascript_engine_binding(root)
     if os.environ.get("APG_JAVASCRIPT_NODE") != os.fspath(before.path):
         fail_invocation("JavaScript engine path changed before invocation")
-    try:
-        completed = _run_javascript_process(
-            [os.fspath(before.path), *arguments],
+    env = environment if environment is not None else {**os.environ, "NO_COLOR": "1"}
+    result, stdout_empty, stderr_empty, return_code, error_kind = (
+        _execute_javascript_contract(
+            before.path,
+            arguments,
             cwd=cwd,
             timeout=timeout,
-            environment=(
-                environment if environment is not None else {**os.environ, "NO_COLOR": "1"}
-            ),
+            environment=env,
+            output_contract_id=output_contract_id,
         )
-    except (OSError, subprocess.TimeoutExpired) as error:
-        _javascript_error(
-            f"subprocess could not be executed ({type(error).__name__})",
-            output_contract_id,
-        )
+    )
+    if error_kind == "interrupted":
+        raise KeyboardInterrupt()
     if os.environ.get("APG_JAVASCRIPT_NODE") != os.fspath(before.path):
         fail_invocation("JavaScript engine path changed after invocation")
     after = _javascript_engine_binding(root)
     if after != before:
         fail_invocation("JavaScript engine binding changed across invocation")
-    result = _validate_javascript_output(
-        output_contract_id,
-        completed.returncode,
-        completed.stdout,
-        completed.stderr,
-    )
+
+    # Drop intermediate and caller-supplied references before any possible error
+    arguments = ()
+    environment = None
+    env = None
+    cwd = None
+    root = None
+
+    if error_kind is not None:
+        safe_kind = error_kind
+        safe_contract_id = output_contract_id
+        output_contract_id = ""
+        before = None
+        after = None
+        result = None
+        error_kind = None
+        _javascript_error(safe_kind, safe_contract_id)
+
     return JavascriptObservation(
-        return_code=completed.returncode,
+        return_code=return_code,
         output_contract_id=output_contract_id,
         result=result,
-        stdout_empty=completed.stdout == "",
-        stderr_empty=completed.stderr == "",
+        stdout_empty=stdout_empty,
+        stderr_empty=stderr_empty,
         engine_public_identity=before.public_identity,
         engine_sha256=before.executable_sha256,
     )
@@ -1526,12 +1709,62 @@ def _read_manifest(path: Path, run_id: str, suite: str) -> list[dict[str, object
     return events
 
 
+def validate_test_selection(selected_files: Sequence[str], selected_root: str) -> tuple[str, ...]:
+    """Require a nonempty, unique inventory selection in the repository path form."""
+    if not isinstance(selected_files, (list, tuple)) or not selected_files:
+        fail_harness("test file selection is missing or malformed")
+    prefix = selected_root.rstrip("/") + "/"
+    for path in selected_files:
+        if (
+            not isinstance(path, str)
+            or not path.startswith(prefix)
+            or "\\" in path
+            or ":" in path
+            or "\x00" in path
+            or PurePosixPath(path).is_absolute()
+            or PurePosixPath(path).as_posix() != path
+            or ".." in PurePosixPath(path).parts
+        ):
+            fail_harness("test file selection contains a noncanonical or foreign path")
+    if len(set(selected_files)) != len(selected_files):
+        fail_harness("test file selection contains duplicate files")
+    return tuple(selected_files)
+
+
+def validate_collection(
+    node_ids: Sequence[str], selected_root: str, selected_files: Sequence[str]
+) -> tuple[str, ...]:
+    """Close one worker's node collection against its exact inventory file set."""
+    expected = set(validate_test_selection(selected_files, selected_root))
+    if (
+        not isinstance(node_ids, (list, tuple))
+        or not node_ids
+        or any(not isinstance(nodeid, str) for nodeid in node_ids)
+        or len(set(node_ids)) != len(node_ids)
+    ):
+        fail_harness("worker collection evidence is malformed, duplicated or empty")
+    files: set[str] = set()
+    for nodeid in node_ids:
+        path, separator, suffix = nodeid.partition("::")
+        if not separator or not suffix:
+            fail_harness("worker collection node ID is malformed")
+        validate_test_selection([path], selected_root)
+        files.add(path)
+    if files != expected:
+        fail_harness(
+            "worker collection differs from inventory: "
+            f"missing={sorted(expected - files)}; foreign={sorted(files - expected)}"
+        )
+    return tuple(node_ids)
+
+
 def validate_worker_manifest(
     path: Path,
     run_id: str,
     suite: str,
     workers: int,
     selected_root: str,
+    selected_files: Sequence[str],
     measured_contexts: set[str] | None = None,
 ) -> None:
     """Require exact worker, collection, terminal-result, and node-down evidence."""
@@ -1558,15 +1791,9 @@ def validate_worker_manifest(
             fail_harness(f"worker manifest {kind} set is incomplete or duplicated")
         if kind == "collection":
             for event in members:
-                node_ids = event.get("node_ids")
-                if (
-                    not isinstance(node_ids, list)
-                    or not node_ids
-                    or any(not isinstance(nodeid, str) for nodeid in node_ids)
-                    or len(set(node_ids)) != len(node_ids)
-                ):
-                    fail_harness("worker collection evidence is malformed or empty")
-                collections.append(tuple(node_ids))
+                collections.append(validate_collection(
+                    event.get("node_ids"), selected_root, selected_files
+                ))
         elif kind == "worker-complete":
             if any(event.get("exitstatus") != 0 for event in members):
                 fail_harness("worker completion evidence reports failure")
@@ -1579,13 +1806,6 @@ def validate_worker_manifest(
     if any(collection != collections[0] for collection in collections[1:]):
         fail_harness("xdist workers did not collect identical node IDs")
     selected = set(collections[0])
-    prefix = selected_root.rstrip("/") + "/"
-    if any(
-        (nodeid.partition("::")[0] != selected_root)
-        and not nodeid.partition("::")[0].startswith(prefix)
-        for nodeid in selected
-    ):
-        fail_harness("worker collection contains a node outside the selected root")
     result_events = by_kind.get("test-result", [])
     result_nodes = [event.get("nodeid") for event in result_events]
     if len(result_nodes) != len(selected) or set(result_nodes) != selected:
@@ -1687,8 +1907,10 @@ def _pytest_command(
     data_file: Path,
     json_file: Path,
     run_id: str,
+    selected_files: Sequence[str],
 ) -> list[str]:
     selected = UNIT_ROOT if suite == "unit" else INTEGRATION_ROOT
+    paths = validate_test_selection(selected_files, selected.as_posix())
     return [
         sys.executable,
         "-m",
@@ -1711,7 +1933,7 @@ def _pytest_command(
         f"--cov-config={root / '.coveragerc'}",
         f"--cov-report=json:{json_file}",
         "--cov-report=",
-        str(root / selected),
+        *(str(root / path) for path in paths),
     ]
 
 
@@ -1720,11 +1942,15 @@ def _run_pytest(
     suite: str,
     workers: int,
     artifacts: Path,
+    selected_files: Sequence[str],
     *,
     run_id: str | None = None,
     failure_mode: str | None = None,
 ) -> tuple[Path, dict[str, object]]:
     run_id = run_id or secrets.token_hex(16)
+    selected_files = validate_test_selection(
+        selected_files, (UNIT_ROOT if suite == "unit" else INTEGRATION_ROOT).as_posix()
+    )
     data_file = artifacts / f"{suite}.coverage"
     json_file = artifacts / f"{suite}.json"
     worker_manifest = artifacts / f"{suite}.workers.jsonl"
@@ -1745,6 +1971,7 @@ def _run_pytest(
     environment["APG_TEST_SELECTED_ROOT"] = (
         UNIT_ROOT if suite == "unit" else INTEGRATION_ROOT
     ).as_posix()
+    environment["APG_TEST_SELECTED_FILES"] = json.dumps(selected_files)
     environment["APG_TEST_WORKER_MANIFEST"] = str(worker_manifest)
     environment["APG_TEST_CHILD_MANIFEST"] = str(child_manifest)
     environment["APG_TEST_ARTIFACT_DIRECTORY"] = str(artifacts)
@@ -1778,7 +2005,7 @@ def _run_pytest(
     else:
         environment.pop("APG_TEST_FAILURE_MODE", None)
     result = subprocess.run(
-        _pytest_command(root, suite, workers, data_file, json_file, run_id),
+        _pytest_command(root, suite, workers, data_file, json_file, run_id, selected_files),
         cwd=root,
         env=environment,
         check=False,
@@ -1798,6 +2025,7 @@ def _run_pytest(
             suite,
             workers,
             (UNIT_ROOT if suite == "unit" else INTEGRATION_ROOT).as_posix(),
+            selected_files,
         )
         if result.returncode == 1:
             raise TestAssertionError(f"{suite} pytest run failed with status 1")
@@ -1811,6 +2039,7 @@ def _run_pytest(
         suite,
         workers,
         (UNIT_ROOT if suite == "unit" else INTEGRATION_ROOT).as_posix(),
+        selected_files,
         measured_contexts,
     )
     validate_child_manifest(
@@ -1885,6 +2114,13 @@ def run(
         validate_javascript_engine(root)
     if requires_node_profile_runtimes(inventory):
         validate_node_profile_runtimes(root)
+    from apg_playwright_runtime import TEST_PATHS, PlaywrightPrerequisiteError, validate
+    if TEST_PATHS & set(inventory.tests):
+        validate_javascript_engine(root)
+        try:
+            validate(root)
+        except PlaywrightPrerequisiteError as error:
+            fail_invocation(str(error))
     artifact_ownership = _artifact_directory(root)
     artifacts = artifact_ownership.path
     completed = False
@@ -1906,6 +2142,10 @@ def run(
                     selected_suite,
                     workers,
                     component_artifacts,
+                    selected_files=tuple(sorted(
+                        path for path, (_owner, owner_suite) in inventory.tests.items()
+                        if owner_suite == selected_suite
+                    )),
                     run_id=f"{invocation_id}-{selected_suite}",
                     failure_mode=failure_mode,
                 )

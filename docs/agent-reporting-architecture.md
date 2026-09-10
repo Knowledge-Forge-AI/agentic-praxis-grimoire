@@ -2,6 +2,13 @@
 
 ## Decision scope
 
+The Python implementation described historically below was replaced by the Go
+`report` package and thin CLI/distribution adapters through APG95/APG96/APG100.
+The [Go library reference](reference/go-library.md#reporting) and Accepted
+[v0.7 architecture](architecture/v0-7-embeddable-toolkit.md) own that current
+implementation. APG127 adds the bounded verification and retry contracts below
+as a development candidate; public v0.9.0 remains unchanged.
+
 This document defines the adopted v0.4 implementation for APG managed phase
 reports. APG27A applies ADR 0021 and ADR 0023 through the standard-library
 `libexec/agent_report` package, Python entry points for `git-show-report` and
@@ -171,10 +178,80 @@ phase, outcome, and the applicable `primary_commit` or
 `primary_git_report_id`. Legacy and free-form bodies retain shallow
 classification only for standalone records in a phase report with no Git
 record. Classification is not represented as full semantic validation.
-Current tools append every valid invocation as a distinct envelope, including
-identical record IDs; the parity baseline preserves that behavior. Dedupe,
-logical replacement, or correction-in-place would require a separate schema
-and compatibility decision.
+Default publication appends every valid invocation as a distinct envelope,
+including identical record IDs. APG127 adds an explicit idempotent append policy
+without changing those default bytes or the historical adapters. Within the
+retained current primary, the key is `(project, phase, kind, record ID)`.
+Identical complete canonical bytes return already-present without replacement;
+any same-key differing bytes fail as a replay conflict. Historical repeated
+identical records remain valid, while mixed identical/conflicting matches fail
+an idempotent retry. No correction-in-place or external identity ledger exists.
+
+New structured operational bodies reject unsupported declared schemas,
+malformed recognized scalar fields and inconsistent applicable primary
+relationships before framing. The same semantic owner validates newly supplied
+operational `Record` values before append, closing envelope-only bypass.
+Show/diff append payload validation is unchanged. Legacy/free-form standalone
+bodies and historical persisted compatibility remain explicit; unknown evidence
+fields and optional future project/result vocabulary stay open.
+
+## Read-only persisted verification
+
+APG127 introduces library `Verify`/`VerifyFile` and `apgr report verify <path>`.
+They reuse `ParseRecords` and canonical record owners to check framing, supported
+schemas, inner/outer identity, ordered sections, evidence hashes, body semantics
+and artifact-local relationships. Verification has no publication, lock,
+recovery, repair, chmod or outbox preparation behavior. Copies need not meet
+publication-only owner-mode requirements. Verification accepts at most 128 MiB
+per input and checks file reads for observable drift.
+
+Semantic verification reconstructs inputs and requires equality with the
+canonical renderer for the supported format version. Renderer bytes are part
+of the verification compatibility contract: a renderer change that changes
+accepted bytes must preserve the old verifier behavior through explicit
+version dispatch and historical fixtures. An unversioned renderer change must
+not invalidate previously accepted persisted records.
+
+APG129 replaces repeated growing-prefix hashing with a monotonic SHA-256 state.
+Each unsized-section byte enters that state once; each candidate finalizes only
+constant-size hash state. Renderer-added newline eligibility uses the last two
+bytes, without copying the prefix. Delimiter searches use overlapping windows
+of at most 64 KiB; scanning, hashing, file reads and metadata-field iteration
+check cancellation inside their loops. Artifact-local relation lookup indexes
+the first matching record, preserving historical first-match semantics.
+
+The structural bound covers envelope/section extraction: O(N + C), where N is
+input bytes and C is delimiter candidates. Test counters cover extraction and
+envelope hashing, not canonical reconstruction. Canonical renderers, metadata
+validation and byte comparisons still contain non-interruptible library calls;
+this is not a verifier-wide wall-clock or scheduler-latency guarantee. The
+unchanged 128 MiB limit bounds their input. Generated valid and invalid cases
+through 16 MiB and deterministic mid-loop cancellation controls qualify the
+bounded extraction design; timing is secondary evidence.
+
+`ParseRecords` still accepts empty bytes as zero envelopes. Verification
+classifies an empty artifact separately and exits 1, because it cannot qualify
+a possibly truncated primary. Usage exits 2; malformed/unsupported and I/O
+failures exit 1 with distinguishable bounded diagnostics. Success reports record
+counts and compatibility-limited historical validation where applicable.
+The CLI distinction is diagnostic text, not a distinct numeric exit status;
+library callers use error families. A file already oversized at initial stat
+is unsupported input. Exceeding the read limit after a permitted initial size
+is an observed concurrent-growth failure in the I/O family.
+
+Show/diff lack per-section lengths. Extraction uses canonical boundaries and
+integrity hashes so delimiter-like opaque bytes remain data. Diff status,
+staged and unstaged hashes cover raw bytes; stored sections may add one final
+newline, so both candidates are considered. Diff ID verification recomputes from
+recorded hashes and the recorded index fingerprint, not the external worktree.
+
+Verification cannot prove truthful body claims, actual execution, external Git
+state, related-record existence outside the artifact, or filesystem-wide outbox
+consistency. A record ID is not a complete-record digest: phase, metadata,
+source basename/newline/association and native Git rendering may change bytes
+without changing that ID. Such changes intentionally conflict under idempotent
+retry. Callers must keep input buffers stable throughout a library call.
+Retry guarantees end when a record is removed by existing primary supersession.
 
 ## Destination safety and locking
 

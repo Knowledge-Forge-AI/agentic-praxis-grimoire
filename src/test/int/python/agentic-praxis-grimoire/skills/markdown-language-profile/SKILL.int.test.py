@@ -78,11 +78,11 @@ def test_register_binding_navigation_and_targeted_guards_hold_in_integrated_tree
 def test_catalog_projection_and_maturity_are_exact() -> None:
     rows = _catalog_rows()
     candidate_rows = [row for row in rows if f"[`{CANDIDATE}`]" in row]
-    assert len(rows) == 39
+    assert len(rows) == 45
     assert len(candidate_rows) == 1
     assert candidate_rows[0].endswith("| `provisional` |")
     assert sum(row.endswith("| `stable` |") for row in rows) == 14
-    assert sum(row.endswith("| `provisional` |") for row in rows) == 25
+    assert sum(row.endswith("| `provisional` |") for row in rows) == 31
     projection = ROOT / ".agents/skills" / CANDIDATE
     assert projection.is_symlink()
     assert os.readlink(projection) == "../../skills/markdown-language-profile"
@@ -98,13 +98,13 @@ def test_router_project_and_checked_edges_are_exact() -> None:
         ROOT / "skills/chatgpt/chatgpt-manager-workflow/references/capability-map.json"
     )["capabilities"]
     candidate_entries = [entry for entry in general if entry["name"] == CANDIDATE]
-    assert len(general) == 37
+    assert len(general) == 43
     assert len(local) == 1
-    assert len(general) + len(local) == 38
+    assert len(general) + len(local) == 44
     assert len(candidate_entries) == 1
     assert "actual Markdown parser" in candidate_entries[0]["trigger"]
     assert CANDIDATE in project_skills.EXPECTED_SKILLS
-    assert len(project_skills.EXPECTED_SKILLS) == 39
+    assert len(project_skills.EXPECTED_SKILLS) == 45
     conceptual = {
         "accessibility-owner", "data-language-owner", "embedded-language-owner",
         "host-owner", "html-owner", "parser-tool-owner",

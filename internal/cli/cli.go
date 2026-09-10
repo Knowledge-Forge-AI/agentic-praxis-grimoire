@@ -22,6 +22,7 @@ Commands:
   report operational    publish one operational report (alias: ops)
   report path           print a canonical primary path without creating it
   report recover        recover one interrupted canonical publication
+  report verify         verify one persisted report file
   skills list           list embedded canonical skills
   skills context-report report embedded discovery context
   skills resolve        resolve one strict structured bundle request

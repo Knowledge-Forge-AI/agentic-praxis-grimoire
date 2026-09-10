@@ -1,0 +1,686 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "schema_version": "1.0.0",
+  "authority": "APG123-BROWSER-UI-SCENARIO-REGISTER",
+  "disclaimer": "Evidence confirms browser DOM, rendering, and accessibility node characteristics; makes NO screen reader audio or assistive technology conformance claim.",
+  "groups": {
+    "playwright": "Playwright Test automation and runner mechanics",
+    "accessibility": "Web accessibility profile DOM, ARIA snapshot, focus, and semantics verification",
+    "svg": "SVG integration, same-origin external use reference, and security route boundary enforcement",
+    "browser_runtime": "Browser runtime DOM, script execution, networking, storage, and isolation semantics"
+  },
+  "scenarios": [
+    {
+      "id": "PW01",
+      "group": "playwright",
+      "title": "Strictness Paired Positive",
+      "description": "Unique locator resolves and clicks successfully; duplicate selector triggers narrow strict mode violation rejection",
+      "predicate_type": "paired",
+      "supported_browsers": [
+        "chromium",
+        "firefox",
+        "webkit"
+      ],
+      "expected_outcome": "passed",
+      "assertions": [
+        "unique_locator_success",
+        "strict_mode_violation_rejection"
+      ]
+    },
+    {
+      "id": "PW02",
+      "group": "playwright",
+      "title": "Delayed Actionability",
+      "description": "Locator auto-waits for delayed element enablement; permanently disabled element exceeds timeout with actionability failure",
+      "predicate_type": "paired",
+      "supported_browsers": [
+        "chromium",
+        "firefox",
+        "webkit"
+      ],
+      "expected_outcome": "passed",
+      "assertions": [
+        "auto_wait_enablement_success",
+        "disabled_timeout_rejection"
+      ]
+    },
+    {
+      "id": "PW03",
+      "group": "playwright",
+      "title": "Web-First Assertions",
+      "description": "Auto-retrying expect toHaveText succeeds on delayed text change; impossible text expectation rejects narrowly",
+      "predicate_type": "paired",
+      "supported_browsers": [
+        "chromium",
+        "firefox",
+        "webkit"
+      ],
+      "expected_outcome": "passed",
+      "assertions": [
+        "retrying_assertion_success",
+        "retrying_assertion_rejection"
+      ]
+    },
+    {
+      "id": "PW04",
+      "group": "playwright",
+      "title": "Contexts State Isolation",
+      "description": "Cookies and localStorage created in context A do not leak into concurrently active context B",
+      "predicate_type": "positive",
+      "supported_browsers": [
+        "chromium",
+        "firefox",
+        "webkit"
+      ],
+      "expected_outcome": "passed",
+      "assertions": [
+        "context_a_state_populated",
+        "context_b_state_clean"
+      ]
+    },
+    {
+      "id": "PW05",
+      "group": "playwright",
+      "title": "Timeout and Cancellation",
+      "description": "Explicit timeout fails with timeout exceeded message; AbortController.signal aborts locator click with AbortError cancellation",
+      "predicate_type": "paired",
+      "supported_browsers": [
+        "chromium",
+        "firefox",
+        "webkit"
+      ],
+      "expected_outcome": "passed",
+      "assertions": [
+        "explicit_timeout_rejection",
+        "locator_click_signal_cancellation"
+      ]
+    },
+    {
+      "id": "PW06",
+      "group": "playwright",
+      "title": "Local Routing Blocked Untrusted",
+      "description": "Ephemeral loopback origin requests pass through; untrusted external network requests are aborted by client route policy",
+      "predicate_type": "paired",
+      "supported_browsers": [
+        "chromium",
+        "firefox",
+        "webkit"
+      ],
+      "expected_outcome": "passed",
+      "assertions": [
+        "loopback_route_permitted",
+        "untrusted_network_aborted"
+      ]
+    },
+    {
+      "id": "PW07",
+      "group": "playwright",
+      "title": "Popup Frame and Navigation",
+      "description": "Navigation lifecycle state, iframe child frame content access, and popup window lifecycle are verified",
+      "predicate_type": "positive",
+      "supported_browsers": [
+        "chromium",
+        "firefox",
+        "webkit"
+      ],
+      "expected_outcome": "passed",
+      "assertions": [
+        "page_navigation_complete",
+        "subframe_locator_content",
+        "popup_window_lifecycle"
+      ]
+    },
+    {
+      "id": "PW08",
+      "group": "playwright",
+      "title": "Screenshot and Trace Policy",
+      "description": "Tracing start/stop produces valid trace zip and screenshot capture saves non-empty png inside scratch artifacts directory",
+      "predicate_type": "positive",
+      "supported_browsers": [
+        "chromium",
+        "firefox",
+        "webkit"
+      ],
+      "expected_outcome": "passed",
+      "assertions": [
+        "screenshot_artifact_retained",
+        "trace_zip_artifact_retained"
+      ]
+    },
+    {
+      "id": "PW09",
+      "group": "playwright",
+      "title": "Deterministic Visual Compare",
+      "description": "Same-run baseline screenshot matches identical re-render; controlled visual negative produces byte-level buffer difference",
+      "predicate_type": "paired",
+      "supported_browsers": [
+        "chromium",
+        "firefox",
+        "webkit"
+      ],
+      "expected_outcome": "passed",
+      "assertions": [
+        "same_run_render_identical",
+        "controlled_visual_negative_differs"
+      ]
+    },
+    {
+      "id": "PW10",
+      "group": "playwright",
+      "title": "Playwright Test Retention and Interruption",
+      "description": "Supervised Playwright Test execution verifies passing run artifact absence, controlled failure retention, and actual SIGINT interruption exit 130 with process cleanup",
+      "predicate_type": "positive",
+      "supported_browsers": [
+        "chromium",
+        "firefox",
+        "webkit"
+      ],
+      "expected_outcome": "passed",
+      "assertions": [
+        "controlled_failure_status_exact",
+        "pass_artifacts_absent",
+        "failed_artifacts_retained",
+        "child_readiness_signaled",
+        "sigint_interruption_exit_130",
+        "browser_worker_cleanup_observed"
+      ]
+    },
+    {
+      "id": "AX01",
+      "group": "accessibility",
+      "title": "Native Button Link and Form Naming",
+      "description": "Accessible name computation succeeds for native button, link with aria-label, and labeled input",
+      "predicate_type": "positive",
+      "supported_browsers": [
+        "chromium",
+        "firefox",
+        "webkit"
+      ],
+      "expected_outcome": "passed",
+      "assertions": [
+        "button_accessible_name",
+        "link_aria_label",
+        "input_label_association"
+      ]
+    },
+    {
+      "id": "AX02",
+      "group": "accessibility",
+      "title": "Intentional Name Failure Narrowly Asserted",
+      "description": "Empty button has empty accessible name; asserting unexpected accessible name fails with narrow expect rejection",
+      "predicate_type": "negative",
+      "supported_browsers": [
+        "chromium",
+        "firefox",
+        "webkit"
+      ],
+      "expected_outcome": "passed",
+      "assertions": [
+        "empty_name_verified",
+        "mismatched_name_narrow_rejection"
+      ]
+    },
+    {
+      "id": "AX03",
+      "group": "accessibility",
+      "title": "Headings Landmarks",
+      "description": "Hierarchical heading levels h1, h2, h3 and landmark roles banner, navigation, main are queryable by accessible role",
+      "predicate_type": "positive",
+      "supported_browsers": [
+        "chromium",
+        "firefox",
+        "webkit"
+      ],
+      "expected_outcome": "passed",
+      "assertions": [
+        "heading_levels_resolved",
+        "landmarks_resolved"
+      ]
+    },
+    {
+      "id": "AX04",
+      "group": "accessibility",
+      "title": "Focus Order and Visible Focus Difference",
+      "description": "Tab key navigation traverses elements in order; rendered screenshot of focused element differs from blurred state proving visible focus ring",
+      "predicate_type": "visual_difference",
+      "supported_browsers": [
+        "chromium",
+        "firefox",
+        "webkit"
+      ],
+      "expected_outcome": "passed",
+      "assertions": [
+        "tab_navigation_advances",
+        "focus_screenshot_differs_from_blur"
+      ]
+    },
+    {
+      "id": "AX05",
+      "group": "accessibility",
+      "title": "Interactive Keyboard Focusable SVG",
+      "description": "SVG with role=button, tabindex=0, and accessible name receives keyboard focus and responds to Enter and Space keys",
+      "predicate_type": "positive",
+      "supported_browsers": [
+        "chromium",
+        "firefox",
+        "webkit"
+      ],
+      "expected_outcome": "passed",
+      "assertions": [
+        "svg_accessible_name",
+        "svg_keyboard_focus",
+        "svg_enter_space_activation"
+      ]
+    },
+    {
+      "id": "AX06",
+      "group": "accessibility",
+      "title": "Meaningful vs Decorative SVG",
+      "description": "Meaningful SVG has role=img and title/aria-label; decorative SVG has aria-hidden=true and empty accessible name",
+      "predicate_type": "paired",
+      "supported_browsers": [
+        "chromium",
+        "firefox",
+        "webkit"
+      ],
+      "expected_outcome": "passed",
+      "assertions": [
+        "meaningful_svg_role_and_name",
+        "decorative_svg_hidden_and_empty"
+      ]
+    },
+    {
+      "id": "AX07",
+      "group": "accessibility",
+      "title": "Complex Information Alternative",
+      "description": "Chart labels and table values agree; removing the structured data alternative leaves the short image name unchanged, demonstrating the distinct information boundary",
+      "predicate_type": "paired",
+      "supported_browsers": [
+        "chromium",
+        "firefox",
+        "webkit"
+      ],
+      "expected_outcome": "passed",
+      "assertions": [
+        "figure_group_labelled",
+        "svg_image_labelled",
+        "table_data_headers_accessible",
+        "short_name_does_not_supply_missing_data_alternative"
+      ]
+    },
+    {
+      "id": "AX08",
+      "group": "accessibility",
+      "title": "Hidden Inert Disabled",
+      "description": "Hidden elements are not visible; disabled elements are disabled; inert containers reject pointer and keyboard interaction",
+      "predicate_type": "positive",
+      "supported_browsers": [
+        "chromium",
+        "firefox",
+        "webkit"
+      ],
+      "expected_outcome": "passed",
+      "assertions": [
+        "element_hidden_verified",
+        "element_disabled_verified",
+        "inert_interaction_rejected"
+      ]
+    },
+    {
+      "id": "AX09",
+      "group": "accessibility",
+      "title": "Dynamic Status Live-Region",
+      "description": "Live region with role=status and aria-live=polite updates dynamic text in DOM/accessibility tree; no AT audio claim made",
+      "predicate_type": "positive",
+      "supported_browsers": [
+        "chromium",
+        "firefox",
+        "webkit"
+      ],
+      "expected_outcome": "passed",
+      "assertions": [
+        "live_region_role_attributes",
+        "dynamic_message_text_updated"
+      ]
+    },
+    {
+      "id": "AX10",
+      "group": "accessibility",
+      "title": "ARIA Snapshot",
+      "description": "Hierarchical ARIA snapshot is generated and matches expected structural YAML representation",
+      "predicate_type": "positive",
+      "supported_browsers": [
+        "chromium",
+        "firefox",
+        "webkit"
+      ],
+      "expected_outcome": "passed",
+      "assertions": [
+        "aria_snapshot_structure_matches"
+      ]
+    },
+    {
+      "id": "AX11",
+      "group": "accessibility",
+      "title": "Forms Validation Table Motion",
+      "description": "HTML5 form constraint validation checkValidity, accessible table headers, and prefers-reduced-motion media query emulation verified",
+      "predicate_type": "positive",
+      "supported_browsers": [
+        "chromium",
+        "firefox",
+        "webkit"
+      ],
+      "expected_outcome": "passed",
+      "assertions": [
+        "form_constraint_validation",
+        "table_headers_accessible",
+        "reduced_motion_emulation"
+      ]
+    },
+    {
+      "id": "SVG01",
+      "group": "svg",
+      "title": "Permitted Same-Origin External SVG Use Reference",
+      "description": "Browser requests external SVG sprite, renders visible graphic on target locator, and produces screenshot difference on same locator when reference is missing",
+      "predicate_type": "paired",
+      "supported_browsers": [
+        "chromium",
+        "firefox",
+        "webkit"
+      ],
+      "expected_outcome": "passed",
+      "assertions": [
+        "browser_requested_sprite_response",
+        "same_locator_rendered_differs_from_missing"
+      ]
+    },
+    {
+      "id": "SVG02",
+      "group": "svg",
+      "title": "Blocked Origin Resource Negative",
+      "description": "Foreign-origin SVG use remains visibly empty under browser/resource policy; a separate fetch probe proves route refusal without claiming that use reached routing",
+      "predicate_type": "negative",
+      "supported_browsers": [
+        "chromium",
+        "firefox",
+        "webkit"
+      ],
+      "expected_outcome": "passed",
+      "assertions": [
+        "foreign_svg_reference_aborted",
+        "foreign_svg_visible_absence_verified"
+      ]
+    },
+    {
+      "id": "SVG03",
+      "group": "svg",
+      "title": "Blocked Path Resource Negative",
+      "description": "Attempt to reference unauthorized path outside fixtures is blocked by server/route policy and results in visible absence; raw traversal returns 403 Forbidden",
+      "predicate_type": "negative",
+      "supported_browsers": [
+        "chromium",
+        "firefox",
+        "webkit"
+      ],
+      "expected_outcome": "passed",
+      "assertions": [
+        "path_traversal_svg_reference_blocked",
+        "path_traversal_visible_absence_verified"
+      ]
+    },
+    {
+      "id": "BR01",
+      "group": "browser_runtime",
+      "title": "Document Lifecycle and ReadyState",
+      "description": "Document advances through readystate transitions (loading, interactive, complete), fires DOMContentLoaded, load, and pageshow events in deterministic order, and exposes active visibilityState",
+      "predicate_type": "positive",
+      "supported_browsers": [
+        "chromium",
+        "firefox",
+        "webkit"
+      ],
+      "expected_outcome": "passed",
+      "assertions": [
+        "document_readystate_order_verified",
+        "lifecycle_events_deterministic_order",
+        "visibility_state_active"
+      ]
+    },
+    {
+      "id": "BR02",
+      "group": "browser_runtime",
+      "title": "Parser and Dynamic DOM with MutationObserver Cleanup",
+      "description": "Parser-inserted scripts and dynamically appended scripts execute in sequence; MutationObserver captures child and attribute records before clean disconnection without leaks",
+      "predicate_type": "paired",
+      "supported_browsers": [
+        "chromium",
+        "firefox",
+        "webkit"
+      ],
+      "expected_outcome": "passed",
+      "assertions": [
+        "parser_and_dynamic_scripts_executed",
+        "mutation_observer_records_captured",
+        "mutation_observer_disconnected_cleanly"
+      ]
+    },
+    {
+      "id": "BR03",
+      "group": "browser_runtime",
+      "title": "Event Capture, Bubble, Cancellation, Options, and Removal",
+      "description": "DOM event dispatch traverses capture, target, and bubble phases; stopPropagation halts traversal, preventDefault records defaultPrevented, once option fires once, and removeEventListener successfully unbinds",
+      "predicate_type": "paired",
+      "supported_browsers": [
+        "chromium",
+        "firefox",
+        "webkit"
+      ],
+      "expected_outcome": "passed",
+      "assertions": [
+        "event_phase_order_verified",
+        "event_propagation_cancellation",
+        "event_default_prevented",
+        "event_listener_options_and_removal"
+      ]
+    },
+    {
+      "id": "BR04",
+      "group": "browser_runtime",
+      "title": "Microtask, Task, rAF, and Timer Cleanup",
+      "description": "Microtasks queue and drain before next task; requestAnimationFrame executes before next paint frame; clearTimeout and cancelAnimationFrame successfully cancel scheduled work",
+      "predicate_type": "paired",
+      "supported_browsers": [
+        "chromium",
+        "firefox",
+        "webkit"
+      ],
+      "expected_outcome": "passed",
+      "assertions": [
+        "microtask_drained_before_next_task",
+        "request_animation_frame_executed",
+        "timer_and_raf_cleanup_verified"
+      ]
+    },
+    {
+      "id": "BR05",
+      "group": "browser_runtime",
+      "title": "URL Parsing and Different-Port Origin Distinction",
+      "description": "URL API accurately parses protocol, host, port, path, search, and hash components; differing loopback ports establish distinct origins despite shared 127.0.0.1 host; relative base resolution has a same-origin positive control",
+      "predicate_type": "paired",
+      "supported_browsers": [
+        "chromium",
+        "firefox",
+        "webkit"
+      ],
+      "expected_outcome": "passed",
+      "assertions": [
+        "url_components_parsed_accurately",
+        "different_port_origin_distinct",
+        "relative_url_and_same_origin_control"
+      ]
+    },
+    {
+      "id": "BR06",
+      "group": "browser_runtime",
+      "title": "Real Local CORS Allow, Deny, Preflight, and Opaque",
+      "description": "Real loopback Server 2 enforces CORS policies: allowed origin succeeds with data; denied origin throws fetch error; preflight OPTIONS succeeds or refuses; no-cors mode returns opaque response; restrictive meta-CSP contains this un-intercepted lane and refuses a fifth valid local endpoint without a server request",
+      "predicate_type": "paired",
+      "supported_browsers": [
+        "chromium",
+        "firefox",
+        "webkit"
+      ],
+      "expected_outcome": "passed",
+      "assertions": [
+        "cors_allow_success",
+        "cors_deny_refusal",
+        "cors_preflight_success",
+        "cors_preflight_refusal",
+        "cors_opaque_mode_success",
+        "unrouted_csp_request_containment"
+      ]
+    },
+    {
+      "id": "BR07",
+      "group": "browser_runtime",
+      "title": "Fetch Abort, Redirect, and Synthetic Credentials",
+      "description": "An already-aborted default-reason signal refuses Fetch with AbortError; a 302 redirect reaches its target; host-scoped synthetic cookies are included or omitted as selected and observed by the server. In-flight cancellation is outside this predicate.",
+      "predicate_type": "paired",
+      "supported_browsers": [
+        "chromium",
+        "firefox",
+        "webkit"
+      ],
+      "expected_outcome": "passed",
+      "assertions": [
+        "fetch_abort_controller_cancellation",
+        "fetch_redirect_followed_successfully",
+        "fetch_credentials_included_and_observed",
+        "fetch_credentials_omitted_observed"
+      ]
+    },
+    {
+      "id": "BR08",
+      "group": "browser_runtime",
+      "title": "localStorage and sessionStorage Context Boundaries",
+      "description": "localStorage persists across page reloads and emits storage events in peer contexts; sessionStorage is scoped to the browsing context and isolated from independent contexts",
+      "predicate_type": "paired",
+      "supported_browsers": [
+        "chromium",
+        "firefox",
+        "webkit"
+      ],
+      "expected_outcome": "passed",
+      "assertions": [
+        "local_storage_persistence_and_reload",
+        "local_storage_peer_event_observed",
+        "session_storage_context_isolation"
+      ]
+    },
+    {
+      "id": "BR09",
+      "group": "browser_runtime",
+      "title": "History API and Location Navigation",
+      "description": "history.pushState and replaceState update URL path and state without full reload; popstate event fires on history.back() restoring state; hash change fires hashchange event",
+      "predicate_type": "paired",
+      "supported_browsers": [
+        "chromium",
+        "firefox",
+        "webkit"
+      ],
+      "expected_outcome": "passed",
+      "assertions": [
+        "history_push_replace_state_updates_location",
+        "popstate_event_restores_state",
+        "hashchange_event_fired"
+      ]
+    },
+    {
+      "id": "BR10",
+      "group": "browser_runtime",
+      "title": "Custom Elements, Shadow DOM, and Slot Projection",
+      "description": "Autonomous custom element executes connectedCallback and observed attribute callbacks; shadow root encapsulates styles and DOM tree; slots distribute light DOM content",
+      "predicate_type": "positive",
+      "supported_browsers": [
+        "chromium",
+        "firefox",
+        "webkit"
+      ],
+      "expected_outcome": "passed",
+      "assertions": [
+        "custom_element_lifecycle_executed",
+        "shadow_dom_style_and_dom_encapsulation",
+        "slot_content_projection_resolved"
+      ]
+    },
+    {
+      "id": "BR11",
+      "group": "browser_runtime",
+      "title": "Computed Style and Geometry Resolution",
+      "description": "getComputedStyle resolves cascade and custom property values; getBoundingClientRect yields accurate pixel layout metrics; scroll geometry reflects overflowing content",
+      "predicate_type": "positive",
+      "supported_browsers": [
+        "chromium",
+        "firefox",
+        "webkit"
+      ],
+      "expected_outcome": "passed",
+      "assertions": [
+        "computed_style_values_resolved",
+        "bounding_client_rect_dimensions_accurate",
+        "scroll_geometry_metrics_consistent"
+      ]
+    },
+    {
+      "id": "BR12",
+      "group": "browser_runtime",
+      "title": "Web Worker Messaging and Termination",
+      "description": "Dedicated Web Worker instantiates from real server allowlist, performs bidirectional postMessage exchange, and terminates cleanly upon worker.terminate()",
+      "predicate_type": "paired",
+      "supported_browsers": [
+        "chromium",
+        "firefox",
+        "webkit"
+      ],
+      "expected_outcome": "passed",
+      "assertions": [
+        "worker_bidirectional_messaging",
+        "worker_post_termination_message_absent"
+      ]
+    },
+    {
+      "id": "BR13",
+      "group": "browser_runtime",
+      "title": "Module and Resource URL Success and Refusal",
+      "description": "Module and submodule URLs load from the local allowlist; a missing same-origin module URL reaches the server, returns 404 and is refused by the browser. This is not cross-origin module/CORS qualification.",
+      "predicate_type": "paired",
+      "supported_browsers": [
+        "chromium",
+        "firefox",
+        "webkit"
+      ],
+      "expected_outcome": "passed",
+      "assertions": [
+        "module_static_and_dynamic_import_success",
+        "module_missing_resource_refusal"
+      ]
+    },
+    {
+      "id": "BR14",
+      "group": "browser_runtime",
+      "title": "Blob URL Creation, Fetch, and Revocation",
+      "description": "URL.createObjectURL generates functional blob URL readable via fetch; URL.revokeObjectURL revokes the URL making subsequent access fail with network error",
+      "predicate_type": "paired",
+      "supported_browsers": [
+        "chromium",
+        "firefox",
+        "webkit"
+      ],
+      "expected_outcome": "passed",
+      "assertions": [
+        "blob_url_creation_and_read_success",
+        "blob_url_revocation_refusal"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "name": "apg124-vite-fixture",
+  "version": "8.2.2",
+  "private": true,
+  "type": "module",
+  "description": "Maintained Vite 8.2.2 test fixture for APG124",
+  "scripts": {
+    "test": "node runner.mjs"
+  }
+}

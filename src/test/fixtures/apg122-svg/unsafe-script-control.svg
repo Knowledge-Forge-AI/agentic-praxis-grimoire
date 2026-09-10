@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <title>Security Negative Control: Script Injection</title>
+  <circle cx="50" cy="50" r="40" fill="#ef4444" />
+  <!-- Dangerous active script element -->
+  <script type="text/javascript">
+    alert(document.cookie);
+  </script>
+</svg>

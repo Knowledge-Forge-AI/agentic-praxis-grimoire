@@ -352,11 +352,12 @@ report evidence.
 
 ## Deferred executable improvements
 
-Remaining candidate improvements include broader operational-body semantic
-validation, an independent persisted-record verifier, idempotency and source-
-stability rules, authorized stale-lock recovery, an explicit public project-key
-mapping, enumerated result fields, and expanded publication-surface linting. A
-later phase must define executable acceptance tests before documentation calls
-one enforced. ADR 0023 implements record existence, exact show/diff association,
-Git-show parity, and temporary-index Git-diff behavior; it does not imply the
-remaining candidates.
+APG127's bounded development candidate owns persisted verification, recognized
+operational-body semantics and opt-in idempotency/source-stability rules; see
+the [evaluation](evaluations/apg127-reporting-infrastructure-consolidation.md).
+Existing Go reporting and `internal/atomicfile` supersede the historical
+stale-lock/recovery suggestion. Public project-key mapping and enumerated result
+fields remain optional future work; existing release projection checks own
+publication-surface linting. None of these records grants implementation,
+repair, publication or successor authority. ADR 0023's association and Git
+evidence contracts remain preserved.

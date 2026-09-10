@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200" width="400" height="200">
+  <title>Icon Sprite Library and Instantiation</title>
+  <defs>
+    <symbol id="sym-star" viewBox="0 0 24 24">
+      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="#f59e0b" />
+    </symbol>
+
+    <symbol id="sym-check" viewBox="0 0 24 24">
+      <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" fill="#10b981" />
+    </symbol>
+
+    <symbol id="sym-badge" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="10" fill="#3b82f6" />
+      <!-- Valid non-cyclic nested use -->
+      <use href="#sym-check" x="4" y="4" width="16" height="16" />
+    </symbol>
+  </defs>
+
+  <!-- Instantiations via use -->
+  <use id="inst-star" href="#sym-star" x="20" y="20" width="48" height="48" />
+  <use id="inst-check" href="#sym-check" x="100" y="20" width="48" height="48" />
+  <use id="inst-badge" href="#sym-badge" x="180" y="20" width="48" height="48" />
+</svg>
