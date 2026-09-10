@@ -4,7 +4,6 @@
 from __future__ import annotations
 
 import json
-from pathlib import Path
 import sys
 
 from src.test.apg_test_support import repository_root

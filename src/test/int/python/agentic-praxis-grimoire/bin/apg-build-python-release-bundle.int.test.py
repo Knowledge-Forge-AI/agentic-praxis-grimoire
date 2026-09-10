@@ -11,7 +11,6 @@ import sys
 import tarfile
 import zipfile
 
-import pytest
 
 from src.test.apg_test_support import repository_root
 

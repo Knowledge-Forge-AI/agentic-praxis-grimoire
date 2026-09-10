@@ -22,9 +22,27 @@ import apg_distribution_candidate as candidate  # noqa: E402
 import apg_npm_distribution as npm_distribution  # noqa: E402
 import apg_python_build_backend as python_backend  # noqa: E402
 import apg_python_publication as python_publication  # noqa: E402
+import apg_source_capture  # noqa: E402
 
 
 UNIT_ROOT = ROOT / "src/test/unit/python/agentic-praxis-grimoire/libexec"
+
+
+@pytest.mark.parametrize("missing", ["docs/reference/go-library.md", "docs/public-pr-ci.md", "CLA.md"])
+def test_current_sdist_document_inventory_survives_archive_validation(tmp_path, missing):
+    filename = python_backend._write_sdist(ROOT, tmp_path)
+    source = tmp_path / filename
+    version = python_backend._version(ROOT)
+    candidate._validate_sdist(source, version=version)
+    trimmed = tmp_path / "trimmed.tar.gz"
+    member_name = f"agentic_praxis_grimoire-{version}/{missing}"
+    with tarfile.open(source, "r:gz") as original, tarfile.open(trimmed, "w:gz") as altered:
+        assert original.extractfile(member_name).read() == (ROOT / missing).read_bytes()
+        for member in original.getmembers():
+            if member.name != member_name:
+                altered.addfile(member, original.extractfile(member))
+    with pytest.raises(candidate.DistributionCandidateError, match="complete Go/Python/skill source"):
+        candidate._validate_sdist(trimmed, version=version)
 
 
 def test_complete_release_candidate_builders_compose_in_process(
@@ -32,6 +50,8 @@ def test_complete_release_candidate_builders_compose_in_process(
 ) -> None:
     """Build and cross-check every local distribution from one binary matrix."""
 
+    source = Path(os.path.realpath(tmp_path / "captured-source"))
+    apg_source_capture.capture_source(ROOT, source)
     python_output = tmp_path / "python"
     python_work = tmp_path / "python-work"
     npm_output = tmp_path / "npm"
@@ -55,7 +75,7 @@ def test_complete_release_candidate_builders_compose_in_process(
         work_root=npm_work,
     )
     manifest = candidate.build_candidate(
-        ROOT,
+        source,
         go_artifacts,
         python_output,
         npm_output,
@@ -65,7 +85,9 @@ def test_complete_release_candidate_builders_compose_in_process(
     assert len(python_paths) == 5
     assert len(npm_records) == 4
     assert manifest["schema_version"] == candidate.MANIFEST_SCHEMA
-    assert manifest["version"] == "0.10.0"
+    assert manifest["version"] == (
+        ROOT / "src/agentic_praxis_grimoire/VERSION"
+    ).read_text(encoding="ascii").strip()
     assert len(manifest["binaries"]) == 3
     assert len(manifest["python"]["wheels"]) == 3
     assert len(manifest["npm"]["platform_packages"]) == 3
@@ -74,14 +96,14 @@ def test_complete_release_candidate_builders_compose_in_process(
     manifest_path = distribution_output / candidate.MANIFEST_NAME
     assert candidate.validate_candidate(
         manifest_path,
-        ROOT,
+        source,
         go_artifacts,
         python_output,
         npm_output,
     ) == manifest
     assert candidate.check(
         manifest_path,
-        ROOT,
+        source,
         go_artifacts,
         python_output,
         npm_output,
@@ -96,7 +118,7 @@ def test_complete_release_candidate_builders_compose_in_process(
     ):
         candidate.validate_manifest(
             manifest_path,
-            ROOT,
+            source,
             go_artifacts,
             python_output,
             npm_output,

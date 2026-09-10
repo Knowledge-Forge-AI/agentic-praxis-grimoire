@@ -1,0 +1,337 @@
+{
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "apg.maturity-candidate/v1"
+    },
+    "phase": {
+      "type": "string",
+      "const": "APG139"
+    },
+    "skill_id": {
+      "type": "string",
+      "enum": [
+        "astro-profile",
+        "browser-runtime-profile",
+        "chatgpt-manager-workflow",
+        "composing-approved-roadmap-assignments",
+        "converting-bash-scripts-to-python",
+        "css-language-profile",
+        "dockerfile-profile",
+        "go-cmp-test-profile",
+        "go-language-profile",
+        "go-test-profile",
+        "gomock-test-profile",
+        "javascript-language-profile",
+        "jsx-language-profile",
+        "markdown-language-profile",
+        "mdx-profile",
+        "minitest-test-profile",
+        "nix-test-profile",
+        "nodejs-runtime-profile",
+        "npm-package-manager-profile",
+        "playwright-test-profile",
+        "postgresql-database-profile",
+        "pytest-test-profile",
+        "react-component-profile",
+        "ruby-language-profile",
+        "sqlite-database-profile",
+        "svg-language-profile",
+        "typescript-language-profile",
+        "vagrantfile-profile",
+        "vite-build-profile",
+        "vitest-test-profile",
+        "web-accessibility-profile"
+      ]
+    },
+    "proposed_outcome": {
+      "type": "string",
+      "enum": [
+        "PROVISIONAL_MAINTENANCE"
+      ]
+    },
+    "review_status": {
+      "type": "string",
+      "enum": [
+        "PENDING_DISPATCHER_PRE_FINAL"
+      ]
+    },
+    "independent_review": {
+      "type": "null"
+    },
+    "evidence": {
+      "type": "object",
+      "properties": {
+        "repeated_positive_use": {
+          "type": "object",
+          "properties": {
+            "assessment": {
+              "type": "string",
+              "enum": [
+                "SUPPORTED",
+                "LIMITED",
+                "MISSING",
+                "PENDING"
+              ]
+            },
+            "references": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "observation": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "assessment",
+            "references",
+            "observation"
+          ],
+          "additionalProperties": false
+        },
+        "representative_non_triggers": {
+          "type": "object",
+          "properties": {
+            "assessment": {
+              "type": "string",
+              "enum": [
+                "SUPPORTED",
+                "LIMITED",
+                "MISSING",
+                "PENDING"
+              ]
+            },
+            "references": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "observation": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "assessment",
+            "references",
+            "observation"
+          ],
+          "additionalProperties": false
+        },
+        "defect_debt_disposition": {
+          "type": "object",
+          "properties": {
+            "assessment": {
+              "type": "string",
+              "enum": [
+                "SUPPORTED",
+                "LIMITED",
+                "MISSING",
+                "PENDING"
+              ]
+            },
+            "references": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "observation": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "assessment",
+            "references",
+            "observation"
+          ],
+          "additionalProperties": false
+        },
+        "rollback": {
+          "type": "object",
+          "properties": {
+            "assessment": {
+              "type": "string",
+              "enum": [
+                "SUPPORTED",
+                "LIMITED",
+                "MISSING",
+                "PENDING"
+              ]
+            },
+            "references": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "observation": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "assessment",
+            "references",
+            "observation"
+          ],
+          "additionalProperties": false
+        },
+        "provenance": {
+          "type": "object",
+          "properties": {
+            "assessment": {
+              "type": "string",
+              "enum": [
+                "SUPPORTED",
+                "LIMITED",
+                "MISSING",
+                "PENDING"
+              ]
+            },
+            "references": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "observation": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "assessment",
+            "references",
+            "observation"
+          ],
+          "additionalProperties": false
+        },
+        "independent_review": {
+          "type": "object",
+          "properties": {
+            "assessment": {
+              "type": "string",
+              "enum": [
+                "SUPPORTED",
+                "LIMITED",
+                "MISSING",
+                "PENDING"
+              ]
+            },
+            "references": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "observation": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "assessment",
+            "references",
+            "observation"
+          ],
+          "additionalProperties": false
+        },
+        "current_validation": {
+          "type": "object",
+          "properties": {
+            "assessment": {
+              "type": "string",
+              "enum": [
+                "SUPPORTED",
+                "LIMITED",
+                "MISSING",
+                "PENDING"
+              ]
+            },
+            "references": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "observation": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "assessment",
+            "references",
+            "observation"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "repeated_positive_use",
+        "representative_non_triggers",
+        "defect_debt_disposition",
+        "rollback",
+        "provenance",
+        "independent_review",
+        "current_validation"
+      ],
+      "additionalProperties": false
+    },
+    "next_lifecycle_trigger": {
+      "type": "string",
+      "minLength": 1
+    },
+    "controlling_debt_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "consumer_limitations": {
+      "type": "string",
+      "minLength": 1
+    },
+    "rationale": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "required": [
+    "schema_version",
+    "phase",
+    "skill_id",
+    "proposed_outcome",
+    "review_status",
+    "independent_review",
+    "evidence",
+    "next_lifecycle_trigger",
+    "controlling_debt_ids",
+    "consumer_limitations",
+    "rationale"
+  ],
+  "additionalProperties": false
+}

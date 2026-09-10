@@ -276,3 +276,16 @@ target behavior are documented in [APG Distribution](../distribution.md).
 Prebuilt native binaries target macOS Apple Silicon (`darwin/arm64`), Linux x86_64
 (`linux/amd64`), and Linux ARM64 (`linux/arm64`). Developer CI qualification
 on Linux x86_64 remains pending; Darwin arm64 is fully qualified.
+
+## APG141 optional candidate interfaces
+
+Explicit `--history-start` and `--history-end` select the
+[v2 hotspot history contract](../guides/hotspot-history.md). Git is required on
+PATH only for this historical mode. Default no-history invocation remains v1.
+
+Modern repository-backed report/response writes use the existing collector's
+leading-dot normalization: `.example` requires project key `example`. Report
+writes still require an explicit matching `--project`; response capture derives
+it when omitted. Unrelated aliases are refused. Equal normalized basenames are
+not globally unique; callers separate outbox roots for distinct projects. See
+[the naming contract](../governance/optional/apg141/project-key-contract.md).

@@ -780,8 +780,8 @@ def test_source_replacement_is_detected_inside_link_and_state_install(
                 return original_atomic(
                     destination,
                     target,
-                    register,  # type: ignore[arg-type]
-                    validate,  # type: ignore[arg-type]
+                    register,
+                    validate,
                 )
 
             monkeypatch.setattr(
@@ -802,8 +802,8 @@ def test_source_replacement_is_detected_inside_link_and_state_install(
                     destination,
                     value,
                     expected,
-                    validate,  # type: ignore[arg-type]
-                    committed,  # type: ignore[arg-type]
+                    validate,
+                    committed,
                 )
 
             monkeypatch.setattr(transaction, "write_state", race_state)

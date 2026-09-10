@@ -152,7 +152,7 @@ def test_keyboard_interrupt_cleans_child_and_closes_descriptor(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
     repository, selected = _roots(tmp_path)
-    module = _module()
+    _module()
     descriptor: int | None = None
     monkeypatch.setenv("TMPDIR", str(selected))
 
@@ -368,7 +368,7 @@ def test_substituted_child_symlink_is_unlinked_without_following_target(
     repository, selected = _roots(tmp_path)
     marker = repository / "must-remain"
     marker.write_text("unchanged\n", encoding="utf-8")
-    module = _module()
+    _module()
     monkeypatch.setenv("TMPDIR", str(selected))
 
     with _environment(repository) as context:

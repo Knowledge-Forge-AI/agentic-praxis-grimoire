@@ -1,0 +1,30 @@
+{
+  "schema": "apg-pre-review-baseline-v1",
+  "ratchets": {
+    "hadolint": {
+      "findings": 0,
+      "rationale": "Zero Dockerfile lint findings across repository Dockerfiles"
+    },
+    "pip-audit": {
+      "findings": 0,
+      "rationale": "Zero known vulnerabilities in pinned dependencies"
+    },
+    "zizmor": {
+      "findings": 0,
+      "rationale": "Zero findings across GitHub Actions workflows under offline audit"
+    },
+    "betterleaks": {
+      "findings": 0,
+      "rationale": "No existing-debt allowance is accepted for public CI; every secret-scanner finding remains visible until separately reviewed"
+    },
+    "malskanner": {
+      "findings": 0,
+      "rationale": "Zero malware or suspicious package findings"
+    },
+    "prompt-defense": {
+      "minimum_score": 80,
+      "max_findings": 0,
+      "rationale": "Instruction defense minimum score over skills inventory"
+    }
+  }
+}

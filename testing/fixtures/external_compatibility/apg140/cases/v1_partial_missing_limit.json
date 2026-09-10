@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "result_kind": "canonical_nodes",
+  "items": [],
+  "page": {
+    "offset": 0,
+    "returned": 0,
+    "truncated": false,
+    "next_offset": null
+  },
+  "diagnostics": []
+}

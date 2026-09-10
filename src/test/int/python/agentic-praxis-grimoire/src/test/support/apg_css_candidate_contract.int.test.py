@@ -28,12 +28,10 @@ from apg_candidate_surface_contract import (  # noqa: E402
     load_removal_plan,
     materialize_synthetic_state,
 )
-from apg_candidate_actual_lifecycle_contract import (  # noqa: E402
-    assert_actual_rejected_preserved,
-)
 from apg_css_candidate_contract import (  # noqa: E402
     assert_case_expected,
     load_contract,
+    load_public_state_fixture,
     validate_collected_case_ids,
 )
 
@@ -43,6 +41,9 @@ APG59 = "133166a4d084ba5d347b133054e4dda515add63f"
 APG60 = "15e253eea62c3f0fd9286cdd604b2f7231f81b64"
 CONTRACT = load_contract(
     ROOT / "src/test/fixtures/apg60-css-reentry-contract.json", ROOT
+)
+PUBLIC_STATE = load_public_state_fixture(
+    ROOT / "src/test/fixtures/apg60-css-public-state-fixture.json", ROOT
 )
 MANIFEST = load_candidate_surface_manifest(
     ROOT / "testing/apg-skill-candidate-surfaces.json", root=ROOT
@@ -123,6 +124,100 @@ def test_synthetic_fully_present_and_removed_lifecycles(tmp_path: Path) -> None:
     materialize_synthetic_state(rejected, MANIFEST, PLAN, "rejected")
     assert_synthetic_lifecycle(retained, MANIFEST, PLAN, "retained")
     assert_synthetic_lifecycle(rejected, MANIFEST, PLAN, "rejected")
+
+
+def test_public_state_fixture_matches_current_projection_and_history_paths() -> None:
+    """Public state checks use the current projection and public records only."""
+    current = next(
+        state for state in PUBLIC_STATE["states"] if state["state"] == "current"
+    )
+    assert derive_skill_surface_counts(ROOT) == (
+        current["canonical_skills"],
+        current["catalog_rows"],
+        current["projections"],
+    )
+    rows = [
+        line
+        for line in (ROOT / "skills/README.md").read_text(encoding="utf-8").splitlines()
+        if line.startswith("| [`")
+    ]
+    assert len(rows) == current["catalog_rows"]
+    assert sum(row.endswith("| `stable` |") for row in rows) == current["stable"]
+    assert (
+        sum(row.endswith("| `provisional` |") for row in rows)
+        == current["provisional"]
+    )
+    for relative in (
+        "skills/agentic-praxis-grimoire-workflow/references/capability-map.json",
+        "skills/chatgpt/chatgpt-manager-workflow/references/capability-map.json",
+    ):
+        assert (ROOT / relative).is_file()
+    general = json.loads(
+        (
+            ROOT
+            / "skills/agentic-praxis-grimoire-workflow/references/capability-map.json"
+        ).read_text(encoding="utf-8")
+    )["capabilities"]
+    local = json.loads(
+        (
+            ROOT
+            / "skills/chatgpt/chatgpt-manager-workflow/references/capability-map.json"
+        ).read_text(encoding="utf-8")
+    )["capabilities"]
+    assert len(general) == current["general_routes"]
+    assert len(local) == current["local_routes"]
+    assert (ROOT / "skills/css-language-profile/SKILL.md").is_file()
+    assert (ROOT / ".agents/skills/css-language-profile").is_symlink()
+    for entry in PUBLIC_STATE["history"].values():
+        for field in ("public_adr", "public_evaluation", "public_exit"):
+            path = ROOT / entry[field]
+            assert path.is_file() and not path.is_symlink()
+
+
+def test_public_state_fixture_binds_apg60a_amendment_without_history_claim() -> None:
+    """The public contract checks the amendment outcome, not Git ancestry."""
+    amendment = PUBLIC_STATE["amendment"]
+    assert CONTRACT["contract_revision"] == amendment["contract_revision"]
+    exception_cases = [
+        case
+        for case in CONTRACT["cases"]
+        if case["exception_grant_source"] is not None
+    ]
+    assert len(exception_cases) == 1
+    exception = exception_cases[0]
+    assert exception["id"] == amendment["allowed_exception_case"]
+    assert exception["exception_grant_source"] == amendment["exception_grant_source"]
+    assert (
+        exception["expected"]["selected_owner"]
+        == amendment["exception_grant_source"]
+    )
+    assert "apply-repository-policy" in exception["expected"]["required_actions"]
+    assert all(
+        case["exception_grant_source"] is None
+        for case in CONTRACT["cases"]
+        if case is not exception
+    )
+
+
+def test_public_state_fixture_models_transition_and_restoration_refusal(
+    tmp_path: Path,
+) -> None:
+    """Synthetic retained/rejected behavior replaces exact historical replay."""
+    retained = tmp_path / "retained"
+    rejected = tmp_path / "rejected"
+    materialize_synthetic_state(retained, MANIFEST, PLAN, "retained")
+    assert_synthetic_lifecycle(retained, MANIFEST, PLAN, "retained")
+    materialize_synthetic_state(rejected, MANIFEST, PLAN, "rejected")
+    assert_synthetic_lifecycle(rejected, MANIFEST, PLAN, "rejected")
+
+    restored_leaf = rejected / "skills/css-language-profile/SKILL.md"
+    restored_leaf.parent.mkdir(parents=True, exist_ok=True)
+    restored_leaf.write_text("restored candidate surface\n", encoding="utf-8")
+    with pytest.raises(
+        SurfaceContractError,
+        match=PUBLIC_STATE["refusal"]["expected_error"],
+    ):
+        assert_actual_rejected_surface_absent(rejected, MANIFEST, PLAN)
 
 
 @pytest.mark.parametrize("owner_id", CURRENT_IDS)

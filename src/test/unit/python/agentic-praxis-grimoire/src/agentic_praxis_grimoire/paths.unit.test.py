@@ -14,7 +14,7 @@ from src.test.apg_test_support import repository_root
 ROOT = repository_root(__file__)
 sys.path.insert(0, str(ROOT / "src"))
 
-from agentic_praxis_grimoire import paths
+from agentic_praxis_grimoire import paths  # noqa: E402
 
 
 def test_global_home_precedence_is_cli_then_environment_then_default(

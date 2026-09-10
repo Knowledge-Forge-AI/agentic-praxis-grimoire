@@ -27,7 +27,8 @@ func TestVerifyRejectsReframedMetadataContradictions(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	writeFileTest(t, filepath.Join(repository, "file.txt"), []byte("two\n"))
+	// Make the fixture edit visible even when filesystem stat times coincide.
+	writeFileTest(t, filepath.Join(repository, "file.txt"), []byte("two changed\n"))
 	diff, err := service.Diff(context.Background(), DiffRequest{RequestMetadata: RequestMetadata{Phase: "CHECK", Result: "passed", FinalGate: "gate"}})
 	if err != nil {
 		t.Fatal(err)

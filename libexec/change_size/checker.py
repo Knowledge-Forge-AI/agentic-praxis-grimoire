@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 import json
-from typing import Any, Iterable
+from typing import Any
 
 from .git_adapter import Entry, GitRepository
 from .inspection import BlobInspection, inspect_blob

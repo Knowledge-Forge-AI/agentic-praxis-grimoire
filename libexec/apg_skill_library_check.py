@@ -1598,7 +1598,6 @@ def _check_leaf(
     declared: list[tuple[str, str]],
     policy: str | None = None,
 ) -> None:
-    leaf_relative = _relative(leaf, root)
     skill_file = leaf / "SKILL.md"
     skill_relative = _relative(skill_file, root)
     if not _ordinary_file(skill_file):

@@ -8,7 +8,6 @@ from pathlib import Path
 import shutil
 import subprocess
 import sys
-from unittest import mock
 
 import pytest
 
@@ -248,7 +247,7 @@ def test_git_adapter_sanitizes_environment_and_bounds_failures(monkeypatch: pyte
     monkeypatch.setattr(subprocess, "run", successful)
     result = core.run_git("repo", ["status"])
     assert result.stdout == "ok\n"
-    assert "GIT_DIR" not in calls[0][1]["env"]  # type: ignore[operator]
+    assert "GIT_DIR" not in calls[0][1]["env"]
     assert calls[0][0] == ["git", "-C", "repo", "status"]
 
     monkeypatch.setattr(

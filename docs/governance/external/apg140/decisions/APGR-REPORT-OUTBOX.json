@@ -1,0 +1,18 @@
+{
+  "schema_version": "apg.roadmap-decision/v1",
+  "item_id": "APGR-REPORT-OUTBOX",
+  "outcome": "CONSUMER_HANDOFF_CLOSED",
+  "closure_phase": "V0110-C",
+  "author": "APG140 producer",
+  "reviewer": "Dispatcher-selected independent APG140 work reviewer",
+  "evidence": {
+    "provider_delivery": [
+      "report/types.go",
+      "docs/governance/external/apg140/support-bindings.json"
+    ],
+    "ownership": [
+      "docs/governance/external/apg140/decisions.md",
+      "docs/governance/external-compatibility.json"
+    ]
+  }
+}

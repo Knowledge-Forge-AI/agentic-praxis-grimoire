@@ -382,8 +382,8 @@ def test_interrupt_after_replacement_link_returns_restores_old_set(
         original(
             destination,
             target,
-            register,  # type: ignore[arg-type]
-            validate,  # type: ignore[arg-type]
+            register,
+            validate,
         )
         raise KeyboardInterrupt
 
@@ -423,7 +423,7 @@ def test_interrupt_after_quarantine_returns_restores_removed_link(
             identity,
             raw_target,
             backup,
-            register,  # type: ignore[arg-type]
+            register,
         )
         raise KeyboardInterrupt
 

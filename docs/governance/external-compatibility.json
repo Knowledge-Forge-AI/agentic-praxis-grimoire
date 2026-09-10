@@ -1,0 +1,193 @@
+{
+  "schema_version": "apg.compatibility-ledger/v1",
+  "release": "v0.11",
+  "owner_phase": "APG140",
+  "watches": [
+    {
+      "watch_id": "DINAS-DEPLOYMENT",
+      "apgr_identity": "public v0.10.0 / APG138 foundation",
+      "consumer_project": "DINAS",
+      "observed_revision": null,
+      "observed_contract": null,
+      "observation_date": null,
+      "fixture_identity": null,
+      "status": "WATCH",
+      "supported_cases": [],
+      "unsupported_cases": [
+        "Live consumer adoption and production execution not qualified by APG138."
+      ],
+      "ownership_split": "APGR owns published artifacts; DINAS owns deployment and host activation, separately from v0.11 readiness.",
+      "refresh_owner": "APGR and DINAS maintainers",
+      "refresh_trigger": "A named consumer contract changes or V0110-C is dispatched to establish source-bound compatibility.",
+      "source_authority": [
+        "docs/evaluations/apg138-v0-11-foundation-closure.md"
+      ],
+      "qualification_evidence": [],
+      "adoption_claimed": false,
+      "inherited_item_ids": []
+    },
+    {
+      "watch_id": "JACA-CI",
+      "apgr_identity": "public v0.10.0 contracts / APG140 development fixture observation",
+      "consumer_project": "JACA",
+      "observed_revision": "APG140-JACA-MAIN-20260912",
+      "observed_contract": "project-onboarding-contract; tools/ci/evidence.go, executor.go, model.go and fixture.go",
+      "observation_date": "2026-09-12",
+      "fixture_identity": {
+        "path": "docs/governance/external/apg140/seams/JACA-CI.json",
+        "sha256": "53f9d59c149ca066bab94870d2f85f83e7d1f4ed80524c783fb16faad6adb351"
+      },
+      "status": "HANDOFF_CLOSED",
+      "supported_cases": [
+        "APGR provider six-field version-1 summary, role handoff, freshness/path refusal and Git-drift tests."
+      ],
+      "unsupported_cases": [
+        "JACA APGR role registration/ingestion: current source consumes ci-policy and rnr-unit, requiring subproject rnr for the latter.",
+        "JACA candidate custody, toolchain environment propagation, Linux whole-inventory runner qualification and production adoption."
+      ],
+      "ownership_split": "APGR owns qualification summary and provider contract; JACA owns CI registration, orchestration and adoption.",
+      "refresh_owner": "APGR and JACA maintainers",
+      "refresh_trigger": "On a material change to the source-bound contract paths, versions, fields, identity/digest domains, error/refusal semantics, publication/receipt behavior, migration assumptions or APGR APIs: perform the scoped impact assessment and versioned fixture retain/revise/retire decision in docs/governance/external/apg140/maintenance.md before renewing supported-case claims.",
+      "source_authority": [
+        "docs/architecture/jaca-ci-handoff.md",
+        "docs/governance/external/apg140/source-inventory.md"
+      ],
+      "qualification_evidence": [
+        "docs/governance/external/apg140/qualification.md",
+        "docs/governance/external/apg140/source-bindings.json",
+        "docs/governance/external/apg140/decisions.md",
+        "docs/governance/external/apg140/support-bindings.json"
+      ],
+      "adoption_claimed": false,
+      "inherited_item_ids": [
+        "APGR-CI-QUAL"
+      ]
+    },
+    {
+      "watch_id": "JACA-OUTBOX",
+      "apgr_identity": "public v0.10.0 contracts / APG140 development fixture observation",
+      "consumer_project": "JACA",
+      "observed_revision": "APG140-JACA-MAIN-20260912",
+      "observed_contract": "XO state/report_artifact.go and state/report_payload.go; APGR report.Result / schema.EnvelopeFormat",
+      "observation_date": "2026-09-12",
+      "fixture_identity": {
+        "path": "docs/governance/external/apg140/seams/JACA-OUTBOX.json",
+        "sha256": "0b2e2c143b8d632a8c6c17b6dd74bc1a0df2f5dcbe009eb6d4e960df16a54892"
+      },
+      "status": "HANDOFF_CLOSED",
+      "supported_cases": [
+        "APGR in-memory report.Result record/payload/bytes and focused report package tests; provider ownership only."
+      ],
+      "unsupported_cases": [
+        "Direct Result.Bytes ingestion: JACA legacy chatgpt-report-record marker differs from APGR agent-report-record.",
+        "Standalone payload or translated-envelope JACA execution is unqualified; adapter selection belongs to JACA.",
+        "JACA transaction/outbox integration, report.Append adoption, persistence/retry and orchestration."
+      ],
+      "ownership_split": "APGR owns report.Result; JACA owns transactions, outbox state, retries and adoption.",
+      "refresh_owner": "JACA artifact/adapter maintainer; APGR report maintainer for provider alias assessment",
+      "refresh_trigger": "Present envelope-marker divergence requires a JACA adapter decision before adoption, even without a new contract change. On a material change to the source-bound contract paths, versions, fields, identity/digest domains, error/refusal semantics, publication/receipt behavior, migration assumptions or APGR APIs: perform the scoped impact assessment and versioned fixture retain/revise/retire decision in docs/governance/external/apg140/maintenance.md before renewing supported-case claims.",
+      "source_authority": [
+        "docs/architecture/apg-jaca-integration.md",
+        "docs/governance/external/apg140/source-inventory.md"
+      ],
+      "qualification_evidence": [
+        "docs/governance/external/apg140/qualification.md",
+        "docs/governance/external/apg140/source-bindings.json",
+        "docs/governance/external/apg140/decisions.md",
+        "docs/governance/external/apg140/support-bindings.json"
+      ],
+      "adoption_claimed": false,
+      "inherited_item_ids": [
+        "APGR-REPORT-OUTBOX"
+      ]
+    },
+    {
+      "watch_id": "JACA-XO",
+      "apgr_identity": "public v0.10.0 contracts / APG140 development fixture observation",
+      "consumer_project": "JACA",
+      "observed_revision": "APG140-JACA-MAIN-20260912",
+      "observed_contract": "ICR-001..006 and XO-ICR-009 in xo-reference-patterns-and-interface-control; xo-capability-roadmap; xo/src/main/go/go.mod",
+      "observation_date": "2026-09-12",
+      "fixture_identity": {
+        "path": "docs/governance/external/apg140/seams/JACA-XO.json",
+        "sha256": "31a6c82c61704b05026247dfa975ced06d67b6258aa7aed723099b81d5deb0b2"
+      },
+      "status": "HANDOFF_CLOSED",
+      "supported_cases": [
+        "APGR candidate-local disposable caller adapter over skills/footprint/schema; DTO containment, sentinel/cancellation and unavailable metrics.",
+        "Historical APG114 released/candidate dual-lane evidence retained as historical, not rerun here."
+      ],
+      "unsupported_cases": [
+        "JACA production Go dependency/import, total-context adoption, adapter execution and downstream qualification.",
+        "Blanket future Go/APGR version compatibility or new released-lane qualification."
+      ],
+      "ownership_split": "APGR owns deterministic library contract; JACA owns its production adapter, orchestration and adoption.",
+      "refresh_owner": "APGR and JACA maintainers",
+      "refresh_trigger": "On a material change to the source-bound contract paths, versions, fields, identity/digest domains, error/refusal semantics, publication/receipt behavior, migration assumptions or APGR APIs: perform the scoped impact assessment and versioned fixture retain/revise/retire decision in docs/governance/external/apg140/maintenance.md before renewing supported-case claims.",
+      "source_authority": [
+        "docs/architecture/jaca-xo-handoff.md",
+        "docs/governance/external/apg140/source-inventory.md"
+      ],
+      "qualification_evidence": [
+        "docs/governance/external/apg140/qualification.md",
+        "docs/governance/external/apg140/source-bindings.json",
+        "docs/governance/external/apg140/decisions.md",
+        "docs/governance/external/apg140/support-bindings.json"
+      ],
+      "adoption_claimed": false,
+      "inherited_item_ids": [
+        "APGR-XO-COMPAT"
+      ]
+    },
+    {
+      "watch_id": "REPO-MAP",
+      "apgr_identity": "public v0.10.0 contracts / APG140 development fixture observation",
+      "consumer_project": "Repo Map",
+      "observed_revision": "APG140-RM-MAIN-20260912",
+      "observed_contract": "ARCH7A public-read; ASYNC1 wire; Go helper JSONL v1; canonical/raw-observation; ARCH5C/ARCH5D migration; mainline publication receipts (paths in APG140 source bindings)",
+      "observation_date": "2026-09-12",
+      "fixture_identity": {
+        "path": "docs/governance/external/apg140/seams/REPO-MAP.json",
+        "sha256": "154d33c2801a6cb22b3f60843895a4789af4392ac8b2db3d6af11ee09e67a3f3"
+      },
+      "status": "QUALIFIED",
+      "supported_cases": [
+        "APGR-local synthetic direct/embedded public-read v1 admission and bounded legacy v0 arrays; unsupported versions and malformed evidence refused.",
+        "Synthetic node/directed-edge/provenance/conflict comparisons and cycle acceptance.",
+        "Source-bound nonempty Python/PostgreSQL migration evidence composition, with no database execution.",
+        "Complete fixture member-byte integrity and caller-owned refusal/cancellation policy."
+      ],
+      "unsupported_cases": [
+        "Hosted Repo Map execution, production graph quality, empirical multi-source publication qualification and production migration/restore safety.",
+        "Cross-request snapshot isolation, unbounded reads, arbitrary future versions or negotiation beyond the observed contract.",
+        "Coordinator/Go-helper runtime execution, source-byte access and planned PublicationRef/portable snapshot qualification.",
+        "Consumer adoption and external runtime integration."
+      ],
+      "ownership_split": "APGR owns reusable guidance and fixtures; Repo Map owns graph/protocol/storage qualification and JACA owns orchestration.",
+      "refresh_owner": "APGR and Repo Map maintainers",
+      "refresh_trigger": "On a material change to the source-bound contract paths, versions, fields, identity/digest domains, error/refusal semantics, publication/receipt behavior, migration assumptions or APGR APIs: perform the scoped impact assessment and versioned fixture retain/revise/retire decision in docs/governance/external/apg140/maintenance.md before renewing supported-case claims.",
+      "source_authority": [
+        "docs/repo-map-support-roadmap.md",
+        "docs/governance/external/apg140/source-inventory.md"
+      ],
+      "qualification_evidence": [
+        "docs/governance/external/apg140/qualification.md",
+        "docs/governance/external/apg140/source-bindings.json",
+        "docs/governance/external/apg140/decisions.md",
+        "docs/governance/external/apg140/support-bindings.json"
+      ],
+      "adoption_claimed": false,
+      "inherited_item_ids": [
+        "RM-S0",
+        "RM-S1",
+        "RM-S2",
+        "RM-S3",
+        "RM-S4",
+        "RM-S5",
+        "SKILL-KG-QUALITY",
+        "SKILL-MIGRATION",
+        "SKILL-VER-PROTO"
+      ]
+    }
+  ]
+}

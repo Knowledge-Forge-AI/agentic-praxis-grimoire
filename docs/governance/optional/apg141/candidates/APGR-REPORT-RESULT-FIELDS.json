@@ -1,0 +1,35 @@
+{
+  "schema_version": "apg141-optional-closure-candidate-v1",
+  "item_id": "APGR-REPORT-RESULT-FIELDS",
+  "review_status": "PENDING_DISPATCHER_PRE_FINAL",
+  "review_ref": null,
+  "review_sha256": null,
+  "receipt": {
+    "schema_version": "apg.roadmap-decision/v1",
+    "item_id": "APGR-REPORT-RESULT-FIELDS",
+    "outcome": "REJECTED",
+    "closure_phase": "V0110-D",
+    "author": "APG141 producer",
+    "reviewer": null,
+    "evidence": {
+      "evaluation": [
+        "docs/governance/optional/apg141/result-fields-decision.md"
+      ],
+      "rejection_rationale": [
+        "docs/governance/optional/apg141/result-fields-decision.md"
+      ]
+    }
+  },
+  "proposed_disposition": {
+    "decision_ref": "docs/governance/optional/apg141/candidates/APGR-REPORT-RESULT-FIELDS.json",
+    "qualification_refs": [
+      "docs/governance/optional/apg141/qualification.md",
+      "docs/governance/optional/apg141/result-fields-decision.md"
+    ],
+    "review_ref": null,
+    "rationale": "APG141 APGR-REPORT-RESULT-FIELDS proposed REJECTED; item-specific contract and rationale remain pending actual review.",
+    "maintenance_ref": null,
+    "compatibility_ref": null,
+    "maturity_ref": null
+  }
+}

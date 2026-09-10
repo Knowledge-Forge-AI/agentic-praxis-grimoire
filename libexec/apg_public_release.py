@@ -10,12 +10,11 @@ import json
 import os
 from pathlib import Path, PurePosixPath
 import re
-import shutil
 import stat
 import subprocess
 import sys
 import tempfile
-from typing import NoReturn, Sequence
+from typing import Mapping, NoReturn, Sequence
 from urllib.parse import unquote, urlsplit
 
 
@@ -1374,6 +1373,23 @@ PUBLIC_VALIDATION_DESELECTIONS_BY_VERSION: dict[str, tuple[str, ...]] = {
     "0.8.1": V07_PUBLIC_VALIDATION_DESELECTIONS,
     "0.9.0": V07_PUBLIC_VALIDATION_DESELECTIONS,
     "0.10.0": V07_PUBLIC_VALIDATION_DESELECTIONS,
+    # v0.11 has a maintained public compatibility fixture for the former
+    # private-oracle CLI node and a public CSS behavior companion. The six
+    # historical CSS/history nodes remain explicitly deselected until their
+    # private source contracts are public.
+    "0.11.0": tuple(
+        sorted(
+            {
+                node
+                for node in V07_PUBLIC_VALIDATION_DESELECTIONS
+                if "cli.int.test.py::test_python_skill_bridge_matches_oracle" not in node
+                and "test_candidate_fixture_debt_and_repository_lifecycle_agree" not in node
+            }
+            | {
+                "src/test/int/python/agentic-praxis-grimoire/skills/css-language-profile/SKILL.int.test.py::test_private_current_machine_contract_remains_source_bound"
+            }
+        )
+    ),
 }
 # None preserves historical audited selection without reading current inventory.
 # A tuple requires inventory closure over the audited files plus exactly these
@@ -1392,6 +1408,9 @@ PUBLIC_INVENTORY_SUPPLEMENTS_BY_VERSION: dict[str, tuple[str, ...] | None] = {
         "src/test/int/python/agentic-praxis-grimoire/libexec/apg_distribution_candidate.int.test.py",
         "src/test/int/python/agentic-praxis-grimoire/src/agentic_praxis_grimoire/reports.int.test.py",
     ),
+    # The v0.11 surface is self-contained: its audited test list is the
+    # complete public selection, so no private inventory supplement is read.
+    "0.11.0": None,
 }
 V07_CRITICAL = tuple(
     sorted(
@@ -1675,6 +1694,356 @@ V010_CRITICAL = tuple(
 
 V010_LICENSING = tuple(V09_LICENSING)
 V010_CATEGORIES = tuple(V09_CATEGORIES)
+# v0.11 is the first current surface after the immutable v0.10 inventory.
+# These additions are explicit so the flat public-surface policy remains a
+# complete, reviewable inventory while every historical surface stays frozen.
+V011_CRITICAL_ADDITIONS = (
+    ".github/workflows/public-pr.yml",
+    "AGENTS.md",
+    "README.md",
+    "docs/README.md",
+    "docs/adr/2026/09/0055-v0-11-capacity-and-closure-governance.md",
+    "docs/adr/2026/09/0056-versioned-hotspot-history.md",
+    "docs/adr/2026/09/0057-public-staging-pr-release-procedure.md",
+    "docs/adr/README.md",
+    "docs/agent-reporting-architecture.md",
+    "docs/distribution.md",
+    "docs/evaluations/apg138-v0-11-foundation-closure.md",
+    "docs/evaluations/apg139-individual-maturity-closure.md",
+    "docs/evaluations/apg140-external-contract-support-closure.md",
+    "docs/evaluations/apg141-optional-work-closure.md",
+    "docs/evaluations/apg142-exact-trigger-maintenance-closure.md",
+    "docs/evaluations/apg143-integrated-readiness-prerequisite.md",
+    "docs/evaluations/apg144-public-staging-candidate-and-operator-handoff.md",
+    "docs/governance/external-compatibility.json",
+    "docs/governance/external/apg140/README.md",
+    "docs/governance/external/apg140/candidates.json",
+    "docs/governance/external/apg140/candidates/APGR-CI-QUAL.json",
+    "docs/governance/external/apg140/candidates/APGR-REPORT-OUTBOX.json",
+    "docs/governance/external/apg140/candidates/APGR-XO-COMPAT.json",
+    "docs/governance/external/apg140/candidates/RM-S0.json",
+    "docs/governance/external/apg140/candidates/RM-S1.json",
+    "docs/governance/external/apg140/candidates/RM-S2.json",
+    "docs/governance/external/apg140/candidates/RM-S3.json",
+    "docs/governance/external/apg140/candidates/RM-S4.json",
+    "docs/governance/external/apg140/candidates/RM-S5.json",
+    "docs/governance/external/apg140/candidates/SKILL-KG-QUALITY.json",
+    "docs/governance/external/apg140/candidates/SKILL-MIGRATION.json",
+    "docs/governance/external/apg140/candidates/SKILL-VER-PROTO.json",
+    "docs/governance/external/apg140/decisions.md",
+    "docs/governance/external/apg140/decisions/APGR-CI-QUAL.json",
+    "docs/governance/external/apg140/decisions/APGR-REPORT-OUTBOX.json",
+    "docs/governance/external/apg140/decisions/APGR-XO-COMPAT.json",
+    "docs/governance/external/apg140/decisions/RM-S0.json",
+    "docs/governance/external/apg140/decisions/RM-S1.json",
+    "docs/governance/external/apg140/decisions/RM-S2.json",
+    "docs/governance/external/apg140/decisions/RM-S3.json",
+    "docs/governance/external/apg140/decisions/RM-S4.json",
+    "docs/governance/external/apg140/decisions/RM-S5.json",
+    "docs/governance/external/apg140/decisions/SKILL-KG-QUALITY.json",
+    "docs/governance/external/apg140/decisions/SKILL-MIGRATION.json",
+    "docs/governance/external/apg140/decisions/SKILL-VER-PROTO.json",
+    "docs/governance/external/apg140/independent-review.md",
+    "docs/governance/external/apg140/maintenance.md",
+    "docs/governance/external/apg140/migration-fixture.json",
+    "docs/governance/external/apg140/qualification.md",
+    "docs/governance/external/apg140/seams/JACA-CI.json",
+    "docs/governance/external/apg140/seams/JACA-OUTBOX.json",
+    "docs/governance/external/apg140/seams/JACA-XO.json",
+    "docs/governance/external/apg140/seams/REPO-MAP.json",
+    "docs/governance/external/apg140/source-bindings.json",
+    "docs/governance/external/apg140/source-inventory.md",
+    "docs/governance/external/apg140/support-bindings.json",
+    "docs/governance/external/apg140/terminal-bindings.json",
+    "docs/governance/maintenance-triggers.json",
+    "docs/governance/maintenance/apg142/README.md",
+    "docs/governance/maintenance/apg142/candidates.json",
+    "docs/governance/maintenance/apg142/candidates/APGR-CXT-BUDGET-COMPRESSION.json",
+    "docs/governance/maintenance/apg142/candidates/APGR-DEBT-CSS-QD-001.json",
+    "docs/governance/maintenance/apg142/candidates/APGR-DEBT-CSS-QD-002.json",
+    "docs/governance/maintenance/apg142/candidates/APGR-DEBT-CSS-QD-003.json",
+    "docs/governance/maintenance/apg142/candidates/APGR-DEBT-CSS-QD-004.json",
+    "docs/governance/maintenance/apg142/candidates/APGR-DEBT-CSS-QD-005.json",
+    "docs/governance/maintenance/apg142/candidates/APGR-DEBT-JS-QD-005.json",
+    "docs/governance/maintenance/apg142/candidates/APGR-REPORT-PUREGO-GIT.json",
+    "docs/governance/maintenance/apg142/context-compression.md",
+    "docs/governance/maintenance/apg142/css-qd-001.md",
+    "docs/governance/maintenance/apg142/css-qd-002.md",
+    "docs/governance/maintenance/apg142/css-qd-003.md",
+    "docs/governance/maintenance/apg142/css-qd-004.md",
+    "docs/governance/maintenance/apg142/css-qd-005.md",
+    "docs/governance/maintenance/apg142/decisions/APGR-CXT-BUDGET-COMPRESSION.json",
+    "docs/governance/maintenance/apg142/decisions/APGR-DEBT-CSS-QD-001.json",
+    "docs/governance/maintenance/apg142/decisions/APGR-DEBT-CSS-QD-002.json",
+    "docs/governance/maintenance/apg142/decisions/APGR-DEBT-CSS-QD-003.json",
+    "docs/governance/maintenance/apg142/decisions/APGR-DEBT-CSS-QD-004.json",
+    "docs/governance/maintenance/apg142/decisions/APGR-DEBT-CSS-QD-005.json",
+    "docs/governance/maintenance/apg142/decisions/APGR-DEBT-JS-QD-005.json",
+    "docs/governance/maintenance/apg142/decisions/APGR-REPORT-PUREGO-GIT.json",
+    "docs/governance/maintenance/apg142/js-qd-005.md",
+    "docs/governance/maintenance/apg142/plan-review.md",
+    "docs/governance/maintenance/apg142/purego-git.md",
+    "docs/governance/maintenance/apg142/qualification.md",
+    "docs/governance/maintenance/apg142/work-review.md",
+    "docs/governance/maturity/apg139/README.md",
+    "docs/governance/maturity/apg139/astro-profile.json",
+    "docs/governance/maturity/apg139/browser-runtime-profile.json",
+    "docs/governance/maturity/apg139/chatgpt-manager-workflow.json",
+    "docs/governance/maturity/apg139/composing-approved-roadmap-assignments.json",
+    "docs/governance/maturity/apg139/converting-bash-scripts-to-python.json",
+    "docs/governance/maturity/apg139/css-language-profile.json",
+    "docs/governance/maturity/apg139/decisions/astro-profile.json",
+    "docs/governance/maturity/apg139/decisions/browser-runtime-profile.json",
+    "docs/governance/maturity/apg139/decisions/chatgpt-manager-workflow.json",
+    "docs/governance/maturity/apg139/decisions/composing-approved-roadmap-assignments.json",
+    "docs/governance/maturity/apg139/decisions/converting-bash-scripts-to-python.json",
+    "docs/governance/maturity/apg139/decisions/css-language-profile.json",
+    "docs/governance/maturity/apg139/decisions/dockerfile-profile.json",
+    "docs/governance/maturity/apg139/decisions/go-cmp-test-profile.json",
+    "docs/governance/maturity/apg139/decisions/go-language-profile.json",
+    "docs/governance/maturity/apg139/decisions/go-test-profile.json",
+    "docs/governance/maturity/apg139/decisions/gomock-test-profile.json",
+    "docs/governance/maturity/apg139/decisions/javascript-language-profile.json",
+    "docs/governance/maturity/apg139/decisions/jsx-language-profile.json",
+    "docs/governance/maturity/apg139/decisions/markdown-language-profile.json",
+    "docs/governance/maturity/apg139/decisions/mdx-profile.json",
+    "docs/governance/maturity/apg139/decisions/minitest-test-profile.json",
+    "docs/governance/maturity/apg139/decisions/nix-test-profile.json",
+    "docs/governance/maturity/apg139/decisions/nodejs-runtime-profile.json",
+    "docs/governance/maturity/apg139/decisions/npm-package-manager-profile.json",
+    "docs/governance/maturity/apg139/decisions/playwright-test-profile.json",
+    "docs/governance/maturity/apg139/decisions/postgresql-database-profile.json",
+    "docs/governance/maturity/apg139/decisions/pytest-test-profile.json",
+    "docs/governance/maturity/apg139/decisions/react-component-profile.json",
+    "docs/governance/maturity/apg139/decisions/ruby-language-profile.json",
+    "docs/governance/maturity/apg139/decisions/sqlite-database-profile.json",
+    "docs/governance/maturity/apg139/decisions/svg-language-profile.json",
+    "docs/governance/maturity/apg139/decisions/typescript-language-profile.json",
+    "docs/governance/maturity/apg139/decisions/vagrantfile-profile.json",
+    "docs/governance/maturity/apg139/decisions/vite-build-profile.json",
+    "docs/governance/maturity/apg139/decisions/vitest-test-profile.json",
+    "docs/governance/maturity/apg139/decisions/web-accessibility-profile.json",
+    "docs/governance/maturity/apg139/dockerfile-profile.json",
+    "docs/governance/maturity/apg139/go-cmp-test-profile.json",
+    "docs/governance/maturity/apg139/go-language-profile.json",
+    "docs/governance/maturity/apg139/go-test-profile.json",
+    "docs/governance/maturity/apg139/gomock-test-profile.json",
+    "docs/governance/maturity/apg139/independent-review.md",
+    "docs/governance/maturity/apg139/javascript-language-profile.json",
+    "docs/governance/maturity/apg139/jsx-language-profile.json",
+    "docs/governance/maturity/apg139/markdown-language-profile.json",
+    "docs/governance/maturity/apg139/mdx-profile.json",
+    "docs/governance/maturity/apg139/minitest-test-profile.json",
+    "docs/governance/maturity/apg139/nix-test-profile.json",
+    "docs/governance/maturity/apg139/nodejs-runtime-profile.json",
+    "docs/governance/maturity/apg139/npm-package-manager-profile.json",
+    "docs/governance/maturity/apg139/playwright-test-profile.json",
+    "docs/governance/maturity/apg139/postgresql-database-profile.json",
+    "docs/governance/maturity/apg139/pytest-test-profile.json",
+    "docs/governance/maturity/apg139/qualification.md",
+    "docs/governance/maturity/apg139/react-component-profile.json",
+    "docs/governance/maturity/apg139/ruby-language-profile.json",
+    "docs/governance/maturity/apg139/sqlite-database-profile.json",
+    "docs/governance/maturity/apg139/svg-language-profile.json",
+    "docs/governance/maturity/apg139/typescript-language-profile.json",
+    "docs/governance/maturity/apg139/vagrantfile-profile.json",
+    "docs/governance/maturity/apg139/vite-build-profile.json",
+    "docs/governance/maturity/apg139/vitest-test-profile.json",
+    "docs/governance/maturity/apg139/web-accessibility-profile.json",
+    "docs/governance/optional/apg141/README.md",
+    "docs/governance/optional/apg141/candidates.json",
+    "docs/governance/optional/apg141/candidates/APGR-CXT2B.json",
+    "docs/governance/optional/apg141/candidates/APGR-HOTSPOT-CHURN.json",
+    "docs/governance/optional/apg141/candidates/APGR-REPORT-PROJECT-KEY.json",
+    "docs/governance/optional/apg141/candidates/APGR-REPORT-RESULT-FIELDS.json",
+    "docs/governance/optional/apg141/caveman-decision.md",
+    "docs/governance/optional/apg141/decisions/APGR-CXT2B.json",
+    "docs/governance/optional/apg141/decisions/APGR-HOTSPOT-CHURN.json",
+    "docs/governance/optional/apg141/decisions/APGR-REPORT-PROJECT-KEY.json",
+    "docs/governance/optional/apg141/decisions/APGR-REPORT-RESULT-FIELDS.json",
+    "docs/governance/optional/apg141/independent-review.md",
+    "docs/governance/optional/apg141/project-key-contract.md",
+    "docs/governance/optional/apg141/qualification.md",
+    "docs/governance/optional/apg141/result-fields-decision.md",
+    "docs/governance/schemas/external-compatibility.schema.json",
+    "docs/governance/schemas/maintenance-triggers.schema.json",
+    "docs/governance/schemas/maturity-candidate.schema.json",
+    "docs/governance/schemas/roadmap-decision.schema.json",
+    "docs/governance/schemas/skill-maturity-ledger.schema.json",
+    "docs/governance/schemas/v0-11-closure-ledger.schema.json",
+    "docs/governance/skill-maturity-ledger.json",
+    "docs/governance/v0-11-closure-governance.md",
+    "docs/governance/v0-11-closure-ledger.json",
+    "docs/guides/hotspot-analysis.md",
+    "docs/guides/hotspot-history.md",
+    "docs/public-pr-ci.md",
+    "docs/reference/cli.md",
+    "docs/roadmap.md",
+    "docs/status/2026/09/12/00183-apg138-v0-11-foundation-closure-exit.md",
+    "docs/status/2026/09/12/00184-apg139-individual-maturity-closure-exit.md",
+    "docs/status/2026/09/12/00185-apg140-external-contract-support-closure-exit.md",
+    "docs/status/2026/09/12/00186-apg141-optional-work-closure-exit.md",
+    "docs/status/2026/09/12/00187-apg142-exact-trigger-maintenance-closure-exit.md",
+    "docs/status/2026/09/12/00188-apg143-integrated-readiness-prerequisite-exit.md",
+    "docs/status/2026/09/13/00189-apg144-public-staging-candidate-and-operator-handoff-exit.md",
+    "docs/status/README.md",
+    "docs/v0-11-roadmap.md",
+    "hotspot/analyze.go",
+    "hotspot/analyze_v2.go",
+    "hotspot/doc.go",
+    "hotspot/history_blob.go",
+    "hotspot/history_git.go",
+    "hotspot/history_git_parse.go",
+    "hotspot/history_git_paths.go",
+    "hotspot/history_git_preflight.go",
+    "hotspot/history_lcs.go",
+    "hotspot/history_measure.go",
+    "hotspot/history_storage.go",
+    "hotspot/json_v2.go",
+    "hotspot/render.go",
+    "hotspot/render_v2.go",
+    "hotspot/request_v2.go",
+    "hotspot/types_v2.go",
+    "internal/cli/analyze.go",
+    "internal/cli/cli.go",
+    "internal/cli/response.go",
+    "release/ci/codeql_policy.json",
+    "release/ci/grype.yaml",
+    "release/ci/sbom_policy.json",
+    "release/v0.11.0-notes.md",
+    "skills/README.md",
+    "src/test/fixtures/apg60-css-public-state-fixture.json",
+    "src/test/support/apg140_migration_fixture.py",
+    "src/test/support/apg_external_compatibility_fixture.py",
+    "testing/apg-test-inventory.json",
+    "testing/fixtures/external_compatibility/apg140/README.md",
+    "testing/fixtures/external_compatibility/apg140/cases/identity_drift_binding.json",
+    "testing/fixtures/external_compatibility/apg140/cases/malformed_syntax.json",
+    "testing/fixtures/external_compatibility/apg140/cases/v0_legacy_nodes_array.json",
+    "testing/fixtures/external_compatibility/apg140/cases/v1_canonical_edges_exhausted.json",
+    "testing/fixtures/external_compatibility/apg140/cases/v1_canonical_edges_truncated.json",
+    "testing/fixtures/external_compatibility/apg140/cases/v1_canonical_nodes_exhausted.json",
+    "testing/fixtures/external_compatibility/apg140/cases/v1_canonical_nodes_truncated.json",
+    "testing/fixtures/external_compatibility/apg140/cases/v1_count_mismatch.json",
+    "testing/fixtures/external_compatibility/apg140/cases/v1_cyclic_graph.json",
+    "testing/fixtures/external_compatibility/apg140/cases/v1_cyclic_graph_edges.json",
+    "testing/fixtures/external_compatibility/apg140/cases/v1_diagnostic_inconsistent_exhausted.json",
+    "testing/fixtures/external_compatibility/apg140/cases/v1_diagnostic_inconsistent_truncated.json",
+    "testing/fixtures/external_compatibility/apg140/cases/v1_embedded_neighborhood_exhausted.json",
+    "testing/fixtures/external_compatibility/apg140/cases/v1_embedded_neighborhood_truncated.json",
+    "testing/fixtures/external_compatibility/apg140/cases/v1_graph_with_conflicts.json",
+    "testing/fixtures/external_compatibility/apg140/cases/v1_partial_missing_limit.json",
+    "testing/fixtures/external_compatibility/apg140/cases/v1_partial_missing_page.json",
+    "testing/fixtures/external_compatibility/apg140/cases/v1_unknown_envelope_field.json",
+    "testing/fixtures/external_compatibility/apg140/manifest.json",
+    "testing/fixtures/skill-cli-compatibility.json",
+    "testing/public-ci-runtime.json",
+    "tools/ci/betterleaks_dispositions.json",
+    "tools/ci/file_length_policy.json",
+    "tools/ci/pre_review_baseline.json",
+    "tools/ci/pre_review_tools.json",
+    "tools/ci/python_type_ownership.json",
+    "tools/ci/retained_python_ratchets.json",
+    "tools/ci/scanner_suppressions_known.json",
+    "tools/ci/semgrep.yml",
+)
+V011_HELPER_ADDITIONS = (
+    "libexec/apg_roadmap_closure.py",
+    "libexec/apg_roadmap_contract.py",
+    "libexec/apg_source_capture.py",
+    "libexec/apg_test.py",
+    "release/ci/matrix_receipts.py",
+    "tools/ci/betterleaks_dispositions.py",
+    "tools/ci/bootstrap_runtime.py",
+    "tools/ci/bootstrap_static.sh",
+    "tools/ci/bootstrap_tool.py",
+    "tools/ci/check_generated_drift.py",
+    "tools/ci/ci_topology.py",
+    "tools/ci/codeql_policy.py",
+    "tools/ci/dependency_inventory.py",
+    "tools/ci/file_length_policy.py",
+    "tools/ci/liquibase_check.py",
+    "tools/ci/pre_review_checks.py",
+    "tools/ci/pre_review_evaluation.py",
+    "tools/ci/pre_review_evidence.py",
+    "tools/ci/pre_review_records.py",
+    "tools/ci/prompt_defense_check.py",
+    "tools/ci/python_inventory.py",
+    "tools/ci/python_retention_inventory.py",
+    "tools/ci/python_type_check.py",
+    "tools/ci/qualify_packages.sh",
+    "tools/ci/retained_python_ratchets.py",
+    "tools/ci/run_pre_review.py",
+    "tools/ci/sbom_records.py",
+    "tools/ci/scanner_suppressions.py",
+    "tools/ci/workflow_model.py",
+)
+V011_TEST_ADDITIONS = (
+    "src/test/int/python/agentic-praxis-grimoire/bin/apg-capture-source.int.test.py",
+    "hotspot/external_consumer_test.go",
+    "hotspot/history_contract_test.go",
+    "hotspot/history_git_safety_test.go",
+    "hotspot/history_test.go",
+    "internal/cli/analyze_history_test.go",
+    "internal/cli/project_key_test.go",
+    "src/test/int/python/agentic-praxis-grimoire/.github/workflows/public-pr.yml.int.test.py",
+    "src/test/int/python/agentic-praxis-grimoire/.github/workflows/release.yml.int.test.py",
+    "src/test/int/python/agentic-praxis-grimoire/bin/apg-public-release.int.test.py",
+    "src/test/int/python/agentic-praxis-grimoire/libexec/apg_distribution_candidate.int.test.py",
+    "src/test/int/python/agentic-praxis-grimoire/libexec/apg_public_release.int.test.py",
+    "src/test/int/python/agentic-praxis-grimoire/libexec/apg_roadmap_closure.int.test.py",
+    "src/test/int/python/agentic-praxis-grimoire/libexec/apg_roadmap_contract.int.test.py",
+    "src/test/int/python/agentic-praxis-grimoire/libexec/apg_source_capture.int.test.py",
+    "src/test/int/python/agentic-praxis-grimoire/tools/ci/betterleaks_dispositions.int.test.py",
+    "src/test/int/python/agentic-praxis-grimoire/tools/ci/ci_topology.int.test.py",
+    "src/test/int/python/agentic-praxis-grimoire/tools/ci/file_length_policy.int.test.py",
+    "src/test/int/python/agentic-praxis-grimoire/tools/ci/pre_review_checks.int.test.py",
+    "src/test/int/python/agentic-praxis-grimoire/tools/ci/python_retention_inventory.int.test.py",
+    "src/test/int/python/agentic-praxis-grimoire/tools/ci/run_pre_review.int.test.py",
+    "src/test/int/python/agentic-praxis-grimoire/tools/ci/scanner_suppressions.int.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/.github/workflows/release.yml.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_distribution_candidate.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_public_release.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_python_publication.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_roadmap_closure.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_roadmap_contract.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_source_capture.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_test.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/release/ci/matrix_receipts.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg140_migration_fixture.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_external_compatibility_fixture.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/tools/ci/betterleaks_dispositions.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/tools/ci/bootstrap_runtime.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/tools/ci/check_generated_drift.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/tools/ci/ci_topology.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/tools/ci/codeql_policy.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/tools/ci/dependency_inventory.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/tools/ci/file_length_policy.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/tools/ci/pre_review_checks.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/tools/ci/pre_review_evaluation.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/tools/ci/pre_review_evidence.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/tools/ci/pre_review_records.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/tools/ci/python_retention_inventory.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/tools/ci/retained_python_ratchets.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/tools/ci/sbom_records.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/tools/ci/scanner_suppressions.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/tools/ci/workflow_model.unit.test.py",
+)
+V011_WRAPPER_ADDITIONS = (
+    "bin/apg-capture-source",
+    "bin/apg-check-roadmap-closure",
+)
+V011_WRAPPERS = tuple(sorted(set(V010_WRAPPERS) | set(V011_WRAPPER_ADDITIONS)))
+V011_HELPERS = tuple(sorted(set(V010_HELPERS) | set(V011_HELPER_ADDITIONS)))
+V011_TESTS = tuple(sorted(set(V010_TESTS) | set(V011_TEST_ADDITIONS)))
+# Helpers, tests and wrappers are critical through their owning additions.
+V011_CRITICAL = tuple(sorted(set(V010_CRITICAL) | set(V011_CRITICAL_ADDITIONS)
+                             | set(V011_HELPER_ADDITIONS) | set(V011_TEST_ADDITIONS)
+                             | set(V011_WRAPPER_ADDITIONS)))
+V011_LICENSING = tuple(V010_LICENSING)
+V011_PROJECTIONS = tuple(V010_PROJECTIONS)
+V011_SKILLS = tuple(V010_SKILLS)
+V011_CATEGORIES = tuple(V010_CATEGORIES)
 
 # Source-only test oracles and generated/local output never enter the
 # release-shaped v0.7 candidate. The compatibility wrappers above are not
@@ -2333,9 +2702,21 @@ def audited_policy_surfaces(version: str) -> tuple[dict[str, tuple[str, ...]], .
         "critical_files": V010_CRITICAL,
         "validation_categories": V010_CATEGORIES,
     }
+    current_v011 = {
+        "required_helpers": V011_HELPERS,
+        "required_licensing_files": V011_LICENSING,
+        "required_projections": V011_PROJECTIONS,
+        "required_skills": V011_SKILLS,
+        "required_test_entrypoints": V011_TESTS,
+        "required_wrappers": V011_WRAPPERS,
+        "critical_files": V011_CRITICAL,
+        "validation_categories": V011_CATEGORIES,
+    }
     if not SEMVER.fullmatch(version):
         fail("public release policy identity is malformed or unsupported")
     core = version.split("+", 1)[0].split("-", 1)[0]
+    if core == "0.11.0":
+        return (current_v011,)
     if core == "0.10.0":
         return (current_v010,)
     if core == "0.9.0":
@@ -2619,6 +3000,14 @@ def is_v010_candidate_path(path: str | bytes) -> bool:
     return True
 
 
+def is_v011_candidate_path(path: str | bytes) -> bool:
+    """Return whether one source path belongs in the current v0.11 surface."""
+
+    # v0.11 extends the audited v0.10 source owners.  Keep the generated and
+    # publication-excluded path rules identical so v0.10 remains immutable.
+    return is_v010_candidate_path(path)
+
+
 def public_candidate_entries(
     repository: Repository,
     version: str,
@@ -2631,6 +3020,8 @@ def public_candidate_entries(
         fail("public candidate version is malformed or unsupported")
     entries = tree_entries(repository, excluded_prefix=excluded_prefix)
     core = version.split("+", 1)[0].split("-", 1)[0]
+    if core == "0.11.0":
+        return tuple(entry for entry in entries if is_v011_candidate_path(entry.path))
     if core == "0.10.0":
         return tuple(entry for entry in entries if is_v010_candidate_path(entry.path))
     if core == "0.9.0":
@@ -2660,7 +3051,7 @@ def validate_critical(entries: Sequence[Entry], policy: dict[str, object]) -> No
         "required_wrappers",
     )
     for key in keys:
-        for path in policy[key]:  # type: ignore[index]
+        for path in policy[key]:
             if path not in present:
                 fail(f"required public path is missing: {path}")
 
@@ -2806,6 +3197,14 @@ def validate_versioned_policy_exclusions(
     if not SEMVER.fullmatch(version):
         fail("public release version is malformed or unsupported")
     core = version.split("+", 1)[0].split("-", 1)[0]
+    if core == "0.11.0":
+        for entry in entries:
+            if not is_v011_candidate_path(entry.path):
+                fail(
+                    f"public v{version} contains a publication-excluded path: "
+                    + entry.display_path
+                )
+        return
     if core == "0.10.0":
         for entry in entries:
             if not is_v010_candidate_path(entry.path):
@@ -2867,7 +3266,7 @@ def render_manifest(manifest: dict[str, object], output_format: str) -> str:
     if output_format == "json":
         return json.dumps(manifest, ensure_ascii=True, separators=(",", ":"), sort_keys=True) + "\n"
     lines = ["APG public manifest v1"]
-    for entry in manifest["entries"]:  # type: ignore[assignment]
+    for entry in manifest["entries"]:
         lines.append(f"{entry['mode']} {entry['sha256']} {entry['path']}")
     return "\n".join(lines) + "\n"
 
@@ -3261,6 +3660,104 @@ def build_candidate(
     return tree, commit, tag_object
 
 
+def build_untagged_candidate(
+    source: Repository,
+    base: Repository,
+    output: Path,
+    version: str,
+) -> tuple[str, str]:
+    """Build the untagged ``staging`` candidate used by the public PR.
+
+    The projection and object-copy machinery is the same as the tagged
+    release builder, but this mode deliberately takes no release-date or
+    author override and creates neither a release branch nor a tag.  The
+    disposable candidate receives a single commit on the exact ``staging``
+    branch so GitHub can create the eventual squash commit later.
+    """
+
+    if version.split("+", 1)[0].split("-", 1)[0] != "0.11.0":
+        unsafe("untagged candidate mode is only available for v0.11.0")
+    validate_repository_separation(source, base)
+    verify_public_release_lineage(
+        base,
+        accepted_commit=PUBLIC_V01_COMMIT,
+        accepted_tree=PUBLIC_V01_TREE,
+    )
+    policy = load_policy(
+        source,
+        expected_surfaces=audited_policy_surfaces(version),
+        allow_v07_compatibility=True,
+        allow_v08_compatibility=True,
+        allow_v09_compatibility=True,
+        allow_v010_compatibility=True,
+    )
+    entries = public_candidate_entries(source, version, excluded_prefix=b"private/")
+    validate_versioned_policy_exclusions(entries, version)
+    validate_critical(entries, policy)
+    validate_public_symlinks(source, entries)
+    validate_output_path(output, source.root, base.root)
+    if not run_git(
+        base.root,
+        ["show-ref", "--verify", "--quiet", "refs/heads/staging"],
+        allow_failure=True,
+    ).returncode:
+        fail("public base already contains the staging branch")
+    if os.path.lexists(output):
+        output.rmdir()
+    initialize_candidate(output, base)
+    metadata = text_git(
+        base.root,
+        ["show", "-s", "--format=%an%x00%ae%x00%aI", base.head],
+    ).split("\x00")
+    if len(metadata) != 3:
+        fail("public base release metadata is incomplete")
+    validate_identity(metadata[0], metadata[1])
+    validate_date(metadata[2])
+    run_git(output, ["config", "user.name", metadata[0]])
+    run_git(output, ["config", "user.email", metadata[1]])
+    for entry in entries:
+        import_object(source, output, entry.oid)
+    with tempfile.NamedTemporaryFile(prefix="apg-public-index-", delete=False) as index_file:
+        index_path = Path(index_file.name)
+    index_path.unlink()
+    try:
+        payload = b"".join(
+            entry.mode.encode("ascii") + b" " + entry.oid.encode("ascii") + b"\t" + entry.path + b"\0"
+            for entry in entries
+        )
+        environment = {"GIT_INDEX_FILE": str(index_path)}
+        run_git(
+            output,
+            ["update-index", "-z", "--index-info"],
+            input_bytes=payload,
+            extra_environment=environment,
+        )
+        tree = text_git(output, ["write-tree"], extra_environment=environment)
+    finally:
+        index_path.unlink(missing_ok=True)
+    identity_environment = {
+        "GIT_AUTHOR_NAME": metadata[0],
+        "GIT_AUTHOR_EMAIL": metadata[1],
+        "GIT_AUTHOR_DATE": metadata[2],
+        "GIT_COMMITTER_NAME": metadata[0],
+        "GIT_COMMITTER_EMAIL": metadata[1],
+        "GIT_COMMITTER_DATE": metadata[2],
+    }
+    commit = text_git(
+        output,
+        ["commit-tree", tree, "-p", base.head, "-m", f"Release v{version}"],
+        extra_environment=identity_environment,
+    )
+    run_git(output, ["update-ref", "refs/heads/staging", commit])
+    run_git(output, ["symbolic-ref", "HEAD", "refs/heads/staging"])
+    run_git(output, ["reset", "--hard", commit])
+    if run_git(source.root, ["status", "--porcelain=v1", "-z", "--untracked-files=all"]).stdout:
+        fail("source changed during candidate construction")
+    if run_git(base.root, ["status", "--porcelain=v1", "-z", "--untracked-files=all"]).stdout:
+        fail("base changed during candidate construction")
+    return tree, commit
+
+
 MARKDOWN_LINK = re.compile(r"(?<!!)\[[^\]]*\]\(([^)]+)\)|!\[[^\]]*\]\(([^)]+)\)")
 HUMAN_MARKDOWN_LINK_EXCLUDED_PREFIXES = (b"hotspot/testdata/classification/",)
 
@@ -3340,7 +3837,42 @@ def run_checked_command(arguments: Sequence[str], cwd: Path, environment: dict[s
             env=environment or os.environ.copy(),
         )
     except OSError as error:
-        fail(f"configured validation could not run: {error.strerror}")
+        fail(f"configured validation could not run: {error.strerror or error}")
+    log_var = os.environ.get("APG_VALIDATION_OUTPUT_LOG")
+    if log_var:
+        log_path = Path(log_var)
+        if not log_path.is_absolute():
+            fail("validation output log path must be absolute")
+        resolved_log = log_path.resolve()
+        forbidden = [cwd.resolve(), Path(__file__).resolve().parents[1]]
+        if environment and "APG12_PUBLIC_V01_ROOT" in environment:
+            forbidden.append(Path(environment["APG12_PUBLIC_V01_ROOT"]).resolve())
+        for root in forbidden:
+            if resolved_log == root or root in resolved_log.parents or resolved_log in root.parents:
+                fail(f"validation output log path cannot overlap repository or validation roots: {resolved_log}")
+        log_payload = (
+            f"--- COMMAND: {' '.join(arguments)} ---\n"
+            f"RETURNCODE: {result.returncode}\n"
+            f"--- STDOUT ---\n"
+            f"{result.stdout.decode('utf-8', 'replace')}\n"
+            f"--- STDERR ---\n"
+            f"{result.stderr.decode('utf-8', 'replace')}\n"
+            f"--- END COMMAND ---\n"
+        ).encode("utf-8")
+        flags = os.O_WRONLY | os.O_CREAT | os.O_APPEND
+        if hasattr(os, "O_NOFOLLOW"):
+            flags |= os.O_NOFOLLOW
+        try:
+            fd = os.open(os.fspath(resolved_log), flags, 0o600)
+            try:
+                offset = 0
+                while offset < len(log_payload):
+                    offset += os.write(fd, log_payload[offset:])
+                os.fsync(fd)
+            finally:
+                os.close(fd)
+        except OSError as error:
+            fail(f"could not write validation output log: {error.strerror or error}")
     if result.returncode:
         detail = (result.stderr + result.stdout)[-8192:].decode("utf-8", "replace").strip()
         fail(f"configured validation failed: {' '.join(arguments)}: {detail}")
@@ -3364,7 +3896,7 @@ def resolve_public_validation_deselections(
         or not isinstance(policy.get("required_test_entrypoints"), (list, tuple))
     ):
         fail("public release policy is malformed")
-    policy_tests = tuple(policy["required_test_entrypoints"])  # type: ignore[arg-type]
+    policy_tests = tuple(policy["required_test_entrypoints"])
     if policy_tests != audited_tests:
         fail(
             "public release policy required_test_entrypoints differs from the "
@@ -3416,10 +3948,10 @@ def validate_categories(
     environment: dict[str, str],
     version: str,
 ) -> None:
-    categories = set(policy["validation_categories"])  # type: ignore[arg-type]
-    wrappers = tuple(policy["required_wrappers"])  # type: ignore[arg-type]
-    helpers = tuple(policy["required_helpers"])  # type: ignore[arg-type]
-    tests = tuple(policy["required_test_entrypoints"])  # type: ignore[arg-type]
+    categories = set(policy["validation_categories"])
+    wrappers = tuple(policy["required_wrappers"])
+    helpers = tuple(policy["required_helpers"])
+    tests = tuple(policy["required_test_entrypoints"])
     if "skill-library" in categories:
         run_checked_command([str(candidate.root / "bin" / "apg-check-skill-library"), "--root", str(candidate.root), "--format", "json"], candidate.root, environment)
     if "record-identity" in categories:
@@ -3521,7 +4053,7 @@ def isolated_validation_environment(
         )
     ]
     try:
-        import pytest  # type: ignore[import-not-found]
+        import pytest
 
         pytest_dir = str(Path(pytest.__file__).resolve().parent.parent)
         if pytest_dir not in inherited_site_packages:
@@ -3581,6 +4113,8 @@ def check_candidate(
     candidate: Repository,
     version: str,
     private_policy: str | None,
+    *,
+    untagged: bool = False,
 ) -> dict[str, object]:
     validate_repository_separation(source, base, candidate)
     verify_public_release_lineage(
@@ -3601,7 +4135,7 @@ def check_candidate(
     )
     candidate_entries = public_candidate_entries(candidate, version)
     core = version.split("+", 1)[0].split("-", 1)[0]
-    if core in {"0.7.0", "0.8.0", "0.8.1", "0.9.0", "0.10.0"}:
+    if core in {"0.7.0", "0.8.0", "0.8.1", "0.9.0", "0.10.0", "0.11.0"}:
         # The development source may retain publication-excluded oracle files,
         # but a v0.7+ release candidate must not project them.  Inspect the
         # unfiltered candidate tree so the check cannot pass merely because
@@ -3636,43 +4170,53 @@ def check_candidate(
         fail("candidate release commit must have exactly one parent equal to the public base")
     if text_git(candidate.root, ["rev-list", "--count", f"{base.head}..HEAD"]) != "1":
         fail("candidate history must add exactly one commit after the public base")
-    expected_branch = f"release/{version}"
+    expected_branch = "staging" if untagged else f"release/{version}"
     if text_git(candidate.root, ["branch", "--show-current"]) != expected_branch:
         fail("candidate is on the wrong release branch")
     if text_git(candidate.root, ["log", "-1", "--format=%s"]) != f"Release v{version}":
         fail("candidate release subject is incorrect")
     tag = f"v{version}"
-    if text_git(candidate.root, ["cat-file", "-t", f"refs/tags/{tag}"]) != "tag":
-        fail("candidate release tag must be an annotated tag with explicit metadata")
-    tag_result = run_git(candidate.root, ["rev-parse", f"{tag}^{{commit}}"], allow_failure=True)
-    if tag_result.returncode or tag_result.stdout.decode().strip() != candidate.head:
-        fail("candidate release tag is missing or mismatched")
-    commit_metadata = text_git(
-        candidate.root,
-        ["show", "-s", "--format=%an%x00%ae%x00%aI%x00%cn%x00%ce%x00%cI", "HEAD"],
-    ).split("\x00")
-    if len(commit_metadata) != 6 or commit_metadata[:3] != commit_metadata[3:]:
-        fail("candidate author and committer metadata must be explicit and identical")
-    tag_metadata = text_git(
-        candidate.root,
-        [
-            "for-each-ref",
-            "--format=%(taggername)%00%(taggeremail:trim)%00%(taggerdate:iso-strict)%00%(contents:subject)",
-            f"refs/tags/{tag}",
-        ],
-    ).split("\x00")
-    if len(tag_metadata) != 4 or tag_metadata != [commit_metadata[0], commit_metadata[1], commit_metadata[2], f"Release v{version}"]:
-        fail("candidate annotated-tag metadata differs from the release commit metadata")
+    if untagged:
+        if run_git(
+            candidate.root,
+            ["show-ref", "--verify", "--quiet", f"refs/tags/{tag}"],
+            allow_failure=True,
+        ).returncode == 0:
+            fail("untagged candidate must not contain a release tag")
+    else:
+        if text_git(candidate.root, ["cat-file", "-t", f"refs/tags/{tag}"]) != "tag":
+            fail("candidate release tag must be an annotated tag with explicit metadata")
+        tag_result = run_git(candidate.root, ["rev-parse", f"{tag}^{{commit}}"], allow_failure=True)
+        if tag_result.returncode or tag_result.stdout.decode().strip() != candidate.head:
+            fail("candidate release tag is missing or mismatched")
+        commit_metadata = text_git(
+            candidate.root,
+            ["show", "-s", "--format=%an%x00%ae%x00%aI%x00%cn%x00%ce%x00%cI", "HEAD"],
+        ).split("\x00")
+        if len(commit_metadata) != 6 or commit_metadata[:3] != commit_metadata[3:]:
+            fail("candidate author and committer metadata must be explicit and identical")
+        tag_metadata = text_git(
+            candidate.root,
+            [
+                "for-each-ref",
+                "--format=%(taggername)%00%(taggeremail:trim)%00%(taggerdate:iso-strict)%00%(contents:subject)",
+                f"refs/tags/{tag}",
+            ],
+        ).split("\x00")
+        if len(tag_metadata) != 4 or tag_metadata != [commit_metadata[0], commit_metadata[1], commit_metadata[2], f"Release v{version}"]:
+            fail("candidate annotated-tag metadata differs from the release commit metadata")
     candidate_heads = reference_map(candidate, "refs/heads")
+    candidate_branch = "refs/heads/staging" if untagged else f"refs/heads/release/{version}"
     expected_heads = {
         "refs/heads/main": base.head,
-        f"refs/heads/release/{version}": candidate.head,
+        candidate_branch: candidate.head,
     }
     if candidate_heads != expected_heads:
         fail("candidate local branch set or identity differs from the release contract")
     candidate_tags = reference_map(candidate, "refs/tags")
     expected_tags = reference_map(base, "refs/tags")
-    expected_tags[f"refs/tags/{tag}"] = text_git(candidate.root, ["rev-parse", f"refs/tags/{tag}"])
+    if not untagged:
+        expected_tags[f"refs/tags/{tag}"] = text_git(candidate.root, ["rev-parse", f"refs/tags/{tag}"])
     if candidate_tags != expected_tags:
         fail("candidate does not preserve the exact public base tags plus the release tag")
     if reference_map(candidate, "refs") != {**expected_heads, **expected_tags}:
@@ -3688,12 +4232,187 @@ def check_candidate(
         require_unchanged(source, source_before, "source")
         require_unchanged(base, base_before, "base")
         require_unchanged(candidate, candidate_before, "candidate")
-    return {
+    result: dict[str, object] = {
         "candidate_commit": candidate.head,
         "candidate_tree": candidate.tree,
         "schema_version": 1,
         "status": "pass",
-        "tag": tag,
+    }
+    if not untagged:
+        result["tag"] = tag
+    else:
+        result["branch"] = "staging"
+    return result
+
+
+def check_untagged_candidate(
+    source: Repository,
+    base: Repository,
+    candidate: Repository,
+    version: str,
+    private_policy: str | None = None,
+) -> dict[str, object]:
+    """Check an untagged v0.11 candidate on the exact ``staging`` branch."""
+
+    return check_candidate(
+        source,
+        base,
+        candidate,
+        version,
+        private_policy,
+        untagged=True,
+    )
+
+
+def _normalise_required_checks(
+    required_checks: Mapping[str, str] | Sequence[str],
+) -> dict[str, str]:
+    """Return the supplied required-check attestation in a stable form."""
+
+    if isinstance(required_checks, Mapping):
+        items = tuple(required_checks.items())
+    elif isinstance(required_checks, str):
+        unsafe("approved required checks must be a sequence of names")
+    else:
+        items = tuple((name, "success") for name in required_checks)
+    if not items:
+        unsafe("at least one approved required check is required")
+    result: dict[str, str] = {}
+    for name, status in items:
+        if not isinstance(name, str) or not name.strip():
+            unsafe("approved required check names must be nonempty strings")
+        if not isinstance(status, str) or status != "success":
+            fail(f"approved required check did not succeed: {name}")
+        if name in result:
+            unsafe(f"approved required checks contain a duplicate: {name}")
+        result[name] = status
+    return dict(sorted(result.items()))
+
+
+def check_merged_source(
+    source: Repository,
+    base: Repository,
+    merged: Repository,
+    version: str,
+    approved_pr: str,
+    required_checks: Mapping[str, str] | Sequence[str],
+    premerge_main: str,
+    merged_commit: str | None = None,
+    private_policy: str | None = None,
+) -> dict[str, object]:
+    """Validate the actual squash merge after the staging PR is accepted.
+
+    This check deliberately consumes the observed merged commit and its
+    supplied PR/check attestations.  It never constructs a merge object or
+    derives a prospective GitHub commit identity.
+    """
+
+    if version.split("+", 1)[0].split("-", 1)[0] != "0.11.0":
+        unsafe("merged-source verification is only available for v0.11.0")
+    if not isinstance(approved_pr, str) or not approved_pr.strip():
+        unsafe("an approved public staging PR is required")
+    checks = _normalise_required_checks(required_checks)
+    if not re.fullmatch(r"[0-9a-f]{40}", premerge_main):
+        unsafe("pre-merge public main identity must be a 40-character Git commit")
+    if merged_commit is not None and not re.fullmatch(r"[0-9a-f]{40}", merged_commit):
+        unsafe("merged commit identity must be a 40-character Git commit")
+
+    validate_repository_separation(source, base, merged)
+    if text_git(merged.root, ["branch", "--show-current"]) != "main":
+        fail("merged public source must be checked out on main")
+
+    source_before = repository_fingerprint(source)
+    base_before = repository_fingerprint(base)
+    merged_before = repository_fingerprint(merged)
+    try:
+        identities = verify_public_release_lineage(
+            base,
+            accepted_commit=PUBLIC_V01_COMMIT,
+            accepted_tree=PUBLIC_V01_TREE,
+        )
+        if not identities or identities[-1].version != "0.10.0":
+            fail("accepted public base must be the v0.10.0 release")
+        accepted_base = identities[-1]
+        if base.head != accepted_base.commit or base.tree != accepted_base.tree:
+            fail("accepted public base does not match the latest v0.10.0 release")
+        if premerge_main != accepted_base.commit:
+            fail("public main moved before merge; rebind and requalify the candidate")
+
+        if merged_commit is not None and merged.head != merged_commit:
+            fail("supplied merged commit does not match the observed public main")
+        parent_record = text_git(
+            merged.root,
+            ["rev-list", "--parents", "-n", "1", "HEAD"],
+        ).split()
+        if len(parent_record) != 2 or parent_record[1] != accepted_base.commit:
+            fail("merged release commit must have exactly the accepted v0.10 base as parent")
+        if text_git(merged.root, ["rev-list", "--count", f"{accepted_base.commit}..HEAD"]) != "1":
+            fail("merged public history must add exactly one commit after the accepted base")
+        if text_git(merged.root, ["log", "-1", "--format=%s"]) != f"Release v{version}":
+            fail("merged release commit subject is incorrect")
+
+        policy = load_policy(
+            source,
+            expected_surfaces=audited_policy_surfaces(version),
+            allow_v07_compatibility=True,
+            allow_v08_compatibility=True,
+            allow_v09_compatibility=True,
+            allow_v010_compatibility=True,
+        )
+        source_entries = public_candidate_entries(
+            source, version, excluded_prefix=b"private/"
+        )
+        merged_all_entries = tree_entries(merged)
+        validate_versioned_policy_exclusions(merged_all_entries, version)
+        if any(
+            entry.path == b"private" or entry.path.startswith(b"private/")
+            for entry in merged_all_entries
+        ):
+            fail("merged public source must not track private/")
+        merged_entries = public_candidate_entries(merged, version)
+        validate_critical(source_entries, policy)
+        validate_critical(merged_entries, policy)
+        validate_public_symlinks(source, source_entries)
+        validate_public_symlinks(merged, merged_entries)
+        source_map = {
+            entry.path: (entry.mode, entry_bytes(source, entry))
+            for entry in source_entries
+        }
+        merged_map = {
+            entry.path: (entry.mode, entry_bytes(merged, entry))
+            for entry in merged_entries
+        }
+        if source_map != merged_map:
+            missing = sorted(source_map.keys() - merged_map.keys())
+            extra = sorted(merged_map.keys() - source_map.keys())
+            detail = ""
+            if missing:
+                detail += f" missing {missing[0].decode('utf-8', 'replace')}"
+            if extra:
+                detail += f" extra {extra[0].decode('utf-8', 'replace')}"
+            if not detail:
+                detail = " content or mode differs"
+            fail(f"merged public tree differs from the projected source:{detail}")
+        if reference_map(merged, "refs/tags") != reference_map(base, "refs/tags"):
+            fail("merged public source must preserve the accepted historical tags")
+        release_tag = f"refs/tags/v{version}"
+        if release_tag in reference_map(merged, "refs/tags"):
+            fail("merged-source verification rejects a premature v0.11 release tag")
+        validate_markdown_links(merged)
+        validate_private_policy(merged, private_policy)
+    finally:
+        require_unchanged(source, source_before, "source")
+        require_unchanged(base, base_before, "base")
+        require_unchanged(merged, merged_before, "merged")
+    return {
+        "approved_pr": approved_pr.strip(),
+        "checks": checks,
+        "merged_commit": merged.head,
+        "merged_parent": accepted_base.commit,
+        "merged_tree": merged.tree,
+        "schema_version": 1,
+        "status": "pass",
+        "version": version,
     }
 
 
@@ -3709,13 +4428,50 @@ def parser() -> argparse.ArgumentParser:
     manifest.add_argument("--format", choices=("text", "json"), default="text")
     build = subcommands.add_parser("build", help="build one deterministic local squashed candidate")
     for option in ("source", "base", "output", "version", "release-date", "author-name", "author-email"):
-        build.add_argument(f"--{option}", required=True)
+        build.add_argument(f"--{option}", required=option not in {"release-date", "author-name", "author-email"})
+    build.add_argument(
+        "--untagged",
+        action="store_true",
+        help="build the v0.11.0 candidate on the exact staging branch without a tag",
+    )
     check = subcommands.add_parser("check", help="validate an existing local candidate read-only")
     for option in ("source", "base", "candidate", "version"):
         check.add_argument(f"--{option}", required=True)
     check.add_argument("--private-policy")
+    check.add_argument("--untagged", action="store_true")
     check.add_argument("--format", choices=("text", "json"), default="text")
+    merged = subcommands.add_parser(
+        "merged-check",
+        aliases=["check-merged"],
+        help="validate the observed post-merge public main commit",
+    )
+    for option in ("source", "base", "merged", "version", "approved-pr", "premerge-main"):
+        merged.add_argument(f"--{option}", required=True)
+    merged.add_argument(
+        "--required-check",
+        action="append",
+        required=True,
+        metavar="NAME=success",
+        help="a required PR check receipt; repeat once per required check",
+    )
+    merged.add_argument("--merged-commit")
+    merged.add_argument("--private-policy")
+    merged.add_argument("--format", choices=("text", "json"), default="text")
     return root
+
+
+def _parse_required_check_arguments(values: Sequence[str]) -> dict[str, str]:
+    """Parse repeated ``NAME=success`` CLI check receipts."""
+
+    parsed: dict[str, str] = {}
+    for value in values:
+        if "=" not in value:
+            unsafe("--required-check values must use NAME=success")
+        name, status = value.split("=", 1)
+        if not name.strip() or not status:
+            unsafe("--required-check values must use NAME=success")
+        parsed[name] = status
+    return _normalise_required_checks(parsed)
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -3734,6 +4490,25 @@ def main(argv: Sequence[str] | None = None) -> int:
         base = resolve_repository(arguments.base, "base")
         if arguments.operation == "build":
             output = Path(os.path.abspath(arguments.output))
+            if arguments.untagged:
+                tree, commit = build_untagged_candidate(source, base, output, version)
+                print(
+                    f"PASS built untagged candidate v{version}: "
+                    f"tree {tree}, commit {commit}, branch staging"
+                )
+                return 0
+            if not all(
+                value
+                for value in (
+                    arguments.release_date,
+                    arguments.author_name,
+                    arguments.author_email,
+                )
+            ):
+                unsafe(
+                    "tagged build requires --release-date, --author-name, and "
+                    "--author-email"
+                )
             tree, commit, tag = build_candidate(
                 source,
                 base,
@@ -3743,10 +4518,38 @@ def main(argv: Sequence[str] | None = None) -> int:
                 arguments.author_name,
                 arguments.author_email,
             )
-            print(f"PASS built local candidate v{version}: tree {tree}, commit {commit}, tag {tag}")
+            print(
+                f"PASS built local candidate v{version}: "
+                f"tree {tree}, commit {commit}, tag {tag}"
+            )
+            return 0
+        if arguments.operation in {"merged-check", "check-merged"}:
+            merged = resolve_repository(arguments.merged, "merged")
+            result = check_merged_source(
+                source,
+                base,
+                merged,
+                version,
+                arguments.approved_pr,
+                _parse_required_check_arguments(arguments.required_check),
+                arguments.premerge_main,
+                arguments.merged_commit,
+                arguments.private_policy,
+            )
+            if arguments.format == "json":
+                print(json.dumps(result, separators=(",", ":"), sort_keys=True))
+            else:
+                print(f"PASS merged source v{version}: {merged.head}")
             return 0
         candidate = resolve_repository(arguments.candidate, "candidate")
-        result = check_candidate(source, base, candidate, version, arguments.private_policy)
+        if arguments.untagged:
+            result = check_untagged_candidate(
+                source, base, candidate, version, arguments.private_policy
+            )
+        else:
+            result = check_candidate(
+                source, base, candidate, version, arguments.private_policy
+            )
         if arguments.format == "json":
             print(json.dumps(result, separators=(",", ":"), sort_keys=True))
         else:

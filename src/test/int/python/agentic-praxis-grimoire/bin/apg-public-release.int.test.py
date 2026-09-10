@@ -587,7 +587,7 @@ class APGPublicReleaseTests(unittest.TestCase):
             "NOTICE",
         ):
             with self.subTest(path=path):
-                policy = self.policy()
+                self.policy()
                 source = self.make_source(self.root / path.replace("/", "-"))
                 (source / path).unlink()
                 self.commit_all(source, f"omit {path}")

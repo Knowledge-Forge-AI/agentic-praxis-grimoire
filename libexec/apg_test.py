@@ -159,6 +159,15 @@ class Inventory:
 
 
 @dataclass(frozen=True)
+class PublicTestSelection:
+    """Exact public Python files and node deselections for one release version."""
+
+    version: str
+    files: dict[str, tuple[str, ...]]
+    deselections: dict[str, tuple[str, ...]]
+
+
+@dataclass(frozen=True)
 class JavascriptEngineBinding:
     """Exact executable facts observed around one JavaScript invocation."""
 
@@ -580,6 +589,139 @@ def validate_inventory(root: Path, inventory: Inventory) -> None:
             fail_policy(f"mirrored test path disagrees with owner: {path}; expected {expected}")
 
 
+def _read_public_version_file(root: Path, expected: str) -> None:
+    """Require the current public projection's version authority to match exactly."""
+    path = root / "src/agentic_praxis_grimoire/VERSION"
+    if path.is_symlink() or not path.is_file():
+        fail_invocation("public validation source VERSION must be a regular file")
+    try:
+        lines = path.read_text(encoding="ascii").splitlines()
+    except (OSError, UnicodeError) as error:
+        fail_invocation(f"public validation source VERSION is unreadable: {error}")
+    if lines != [expected]:
+        observed = lines[0] if len(lines) == 1 else "<malformed>"
+        fail_invocation(
+            "public validation source VERSION does not match --public-version "
+            f"{expected} (observed {observed})"
+        )
+
+
+def load_public_test_selection(
+    root: Path, inventory: Inventory, version: str
+) -> PublicTestSelection:
+    """Load one clean public projection and close its canonical Python selection."""
+    import apg_public_release as public_release
+
+    if not isinstance(version, str):
+        raise InvocationError("public validation version must be a string")
+    try:
+        public_release.validate_version(version)
+    except (public_release.InvocationError, public_release.ToolError) as error:
+        fail_invocation(f"public validation version is invalid: {error}")
+    private_path = root / "private"
+    if private_path.exists() or private_path.is_symlink():
+        fail_invocation("public validation source contains a private directory")
+    _read_public_version_file(root, version)
+
+    try:
+        repository = public_release.resolve_repository(root, "public validation source")
+        committed_version = public_release.committed_bytes(
+            repository, "src/agentic_praxis_grimoire/VERSION"
+        ).decode("ascii").splitlines()
+        if committed_version != [version]:
+            fail_invocation(
+                "public validation source committed VERSION does not match "
+                f"--public-version {version}"
+            )
+        public_release.validate_public_release_surface(repository, version)
+        policy = public_release.load_policy(
+            repository,
+            expected_surfaces=public_release.audited_policy_surfaces(version),
+        )
+        deselections = public_release.resolve_public_validation_deselections(
+            version, policy
+        )
+    except (OSError, UnicodeError, public_release.InvocationError, public_release.ToolError) as error:
+        fail_invocation(f"public validation source rejected: {error}")
+
+    policy_tests = policy.get("required_test_entrypoints")
+    if (
+        not isinstance(policy_tests, (list, tuple))
+        or any(not isinstance(path, str) for path in policy_tests)
+        or len(set(policy_tests)) != len(policy_tests)
+    ):
+        fail_invocation("public validation policy test entrypoints are malformed")
+
+    audited_python = tuple(path for path in policy_tests if path.endswith(".py"))
+    try:
+        selected_python = public_release.public_python_selection(
+            repository, version, audited_python
+        )
+    except (public_release.InvocationError, public_release.ToolError) as error:
+        fail_invocation(f"public validation test selection rejected: {error}")
+    if (
+        not isinstance(selected_python, (list, tuple))
+        or any(not isinstance(path, str) for path in selected_python)
+        or len(set(selected_python)) != len(selected_python)
+        or not set(audited_python).issubset(selected_python)
+    ):
+        fail_invocation("public validation Python test selection is malformed")
+
+    selected: dict[str, list[str]] = {"unit": [], "integration": []}
+    roots = (
+        (UNIT_ROOT.as_posix() + "/", "unit"),
+        (INTEGRATION_ROOT.as_posix() + "/", "integration"),
+    )
+    for path in selected_python:
+        matching_suites = [suite for prefix, suite in roots if path.startswith(prefix)]
+        if len(matching_suites) != 1:
+            fail_invocation(
+                "public validation policy contains a Python test outside the "
+                f"canonical suites: {path}"
+            )
+        suite = matching_suites[0]
+        declared = inventory.tests.get(path)
+        if declared is None:
+            fail_invocation(f"public validation test is missing from inventory: {path}")
+        if declared[1] != suite:
+            fail_invocation(
+                f"public validation test suite disagrees with inventory: {path}"
+            )
+        selected[suite].append(path)
+
+    if any(not paths for paths in selected.values()):
+        fail_invocation("public validation policy omits a canonical Python test suite")
+
+    selected_paths = {path for paths in selected.values() for path in paths}
+    if not isinstance(deselections, (list, tuple)):
+        fail_invocation("public validation deselections are malformed")
+    if any(not isinstance(node, str) for node in deselections):
+        fail_invocation("public validation deselections are malformed")
+    if tuple(deselections) != tuple(sorted(set(deselections))):
+        fail_invocation("public validation deselections are malformed")
+    deselected_by_suite: dict[str, list[str]] = {"unit": [], "integration": []}
+    for node_id in deselections:
+        if not isinstance(node_id, str):
+            fail_invocation("public validation deselections are malformed")
+        node_file, separator, node_name = node_id.partition("::")
+        if not separator or not node_name or node_file not in selected_paths:
+            fail_invocation(
+                "public validation deselection is outside the exact audited "
+                f"Python selection: {node_id}"
+            )
+        suite = inventory.tests[node_file][1]
+        deselected_by_suite[suite].append(node_id)
+
+    return PublicTestSelection(
+        version=version,
+        files={suite: tuple(sorted(paths)) for suite, paths in selected.items()},
+        deselections={
+            suite: tuple(sorted(paths))
+            for suite, paths in deselected_by_suite.items()
+        },
+    )
+
+
 def dependency_versions() -> dict[str, str]:
     """Require the exact reviewed test stack."""
     versions: dict[str, str] = {}
@@ -840,7 +982,6 @@ def node_profile_invocation(root: Path, contract_id: str):
         cleanup_error = _cleanup_node_profile_invocation(invocation)
         safe_contract_id = contract_id
         child = None
-        error = None
         invocation = None
         invocation_root = None
         owned = None
@@ -1112,7 +1253,7 @@ def invoke_node_profile_runtime(
     else:
         try:
             before = _node_profile_runtime_binding(root, role)
-        except ToolError as error:
+        except ToolError:
             error_kind = "runtime preflight contract failed"
             result = None
         else:
@@ -1161,7 +1302,6 @@ def invoke_node_profile_runtime(
         before = None
         after = None
         result = None
-        error = None
         _raise_node_profile_qualification(safe_error_kind, safe_contract_id)
     return NodeProfileObservation(
         role, output_contract_id, result, before.public_identity, before.executable_sha256
@@ -1731,14 +1871,19 @@ def validate_test_selection(selected_files: Sequence[str], selected_root: str) -
     return tuple(selected_files)
 
 
-def validate_collection(
-    node_ids: Sequence[str], selected_root: str, selected_files: Sequence[str]
+def _validate_node_ids(
+    node_ids: object,
+    selected_root: str,
+    selected_files: Sequence[str],
+    *,
+    allow_empty: bool,
+    require_all_files: bool,
 ) -> tuple[str, ...]:
-    """Close one worker's node collection against its exact inventory file set."""
+    """Validate node syntax and membership against one selected file inventory."""
     expected = set(validate_test_selection(selected_files, selected_root))
     if (
         not isinstance(node_ids, (list, tuple))
-        or not node_ids
+        or (not allow_empty and not node_ids)
         or any(not isinstance(nodeid, str) for nodeid in node_ids)
         or len(set(node_ids)) != len(node_ids)
     ):
@@ -1750,12 +1895,30 @@ def validate_collection(
             fail_harness("worker collection node ID is malformed")
         validate_test_selection([path], selected_root)
         files.add(path)
-    if files != expected:
+    if not files.issubset(expected):
+        fail_harness(
+            "worker collection contains files outside the selected inventory: "
+            f"foreign={sorted(files - expected)}"
+        )
+    if require_all_files and files != expected:
         fail_harness(
             "worker collection differs from inventory: "
             f"missing={sorted(expected - files)}; foreign={sorted(files - expected)}"
         )
     return tuple(node_ids)
+
+
+def validate_collection(
+    node_ids: Sequence[str], selected_root: str, selected_files: Sequence[str]
+) -> tuple[str, ...]:
+    """Close one worker's node collection against its exact inventory file set."""
+    return _validate_node_ids(
+        node_ids,
+        selected_root,
+        selected_files,
+        allow_empty=False,
+        require_all_files=True,
+    )
 
 
 def validate_worker_manifest(
@@ -1766,6 +1929,7 @@ def validate_worker_manifest(
     selected_root: str,
     selected_files: Sequence[str],
     measured_contexts: set[str] | None = None,
+    deselections: Sequence[str] = (),
 ) -> None:
     """Require exact worker, collection, terminal-result, and node-down evidence."""
     events = _read_manifest(path, run_id, suite)
@@ -1783,7 +1947,7 @@ def validate_worker_manifest(
         }:
             fail_harness("worker manifest contains an unexpected event")
         by_kind.setdefault(str(kind), []).append(event)
-    collections: list[tuple[str, ...]] = []
+    collection_records: list[tuple[tuple[str, ...], tuple[str, ...] | None, tuple[str, ...] | None]] = []
     for kind in ("worker-start", "collection", "worker-complete", "node-down"):
         members = by_kind.get(kind, [])
         observed = [event.get("worker") for event in members]
@@ -1791,9 +1955,45 @@ def validate_worker_manifest(
             fail_harness(f"worker manifest {kind} set is incomplete or duplicated")
         if kind == "collection":
             for event in members:
-                collections.append(validate_collection(
+                raw = validate_collection(
                     event.get("node_ids"), selected_root, selected_files
-                ))
+                )
+                has_remaining = "remaining_node_ids" in event
+                has_deselected = "deselected_node_ids" in event
+                if has_remaining != has_deselected:
+                    fail_harness(
+                        "worker collection evidence must include both raw and "
+                        "post-deselection node IDs"
+                    )
+                if has_remaining:
+                    remaining = _validate_node_ids(
+                        event.get("remaining_node_ids"),
+                        selected_root,
+                        selected_files,
+                        allow_empty=True,
+                        require_all_files=False,
+                    )
+                    observed_deselected = _validate_node_ids(
+                        event.get("deselected_node_ids"),
+                        selected_root,
+                        selected_files,
+                        allow_empty=True,
+                        require_all_files=False,
+                    )
+                    raw_set = set(raw)
+                    remaining_set = set(remaining)
+                    observed_set = set(observed_deselected)
+                    if (
+                        remaining_set & observed_set
+                        or remaining_set | observed_set != raw_set
+                    ):
+                        fail_harness(
+                            "worker collection raw and post-deselection node IDs "
+                            "do not form an exact partition"
+                        )
+                    collection_records.append((raw, remaining, observed_deselected))
+                else:
+                    collection_records.append((raw, None, None))
         elif kind == "worker-complete":
             if any(event.get("exitstatus") != 0 for event in members):
                 fail_harness("worker completion evidence reports failure")
@@ -1803,12 +2003,47 @@ def validate_worker_manifest(
                 for event in members
             ):
                 fail_harness("worker node-down evidence reports a crash or incomplete exit")
-    if any(collection != collections[0] for collection in collections[1:]):
+    if not collection_records:
+        fail_harness("worker collection evidence is missing")
+    raw_collections = [record[0] for record in collection_records]
+    formats = {record[1] is not None for record in collection_records}
+    if len(formats) != 1:
+        fail_harness("worker collection evidence mixes legacy and enriched formats")
+    if any(collection != raw_collections[0] for collection in raw_collections[1:]):
         fail_harness("xdist workers did not collect identical node IDs")
-    selected = set(collections[0])
+    if (
+        not isinstance(deselections, (list, tuple))
+        or any(not isinstance(nodeid, str) for nodeid in deselections)
+        or len(set(deselections)) != len(deselections)
+    ):
+        fail_harness("worker manifest deselection set is malformed")
+    approved_deselections = tuple(deselections)
+    approved_set = set(approved_deselections)
+    enriched = next(iter(formats))
+    if enriched:
+        remaining_collections = [record[1] for record in collection_records]
+        observed_deselections = [record[2] for record in collection_records]
+        if any(
+            remaining != remaining_collections[0]
+            for remaining in remaining_collections[1:]
+        ) or any(
+            observed != observed_deselections[0]
+            for observed in observed_deselections[1:]
+        ):
+            fail_harness("xdist workers disagreed about post-deselection node IDs")
+        actual_deselected = set(observed_deselections[0] or ())
+        if actual_deselected != approved_set:
+            fail_harness("worker manifest deselection set differs from collection")
+        selected = set(remaining_collections[0] or ())
+    else:
+        selected = set(raw_collections[0])
+        if not approved_set.issubset(selected):
+            fail_harness("worker manifest deselection set differs from collection")
+        selected -= approved_set
     result_events = by_kind.get("test-result", [])
     result_nodes = [event.get("nodeid") for event in result_events]
-    if len(result_nodes) != len(selected) or set(result_nodes) != selected:
+    expected_results = selected
+    if len(result_nodes) != len(expected_results) or set(result_nodes) != expected_results:
         fail_harness("every selected node must have exactly one terminal result")
     if any(event.get("outcome") not in {"passed", "failed", "skipped"} for event in result_events):
         fail_harness("worker manifest terminal result is malformed")
@@ -1908,6 +2143,7 @@ def _pytest_command(
     json_file: Path,
     run_id: str,
     selected_files: Sequence[str],
+    deselections: Sequence[str] = (),
 ) -> list[str]:
     selected = UNIT_ROOT if suite == "unit" else INTEGRATION_ROOT
     paths = validate_test_selection(selected_files, selected.as_posix())
@@ -1933,6 +2169,11 @@ def _pytest_command(
         f"--cov-config={root / '.coveragerc'}",
         f"--cov-report=json:{json_file}",
         "--cov-report=",
+        *(
+            argument
+            for node_id in deselections
+            for argument in ("--deselect", node_id)
+        ),
         *(str(root / path) for path in paths),
     ]
 
@@ -1946,6 +2187,7 @@ def _run_pytest(
     *,
     run_id: str | None = None,
     failure_mode: str | None = None,
+    deselections: Sequence[str] = (),
 ) -> tuple[Path, dict[str, object]]:
     run_id = run_id or secrets.token_hex(16)
     selected_files = validate_test_selection(
@@ -2005,7 +2247,16 @@ def _run_pytest(
     else:
         environment.pop("APG_TEST_FAILURE_MODE", None)
     result = subprocess.run(
-        _pytest_command(root, suite, workers, data_file, json_file, run_id, selected_files),
+        _pytest_command(
+            root,
+            suite,
+            workers,
+            data_file,
+            json_file,
+            run_id,
+            selected_files,
+            deselections,
+        ),
         cwd=root,
         env=environment,
         check=False,
@@ -2026,6 +2277,8 @@ def _run_pytest(
             workers,
             (UNIT_ROOT if suite == "unit" else INTEGRATION_ROOT).as_posix(),
             selected_files,
+            None,
+            deselections,
         )
         if result.returncode == 1:
             raise TestAssertionError(f"{suite} pytest run failed with status 1")
@@ -2041,6 +2294,7 @@ def _run_pytest(
         (UNIT_ROOT if suite == "unit" else INTEGRATION_ROOT).as_posix(),
         selected_files,
         measured_contexts,
+        deselections,
     )
     validate_child_manifest(
         child_manifest, run_id, suite, measured_contexts
@@ -2101,21 +2355,41 @@ def run(
     *,
     keep_artifacts_on_failure: bool = False,
     failure_mode: str | None = None,
+    public_version: str | None = None,
 ) -> None:
     """Validate inventory, run selected suites, and enforce exact gates."""
     if workers < 1 or workers > 64:
         raise InvocationError("workers must be between 1 and 64")
+    if public_version is not None and suite == "policy":
+        raise InvocationError("--public-version applies only to test suites")
     inventory = load_inventory(root)
     validate_inventory(root, inventory)
+    public_selection = (
+        load_public_test_selection(root, inventory, public_version)
+        if public_version is not None
+        else None
+    )
+    effective_inventory = inventory
+    if public_selection is not None:
+        selected_paths = {
+            path
+            for paths in public_selection.files.values()
+            for path in paths
+        }
+        effective_inventory = Inventory(
+            inventory.coverage_sources,
+            inventory.excluded_launchers,
+            {path: inventory.tests[path] for path in selected_paths},
+        )
     dependency_versions()
-    if requires_typescript_compiler(inventory):
+    if requires_typescript_compiler(effective_inventory):
         validate_typescript_compiler(root)
-    if requires_javascript_engine(inventory):
+    if requires_javascript_engine(effective_inventory):
         validate_javascript_engine(root)
-    if requires_node_profile_runtimes(inventory):
+    if requires_node_profile_runtimes(effective_inventory):
         validate_node_profile_runtimes(root)
     from apg_playwright_runtime import TEST_PATHS, PlaywrightPrerequisiteError, validate
-    if TEST_PATHS & set(inventory.tests):
+    if TEST_PATHS & set(effective_inventory.tests):
         validate_javascript_engine(root)
         try:
             validate(root)
@@ -2142,12 +2416,21 @@ def run(
                     selected_suite,
                     workers,
                     component_artifacts,
-                    selected_files=tuple(sorted(
-                        path for path, (_owner, owner_suite) in inventory.tests.items()
-                        if owner_suite == selected_suite
-                    )),
+                    selected_files=(
+                        public_selection.files[selected_suite]
+                        if public_selection is not None
+                        else tuple(sorted(
+                            path for path, (_owner, owner_suite) in inventory.tests.items()
+                            if owner_suite == selected_suite
+                        ))
+                    ),
                     run_id=f"{invocation_id}-{selected_suite}",
                     failure_mode=failure_mode,
+                    deselections=(
+                        public_selection.deselections[selected_suite]
+                        if public_selection is not None
+                        else ()
+                    ),
                 )
                 validate_coverage_report(report, set(inventory.coverage_sources))
                 paths = sorted(
@@ -2560,13 +2843,14 @@ def _scan_early_args(raw_args: Sequence[str]) -> tuple[str, Path | None]:
 
 
 def run_policy(root: Path) -> None:
-    """Execute inventory validation, skill library check, and record identity check."""
+    """Execute inventory, skill, record identity and roadmap-governance policy."""
     inventory = load_inventory(root)
     validate_inventory(root, inventory)
     dependency_versions()
 
     import apg_skill_library_check
     import apg_record_identity
+    import apg_roadmap_closure
 
     skill_result = apg_skill_library_check.check_library(root)
     if not skill_result.passed:
@@ -2579,7 +2863,11 @@ def run_policy(root: Path) -> None:
     if not record_result.passed:
         raise PolicyCheckError("record identity policy check failed")
 
-    print("PASS policy: inventory, skill-library, and record-identity checks passed")
+    closure_result = apg_roadmap_closure.check_roadmap_closure(root)
+    if not closure_result["passed"]:
+        raise PolicyCheckError("roadmap closure policy check failed")
+
+    print("PASS policy: inventory, skill-library, record-identity, and roadmap-closure checks passed")
 
 
 def parser() -> argparse.ArgumentParser:
@@ -2602,6 +2890,11 @@ def parser() -> argparse.ArgumentParser:
         type=Path,
         default=None,
         help="write machine-readable JACA CI qualification summary JSON",
+    )
+    value.add_argument(
+        "--public-version",
+        default=None,
+        help="run the exact clean public projection for this release version",
     )
     return value
 
@@ -2688,6 +2981,8 @@ def main(arguments: Sequence[str] | None = None) -> int:
             return False
 
     try:
+        if args.public_version is not None and suite == "policy":
+            raise InvocationError("--public-version applies only to test suites")
         if suite == "policy":
             run_policy(root)
         else:
@@ -2697,6 +2992,7 @@ def main(arguments: Sequence[str] | None = None) -> int:
                 root,
                 keep_artifacts_on_failure=args.keep_artifacts_on_failure,
                 failure_mode=args.verify_failure_mode,
+                public_version=args.public_version,
             )
         if not _write_admitted("pass", "pass"):
             return 1

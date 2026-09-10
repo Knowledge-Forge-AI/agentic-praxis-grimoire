@@ -629,3 +629,62 @@ Publication completes APGR-side CI/XO delivery for this release. It does not
 activate JACA adoption or a Nix/host update. Linux runtime execution was not part
 of v0.9.0 product qualification. Later Theme Forge and Repo Map work remains
 separate roadmap scope.
+
+## v0.10.0 qualification and deterministic release freeze
+
+APG129 and APG137 established deterministic v0.10.0 release freeze qualification.
+Public v0.10 expanded the canonical catalog to 45 canonical skills across 14 stable
+and 31 provisional leaves, with 45 discovery links, while preserving all historical
+v0.1 through v0.9 inventories, digests, and validators. The v0.10 release freeze
+remained bound to the accepted public v0.9 base, requiring exact single-parent
+squash lineage, clean working tree, and strict distribution manifest verification.
+
+## v0.11.0 public staging PR release architecture
+
+Under [ADR 0057](adr/2026/09/0057-public-staging-pr-release-procedure.md), the
+v0.11.0 release architecture adopts a user-directed pull request boundary:
+**staging -> main PR -> release**. Direct publication or pushing of tagged
+release commits to public `main` is retired in favor of PR-governed integration.
+
+### Core procedural constraints
+
+1. **Premerge main tip identity**: Before merging the staging PR, the public `main`
+   tip must strictly match the accepted public v0.10 base. If `main` has moved or
+   diverged, release qualification must halt immediately to rebind and requalify
+   against the new base. The pull request boundary must never be bypassed.
+2. **Squash commit subject**: When merging the staging PR into `main`, GitHub squash
+   merge must adopt the exact subject `Release v0.11.0`.
+3. **No predicting GitHub squash SHA**: GitHub creates the squash merge commit object
+   dynamically with server-generated committer and timestamp metadata. Release
+   tooling and processes must never attempt to predict the GitHub squash commit SHA.
+4. **Three-phase mode separation**:
+   - **Untagged PR candidate mode**: Prepares and validates the untagged candidate on the
+     exact branch `staging` and its projected tree for pull request submission, without
+     requiring premature tag creation or date/author overrides.
+   - **Actual merged source checks**: After the staging PR is squash-merged to `main`,
+     validates the actual merged commit on `main`. Verifies sole accepted-base parent,
+     the exact commit subject `Release v0.11.0`, tree identity against the projected
+     source, and runs isolated verification categories without predicting commit SHAs.
+   - **Final tagged release**: Creates and verifies the annotated tag `v0.11.0` pointing
+     to the actual merged commit on `main`.
+   The development CLI exposes the first two local checks as `build --untagged` and
+   `check --untagged`, and exposes the observed post-merge check as `merged-check`.
+  The latter requires the observed merged commit, the accepted pre-merge `main` identity,
+  a caller-supplied approved-PR receipt, and an explicit success receipt for every required
+  check. These local arguments are attestations; the command does not contact GitHub or
+  establish that a review was actually approved. The release publisher performs that host
+  readback, requiring a current approval bound to the PR head and successful `public-pr`
+  GitHub Actions check-runs. It also requires the v0.11 distribution manifest's
+  `source_commit` and `source_tree` to equal the observed merged commit and tree. The
+  verifier refuses a moved base and never derives a future merge SHA.
+5. **Post-merge binary rebuild and rescan**: Artifacts containing embedded commit
+   metadata (such as Go binaries with build info or git commit hashes) cannot be
+   finalized before merge because the squash commit SHA is unknown prior to merge.
+   They must be rebuilt, requalified, and rescanned after merge against the actual
+   merged commit.
+6. **Disclosure-before-staging**: Strict confidentiality, privacy (`private/` boundary
+   exclusion), intellectual property rights, and clean history checks are mandatory
+   on the exact local public projection before any staging push. A public staging
+   push already discloses its contents; hosted scanners cannot replace this gate.
+   No force overwriting of public branches is permitted. Formal repository branch
+   protection rules are scheduled for V0110-G.

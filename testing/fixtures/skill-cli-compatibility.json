@@ -1,0 +1,37 @@
+{
+  "schema_version": "apg.public-cli-compatibility/v1",
+  "source_release": "v0.10.0",
+  "source_url": "https://github.com/Knowledge-Forge-AI/agentic-praxis-grimoire/releases/download/v0.10.0/knowledge-forge-ai-apgr-darwin-arm64-0.10.0.tgz",
+  "archive_sha256": "e4d6f264181c121fedf1f1e72d5718c8e69fb3a52d20e4dcc2356ff8cd62171a",
+  "binary_sha256": "14e0b9411bb94990db7263b1504bfe1cd32a9f2de9ca5179bc0ecf3fb5db250a",
+  "cases": [
+    {
+      "arguments": [
+        "skills",
+        "list",
+        "--format",
+        "json"
+      ],
+      "stdout_sha256": "b79bba455bb7d5f7ceb3f580425922ef7ef61640e44ad4e5602381c2573cf619",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "arguments": [
+        "skills",
+        "context-report"
+      ],
+      "stdout_sha256": "54f3b6c3aae460f8a0ef3f6473038961e3017c82eb7ec43c3ac5cabad3618405",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "arguments": [
+        "skills",
+        "context-report",
+        "--format",
+        "text"
+      ],
+      "stdout_sha256": "e23968a5aee6d11bd612453b38619f60285a7155a3678b54ed152c94d974d232",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

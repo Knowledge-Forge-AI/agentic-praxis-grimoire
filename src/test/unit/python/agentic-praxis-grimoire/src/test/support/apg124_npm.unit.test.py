@@ -10,8 +10,6 @@ from __future__ import annotations
 import json
 import os
 from pathlib import Path
-import stat
-import subprocess
 import sys
 import pytest
 
@@ -24,7 +22,6 @@ from apg124_npm import (  # noqa: E402
     ALL_SCENARIOS,
     DEPENDENCY_TOPOLOGY_SCENARIOS,
     EXPECTED_NODE_ENGINES,
-    EXPECTED_NODE_SHA256,
     EXPECTED_NODE_VERSION,
     EXPECTED_NPM_LICENSE,
     EXPECTED_NPM_VERSION,
@@ -34,10 +31,8 @@ from apg124_npm import (  # noqa: E402
     REGISTERED_SCENARIO_ASSERTIONS,
     SCENARIO_GROUPS,
     NpmHarnessConfig,
-    NpmHarnessError,
     NpmHarnessExecutionError,
     NpmHarnessPrerequisiteError,
-    NpmHarnessReceipt,
     NpmHarnessValidationError,
     load_scenarios_register,
     observe_npm_harness_config,
@@ -467,3 +462,45 @@ def test_empty_execution_selection_fails_before_scratch_creation():
     from apg124_npm import execute_npm_harness, NpmHarnessExecutionError
     with pytest.raises(NpmHarnessExecutionError, match="must not be empty"):
         execute_npm_harness(None, Path("unused"), scenarios=())
+
+
+def test_synthetic_fixture_identities_and_dependency_keys() -> None:
+    """Verify synthetic package identities and dependency keys/assertions remain consistent."""
+    # Verify config package identity
+    config_pkg_path = FIXTURES_DIR / "projects" / "config" / "package.json"
+    assert config_pkg_path.is_file(), f"Fixture {config_pkg_path} must exist"
+    config_pkg = json.loads(config_pkg_path.read_text(encoding="utf-8"))
+    assert config_pkg.get("name") == "apgr-apg124-fixture-config"
+    assert config_pkg.get("version") == "1.0.0"
+
+    # Verify dep-b package identity and exported module name
+    dep_b_pkg_path = FIXTURES_DIR / "packages" / "dep-b" / "package.json"
+    assert dep_b_pkg_path.is_file(), f"Fixture {dep_b_pkg_path} must exist"
+    dep_b_pkg = json.loads(dep_b_pkg_path.read_text(encoding="utf-8"))
+    assert dep_b_pkg.get("name") == "apgr-apg124-fixture-dep-b"
+    assert dep_b_pkg.get("version") == "1.0.0"
+
+    dep_b_idx_path = FIXTURES_DIR / "packages" / "dep-b" / "index.js"
+    assert dep_b_idx_path.is_file(), f"Fixture {dep_b_idx_path} must exist"
+    dep_b_idx = dep_b_idx_path.read_text(encoding="utf-8")
+    assert 'name: "apgr-apg124-fixture-dep-b"' in dep_b_idx
+
+    # Verify stale-lock dependencies key and path
+    stale_pkg_path = FIXTURES_DIR / "projects" / "stale-lock" / "package.json"
+    assert stale_pkg_path.is_file(), f"Fixture {stale_pkg_path} must exist"
+    stale_pkg = json.loads(stale_pkg_path.read_text(encoding="utf-8"))
+    assert "apgr-apg124-fixture-dep-b" in stale_pkg.get("dependencies", {})
+    assert "dep-b" not in stale_pkg.get("dependencies", {})
+    assert stale_pkg["dependencies"]["apgr-apg124-fixture-dep-b"] == "file:../dep-b"
+
+    # Verify install-update dependencies key and path
+    update_pkg_path = FIXTURES_DIR / "projects" / "install-update" / "package.json"
+    assert update_pkg_path.is_file(), f"Fixture {update_pkg_path} must exist"
+    update_pkg = json.loads(update_pkg_path.read_text(encoding="utf-8"))
+    assert "apgr-apg124-fixture-dep-b" in update_pkg.get("dependencies", {})
+    assert "dep-b" not in update_pkg.get("dependencies", {})
+    assert update_pkg["dependencies"]["apgr-apg124-fixture-dep-b"] == "file:../dep-b"
+
+    # Verify physical directories remain stable
+    assert (FIXTURES_DIR / "packages" / "dep-b").is_dir()
+    assert (FIXTURES_DIR / "projects" / "config").is_dir()

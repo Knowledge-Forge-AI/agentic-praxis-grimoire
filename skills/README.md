@@ -24,8 +24,13 @@ APG125 adds provisional `browser-runtime-profile` under `v0.10-browser-runtime`.
 Development contains 45 canonical leaves, 45 catalog rows and 45 projections,
 with 14 stable / 31 provisional. The six-candidate ceiling is 11,507 description
 bytes, with no unused named reservation. APG126 qualified the preserved APG125 candidate after its original provider
-block. APG129 integrated readiness is in progress; all 31 provisional leaves
-retain that maturity.
+block. Public v0.10.0 is now released across GitHub, Go, PyPI and npm.
+[APG138](../docs/evaluations/apg138-v0-11-foundation-closure.md) establishes the
+[v0.11 closure roadmap](../docs/v0-11-roadmap.md) and individual
+[maturity ledger](../docs/governance/skill-maturity-ledger.json). All 31
+provisional leaves retain that maturity pending V0110-B. The v0.11 capacity
+ADR retains the effective ceiling and existing enforcement policy identity;
+no new leaf or description compression is admitted.
 
 Public v0.2.0 appended one intentionally squashed release commit and annotated
 tag to preserved public v0.1.0 and supplied the maintainer's separately managed
@@ -496,8 +501,8 @@ Clean A/B superiority and a positive use in a second repository are valuable
 evidence but are not independent stability blockers under ADR 0006. A concrete
 unresolved material authority, privacy, safety, or procedure defect may block an
 individual skill. The current catalog contains fourteen `stable` rows and
-twenty-three `provisional` manager-assignment, language, database, test-profile, or
-conversion rows. Public
+thirty-one `provisional` rows, individually tracked in the
+[v0.11 maturity ledger](../docs/governance/skill-maturity-ledger.json). Public
 v0.1.0 retains its historical provisional catalog; public v0.2.0 contains the
 six stable leaves. APG14 changes no skill procedure or maturity row. APG16,
 APG17, APG18, APG19, APG20A, APG21, and APG21A add only provisional development

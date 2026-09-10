@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "result_kind": "canonical_edges",
+  "items": [
+    {
+      "source_key": "n:cycle:alpha",
+      "edge_kind": "calls",
+      "target_key": "n:cycle:beta",
+      "identity_metadata_hash": "h:cycle:ab",
+      "identity_metadata": {
+        "call_type": "async"
+      }
+    },
+    {
+      "source_key": "n:cycle:beta",
+      "edge_kind": "calls",
+      "target_key": "n:cycle:gamma",
+      "identity_metadata_hash": "h:cycle:bg",
+      "identity_metadata": {
+        "call_type": "async"
+      }
+    },
+    {
+      "source_key": "n:cycle:gamma",
+      "edge_kind": "calls",
+      "target_key": "n:cycle:alpha",
+      "identity_metadata_hash": "h:cycle:ga",
+      "identity_metadata": {
+        "call_type": "async"
+      }
+    }
+  ],
+  "page": {
+    "limit": 50,
+    "offset": 0,
+    "returned": 3,
+    "truncated": false,
+    "next_offset": null
+  },
+  "diagnostics": []
+}

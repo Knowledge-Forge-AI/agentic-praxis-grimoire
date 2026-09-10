@@ -1,0 +1,19 @@
+{
+  "schema_version": "apg140-seam-bindings-v1",
+  "watch_id": "JACA-XO",
+  "scope": "APGR-local evidence only; no consumer adoption",
+  "members": [
+    {
+      "path": "testing/fixtures/xo_consumer/adapter.go",
+      "sha256": "d92dc920c37a2b2fb48d0c7af28e2395f6792dc5cd411e83aecb3e034ec49d2b"
+    },
+    {
+      "path": "testing/fixtures/xo_consumer/adapter_test.go",
+      "sha256": "9eabbacf425961c01b760b98e6befa8b35a9c50c3042255091436ecb49a30782"
+    },
+    {
+      "path": "testing/fixtures/xo_consumer/fixture-go.mod",
+      "sha256": "26a99e106f08e5061d914ae7e8ef4150870fd3a24abe7940792f6eaf9148674e"
+    }
+  ]
+}

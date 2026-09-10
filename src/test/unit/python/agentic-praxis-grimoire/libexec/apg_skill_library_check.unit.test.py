@@ -12,7 +12,7 @@ import unittest
 from unittest import mock
 
 from src.test.apg_test_support import repository_root
-from src.test.apg_skill_library_cases import CompleteCheckerBoundaryTests
+from src.test.apg_skill_library_cases import CompleteCheckerBoundaryTests as CompleteCheckerBoundaryTests
 
 
 REPOSITORY_ROOT = repository_root(__file__)
@@ -27,8 +27,6 @@ from apg_skill_library_check import (  # noqa: E402
     main,
     parse_catalog,
     parse_frontmatter,
-    render_json,
-    render_text,
     valid_skill_name,
     visible_lines,
 )
