@@ -258,3 +258,26 @@ reconciliation before attended staging), `public_pr_ci: not_run`, `public_releas
 and branch protection remains unconfigured (empirically verified on 2026-09-13 via GitHub API:
 HTTP 404 branch not protected, rulesets empty). This dispatch performs no public mutation; the
 dispatcher owns private Git publication.
+
+## APG145 hosted CI repair and staging correction
+
+APG145 continues the approved v0.11 program as the hosted-CI repair and staging
+correction slice under V0110-G, allocating exit 00190. Following the 7 failed jobs and
+1 skipped job observed in public PR #1 run 34796052087, APG145 incorporates 9
+independent plan-review findings, deliberately reversing advisory finding E2
+(mapping index == -1 to driver) per OASIS SARIF §3.54.4, to resolve root causes across
+toolchain bootstrap (tomli==2.4.1 pin in bootstrap_static.sh), package qualification (python-work directory
+creation in qualify_packages.sh), macOS Go toolchain provisioning (actions/setup-go in
+public-pr.yml and error differentiation in apg_skill_library_check.py), CodeQL SARIF
+tool extension rule resolution in codeql_policy.py, source and fixture security
+remediations (skills.go slice allocation, runner.mjs descriptor-based O_NOFOLLOW file read
+and origin reflection elimination, test permission normalization to 0o700/0o600/0o710),
+matrix receipt resilience (prescribed artifacts and honest failure receipts recording
+unavailable_artifacts in matrix_receipts.py), and linear staging correction operator
+discipline (stage_operator.py and apg_public_release.py update mode on staging parent
+cd525f33ba2527862670d34d01fbdfb5f267b66c, public base ancestry 250ce73a..., and PR #1
+reuse without force-push). All 55 inherited decisions remain terminal and valid; 45
+canonical skills (14 stable / 31 provisional), six active CSS/JS debts, and the 11,507-byte
+ceiling are preserved. External pending state is preserved: hosted_pr_run_1: failed
+(PR #1 run 34796052087), correction_hosted_validation: pending, public_release: not_started.
+This dispatch performs no public mutation; the dispatcher owns private Git publication.

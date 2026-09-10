@@ -3665,6 +3665,9 @@ def build_untagged_candidate(
     base: Repository,
     output: Path,
     version: str,
+    *,
+    staging_parent: str | None = None,
+    subject: str | None = None,
 ) -> tuple[str, str]:
     """Build the untagged ``staging`` candidate used by the public PR.
 
@@ -3696,12 +3699,20 @@ def build_untagged_candidate(
     validate_critical(entries, policy)
     validate_public_symlinks(source, entries)
     validate_output_path(output, source.root, base.root)
-    if not run_git(
-        base.root,
-        ["show-ref", "--verify", "--quiet", "refs/heads/staging"],
-        allow_failure=True,
-    ).returncode:
-        fail("public base already contains the staging branch")
+    if staging_parent is None:
+        if not run_git(
+            base.root,
+            ["show-ref", "--verify", "--quiet", "refs/heads/staging"],
+            allow_failure=True,
+        ).returncode:
+            fail("public base already contains the staging branch")
+    else:
+        if run_git(
+            base.root,
+            ["merge-base", "--is-ancestor", base.head, staging_parent],
+            allow_failure=True,
+        ).returncode != 0:
+            fail("public base is not an ancestor of staging parent")
     if os.path.lexists(output):
         output.rmdir()
     initialize_candidate(output, base)
@@ -3743,9 +3754,11 @@ def build_untagged_candidate(
         "GIT_COMMITTER_EMAIL": metadata[1],
         "GIT_COMMITTER_DATE": metadata[2],
     }
+    commit_parent = staging_parent if staging_parent is not None else base.head
+    commit_subject = subject or (f"Release v{version}" if staging_parent is None else f"Release v{version} staging correction")
     commit = text_git(
         output,
-        ["commit-tree", tree, "-p", base.head, "-m", f"Release v{version}"],
+        ["commit-tree", tree, "-p", commit_parent, "-m", commit_subject],
         extra_environment=identity_environment,
     )
     run_git(output, ["update-ref", "refs/heads/staging", commit])
@@ -4115,6 +4128,9 @@ def check_candidate(
     private_policy: str | None,
     *,
     untagged: bool = False,
+    allow_staging_correction: bool = False,
+    correction_parent: str | None = None,
+    correction_subject: str | None = None,
 ) -> dict[str, object]:
     validate_repository_separation(source, base, candidate)
     verify_public_release_lineage(
@@ -4163,18 +4179,39 @@ def check_candidate(
     for path, expected in source_map.items():
         if candidate_map[path] != expected:
             fail(f"candidate mode, bytes, or symlink target differs: {path.decode('utf-8', 'replace')}")
-    if text_git(candidate.root, ["rev-parse", "HEAD^"]) != base.head:
-        fail("candidate release commit does not have the public base as sole parent")
-    parent_record = text_git(candidate.root, ["rev-list", "--parents", "-n", "1", "HEAD"]).split()
-    if len(parent_record) != 2 or parent_record[1] != base.head:
-        fail("candidate release commit must have exactly one parent equal to the public base")
-    if text_git(candidate.root, ["rev-list", "--count", f"{base.head}..HEAD"]) != "1":
-        fail("candidate history must add exactly one commit after the public base")
-    expected_branch = "staging" if untagged else f"release/{version}"
-    if text_git(candidate.root, ["branch", "--show-current"]) != expected_branch:
-        fail("candidate is on the wrong release branch")
-    if text_git(candidate.root, ["log", "-1", "--format=%s"]) != f"Release v{version}":
-        fail("candidate release subject is incorrect")
+    if allow_staging_correction:
+        if not correction_parent:
+            fail("candidate correction check requires an explicit correction_parent")
+        if run_git(candidate.root, ["merge-base", "--is-ancestor", base.head, "HEAD"], allow_failure=True).returncode != 0:
+            fail("candidate release commit does not have the public base in its ancestry")
+        parent_record = text_git(candidate.root, ["rev-list", "--parents", "-n", "1", "HEAD"]).split()
+        if len(parent_record) != 2:
+            fail("candidate correction commit must have exactly one parent")
+        if parent_record[1] != correction_parent:
+            fail(f"candidate correction parent mismatch: expected {correction_parent}, got {parent_record[1]}")
+        expected_branch = "staging"
+        if text_git(candidate.root, ["branch", "--show-current"]) != expected_branch:
+            fail("candidate is on the wrong release branch")
+        actual_subject = text_git(candidate.root, ["log", "-1", "--format=%s"])
+        if correction_subject:
+            if actual_subject != correction_subject:
+                fail(f"candidate release subject is incorrect: expected {correction_subject}, got {actual_subject}")
+        else:
+            if not actual_subject or not actual_subject.strip():
+                fail("candidate release subject is empty")
+    else:
+        if text_git(candidate.root, ["rev-parse", "HEAD^"]) != base.head:
+            fail("candidate release commit does not have the public base as sole parent")
+        parent_record = text_git(candidate.root, ["rev-list", "--parents", "-n", "1", "HEAD"]).split()
+        if len(parent_record) != 2 or parent_record[1] != base.head:
+            fail("candidate release commit must have exactly one parent equal to the public base")
+        if text_git(candidate.root, ["rev-list", "--count", f"{base.head}..HEAD"]) != "1":
+            fail("candidate history must add exactly one commit after the public base")
+        expected_branch = "staging" if untagged else f"release/{version}"
+        if text_git(candidate.root, ["branch", "--show-current"]) != expected_branch:
+            fail("candidate is on the wrong release branch")
+        if text_git(candidate.root, ["log", "-1", "--format=%s"]) != f"Release v{version}":
+            fail("candidate release subject is incorrect")
     tag = f"v{version}"
     if untagged:
         if run_git(
@@ -4251,6 +4288,10 @@ def check_untagged_candidate(
     candidate: Repository,
     version: str,
     private_policy: str | None = None,
+    *,
+    allow_staging_correction: bool = False,
+    correction_parent: str | None = None,
+    correction_subject: str | None = None,
 ) -> dict[str, object]:
     """Check an untagged v0.11 candidate on the exact ``staging`` branch."""
 
@@ -4261,6 +4302,9 @@ def check_untagged_candidate(
         version,
         private_policy,
         untagged=True,
+        allow_staging_correction=allow_staging_correction,
+        correction_parent=correction_parent,
+        correction_subject=correction_subject,
     )
 
 
@@ -4434,11 +4478,16 @@ def parser() -> argparse.ArgumentParser:
         action="store_true",
         help="build the v0.11.0 candidate on the exact staging branch without a tag",
     )
+    build.add_argument("--staging-parent", help="staging parent commit for linear correction builds")
+    build.add_argument("--subject", help="commit subject message")
     check = subcommands.add_parser("check", help="validate an existing local candidate read-only")
     for option in ("source", "base", "candidate", "version"):
         check.add_argument(f"--{option}", required=True)
     check.add_argument("--private-policy")
     check.add_argument("--untagged", action="store_true")
+    check.add_argument("--allow-staging-correction", action="store_true", help="allow candidate with staging correction parent")
+    check.add_argument("--correction-parent", help="expected staging parent commit")
+    check.add_argument("--correction-subject", help="expected staging correction commit subject")
     check.add_argument("--format", choices=("text", "json"), default="text")
     merged = subcommands.add_parser(
         "merged-check",
@@ -4490,8 +4539,19 @@ def main(argv: Sequence[str] | None = None) -> int:
         base = resolve_repository(arguments.base, "base")
         if arguments.operation == "build":
             output = Path(os.path.abspath(arguments.output))
+            if arguments.staging_parent and not arguments.untagged:
+                unsafe("--staging-parent is only valid with --untagged")
+            if arguments.subject and not arguments.untagged:
+                unsafe("--subject is only valid with --untagged")
             if arguments.untagged:
-                tree, commit = build_untagged_candidate(source, base, output, version)
+                tree, commit = build_untagged_candidate(
+                    source,
+                    base,
+                    output,
+                    version,
+                    staging_parent=arguments.staging_parent,
+                    subject=arguments.subject,
+                )
                 print(
                     f"PASS built untagged candidate v{version}: "
                     f"tree {tree}, commit {commit}, branch staging"
@@ -4542,13 +4602,29 @@ def main(argv: Sequence[str] | None = None) -> int:
                 print(f"PASS merged source v{version}: {merged.head}")
             return 0
         candidate = resolve_repository(arguments.candidate, "candidate")
+        if arguments.allow_staging_correction and not arguments.correction_parent:
+            unsafe("--allow-staging-correction requires --correction-parent")
         if arguments.untagged:
             result = check_untagged_candidate(
-                source, base, candidate, version, arguments.private_policy
+                source,
+                base,
+                candidate,
+                version,
+                arguments.private_policy,
+                allow_staging_correction=arguments.allow_staging_correction,
+                correction_parent=arguments.correction_parent,
+                correction_subject=arguments.correction_subject,
             )
         else:
             result = check_candidate(
-                source, base, candidate, version, arguments.private_policy
+                source,
+                base,
+                candidate,
+                version,
+                arguments.private_policy,
+                allow_staging_correction=arguments.allow_staging_correction,
+                correction_parent=arguments.correction_parent,
+                correction_subject=arguments.correction_subject,
             )
         if arguments.format == "json":
             print(json.dumps(result, separators=(",", ":"), sort_keys=True))

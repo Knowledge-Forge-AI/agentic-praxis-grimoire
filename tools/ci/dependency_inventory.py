@@ -31,6 +31,7 @@ CI_REQUIREMENTS = (
     "mypy==1.15.0",
     "pip-audit==2.10.1",
     "semgrep==1.174.0",
+    "tomli==2.4.1",
 )
 SCHEMA = "apg-dependency-audit-v1"
 

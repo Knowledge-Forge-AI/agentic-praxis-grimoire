@@ -33,6 +33,21 @@ DEFAULT_MEMBER_JOBS = {
 
 VALID_STATUSES = {"success", "failure", "cancelled", "skipped"}
 
+PRESCRIBED_JOB_ARTIFACTS: dict[str, tuple[str, ...]] = {
+    "guard": (),
+    "static-analysis": ("manifest.json",),
+    "policy": (),
+    "unit-integration": ("apgr-unit-integration-summary.json",),
+    "closure": (),
+    "go": (),
+    "package": ("apg-distribution-manifest.json",),
+    "sbom-and-vulnerability": ("scan-results.json",),
+    "codeql-go": ("codeql-go.sarif",),
+    "codeql-python": ("codeql-python.sarif",),
+    "codeql-javascript-typescript": ("codeql-javascript-typescript.sarif",),
+    "codeql-actions": ("codeql-actions.sarif",),
+}
+
 
 def _digest(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
@@ -45,6 +60,7 @@ def emit_receipt(
     status: str = "success",
     artifacts: dict[str, str] | None = None,
     sha: str | None = None,
+    unavailable_artifacts: list[str] | None = None,
 ) -> Path:
     if job_name not in DEFAULT_MEMBER_JOBS:
         raise ValueError(f"unknown matrix member: {job_name}")
@@ -53,9 +69,11 @@ def emit_receipt(
     resolved_sha = sha or os.environ.get("COMMIT_SHA") or os.environ.get("GITHUB_SHA") or "unknown"
     if re.fullmatch(r"[0-9a-f]{40}", resolved_sha) is None:
         raise ValueError("receipt requires an exact tested commit SHA")
+    if status == "success" and unavailable_artifacts:
+        raise ValueError("successful job cannot have unavailable artifacts")
     receipt_dir.mkdir(parents=True, exist_ok=True)
     receipt_path = receipt_dir / f"{job_name}-receipt.json"
-    doc = {
+    doc: dict[str, Any] = {
         "schema": SCHEMA,
         "job": job_name,
         "status": status,
@@ -66,6 +84,8 @@ def emit_receipt(
         "pr_base_sha": os.environ.get("PR_BASE_SHA", ""),
         "workflow_sha256": _digest(WORKFLOW),
     }
+    if unavailable_artifacts:
+        doc["unavailable_artifacts"] = list(unavailable_artifacts)
     receipt_path.write_text(json.dumps(doc, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return receipt_path
 
@@ -144,6 +164,13 @@ def verify_matrix(
             errors.append(f"job {job} did not succeed: status={status}")
             continue
 
+        unavailable = doc.get("unavailable_artifacts")
+        if unavailable is not None:
+            if not isinstance(unavailable, list):
+                errors.append(f"malformed unavailable_artifacts for job: {job}")
+            elif unavailable:
+                errors.append(f"successful job {job} contains unavailable artifacts: {unavailable}")
+
         expected_status = expected_statuses.get(job)
         if needs_statuses_supplied and expected_status != "success":
             errors.append(
@@ -165,6 +192,9 @@ def verify_matrix(
         if not isinstance(artifacts, dict):
             errors.append(f"malformed artifact inventory for job: {job}")
         elif check_disk_artifacts:
+            for req_art in PRESCRIBED_JOB_ARTIFACTS.get(job, ()):
+                if req_art not in artifacts:
+                    errors.append(f"missing prescribed artifact for {job}: {req_art}")
             for rel_path, expected_hash in artifacts.items():
                 if (
                     not isinstance(rel_path, str)
@@ -223,14 +253,29 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.command == "emit":
         artifacts = {}
+        unavailable_artifacts = []
         args.dir.mkdir(parents=True, exist_ok=True)
         for source in args.artifact:
-            if source.is_symlink() or not source.is_file() or source.name in artifacts:
-                raise ValueError("receipt artifact must be a distinct direct file")
+            if source.is_symlink() or ".." in source.parts:
+                raise ValueError("receipt artifact must be a safe path")
+            if source.name in artifacts or source.name in unavailable_artifacts:
+                raise ValueError("receipt artifact must be distinct")
+            if not source.is_file():
+                if args.status == "success":
+                    raise ValueError(f"receipt artifact missing for successful job: {source}")
+                unavailable_artifacts.append(source.name)
+                continue
             payload = source.read_bytes()
             (args.dir / source.name).write_bytes(payload)
             artifacts[source.name] = hashlib.sha256(payload).hexdigest()
-        p = emit_receipt(args.job, args.dir, status=args.status, sha=args.sha, artifacts=artifacts)
+        p = emit_receipt(
+            args.job,
+            args.dir,
+            status=args.status,
+            sha=args.sha,
+            artifacts=artifacts,
+            unavailable_artifacts=unavailable_artifacts,
+        )
         print(f"Emitted receipt for {args.job} at {p}")
         return 0
 

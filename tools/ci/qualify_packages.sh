@@ -2,7 +2,7 @@
 # Task-owned public CI provisioning; no active installation.
 set -euo pipefail
 pkg_root="$RUNNER_TEMP/apgr-packages"
-mkdir -p "$pkg_root/npm-a" "$pkg_root/npm-work-a" "$pkg_root/npm-b" "$pkg_root/npm-work-b"
+mkdir -p "$pkg_root/python-work" "$pkg_root/npm-a" "$pkg_root/npm-work-a" "$pkg_root/npm-b" "$pkg_root/npm-work-b"
 python3 bin/apg-build-python-release-bundle build --source "$GITHUB_WORKSPACE" --output "$pkg_root/python" --work-root "$pkg_root/python-work" --python "$(command -v python3)"
 python3 libexec/apg_npm_distribution.py build --source "$GITHUB_WORKSPACE" --artifact-root "$pkg_root/python-work/build-a/binaries" --output "$pkg_root/npm-a" --work-root "$pkg_root/npm-work-a"
 python3 libexec/apg_npm_distribution.py build --source "$GITHUB_WORKSPACE" --artifact-root "$pkg_root/python-work/build-b/binaries" --output "$pkg_root/npm-b" --work-root "$pkg_root/npm-work-b"

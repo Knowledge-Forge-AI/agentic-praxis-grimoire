@@ -414,7 +414,7 @@ def test_staged_change_classes_unique_blobs_and_review_impact(tmp_path: Path) ->
     git(repo, "commit", "-qm", "fixtures")
 
     git(repo, "mv", "rename.txt", "renamed.txt")
-    os.chmod(repo / "mode.sh", 0o755)
+    os.chmod(repo / "mode.sh", 0o700)
     (repo / "delete.txt").unlink()
     (repo / "modify.txt").write_text("after\n", encoding="utf-8")
     (repo / "added.txt").write_text("same blob\n", encoding="utf-8")

@@ -44,11 +44,23 @@ class EmbeddedCorpusConvergenceTests(unittest.TestCase):
 
     @mock.patch("apg_skill_library_check.subprocess.run")
     def test_go_embedded_corpus_verification_fails_closed(self, run: mock.Mock) -> None:
-        run.return_value = mock.Mock(returncode=1, stdout=b"", stderr=b"bounded")
-        self.assertEqual(
-            checker._embedded_corpus_failure(REPOSITORY_ROOT),
-            "Go embedded-corpus verification disagrees with repository truth",
+        # 1. Prerequisite or execution failure (e.g. toolchain error)
+        run.return_value = mock.Mock(returncode=1, stdout=b"", stderr=b"Go toolchain is required for the source-checkout bridge")
+        failure = checker._embedded_corpus_failure(REPOSITORY_ROOT)
+        self.assertIsNotNone(failure)
+        self.assertTrue(failure.startswith("Go embedded-corpus verification prerequisite or execution failed (exit 1):"))
+        self.assertIn("Go toolchain is required", failure)
+
+        # 2. Genuine corpus disagreement
+        run.return_value = mock.Mock(
+            returncode=1,
+            stdout=b"",
+            stderr=b"checkout skill metadata disagrees with the embedded canonical corpus",
         )
+        failure_corpus = checker._embedded_corpus_failure(REPOSITORY_ROOT)
+        self.assertIsNotNone(failure_corpus)
+        self.assertTrue(failure_corpus.startswith("Go embedded-corpus verification disagrees with repository truth:"))
+        self.assertIn("checkout skill metadata disagrees", failure_corpus)
 
     @mock.patch("apg_skill_library_check._embedded_corpus_failure")
     @mock.patch("apg_skill_library_check.check_library")

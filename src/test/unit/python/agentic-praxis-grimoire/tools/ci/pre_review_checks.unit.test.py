@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
+import subprocess
+import sys
 
 from tools.ci.pre_review_checks import _command_attestation, checks
 from tools.ci.pre_review_records import ROOT, Check
@@ -74,6 +77,82 @@ def test_bootstrap_static_manifest_subset_and_no_uv() -> None:
         assert "assets" in manifest_tools[tool]
         assert "darwin-arm64" in manifest_tools[tool]["assets"]
         assert "linux-amd64" in manifest_tools[tool]["assets"]
+
+
+def test_bootstrap_static_pins_and_tomli_compatibility() -> None:
+    text = (ROOT / "tools/ci/bootstrap_static.sh").read_text(encoding="utf-8")
+    assert '"ruff==0.9.10"' in text
+    assert '"mypy==1.15.0"' in text
+    assert '"pip-audit==2.10.1"' in text
+    assert '"semgrep==1.174.0"' in text
+    assert '"tomli==2.4.1"' in text
+    assert '"tomli==2.0.1"' not in text
+
+    import re
+    tomli_match = re.search(r"tomli==([0-9]+\.[0-9]+\.[0-9]+)", text)
+    assert tomli_match is not None
+    tomli_ver = tuple(int(x) for x in tomli_match.group(1).split("."))
+    # pip-audit requires tomli >= 2.2.1
+    assert tomli_ver >= (2, 2, 1)
+    # semgrep 1.174.0 requires tomli ~= 2.4.0 (>= 2.4.0, == 2.4.*)
+    assert tomli_ver[:2] == (2, 4)
+    assert tomli_ver[2] >= 0
+
+
+def test_qualify_packages_prepares_python_work_root() -> None:
+    text = (ROOT / "tools/ci/qualify_packages.sh").read_text(encoding="utf-8")
+    assert 'mkdir -p "$pkg_root/python-work"' in text
+    assert 'mkdir -p "$pkg_root/python"' not in text
+
+
+def test_qualify_packages_clean_root_execution_to_builder_boundary(tmp_path: Path) -> None:
+    """Execute qualify_packages.sh from clean RUNNER_TEMP to verify work-root creation up to builder boundary."""
+    runner_temp = tmp_path / "runner_temp"
+    runner_temp.mkdir()
+    pkg_root = runner_temp / "apgr-packages"
+    assert not pkg_root.exists()
+
+    # Local recording builder script shadowing python3 on PATH
+    mock_bin = tmp_path / "mock_bin"
+    mock_bin.mkdir()
+    intercept_log = tmp_path / "intercepted.log"
+    mock_python = mock_bin / "python3"
+    mock_python.write_text(
+        f'#!/usr/bin/env bash\n'
+        f'if [[ "$*" == *"bin/apg-build-python-release-bundle"* ]]; then\n'
+        f'    echo "$*" > "{intercept_log}"\n'
+        f'    exit 99\n'
+        f'fi\n'
+        f'exec "{sys.executable}" "$@"\n',
+        encoding="utf-8",
+    )
+    mock_python.chmod(0o755)
+
+    env = os.environ.copy()
+    env["RUNNER_TEMP"] = str(runner_temp)
+    env["GITHUB_WORKSPACE"] = str(ROOT)
+    env["PATH"] = f"{mock_bin}:{env.get('PATH', '')}"
+
+    res = subprocess.run(
+        ["bash", str(ROOT / "tools/ci/qualify_packages.sh")],
+        env=env,
+        capture_output=True,
+        text=True,
+    )
+    assert res.returncode == 99
+    assert intercept_log.is_file()
+    assert "bin/apg-build-python-release-bundle" in intercept_log.read_text(encoding="utf-8")
+
+    # Verify work roots created
+    assert (pkg_root / "python-work").is_dir()
+    assert (pkg_root / "npm-a").is_dir()
+    assert (pkg_root / "npm-work-a").is_dir()
+    assert (pkg_root / "npm-b").is_dir()
+    assert (pkg_root / "npm-work-b").is_dir()
+
+    # Verify output directories retain absent/empty semantics
+    assert not (pkg_root / "python").exists()
+    assert not (runner_temp / "deliverables").exists()
 
 
 def test_checks_fails_explicitly_when_workflow_targets_absent(tmp_path: Path, monkeypatch) -> None:

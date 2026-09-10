@@ -264,3 +264,5 @@ Exit 00182 remains privately reserved for APG137; APG138 uses corrected exit 001
 - [`00188 — APG143 Integrated Readiness Prerequisite Exit`](2026/09/12/00188-apg143-integrated-readiness-prerequisite-exit.md)
 
 - [`00189 — APG144 Public Staging Candidate and Operator Handoff Exit`](2026/09/13/00189-apg144-public-staging-candidate-and-operator-handoff-exit.md)
+
+- [`00190 — APG145 Hosted CI Repair and Staging Correction Exit`](2026/09/13/00190-apg145-hosted-ci-repair-and-staging-correction-exit.md)

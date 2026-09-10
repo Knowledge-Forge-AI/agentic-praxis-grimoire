@@ -162,6 +162,26 @@ description bytes under the 11,507-byte ceiling. Public staging push, PR creatio
 protection settings configuration, and release tagging remain unperformed. This dispatch
 performs no public mutation; the dispatcher owns private Git publication.
 
+APG145 continues the approved v0.11 program as the hosted-CI repair and staging
+correction slice under V0110-G, allocating exit 00190. Following the 7 failed jobs and
+1 skipped job observed in public PR #1 run 34796052087, APG145 incorporates 9
+independent plan-review findings, deliberately reversing advisory finding E2
+(mapping index == -1 to driver) per OASIS SARIF §3.54.4, to resolve root causes across
+toolchain bootstrap (tomli==2.4.1 pin in bootstrap_static.sh), package qualification (python-work directory
+creation in qualify_packages.sh), macOS Go toolchain provisioning (actions/setup-go in
+public-pr.yml and error differentiation in apg_skill_library_check.py), CodeQL SARIF
+tool extension rule resolution in codeql_policy.py, source and fixture security
+remediations (skills.go slice allocation, runner.mjs descriptor-based O_NOFOLLOW file read
+and origin reflection elimination, test permission normalization to 0o700/0o600/0o710),
+matrix receipt resilience (prescribed artifacts and honest failure receipts recording
+unavailable_artifacts in matrix_receipts.py), and linear staging correction operator
+discipline (stage_operator.py and apg_public_release.py update mode on staging parent
+cd525f33ba2527862670d34d01fbdfb5f267b66c, public base ancestry 250ce73a..., and PR #1
+reuse without force-push). Accounting remains 55 terminal / zero OPEN / zero invalid;
+inventory retains 45 canonical leaves (14 stable / 31 provisional), six active CSS/JS debts,
+and 11,142 description bytes under the 11,507-byte ceiling. This dispatch performs no
+Git publication or remote mutations; the dispatcher owns private Git publication.
+
 ## Project map
 
 - [Project model](docs/project-model.md): artifact ownership and practice

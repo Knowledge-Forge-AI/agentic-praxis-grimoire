@@ -563,7 +563,7 @@ class APGPublicReleaseTests(unittest.TestCase):
             ("omit", lambda repo: (repo / "ordinary.txt").unlink()),
             ("extra", lambda repo: (repo / "extra.txt").write_text("extra\n")),
             ("bytes", lambda repo: (repo / "ordinary.txt").write_text("changed\n")),
-            ("mode", lambda repo: os.chmod(repo / "bin" / "apg-project-skills", 0o644)),
+            ("mode", lambda repo: os.chmod(repo / "bin" / "apg-project-skills", 0o600)),
             ("link", lambda repo: (repo / "relative-link").unlink()),
             ("private", lambda repo: ((repo / "private").mkdir(), (repo / "private" / "leak").write_text("leak\n"))),
         )

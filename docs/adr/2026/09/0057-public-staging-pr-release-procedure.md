@@ -65,6 +65,13 @@ deferred to live-host execution:
 - **Attended stage-only operator**: Maintained release staging operator tooling enforces
   base identity, untagged candidate verification, staging push without tags or history transfer,
   and PR creation with public-safe release notes.
+- **Staging correction commit discipline**: When hosted CI or review detects defects on the public
+  staging PR prior to merge, corrections are prepared as ordinary, linear fast-forward commits
+  on top of the existing staging branch head. Force-pushing (`+`), history rewriting, branch deletion,
+  and new PR creation are strictly forbidden. The stage operator operates in `--update` mode,
+  verifying that the public base commit is in candidate ancestry, the immediate parent matches
+  the expected prior staging tip, the open PR is preserved and reused, and post-push readbacks
+  confirm exact remote commit and tree identity.
 
 ### Deferred to live-host execution (attended staging and V0110-G)
 - **Premerge tip enforcement**: Live read of remote `main` immediately prior to merge.
