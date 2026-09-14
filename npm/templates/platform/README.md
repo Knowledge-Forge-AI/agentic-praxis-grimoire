@@ -27,7 +27,7 @@ The prebuilt binary executes runtime commands (`skills`, `footprint`, `env`, `an
 - Architecture: `__APG_CPU__`
 - Target: `__APG_TARGET__`
 - Node.js Engine: `>=22.0.0`
-- Developer Gate: Darwin arm64 passed the [integrated source qualification](https://github.com/Knowledge-Forge-AI/agentic-praxis-grimoire/blob/v__APG_VERSION__/docs/status/2026/09/06/00159-apg114-v090-integrated-source-qualification-exit.md); Linux x86_64 qualification remains pending.
+- Developer Gate: Darwin arm64 has historical [integrated source qualification](https://github.com/Knowledge-Forge-AI/agentic-praxis-grimoire/blob/v0.9.0/docs/status/2026/09/06/00159-apg114-v090-integrated-source-qualification-exit.md); Linux x86_64 qualification remains pending.
 
 ## License
 

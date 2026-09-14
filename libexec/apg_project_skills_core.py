@@ -2,19 +2,15 @@
 
 from __future__ import annotations
 
-import argparse
 from contextlib import contextmanager
 from dataclasses import dataclass
-import errno
 import fcntl
 import json
 import os
 from pathlib import Path
 import re
-import signal
 import stat
 import subprocess
-import sys
 import tempfile
 from typing import Iterator, NoReturn, Sequence
 

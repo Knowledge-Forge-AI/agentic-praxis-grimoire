@@ -2,16 +2,16 @@
 
 from __future__ import annotations
 
-from pathlib import Path
 import hashlib
 import json
 import os
 import subprocess
+import zipfile
+from pathlib import Path
 
 import pytest
 
 from src.test.apg_test_support import repository_root
-
 
 REPOSITORY_ROOT = repository_root(__file__)
 WORKFLOW = REPOSITORY_ROOT / ".github" / "workflows" / "release.yml"
@@ -39,7 +39,11 @@ MANIFEST_NAME = "apg-distribution-manifest.json"
 
 def _verification_script() -> str:
     workflow = json.loads(WORKFLOW.read_text(encoding="utf-8"))
-    return workflow["jobs"]["publish"]["steps"][0]["run"]
+    return "\n".join(
+        step["run"]
+        for step in workflow["jobs"]["publish"]["steps"][:2]
+        if "run" in step
+    )
 
 
 def _fixture(
@@ -61,6 +65,8 @@ def _fixture(
     duplicate_asset: bool = False,
     malformed_checksums: bool = False,
     include_non_python_assets: bool = True,
+    manifest_source_mismatch: bool = False,
+    aggregate_failed: bool = False,
 ) -> tuple[Path, Path]:
     active_version = fixture_version if fixture_version is not None else VERSION
     active_wheels, active_sdist, active_npm = _distribution_filenames(active_version)
@@ -106,6 +112,9 @@ def _fixture(
             },
         },
     }
+    if active_version == "0.11.0":
+        manifest_obj["source_commit"] = "a" * 40 if manifest_source_mismatch else "b" * 40
+        manifest_obj["source_tree"] = "e" * 40 if manifest_source_mismatch else "f" * 40
 
     if include_non_python_assets:
         asset_map[active_npm] = b"exact npm tarball bytes"
@@ -125,6 +134,49 @@ def _fixture(
         "\n".join(manifest_lines) + "\n",
         encoding="ascii",
     )
+
+    receipt_jobs = (
+        "guard",
+        "static-analysis",
+        "policy",
+        "unit-integration",
+        "closure",
+        "go",
+        "package",
+        "sbom-and-vulnerability",
+        "codeql-go",
+        "codeql-python",
+        "codeql-javascript-typescript",
+        "codeql-actions",
+    )
+    aggregate_members = {
+        job: {
+            "schema": "apg-matrix-receipt-v1",
+            "job": job,
+            "status": "failure" if aggregate_failed and job == "policy" else "success",
+            "sha": "6" * 40,
+            "timestamp": "2026-09-12T00:00:00Z",
+            "artifacts": {},
+            "pr_head_sha": "e" * 40,
+            "pr_base_sha": "a" * 40,
+            "workflow_sha256": "1" * 64,
+        }
+        for job in receipt_jobs
+    }
+    aggregate = {
+        "schema": "apg-matrix-aggregate-v1",
+        "timestamp": "2026-09-12T00:00:00Z",
+        "success": not aggregate_failed,
+        "required_members_count": len(receipt_jobs),
+        "verified_members_count": len(receipt_jobs),
+        "errors": ["job policy did not succeed: status=failure"] if aggregate_failed else [],
+        "members": aggregate_members,
+    }
+    with zipfile.ZipFile(tmp_path / "aggregate-gate.zip", "w", zipfile.ZIP_DEFLATED) as archive:
+        archive.writestr(
+            "matrix-aggregate.json",
+            json.dumps(aggregate, sort_keys=True, separators=(",", ":")) + "\n",
+        )
 
     release_assets = [
         {"id": idx + 1, "name": name}
@@ -185,6 +237,14 @@ def _run(
     duplicate_asset: bool = False,
     malformed_checksums: bool = False,
     include_non_python_assets: bool = True,
+    approved_review: bool = True,
+    review_changed_after_approval: bool = False,
+    workflow_bound: bool = True,
+    manifest_source_mismatch: bool = False,
+    aggregate_missing: bool = False,
+    aggregate_mismatch: bool = False,
+    aggregate_parent_mismatch: bool = False,
+    aggregate_failed: bool = False,
     repository: str = "Knowledge-Forge-AI/agentic-praxis-grimoire",
 ) -> subprocess.CompletedProcess[str]:
     assets, event = _fixture(
@@ -205,6 +265,8 @@ def _run(
         duplicate_asset=duplicate_asset,
         malformed_checksums=malformed_checksums,
         include_non_python_assets=include_non_python_assets,
+        manifest_source_mismatch=manifest_source_mismatch,
+        aggregate_failed=aggregate_failed,
     )
     commands = tmp_path / "bin"
     commands.mkdir()
@@ -212,6 +274,7 @@ def _run(
     fake.write_text(
         """#!/usr/bin/env python3
 from pathlib import Path
+import hashlib
 import json
 import os
 import shutil
@@ -219,10 +282,151 @@ import sys
 
 event_path = Path(os.environ["GITHUB_EVENT_PATH"])
 event = json.loads(event_path.read_text(encoding="utf-8"))
-asset_id = int(sys.argv[-1].rsplit("/", 1)[-1])
-name = next(a["name"] for a in event["release"]["assets"] if a["id"] == asset_id)
-with (Path(os.environ["APG_FAKE_ASSETS"]) / name).open("rb") as source:
-    shutil.copyfileobj(source, sys.stdout.buffer)
+api_path = sys.argv[-1]
+accepted_base = "a" * 40
+merged_commit = "b" * 40
+tag_object = "c" * 40
+accepted_tag_object = "d" * 40
+pr_head = "e" * 40
+tested_sha = "6" * 40
+run_id = "123"
+if api_path.endswith("/git/ref/tags/v0.11.0"):
+    value = {"object": {"sha": tag_object, "type": "tag"}}
+elif api_path.endswith("/git/tags/" + tag_object):
+    value = {"object": {"sha": merged_commit, "type": "commit"}}
+elif api_path.endswith("/git/ref/tags/v0.10.0"):
+    value = {"object": {"sha": accepted_tag_object, "type": "tag"}}
+elif api_path.endswith("/git/tags/" + accepted_tag_object):
+    value = {"object": {"sha": accepted_base, "type": "commit"}}
+elif api_path.endswith("/commits/" + merged_commit):
+    value = {
+        "parents": [{"sha": accepted_base}],
+        "commit": {
+            "tree": {"sha": "f" * 40},
+            "message": "Release v0.11.0\\n\\nfixture",
+        },
+    }
+elif api_path.endswith("/commits/" + tested_sha):
+    value = {
+        "parents": [
+            {"sha": accepted_base},
+            {
+                "sha": "9" * 40
+                if os.environ.get("APG_AGGREGATE_PARENT_MISMATCH") == "1"
+                else pr_head
+            },
+        ],
+        "commit": {
+            "tree": {
+                "sha": "0" * 40
+                if os.environ.get("APG_AGGREGATE_MISMATCH") == "1"
+                else "f" * 40
+            },
+        },
+    }
+elif api_path.endswith("/commits/" + merged_commit + "/pulls"):
+    value = [{
+        "number": 42,
+        "base": {"ref": "main"},
+        "head": {
+            "ref": "staging",
+            "repo": {"full_name": "Knowledge-Forge-AI/agentic-praxis-grimoire"},
+            "sha": pr_head,
+        },
+        "merged_at": "2026-09-12T00:00:00Z",
+        "merge_commit_sha": merged_commit,
+    }]
+elif api_path.endswith("/pulls/42"):
+    value = {
+        "number": 42,
+        "base": {"ref": "main"},
+        "head": {
+            "ref": "staging",
+            "repo": {"full_name": "Knowledge-Forge-AI/agentic-praxis-grimoire"},
+            "sha": pr_head,
+        },
+        "merged_at": "2026-09-12T00:00:00Z",
+        "merge_commit_sha": merged_commit,
+    }
+elif api_path.endswith("/pulls/42/reviews"):
+    if os.environ.get("APG_APPROVED_REVIEW") != "1":
+        value = [[]]
+    elif os.environ.get("APG_REVIEW_CHANGED_AFTER_APPROVAL") == "1":
+        value = [[
+            {
+                "id": 1,
+                "state": "APPROVED",
+                "commit_id": pr_head,
+                "user": {"login": "reviewer"},
+            },
+            {
+                "id": 2,
+                "state": "CHANGES_REQUESTED",
+                "commit_id": pr_head,
+                "user": {"login": "reviewer"},
+            },
+        ]]
+    else:
+        value = [[{
+            "id": 1,
+            "state": "APPROVED",
+            "commit_id": pr_head,
+            "user": {"login": "reviewer"},
+        }]]
+elif "/actions/runs?" in api_path:
+    value = [{
+        "total_count": 1,
+        "workflow_runs": [{
+            "id": int(run_id),
+            "path": ".github/workflows/public-pr.yml" if os.environ.get("APG_WORKFLOW_BOUND") == "1" else ".github/workflows/other.yml",
+            "event": "pull_request",
+            "status": "completed",
+            "conclusion": "success",
+            "head_branch": "staging",
+            "head_sha": pr_head,
+            "head_repository": {"full_name": "Knowledge-Forge-AI/agentic-praxis-grimoire"},
+            "pull_requests": [{"number": 42}],
+            "updated_at": "2026-09-12T00:00:00Z",
+        }],
+    }]
+elif "/actions/runs/" + run_id + "/jobs?" in api_path:
+    names = [
+        "guard", "static-analysis", "policy", "unit-integration", "closure", "go",
+        "package", "sbom-and-vulnerability", "codeql (go)", "codeql (python)",
+        "codeql (javascript-typescript)", "codeql (actions)", "public-pr-gate",
+    ]
+    value = [{"total_count": len(names), "jobs": [
+        {
+            "name": name,
+            "head_sha": pr_head,
+            "status": "completed",
+            "conclusion": "success",
+            "completed_at": "2026-09-12T00:00:00Z",
+        }
+        for name in names
+    ]}]
+elif "/actions/runs/" + run_id + "/artifacts?" in api_path:
+    aggregate = Path(os.environ["APG_AGGREGATE_ZIP"])
+    artifacts = [] if os.environ.get("APG_AGGREGATE_MISSING") == "1" else [{
+        "id": 777,
+        "name": "public-pr-gate-result",
+        "size_in_bytes": aggregate.stat().st_size,
+        "expired": False,
+        "digest": "sha256:" + hashlib.sha256(aggregate.read_bytes()).hexdigest(),
+        "workflow_run": {"id": int(run_id), "head_branch": "staging", "head_sha": pr_head},
+    }]
+    value = [{"total_count": len(artifacts), "artifacts": artifacts}]
+elif "/actions/artifacts/777/zip" in api_path:
+    with Path(os.environ["APG_AGGREGATE_ZIP"]).open("rb") as source:
+        shutil.copyfileobj(source, sys.stdout.buffer)
+    raise SystemExit(0)
+else:
+    asset_id = int(api_path.rsplit("/", 1)[-1])
+    name = next(a["name"] for a in event["release"]["assets"] if a["id"] == asset_id)
+    with (Path(os.environ["APG_FAKE_ASSETS"]) / name).open("rb") as source:
+        shutil.copyfileobj(source, sys.stdout.buffer)
+    raise SystemExit(0)
+print(json.dumps(value), end="")
 """,
         encoding="utf-8",
     )
@@ -230,8 +434,16 @@ with (Path(os.environ["APG_FAKE_ASSETS"]) / name).open("rb") as source:
     environment = {
         "APG_FAKE_ASSETS": os.fspath(assets),
         "GH_TOKEN": "bounded-test-token",
+        "APG_APPROVED_REVIEW": "1" if approved_review else "0",
+        "APG_REVIEW_CHANGED_AFTER_APPROVAL": "1" if review_changed_after_approval else "0",
+        "APG_WORKFLOW_BOUND": "1" if workflow_bound else "0",
+        "APG_AGGREGATE_MISSING": "1" if aggregate_missing else "0",
+        "APG_AGGREGATE_MISMATCH": "1" if aggregate_mismatch else "0",
+        "APG_AGGREGATE_PARENT_MISMATCH": "1" if aggregate_parent_mismatch else "0",
+        "APG_AGGREGATE_ZIP": os.fspath(tmp_path / "aggregate-gate.zip"),
         "GITHUB_EVENT_PATH": os.fspath(event),
         "GITHUB_REPOSITORY": repository,
+        "RUNNER_TEMP": os.fspath(tmp_path),
         "PATH": os.fspath(commands) + os.pathsep + os.environ["PATH"],
     }
     return subprocess.run(
@@ -239,8 +451,7 @@ with (Path(os.environ["APG_FAKE_ASSETS"]) / name).open("rb") as source:
         cwd=tmp_path,
         env=environment,
         text=True,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
+        capture_output=True,
         check=False,
     )
 
@@ -261,6 +472,7 @@ def test_verification_step_selects_the_exact_checked_distribution_paths(
         "SHA256SUMS",
         "apg-distribution-manifest.json",
     ]
+    assert (tmp_path / "aggregate-gate" / "matrix-aggregate.json").is_file()
 
 
 def test_verification_step_stops_on_wheel_checksum_mismatch(tmp_path: Path) -> None:
@@ -293,6 +505,68 @@ def test_verification_step_stops_on_manifest_missing_wheel(tmp_path: Path) -> No
     assert result.returncode != 0
 
 
+def test_verification_step_requires_current_approved_review(tmp_path: Path) -> None:
+    result = _run(tmp_path, approved_review=False)
+
+    assert result.returncode != 0
+
+
+def test_verification_step_rejects_a_later_changes_requested_review(
+    tmp_path: Path,
+) -> None:
+    result = _run(tmp_path, review_changed_after_approval=True)
+
+    assert result.returncode != 0
+
+
+def test_verification_step_requires_public_pr_workflow_check_provenance(
+    tmp_path: Path,
+) -> None:
+    result = _run(tmp_path, workflow_bound=False)
+
+    assert result.returncode != 0
+
+
+def test_verification_step_requires_the_aggregate_gate_artifact(
+    tmp_path: Path,
+) -> None:
+    result = _run(tmp_path, aggregate_missing=True)
+
+    assert result.returncode != 0
+
+
+def test_verification_step_binds_aggregate_candidate_tree_to_merged_tree(
+    tmp_path: Path,
+) -> None:
+    result = _run(tmp_path, aggregate_mismatch=True)
+
+    assert result.returncode != 0
+
+
+def test_verification_step_requires_base_and_pr_head_candidate_parents(
+    tmp_path: Path,
+) -> None:
+    result = _run(tmp_path, aggregate_parent_mismatch=True)
+
+    assert result.returncode != 0
+
+
+def test_verification_step_rejects_a_failed_aggregate_gate(
+    tmp_path: Path,
+) -> None:
+    result = _run(tmp_path, aggregate_failed=True)
+
+    assert result.returncode != 0
+
+
+def test_verification_step_binds_manifest_to_observed_merged_source(
+    tmp_path: Path,
+) -> None:
+    result = _run(tmp_path, manifest_source_mismatch=True)
+
+    assert result.returncode != 0
+
+
 # These historical rejection cases assume monotonically increasing releases;
 # restoring one as VERSION requires revisiting the corresponding negative.
 @pytest.mark.parametrize(
@@ -302,8 +576,11 @@ def test_verification_step_stops_on_manifest_missing_wheel(tmp_path: Path) -> No
         {"tag": "v0.7.1"},
         {"tag": "v0.8.1"},
         {"tag": "v0.9.0"},
+        {"tag": "v0.10.0"},
         {"fixture_version": "0.9.0"},
         {"fixture_version": "0.9.0", "tag": "v0.9.0"},
+        {"fixture_version": "0.10.0"},
+        {"fixture_version": "0.10.0", "tag": "v0.10.0"},
         {"extra_wheel": True},
         {"universal_wheel": True},
         {"extra_sdist": True},

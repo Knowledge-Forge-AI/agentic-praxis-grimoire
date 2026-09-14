@@ -6,7 +6,7 @@ from __future__ import annotations
 import importlib.util
 import json
 import os
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 import shutil
 import sys
 import tempfile
@@ -42,7 +42,7 @@ class APGPublicReleaseBoundaryTests(unittest.TestCase):
             with self.subTest(version=version):
                 surfaces = release.audited_policy_surfaces(version)
                 self.assertEqual(surfaces[0]["required_skills"], expected)
-        for version in ("invalid", "0.5.1", "0.6.1", "0.8.2", "0.9.1", "0.10.1", "0.11.0"):
+        for version in ("invalid", "0.5.1", "0.6.1", "0.8.2", "0.9.1", "0.10.1"):
             with self.subTest(version=version):
                 with self.assertRaisesRegex(release.ToolError, "policy identity"):
                     release.audited_policy_surfaces(version)
@@ -174,7 +174,7 @@ class APGPublicReleaseBoundaryTests(unittest.TestCase):
                             release.validate_versioned_policy_exclusions(
                                 (*projected_v010, entry), "0.10.0"
                             )
-            for unsupported in ("0.10.1", "0.11.0"):
+            for unsupported in ("0.10.1",):
                 with self.subTest(unsupported_candidate=unsupported):
                     with self.assertRaisesRegex(release.ToolError, "unsupported"):
                         release.public_candidate_entries(repository, unsupported)
@@ -291,7 +291,8 @@ class APGPublicReleaseBoundaryTests(unittest.TestCase):
                     release.validate_identity(name, email)
 
     def test_repository_separation_rejects_equal_and_nested_roots(self) -> None:
-        repository = lambda path: release.Repository(path, "a" * 40, "b" * 40)
+        def repository(path):
+            return release.Repository(path, "a" * 40, "b" * 40)
         release.validate_repository_separation(repository(Path("/one")), repository(Path("/two")))
         for second in (Path("/one"), Path("/one/nested"), Path("/")):
             with self.subTest(second=second):
@@ -460,10 +461,347 @@ class APGPublicReleaseBoundaryTests(unittest.TestCase):
             with self.assertRaisesRegex(release.ToolError, "differs from the audited schema-1 surface"):
                 release.resolve_public_validation_deselections("0.9.0", v10_loaded)
             # Malformed/unknown version against loaded policy
-            for bad_ver in ("0.10", "invalid", "0.10.1", "0.11.0"):
+            for bad_ver in ("0.10", "invalid", "0.10.1"):
                 with self.subTest(bad_ver=bad_ver):
                     with self.assertRaisesRegex(release.ToolError, "malformed or unsupported"):
                         release.resolve_public_validation_deselections(bad_ver, v10_loaded)
+
+
+class APGPublicReleaseV011PreparationTests(unittest.TestCase):
+    """Exercise the real v0.11 staging and observed-squash boundaries."""
+
+    def setUp(self) -> None:
+        self.fixture = FIXTURE_MODULE.APGPublicReleaseTests(
+            "test_01_manifest_is_deterministic_in_text_and_json"
+        )
+        self.fixture.setUp()
+
+    def tearDown(self) -> None:
+        self.fixture.tearDown()
+
+    def _make_surface_source(self, version: str, name: str) -> Path:
+        source = self.fixture.make_source(self.fixture.root / name)
+        policy = self.fixture.policy()
+        surface = release.audited_policy_surfaces(version)[0]
+        policy.update({key: list(values) for key, values in surface.items()})
+        self.fixture.write_policy(source, policy)
+
+        path_keys = (
+            "critical_files",
+            "required_helpers",
+            "required_licensing_files",
+            "required_projections",
+            "required_skills",
+            "required_test_entrypoints",
+            "required_wrappers",
+        )
+        projections = set(policy["required_projections"])
+        skills = set(policy["required_skills"])
+        tests = set(policy["required_test_entrypoints"])
+        wrappers = set(policy["required_wrappers"])
+        paths = {path for key in path_keys for path in policy[key]}
+        for relative in sorted(paths):
+            target = source / relative
+            if os.path.lexists(target):
+                continue
+            target.parent.mkdir(parents=True, exist_ok=True)
+            if relative in projections:
+                skill_path = next(
+                    PurePosixPath(item).parent
+                    for item in skills
+                    if PurePosixPath(item).parent.name == target.name
+                )
+                target.symlink_to(
+                    PurePosixPath("../..") / skill_path,
+                    target_is_directory=True,
+                )
+            elif relative in skills:
+                skill_name = target.parent.name
+                target.write_text(
+                    f"---\nname: {skill_name}\ndescription: fixture\n---\n",
+                    encoding="utf-8",
+                )
+            elif relative in tests:
+                if target.suffix == ".bats":
+                    target.write_text(
+                        '#!/usr/bin/env bats\n@test "fixture" { true; }\n',
+                        encoding="utf-8",
+                    )
+                else:
+                    target.write_text("def test_fixture():\n    pass\n", encoding="utf-8")
+            elif relative in wrappers:
+                target.write_text("#!/bin/sh\nexit 0\n", encoding="utf-8")
+                target.chmod(0o755)
+            else:
+                target.write_text("# Fixture owner\n", encoding="utf-8")
+        self.fixture.commit_all(source, f"Fixture v{version} source")
+        return source
+
+    def _make_v011_lineage(self, name: str) -> tuple[Path, Path]:
+        # The fixture launcher patches only the external accepted v0.1
+        # identity/tree.  The v0.10 tags, refs, trees, and source projection
+        # below are built and observed through real disposable Git repositories.
+        v010_source = self._make_surface_source("0.10.0", f"{name}-v010-source")
+        v010_base, result = self.fixture.build(
+            self.fixture.root / f"{name}-v010-base",
+            source=v010_source,
+            base=self.fixture.base,
+            version="0.10.0",
+        )
+        self.fixture.assert_success(result)
+        v011_source = self._make_surface_source("0.11.0", f"{name}-v011-source")
+        return v011_source, v010_base
+
+    def _build_untagged(
+        self, source: Path, base: Path, name: str
+    ) -> tuple[Path, object]:
+        output = self.fixture.root / name
+        result = self.fixture.run_command(
+            "build",
+            "--untagged",
+            "--source",
+            str(source),
+            "--base",
+            str(base),
+            "--output",
+            str(output),
+            "--version",
+            "0.11.0",
+        )
+        return output, result
+
+    def _check_untagged(
+        self, source: Path, base: Path, candidate: Path
+    ) -> object:
+        return self.fixture.run_command(
+            "check",
+            "--untagged",
+            "--source",
+            str(source),
+            "--base",
+            str(base),
+            "--candidate",
+            str(candidate),
+            "--version",
+            "0.11.0",
+        )
+
+    def _remove_entry(self, path: Path) -> None:
+        if not os.path.lexists(path):
+            return
+        if path.is_dir() and not path.is_symlink():
+            shutil.rmtree(path)
+        else:
+            path.unlink()
+
+    def _make_squashed_merged(
+        self, base: Path, candidate: Path, name: str
+    ) -> Path:
+        merged = self.fixture.root / name
+        shutil.copytree(base, merged, symlinks=True)
+        for child in tuple(merged.iterdir()):
+            if child.name != ".git":
+                self._remove_entry(child)
+        for child in candidate.iterdir():
+            if child.name == ".git":
+                continue
+            target = merged / child.name
+            self._remove_entry(target)
+            if child.is_symlink():
+                target.symlink_to(os.readlink(child), target_is_directory=child.is_dir())
+            elif child.is_dir():
+                shutil.copytree(child, target, symlinks=True)
+            else:
+                shutil.copy2(child, target)
+        base_head = self.fixture.git(merged, "rev-parse", "HEAD").stdout.strip()
+        self.fixture.git(merged, "update-ref", "refs/heads/main", base_head)
+        self.fixture.git(merged, "symbolic-ref", "HEAD", "refs/heads/main")
+        self.fixture.git(merged, "update-ref", "-d", "refs/heads/release/0.10.0")
+        self.fixture.commit_all(merged, "Release v0.11.0")
+        return merged
+
+    def _check_merged(
+        self,
+        source: Path,
+        base: Path,
+        merged: Path,
+        premerge_main: str,
+    ) -> object:
+        merged_commit = self.fixture.git(
+            merged, "rev-parse", "HEAD"
+        ).stdout.strip()
+        arguments = [
+            "merged-check",
+            "--source",
+            str(source),
+            "--base",
+            str(base),
+            "--merged",
+            str(merged),
+            "--version",
+            "0.11.0",
+            "--approved-pr",
+            "https://github.com/Knowledge-Forge-AI/agentic-praxis-grimoire/pull/42",
+            "--premerge-main",
+            premerge_main,
+            "--merged-commit",
+            merged_commit,
+            "--required-check",
+            "public-pr-gate=success",
+            "--format",
+            "json",
+        ]
+        return self.fixture.run_command(*arguments)
+
+    def test_untagged_build_and_check_use_staging_without_a_release_tag(self) -> None:
+        source, base = self._make_v011_lineage("untagged")
+        source_before = self.fixture.fingerprint(source)
+        base_before = self.fixture.fingerprint(base)
+        candidate, built = self._build_untagged(source, base, "untagged-candidate")
+        self.fixture.assert_success(built)
+
+        candidate_head = self.fixture.git(candidate, "rev-parse", "HEAD").stdout.strip()
+        base_head = self.fixture.git(base, "rev-parse", "HEAD").stdout.strip()
+        self.assertEqual(
+            self.fixture.git(candidate, "branch", "--show-current").stdout.strip(),
+            "staging",
+        )
+        self.assertEqual(
+            self.fixture.git(
+                candidate, "rev-list", "--parents", "-n", "1", "HEAD"
+            ).stdout.strip().split(),
+            [candidate_head, base_head],
+        )
+        self.assertEqual(
+            self.fixture.git(
+                candidate, "rev-list", "--count", f"{base_head}..HEAD"
+            ).stdout.strip(),
+            "1",
+        )
+        tags = self.fixture.git(
+            candidate, "for-each-ref", "--format=%(refname)", "refs/tags"
+        ).stdout.splitlines()
+        self.assertNotIn("refs/tags/v0.11.0", tags)
+        candidate_before = self.fixture.fingerprint(candidate)
+        self.fixture.assert_success(self._check_untagged(source, base, candidate))
+        self.assertEqual(self.fixture.fingerprint(candidate), candidate_before)
+        self.assertEqual(self.fixture.fingerprint(source), source_before)
+        self.assertEqual(self.fixture.fingerprint(base), base_before)
+
+    def test_merged_check_accepts_an_observed_squash_tree(self) -> None:
+        source, base = self._make_v011_lineage("merged")
+        candidate, built = self._build_untagged(source, base, "merged-staging")
+        self.fixture.assert_success(built)
+        self.fixture.assert_success(self._check_untagged(source, base, candidate))
+        merged = self._make_squashed_merged(base, candidate, "merged-source")
+        base_head = self.fixture.git(base, "rev-parse", "HEAD").stdout.strip()
+        merged_head = self.fixture.git(merged, "rev-parse", "HEAD").stdout.strip()
+        before = tuple(self.fixture.fingerprint(repo) for repo in (source, base, merged))
+
+        result = self._check_merged(source, base, merged, base_head)
+        self.fixture.assert_success(result)
+        payload = json.loads(result.stdout)
+        self.assertEqual(payload["status"], "pass")
+        self.assertEqual(payload["merged_commit"], merged_head)
+        self.assertEqual(payload["merged_parent"], base_head)
+        self.assertEqual(
+            payload["merged_tree"],
+            self.fixture.git(merged, "rev-parse", "HEAD^{tree}").stdout.strip(),
+        )
+        self.assertEqual(
+            self.fixture.git(merged, "branch", "--show-current").stdout.strip(),
+            "main",
+        )
+        self.assertEqual(
+            self.fixture.git(
+                merged, "rev-list", "--parents", "-n", "1", "HEAD"
+            ).stdout.strip().split(),
+            [merged_head, base_head],
+        )
+        self.assertNotEqual(
+            self.fixture.git(
+                merged, "show-ref", "--verify", "--quiet", "refs/tags/v0.11.0", check=False
+            ).returncode,
+            0,
+        )
+        self.assertEqual(
+            tuple(self.fixture.fingerprint(repo) for repo in (source, base, merged)),
+            before,
+        )
+
+    def test_merged_check_refuses_source_tree_and_lineage_contract_breaks(self) -> None:
+        source, base = self._make_v011_lineage("refusal")
+        candidate, built = self._build_untagged(source, base, "refusal-staging")
+        self.fixture.assert_success(built)
+        base_head = self.fixture.git(base, "rev-parse", "HEAD").stdout.strip()
+
+        def source_bytes(repo: Path, _base: Path, _merged: Path) -> None:
+            (repo / "ordinary.txt").write_text("changed source bytes\n", encoding="utf-8")
+            self.fixture.commit_all(repo, "Change projected source bytes")
+
+        def source_mode(repo: Path, _base: Path, _merged: Path) -> None:
+            (repo / "ordinary.txt").chmod(0o755)
+            self.fixture.commit_all(repo, "Change projected source mode")
+
+        def tree_extra(_source: Path, _base: Path, repo: Path) -> None:
+            (repo / "tree-extra.txt").write_text("extra tree entry\n", encoding="utf-8")
+            self.fixture.commit_all(repo, "Add extra tree entry")
+
+        def private_path(_source: Path, _base: Path, repo: Path) -> None:
+            (repo / "private").mkdir()
+            (repo / "private" / "leak.txt").write_text("private\n", encoding="utf-8")
+            self.fixture.commit_all(repo, "Add private path")
+
+        def extra_history(_source: Path, _base: Path, repo: Path) -> None:
+            self.fixture.git(repo, "commit", "--allow-empty", "-q", "-m", "Post-release history")
+
+        def premature_tag(_source: Path, _base: Path, repo: Path) -> None:
+            self.fixture.git(repo, "tag", "-a", "v0.11.0", "-m", "Release v0.11.0")
+
+        def moved_base(_source: Path, repo: Path, _merged: Path) -> None:
+            tree = self.fixture.git(repo, "rev-parse", "HEAD^{tree}").stdout.strip()
+            moved = self.fixture.git(
+                repo, "commit-tree", tree, "-p", base_head, "-m", "Moved public main"
+            ).stdout.strip()
+            self.fixture.git(repo, "update-ref", "refs/heads/main", moved)
+
+        scenarios = {
+            "source-bytes": source_bytes,
+            "source-mode": source_mode,
+            "tree-extra": tree_extra,
+            "private-path": private_path,
+            "extra-history": extra_history,
+            "premature-tag": premature_tag,
+            "moved-base": moved_base,
+        }
+        for name, mutate in scenarios.items():
+            with self.subTest(name=name):
+                source_case = self.fixture.root / f"{name}-source"
+                base_case = self.fixture.root / f"{name}-base"
+                shutil.copytree(source, source_case, symlinks=True)
+                shutil.copytree(base, base_case, symlinks=True)
+                merged_case = self._make_squashed_merged(
+                    base_case, candidate, f"{name}-merged"
+                )
+                mutate(source_case, base_case, merged_case)
+                before = tuple(
+                    self.fixture.fingerprint(repo)
+                    for repo in (source_case, base_case, merged_case)
+                )
+                premerge_main = self.fixture.git(
+                    base_case, "rev-parse", "refs/heads/main"
+                ).stdout.strip()
+                result = self._check_merged(
+                    source_case, base_case, merged_case, premerge_main
+                )
+                self.assertEqual(result.returncode, 1, result.stderr)
+                self.assertEqual(
+                    tuple(
+                        self.fixture.fingerprint(repo)
+                        for repo in (source_case, base_case, merged_case)
+                    ),
+                    before,
+                )
 
 
 class APGPublicReleaseV03PolicyTests(unittest.TestCase):

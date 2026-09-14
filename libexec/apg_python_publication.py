@@ -60,7 +60,7 @@ TARGET_TAGS = _canonical_target_tags()
 # ``EPOCH`` is the current release policy alias. Historical reconstruction
 # uses the named v0.6 value explicitly below; it must not silently inherit the
 # current release epoch.
-EPOCH = distribution.V010_RELEASE_EPOCH
+EPOCH = distribution.RELEASE_EPOCH_BY_VERSION["0.11.0"]
 HISTORICAL_V06_VERSION = "0.6.0"
 HISTORICAL_V06_WHEEL_NAME = (
     f"{DIST_NAME}-{HISTORICAL_V06_VERSION}-py3-none-any.whl"

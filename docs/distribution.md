@@ -1,7 +1,7 @@
 # APG Distribution
 
-This documentation covers v0.10.0. The preceding **v0.9.0** and **v0.8.1** releases
-remain frozen. The distribution architecture preserves the multi-registry packaging
+This documentation covers the **unreleased v0.11.0 candidate**. The published
+**v0.10.0** and preceding releases remain frozen. The distribution architecture preserves the multi-registry packaging
 model and provides the 45-skill corpus. Local build and inspection do not publish
 packages.
 
@@ -122,7 +122,11 @@ source build uses the current checkout's version and corpus and is removed after
 the invocation. Installed wheels always use their bundled binary and never
 require a runtime compiler or network access.
 
-Once v0.10.0 is published, install Python with
+v0.11.0 candidate artifacts require local qualification before any release.
+The public staging PR and post-merge artifact qualification are separate gates;
+see the [release procedure](public-release-process.md).
+
+v0.10.0 remains publicly released across GitHub, Go, PyPI and npm. Install Python with
 `pip install agentic-praxis-grimoire==0.10.0`, npm with
 `npm install -g @knowledge-forge-ai/apgr@0.10.0`, or the Go module with
 `go get github.com/Knowledge-Forge-AI/agentic-praxis-grimoire@v0.10.0`.

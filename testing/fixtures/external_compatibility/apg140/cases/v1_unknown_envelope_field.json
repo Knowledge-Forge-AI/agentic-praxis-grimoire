@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "result_kind": "canonical_nodes",
+  "items": [],
+  "page": {
+    "limit": 50,
+    "offset": 0,
+    "returned": 0,
+    "truncated": false,
+    "next_offset": null
+  },
+  "diagnostics": [],
+  "unexpected_field_policy_violation": "fails_closed"
+}

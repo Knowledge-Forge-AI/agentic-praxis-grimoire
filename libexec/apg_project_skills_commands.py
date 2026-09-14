@@ -24,7 +24,6 @@ from apg_project_skills_core import (
     canonical_skills,
     create_projection_parents,
     fail,
-    frontmatter_name,
     fsync_directory,
     inode_matches,
     is_tracked,

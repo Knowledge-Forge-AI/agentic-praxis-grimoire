@@ -9,9 +9,7 @@ for scenarios PW01-PW10 and SVG01-SVG03.
 from __future__ import annotations
 
 import json
-from pathlib import Path
 import sys
-import pytest
 
 from src.test.apg_test_support import repository_root
 
@@ -19,7 +17,6 @@ ROOT = repository_root(__file__)
 sys.path.insert(0, str(ROOT / "src/test/support"))
 
 from apg123_browser_ui import (  # noqa: E402
-    BROWSER_CORROBORATION_DISCLAIMER,
     EXPECTED_PLAYWRIGHT_VERSION,
     PLAYWRIGHT_SCENARIOS,
     SUPPORTED_BROWSERS,

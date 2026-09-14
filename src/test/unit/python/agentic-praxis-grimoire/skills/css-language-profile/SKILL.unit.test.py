@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Maintained unit contract for the CSS language profile."""
 
-from pathlib import Path
 import sys
 
 from src.test.apg_test_support import repository_root

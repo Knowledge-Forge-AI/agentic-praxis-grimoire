@@ -1,0 +1,41 @@
+{
+  "schema_version": "apg141-optional-closure-candidate-v1",
+  "item_id": "APGR-REPORT-PROJECT-KEY",
+  "review_status": "PENDING_DISPATCHER_PRE_FINAL",
+  "review_ref": null,
+  "review_sha256": null,
+  "receipt": {
+    "schema_version": "apg.roadmap-decision/v1",
+    "item_id": "APGR-REPORT-PROJECT-KEY",
+    "outcome": "DELIVERED",
+    "closure_phase": "V0110-D",
+    "author": "APG141 producer",
+    "reviewer": null,
+    "evidence": {
+      "implementation": [
+        "internal/cli/cli.go"
+      ],
+      "qualification": [
+        "docs/governance/optional/apg141/qualification.md"
+      ],
+      "compatibility": [
+        "docs/governance/optional/apg141/project-key-contract.md"
+      ],
+      "rollback": [
+        "docs/governance/optional/apg141/project-key-contract.md"
+      ]
+    }
+  },
+  "proposed_disposition": {
+    "decision_ref": "docs/governance/optional/apg141/candidates/APGR-REPORT-PROJECT-KEY.json",
+    "qualification_refs": [
+      "docs/governance/optional/apg141/qualification.md",
+      "docs/governance/optional/apg141/project-key-contract.md"
+    ],
+    "review_ref": null,
+    "rationale": "APG141 APGR-REPORT-PROJECT-KEY proposed DELIVERED; item-specific contract and rationale remain pending actual review.",
+    "maintenance_ref": null,
+    "compatibility_ref": null,
+    "maturity_ref": null
+  }
+}

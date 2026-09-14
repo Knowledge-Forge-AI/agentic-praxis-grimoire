@@ -42,7 +42,7 @@ from apg_css_evidence_retention_contract import (  # noqa: E402
 
 
 PRIVATE_SOURCE_PATHS = private_source_binding_paths(ROOT, required=False)
-pytestmark = pytest.mark.skipif(
+PRIVATE_SOURCE_EVIDENCE = pytest.mark.skipif(
     PRIVATE_SOURCE_PATHS is None,
     reason="publication-excluded CSS evidence is unavailable",
 )
@@ -72,6 +72,7 @@ def validate_bundle(bundle: list[dict]) -> dict[str, int]:
     return validate_resolved_structured_decisions_v3(ROOT, *bundle)
 
 
+@PRIVATE_SOURCE_EVIDENCE
 def test_current_compact_contract_is_complete_and_proportionate() -> None:
     assert validate_current_contract(ROOT) == {
         "adjudications": 18,
@@ -85,6 +86,7 @@ def test_current_compact_contract_is_complete_and_proportionate() -> None:
     }
 
 
+@PRIVATE_SOURCE_EVIDENCE
 def test_private_source_binding_owner_fails_closed(tmp_path: Path) -> None:
     assert private_source_binding_paths(tmp_path, required=False) is None
     with pytest.raises(EvidenceContractError, match="unavailable"):
@@ -134,6 +136,7 @@ def test_private_source_binding_owner_fails_closed(tmp_path: Path) -> None:
         private_source_binding_paths(tmp_path)
 
 
+@PRIVATE_SOURCE_EVIDENCE
 def test_lane_t_tombstone_requires_exact_bound_replacement() -> None:
     tombstone = load_json(ROOT / PRIVATE_SOURCE_PATHS["lane_t"])
     expected = PRIVATE_SOURCE_PATHS["lane_t2"]
@@ -183,6 +186,7 @@ def test_current_known_debt_is_exact_and_human_accepted() -> None:
     }
 
 
+@PRIVATE_SOURCE_EVIDENCE
 def test_h1_target_identity_baseline_is_exact() -> None:
     ledger = load_json(LEDGER)
     validate_target_ledger(ledger)
@@ -194,6 +198,7 @@ def test_h1_target_identity_baseline_is_exact() -> None:
     "binding", ("h1_target_ledger", "purpose_registry", "lane_n", "lane_t2", "compact_v3"),
     ids=("path0", "path1", "path2", "path3", "path4"),
 )
+@PRIVATE_SOURCE_EVIDENCE
 def test_duplicate_json_keys_fail_closed(binding: str, tmp_path: Path) -> None:
     path = ROOT / PRIVATE_SOURCE_PATHS[binding]
     duplicate = path.read_text(encoding="utf-8").replace("{", '{"schema_version":99,', 1)
@@ -214,6 +219,7 @@ def test_duplicate_json_keys_fail_closed(binding: str, tmp_path: Path) -> None:
         "purpose-digest-drift",
     ),
 )
+@PRIVATE_SOURCE_EVIDENCE
 def test_purpose_identity_mutations_fail(mutation: str) -> None:
     bundle = deepcopy(load_bundle())
     resolved, registry = bundle[0], bundle[3]
@@ -233,6 +239,7 @@ def test_purpose_identity_mutations_fail(mutation: str) -> None:
         validate_bundle(bundle)
 
 
+@PRIVATE_SOURCE_EVIDENCE
 def test_target_006_content_under_target_007_id_fails() -> None:
     bundle = deepcopy(load_bundle())
     replacement = deepcopy(bundle[0]["rows"][-2])
@@ -242,6 +249,7 @@ def test_target_006_content_under_target_007_id_fails() -> None:
         validate_bundle(bundle)
 
 
+@PRIVATE_SOURCE_EVIDENCE
 def test_wrong_target_identity_fails() -> None:
     bundle = deepcopy(load_bundle())
     bundle[4]["targets"][0]["commit"] = "0" * 40
@@ -263,6 +271,7 @@ def test_wrong_target_identity_fails() -> None:
         "wrong-completion-class",
     ),
 )
+@PRIVATE_SOURCE_EVIDENCE
 def test_compact_schema_and_structured_mutations_fail(mutation: str) -> None:
     bundle = deepcopy(load_bundle())
     compact = bundle[5]
@@ -296,6 +305,7 @@ def test_compact_schema_and_structured_mutations_fail(mutation: str) -> None:
         ("synthesize", 2, "retain-n"),
     ),
 )
+@PRIVATE_SOURCE_EVIDENCE
 def test_adjudication_action_semantics_fail_closed(
     decision: str,
     index: int,
@@ -313,6 +323,7 @@ def test_adjudication_action_semantics_fail_closed(
 
 
 @pytest.mark.parametrize("field", ("reason", "source_ids", "reviewer"))
+@PRIVATE_SOURCE_EVIDENCE
 def test_synthesize_requires_row_specific_source_backed_review(field: str) -> None:
     bundle = deepcopy(load_bundle())
     adjudication = next(
@@ -323,6 +334,7 @@ def test_synthesize_requires_row_specific_source_backed_review(field: str) -> No
         validate_bundle(bundle)
 
 
+@PRIVATE_SOURCE_EVIDENCE
 def test_agreement_must_not_be_adjudicated() -> None:
     bundle = deepcopy(load_bundle())
     bundle[2]["vectors"][0]["response"] = bundle[1]["vectors"][0]["response"]
@@ -330,6 +342,7 @@ def test_agreement_must_not_be_adjudicated() -> None:
         validate_bundle(bundle)
 
 
+@PRIVATE_SOURCE_EVIDENCE
 def test_partial_route_deletion_fails() -> None:
     bundle = deepcopy(load_bundle())
     row = next(item for item in bundle[5]["rows"] if len(item["route_obligations"]) > 1)
@@ -359,6 +372,7 @@ def test_conflicting_or_duplicate_route_obligation_fails() -> None:
         validate_route_obligations(value)
 
 
+@PRIVATE_SOURCE_EVIDENCE
 def test_stale_lane_t_cannot_be_current_authority() -> None:
     bundle = deepcopy(load_bundle())
     bundle[5]["source_bindings"]["lane_t"]["authority_class"] = "current-product-semantics"
@@ -418,11 +432,13 @@ def test_banned_opaque_payload_fields_fail(field: str) -> None:
         validate_no_opaque_payload_fields({"row": {field: "opaque"}})
 
 
+@PRIVATE_SOURCE_EVIDENCE
 def test_current_machine_artifacts_have_no_banned_payload_fields() -> None:
     for path in (SCENARIOS, REGISTRY, COMPACT):
         validate_no_opaque_payload_fields(load_json(path) if path != SCENARIOS else json.loads(path.read_text()))
 
 
+@PRIVATE_SOURCE_EVIDENCE
 def test_named_patch_representation_is_exact() -> None:
     validate_patch_representations(load_json(COMPACT)["patch_representations"])
 
@@ -432,6 +448,7 @@ def test_unnamed_diff_digest_fails() -> None:
         validate_diff_digest_claims({"diff_sha256": "a" * 64})
 
 
+@PRIVATE_SOURCE_EVIDENCE
 def test_mislabeled_or_false_patch_digest_fails() -> None:
     record = deepcopy(load_json(COMPACT)["patch_representations"])
     record[0]["sha256"] = FALSE_APG77B_DIFF_DIGEST
@@ -464,6 +481,7 @@ def test_artifact_size_ceilings_fail_closed() -> None:
         })
 
 
+@PRIVATE_SOURCE_EVIDENCE
 def test_historical_provenance_is_retained_but_not_current_machine_authority() -> None:
     compact = load_json(COMPACT)
     binding = compact["source_bindings"]["provenance_v2"]
@@ -471,6 +489,7 @@ def test_historical_provenance_is_retained_but_not_current_machine_authority() -
     assert PROVENANCE_V2.stat().st_size == 747455
 
 
+@PRIVATE_SOURCE_EVIDENCE
 def test_compact_canonical_encoding_rejects_pretty_json(tmp_path: Path) -> None:
     compact = load_json(COMPACT)
     pretty = tmp_path / "pretty.json"

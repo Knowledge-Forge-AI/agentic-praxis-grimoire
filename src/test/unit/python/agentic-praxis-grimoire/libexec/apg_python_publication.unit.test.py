@@ -5,7 +5,6 @@ from __future__ import annotations
 from io import BytesIO
 from pathlib import Path
 import gzip
-import hashlib
 import json
 import os
 import shutil
@@ -13,7 +12,6 @@ import stat
 import subprocess
 import sys
 import tarfile
-import tempfile
 import zipfile
 
 import pytest
@@ -28,6 +26,10 @@ import apg_go_build as go_build  # noqa: E402
 import apg_python_build_backend as backend  # noqa: E402
 import apg_python_distribution as distribution  # noqa: E402
 import apg_python_publication as publication  # noqa: E402
+
+
+CURRENT_VERSION = "0.11.0"
+HISTORICAL_VERSION = "0.10.0"
 
 
 def _identity(
@@ -101,10 +103,10 @@ def _historical_wheel(path: Path) -> None:
 
 def test_version_and_target_layout_are_derived_from_the_single_authority() -> None:
     assert publication.VERSION == (REPOSITORY_ROOT / "src/agentic_praxis_grimoire/VERSION").read_text().strip()
-    assert publication.VERSION == "0.10.0"
+    assert publication.VERSION == CURRENT_VERSION
     assert len(publication.WHEEL_NAMES) == 3
-    assert all(name.startswith("agentic_praxis_grimoire-0.10.0-py3-none-") for name in publication.WHEEL_NAMES)
-    assert publication.SDIST_NAME == "agentic_praxis_grimoire-0.10.0.tar.gz"
+    assert all(name.startswith(f"agentic_praxis_grimoire-{CURRENT_VERSION}-py3-none-") for name in publication.WHEEL_NAMES)
+    assert publication.SDIST_NAME == f"agentic_praxis_grimoire-{CURRENT_VERSION}.tar.gz"
     assert "py3-none-any" not in " ".join(publication.WHEEL_NAMES)
     assert publication.TARGET_TAGS == backend.TARGET_TAGS
 
@@ -143,6 +145,10 @@ def test_backend_sdist_contains_source_but_no_binary_or_legacy_consumer(tmp_path
     assert root + "src/agentic_praxis_grimoire/VERSION" in names
     assert any(name.startswith(root + "skills/") and name.endswith("/SKILL.md") for name in names)
     assert any(name.startswith(root + "footprint/") for name in names)
+    for relative in ("CLA.md", "CONTRIBUTING.md", "docs/README.md",
+                     "docs/reference/go-library.md", "docs/distribution.md",
+                     "docs/public-pr-ci.md", "release/v0.11.0-notes.md"):
+        assert root + relative in names
     assert root + "src/agentic_praxis_grimoire/skills.py" not in names
     assert not any(name.endswith("/bin/apgr") for name in names)
     publication.validate_distributions(
@@ -483,8 +489,8 @@ def test_release_workflow_targets_current_version_and_tag() -> None:
         (REPOSITORY_ROOT / ".github/workflows/release.yml").read_text(encoding="utf-8")
     )
     command = workflow["jobs"]["publish"]["steps"][0]["run"]
-    assert "expected_tag=v0.10.0" in command
-    assert "expected_version=0.10.0" in command
+    assert f"expected_tag=v{CURRENT_VERSION}" in command
+    assert f"expected_version={CURRENT_VERSION}" in command
 
 
 def test_backend_manifest_and_configuration_refusals_are_complete(tmp_path: Path) -> None:
@@ -667,8 +673,8 @@ def test_package_links_refuse_repository_escape(target: str) -> None:
         backend._package_readme(f"[license]({target})", "0.8.1")
 
 
-def test_publication_epoch_alias_tracks_v0100_candidate() -> None:
-    assert publication.EPOCH == distribution.V010_RELEASE_EPOCH
+def test_publication_epoch_alias_tracks_v0110_candidate() -> None:
+    assert publication.EPOCH == distribution.V011_RELEASE_EPOCH
     assert publication.EPOCH == distribution.release_epoch(publication.VERSION)
 
 
@@ -699,7 +705,12 @@ OLDER_FORBIDDEN_WORDING = (
 
 def _assert_current_release_wording(text: str) -> None:
     normalized = " ".join(text.lower().split())
-    assert "this documentation covers v0.10.0." in normalized
+    # Current candidate surfaces announce v0.11.0; retained v0.10.0
+    # references remain valid for historical documentation and release pins.
+    assert (
+        f"this documentation covers the **unreleased v{CURRENT_VERSION} candidate**" in normalized
+        or f"this documentation covers v{HISTORICAL_VERSION}." in normalized
+    )
     for stale in (*OLDER_FORBIDDEN_WORDING,
         "development readiness", "development interface", "development candidate",
         "development qualification", "documentation candidate", "preparing for v0.10.0",
@@ -714,20 +725,21 @@ def _assert_current_release_wording(text: str) -> None:
         assert stale not in normalized, stale
 
 
-def test_package_metadata_has_v0100_release_source_guidance() -> None:
+def test_package_metadata_has_v0110_release_source_guidance() -> None:
     metadata = backend._metadata(REPOSITORY_ROOT).decode("utf-8")
-    assert "Version: 0.10.0\n" in metadata
+    assert f"Version: {CURRENT_VERSION}\n" in metadata
     _assert_current_release_wording(metadata)
     for pin in (
-        "pip install agentic-praxis-grimoire==0.10.0",
-        "npm install -g @knowledge-forge-ai/apgr@0.10.0",
-        "go get github.com/Knowledge-Forge-AI/agentic-praxis-grimoire@v0.10.0",
+        f"pip install agentic-praxis-grimoire=={HISTORICAL_VERSION}",
+        f"npm install -g @knowledge-forge-ai/apgr@{HISTORICAL_VERSION}",
+        f"go get github.com/Knowledge-Forge-AI/agentic-praxis-grimoire@v{HISTORICAL_VERSION}",
     ):
         assert pin in metadata
-    assert "Once v0.10.0 is published" in metadata
+    assert f"v{HISTORICAL_VERSION} packages are published" in metadata
+    assert f"Once v{HISTORICAL_VERSION} is published" not in metadata
     readme = (REPOSITORY_ROOT / "README.md").read_text(encoding="utf-8")
-    assert backend._package_readme(readme, "0.10.0") in metadata
-    assert "/blob/v0.10.0/docs/" in metadata
+    assert backend._package_readme(readme, CURRENT_VERSION) in metadata
+    assert f"/blob/v{CURRENT_VERSION}/docs/" in metadata
     assert "](docs/" not in metadata
     assert "](release/" not in metadata
 

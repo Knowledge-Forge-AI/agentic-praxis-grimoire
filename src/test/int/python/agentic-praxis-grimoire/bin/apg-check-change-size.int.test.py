@@ -414,7 +414,7 @@ def test_staged_change_classes_unique_blobs_and_review_impact(tmp_path: Path) ->
     git(repo, "commit", "-qm", "fixtures")
 
     git(repo, "mv", "rename.txt", "renamed.txt")
-    os.chmod(repo / "mode.sh", 0o755)
+    os.chmod(repo / "mode.sh", 0o700)
     (repo / "delete.txt").unlink()
     (repo / "modify.txt").write_text("after\n", encoding="utf-8")
     (repo / "added.txt").write_text("same blob\n", encoding="utf-8")
@@ -537,9 +537,9 @@ def test_malformed_policy_families_fail_closed(
     owner: object = value
     for component in path[:-1]:
         assert isinstance(owner, (dict, list))
-        owner = owner[component]  # type: ignore[index]
+        owner = owner[component]
     assert isinstance(owner, (dict, list))
-    owner[path[-1]] = replacement  # type: ignore[index]
+    owner[path[-1]] = replacement
     (repo / "testing" / "apg-change-size-policy.json").write_text(
         json.dumps(value), encoding="utf-8"
     )
@@ -609,9 +609,9 @@ def test_malformed_exception_and_signature_families_fail_closed(
     elif scenario == "lfs-override":
         item["overrides"] = ["lfs_pointer_treatment"]
     elif scenario == "bad-hex":
-        value["classification"]["archive_signatures"][0]["hex"] = "not-hex"  # type: ignore[index]
+        value["classification"]["archive_signatures"][0]["hex"] = "not-hex"
     elif scenario == "non-list-signatures":
-        value["classification"]["archive_signatures"] = "not-a-list"  # type: ignore[index]
+        value["classification"]["archive_signatures"] = "not-a-list"
     elif scenario == "bad-maximum":
         item["maximum_bytes"] = 0
     if scenario.startswith("duplicate"):

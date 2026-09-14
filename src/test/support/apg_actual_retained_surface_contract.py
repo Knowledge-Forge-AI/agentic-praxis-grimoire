@@ -6,7 +6,6 @@ import ast
 from collections import Counter
 import json
 from pathlib import Path
-import re
 from typing import Any, NoReturn, Sequence
 
 from apg_candidate_decision_contract import assert_candidate_decision

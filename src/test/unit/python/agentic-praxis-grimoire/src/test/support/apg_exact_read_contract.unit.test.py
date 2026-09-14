@@ -181,7 +181,7 @@ def test_invalid_declared_size_fails_closed(expected: object) -> None:
     with pytest.raises(ReadError, match="invalid size"):
         read_exact(
             0,
-            expected,  # type: ignore[arg-type]
+            expected,
             read_chunk=_scripted(b""),
             fail=_fail,
             subject="owner",
@@ -197,5 +197,5 @@ def test_invalid_chunk_ceiling_fails_closed(chunk_bytes: object) -> None:
             read_chunk=_scripted(b"0123", b""),
             fail=_fail,
             subject="owner",
-            chunk_bytes=chunk_bytes,  # type: ignore[arg-type]
+            chunk_bytes=chunk_bytes,
         )

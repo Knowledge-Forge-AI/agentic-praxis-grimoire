@@ -1,0 +1,22 @@
+{
+  "schema_version": "apg.roadmap-decision/v1",
+  "item_id": "APGR-HOTSPOT-CHURN",
+  "outcome": "DELIVERED",
+  "closure_phase": "V0110-D",
+  "author": "APG141 terminal closeout author",
+  "reviewer": "Dispatcher-selected independent APG141 work reviewer",
+  "evidence": {
+    "implementation": [
+      "hotspot/analyze_v2.go"
+    ],
+    "qualification": [
+      "docs/governance/optional/apg141/qualification.md"
+    ],
+    "compatibility": [
+      "docs/guides/hotspot-history.md"
+    ],
+    "rollback": [
+      "docs/guides/hotspot-history.md"
+    ]
+  }
+}

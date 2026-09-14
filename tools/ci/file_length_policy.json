@@ -1,0 +1,169 @@
+{
+  "allowances": [
+    {
+      "count": 1017,
+      "maintenance": "No growth beyond the entry bound. Review reductions; retire when at or below 1000 lines. No transfer or automatic increase.",
+      "owner": "npm-distribution",
+      "path": "libexec/apg_npm_distribution.py",
+      "rationale": "Pre-existing npm packaging and distribution orchestrator exceeding failure limit",
+      "role": "maintained-source",
+      "sha256": "33f3e26218c6be7b302ceccfc606b43f245b9f2e731152ecca9ccd04576c4a6b"
+    },
+    {
+      "count": 4584,
+      "maintenance": "No growth beyond the entry bound. Review reductions; retire when at or below 1000 lines. No transfer or automatic increase.",
+      "owner": "public-release",
+      "path": "libexec/apg_public_release.py",
+      "rationale": "Pre-existing public release lifecycle orchestrator exceeding failure limit",
+      "role": "maintained-source",
+      "sha256": "971381ec69ec37b920fc2992f43d0557896a2b6b768f55a616257e943eef877c"
+    },
+    {
+      "count": 2330,
+      "maintenance": "No growth beyond the entry bound. Review reductions; retire when at or below 1000 lines. No transfer or automatic increase.",
+      "owner": "skill-library-check",
+      "path": "libexec/apg_skill_library_check.py",
+      "rationale": "Pre-existing skill verification and catalog topology enforcement exceeding failure limit",
+      "role": "maintained-source",
+      "sha256": "f0de9865db8b80cf20120ec0885ae0946adcd9c1e350e8b41587b8501753a583"
+    },
+    {
+      "count": 3034,
+      "maintenance": "No growth beyond the entry bound. Review reductions; retire when at or below 1000 lines. No transfer or automatic increase.",
+      "owner": "test-runner",
+      "path": "libexec/apg_test.py",
+      "rationale": "Pre-existing test execution runner and exact coverage orchestrator exceeding failure limit",
+      "role": "maintained-source",
+      "sha256": "1f40b59c6b4a240623d3769724de404e83664835587273ee265e77162b2f4e2f"
+    },
+    {
+      "count": 1026,
+      "maintenance": "No growth beyond the entry bound. Review reductions; retire when at or below 1000 lines. No transfer or automatic increase.",
+      "owner": "user-skills",
+      "path": "libexec/apg_user_skills.py",
+      "rationale": "Pre-existing user skills management CLI and execution adapter exceeding failure limit",
+      "role": "maintained-source",
+      "sha256": "9a6d213b80944021f22b97c9063f82c6bf0a46a543ddddd05de83154947fd1b9"
+    },
+    {
+      "count": 1026,
+      "maintenance": "No growth beyond the entry bound. Review reductions; retire when at or below 1000 lines. No transfer or automatic increase.",
+      "owner": "skill-library-check",
+      "path": "src/test/int/python/agentic-praxis-grimoire/bin/apg-check-skill-library.int.test.py",
+      "rationale": "Comprehensive skill library verification integration scenarios exceeding failure limit",
+      "role": "fixture-or-test",
+      "sha256": "54e4ed6b37f3408c27d962fd82eb20624e5377e7943ca1248afe2cbe9da48b9d"
+    },
+    {
+      "count": 1139,
+      "maintenance": "No growth beyond the entry bound. Review reductions; retire when at or below 1000 lines. No transfer or automatic increase.",
+      "owner": "public-release",
+      "path": "src/test/int/python/agentic-praxis-grimoire/bin/apg-public-release.int.test.py",
+      "rationale": "Comprehensive public release integration lifecycle scenarios exceeding failure limit",
+      "role": "fixture-or-test",
+      "sha256": "e505ced999e741016ec08b8b953c6fabe57731b4f3bc6aedaaa4388adc03c005"
+    },
+    {
+      "count": 1363,
+      "maintenance": "No growth beyond the entry bound. Review reductions; retire when at or below 1000 lines. No transfer or automatic increase.",
+      "owner": "test-runner",
+      "path": "src/test/int/python/agentic-praxis-grimoire/bin/apg-test.int.test.py",
+      "rationale": "Comprehensive test runner and coverage gate integration scenarios exceeding failure limit",
+      "role": "fixture-or-test",
+      "sha256": "61a46e97e63d4d14aed0ee43f43eb2bad68a0cfacd13aeeb6f35ab2f44535677"
+    },
+    {
+      "count": 1119,
+      "maintenance": "No growth beyond the entry bound. Review reductions; retire when at or below 1000 lines. No transfer or automatic increase.",
+      "owner": "roadmap-closure",
+      "path": "src/test/int/python/agentic-praxis-grimoire/libexec/apg_roadmap_closure.int.test.py",
+      "rationale": "Comprehensive roadmap closure and ledger validation integration scenarios exceeding failure limit",
+      "role": "fixture-or-test",
+      "sha256": "8404746e33e1c77d1c03ad0859649ce5cd4193953fdde6816405b71baf0d82fd"
+    },
+    {
+      "count": 1245,
+      "maintenance": "No growth beyond the entry bound. Review reductions; retire when at or below 1000 lines. No transfer or automatic increase.",
+      "owner": "test-support",
+      "path": "src/test/support/apg122_svg_contract.py",
+      "rationale": "SVG language profile test contract and fixture verification exceeding failure limit",
+      "role": "fixture-or-test",
+      "sha256": "11e527918ecfb3570b75bc8538db9fb330860020c3f7fb731a7bc42265b25e97"
+    },
+    {
+      "count": 1269,
+      "maintenance": "No growth beyond the entry bound. Review reductions; retire when at or below 1000 lines. No transfer or automatic increase.",
+      "owner": "test-support",
+      "path": "src/test/support/apg123_browser_ui.py",
+      "rationale": "Browser UI runtime interaction and headless verification contract exceeding failure limit",
+      "role": "fixture-or-test",
+      "sha256": "a5d667db8996fd2db57710a1fa039404cc27ac969cf3d7c829ca83e90a98bd6a"
+    },
+    {
+      "count": 1421,
+      "maintenance": "No growth beyond the entry bound. Review reductions; retire when at or below 1000 lines. No transfer or automatic increase.",
+      "owner": "test-support",
+      "path": "src/test/support/apg_css_evidence_retention_contract.py",
+      "rationale": "CSS candidate evidence retention contract and oracle verification exceeding failure limit",
+      "role": "fixture-or-test",
+      "sha256": "22133ea2b2ef25e5e32f1cf8415d2bbe97c0c9d437db893a4180ca3dbd1b3495"
+    },
+    {
+      "count": 1066,
+      "maintenance": "No growth beyond the entry bound. Review reductions; retire when at or below 1000 lines. No transfer or automatic increase.",
+      "owner": "distribution-candidate",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_distribution_candidate.unit.test.py",
+      "rationale": "Distribution candidate unit verification suite exceeding failure limit",
+      "role": "fixture-or-test",
+      "sha256": "5681c4e1406337e22fc442027bbeb96e8f2e580967966132e04f074250fc269a"
+    },
+    {
+      "count": 1282,
+      "maintenance": "No growth beyond the entry bound. Review reductions; retire when at or below 1000 lines. No transfer or automatic increase.",
+      "owner": "public-release",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_public_release.unit.test.py",
+      "rationale": "Public release unit test suite covering release lifecycle states exceeding failure limit",
+      "role": "fixture-or-test",
+      "sha256": "4f77c96fe790769725c1af84bc0ebc00dd87fe818749c7271c40dcc7ce81e11a"
+    },
+    {
+      "count": 3104,
+      "maintenance": "No growth beyond the entry bound. Review reductions; retire when at or below 1000 lines. No transfer or automatic increase.",
+      "owner": "skill-library-check",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_skill_library_check.unit.test.py",
+      "rationale": "Skill library check unit verification suite exceeding failure limit",
+      "role": "fixture-or-test",
+      "sha256": "f5fa925e9ddb72bf054b5c7cd2329728ad9485a5198087c63f8f7a841fb36bfa"
+    },
+    {
+      "count": 3423,
+      "maintenance": "No growth beyond the entry bound. Review reductions; retire when at or below 1000 lines. No transfer or automatic increase.",
+      "owner": "test-runner",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_test.unit.test.py",
+      "rationale": "Test runner and coverage policy unit test suite exceeding failure limit",
+      "role": "fixture-or-test",
+      "sha256": "b41db535fb15584e850326fd5797d735a4d55f7f5ae5e719c2475ac7340a5817"
+    },
+    {
+      "count": 1710,
+      "maintenance": "No growth beyond the entry bound. Review reductions; retire when at or below 1000 lines. No transfer or automatic increase.",
+      "owner": "test-support",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg123_browser_ui.unit.test.py",
+      "rationale": "Browser UI contract unit verification suite exceeding failure limit",
+      "role": "fixture-or-test",
+      "sha256": "55f422567906b28a953cea2d7ed8d57a594d36e682eb674b34180ab1f901a513"
+    },
+    {
+      "count": 2352,
+      "maintenance": "No growth beyond the entry bound. Review reductions; retire when at or below 1000 lines. No transfer or automatic increase.",
+      "owner": "ci-tooling",
+      "path": "tools/ci/sbom_records.py",
+      "rationale": "Pre-existing SBOM record generator and validator exceeding failure limit",
+      "role": "maintained-source",
+      "sha256": "1cb15b557fa82323a32375429a060327ab0f2c3e5afc6d0a7ee917b0d3b11483"
+    }
+  ],
+  "failure_limit": 1000,
+  "schema": "apg-file-length-policy-v1",
+  "warning_limit": 400
+}

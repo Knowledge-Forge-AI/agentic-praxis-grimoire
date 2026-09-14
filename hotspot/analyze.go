@@ -53,7 +53,7 @@ func Analyze(ctx context.Context, request Request) (Report, error) {
 			ExcludePaths: validated.Filters.ExcludePaths, DisplayTopN: validated.DisplayTopN,
 		},
 		Exclusions: scan.exclusionRows(), CapabilityVersion: CapabilityMatrixV1, Capabilities: frozenCapabilities(),
-		DeferredCapabilities: []DeferredCapability{{Name: "growth/churn", Status: "deferred"}},
+		DeferredCapabilities: structuralDeferredCapabilities(),
 		Files:                scan.files, Owners: scan.owners, ProceduralRegions: scan.regions, Warnings: scan.warnings,
 	}
 	report.LanguageAggregates = aggregateLanguages(report.Files)
@@ -112,4 +112,9 @@ func aggregateLanguages(files []FileRow) []LanguageAggregate {
 	}
 	sort.Slice(result, func(i, j int) bool { return result[i].Language < result[j].Language })
 	return result
+}
+
+// structuralDeferredCapabilities is the shared v1 capability contract.
+func structuralDeferredCapabilities() []DeferredCapability {
+	return []DeferredCapability{{Name: "growth/churn", Status: "deferred"}}
 }

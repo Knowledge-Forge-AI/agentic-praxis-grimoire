@@ -11,10 +11,13 @@ task-scoped guidance, collecting immutable evidence, capturing curated
 environments, inspecting repository structures, and measuring context footprints
 without dictating an orchestration workflow.
 
-This documentation covers v0.10.0. APGR v0.10.0 includes all six provisional visual-web
-profiles, bringing the corpus to 45 canonical skills; public v0.9.0 and v0.8.1
-remain frozen historical predecessors. See the [v0.10 roadmap](docs/v0-10-roadmap.md)
-and [v0.10.0 release notes](release/v0.10.0-notes.md).
+This documentation covers the **unreleased v0.11.0 candidate**. It retains 45
+canonical skills and adds closure governance, hotspot schema v2, report-key
+support, and preparation for public staging PR validation. v0.10.0 remains the
+published release across GitHub, Go, PyPI and npm; earlier releases stay frozen.
+See the [candidate notes](release/v0.11.0-notes.md) and
+[v0.11 closure roadmap](docs/v0-11-roadmap.md). Candidate preparation does not
+establish hosted CI acceptance or publication.
 
 APGR includes:
 
@@ -77,7 +80,7 @@ frameworks invoke APGR as an in-process library or CLI subprocess.
 
 ### Skill corpus and maturity
 
-APGR v0.10.0 provides 45 canonical leaves: 14 stable and 31 provisional. Canonical Markdown
+APGR v0.11.0 retains 45 canonical leaves: 14 stable and 31 provisional. Canonical Markdown
 under `skills/` is the maintained body authority; embedded metadata and package
 resources are verified projections of it:
 
@@ -87,7 +90,7 @@ resources are verified projections of it:
 
 ## Quick start
 
-Once v0.10.0 is published, its packages can be installed from the supported
+v0.10.0 packages are published and can be installed from the supported
 registries using the version-pinned commands in the
 [upgrade guidance](#upgrade-guidance-and-release-status).
 
@@ -432,14 +435,23 @@ can dispatch through that checkout; the native/npm binary cannot run `test`.
 
 ## Upgrade guidance and release status
 
+### Preparing v0.11.0
+
+v0.11.0 is unreleased. Exercise candidate features from a source checkout or
+locally qualified wheel/npm artifacts; registry installation commands below
+refer to the published predecessor. The release route is public `staging` →
+pull request → squash merge to `main` → release. See the
+[release procedure](docs/public-release-process.md). Local preparation does not
+mean a public PR has run or that branch protection is configured.
+
 ### Upgrading to v0.10.0
 
-This documentation covers v0.10.0. The v0.10.0 release adds six frontend profiles,
+The published v0.10.0 release adds six frontend profiles,
 report verification and qualification maintenance; see the
 [v0.10.0 release notes](release/v0.10.0-notes.md). The CI-first qualification
 interface (`--summary-file`, `policy` role) and Go consumer interfaces remain.
 
-Once v0.10.0 is published, use these installation commands:
+Install the published v0.10.0 packages with these commands:
 
 - **Go consumers**: Require `github.com/Knowledge-Forge-AI/agentic-praxis-grimoire v0.10.0`
   or run `go get github.com/Knowledge-Forge-AI/agentic-praxis-grimoire@v0.10.0`.
@@ -468,16 +480,17 @@ see the [v0.8.1 release notes](release/v0.8.1-notes.md) and
 
 APGR is engineered with strict operational boundaries:
 
-- **No Shell Execution**: Subprocess adapters execute binaries directly using
-  exact argument vectors (`execve`), never passing strings through a shell.
+- **Explicit Process Boundaries**: Core subprocess adapters execute binaries with
+  argument vectors. Public CI uses maintained shell scripts in disposable jobs.
 - **Secret-Rejecting Environment Snapshots**: Environment profiles enforce strict
   allowlists. Secret-like variables (containing tokens, keys, passwords, or
   credentials) are rejected fail-closed.
 - **Filesystem Isolation**: Materialized skill bundles and scratch operations are
   confined to caller-owned, disposable directories. APGR never mutates user-global
   skill roots or configuration without explicit flags.
-- **Zero Telemetry / Offline Operation**: All local commands operate completely
-  offline with no telemetry, tracking, or unexpected network requests.
+- **Local Core Operations**: Report, skill, environment and hotspot operations
+  use local inputs without telemetry. CI provisioning and vulnerability database
+  refresh use declared public network endpoints.
 - **Reproducible Builds**: All distribution archives, Go binaries, and package
   manifests are bit-for-bit reproducible under fixed release epochs.
 
@@ -530,9 +543,10 @@ The release retains these limits:
   profiles, under the 11,507-byte discovery integrity ceiling.
 - **Frontend profile qualification**: Desktop browser execution does not qualify the
   Tauri embedded WebView, native host, sidecars, or assistive technology.
-- **Platform qualification gate**: macOS Apple Silicon (`darwin/arm64`) is fully qualified.
-  Linux packages receive cross-build and archive inspection; Linux runtime execution is
-  separate, and Linux developer runner qualification remains pending.
+- **Platform qualification gate**: v0.11 requires fresh candidate evidence on
+  macOS Apple Silicon (`darwin/arm64`); prior release results are not inherited.
+  Linux cross-build and archive inspection remain separate from Linux execution.
+  Prepared hosted jobs do not establish hosted runtime qualification.
 - **Process execution guard**: Static function and process checks verify named source files
   and bindings; dynamic metaprogramming and reflection require manual source review.
 - **Report verification**: Report verification guarantees artifact-local integrity up to

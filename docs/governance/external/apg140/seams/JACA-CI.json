@@ -1,0 +1,27 @@
+{
+  "schema_version": "apg140-seam-bindings-v1",
+  "watch_id": "JACA-CI",
+  "scope": "APGR-local evidence only; no consumer adoption",
+  "members": [
+    {
+      "path": "testing/fixtures/jaca_ci/valid-apg-pr.json",
+      "sha256": "1b5b305211c8c3cccef7b120639b32c23885f08cb51b3450524183902317c88a"
+    },
+    {
+      "path": "testing/fixtures/jaca_ci/invalid-role-pr.json",
+      "sha256": "7b1cbb2171d4d8289c81f763b9bfc680eaf29eff432ecae4510566346da27fc4"
+    },
+    {
+      "path": "testing/fixtures/jaca_ci/drift-pr.json",
+      "sha256": "24e9d072cc317da18171bd77d7cf0788fc18a40e999f1f287ec6de274033daa3"
+    },
+    {
+      "path": "testing/fixtures/jaca_ci/sample-summary-pass.json",
+      "sha256": "a27c361fc8800895aeb279821fa5a313d7c08ebf4f1ceba6ccff24be8f569872"
+    },
+    {
+      "path": "testing/fixtures/jaca_ci/sample-summary-fail.json",
+      "sha256": "3dd3234a3af1a83e3559ac843eba0297f4a4b3bc6da72570470a3ce3ffc3d1a9"
+    }
+  ]
+}

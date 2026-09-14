@@ -21,7 +21,6 @@ from apg_skill_library_check import (  # noqa: E402
     CheckResult,
     Diagnostic,
     check_library,
-    inline_links,
     main,
     parse_catalog,
     parse_frontmatter,

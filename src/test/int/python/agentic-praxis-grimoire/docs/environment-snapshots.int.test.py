@@ -84,7 +84,7 @@ def _validator_cases() -> dict[str, dict[str, list[object]]]:
         assert set(row) == {"accepted", "rejected"}
         assert isinstance(row["accepted"], list) and row["accepted"]
         assert isinstance(row["rejected"], list) and row["rejected"]
-        normalized[validator] = row  # type: ignore[assignment]
+        normalized[validator] = row
     return normalized
 
 

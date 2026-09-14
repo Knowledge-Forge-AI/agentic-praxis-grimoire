@@ -630,7 +630,9 @@ def test_apg81h_independence_mutations(tmp_path: Path) -> None:
     with pytest.raises(ValueError, match="disagree"):
         _require_independent_rows(lambda: production, lambda: altered_authority)
 
-    producer = lambda: production
+    def producer():
+        return production
+
     with pytest.raises(ValueError, match="not independent"):
         _require_independent_rows(producer, producer)
 

@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "source_contract": "APG140-RM-MAIN-20260912",
+  "scope": "synthetic-local",
+  "owner": "fixture-owner",
+  "ledger": {
+    "applied": ["prior-schema"],
+    "expected": ["prior-schema", "arch5c-add-identity", "arch5d-drop-legacy"]
+  },
+  "backup": {
+    "checksum_verified": true,
+    "restore_supported": true,
+    "restore_rehearsal": "synthetic-success"
+  },
+  "before": [2, 1, 0, 1],
+  "after": [1, 1, 0, 1],
+  "steps": [
+    "verify-backup", "compare-schema", "add-identity", "reconcile-identity",
+    "verify-stable", "drop-legacy", "verify-ledger"
+  ],
+  "rollback": "restore-verified-backup-under-owner-authority"
+}

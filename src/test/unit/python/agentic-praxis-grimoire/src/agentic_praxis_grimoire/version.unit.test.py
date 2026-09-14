@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from pathlib import Path
 import sys
 try:
     import tomllib
@@ -19,10 +18,13 @@ from agentic_praxis_grimoire import VERSION, __version__  # noqa: E402
 from agentic_praxis_grimoire.version import version  # noqa: E402
 
 
+CURRENT_VERSION = "0.11.0"
+
+
 def test_version_is_read_from_the_single_package_resource() -> None:
     resource = ROOT / "src/agentic_praxis_grimoire/VERSION"
-    assert resource.read_text(encoding="utf-8") == "0.10.0\n"
-    assert VERSION == "0.10.0"
+    assert resource.read_text(encoding="utf-8") == f"{CURRENT_VERSION}\n"
+    assert VERSION == CURRENT_VERSION
     assert __version__ == VERSION
     assert version() == VERSION
     metadata = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))

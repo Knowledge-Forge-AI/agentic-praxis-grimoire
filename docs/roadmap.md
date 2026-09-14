@@ -8,20 +8,26 @@ still requires human review.
 
 ## Roadmap policy
 
-**v0.9.0 is publicly released** across GitHub Release, PyPI, npm, and Go.
-[APG121 reconciliation](evaluations/apg121-v090-publication-reconciliation.md)
-records fresh read-only terminal publication evidence and the Nix handoff.
-APG115 through APG120 remain historical preparation, qualification, and recovery
-records; their phase-local incomplete states are preserved below.
-APGR-side JACA CI/XO compatibility is complete for this release. JACA adoption
-and activation, Nix adapter updates and host activation, and later Theme Forge
-and Repo Map work remain separately owned and authorized. Linux runtime execution
-was not part of v0.9.0 product qualification.
+**v0.10.0 is publicly released** across GitHub Release, Go, PyPI and npm.
+[APG138 reconciliation](evaluations/apg138-v0-11-foundation-closure.md)
+records the operator-supplied terminal publication authority. Earlier release
+preparation, qualification, blocked and recovery records remain historical.
 
-[v0.10 development](v0-10-roadmap.md) is now authorized for APG122's foundation,
-capacity policy and SVG vertical slice. The prior publication-reconciliation
-successor draft is superseded. Adapter deployment remains separately owned;
-it is not a v0.10 prerequisite. No later v0.10 slice or Repo Map work is started.
+The [v0.11 closure roadmap](v0-11-roadmap.md) is the current authorized
+development line. APG138 established V0110-A foundation governance and the
+[closure ledger](governance/v0-11-closure-ledger.json). Historical APG139,
+APG140 and APG141 exits closed V0110-B/C/D with respectively 31, 43 and 47
+terminal rows. APG142 closed V0110-E: current accounting is 55 inherited /
+55 terminal / zero OPEN / zero invalid. The release exit is
+`inherited_roadmap_open_items = 0`, through terminal dispositions rather than
+mandatory implementation of every idea. APG143 is the partial V0110-F readiness
+phase; zero accounting alone does not qualify release readiness. V0110-G
+remains unauthorized.
+
+The v0.9/v0.10 roadmaps, v0.10 backlog consolidation and Repo Map support
+roadmap remain historical source records. Their optional, external-gated and
+condition-triggered rows no longer compete with v0.11 scheduling. Consumer
+adoption, DINAS deployment and host activation remain separately owned.
 
 The human maintainer retains ultimate roadmap authority. ChatGPT may advance
 successive bounded phases only within a human-approved task or preapproved
@@ -2474,3 +2480,54 @@ and exact supplemental-file closure, with a fresh passing source gate. APG135 re
 blocked; its candidates cannot be released after correction. The next separately
 authorized freeze must rebuild all inputs from finalized APG136. No release
 bundle, public publication or automatic successor is included.
+
+## APG141 V0110-D closure
+
+APG141 closes [optional work](evaluations/apg141-optional-work-closure.md)
+after supplied independent review and scoped terminal verification: 55 inherited /
+47 terminal / 8 open / zero invalid. Separate decisions deliver bounded hotspot
+history v2 and the report-key repair, and reject the Caveman adapter and result-field
+restriction. Combined complexity/churn scoring is explicitly abandoned for the
+inherited hotspot item. At that historical APG141 exit, V0110-E/F/G
+and release remained unstarted.
+
+## APG142 V0110-E terminal closure
+
+APG142 [audits the eight exact maintenance triggers](evaluations/apg142-exact-trigger-maintenance-closure.md) and strengthens
+maintenance receipt reference consistency. Supplied independent review supports
+all eight FALSE findings; separate terminal receipts and ledger transitions are
+post-review amendments with scoped closeout verification. Actual accounting is
+55 inherited / 55 terminal / zero OPEN / zero invalid. Prior outcomes and all
+active debt/maturity consequences remain intact. V0110-F must reconcile ADR 0055
+status and qualify the new governance/checker/schema/test-selection surfaces.
+No independent re-review of amended bytes is claimed. At the historical
+APG142 exit, V0110-F/G remained unstarted.
+
+## APG143 V0110-F recovery and public CI preparation
+
+The [APG143 evaluation](evaluations/apg143-integrated-readiness-prerequisite.md)
+preserves the blocked READINESS1 closeout and its fixture corrections as
+historical evidence. READINESS2 continues the same phase and exit 00188 with
+authority for a maintained capture adapter, unreleased v0.11 metadata and
+public staging PR CI preparation. ADR 0055 acceptance, measured capacity and
+55/55/0/0 accounting remain intact. Fresh integrated source and distribution
+qualification are required; historical results do not qualify current bytes.
+The future public route is `staging` → PR → squash merge to `main` → release.
+No public PR execution or release is claimed; V0110-G remains unauthorized.
+
+The historical READINESS2 terminal closeout remained blocked: 4,196 unit and 841 integration
+tests pass with two skips, but integration branches are 4,109/5,168, below 80%.
+The file-length policy/gate and static/suppression decisions remain unresolved.
+Supplied review findings receive terminal corrections and scoped verification;
+no independent re-review of amended bytes or readiness success is claimed.
+
+### READINESS3 continuation
+
+READINESS3 continues APG143 / V0110-F / exit 00188. The manager-authorized
+file-length policy and no-growth allowances are implemented, lint is corrected
+with exact immutable-fixture classifications, and real suppression/nonsecret
+records replace line/count-only observations. Suppression approvals await the
+dispatcher pre-final review; local qualification and evidence applicability are
+recorded by the current APG143 evaluation and managed records. READINESS1/2
+remain historical blocked attempts. No readiness acceptance, V0110-G, public
+operation, consumer adoption or host mutation follows automatically.

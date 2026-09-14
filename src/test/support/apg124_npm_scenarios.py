@@ -4,7 +4,6 @@ import json
 import os
 from pathlib import Path
 import shutil
-import tarfile
 
 def scenario_npm01(config, fixtures_dir: Path, sc_scratch: Path, cache_dir: Path, run_npm_subprocess):
     """Execute NPM01 predicates against the selected npm CLI."""
@@ -45,7 +44,7 @@ def scenario_npm02(config, fixtures_dir: Path, sc_scratch: Path, cache_dir: Path
 
     exit_nonzero = (res.returncode != 0)
     sync_error = ("in sync" in res.stderr.lower() or "eusage" in res.stderr.lower())
-    missing_dep = ("dep-b" in res.stderr)
+    missing_dep = ("apgr-apg124-fixture-dep-b" in res.stderr)
 
     assertions.append({"name": "exit_code_nonzero", "passed": exit_nonzero})
     assertions.append({"name": "sync_error_reported", "passed": sync_error})
@@ -66,10 +65,10 @@ def scenario_npm03(config, fixtures_dir: Path, sc_scratch: Path, cache_dir: Path
     res = run_npm_subprocess(config, ["install", "--ignore-scripts", "--no-audit", "--no-fund"], work_dir, cache_dir)
 
     exit_zero = (res.returncode == 0)
-    dep_installed = (work_dir / "node_modules" / "dep-b").exists()
+    dep_installed = (work_dir / "node_modules" / "apgr-apg124-fixture-dep-b").exists()
     lock_data = json.loads((work_dir / "package-lock.json").read_text(encoding="utf-8"))
     packages = lock_data.get("packages", {})
-    lock_updated = any("dep-b" in k for k in packages.keys())
+    lock_updated = any("apgr-apg124-fixture-dep-b" in k for k in packages.keys())
 
     assertions.append({"name": "exit_code_zero", "passed": exit_zero})
     assertions.append({"name": "dependency_installed", "passed": dep_installed})

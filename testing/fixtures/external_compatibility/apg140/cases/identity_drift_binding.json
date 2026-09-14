@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "result_kind": "canonical_edges",
+  "items": [],
+  "page": {
+    "limit": 50,
+    "offset": 0,
+    "returned": 0,
+    "truncated": false,
+    "next_offset": null
+  },
+  "diagnostics": []
+}

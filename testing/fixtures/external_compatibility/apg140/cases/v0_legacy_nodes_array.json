@@ -1,0 +1,10 @@
+[
+  {
+    "canonical_key": "n:legacy:client",
+    "kind": "service"
+  },
+  {
+    "canonical_key": "n:legacy:db",
+    "kind": "datastore"
+  }
+]

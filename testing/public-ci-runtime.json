@@ -1,0 +1,34 @@
+{
+  "schema_version": "apg.public-ci-runtime/v1",
+  "platform": "darwin/arm64",
+  "runner": "macos-15",
+  "python_packages": {
+    "coverage": "7.15.2",
+    "pytest": "9.1.1",
+    "pytest-cov": "7.1.0",
+    "pytest-xdist": "3.8.0"
+  },
+  "primary_node": {
+    "source": "github:NixOS/nixpkgs/0921fdb3e13e40fe25fbc52b89661a9d6d32ac68",
+    "attribute": "legacyPackages.aarch64-darwin.nodejs",
+    "version": "22.22.2",
+    "sha256": "b7fff29202c2d59eeff28c53588d2832323b45cb2e854ba29bea47ade37d8359",
+    "root_owned": true,
+    "required_root": "/nix/store"
+  },
+  "secondary_node": {
+    "url": "https://nodejs.org/dist/v24.19.0/node-v24.19.0-darwin-arm64.tar.gz",
+    "archive_sha256": "8294b7aa9b03997481c06babf1e8b270c859358f27da57a11509afe537ac381d",
+    "binary_member": "node-v24.19.0-darwin-arm64/bin/node",
+    "sha256": "27db838bb204ef7c21df2931f5656e4c8fb32e6e947f363a402b49714d32b5b1"
+  },
+  "npm_packages": {
+    "typescript": "7.0.2",
+    "npm": "12.0.2",
+    "@playwright/test": "1.62.1",
+    "vite": "8.2.2",
+    "rolldown": "1.2.7"
+  },
+  "browsers": ["chromium", "firefox", "webkit"],
+  "qualification": "source identities checked locally; hosted provisioning not_run"
+}

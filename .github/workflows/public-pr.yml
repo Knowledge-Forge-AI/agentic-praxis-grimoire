@@ -1,0 +1,740 @@
+{
+  "name": "public-pr",
+  "permissions": {
+    "contents": "read"
+  },
+  "concurrency": {
+    "group": "public-pr-${{ github.event.pull_request.number || github.ref }}",
+    "cancel-in-progress": true
+  },
+  "env": {
+    "COMMIT_SHA": "${{ github.sha }}",
+    "PR_HEAD_SHA": "${{ github.event.pull_request.head.sha }}",
+    "PR_BASE_SHA": "${{ github.event.pull_request.base.sha }}"
+  },
+  "jobs": {
+    "guard": {
+      "name": "guard",
+      "runs-on": "ubuntu-latest",
+      "timeout-minutes": 5,
+      "steps": [
+        {
+          "name": "Check out trusted repository",
+          "uses": "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "with": {
+            "persist-credentials": false,
+            "fetch-depth": 0
+          }
+        },
+        {
+          "name": "Verify repository and pull request boundary",
+          "env": {
+            "EXPECTED_REPO": "Knowledge-Forge-AI/agentic-praxis-grimoire",
+            "EXPECTED_REPO_ID": "1306002537",
+            "ACTUAL_REPO": "${{ github.repository }}",
+            "ACTUAL_REPO_ID": "${{ github.repository_id }}",
+            "BASE_REF": "${{ github.base_ref }}",
+            "HEAD_REF": "${{ github.head_ref }}",
+            "HEAD_REPO": "${{ github.event.pull_request.head.repo.full_name }}",
+            "COMMIT_SHA": "${{ github.sha }}"
+          },
+          "run": "set -euo pipefail\nEXPECTED_REPO=\"Knowledge-Forge-AI/agentic-praxis-grimoire\"\nEXPECTED_REPO_ID=\"1306002537\"\n[[ \"$ACTUAL_REPO\" == \"$EXPECTED_REPO\" ]] || { echo \"Unexpected repo: $ACTUAL_REPO\" >&2; exit 1; }\n[[ \"$ACTUAL_REPO_ID\" == \"$EXPECTED_REPO_ID\" ]] || { echo \"Unexpected repo ID: $ACTUAL_REPO_ID\" >&2; exit 1; }\n[[ \"$BASE_REF\" == \"main\" ]] || { echo \"PR must target main, got: $BASE_REF\" >&2; exit 1; }\n[[ \"$HEAD_REF\" == \"staging\" ]] || { echo \"PR must originate from staging, got: $HEAD_REF\" >&2; exit 1; }\n[[ \"$HEAD_REPO\" == \"$EXPECTED_REPO\" ]] || { echo \"Forked PR forbidden; must be same repo\" >&2; exit 1; }\nmkdir -p \"${RUNNER_TEMP}/receipts\"\npython3 release/ci/matrix_receipts.py emit --job guard --dir \"${RUNNER_TEMP}/receipts\" --sha \"${COMMIT_SHA:-$GITHUB_SHA}\"\n"
+        },
+        {
+          "name": "Retain guard receipt",
+          "uses": "actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f",
+          "with": {
+            "name": "guard-receipt",
+            "path": "${{ runner.temp }}/receipts",
+            "retention-days": 7,
+            "if-no-files-found": "error"
+          },
+          "if": "${{ always() }}"
+        }
+      ],
+      "if": "${{ github.repository == 'Knowledge-Forge-AI/agentic-praxis-grimoire' && github.repository_id == '1306002537' }}"
+    },
+    "static-analysis": {
+      "name": "static-analysis",
+      "if": "${{ needs.guard.result == 'success' && github.repository == 'Knowledge-Forge-AI/agentic-praxis-grimoire' && github.repository_id == 1306002537 && github.base_ref == 'main' && github.head_ref == 'staging' && github.event.pull_request.head.repo.full_name == github.repository }}",
+      "needs": [
+        "guard"
+      ],
+      "runs-on": "ubuntu-latest",
+      "timeout-minutes": 25,
+      "steps": [
+        {
+          "name": "Check out repository",
+          "uses": "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "with": {
+            "persist-credentials": false,
+            "fetch-depth": 0
+          }
+        },
+        {
+          "name": "Set up Python",
+          "uses": "actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97",
+          "with": {
+            "python-version": "3.13"
+          }
+        },
+        {
+          "name": "Set up Go",
+          "uses": "actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e",
+          "with": {
+            "go-version": "1.25.14",
+            "cache": false
+          }
+        },
+        {
+          "name": "Set up Node",
+          "uses": "actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38",
+          "with": {
+            "node-version": "22"
+          }
+        },
+        {
+          "name": "Set up Java",
+          "uses": "actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961",
+          "with": {
+            "distribution": "temurin",
+            "java-version": "21"
+          }
+        },
+        {
+          "name": "Bootstrap pinned static-analysis tools",
+          "run": "bash tools/ci/bootstrap_static.sh",
+          "env": {
+            "GOCACHE": "${{ runner.temp }}/go-cache",
+            "GOMODCACHE": "${{ runner.temp }}/go-modcache",
+            "npm_config_cache": "${{ runner.temp }}/npm-cache",
+            "GOTOOLCHAIN": "local"
+          }
+        },
+        {
+          "name": "Run adapted pre-review static analysis stack",
+          "run": "mkdir -p \"$RUNNER_TEMP/pre-review-evidence\"\n\"$RUNNER_TEMP/apgr-static-tools/python/bin/python\" tools/ci/run_pre_review.py --tool-root \"$RUNNER_TEMP/apgr-static-tools\" --evidence-dir \"$RUNNER_TEMP/pre-review-evidence\"\n"
+        },
+        {
+          "name": "Retain bounded sanitized static analysis evidence",
+          "if": "${{ always() }}",
+          "uses": "actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f",
+          "with": {
+            "name": "pre-review-evidence",
+            "path": "${{ runner.temp }}/pre-review-evidence",
+            "if-no-files-found": "warn",
+            "retention-days": 7
+          }
+        },
+        {
+          "name": "Emit static analysis receipt",
+          "if": "${{ always() }}",
+          "run": "mkdir -p \"${RUNNER_TEMP}/receipts\"\npython3 release/ci/matrix_receipts.py emit --job static-analysis --status \"$CI_JOB_STATUS\" --dir \"${RUNNER_TEMP}/receipts\" --sha \"${COMMIT_SHA:-$GITHUB_SHA}\" --artifact \"$RUNNER_TEMP/pre-review-evidence/manifest.json\"\n",
+          "env": {
+            "CI_JOB_STATUS": "${{ job.status }}"
+          }
+        },
+        {
+          "name": "Retain static analysis receipt",
+          "uses": "actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f",
+          "with": {
+            "name": "static-analysis-receipt",
+            "path": "${{ runner.temp }}/receipts",
+            "retention-days": 7,
+            "if-no-files-found": "error"
+          },
+          "if": "${{ always() }}"
+        }
+      ]
+    },
+    "policy": {
+      "name": "policy",
+      "if": "${{ needs.guard.result == 'success' && github.repository == 'Knowledge-Forge-AI/agentic-praxis-grimoire' && github.repository_id == 1306002537 && github.base_ref == 'main' && github.head_ref == 'staging' && github.event.pull_request.head.repo.full_name == github.repository }}",
+      "needs": [
+        "guard"
+      ],
+      "runs-on": "ubuntu-latest",
+      "timeout-minutes": 10,
+      "steps": [
+        {
+          "name": "Check out repository",
+          "uses": "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "with": {
+            "persist-credentials": false,
+            "fetch-depth": 0
+          }
+        },
+        {
+          "name": "Set up Python",
+          "uses": "actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97",
+          "with": {
+            "python-version": "3.13"
+          }
+        },
+        {
+          "name": "Execute repository policy validations",
+          "run": "python3 bin/apg-check-skill-library --format json\npython3 bin/apg-check-record-identity --format json\npython3 bin/apg-check-change-size commit HEAD\n"
+        },
+        {
+          "name": "Emit policy receipt",
+          "if": "${{ always() }}",
+          "run": "mkdir -p \"${RUNNER_TEMP}/receipts\"\npython3 release/ci/matrix_receipts.py emit --job policy --status \"$CI_JOB_STATUS\" --dir \"${RUNNER_TEMP}/receipts\" --sha \"${COMMIT_SHA:-$GITHUB_SHA}\"\n",
+          "env": {
+            "CI_JOB_STATUS": "${{ job.status }}"
+          }
+        },
+        {
+          "name": "Retain policy receipt",
+          "uses": "actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f",
+          "with": {
+            "name": "policy-receipt",
+            "path": "${{ runner.temp }}/receipts",
+            "retention-days": 7,
+            "if-no-files-found": "error"
+          },
+          "if": "${{ always() }}"
+        }
+      ]
+    },
+    "unit-integration": {
+      "name": "unit-integration",
+      "if": "${{ needs.guard.result == 'success' && github.repository == 'Knowledge-Forge-AI/agentic-praxis-grimoire' && github.repository_id == 1306002537 && github.base_ref == 'main' && github.head_ref == 'staging' && github.event.pull_request.head.repo.full_name == github.repository }}",
+      "needs": [
+        "guard"
+      ],
+      "runs-on": "macos-15",
+      "timeout-minutes": 90,
+      "steps": [
+        {
+          "name": "Check out repository",
+          "uses": "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "with": {
+            "persist-credentials": false,
+            "fetch-depth": 0
+          }
+        },
+        {
+          "name": "Set up Python",
+          "uses": "actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97",
+          "with": {
+            "python-version": "3.13"
+          }
+        },
+        {
+          "name": "Set up Go",
+          "uses": "actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e",
+          "with": {
+            "go-version": "1.25.14",
+            "cache": false
+          }
+        },
+        {
+          "name": "Install pinned Nix on disposable hosted runner",
+          "uses": "cachix/install-nix-action@13d8dd58da0234aa297dedd986986ccb8e7f3e24",
+          "with": {
+            "install_url": "https://releases.nixos.org/nix/nix-2.35.2/install",
+            "extra_nix_config": "experimental-features = nix-command flakes",
+            "enable_kvm": false
+          }
+        },
+        {
+          "name": "Bootstrap exact disposable APGR runtime",
+          "run": "set -euo pipefail\npython3 tools/ci/bootstrap_runtime.py \\\n  --root \"${RUNNER_TEMP}/apgr-runtime\" \\\n  --env-file \"${RUNNER_TEMP}/apgr-runtime.env\"\ncat \"${RUNNER_TEMP}/apgr-runtime.env\" >> \"${GITHUB_ENV}\"\n"
+        },
+        {
+          "name": "Run unit and integration suite",
+          "run": "set -euo pipefail\n\"${APGR_TEST_PYTHON}\" bin/apg-test policy \\\n  --summary-file \"${RUNNER_TEMP}/apgr-policy-summary.json\"\n\"${APGR_TEST_PYTHON}\" bin/apg-test unit-integration --public-version 0.11.0 \\\n  --summary-file \"${RUNNER_TEMP}/apgr-unit-integration-summary.json\"\n"
+        },
+        {
+          "name": "Emit unit-integration receipt",
+          "if": "${{ always() }}",
+          "run": "mkdir -p \"${RUNNER_TEMP}/receipts\"\npython3 release/ci/matrix_receipts.py emit --job unit-integration --status \"$CI_JOB_STATUS\" --dir \"${RUNNER_TEMP}/receipts\" --sha \"${COMMIT_SHA:-$GITHUB_SHA}\" --artifact \"$RUNNER_TEMP/apgr-unit-integration-summary.json\"\n",
+          "env": {
+            "CI_JOB_STATUS": "${{ job.status }}"
+          }
+        },
+        {
+          "name": "Retain unit-integration receipt",
+          "uses": "actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f",
+          "with": {
+            "name": "unit-integration-receipt",
+            "path": "${{ runner.temp }}/receipts",
+            "retention-days": 7,
+            "if-no-files-found": "error"
+          },
+          "if": "${{ always() }}"
+        },
+        {
+          "name": "Retain canonical component and union summaries",
+          "if": "${{ always() }}",
+          "uses": "actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f",
+          "with": {
+            "name": "canonical-suite-evidence",
+            "path": "${{ runner.temp }}/apgr-*-summary.json",
+            "if-no-files-found": "warn",
+            "retention-days": 7
+          }
+        }
+      ]
+    },
+    "closure": {
+      "name": "closure",
+      "if": "${{ needs.guard.result == 'success' && github.repository == 'Knowledge-Forge-AI/agentic-praxis-grimoire' && github.repository_id == 1306002537 && github.base_ref == 'main' && github.head_ref == 'staging' && github.event.pull_request.head.repo.full_name == github.repository }}",
+      "needs": [
+        "guard"
+      ],
+      "runs-on": "ubuntu-latest",
+      "timeout-minutes": 10,
+      "steps": [
+        {
+          "name": "Check out repository",
+          "uses": "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "with": {
+            "persist-credentials": false,
+            "fetch-depth": 0
+          }
+        },
+        {
+          "name": "Set up Python",
+          "uses": "actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97",
+          "with": {
+            "python-version": "3.13"
+          }
+        },
+        {
+          "name": "Check roadmap closure governance",
+          "run": "python3 bin/apg-check-roadmap-closure --json\npython3 bin/apg-check-roadmap-closure --require-zero --json\n"
+        },
+        {
+          "name": "Emit closure receipt",
+          "if": "${{ always() }}",
+          "run": "mkdir -p \"${RUNNER_TEMP}/receipts\"\npython3 release/ci/matrix_receipts.py emit --job closure --status \"$CI_JOB_STATUS\" --dir \"${RUNNER_TEMP}/receipts\" --sha \"${COMMIT_SHA:-$GITHUB_SHA}\"\n",
+          "env": {
+            "CI_JOB_STATUS": "${{ job.status }}"
+          }
+        },
+        {
+          "name": "Retain closure receipt",
+          "uses": "actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f",
+          "with": {
+            "name": "closure-receipt",
+            "path": "${{ runner.temp }}/receipts",
+            "retention-days": 7,
+            "if-no-files-found": "error"
+          },
+          "if": "${{ always() }}"
+        }
+      ]
+    },
+    "go": {
+      "name": "go",
+      "if": "${{ needs.guard.result == 'success' && github.repository == 'Knowledge-Forge-AI/agentic-praxis-grimoire' && github.repository_id == 1306002537 && github.base_ref == 'main' && github.head_ref == 'staging' && github.event.pull_request.head.repo.full_name == github.repository }}",
+      "needs": [
+        "guard"
+      ],
+      "runs-on": "ubuntu-latest",
+      "timeout-minutes": 20,
+      "steps": [
+        {
+          "name": "Check out repository",
+          "uses": "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "with": {
+            "persist-credentials": false,
+            "fetch-depth": 0
+          }
+        },
+        {
+          "name": "Set up Go",
+          "uses": "actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e",
+          "with": {
+            "go-version": "1.25.14",
+            "cache": false
+          }
+        },
+        {
+          "name": "Run Go test and vet suite",
+          "run": "go test -count=1 ./...\ngo vet ./...\ngo test -race -count=1 ./...\n"
+        },
+        {
+          "name": "Emit Go receipt",
+          "if": "${{ always() }}",
+          "run": "mkdir -p \"${RUNNER_TEMP}/receipts\"\npython3 release/ci/matrix_receipts.py emit --job go --status \"$CI_JOB_STATUS\" --dir \"${RUNNER_TEMP}/receipts\" --sha \"${COMMIT_SHA:-$GITHUB_SHA}\"\n",
+          "env": {
+            "CI_JOB_STATUS": "${{ job.status }}"
+          }
+        },
+        {
+          "name": "Retain Go receipt",
+          "uses": "actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f",
+          "with": {
+            "name": "go-receipt",
+            "path": "${{ runner.temp }}/receipts",
+            "retention-days": 7,
+            "if-no-files-found": "error"
+          },
+          "if": "${{ always() }}"
+        }
+      ]
+    },
+    "package": {
+      "name": "package",
+      "if": "${{ needs.guard.result == 'success' && github.repository == 'Knowledge-Forge-AI/agentic-praxis-grimoire' && github.repository_id == 1306002537 && github.base_ref == 'main' && github.head_ref == 'staging' && github.event.pull_request.head.repo.full_name == github.repository }}",
+      "needs": [
+        "guard"
+      ],
+      "runs-on": "ubuntu-latest",
+      "timeout-minutes": 25,
+      "steps": [
+        {
+          "name": "Check out repository",
+          "uses": "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "with": {
+            "persist-credentials": false,
+            "fetch-depth": 0
+          }
+        },
+        {
+          "name": "Set up Python",
+          "uses": "actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97",
+          "with": {
+            "python-version": "3.13"
+          }
+        },
+        {
+          "name": "Set up Go",
+          "uses": "actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e",
+          "with": {
+            "go-version": "1.25.14",
+            "cache": false
+          }
+        },
+        {
+          "name": "Set up Node for isolated Linux npm entrypoints",
+          "uses": "actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38",
+          "with": {
+            "node-version": "22.22.2",
+            "package-manager-cache": false
+          }
+        },
+        {
+          "name": "Build deterministic release deliverables",
+          "run": "bash tools/ci/qualify_packages.sh",
+          "env": {
+            "PIP_CACHE_DIR": "${{ runner.temp }}/pip-cache",
+            "npm_config_cache": "${{ runner.temp }}/npm-cache",
+            "GOCACHE": "${{ runner.temp }}/go-cache",
+            "GOMODCACHE": "${{ runner.temp }}/go-mod-cache",
+            "GOTOOLCHAIN": "local",
+            "PYTHONPYCACHEPREFIX": "${{ runner.temp }}/pycache"
+          }
+        },
+        {
+          "name": "Retain deliverable artifacts",
+          "uses": "actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f",
+          "with": {
+            "name": "deliverables",
+            "path": "${{ runner.temp }}/deliverables/",
+            "retention-days": 7,
+            "if-no-files-found": "error"
+          }
+        },
+        {
+          "name": "Emit package receipt",
+          "if": "${{ always() }}",
+          "run": "mkdir -p \"${RUNNER_TEMP}/receipts\"\npython3 release/ci/matrix_receipts.py emit --job package --status \"$CI_JOB_STATUS\" --dir \"${RUNNER_TEMP}/receipts\" --sha \"${COMMIT_SHA:-$GITHUB_SHA}\" --artifact \"$RUNNER_TEMP/deliverables/apg-distribution-manifest.json\"\n",
+          "env": {
+            "CI_JOB_STATUS": "${{ job.status }}"
+          }
+        },
+        {
+          "name": "Retain package receipt",
+          "uses": "actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f",
+          "with": {
+            "name": "package-receipt",
+            "path": "${{ runner.temp }}/receipts",
+            "retention-days": 7,
+            "if-no-files-found": "error"
+          },
+          "if": "${{ always() }}"
+        }
+      ]
+    },
+    "sbom-and-vulnerability": {
+      "name": "sbom-and-vulnerability",
+      "if": "${{ needs.guard.result == 'success' && github.repository == 'Knowledge-Forge-AI/agentic-praxis-grimoire' && github.repository_id == 1306002537 && github.base_ref == 'main' && github.head_ref == 'staging' && github.event.pull_request.head.repo.full_name == github.repository }}",
+      "needs": [
+        "guard",
+        "package"
+      ],
+      "runs-on": "ubuntu-latest",
+      "timeout-minutes": 25,
+      "steps": [
+        {
+          "name": "Check out repository",
+          "uses": "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "with": {
+            "persist-credentials": false,
+            "fetch-depth": 0
+          }
+        },
+        {
+          "name": "Set up Python",
+          "uses": "actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97",
+          "with": {
+            "python-version": "3.13"
+          }
+        },
+        {
+          "name": "Download exact qualified deliverables",
+          "uses": "actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16",
+          "with": {
+            "name": "deliverables",
+            "path": "${{ runner.temp }}/deliverables"
+          }
+        },
+        {
+          "name": "Set up Go for the isolated sdist build",
+          "uses": "actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e",
+          "with": {
+            "go-version": "1.25.14",
+            "cache": false
+          }
+        },
+        {
+          "name": "Bootstrap verified scanner binaries",
+          "run": "mkdir -p \"$RUNNER_TEMP/scanners\"\nfor tool in syft grype; do python3 tools/ci/bootstrap_tool.py --tool \"$tool\" --bin-dir \"$RUNNER_TEMP/scanners\"; done\n"
+        },
+        {
+          "name": "Scan exact public source and every release deliverable",
+          "run": "python3 tools/ci/sbom_records.py scan --source \"$GITHUB_WORKSPACE\" --artifacts \"$RUNNER_TEMP/deliverables\" --output \"$RUNNER_TEMP/sbom-evidence\" --scanner-root \"$RUNNER_TEMP/scanners\"\n"
+        },
+        {
+          "name": "Retain bounded SBOM and vulnerability evidence",
+          "if": "${{ always() }}",
+          "uses": "actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f",
+          "with": {
+            "name": "sbom-and-vulnerability-reports",
+            "path": "${{ runner.temp }}/sbom-evidence",
+            "if-no-files-found": "warn",
+            "retention-days": 7
+          }
+        },
+        {
+          "name": "Emit sbom-and-vulnerability receipt",
+          "if": "${{ always() }}",
+          "run": "mkdir -p \"${RUNNER_TEMP}/receipts\"\npython3 release/ci/matrix_receipts.py emit --job sbom-and-vulnerability --status \"$CI_JOB_STATUS\" --dir \"${RUNNER_TEMP}/receipts\" --sha \"${COMMIT_SHA:-$GITHUB_SHA}\" --artifact \"$RUNNER_TEMP/sbom-evidence/scan-results.json\"\n",
+          "env": {
+            "CI_JOB_STATUS": "${{ job.status }}"
+          }
+        },
+        {
+          "name": "Retain sbom-and-vulnerability receipt",
+          "uses": "actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f",
+          "with": {
+            "name": "sbom-and-vulnerability-receipt",
+            "path": "${{ runner.temp }}/receipts",
+            "retention-days": 7,
+            "if-no-files-found": "error"
+          },
+          "if": "${{ always() }}"
+        }
+      ]
+    },
+    "codeql": {
+      "name": "codeql (${{ matrix.language }})",
+      "if": "${{ needs.guard.result == 'success' && github.repository == 'Knowledge-Forge-AI/agentic-praxis-grimoire' && github.repository_id == 1306002537 && github.base_ref == 'main' && github.head_ref == 'staging' && github.event.pull_request.head.repo.full_name == github.repository }}",
+      "needs": [
+        "guard"
+      ],
+      "runs-on": "ubuntu-latest",
+      "timeout-minutes": 45,
+      "permissions": {
+        "contents": "read",
+        "security-events": "write"
+      },
+      "strategy": {
+        "fail-fast": false,
+        "matrix": {
+          "include": [
+            {
+              "language": "go",
+              "build-mode": "manual"
+            },
+            {
+              "language": "python",
+              "build-mode": "none"
+            },
+            {
+              "language": "javascript-typescript",
+              "build-mode": "none"
+            },
+            {
+              "language": "actions",
+              "build-mode": "none"
+            }
+          ]
+        }
+      },
+      "steps": [
+        {
+          "name": "Check out repository",
+          "uses": "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "with": {
+            "persist-credentials": false,
+            "fetch-depth": 0
+          }
+        },
+        {
+          "name": "Set up Go for Go analysis",
+          "if": "matrix.language == 'go'",
+          "uses": "actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e",
+          "with": {
+            "go-version": "1.25.14",
+            "cache": false
+          }
+        },
+        {
+          "name": "Initialize CodeQL",
+          "uses": "github/codeql-action/init@b96794f015dfd88f77b49b1c93e0fa7110f94c63",
+          "with": {
+            "languages": "${{ matrix.language }}",
+            "build-mode": "${{ matrix.build-mode }}",
+            "queries": "security-extended"
+          }
+        },
+        {
+          "name": "Build Go binaries",
+          "if": "matrix.build-mode == 'manual'",
+          "run": "go build -o \"$RUNNER_TEMP/apgr-codeql\" ./cmd/apgr\n"
+        },
+        {
+          "name": "Perform CodeQL Analysis",
+          "uses": "github/codeql-action/analyze@b96794f015dfd88f77b49b1c93e0fa7110f94c63",
+          "with": {
+            "category": "/language:${{ matrix.language }}",
+            "output": "${{ runner.temp }}/codeql-results"
+          }
+        },
+        {
+          "name": "Bind CodeQL SARIF to matrix member",
+          "if": "${{ always() }}",
+          "run": "set -euo pipefail\nresult_dir=\"${RUNNER_TEMP}/codeql-results\"\nexpected=\"${result_dir}/codeql-$CI_LANGUAGE.sarif\"\nmapfile -t sarif_files < <(find \"$result_dir\" -type f -name '*.sarif' -print)\n[[ \"${#sarif_files[@]}\" -eq 1 ]] || {\n  echo \"expected exactly one CodeQL SARIF file, found ${#sarif_files[@]}\" >&2\n  exit 1\n}\nif [[ \"${sarif_files[0]}\" != \"$expected\" ]]; then mv -- \"${sarif_files[0]}\" \"$expected\"; fi\n",
+          "env": {
+            "CI_LANGUAGE": "${{ matrix.language }}"
+          }
+        },
+        {
+          "name": "Enforce CodeQL result policy",
+          "if": "${{ always() }}",
+          "run": "python3 tools/ci/codeql_policy.py \\\n  --language \"$CI_LANGUAGE\" \\\n  --sarif-dir \"${RUNNER_TEMP}/codeql-results\"\n",
+          "env": {
+            "CI_LANGUAGE": "${{ matrix.language }}"
+          }
+        },
+        {
+          "name": "Retain CodeQL SARIF",
+          "if": "${{ always() }}",
+          "uses": "actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f",
+          "with": {
+            "name": "codeql-sarif-${{ matrix.language }}",
+            "path": "${{ runner.temp }}/codeql-results",
+            "retention-days": 7,
+            "if-no-files-found": "error"
+          }
+        },
+        {
+          "name": "Emit codeql receipt",
+          "if": "${{ always() }}",
+          "run": "# GitHub Actions reports an aggregate completion status for the codeql matrix job (needs.codeql.result).\n# Each matrix member independently emits a language-specific receipt (codeql-$CI_LANGUAGE) with its\n# individual SARIF artifact digest to enable granular per-member accounting at the gate.\nmkdir -p \"${RUNNER_TEMP}/receipts\"\npython3 release/ci/matrix_receipts.py emit \\\n  --job \"codeql-$CI_LANGUAGE\" \\\n  --status \"$CI_JOB_STATUS\" \\\n  --dir \"${RUNNER_TEMP}/receipts\" \\\n  --sha \"${COMMIT_SHA:-$GITHUB_SHA}\" --artifact \"$RUNNER_TEMP/codeql-results/codeql-$CI_LANGUAGE.sarif\"\n",
+          "env": {
+            "CI_JOB_STATUS": "${{ job.status }}",
+            "CI_LANGUAGE": "${{ matrix.language }}"
+          }
+        },
+        {
+          "name": "Retain codeql receipt",
+          "if": "${{ always() }}",
+          "uses": "actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f",
+          "with": {
+            "name": "codeql-receipt-${{ matrix.language }}",
+            "path": "${{ runner.temp }}/receipts",
+            "retention-days": 7,
+            "if-no-files-found": "error"
+          }
+        }
+      ]
+    },
+    "public-pr-gate": {
+      "name": "public-pr-gate",
+      "if": "${{ always() && github.repository == 'Knowledge-Forge-AI/agentic-praxis-grimoire' && github.repository_id == 1306002537 }}",
+      "needs": [
+        "guard",
+        "static-analysis",
+        "policy",
+        "unit-integration",
+        "closure",
+        "go",
+        "package",
+        "sbom-and-vulnerability",
+        "codeql"
+      ],
+      "runs-on": "ubuntu-latest",
+      "timeout-minutes": 10,
+      "env": {
+        "MATRIX_NEEDS_RESULTS": "{\"guard\":\"${{ needs.guard.result }}\",\"static-analysis\":\"${{ needs.static-analysis.result }}\",\"policy\":\"${{ needs.policy.result }}\",\"unit-integration\":\"${{ needs.unit-integration.result }}\",\"closure\":\"${{ needs.closure.result }}\",\"go\":\"${{ needs.go.result }}\",\"package\":\"${{ needs.package.result }}\",\"sbom-and-vulnerability\":\"${{ needs.sbom-and-vulnerability.result }}\",\"codeql-go\":\"${{ needs.codeql.result }}\",\"codeql-python\":\"${{ needs.codeql.result }}\",\"codeql-javascript-typescript\":\"${{ needs.codeql.result }}\",\"codeql-actions\":\"${{ needs.codeql.result }}\"}"
+      },
+      "steps": [
+        {
+          "name": "Check out repository",
+          "uses": "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "with": {
+            "persist-credentials": false,
+            "fetch-depth": 0
+          }
+        },
+        {
+          "name": "Download all receipts",
+          "uses": "actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16",
+          "with": {
+            "pattern": "*-receipt*",
+            "path": "${{ runner.temp }}/all-receipts",
+            "merge-multiple": false
+          }
+        },
+        {
+          "name": "Verify matrix completeness and explicit member success",
+          "run": "# CodeQL executes across a matrix of languages where needs.codeql.result reflects aggregate job\n# completion. Individual receipts (codeql-go, codeql-python, codeql-javascript-typescript, codeql-actions)\n# provide per-member execution and artifact proof. MATRIX_NEEDS_RESULTS binds the aggregate needs status\n# to each member identity so matrix_receipts.py verify enforces both aggregate job success and\n# per-member receipt completeness.\npython3 release/ci/matrix_receipts.py verify --dir \"$RUNNER_TEMP/all-receipts\" --sha \"$COMMIT_SHA\" --statuses-json \"$MATRIX_NEEDS_RESULTS\" > \"$RUNNER_TEMP/matrix-aggregate.json\"\n"
+        },
+        {
+          "name": "Retain final gate artifact",
+          "if": "${{ always() }}",
+          "uses": "actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f",
+          "with": {
+            "name": "public-pr-gate-result",
+            "path": "${{ runner.temp }}/matrix-aggregate.json",
+            "retention-days": 7,
+            "if-no-files-found": "error"
+          }
+        }
+      ]
+    }
+  },
+  "defaults": {
+    "run": {
+      "shell": "bash"
+    }
+  },
+  "on": {
+    "pull_request": {
+      "branches": [
+        "main"
+      ],
+      "types": [
+        "opened",
+        "synchronize",
+        "reopened",
+        "ready_for_review"
+      ]
+    }
+  }
+}

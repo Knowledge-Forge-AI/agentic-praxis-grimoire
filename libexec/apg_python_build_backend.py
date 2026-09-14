@@ -31,7 +31,7 @@ import zipfile
 try:
     import tomllib
 except ImportError:
-    import tomli as tomllib  # type: ignore[no-redef]
+    import tomli as tomllib
 
 
 PROJECT_NAME = "agentic-praxis-grimoire"
@@ -41,7 +41,8 @@ SUPPORTED_TARGETS = ("darwin/arm64", "linux/amd64", "linux/arm64")
 # The editable backend defaults to the current release epoch. Historical
 # source archives retain their own backend value, and the historical build
 # helper binds v0.6 explicitly.
-DEFAULT_EPOCH = 1_788_996_391
+# Unreleased v0.11 candidate archive epoch, not a publication timestamp.
+DEFAULT_EPOCH = 1_789_000_000
 MANIFEST_SCHEMA = "apg.binary-manifest/v1"
 PUBLIC_REPOSITORY_URL = "https://github.com/Knowledge-Forge-AI/agentic-praxis-grimoire"
 
@@ -82,7 +83,7 @@ def _target_tags() -> dict[str, str]:
     if os.fspath(helper_directory) not in sys.path:
         sys.path.insert(0, os.fspath(helper_directory))
     try:
-        import apg_go_build  # type: ignore[import-not-found]
+        import apg_go_build
 
         result: dict[str, str] = {}
         for target in SUPPORTED_TARGETS:
@@ -248,7 +249,7 @@ def _validated_manifest(
     if helper_directory not in sys.path:
         sys.path.insert(0, helper_directory)
     try:
-        import apg_go_build  # type: ignore[import-not-found]
+        import apg_go_build
 
         expected_target = apg_go_build.target_mapping(target)
     except (ImportError, AttributeError) as error:
@@ -285,7 +286,7 @@ def _build_binary(root: Path, target: str, output: Path) -> BinaryIdentity:
     if helper_directory not in sys.path:
         sys.path.insert(0, helper_directory)
     try:
-        import apg_go_build  # type: ignore[import-not-found]
+        import apg_go_build
     except ImportError as error:
         raise BackendError("canonical Go build helper could not be loaded") from error
     output = output.absolute()
@@ -549,6 +550,12 @@ def _sdist_paths(root: Path) -> tuple[Path, ...]:
         "schema",
         "skills",
     )
+    if tuple(int(part) for part in _version(root).split(".")[:2]) >= (0, 11):
+        roots += ("docs",)
+        for relative in ("CLA.md", "CONTRIBUTING.md"):
+            selected.append(_direct_file(root / relative, relative))
+        for path in sorted((root / "release").glob("*.md")):
+            selected.append(_direct_file(path, "release documentation"))
     for name in roots:
         directory = root / name
         if not directory.is_dir() or directory.is_symlink():
