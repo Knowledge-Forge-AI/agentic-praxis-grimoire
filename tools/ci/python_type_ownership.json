@@ -1,0 +1,6 @@
+{
+  "schema": "apg-python-type-ownership-v1",
+  "targets": [
+    "src/agentic_praxis_grimoire"
+  ]
+}

@@ -1,0 +1,70 @@
+{
+  "schema_version": "apg140-terminal-bindings-v1",
+  "phase": "APG140",
+  "disposition": "amend",
+  "review_ref": "docs/governance/external/apg140/independent-review.md",
+  "review_sha256": "0bb4435f1bc5c88803b516ce2e24b6ae566992d4e1dab6cbf869100b450114a8",
+  "review_scope": "Dispatcher-supplied pre-final candidate review; transcription digest; terminal bytes were not independently re-reviewed",
+  "decisions": [
+    {
+      "item_id": "APGR-CI-QUAL",
+      "decision_ref": "docs/governance/external/apg140/decisions/APGR-CI-QUAL.json",
+      "sha256": "b86f80b3777b2e99d633947bcdf895c084eb442cd4c8bee54e0c49ad9f2204bf"
+    },
+    {
+      "item_id": "APGR-REPORT-OUTBOX",
+      "decision_ref": "docs/governance/external/apg140/decisions/APGR-REPORT-OUTBOX.json",
+      "sha256": "0c5dcbd307f0cb501874ec19bb3ad2ecc4430c8d4d76f8b3c2077f352742f7f4"
+    },
+    {
+      "item_id": "APGR-XO-COMPAT",
+      "decision_ref": "docs/governance/external/apg140/decisions/APGR-XO-COMPAT.json",
+      "sha256": "94f892b69d4e66a3ff5eab1d7f45a12b08d77d7807f77535693e2954f8d7766e"
+    },
+    {
+      "item_id": "RM-S0",
+      "decision_ref": "docs/governance/external/apg140/decisions/RM-S0.json",
+      "sha256": "33f29e3921cd7f396b491f61c51ff08b5a4e2e35ce148dbb60c0902caaf77281"
+    },
+    {
+      "item_id": "RM-S1",
+      "decision_ref": "docs/governance/external/apg140/decisions/RM-S1.json",
+      "sha256": "86a50e56caede98f5789862b65cc9b81f606dd547ddfeff69d14deb694b06853"
+    },
+    {
+      "item_id": "RM-S2",
+      "decision_ref": "docs/governance/external/apg140/decisions/RM-S2.json",
+      "sha256": "fd8f9d6b2cd5493ce44e6806204eee60127d5819deed7ab44734441ddff8622a"
+    },
+    {
+      "item_id": "RM-S3",
+      "decision_ref": "docs/governance/external/apg140/decisions/RM-S3.json",
+      "sha256": "ffb80d4e51eabc69ead9c21fa019c7eb5fd4af9b2fec0403587b37ddfd34fa49"
+    },
+    {
+      "item_id": "RM-S4",
+      "decision_ref": "docs/governance/external/apg140/decisions/RM-S4.json",
+      "sha256": "3780ccbb2e9901bef060fecc364af76359729ed1d9b0a6d2d94625ce8b7b5003"
+    },
+    {
+      "item_id": "RM-S5",
+      "decision_ref": "docs/governance/external/apg140/decisions/RM-S5.json",
+      "sha256": "53a2bb8a6305ac123ed6bedd9fdc16ad5b6fd947ce6306271a95bb2362cb25c3"
+    },
+    {
+      "item_id": "SKILL-KG-QUALITY",
+      "decision_ref": "docs/governance/external/apg140/decisions/SKILL-KG-QUALITY.json",
+      "sha256": "a0beec65ea465c4fec60b0404e0edac0d44bebc4077115aa09047a751c928b6f"
+    },
+    {
+      "item_id": "SKILL-MIGRATION",
+      "decision_ref": "docs/governance/external/apg140/decisions/SKILL-MIGRATION.json",
+      "sha256": "03f4139da4c5f772e2c84e11bcbe02e08a0cf2bbec66febf7a961e39977ebd54"
+    },
+    {
+      "item_id": "SKILL-VER-PROTO",
+      "decision_ref": "docs/governance/external/apg140/decisions/SKILL-VER-PROTO.json",
+      "sha256": "fd2540124f9315c8f13f9c688714718310eb156fe448227f0aae1c52f0eacddb"
+    }
+  ]
+}

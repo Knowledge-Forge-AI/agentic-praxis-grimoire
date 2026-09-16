@@ -3,6 +3,6 @@
 from __future__ import annotations
 
 from apg_python_source_binding_contract import (
-    assert_audited_assignment,
-    assert_bound_assignment,
+    assert_audited_assignment as assert_audited_assignment,
+    assert_bound_assignment as assert_bound_assignment,
 )

@@ -1,0 +1,38 @@
+{
+  "schema_version": "apg142-maintenance-closure-candidate-v1",
+  "item_id": "APGR-REPORT-PUREGO-GIT",
+  "trigger_id": "APGR-REPORT-PUREGO-GIT",
+  "finding": "FALSE",
+  "review_status": "PENDING_DISPATCHER_PRE_FINAL",
+  "review_ref": null,
+  "review_sha256": null,
+  "receipt": {
+    "schema_version": "apg.roadmap-decision/v1",
+    "item_id": "APGR-REPORT-PUREGO-GIT",
+    "outcome": "MAINTENANCE_TRIGGER",
+    "closure_phase": "V0110-E",
+    "author": "APG142 producer",
+    "reviewer": null,
+    "evidence": {
+      "trigger_observation": [
+        "docs/governance/maintenance/apg142/purego-git.md"
+      ],
+      "refresh_procedure": [
+        "docs/governance/maintenance/apg142/purego-git.md"
+      ],
+      "independent_review": []
+    }
+  },
+  "proposed_disposition": {
+    "decision_ref": "docs/governance/maintenance/apg142/decisions/APGR-REPORT-PUREGO-GIT.json",
+    "qualification_refs": [
+      "docs/governance/maintenance/apg142/purego-git.md",
+      "docs/governance/maintenance/apg142/qualification.md"
+    ],
+    "review_ref": null,
+    "rationale": "APG142 individual APGR-REPORT-PUREGO-GIT audit finds the exact recurring condition FALSE in the inspected accepted/current source scope; active debt and maturity consequences are preserved. Pending actual dispatcher review.",
+    "maintenance_ref": "APGR-REPORT-PUREGO-GIT",
+    "compatibility_ref": null,
+    "maturity_ref": null
+  }
+}

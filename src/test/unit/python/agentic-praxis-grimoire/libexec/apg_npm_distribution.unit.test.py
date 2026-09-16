@@ -24,7 +24,7 @@ def _artifact_root(tmp_path: Path, *, tamper: str | None = None) -> Path:
     for target in distribution.TARGETS:
         target_root = root / target.slug
         target_root.mkdir(parents=True)
-        binary = f"#!/bin/sh\nprintf '%s\\n' \"$@\"\n".encode("utf-8")
+        binary = "#!/bin/sh\nprintf '%s\\n' \"$@\"\n".encode("utf-8")
         binary_path = target_root / "apgr"
         binary_path.write_bytes(binary)
         binary_path.chmod(0o700)
@@ -644,9 +644,10 @@ def test_template_readme_parameterization_across_versions() -> None:
 
 def test_npm_readme_and_templates_have_durable_conditional_installation_wording() -> None:
     npm_readme = " ".join((ROOT / "npm/README.md").read_text(encoding="utf-8").split())
-    assert "This documentation covers v0.10.0." in npm_readme
-    assert "Once this version is published" in npm_readme
-    assert "@knowledge-forge-ai/apgr@0.10.0" in npm_readme
+    assert f"This documentation covers the **unreleased v{CURRENT_VERSION} candidate**" in npm_readme
+    assert "Public v0.10.0 and earlier releases remain frozen" in npm_readme
+    assert "After publication, install the launcher" in npm_readme
+    assert f"@knowledge-forge-ai/apgr@{CURRENT_VERSION}" in npm_readme
     assert "@0.9.0" not in npm_readme
 
     for template_rel in ("npm/templates/launcher/README.md", "npm/templates/platform/README.md"):

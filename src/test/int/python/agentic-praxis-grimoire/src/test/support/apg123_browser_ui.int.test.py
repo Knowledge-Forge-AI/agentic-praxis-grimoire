@@ -8,7 +8,6 @@ Also validates prerequisite refusal boundaries and evaluation receipt completene
 
 from __future__ import annotations
 
-import os
 from pathlib import Path
 import sys
 import pytest
@@ -20,16 +19,11 @@ SUPPORT = ROOT / "src/test/support"
 sys.path.insert(0, str(SUPPORT))
 
 from apg123_browser_ui import (  # noqa: E402
-    ALL_SCENARIOS,
     APG123_SCENARIOS,
     BROWSER_RUNTIME_SCENARIOS,
     BrowserHarnessConfig,
-    BrowserHarnessExecutionError,
     BrowserHarnessPrerequisiteError,
-    BrowserHarnessReceipt,
-    BrowserHarnessValidationError,
     execute_browser_harness,
-    load_scenarios_register,
     observe_browser_harness_config,
     validate_browser_cache,
     validate_node_executable,

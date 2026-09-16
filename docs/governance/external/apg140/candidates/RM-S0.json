@@ -1,0 +1,43 @@
+{
+  "schema_version": "apg140-external-closure-candidate-v1",
+  "item_id": "RM-S0",
+  "review_status": "PENDING_DISPATCHER_PRE_FINAL",
+  "review_ref": null,
+  "review_sha256": null,
+  "receipt": {
+    "schema_version": "apg.roadmap-decision/v1",
+    "item_id": "RM-S0",
+    "outcome": "DELIVERED",
+    "closure_phase": "V0110-C",
+    "author": "APG140 producer",
+    "reviewer": null,
+    "evidence": {
+      "implementation": [
+        "docs/governance/external/apg140/source-inventory.md",
+        "docs/governance/external/apg140/support-bindings.json"
+      ],
+      "qualification": [
+        "docs/governance/external/apg140/qualification.md"
+      ],
+      "compatibility": [
+        "docs/governance/external-compatibility.json"
+      ],
+      "rollback": [
+        "docs/governance/external/apg140/maintenance.md"
+      ]
+    }
+  },
+  "proposed_disposition": {
+    "decision_ref": "docs/governance/external/apg140/candidates/RM-S0.json",
+    "qualification_refs": [
+      "docs/governance/external/apg140/qualification.md",
+      "docs/governance/external/apg140/source-inventory.md",
+      "docs/governance/external/apg140/decisions.md"
+    ],
+    "review_ref": null,
+    "rationale": "APG140 RM-S0 source-bound outcome: DELIVERED; see item-specific reasoning in decisions.md.",
+    "maintenance_ref": null,
+    "compatibility_ref": null,
+    "maturity_ref": null
+  }
+}

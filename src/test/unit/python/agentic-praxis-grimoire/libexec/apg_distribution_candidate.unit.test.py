@@ -12,6 +12,7 @@ import stat
 import subprocess
 import sys
 import tarfile
+from unittest import mock
 import zipfile
 
 import pytest
@@ -21,9 +22,18 @@ ROOT = Path(__file__).resolve().parents[6]
 sys.path.insert(0, str(ROOT / "libexec"))
 
 import apg_distribution_candidate as candidate  # noqa: E402
+import apg_source_capture  # noqa: E402
 
 
 VERSION = "0.10.0"
+
+
+def _capture_prospective_source(tmp_path: Path) -> Path:
+    """Give the v0.11 candidate builder a clean source repository."""
+
+    source = Path(os.path.realpath(tmp_path / "captured-source"))
+    apg_source_capture.capture_source(ROOT, source)
+    return source
 
 
 def _source(tmp_path: Path) -> tuple[Path, str]:
@@ -373,6 +383,63 @@ def test_source_candidate_identity_is_deterministic_and_public_safe() -> None:
     assert len(first["fingerprint"]) == 64
 
 
+def test_v011_source_revision_identity_requires_git_source(tmp_path: Path) -> None:
+    source = tmp_path / "source"
+    source.mkdir()
+    (source / "marker").write_text("public source\n", encoding="utf-8")
+    subprocess.run(["git", "init", "-q", "-b", "main", str(source)], check=True)
+    subprocess.run(["git", "-C", str(source), "config", "user.name", "APGR Test"], check=True)
+    subprocess.run(["git", "-C", str(source), "config", "user.email", "test@example.invalid"], check=True)
+    subprocess.run(["git", "-C", str(source), "add", "marker"], check=True)
+    subprocess.run(
+        ["git", "-C", str(source), "commit", "-q", "-m", "fixture"],
+        check=True,
+    )
+
+    identity = candidate._source_revision_identity(source, "0.11.0")
+    assert set(identity) == {"source_commit", "source_tree"}
+    assert len(identity["source_commit"]) == 40
+    assert len(identity["source_tree"]) == 40
+
+    (source / "marker").write_text("dirty source\n", encoding="utf-8")
+    with pytest.raises(
+        candidate.DistributionCandidateError,
+        match="requires a clean Git checkout",
+    ):
+        candidate._source_revision_identity(source, "0.11.0")
+
+    non_git = tmp_path / "non-git"
+    non_git.mkdir()
+    with pytest.raises(candidate.DistributionCandidateError, match="requires a Git checkout"):
+        candidate._source_revision_identity(non_git, "0.11.0")
+
+
+def test_v011_source_revision_identity_refuses_inconsistent_observation(
+    tmp_path: Path,
+) -> None:
+    source = tmp_path / "source"
+    source.mkdir()
+    identities = iter((("a" * 40, "b" * 40), ("c" * 40, "d" * 40)))
+
+    def run(arguments: list[str], **_kwargs: object) -> mock.Mock:
+        command = arguments[3:]
+        if command[:2] == ["status", "--porcelain=v1"]:
+            return mock.Mock(returncode=0, stdout="")
+        if command == ["show", "-s", "--format=%H%x00%T", "HEAD"]:
+            commit, tree = next(identities)
+            return mock.Mock(returncode=0, stdout=f"{commit}\x00{tree}\n")
+        raise AssertionError(arguments)
+
+    with (
+        mock.patch.object(candidate.subprocess, "run", side_effect=run),
+        pytest.raises(
+            candidate.DistributionCandidateError,
+            match="changed during identity capture",
+        ),
+    ):
+        candidate._source_revision_identity(source, "0.11.0")
+
+
 def test_cross_ecosystem_binary_hash_mismatch_fails_closed(tmp_path: Path) -> None:
     source, go_root, python_root, npm_root = _artifacts(
         tmp_path, wheel_tamper="linux/arm64"
@@ -443,6 +510,7 @@ def test_cli_build_and_check_use_only_explicit_artifact_directories(
 
 
 def test_offline_real_candidate_cli_pipeline(tmp_path: Path) -> None:
+    source = _capture_prospective_source(tmp_path)
     python_output = tmp_path / "python-dist"
     python_work = tmp_path / "python-work"
     npm_output = tmp_path / "npm-dist"
@@ -494,7 +562,7 @@ def test_offline_real_candidate_cli_pipeline(tmp_path: Path) -> None:
             str(ROOT / "libexec/apg_distribution_candidate.py"),
             "build",
             "--source-root",
-            str(ROOT),
+            str(source),
             "--go-artifacts",
             str(python_work / "build-a/binaries"),
             "--python-artifacts",
@@ -510,13 +578,25 @@ def test_offline_real_candidate_cli_pipeline(tmp_path: Path) -> None:
     )
 
     manifest = distribution_output / candidate.MANIFEST_NAME
-    assert candidate.validate_candidate(
+    validated = candidate.validate_candidate(
         manifest,
-        ROOT,
+        source,
         python_work / "build-a/binaries",
         python_output,
         npm_output,
-    )["version"] == VERSION
+    )
+    current_version = (source / "src/agentic_praxis_grimoire/VERSION").read_text(
+        encoding="ascii"
+    ).strip()
+    assert validated["version"] == current_version
+    assert validated["source_commit"] == subprocess.run(
+        ["git", "rev-parse", "HEAD"], cwd=source, check=True,
+        capture_output=True, text=True,
+    ).stdout.strip()
+    assert validated["source_tree"] == subprocess.run(
+        ["git", "rev-parse", "HEAD^{tree}"], cwd=source, check=True,
+        capture_output=True, text=True,
+    ).stdout.strip()
 
 
 @pytest.mark.parametrize("value", ("relative", "../escape", "./candidate"))

@@ -1,0 +1,38 @@
+{
+  "schema_version": "apg140-external-closure-candidate-v1",
+  "item_id": "APGR-XO-COMPAT",
+  "review_status": "PENDING_DISPATCHER_PRE_FINAL",
+  "review_ref": null,
+  "review_sha256": null,
+  "receipt": {
+    "schema_version": "apg.roadmap-decision/v1",
+    "item_id": "APGR-XO-COMPAT",
+    "outcome": "CONSUMER_HANDOFF_CLOSED",
+    "closure_phase": "V0110-C",
+    "author": "APG140 producer",
+    "reviewer": null,
+    "evidence": {
+      "provider_delivery": [
+        "docs/architecture/jaca-xo-handoff.md",
+        "docs/governance/external/apg140/support-bindings.json"
+      ],
+      "ownership": [
+        "docs/governance/external/apg140/decisions.md",
+        "docs/governance/external-compatibility.json"
+      ]
+    }
+  },
+  "proposed_disposition": {
+    "decision_ref": "docs/governance/external/apg140/candidates/APGR-XO-COMPAT.json",
+    "qualification_refs": [
+      "docs/governance/external/apg140/qualification.md",
+      "docs/governance/external/apg140/source-inventory.md",
+      "docs/governance/external/apg140/decisions.md"
+    ],
+    "review_ref": null,
+    "rationale": "APG140 APGR-XO-COMPAT source-bound outcome: CONSUMER_HANDOFF_CLOSED; see item-specific reasoning in decisions.md.",
+    "maintenance_ref": null,
+    "compatibility_ref": "JACA-XO",
+    "maturity_ref": null
+  }
+}

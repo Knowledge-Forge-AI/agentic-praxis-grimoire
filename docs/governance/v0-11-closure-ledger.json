@@ -1,0 +1,1753 @@
+{
+  "schema_version": "apg.closure-ledger/v1",
+  "release": "v0.11",
+  "owner_phase": "APG138",
+  "items": [
+    {
+      "item_id": "APGR-CI-QUAL",
+      "sources": [
+        "docs/v0-10-backlog-consolidation.md",
+        "docs/v0-9-roadmap.md",
+        "docs/architecture/jaca-ci-handoff.md"
+      ],
+      "inherited_class": "EXTERNAL_GATE",
+      "closure_phase": "V0110-C",
+      "allowed_outcomes": [
+        "DELIVERED",
+        "CONSUMER_HANDOFF_CLOSED"
+      ],
+      "prerequisites": [
+        "APGR internal test suites with 80/80 and 85/85 coverage thresholds",
+        "JACA Project Onboarding Contract Section 2"
+      ],
+      "trigger_ref": null,
+      "consequence": "Passing CI roles; strict exit code mapping; zero-mutation target path admission; Git drift abort; schema conformance fixtures",
+      "status": "CONSUMER_HANDOFF_CLOSED",
+      "disposition": {
+        "decision_ref": "docs/governance/external/apg140/decisions/APGR-CI-QUAL.json",
+        "qualification_refs": [
+          "docs/governance/external/apg140/qualification.md",
+          "docs/governance/external/apg140/source-inventory.md",
+          "docs/governance/external/apg140/decisions.md"
+        ],
+        "review_ref": "docs/governance/external/apg140/independent-review.md",
+        "rationale": "APG140 APGR-CI-QUAL source-bound outcome: CONSUMER_HANDOFF_CLOSED; see item-specific reasoning in decisions.md.",
+        "maintenance_ref": null,
+        "compatibility_ref": "JACA-CI",
+        "maturity_ref": null
+      }
+    },
+    {
+      "item_id": "APGR-CXT-BUDGET-COMPRESSION",
+      "sources": [
+        "docs/v0-10-backlog-consolidation.md",
+        "docs/adr/2026/09/0053-v0-10-discovery-capacity-and-svg.md"
+      ],
+      "inherited_class": "CONDITION_TRIGGERED",
+      "closure_phase": "V0110-E",
+      "allowed_outcomes": [
+        "DELIVERED",
+        "MAINTENANCE_TRIGGER"
+      ],
+      "prerequisites": [
+        "Exhaustion of ADR 0053 capacity ceiling (11,507 bytes) or explicit operator rejection of reservation model"
+      ],
+      "trigger_ref": "APGR-CXT-BUDGET-COMPRESSION",
+      "consequence": "Semantic discovery parity tests demonstrating no loss of routing precision across benchmark queries",
+      "status": "MAINTENANCE_TRIGGER",
+      "disposition": {
+        "decision_ref": "docs/governance/maintenance/apg142/decisions/APGR-CXT-BUDGET-COMPRESSION.json",
+        "qualification_refs": [
+          "docs/adr/2026/09/0055-v0-11-capacity-and-closure-governance.md",
+          "docs/governance/maintenance/apg142/context-compression.md",
+          "docs/governance/maintenance/apg142/qualification.md"
+        ],
+        "review_ref": "docs/governance/maintenance/apg142/work-review.md",
+        "rationale": "Fresh maintained measurement gives 11,142 UTF-8 description bytes below the unchanged 11,507 ceiling for 45 leaves; the assignment retains the reservation model. Neither accepted branch fires. ADR 0055 status reconciliation remains V0110-F work; no compression or capacity change occurs.",
+        "maintenance_ref": "APGR-CXT-BUDGET-COMPRESSION",
+        "compatibility_ref": null,
+        "maturity_ref": null
+      }
+    },
+    {
+      "item_id": "APGR-CXT2B",
+      "sources": [
+        "docs/v0-10-backlog-consolidation.md",
+        "docs/v0-9-roadmap.md"
+      ],
+      "inherited_class": "OPTIONAL_LATER",
+      "closure_phase": "V0110-D",
+      "allowed_outcomes": [
+        "DELIVERED",
+        "REJECTED"
+      ],
+      "prerequisites": [
+        "Pinned Caveman format specification; fail-closed decoding and mapping into APGR footprint schema"
+      ],
+      "trigger_ref": null,
+      "consequence": "Fixture decoding and strict refusal tests on schema mismatch",
+      "status": "REJECTED",
+      "disposition": {
+        "decision_ref": "docs/governance/optional/apg141/decisions/APGR-CXT2B.json",
+        "qualification_refs": [
+          "docs/governance/optional/apg141/qualification.md",
+          "docs/governance/optional/apg141/caveman-decision.md"
+        ],
+        "review_ref": "docs/governance/optional/apg141/independent-review.md",
+        "rationale": "APG141 rejects the optional Caveman adapter after successful dated source and MIT rights inspection: no concrete consumer mapping was demonstrated, and UTF-16 counts or estimated tokens cannot be relabelled as native APGR measures. Existing footprint measurement and explicit imported telemetry meet the established need. This is bounded to inspected contracts; future distinct demand requires a new roadmap item.",
+        "maintenance_ref": null,
+        "compatibility_ref": null,
+        "maturity_ref": null
+      }
+    },
+    {
+      "item_id": "APGR-DEBT-CSS-QD-001",
+      "sources": [
+        "docs/v0-10-backlog-consolidation.md",
+        "docs/governance/language-profile-known-debt.json"
+      ],
+      "inherited_class": "CONDITION_TRIGGERED",
+      "closure_phase": "V0110-E",
+      "allowed_outcomes": [
+        "DELIVERED",
+        "MAINTENANCE_TRIGGER"
+      ],
+      "prerequisites": [
+        "Introduce a compact independent source-purpose binding when future TARGET-007 maintenance justifies it."
+      ],
+      "trigger_ref": "CSS-QD-001",
+      "consequence": "Reproduce the recorded consequence, prove the repair at its real boundary, retain source/target semantics and obtain required non-author review.",
+      "status": "MAINTENANCE_TRIGGER",
+      "disposition": {
+        "decision_ref": "docs/governance/maintenance/apg142/decisions/APGR-DEBT-CSS-QD-001.json",
+        "qualification_refs": [
+          "docs/governance/maintenance/apg142/css-qd-001.md",
+          "docs/governance/maintenance/apg142/qualification.md"
+        ],
+        "review_ref": "docs/governance/maintenance/apg142/work-review.md",
+        "rationale": "Public APG77D target-first manifest, scenario fixture and candidate/retention contracts preserve TARGET-007 purpose, source IDs, target identity and source-registry semantics. Later lifecycle metadata does not change those named inputs. Active stable-blocking debt remains.",
+        "maintenance_ref": "CSS-QD-001",
+        "compatibility_ref": null,
+        "maturity_ref": null
+      }
+    },
+    {
+      "item_id": "APGR-DEBT-CSS-QD-002",
+      "sources": [
+        "docs/v0-10-backlog-consolidation.md",
+        "docs/governance/language-profile-known-debt.json"
+      ],
+      "inherited_class": "CONDITION_TRIGGERED",
+      "closure_phase": "V0110-E",
+      "allowed_outcomes": [
+        "DELIVERED",
+        "MAINTENANCE_TRIGGER"
+      ],
+      "prerequisites": [
+        "Add an independently frozen disagreement index if the lane mechanism becomes current authority again."
+      ],
+      "trigger_ref": "CSS-QD-002",
+      "consequence": "Reproduce the recorded consequence, prove the repair at its real boundary, retain source/target semantics and obtain required non-author review.",
+      "status": "MAINTENANCE_TRIGGER",
+      "disposition": {
+        "decision_ref": "docs/governance/maintenance/apg142/decisions/APGR-DEBT-CSS-QD-002.json",
+        "qualification_refs": [
+          "docs/governance/maintenance/apg142/css-qd-002.md",
+          "docs/governance/maintenance/apg142/qualification.md"
+        ],
+        "review_ref": "docs/governance/maintenance/apg142/work-review.md",
+        "rationale": "Public APG77D scenario and retention contracts preserve the closed Selection/Response vocabularies and compact authority. Supporting private lane/compact comparisons observe no Lane N, Lane T2 or compact v3 change; those complete private vectors are not publicly reproducible here. The exact refresh is FALSE, independently of the narrower disagreement-index repair threshold. Active stable-blocking debt remains.",
+        "maintenance_ref": "CSS-QD-002",
+        "compatibility_ref": null,
+        "maturity_ref": null
+      }
+    },
+    {
+      "item_id": "APGR-DEBT-CSS-QD-003",
+      "sources": [
+        "docs/v0-10-backlog-consolidation.md",
+        "docs/governance/language-profile-known-debt.json"
+      ],
+      "inherited_class": "CONDITION_TRIGGERED",
+      "closure_phase": "V0110-E",
+      "allowed_outcomes": [
+        "DELIVERED",
+        "MAINTENANCE_TRIGGER"
+      ],
+      "prerequisites": [
+        "Add a bounded row/source relation only when a real maintenance workflow needs machine generation or automatic adjudication."
+      ],
+      "trigger_ref": "CSS-QD-003",
+      "consequence": "Reproduce the recorded consequence, prove the repair at its real boundary, retain source/target semantics and obtain required non-author review.",
+      "status": "MAINTENANCE_TRIGGER",
+      "disposition": {
+        "decision_ref": "docs/governance/maintenance/apg142/decisions/APGR-DEBT-CSS-QD-003.json",
+        "qualification_refs": [
+          "docs/governance/maintenance/apg142/css-qd-003.md",
+          "docs/governance/maintenance/apg142/qualification.md"
+        ],
+        "review_ref": "docs/governance/maintenance/apg142/work-review.md",
+        "rationale": "Public APG77D target-first registry, scenario fixture and retention/candidate contracts preserve source, purpose and adjudication authority; lifecycle annotations do not revise it. Private purpose/compact comparisons support the unchanged named rows with limited public reproducibility. The refresh is FALSE independently of machine-generation or automatic-adjudication need. Active stable-blocking debt remains.",
+        "maintenance_ref": "CSS-QD-003",
+        "compatibility_ref": null,
+        "maturity_ref": null
+      }
+    },
+    {
+      "item_id": "APGR-DEBT-CSS-QD-004",
+      "sources": [
+        "docs/v0-10-backlog-consolidation.md",
+        "docs/governance/language-profile-known-debt.json"
+      ],
+      "inherited_class": "CONDITION_TRIGGERED",
+      "closure_phase": "V0110-E",
+      "allowed_outcomes": [
+        "DELIVERED",
+        "MAINTENANCE_TRIGGER"
+      ],
+      "prerequisites": [
+        "Add the invariant during the next material route-schema revision."
+      ],
+      "trigger_ref": "CSS-QD-004",
+      "consequence": "Reproduce the recorded consequence, prove the repair at its real boundary, retain source/target semantics and obtain required non-author review.",
+      "status": "MAINTENANCE_TRIGGER",
+      "disposition": {
+        "decision_ref": "docs/governance/maintenance/apg142/decisions/APGR-DEBT-CSS-QD-004.json",
+        "qualification_refs": [
+          "docs/governance/maintenance/apg142/css-qd-004.md",
+          "docs/governance/maintenance/apg142/qualification.md"
+        ],
+        "review_ref": "docs/governance/maintenance/apg142/work-review.md",
+        "rationale": "The preserved public CSS retention contract and route vocabulary retain owner, decision scope, stop state and obligation schema. No CSS route-schema revision occurred; unrelated governance and hotspot schemas do not change that authority. Active stable-blocking debt remains.",
+        "maintenance_ref": "CSS-QD-004",
+        "compatibility_ref": null,
+        "maturity_ref": null
+      }
+    },
+    {
+      "item_id": "APGR-DEBT-CSS-QD-005",
+      "sources": [
+        "docs/v0-10-backlog-consolidation.md",
+        "docs/governance/language-profile-known-debt.json"
+      ],
+      "inherited_class": "CONDITION_TRIGGERED",
+      "closure_phase": "V0110-E",
+      "allowed_outcomes": [
+        "DELIVERED",
+        "MAINTENANCE_TRIGGER"
+      ],
+      "prerequisites": [
+        "Remove the arrays during a future compatible compact-schema revision."
+      ],
+      "trigger_ref": "CSS-QD-005",
+      "consequence": "Reproduce the recorded consequence, prove the repair at its real boundary, retain source/target semantics and obtain required non-author review.",
+      "status": "MAINTENANCE_TRIGGER",
+      "disposition": {
+        "decision_ref": "docs/governance/maintenance/apg142/decisions/APGR-DEBT-CSS-QD-005.json",
+        "qualification_refs": [
+          "docs/governance/maintenance/apg142/css-qd-005.md",
+          "docs/governance/maintenance/apg142/qualification.md"
+        ],
+        "review_ref": "docs/governance/maintenance/apg142/work-review.md",
+        "rationale": "The named CSS compact schema and retained arrays are unchanged from accepted APG77D authority. No compatible compact-schema revision triggers removal of redundant arrays. The debt remains active and non-stable-blocking.",
+        "maintenance_ref": "CSS-QD-005",
+        "compatibility_ref": null,
+        "maturity_ref": null
+      }
+    },
+    {
+      "item_id": "APGR-DEBT-JS-QD-005",
+      "sources": [
+        "docs/v0-10-backlog-consolidation.md",
+        "docs/governance/language-profile-known-debt.json"
+      ],
+      "inherited_class": "CONDITION_TRIGGERED",
+      "closure_phase": "V0110-E",
+      "allowed_outcomes": [
+        "DELIVERED",
+        "MAINTENANCE_TRIGGER"
+      ],
+      "prerequisites": [
+        "Add one proportionate direct managed-report identity binding, preferably an existing report ID plus exact full-file digest or reusable report-integrity owner, that rejects a changed APG79B report without making the large report a semantic oracle, release payload, or duplicated current evidence system."
+      ],
+      "trigger_ref": "JS-QD-005",
+      "consequence": "Reproduce the recorded consequence, prove the repair at its real boundary, retain source/target semantics and obtain required non-author review.",
+      "status": "MAINTENANCE_TRIGGER",
+      "disposition": {
+        "decision_ref": "docs/governance/maintenance/apg142/decisions/APGR-DEBT-JS-QD-005.json",
+        "qualification_refs": [
+          "docs/adr/2026/09/0054-js-qd-005-refresh-trigger-interpretation.md",
+          "docs/governance/maintenance/apg142/js-qd-005.md",
+          "docs/governance/maintenance/apg142/qualification.md"
+        ],
+        "review_ref": "docs/governance/maintenance/apg142/work-review.md",
+        "rationale": "Under ADR 0054, APG141 modern CLI/response leading-dot normalization does not change APG79B historical path, byte-producing generator/format, IDs, ordering, associations, source-role record, historical disposition or integrity authority. JS_QD_005_REFRESH_NOT_TRIGGERED remains exact. No original report search or reconstruction occurred; active stable-blocking debt remains.",
+        "maintenance_ref": "JS-QD-005",
+        "compatibility_ref": null,
+        "maturity_ref": null
+      }
+    },
+    {
+      "item_id": "APGR-HOTSPOT-CHURN",
+      "sources": [
+        "docs/v0-10-backlog-consolidation.md",
+        "docs/evaluations/apg99-structural-hotspot-analyzer.md"
+      ],
+      "inherited_class": "OPTIONAL_LATER",
+      "closure_phase": "V0110-D",
+      "allowed_outcomes": [
+        "DELIVERED",
+        "REJECTED"
+      ],
+      "prerequisites": [
+        "Structural hotspot analyzer baseline (`hotspot` package v1)",
+        "Git commit history parser and deterministic commit churn metrics"
+      ],
+      "trigger_ref": null,
+      "consequence": "Deterministic churn scoring combining change frequency with structural complexity",
+      "status": "DELIVERED",
+      "disposition": {
+        "decision_ref": "docs/governance/optional/apg141/decisions/APGR-HOTSPOT-CHURN.json",
+        "qualification_refs": [
+          "docs/governance/optional/apg141/qualification.md",
+          "docs/guides/hotspot-history.md"
+        ],
+        "review_ref": "docs/governance/optional/apg141/independent-review.md",
+        "rationale": "APG141 delivers deterministic bounded file-level transition frequency, physical-line churn and signed growth in opt-in v2. The inherited combined frequency/structural-complexity score is deliberately abandoned for this item: no justified weighting and availability contract supports combining the dimensions; structural ranking stays unchanged. A materially different scoring request requires a new roadmap item. Historical symlinks/gitlinks anywhere refuse the request, so current APGR trees are unsupported; ranges are capped at 256 first-parent commits.",
+        "maintenance_ref": null,
+        "compatibility_ref": null,
+        "maturity_ref": null
+      }
+    },
+    {
+      "item_id": "APGR-REPORT-OUTBOX",
+      "sources": [
+        "docs/v0-10-backlog-consolidation.md",
+        "docs/architecture/apg-jaca-integration.md"
+      ],
+      "inherited_class": "EXTERNAL_GATE",
+      "closure_phase": "V0110-C",
+      "allowed_outcomes": [
+        "DELIVERED",
+        "CONSUMER_HANDOFF_CLOSED"
+      ],
+      "prerequisites": [
+        "JACA durable outbox architecture and transaction coordinator"
+      ],
+      "trigger_ref": null,
+      "consequence": "Atomic report record publication without multi-writer contention",
+      "status": "CONSUMER_HANDOFF_CLOSED",
+      "disposition": {
+        "decision_ref": "docs/governance/external/apg140/decisions/APGR-REPORT-OUTBOX.json",
+        "qualification_refs": [
+          "docs/governance/external/apg140/qualification.md",
+          "docs/governance/external/apg140/source-inventory.md",
+          "docs/governance/external/apg140/decisions.md"
+        ],
+        "review_ref": "docs/governance/external/apg140/independent-review.md",
+        "rationale": "APG140 APGR-REPORT-OUTBOX source-bound outcome: CONSUMER_HANDOFF_CLOSED; see item-specific reasoning in decisions.md.",
+        "maintenance_ref": null,
+        "compatibility_ref": "JACA-OUTBOX",
+        "maturity_ref": null
+      }
+    },
+    {
+      "item_id": "APGR-REPORT-PROJECT-KEY",
+      "sources": [
+        "docs/v0-10-backlog-consolidation.md",
+        "docs/manager-worker-protocol.md",
+        "report/append.go"
+      ],
+      "inherited_class": "OPTIONAL_LATER",
+      "closure_phase": "V0110-D",
+      "allowed_outcomes": [
+        "DELIVERED",
+        "REJECTED"
+      ],
+      "prerequisites": [
+        "Current report/release contracts and maintained fixtures"
+      ],
+      "trigger_ref": null,
+      "consequence": "Source-backed compatibility tests at the actual parser, append or release projection boundary.",
+      "status": "DELIVERED",
+      "disposition": {
+        "decision_ref": "docs/governance/optional/apg141/decisions/APGR-REPORT-PROJECT-KEY.json",
+        "qualification_refs": [
+          "docs/governance/optional/apg141/qualification.md",
+          "docs/governance/optional/apg141/project-key-contract.md"
+        ],
+        "review_ref": "docs/governance/optional/apg141/independent-review.md",
+        "rationale": "APG141 delivers the demonstrated dot-prefixed basename repair by aligning modern report and response selection with existing Go/legacy leading-dot normalization. Explicit project agreement and identifier refusal remain; no implicit alias registry or global uniqueness is introduced.",
+        "maintenance_ref": null,
+        "compatibility_ref": null,
+        "maturity_ref": null
+      }
+    },
+    {
+      "item_id": "APGR-REPORT-PUREGO-GIT",
+      "sources": [
+        "docs/v0-10-backlog-consolidation.md",
+        "docs/architecture/v0-7-embeddable-toolkit.md"
+      ],
+      "inherited_class": "CONDITION_TRIGGERED",
+      "closure_phase": "V0110-E",
+      "allowed_outcomes": [
+        "DELIVERED",
+        "MAINTENANCE_TRIGGER"
+      ],
+      "prerequisites": [
+        "Demonstrated inadequacy, security defect, or platform restriction of sanitized `git` CLI subprocess invocation"
+      ],
+      "trigger_ref": "APGR-REPORT-PUREGO-GIT",
+      "consequence": "Bit-for-bit parity with Git CLI diffs without launching subprocesses",
+      "status": "MAINTENANCE_TRIGGER",
+      "disposition": {
+        "decision_ref": "docs/governance/maintenance/apg142/decisions/APGR-REPORT-PUREGO-GIT.json",
+        "qualification_refs": [
+          "docs/governance/maintenance/apg142/purego-git.md",
+          "docs/governance/maintenance/apg142/qualification.md"
+        ],
+        "review_ref": "docs/governance/maintenance/apg142/work-review.md",
+        "rationale": "The supported APG-JACA reporting contract expressly permits native Git subprocesses and current development operations use Git. No exact prohibition is observed in that bounded scope; no universal consumer-runtime claim or backend repair is made.",
+        "maintenance_ref": "APGR-REPORT-PUREGO-GIT",
+        "compatibility_ref": null,
+        "maturity_ref": null
+      }
+    },
+    {
+      "item_id": "APGR-REPORT-RESULT-FIELDS",
+      "sources": [
+        "docs/v0-10-backlog-consolidation.md",
+        "docs/manager-worker-protocol.md",
+        "report/append.go"
+      ],
+      "inherited_class": "OPTIONAL_LATER",
+      "closure_phase": "V0110-D",
+      "allowed_outcomes": [
+        "DELIVERED",
+        "REJECTED"
+      ],
+      "prerequisites": [
+        "Current report/release contracts and maintained fixtures"
+      ],
+      "trigger_ref": null,
+      "consequence": "Source-backed compatibility tests at the actual parser, append or release projection boundary.",
+      "status": "REJECTED",
+      "disposition": {
+        "decision_ref": "docs/governance/optional/apg141/decisions/APGR-REPORT-RESULT-FIELDS.json",
+        "qualification_refs": [
+          "docs/governance/optional/apg141/qualification.md",
+          "docs/governance/optional/apg141/result-fields-decision.md"
+        ],
+        "review_ref": "docs/governance/optional/apg141/independent-review.md",
+        "rationale": "APG141 rejects a producer result-field restriction because inspected consumer contracts establish no reusable closed field/outcome vocabulary. Preserve report.Result, caller-owned outcome text and current safety validation; consumer envelope mismatch remains consumer-owned and is not concealed by producer changes.",
+        "maintenance_ref": null,
+        "compatibility_ref": null,
+        "maturity_ref": null
+      }
+    },
+    {
+      "item_id": "APGR-XO-COMPAT",
+      "sources": [
+        "docs/v0-10-backlog-consolidation.md",
+        "docs/v0-9-roadmap.md",
+        "docs/architecture/jaca-xo-handoff.md"
+      ],
+      "inherited_class": "EXTERNAL_GATE",
+      "closure_phase": "V0110-C",
+      "allowed_outcomes": [
+        "DELIVERED",
+        "CONSUMER_HANDOFF_CLOSED"
+      ],
+      "prerequisites": [
+        "Go 1.25+ compatibility across public packages `skills`, `footprint`, `schema`",
+        "JACA XO Interface Control register (ICR-001..006, XO-ICR-009)"
+      ],
+      "trigger_ref": null,
+      "consequence": "Static AST check verifying zero APGR domain type leaks; static dependency check verifying zero subprocess (`os/exec`) or internal/cmd imports; dual-lane in-memory execution pass",
+      "status": "CONSUMER_HANDOFF_CLOSED",
+      "disposition": {
+        "decision_ref": "docs/governance/external/apg140/decisions/APGR-XO-COMPAT.json",
+        "qualification_refs": [
+          "docs/governance/external/apg140/qualification.md",
+          "docs/governance/external/apg140/source-inventory.md",
+          "docs/governance/external/apg140/decisions.md"
+        ],
+        "review_ref": "docs/governance/external/apg140/independent-review.md",
+        "rationale": "APG140 APGR-XO-COMPAT source-bound outcome: CONSUMER_HANDOFF_CLOSED; see item-specific reasoning in decisions.md.",
+        "maintenance_ref": null,
+        "compatibility_ref": "JACA-XO",
+        "maturity_ref": null
+      }
+    },
+    {
+      "item_id": "MATURITY:astro-profile",
+      "sources": [
+        "docs/v0-10-backlog-consolidation.md",
+        "skills/README.md"
+      ],
+      "inherited_class": "PROVISIONAL_MATURITY",
+      "closure_phase": "V0110-B",
+      "allowed_outcomes": [
+        "STABLE",
+        "PROVISIONAL_MAINTENANCE",
+        "DEPRECATED_OR_SUPERSEDED"
+      ],
+      "prerequisites": [
+        "Individual astro-profile decision covering repeated_positive_use, representative_non_triggers, defect_debt_disposition, rollback, provenance, independent_review, current_validation."
+      ],
+      "trigger_ref": null,
+      "consequence": "No undifferentiated future maturity backlog; preserve exact blocking debts.",
+      "status": "PROVISIONAL_MAINTENANCE",
+      "disposition": {
+        "decision_ref": "docs/governance/maturity/apg139/decisions/astro-profile.json",
+        "review_ref": "docs/governance/maturity/apg139/independent-review.md",
+        "qualification_refs": [
+          "docs/governance/maturity/apg139/qualification.md"
+        ],
+        "rationale": "Retain this useful owner. The cited scope and qualification evidence does not establish a complete independently reviewed individual promotion case; the named guidance-use and boundary evidence remains to be supplied or identified. Weak promotion evidence is not a reason for deprecation. The supplied independent pre-final review supports retention; terminal binding is owned by closeout.",
+        "maintenance_ref": "MATURITY:astro-profile",
+        "compatibility_ref": null,
+        "maturity_ref": "astro-profile"
+      }
+    },
+    {
+      "item_id": "MATURITY:browser-runtime-profile",
+      "sources": [
+        "docs/v0-10-backlog-consolidation.md",
+        "skills/README.md"
+      ],
+      "inherited_class": "PROVISIONAL_MATURITY",
+      "closure_phase": "V0110-B",
+      "allowed_outcomes": [
+        "STABLE",
+        "PROVISIONAL_MAINTENANCE",
+        "DEPRECATED_OR_SUPERSEDED"
+      ],
+      "prerequisites": [
+        "Individual browser-runtime-profile decision covering repeated_positive_use, representative_non_triggers, defect_debt_disposition, rollback, provenance, independent_review, current_validation."
+      ],
+      "trigger_ref": null,
+      "consequence": "No undifferentiated future maturity backlog; preserve exact blocking debts.",
+      "status": "PROVISIONAL_MAINTENANCE",
+      "disposition": {
+        "decision_ref": "docs/governance/maturity/apg139/decisions/browser-runtime-profile.json",
+        "review_ref": "docs/governance/maturity/apg139/independent-review.md",
+        "qualification_refs": [
+          "docs/governance/maturity/apg139/qualification.md"
+        ],
+        "rationale": "Retain this useful owner. The cited scope and qualification evidence does not establish a complete independently reviewed individual promotion case; the named guidance-use and boundary evidence remains to be supplied or identified. Weak promotion evidence is not a reason for deprecation. The supplied independent pre-final review supports retention; terminal binding is owned by closeout.",
+        "maintenance_ref": "MATURITY:browser-runtime-profile",
+        "compatibility_ref": null,
+        "maturity_ref": "browser-runtime-profile"
+      }
+    },
+    {
+      "item_id": "MATURITY:chatgpt-manager-workflow",
+      "sources": [
+        "docs/v0-10-backlog-consolidation.md",
+        "skills/README.md"
+      ],
+      "inherited_class": "PROVISIONAL_MATURITY",
+      "closure_phase": "V0110-B",
+      "allowed_outcomes": [
+        "STABLE",
+        "PROVISIONAL_MAINTENANCE",
+        "DEPRECATED_OR_SUPERSEDED"
+      ],
+      "prerequisites": [
+        "Individual chatgpt-manager-workflow decision covering repeated_positive_use, representative_non_triggers, defect_debt_disposition, rollback, provenance, independent_review, current_validation."
+      ],
+      "trigger_ref": null,
+      "consequence": "No undifferentiated future maturity backlog; preserve exact blocking debts.",
+      "status": "PROVISIONAL_MAINTENANCE",
+      "disposition": {
+        "decision_ref": "docs/governance/maturity/apg139/decisions/chatgpt-manager-workflow.json",
+        "review_ref": "docs/governance/maturity/apg139/independent-review.md",
+        "qualification_refs": [
+          "docs/governance/maturity/apg139/qualification.md"
+        ],
+        "rationale": "Retain this useful owner. The inspected calibration, fixture and isolated guidance applications do not establish a complete independently reviewed individual stable-promotion case. APG-local actual use can satisfy the policy; neither another repository nor comparative A/B evidence is required. The supplied independent pre-final review supports retention; terminal binding is owned by closeout.",
+        "maintenance_ref": "MATURITY:chatgpt-manager-workflow",
+        "compatibility_ref": null,
+        "maturity_ref": "chatgpt-manager-workflow"
+      }
+    },
+    {
+      "item_id": "MATURITY:composing-approved-roadmap-assignments",
+      "sources": [
+        "docs/v0-10-backlog-consolidation.md",
+        "skills/README.md"
+      ],
+      "inherited_class": "PROVISIONAL_MATURITY",
+      "closure_phase": "V0110-B",
+      "allowed_outcomes": [
+        "STABLE",
+        "PROVISIONAL_MAINTENANCE",
+        "DEPRECATED_OR_SUPERSEDED"
+      ],
+      "prerequisites": [
+        "Individual composing-approved-roadmap-assignments decision covering repeated_positive_use, representative_non_triggers, defect_debt_disposition, rollback, provenance, independent_review, current_validation."
+      ],
+      "trigger_ref": null,
+      "consequence": "No undifferentiated future maturity backlog; preserve exact blocking debts.",
+      "status": "PROVISIONAL_MAINTENANCE",
+      "disposition": {
+        "decision_ref": "docs/governance/maturity/apg139/decisions/composing-approved-roadmap-assignments.json",
+        "review_ref": "docs/governance/maturity/apg139/independent-review.md",
+        "qualification_refs": [
+          "docs/governance/maturity/apg139/qualification.md"
+        ],
+        "rationale": "Retain this useful owner. The inspected calibration, fixture and isolated guidance applications do not establish a complete independently reviewed individual stable-promotion case. APG-local actual use can satisfy the policy; neither another repository nor comparative A/B evidence is required. The supplied independent pre-final review supports retention; terminal binding is owned by closeout.",
+        "maintenance_ref": "MATURITY:composing-approved-roadmap-assignments",
+        "compatibility_ref": null,
+        "maturity_ref": "composing-approved-roadmap-assignments"
+      }
+    },
+    {
+      "item_id": "MATURITY:converting-bash-scripts-to-python",
+      "sources": [
+        "docs/v0-10-backlog-consolidation.md",
+        "skills/README.md"
+      ],
+      "inherited_class": "PROVISIONAL_MATURITY",
+      "closure_phase": "V0110-B",
+      "allowed_outcomes": [
+        "STABLE",
+        "PROVISIONAL_MAINTENANCE",
+        "DEPRECATED_OR_SUPERSEDED"
+      ],
+      "prerequisites": [
+        "Individual converting-bash-scripts-to-python decision covering repeated_positive_use, representative_non_triggers, defect_debt_disposition, rollback, provenance, independent_review, current_validation."
+      ],
+      "trigger_ref": null,
+      "consequence": "No undifferentiated future maturity backlog; preserve exact blocking debts.",
+      "status": "PROVISIONAL_MAINTENANCE",
+      "disposition": {
+        "decision_ref": "docs/governance/maturity/apg139/decisions/converting-bash-scripts-to-python.json",
+        "review_ref": "docs/governance/maturity/apg139/independent-review.md",
+        "qualification_refs": [
+          "docs/governance/maturity/apg139/qualification.md"
+        ],
+        "rationale": "Retain this useful owner. The inspected calibration, fixture and isolated guidance applications do not establish a complete independently reviewed individual stable-promotion case. APG-local actual use can satisfy the policy; neither another repository nor comparative A/B evidence is required. The supplied independent pre-final review supports retention; terminal binding is owned by closeout.",
+        "maintenance_ref": "MATURITY:converting-bash-scripts-to-python",
+        "compatibility_ref": null,
+        "maturity_ref": "converting-bash-scripts-to-python"
+      }
+    },
+    {
+      "item_id": "MATURITY:css-language-profile",
+      "sources": [
+        "docs/v0-10-backlog-consolidation.md",
+        "skills/README.md"
+      ],
+      "inherited_class": "PROVISIONAL_MATURITY",
+      "closure_phase": "V0110-B",
+      "allowed_outcomes": [
+        "STABLE",
+        "PROVISIONAL_MAINTENANCE",
+        "DEPRECATED_OR_SUPERSEDED"
+      ],
+      "prerequisites": [
+        "Individual css-language-profile decision covering repeated_positive_use, representative_non_triggers, defect_debt_disposition, rollback, provenance, independent_review, current_validation."
+      ],
+      "trigger_ref": null,
+      "consequence": "No undifferentiated future maturity backlog; preserve exact blocking debts.",
+      "status": "PROVISIONAL_MAINTENANCE",
+      "disposition": {
+        "decision_ref": "docs/governance/maturity/apg139/decisions/css-language-profile.json",
+        "review_ref": "docs/governance/maturity/apg139/independent-review.md",
+        "qualification_refs": [
+          "docs/governance/maturity/apg139/qualification.md"
+        ],
+        "rationale": "Retain this useful owner. The cited scope and qualification evidence does not establish a complete independently reviewed individual promotion case; the named guidance-use and boundary evidence remains to be supplied or identified. Weak promotion evidence is not a reason for deprecation. The supplied independent pre-final review supports retention; terminal binding is owned by closeout.",
+        "maintenance_ref": "MATURITY:css-language-profile",
+        "compatibility_ref": null,
+        "maturity_ref": "css-language-profile"
+      }
+    },
+    {
+      "item_id": "MATURITY:dockerfile-profile",
+      "sources": [
+        "docs/v0-10-backlog-consolidation.md",
+        "skills/README.md"
+      ],
+      "inherited_class": "PROVISIONAL_MATURITY",
+      "closure_phase": "V0110-B",
+      "allowed_outcomes": [
+        "STABLE",
+        "PROVISIONAL_MAINTENANCE",
+        "DEPRECATED_OR_SUPERSEDED"
+      ],
+      "prerequisites": [
+        "Individual dockerfile-profile decision covering repeated_positive_use, representative_non_triggers, defect_debt_disposition, rollback, provenance, independent_review, current_validation."
+      ],
+      "trigger_ref": null,
+      "consequence": "No undifferentiated future maturity backlog; preserve exact blocking debts.",
+      "status": "PROVISIONAL_MAINTENANCE",
+      "disposition": {
+        "decision_ref": "docs/governance/maturity/apg139/decisions/dockerfile-profile.json",
+        "review_ref": "docs/governance/maturity/apg139/independent-review.md",
+        "qualification_refs": [
+          "docs/governance/maturity/apg139/qualification.md"
+        ],
+        "rationale": "Retain this useful owner. The inspected calibration, fixture and isolated guidance applications do not establish a complete independently reviewed individual stable-promotion case. APG-local actual use can satisfy the policy; neither another repository nor comparative A/B evidence is required. The supplied independent pre-final review supports retention; terminal binding is owned by closeout.",
+        "maintenance_ref": "MATURITY:dockerfile-profile",
+        "compatibility_ref": null,
+        "maturity_ref": "dockerfile-profile"
+      }
+    },
+    {
+      "item_id": "MATURITY:go-cmp-test-profile",
+      "sources": [
+        "docs/v0-10-backlog-consolidation.md",
+        "skills/README.md"
+      ],
+      "inherited_class": "PROVISIONAL_MATURITY",
+      "closure_phase": "V0110-B",
+      "allowed_outcomes": [
+        "STABLE",
+        "PROVISIONAL_MAINTENANCE",
+        "DEPRECATED_OR_SUPERSEDED"
+      ],
+      "prerequisites": [
+        "Individual go-cmp-test-profile decision covering repeated_positive_use, representative_non_triggers, defect_debt_disposition, rollback, provenance, independent_review, current_validation."
+      ],
+      "trigger_ref": null,
+      "consequence": "No undifferentiated future maturity backlog; preserve exact blocking debts.",
+      "status": "PROVISIONAL_MAINTENANCE",
+      "disposition": {
+        "decision_ref": "docs/governance/maturity/apg139/decisions/go-cmp-test-profile.json",
+        "review_ref": "docs/governance/maturity/apg139/independent-review.md",
+        "qualification_refs": [
+          "docs/governance/maturity/apg139/qualification.md"
+        ],
+        "rationale": "Retain the selected framework owner. Historical authored scenarios and bounded static guidance application are relevant but do not supply a complete individually reviewed repeated-use and non-trigger promotion case. Additional repositories are not required; APG tasks can supply the missing evidence. The supplied independent pre-final review supports retention; terminal binding is owned by closeout.",
+        "maintenance_ref": "MATURITY:go-cmp-test-profile",
+        "compatibility_ref": null,
+        "maturity_ref": "go-cmp-test-profile"
+      }
+    },
+    {
+      "item_id": "MATURITY:go-language-profile",
+      "sources": [
+        "docs/v0-10-backlog-consolidation.md",
+        "skills/README.md"
+      ],
+      "inherited_class": "PROVISIONAL_MATURITY",
+      "closure_phase": "V0110-B",
+      "allowed_outcomes": [
+        "STABLE",
+        "PROVISIONAL_MAINTENANCE",
+        "DEPRECATED_OR_SUPERSEDED"
+      ],
+      "prerequisites": [
+        "Individual go-language-profile decision covering repeated_positive_use, representative_non_triggers, defect_debt_disposition, rollback, provenance, independent_review, current_validation."
+      ],
+      "trigger_ref": null,
+      "consequence": "No undifferentiated future maturity backlog; preserve exact blocking debts.",
+      "status": "PROVISIONAL_MAINTENANCE",
+      "disposition": {
+        "decision_ref": "docs/governance/maturity/apg139/decisions/go-language-profile.json",
+        "review_ref": "docs/governance/maturity/apg139/independent-review.md",
+        "qualification_refs": [
+          "docs/governance/maturity/apg139/qualification.md"
+        ],
+        "rationale": "Retain this useful owner. The inspected calibration, fixture and isolated guidance applications do not establish a complete independently reviewed individual stable-promotion case. APG-local actual use can satisfy the policy; neither another repository nor comparative A/B evidence is required. The supplied independent pre-final review supports retention; terminal binding is owned by closeout.",
+        "maintenance_ref": "MATURITY:go-language-profile",
+        "compatibility_ref": null,
+        "maturity_ref": "go-language-profile"
+      }
+    },
+    {
+      "item_id": "MATURITY:go-test-profile",
+      "sources": [
+        "docs/v0-10-backlog-consolidation.md",
+        "skills/README.md"
+      ],
+      "inherited_class": "PROVISIONAL_MATURITY",
+      "closure_phase": "V0110-B",
+      "allowed_outcomes": [
+        "STABLE",
+        "PROVISIONAL_MAINTENANCE",
+        "DEPRECATED_OR_SUPERSEDED"
+      ],
+      "prerequisites": [
+        "Individual go-test-profile decision covering repeated_positive_use, representative_non_triggers, defect_debt_disposition, rollback, provenance, independent_review, current_validation."
+      ],
+      "trigger_ref": null,
+      "consequence": "No undifferentiated future maturity backlog; preserve exact blocking debts.",
+      "status": "PROVISIONAL_MAINTENANCE",
+      "disposition": {
+        "decision_ref": "docs/governance/maturity/apg139/decisions/go-test-profile.json",
+        "review_ref": "docs/governance/maturity/apg139/independent-review.md",
+        "qualification_refs": [
+          "docs/governance/maturity/apg139/qualification.md"
+        ],
+        "rationale": "Retain the selected framework owner. Historical authored scenarios and bounded static guidance application are relevant but do not supply a complete individually reviewed repeated-use and non-trigger promotion case. Additional repositories are not required; APG tasks can supply the missing evidence. The supplied independent pre-final review supports retention; terminal binding is owned by closeout.",
+        "maintenance_ref": "MATURITY:go-test-profile",
+        "compatibility_ref": null,
+        "maturity_ref": "go-test-profile"
+      }
+    },
+    {
+      "item_id": "MATURITY:gomock-test-profile",
+      "sources": [
+        "docs/v0-10-backlog-consolidation.md",
+        "skills/README.md"
+      ],
+      "inherited_class": "PROVISIONAL_MATURITY",
+      "closure_phase": "V0110-B",
+      "allowed_outcomes": [
+        "STABLE",
+        "PROVISIONAL_MAINTENANCE",
+        "DEPRECATED_OR_SUPERSEDED"
+      ],
+      "prerequisites": [
+        "Individual gomock-test-profile decision covering repeated_positive_use, representative_non_triggers, defect_debt_disposition, rollback, provenance, independent_review, current_validation."
+      ],
+      "trigger_ref": null,
+      "consequence": "No undifferentiated future maturity backlog; preserve exact blocking debts.",
+      "status": "PROVISIONAL_MAINTENANCE",
+      "disposition": {
+        "decision_ref": "docs/governance/maturity/apg139/decisions/gomock-test-profile.json",
+        "review_ref": "docs/governance/maturity/apg139/independent-review.md",
+        "qualification_refs": [
+          "docs/governance/maturity/apg139/qualification.md"
+        ],
+        "rationale": "Retain the selected framework owner. Historical authored scenarios and bounded static guidance application are relevant but do not supply a complete individually reviewed repeated-use and non-trigger promotion case. Additional repositories are not required; APG tasks can supply the missing evidence. The supplied independent pre-final review supports retention; terminal binding is owned by closeout.",
+        "maintenance_ref": "MATURITY:gomock-test-profile",
+        "compatibility_ref": null,
+        "maturity_ref": "gomock-test-profile"
+      }
+    },
+    {
+      "item_id": "MATURITY:javascript-language-profile",
+      "sources": [
+        "docs/v0-10-backlog-consolidation.md",
+        "skills/README.md"
+      ],
+      "inherited_class": "PROVISIONAL_MATURITY",
+      "closure_phase": "V0110-B",
+      "allowed_outcomes": [
+        "STABLE",
+        "PROVISIONAL_MAINTENANCE",
+        "DEPRECATED_OR_SUPERSEDED"
+      ],
+      "prerequisites": [
+        "Individual javascript-language-profile decision covering repeated_positive_use, representative_non_triggers, defect_debt_disposition, rollback, provenance, independent_review, current_validation."
+      ],
+      "trigger_ref": null,
+      "consequence": "No undifferentiated future maturity backlog; preserve exact blocking debts.",
+      "status": "PROVISIONAL_MAINTENANCE",
+      "disposition": {
+        "decision_ref": "docs/governance/maturity/apg139/decisions/javascript-language-profile.json",
+        "review_ref": "docs/governance/maturity/apg139/independent-review.md",
+        "qualification_refs": [
+          "docs/governance/maturity/apg139/qualification.md"
+        ],
+        "rationale": "Retain this useful owner. The inspected calibration, fixture and isolated guidance applications do not establish a complete independently reviewed individual stable-promotion case. APG-local actual use can satisfy the policy; neither another repository nor comparative A/B evidence is required. The supplied independent pre-final review supports retention; terminal binding is owned by closeout.",
+        "maintenance_ref": "MATURITY:javascript-language-profile",
+        "compatibility_ref": null,
+        "maturity_ref": "javascript-language-profile"
+      }
+    },
+    {
+      "item_id": "MATURITY:jsx-language-profile",
+      "sources": [
+        "docs/v0-10-backlog-consolidation.md",
+        "skills/README.md"
+      ],
+      "inherited_class": "PROVISIONAL_MATURITY",
+      "closure_phase": "V0110-B",
+      "allowed_outcomes": [
+        "STABLE",
+        "PROVISIONAL_MAINTENANCE",
+        "DEPRECATED_OR_SUPERSEDED"
+      ],
+      "prerequisites": [
+        "Individual jsx-language-profile decision covering repeated_positive_use, representative_non_triggers, defect_debt_disposition, rollback, provenance, independent_review, current_validation."
+      ],
+      "trigger_ref": null,
+      "consequence": "No undifferentiated future maturity backlog; preserve exact blocking debts.",
+      "status": "PROVISIONAL_MAINTENANCE",
+      "disposition": {
+        "decision_ref": "docs/governance/maturity/apg139/decisions/jsx-language-profile.json",
+        "review_ref": "docs/governance/maturity/apg139/independent-review.md",
+        "qualification_refs": [
+          "docs/governance/maturity/apg139/qualification.md"
+        ],
+        "rationale": "Retain this useful owner. The cited scope and qualification evidence does not establish a complete independently reviewed individual promotion case; the named guidance-use and boundary evidence remains to be supplied or identified. Weak promotion evidence is not a reason for deprecation. The supplied independent pre-final review supports retention; terminal binding is owned by closeout.",
+        "maintenance_ref": "MATURITY:jsx-language-profile",
+        "compatibility_ref": null,
+        "maturity_ref": "jsx-language-profile"
+      }
+    },
+    {
+      "item_id": "MATURITY:markdown-language-profile",
+      "sources": [
+        "docs/v0-10-backlog-consolidation.md",
+        "skills/README.md"
+      ],
+      "inherited_class": "PROVISIONAL_MATURITY",
+      "closure_phase": "V0110-B",
+      "allowed_outcomes": [
+        "STABLE",
+        "PROVISIONAL_MAINTENANCE",
+        "DEPRECATED_OR_SUPERSEDED"
+      ],
+      "prerequisites": [
+        "Individual markdown-language-profile decision covering repeated_positive_use, representative_non_triggers, defect_debt_disposition, rollback, provenance, independent_review, current_validation."
+      ],
+      "trigger_ref": null,
+      "consequence": "No undifferentiated future maturity backlog; preserve exact blocking debts.",
+      "status": "PROVISIONAL_MAINTENANCE",
+      "disposition": {
+        "decision_ref": "docs/governance/maturity/apg139/decisions/markdown-language-profile.json",
+        "review_ref": "docs/governance/maturity/apg139/independent-review.md",
+        "qualification_refs": [
+          "docs/governance/maturity/apg139/qualification.md"
+        ],
+        "rationale": "Retain this useful owner. The cited scope and qualification evidence does not establish a complete independently reviewed individual promotion case; the named guidance-use and boundary evidence remains to be supplied or identified. Weak promotion evidence is not a reason for deprecation. The supplied independent pre-final review supports retention; terminal binding is owned by closeout.",
+        "maintenance_ref": "MATURITY:markdown-language-profile",
+        "compatibility_ref": null,
+        "maturity_ref": "markdown-language-profile"
+      }
+    },
+    {
+      "item_id": "MATURITY:mdx-profile",
+      "sources": [
+        "docs/v0-10-backlog-consolidation.md",
+        "skills/README.md"
+      ],
+      "inherited_class": "PROVISIONAL_MATURITY",
+      "closure_phase": "V0110-B",
+      "allowed_outcomes": [
+        "STABLE",
+        "PROVISIONAL_MAINTENANCE",
+        "DEPRECATED_OR_SUPERSEDED"
+      ],
+      "prerequisites": [
+        "Individual mdx-profile decision covering repeated_positive_use, representative_non_triggers, defect_debt_disposition, rollback, provenance, independent_review, current_validation."
+      ],
+      "trigger_ref": null,
+      "consequence": "No undifferentiated future maturity backlog; preserve exact blocking debts.",
+      "status": "PROVISIONAL_MAINTENANCE",
+      "disposition": {
+        "decision_ref": "docs/governance/maturity/apg139/decisions/mdx-profile.json",
+        "review_ref": "docs/governance/maturity/apg139/independent-review.md",
+        "qualification_refs": [
+          "docs/governance/maturity/apg139/qualification.md"
+        ],
+        "rationale": "Retain this useful owner. The cited scope and qualification evidence does not establish a complete independently reviewed individual promotion case; the named guidance-use and boundary evidence remains to be supplied or identified. Weak promotion evidence is not a reason for deprecation. The supplied independent pre-final review supports retention; terminal binding is owned by closeout.",
+        "maintenance_ref": "MATURITY:mdx-profile",
+        "compatibility_ref": null,
+        "maturity_ref": "mdx-profile"
+      }
+    },
+    {
+      "item_id": "MATURITY:minitest-test-profile",
+      "sources": [
+        "docs/v0-10-backlog-consolidation.md",
+        "skills/README.md"
+      ],
+      "inherited_class": "PROVISIONAL_MATURITY",
+      "closure_phase": "V0110-B",
+      "allowed_outcomes": [
+        "STABLE",
+        "PROVISIONAL_MAINTENANCE",
+        "DEPRECATED_OR_SUPERSEDED"
+      ],
+      "prerequisites": [
+        "Individual minitest-test-profile decision covering repeated_positive_use, representative_non_triggers, defect_debt_disposition, rollback, provenance, independent_review, current_validation."
+      ],
+      "trigger_ref": null,
+      "consequence": "No undifferentiated future maturity backlog; preserve exact blocking debts.",
+      "status": "PROVISIONAL_MAINTENANCE",
+      "disposition": {
+        "decision_ref": "docs/governance/maturity/apg139/decisions/minitest-test-profile.json",
+        "review_ref": "docs/governance/maturity/apg139/independent-review.md",
+        "qualification_refs": [
+          "docs/governance/maturity/apg139/qualification.md"
+        ],
+        "rationale": "Retain the selected framework owner. Historical authored scenarios and bounded static guidance application are relevant but do not supply a complete individually reviewed repeated-use and non-trigger promotion case. Additional repositories are not required; APG tasks can supply the missing evidence. The supplied independent pre-final review supports retention; terminal binding is owned by closeout.",
+        "maintenance_ref": "MATURITY:minitest-test-profile",
+        "compatibility_ref": null,
+        "maturity_ref": "minitest-test-profile"
+      }
+    },
+    {
+      "item_id": "MATURITY:nix-test-profile",
+      "sources": [
+        "docs/v0-10-backlog-consolidation.md",
+        "skills/README.md"
+      ],
+      "inherited_class": "PROVISIONAL_MATURITY",
+      "closure_phase": "V0110-B",
+      "allowed_outcomes": [
+        "STABLE",
+        "PROVISIONAL_MAINTENANCE",
+        "DEPRECATED_OR_SUPERSEDED"
+      ],
+      "prerequisites": [
+        "Individual nix-test-profile decision covering repeated_positive_use, representative_non_triggers, defect_debt_disposition, rollback, provenance, independent_review, current_validation."
+      ],
+      "trigger_ref": null,
+      "consequence": "No undifferentiated future maturity backlog; preserve exact blocking debts.",
+      "status": "PROVISIONAL_MAINTENANCE",
+      "disposition": {
+        "decision_ref": "docs/governance/maturity/apg139/decisions/nix-test-profile.json",
+        "review_ref": "docs/governance/maturity/apg139/independent-review.md",
+        "qualification_refs": [
+          "docs/governance/maturity/apg139/qualification.md"
+        ],
+        "rationale": "Retain the selected framework owner. Historical authored scenarios and bounded static guidance application are relevant but do not supply a complete individually reviewed repeated-use and non-trigger promotion case. Additional repositories are not required; APG tasks can supply the missing evidence. The supplied independent pre-final review supports retention; terminal binding is owned by closeout.",
+        "maintenance_ref": "MATURITY:nix-test-profile",
+        "compatibility_ref": null,
+        "maturity_ref": "nix-test-profile"
+      }
+    },
+    {
+      "item_id": "MATURITY:nodejs-runtime-profile",
+      "sources": [
+        "docs/v0-10-backlog-consolidation.md",
+        "skills/README.md"
+      ],
+      "inherited_class": "PROVISIONAL_MATURITY",
+      "closure_phase": "V0110-B",
+      "allowed_outcomes": [
+        "STABLE",
+        "PROVISIONAL_MAINTENANCE",
+        "DEPRECATED_OR_SUPERSEDED"
+      ],
+      "prerequisites": [
+        "Individual nodejs-runtime-profile decision covering repeated_positive_use, representative_non_triggers, defect_debt_disposition, rollback, provenance, independent_review, current_validation."
+      ],
+      "trigger_ref": null,
+      "consequence": "No undifferentiated future maturity backlog; preserve exact blocking debts.",
+      "status": "PROVISIONAL_MAINTENANCE",
+      "disposition": {
+        "decision_ref": "docs/governance/maturity/apg139/decisions/nodejs-runtime-profile.json",
+        "review_ref": "docs/governance/maturity/apg139/independent-review.md",
+        "qualification_refs": [
+          "docs/governance/maturity/apg139/qualification.md"
+        ],
+        "rationale": "Retain this useful owner. The inspected calibration, fixture and isolated guidance applications do not establish a complete independently reviewed individual stable-promotion case. APG-local actual use can satisfy the policy; neither another repository nor comparative A/B evidence is required. The supplied independent pre-final review supports retention; terminal binding is owned by closeout.",
+        "maintenance_ref": "MATURITY:nodejs-runtime-profile",
+        "compatibility_ref": null,
+        "maturity_ref": "nodejs-runtime-profile"
+      }
+    },
+    {
+      "item_id": "MATURITY:npm-package-manager-profile",
+      "sources": [
+        "docs/v0-10-backlog-consolidation.md",
+        "skills/README.md"
+      ],
+      "inherited_class": "PROVISIONAL_MATURITY",
+      "closure_phase": "V0110-B",
+      "allowed_outcomes": [
+        "STABLE",
+        "PROVISIONAL_MAINTENANCE",
+        "DEPRECATED_OR_SUPERSEDED"
+      ],
+      "prerequisites": [
+        "Individual npm-package-manager-profile decision covering repeated_positive_use, representative_non_triggers, defect_debt_disposition, rollback, provenance, independent_review, current_validation."
+      ],
+      "trigger_ref": null,
+      "consequence": "No undifferentiated future maturity backlog; preserve exact blocking debts.",
+      "status": "PROVISIONAL_MAINTENANCE",
+      "disposition": {
+        "decision_ref": "docs/governance/maturity/apg139/decisions/npm-package-manager-profile.json",
+        "review_ref": "docs/governance/maturity/apg139/independent-review.md",
+        "qualification_refs": [
+          "docs/governance/maturity/apg139/qualification.md"
+        ],
+        "rationale": "Retain this useful owner. The cited scope and qualification evidence does not establish a complete independently reviewed individual promotion case; the named guidance-use and boundary evidence remains to be supplied or identified. Weak promotion evidence is not a reason for deprecation. The supplied independent pre-final review supports retention; terminal binding is owned by closeout.",
+        "maintenance_ref": "MATURITY:npm-package-manager-profile",
+        "compatibility_ref": null,
+        "maturity_ref": "npm-package-manager-profile"
+      }
+    },
+    {
+      "item_id": "MATURITY:playwright-test-profile",
+      "sources": [
+        "docs/v0-10-backlog-consolidation.md",
+        "skills/README.md"
+      ],
+      "inherited_class": "PROVISIONAL_MATURITY",
+      "closure_phase": "V0110-B",
+      "allowed_outcomes": [
+        "STABLE",
+        "PROVISIONAL_MAINTENANCE",
+        "DEPRECATED_OR_SUPERSEDED"
+      ],
+      "prerequisites": [
+        "Individual playwright-test-profile decision covering repeated_positive_use, representative_non_triggers, defect_debt_disposition, rollback, provenance, independent_review, current_validation."
+      ],
+      "trigger_ref": null,
+      "consequence": "No undifferentiated future maturity backlog; preserve exact blocking debts.",
+      "status": "PROVISIONAL_MAINTENANCE",
+      "disposition": {
+        "decision_ref": "docs/governance/maturity/apg139/decisions/playwright-test-profile.json",
+        "review_ref": "docs/governance/maturity/apg139/independent-review.md",
+        "qualification_refs": [
+          "docs/governance/maturity/apg139/qualification.md"
+        ],
+        "rationale": "Retain the selected framework owner. Historical authored scenarios and bounded static guidance application are relevant but do not supply a complete individually reviewed repeated-use and non-trigger promotion case. Additional repositories are not required; APG tasks can supply the missing evidence. The supplied independent pre-final review supports retention; terminal binding is owned by closeout.",
+        "maintenance_ref": "MATURITY:playwright-test-profile",
+        "compatibility_ref": null,
+        "maturity_ref": "playwright-test-profile"
+      }
+    },
+    {
+      "item_id": "MATURITY:postgresql-database-profile",
+      "sources": [
+        "docs/v0-10-backlog-consolidation.md",
+        "skills/README.md"
+      ],
+      "inherited_class": "PROVISIONAL_MATURITY",
+      "closure_phase": "V0110-B",
+      "allowed_outcomes": [
+        "STABLE",
+        "PROVISIONAL_MAINTENANCE",
+        "DEPRECATED_OR_SUPERSEDED"
+      ],
+      "prerequisites": [
+        "Individual postgresql-database-profile decision covering repeated_positive_use, representative_non_triggers, defect_debt_disposition, rollback, provenance, independent_review, current_validation."
+      ],
+      "trigger_ref": null,
+      "consequence": "No undifferentiated future maturity backlog; preserve exact blocking debts.",
+      "status": "PROVISIONAL_MAINTENANCE",
+      "disposition": {
+        "decision_ref": "docs/governance/maturity/apg139/decisions/postgresql-database-profile.json",
+        "review_ref": "docs/governance/maturity/apg139/independent-review.md",
+        "qualification_refs": [
+          "docs/governance/maturity/apg139/qualification.md"
+        ],
+        "rationale": "Retain this useful owner. The inspected calibration, fixture and isolated guidance applications do not establish a complete independently reviewed individual stable-promotion case. APG-local actual use can satisfy the policy; neither another repository nor comparative A/B evidence is required. The supplied independent pre-final review supports retention; terminal binding is owned by closeout.",
+        "maintenance_ref": "MATURITY:postgresql-database-profile",
+        "compatibility_ref": null,
+        "maturity_ref": "postgresql-database-profile"
+      }
+    },
+    {
+      "item_id": "MATURITY:pytest-test-profile",
+      "sources": [
+        "docs/v0-10-backlog-consolidation.md",
+        "skills/README.md"
+      ],
+      "inherited_class": "PROVISIONAL_MATURITY",
+      "closure_phase": "V0110-B",
+      "allowed_outcomes": [
+        "STABLE",
+        "PROVISIONAL_MAINTENANCE",
+        "DEPRECATED_OR_SUPERSEDED"
+      ],
+      "prerequisites": [
+        "Individual pytest-test-profile decision covering repeated_positive_use, representative_non_triggers, defect_debt_disposition, rollback, provenance, independent_review, current_validation."
+      ],
+      "trigger_ref": null,
+      "consequence": "No undifferentiated future maturity backlog; preserve exact blocking debts.",
+      "status": "PROVISIONAL_MAINTENANCE",
+      "disposition": {
+        "decision_ref": "docs/governance/maturity/apg139/decisions/pytest-test-profile.json",
+        "review_ref": "docs/governance/maturity/apg139/independent-review.md",
+        "qualification_refs": [
+          "docs/governance/maturity/apg139/qualification.md"
+        ],
+        "rationale": "Retain the selected framework owner. Historical authored scenarios and bounded static guidance application are relevant but do not supply a complete individually reviewed repeated-use and non-trigger promotion case. Additional repositories are not required; APG tasks can supply the missing evidence. The supplied independent pre-final review supports retention; terminal binding is owned by closeout.",
+        "maintenance_ref": "MATURITY:pytest-test-profile",
+        "compatibility_ref": null,
+        "maturity_ref": "pytest-test-profile"
+      }
+    },
+    {
+      "item_id": "MATURITY:react-component-profile",
+      "sources": [
+        "docs/v0-10-backlog-consolidation.md",
+        "skills/README.md"
+      ],
+      "inherited_class": "PROVISIONAL_MATURITY",
+      "closure_phase": "V0110-B",
+      "allowed_outcomes": [
+        "STABLE",
+        "PROVISIONAL_MAINTENANCE",
+        "DEPRECATED_OR_SUPERSEDED"
+      ],
+      "prerequisites": [
+        "Individual react-component-profile decision covering repeated_positive_use, representative_non_triggers, defect_debt_disposition, rollback, provenance, independent_review, current_validation."
+      ],
+      "trigger_ref": null,
+      "consequence": "No undifferentiated future maturity backlog; preserve exact blocking debts.",
+      "status": "PROVISIONAL_MAINTENANCE",
+      "disposition": {
+        "decision_ref": "docs/governance/maturity/apg139/decisions/react-component-profile.json",
+        "review_ref": "docs/governance/maturity/apg139/independent-review.md",
+        "qualification_refs": [
+          "docs/governance/maturity/apg139/qualification.md"
+        ],
+        "rationale": "Retain this useful owner. The cited scope and qualification evidence does not establish a complete independently reviewed individual promotion case; the named guidance-use and boundary evidence remains to be supplied or identified. Weak promotion evidence is not a reason for deprecation. The supplied independent pre-final review supports retention; terminal binding is owned by closeout.",
+        "maintenance_ref": "MATURITY:react-component-profile",
+        "compatibility_ref": null,
+        "maturity_ref": "react-component-profile"
+      }
+    },
+    {
+      "item_id": "MATURITY:ruby-language-profile",
+      "sources": [
+        "docs/v0-10-backlog-consolidation.md",
+        "skills/README.md"
+      ],
+      "inherited_class": "PROVISIONAL_MATURITY",
+      "closure_phase": "V0110-B",
+      "allowed_outcomes": [
+        "STABLE",
+        "PROVISIONAL_MAINTENANCE",
+        "DEPRECATED_OR_SUPERSEDED"
+      ],
+      "prerequisites": [
+        "Individual ruby-language-profile decision covering repeated_positive_use, representative_non_triggers, defect_debt_disposition, rollback, provenance, independent_review, current_validation."
+      ],
+      "trigger_ref": null,
+      "consequence": "No undifferentiated future maturity backlog; preserve exact blocking debts.",
+      "status": "PROVISIONAL_MAINTENANCE",
+      "disposition": {
+        "decision_ref": "docs/governance/maturity/apg139/decisions/ruby-language-profile.json",
+        "review_ref": "docs/governance/maturity/apg139/independent-review.md",
+        "qualification_refs": [
+          "docs/governance/maturity/apg139/qualification.md"
+        ],
+        "rationale": "Retain this useful owner. The inspected calibration, fixture and isolated guidance applications do not establish a complete independently reviewed individual stable-promotion case. APG-local actual use can satisfy the policy; neither another repository nor comparative A/B evidence is required. The supplied independent pre-final review supports retention; terminal binding is owned by closeout.",
+        "maintenance_ref": "MATURITY:ruby-language-profile",
+        "compatibility_ref": null,
+        "maturity_ref": "ruby-language-profile"
+      }
+    },
+    {
+      "item_id": "MATURITY:sqlite-database-profile",
+      "sources": [
+        "docs/v0-10-backlog-consolidation.md",
+        "skills/README.md"
+      ],
+      "inherited_class": "PROVISIONAL_MATURITY",
+      "closure_phase": "V0110-B",
+      "allowed_outcomes": [
+        "STABLE",
+        "PROVISIONAL_MAINTENANCE",
+        "DEPRECATED_OR_SUPERSEDED"
+      ],
+      "prerequisites": [
+        "Individual sqlite-database-profile decision covering repeated_positive_use, representative_non_triggers, defect_debt_disposition, rollback, provenance, independent_review, current_validation."
+      ],
+      "trigger_ref": null,
+      "consequence": "No undifferentiated future maturity backlog; preserve exact blocking debts.",
+      "status": "PROVISIONAL_MAINTENANCE",
+      "disposition": {
+        "decision_ref": "docs/governance/maturity/apg139/decisions/sqlite-database-profile.json",
+        "review_ref": "docs/governance/maturity/apg139/independent-review.md",
+        "qualification_refs": [
+          "docs/governance/maturity/apg139/qualification.md"
+        ],
+        "rationale": "Retain this useful owner. The inspected calibration, fixture and isolated guidance applications do not establish a complete independently reviewed individual stable-promotion case. APG-local actual use can satisfy the policy; neither another repository nor comparative A/B evidence is required. The supplied independent pre-final review supports retention; terminal binding is owned by closeout.",
+        "maintenance_ref": "MATURITY:sqlite-database-profile",
+        "compatibility_ref": null,
+        "maturity_ref": "sqlite-database-profile"
+      }
+    },
+    {
+      "item_id": "MATURITY:svg-language-profile",
+      "sources": [
+        "docs/v0-10-backlog-consolidation.md",
+        "skills/README.md"
+      ],
+      "inherited_class": "PROVISIONAL_MATURITY",
+      "closure_phase": "V0110-B",
+      "allowed_outcomes": [
+        "STABLE",
+        "PROVISIONAL_MAINTENANCE",
+        "DEPRECATED_OR_SUPERSEDED"
+      ],
+      "prerequisites": [
+        "Individual svg-language-profile decision covering repeated_positive_use, representative_non_triggers, defect_debt_disposition, rollback, provenance, independent_review, current_validation."
+      ],
+      "trigger_ref": null,
+      "consequence": "No undifferentiated future maturity backlog; preserve exact blocking debts.",
+      "status": "PROVISIONAL_MAINTENANCE",
+      "disposition": {
+        "decision_ref": "docs/governance/maturity/apg139/decisions/svg-language-profile.json",
+        "review_ref": "docs/governance/maturity/apg139/independent-review.md",
+        "qualification_refs": [
+          "docs/governance/maturity/apg139/qualification.md"
+        ],
+        "rationale": "Retain this useful owner. The cited scope and qualification evidence does not establish a complete independently reviewed individual promotion case; the named guidance-use and boundary evidence remains to be supplied or identified. Weak promotion evidence is not a reason for deprecation. The supplied independent pre-final review supports retention; terminal binding is owned by closeout.",
+        "maintenance_ref": "MATURITY:svg-language-profile",
+        "compatibility_ref": null,
+        "maturity_ref": "svg-language-profile"
+      }
+    },
+    {
+      "item_id": "MATURITY:typescript-language-profile",
+      "sources": [
+        "docs/v0-10-backlog-consolidation.md",
+        "skills/README.md"
+      ],
+      "inherited_class": "PROVISIONAL_MATURITY",
+      "closure_phase": "V0110-B",
+      "allowed_outcomes": [
+        "STABLE",
+        "PROVISIONAL_MAINTENANCE",
+        "DEPRECATED_OR_SUPERSEDED"
+      ],
+      "prerequisites": [
+        "Individual typescript-language-profile decision covering repeated_positive_use, representative_non_triggers, defect_debt_disposition, rollback, provenance, independent_review, current_validation."
+      ],
+      "trigger_ref": null,
+      "consequence": "No undifferentiated future maturity backlog; preserve exact blocking debts.",
+      "status": "PROVISIONAL_MAINTENANCE",
+      "disposition": {
+        "decision_ref": "docs/governance/maturity/apg139/decisions/typescript-language-profile.json",
+        "review_ref": "docs/governance/maturity/apg139/independent-review.md",
+        "qualification_refs": [
+          "docs/governance/maturity/apg139/qualification.md"
+        ],
+        "rationale": "Retain this useful owner. The inspected calibration, fixture and isolated guidance applications do not establish a complete independently reviewed individual stable-promotion case. APG-local actual use can satisfy the policy; neither another repository nor comparative A/B evidence is required. The supplied independent pre-final review supports retention; terminal binding is owned by closeout.",
+        "maintenance_ref": "MATURITY:typescript-language-profile",
+        "compatibility_ref": null,
+        "maturity_ref": "typescript-language-profile"
+      }
+    },
+    {
+      "item_id": "MATURITY:vagrantfile-profile",
+      "sources": [
+        "docs/v0-10-backlog-consolidation.md",
+        "skills/README.md"
+      ],
+      "inherited_class": "PROVISIONAL_MATURITY",
+      "closure_phase": "V0110-B",
+      "allowed_outcomes": [
+        "STABLE",
+        "PROVISIONAL_MAINTENANCE",
+        "DEPRECATED_OR_SUPERSEDED"
+      ],
+      "prerequisites": [
+        "Individual vagrantfile-profile decision covering repeated_positive_use, representative_non_triggers, defect_debt_disposition, rollback, provenance, independent_review, current_validation."
+      ],
+      "trigger_ref": null,
+      "consequence": "No undifferentiated future maturity backlog; preserve exact blocking debts.",
+      "status": "PROVISIONAL_MAINTENANCE",
+      "disposition": {
+        "decision_ref": "docs/governance/maturity/apg139/decisions/vagrantfile-profile.json",
+        "review_ref": "docs/governance/maturity/apg139/independent-review.md",
+        "qualification_refs": [
+          "docs/governance/maturity/apg139/qualification.md"
+        ],
+        "rationale": "Retain this useful owner. The inspected calibration, fixture and isolated guidance applications do not establish a complete independently reviewed individual stable-promotion case. APG-local actual use can satisfy the policy; neither another repository nor comparative A/B evidence is required. The supplied independent pre-final review supports retention; terminal binding is owned by closeout.",
+        "maintenance_ref": "MATURITY:vagrantfile-profile",
+        "compatibility_ref": null,
+        "maturity_ref": "vagrantfile-profile"
+      }
+    },
+    {
+      "item_id": "MATURITY:vite-build-profile",
+      "sources": [
+        "docs/v0-10-backlog-consolidation.md",
+        "skills/README.md"
+      ],
+      "inherited_class": "PROVISIONAL_MATURITY",
+      "closure_phase": "V0110-B",
+      "allowed_outcomes": [
+        "STABLE",
+        "PROVISIONAL_MAINTENANCE",
+        "DEPRECATED_OR_SUPERSEDED"
+      ],
+      "prerequisites": [
+        "Individual vite-build-profile decision covering repeated_positive_use, representative_non_triggers, defect_debt_disposition, rollback, provenance, independent_review, current_validation."
+      ],
+      "trigger_ref": null,
+      "consequence": "No undifferentiated future maturity backlog; preserve exact blocking debts.",
+      "status": "PROVISIONAL_MAINTENANCE",
+      "disposition": {
+        "decision_ref": "docs/governance/maturity/apg139/decisions/vite-build-profile.json",
+        "review_ref": "docs/governance/maturity/apg139/independent-review.md",
+        "qualification_refs": [
+          "docs/governance/maturity/apg139/qualification.md"
+        ],
+        "rationale": "Retain this useful owner. The cited scope and qualification evidence does not establish a complete independently reviewed individual promotion case; the named guidance-use and boundary evidence remains to be supplied or identified. Weak promotion evidence is not a reason for deprecation. The supplied independent pre-final review supports retention; terminal binding is owned by closeout.",
+        "maintenance_ref": "MATURITY:vite-build-profile",
+        "compatibility_ref": null,
+        "maturity_ref": "vite-build-profile"
+      }
+    },
+    {
+      "item_id": "MATURITY:vitest-test-profile",
+      "sources": [
+        "docs/v0-10-backlog-consolidation.md",
+        "skills/README.md"
+      ],
+      "inherited_class": "PROVISIONAL_MATURITY",
+      "closure_phase": "V0110-B",
+      "allowed_outcomes": [
+        "STABLE",
+        "PROVISIONAL_MAINTENANCE",
+        "DEPRECATED_OR_SUPERSEDED"
+      ],
+      "prerequisites": [
+        "Individual vitest-test-profile decision covering repeated_positive_use, representative_non_triggers, defect_debt_disposition, rollback, provenance, independent_review, current_validation."
+      ],
+      "trigger_ref": null,
+      "consequence": "No undifferentiated future maturity backlog; preserve exact blocking debts.",
+      "status": "PROVISIONAL_MAINTENANCE",
+      "disposition": {
+        "decision_ref": "docs/governance/maturity/apg139/decisions/vitest-test-profile.json",
+        "review_ref": "docs/governance/maturity/apg139/independent-review.md",
+        "qualification_refs": [
+          "docs/governance/maturity/apg139/qualification.md"
+        ],
+        "rationale": "Retain the selected framework owner. Historical authored scenarios and bounded static guidance application are relevant but do not supply a complete individually reviewed repeated-use and non-trigger promotion case. Additional repositories are not required; APG tasks can supply the missing evidence. The supplied independent pre-final review supports retention; terminal binding is owned by closeout.",
+        "maintenance_ref": "MATURITY:vitest-test-profile",
+        "compatibility_ref": null,
+        "maturity_ref": "vitest-test-profile"
+      }
+    },
+    {
+      "item_id": "MATURITY:web-accessibility-profile",
+      "sources": [
+        "docs/v0-10-backlog-consolidation.md",
+        "skills/README.md"
+      ],
+      "inherited_class": "PROVISIONAL_MATURITY",
+      "closure_phase": "V0110-B",
+      "allowed_outcomes": [
+        "STABLE",
+        "PROVISIONAL_MAINTENANCE",
+        "DEPRECATED_OR_SUPERSEDED"
+      ],
+      "prerequisites": [
+        "Individual web-accessibility-profile decision covering repeated_positive_use, representative_non_triggers, defect_debt_disposition, rollback, provenance, independent_review, current_validation."
+      ],
+      "trigger_ref": null,
+      "consequence": "No undifferentiated future maturity backlog; preserve exact blocking debts.",
+      "status": "PROVISIONAL_MAINTENANCE",
+      "disposition": {
+        "decision_ref": "docs/governance/maturity/apg139/decisions/web-accessibility-profile.json",
+        "review_ref": "docs/governance/maturity/apg139/independent-review.md",
+        "qualification_refs": [
+          "docs/governance/maturity/apg139/qualification.md"
+        ],
+        "rationale": "Retain this useful owner. The cited scope and qualification evidence does not establish a complete independently reviewed individual promotion case; the named guidance-use and boundary evidence remains to be supplied or identified. Weak promotion evidence is not a reason for deprecation. The supplied independent pre-final review supports retention; terminal binding is owned by closeout.",
+        "maintenance_ref": "MATURITY:web-accessibility-profile",
+        "compatibility_ref": null,
+        "maturity_ref": "web-accessibility-profile"
+      }
+    },
+    {
+      "item_id": "RM-S0",
+      "sources": [
+        "docs/repo-map-support-roadmap.md"
+      ],
+      "inherited_class": "EXTERNAL_GATE",
+      "closure_phase": "V0110-C",
+      "allowed_outcomes": [
+        "DELIVERED",
+        "REJECTED",
+        "CONSUMER_HANDOFF_CLOSED"
+      ],
+      "prerequisites": [
+        "Complete RM-S0 contract/gap and ownership disposition under V0110-C, with source-bound fixtures and explicit limitations."
+      ],
+      "trigger_ref": null,
+      "consequence": "Close provider support scope into compatibility maintenance without claiming external adoption.",
+      "status": "DELIVERED",
+      "disposition": {
+        "decision_ref": "docs/governance/external/apg140/decisions/RM-S0.json",
+        "qualification_refs": [
+          "docs/governance/external/apg140/qualification.md",
+          "docs/governance/external/apg140/source-inventory.md",
+          "docs/governance/external/apg140/decisions.md"
+        ],
+        "review_ref": "docs/governance/external/apg140/independent-review.md",
+        "rationale": "APG140 RM-S0 source-bound outcome: DELIVERED; see item-specific reasoning in decisions.md.",
+        "maintenance_ref": null,
+        "compatibility_ref": null,
+        "maturity_ref": null
+      }
+    },
+    {
+      "item_id": "RM-S1",
+      "sources": [
+        "docs/repo-map-support-roadmap.md"
+      ],
+      "inherited_class": "EXTERNAL_GATE",
+      "closure_phase": "V0110-C",
+      "allowed_outcomes": [
+        "DELIVERED",
+        "REJECTED",
+        "CONSUMER_HANDOFF_CLOSED"
+      ],
+      "prerequisites": [
+        "Complete RM-S1 contract/gap and ownership disposition under V0110-C, with source-bound fixtures and explicit limitations."
+      ],
+      "trigger_ref": null,
+      "consequence": "Close provider support scope into compatibility maintenance without claiming external adoption.",
+      "status": "REJECTED",
+      "disposition": {
+        "decision_ref": "docs/governance/external/apg140/decisions/RM-S1.json",
+        "qualification_refs": [
+          "docs/governance/external/apg140/qualification.md",
+          "docs/governance/external/apg140/source-inventory.md",
+          "docs/governance/external/apg140/decisions.md"
+        ],
+        "review_ref": "docs/governance/external/apg140/independent-review.md",
+        "rationale": "APG140 RM-S1 source-bound outcome: REJECTED; see item-specific reasoning in decisions.md.",
+        "maintenance_ref": null,
+        "compatibility_ref": null,
+        "maturity_ref": null
+      }
+    },
+    {
+      "item_id": "RM-S2",
+      "sources": [
+        "docs/repo-map-support-roadmap.md"
+      ],
+      "inherited_class": "EXTERNAL_GATE",
+      "closure_phase": "V0110-C",
+      "allowed_outcomes": [
+        "DELIVERED",
+        "REJECTED",
+        "CONSUMER_HANDOFF_CLOSED"
+      ],
+      "prerequisites": [
+        "Complete RM-S2 contract/gap and ownership disposition under V0110-C, with source-bound fixtures and explicit limitations."
+      ],
+      "trigger_ref": null,
+      "consequence": "Close provider support scope into compatibility maintenance without claiming external adoption.",
+      "status": "REJECTED",
+      "disposition": {
+        "decision_ref": "docs/governance/external/apg140/decisions/RM-S2.json",
+        "qualification_refs": [
+          "docs/governance/external/apg140/qualification.md",
+          "docs/governance/external/apg140/source-inventory.md",
+          "docs/governance/external/apg140/decisions.md"
+        ],
+        "review_ref": "docs/governance/external/apg140/independent-review.md",
+        "rationale": "APG140 RM-S2 source-bound outcome: REJECTED; see item-specific reasoning in decisions.md.",
+        "maintenance_ref": null,
+        "compatibility_ref": null,
+        "maturity_ref": null
+      }
+    },
+    {
+      "item_id": "RM-S3",
+      "sources": [
+        "docs/repo-map-support-roadmap.md"
+      ],
+      "inherited_class": "EXTERNAL_GATE",
+      "closure_phase": "V0110-C",
+      "allowed_outcomes": [
+        "DELIVERED",
+        "REJECTED",
+        "CONSUMER_HANDOFF_CLOSED"
+      ],
+      "prerequisites": [
+        "Complete RM-S3 contract/gap and ownership disposition under V0110-C, with source-bound fixtures and explicit limitations."
+      ],
+      "trigger_ref": null,
+      "consequence": "Close provider support scope into compatibility maintenance without claiming external adoption.",
+      "status": "REJECTED",
+      "disposition": {
+        "decision_ref": "docs/governance/external/apg140/decisions/RM-S3.json",
+        "qualification_refs": [
+          "docs/governance/external/apg140/qualification.md",
+          "docs/governance/external/apg140/source-inventory.md",
+          "docs/governance/external/apg140/decisions.md"
+        ],
+        "review_ref": "docs/governance/external/apg140/independent-review.md",
+        "rationale": "APG140 RM-S3 source-bound outcome: REJECTED; see item-specific reasoning in decisions.md.",
+        "maintenance_ref": null,
+        "compatibility_ref": null,
+        "maturity_ref": null
+      }
+    },
+    {
+      "item_id": "RM-S4",
+      "sources": [
+        "docs/repo-map-support-roadmap.md"
+      ],
+      "inherited_class": "EXTERNAL_GATE",
+      "closure_phase": "V0110-C",
+      "allowed_outcomes": [
+        "DELIVERED",
+        "REJECTED",
+        "CONSUMER_HANDOFF_CLOSED"
+      ],
+      "prerequisites": [
+        "Complete RM-S4 contract/gap and ownership disposition under V0110-C, with source-bound fixtures and explicit limitations."
+      ],
+      "trigger_ref": null,
+      "consequence": "Close provider support scope into compatibility maintenance without claiming external adoption.",
+      "status": "DELIVERED",
+      "disposition": {
+        "decision_ref": "docs/governance/external/apg140/decisions/RM-S4.json",
+        "qualification_refs": [
+          "docs/governance/external/apg140/qualification.md",
+          "docs/governance/external/apg140/source-inventory.md",
+          "docs/governance/external/apg140/decisions.md"
+        ],
+        "review_ref": "docs/governance/external/apg140/independent-review.md",
+        "rationale": "APG140 RM-S4 source-bound outcome: DELIVERED; see item-specific reasoning in decisions.md.",
+        "maintenance_ref": null,
+        "compatibility_ref": null,
+        "maturity_ref": null
+      }
+    },
+    {
+      "item_id": "RM-S5",
+      "sources": [
+        "docs/repo-map-support-roadmap.md"
+      ],
+      "inherited_class": "EXTERNAL_GATE",
+      "closure_phase": "V0110-C",
+      "allowed_outcomes": [
+        "DELIVERED",
+        "REJECTED",
+        "CONSUMER_HANDOFF_CLOSED"
+      ],
+      "prerequisites": [
+        "Complete RM-S5 contract/gap and ownership disposition under V0110-C, with source-bound fixtures and explicit limitations."
+      ],
+      "trigger_ref": null,
+      "consequence": "Close provider support scope into compatibility maintenance without claiming external adoption.",
+      "status": "DELIVERED",
+      "disposition": {
+        "decision_ref": "docs/governance/external/apg140/decisions/RM-S5.json",
+        "qualification_refs": [
+          "docs/governance/external/apg140/qualification.md",
+          "docs/governance/external/apg140/source-inventory.md",
+          "docs/governance/external/apg140/decisions.md"
+        ],
+        "review_ref": "docs/governance/external/apg140/independent-review.md",
+        "rationale": "APG140 RM-S5 source-bound outcome: DELIVERED; see item-specific reasoning in decisions.md.",
+        "maintenance_ref": null,
+        "compatibility_ref": null,
+        "maturity_ref": null
+      }
+    },
+    {
+      "item_id": "SKILL-KG-QUALITY",
+      "sources": [
+        "docs/v0-10-backlog-consolidation.md",
+        "docs/v0-9-roadmap.md"
+      ],
+      "inherited_class": "EXTERNAL_GATE",
+      "closure_phase": "V0110-C",
+      "allowed_outcomes": [
+        "DELIVERED",
+        "REJECTED"
+      ],
+      "prerequisites": [
+        "Accepted and source-bound multi-source publication/integration qualification for the exact proposed profile contract."
+      ],
+      "trigger_ref": null,
+      "consequence": "Mechanical check pass; graph node/edge quality, provenance, and claim strength assertion fixtures",
+      "status": "REJECTED",
+      "disposition": {
+        "decision_ref": "docs/governance/external/apg140/decisions/SKILL-KG-QUALITY.json",
+        "qualification_refs": [
+          "docs/governance/external/apg140/qualification.md",
+          "docs/governance/external/apg140/source-inventory.md",
+          "docs/governance/external/apg140/decisions.md"
+        ],
+        "review_ref": "docs/governance/external/apg140/independent-review.md",
+        "rationale": "APG140 SKILL-KG-QUALITY source-bound outcome: REJECTED; see item-specific reasoning in decisions.md.",
+        "maintenance_ref": null,
+        "compatibility_ref": null,
+        "maturity_ref": null
+      }
+    },
+    {
+      "item_id": "SKILL-MIGRATION",
+      "sources": [
+        "docs/v0-10-backlog-consolidation.md",
+        "docs/v0-9-roadmap.md"
+      ],
+      "inherited_class": "CONDITION_TRIGGERED",
+      "closure_phase": "V0110-C",
+      "allowed_outcomes": [
+        "DELIVERED",
+        "REJECTED"
+      ],
+      "prerequisites": [
+        "Demonstration that existing process skills (`designing-significant-changes`, `planning-repository-work`, `implementing-with-test-discipline`, `converting-bash-scripts-to-python`, `synthesizing-repository-guidance`) leave a demonstrable gap"
+      ],
+      "trigger_ref": "SKILL-MIGRATION",
+      "consequence": "Demonstrable gap evidence across multi-language migration scenarios that cannot be resolved by composing existing process skills",
+      "status": "REJECTED",
+      "disposition": {
+        "decision_ref": "docs/governance/external/apg140/decisions/SKILL-MIGRATION.json",
+        "qualification_refs": [
+          "docs/governance/external/apg140/qualification.md",
+          "docs/governance/external/apg140/source-inventory.md",
+          "docs/governance/external/apg140/decisions.md"
+        ],
+        "review_ref": "docs/governance/external/apg140/independent-review.md",
+        "rationale": "APG140 SKILL-MIGRATION source-bound outcome: REJECTED; see item-specific reasoning in decisions.md.",
+        "maintenance_ref": null,
+        "compatibility_ref": null,
+        "maturity_ref": null
+      }
+    },
+    {
+      "item_id": "SKILL-VER-PROTO",
+      "sources": [
+        "docs/v0-10-backlog-consolidation.md",
+        "docs/v0-9-roadmap.md"
+      ],
+      "inherited_class": "EXTERNAL_GATE",
+      "closure_phase": "V0110-C",
+      "allowed_outcomes": [
+        "DELIVERED",
+        "REJECTED"
+      ],
+      "prerequisites": [
+        "Accepted and source-bound multi-source publication/integration qualification for the exact proposed profile contract."
+      ],
+      "trigger_ref": null,
+      "consequence": "Mechanical check pass; wire vs semantic contract separation fixtures; backwards compatibility verification",
+      "status": "REJECTED",
+      "disposition": {
+        "decision_ref": "docs/governance/external/apg140/decisions/SKILL-VER-PROTO.json",
+        "qualification_refs": [
+          "docs/governance/external/apg140/qualification.md",
+          "docs/governance/external/apg140/source-inventory.md",
+          "docs/governance/external/apg140/decisions.md"
+        ],
+        "review_ref": "docs/governance/external/apg140/independent-review.md",
+        "rationale": "APG140 SKILL-VER-PROTO source-bound outcome: REJECTED; see item-specific reasoning in decisions.md.",
+        "maintenance_ref": null,
+        "compatibility_ref": null,
+        "maturity_ref": null
+      }
+    }
+  ],
+  "historical_exclusions": [
+    "APGR-CAP1",
+    "APGR-CXT-FOOTPRINT",
+    "APGR-DEBT-JS-QD-001",
+    "APGR-DEBT-JS-QD-002",
+    "APGR-DEBT-JS-QD-003",
+    "APGR-DEBT-JS-QD-004",
+    "APGR-PUBLICATION-LINT",
+    "APGR-REPORT-GO",
+    "APGR-REPORT-IDEMPOTENCY",
+    "APGR-REPORT-OPS-SEMANTICS",
+    "APGR-REPORT-STALELOCK",
+    "APGR-REPORT-VERIFIER",
+    "SKILL-A11Y",
+    "SKILL-BROWSER",
+    "SKILL-NPM-PKG",
+    "SKILL-PLAYWRIGHT",
+    "SKILL-SVG",
+    "SKILL-VITE"
+  ]
+}

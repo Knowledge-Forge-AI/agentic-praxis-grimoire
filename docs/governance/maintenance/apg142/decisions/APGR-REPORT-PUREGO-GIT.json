@@ -1,0 +1,19 @@
+{
+  "schema_version": "apg.roadmap-decision/v1",
+  "item_id": "APGR-REPORT-PUREGO-GIT",
+  "outcome": "MAINTENANCE_TRIGGER",
+  "closure_phase": "V0110-E",
+  "author": "APG142 producer",
+  "reviewer": "Dispatcher-supplied APG142 independent pre-final reviewer",
+  "evidence": {
+    "trigger_observation": [
+      "docs/governance/maintenance/apg142/purego-git.md"
+    ],
+    "refresh_procedure": [
+      "docs/governance/maintenance/apg142/purego-git.md"
+    ],
+    "independent_review": [
+      "docs/governance/maintenance/apg142/work-review.md"
+    ]
+  }
+}

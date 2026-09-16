@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import hashlib
+import json
 import os
 from pathlib import Path
 import shutil
@@ -62,9 +64,7 @@ def test_python_skill_bridge_matches_oracle_and_routes_new_go_surfaces(
     capfd: pytest.CaptureFixture[str],
 ) -> None:
     monkeypatch.syspath_prepend(os.fspath(ROOT / "src"))
-    monkeypatch.syspath_prepend(os.fspath(ROOT / "private/oracles"))
     from agentic_praxis_grimoire import cli
-    import skills
 
     binary = tmp_path / "apgr"
     built = subprocess.run(
@@ -79,16 +79,17 @@ def test_python_skill_bridge_matches_oracle_and_routes_new_go_surfaces(
     assert built.returncode == 0, built.stderr
     monkeypatch.setenv("APGR_GO_BINARY", os.fspath(binary))
 
-    for action, arguments in (
-        ("list", ["--format", "json"]),
-        ("context-report", []),
-        ("context-report", ["--format", "text"]),
-    ):
-        assert skills.main(action, arguments) == 0
-        oracle = capfd.readouterr()
-        assert cli.main(["skills", action, *arguments]) == 0
+    # Public predecessor evidence replaces the private Python oracle. The
+    # fixture binds the published archive, binary, and exact output digests.
+    fixture = json.loads(
+        (ROOT / "testing/fixtures/skill-cli-compatibility.json").read_text()
+    )
+    assert fixture["source_release"] == "v0.10.0"
+    for case in fixture["cases"]:
+        assert cli.main(case["arguments"]) == 0
         delegated = capfd.readouterr()
-        assert delegated == oracle
+        assert hashlib.sha256(delegated.out.encode()).hexdigest() == case["stdout_sha256"]
+        assert hashlib.sha256(delegated.err.encode()).hexdigest() == case["stderr_sha256"]
 
     request = tmp_path / "request.json"
     request.write_text(

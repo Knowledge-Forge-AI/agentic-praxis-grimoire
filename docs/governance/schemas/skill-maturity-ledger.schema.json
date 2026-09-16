@@ -1,0 +1,219 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "skill-maturity-ledger",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "apg.maturity-ledger/v1",
+      "type": "string"
+    },
+    "release": {
+      "const": "v0.11",
+      "type": "string"
+    },
+    "owner_phase": {
+      "type": "string",
+      "minLength": 1
+    },
+    "skills": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "skill_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "current_maturity": {
+            "type": "string",
+            "enum": [
+              "stable",
+              "provisional",
+              "deprecated"
+            ]
+          },
+          "blocking_debts": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true
+          },
+          "debt_authority": {
+            "type": "string",
+            "const": "docs/governance/language-profile-known-debt.json"
+          },
+          "active_debts": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true
+          },
+          "resolved_debts": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true
+          },
+          "source_references": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true
+          },
+          "required_evidence_categories": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true
+          },
+          "evidence": {
+            "type": "object",
+            "properties": {
+              "repeated_positive_use": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "uniqueItems": true
+              },
+              "representative_non_triggers": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "uniqueItems": true
+              },
+              "defect_debt_disposition": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "uniqueItems": true
+              },
+              "rollback": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "uniqueItems": true
+              },
+              "provenance": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "uniqueItems": true
+              },
+              "independent_review": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "uniqueItems": true
+              },
+              "current_validation": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "uniqueItems": true
+              }
+            },
+            "required": [
+              "repeated_positive_use",
+              "representative_non_triggers",
+              "defect_debt_disposition",
+              "rollback",
+              "provenance",
+              "independent_review",
+              "current_validation"
+            ],
+            "additionalProperties": false
+          },
+          "independent_review": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "next_lifecycle_trigger": {
+            "type": "string",
+            "minLength": 1
+          },
+          "disposition_status": {
+            "type": "string",
+            "enum": [
+              "EXISTING_STABLE",
+              "PENDING_V0110_B",
+              "STABLE",
+              "PROVISIONAL_MAINTENANCE",
+              "DEPRECATED_OR_SUPERSEDED"
+            ]
+          },
+          "maintenance_ref": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "skill_id",
+          "path",
+          "current_maturity",
+          "blocking_debts",
+          "debt_authority",
+          "active_debts",
+          "resolved_debts",
+          "source_references",
+          "required_evidence_categories",
+          "evidence",
+          "independent_review",
+          "next_lifecycle_trigger",
+          "disposition_status",
+          "maintenance_ref"
+        ],
+        "additionalProperties": false
+      },
+      "uniqueItems": true
+    }
+  },
+  "required": [
+    "schema_version",
+    "release",
+    "owner_phase",
+    "skills"
+  ],
+  "additionalProperties": false
+}

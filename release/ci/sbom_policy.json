@@ -1,0 +1,194 @@
+{
+  "schema": "apg-sbom-policy-v1",
+  "product": "agentic-praxis-grimoire",
+  "scan": {
+    "source": {
+      "required_types": [
+        "go-module",
+        "npm"
+      ],
+      "required_catalogers": [
+        "go-module-file-cataloger",
+        "javascript-lock-cataloger",
+        "javascript-package-cataloger"
+      ],
+      "catalogers": "all",
+      "exclude": [
+        "**/.git/**",
+        "**/private/**",
+        "**/.scratch/**",
+        "**/build/**",
+        "**/dist/**",
+        "**/node_modules/**",
+        "**/.venv/**",
+        "**/__pycache__/**"
+      ]
+    },
+    "bundle": {
+      "checksum_file": "SHA256SUMS",
+      "manifest_file": "apg-distribution-manifest.json",
+      "go": {
+        "darwin-arm64": {
+          "binary": "go/darwin-arm64/apgr",
+          "manifest": "go/darwin-arm64/apgr.binary-manifest.json",
+          "target": "darwin/arm64"
+        },
+        "linux-amd64": {
+          "binary": "go/linux-amd64/apgr",
+          "manifest": "go/linux-amd64/apgr.binary-manifest.json",
+          "target": "linux/amd64"
+        },
+        "linux-arm64": {
+          "binary": "go/linux-arm64/apgr",
+          "manifest": "go/linux-arm64/apgr.binary-manifest.json",
+          "target": "linux/arm64"
+        }
+      },
+      "python": {
+        "directory": "python",
+        "wheel_glob": "*.whl",
+        "sdist_glob": "*.tar.gz",
+        "wheel_count": 3,
+        "sdist_count": 1
+      },
+      "npm": {
+        "directory": "npm",
+        "glob": "*.tgz",
+        "count": 4
+      }
+    },
+    "artifact_requirements": {
+      "go-binary": {
+        "required_types": [
+          "go-module"
+        ]
+      },
+      "python-wheel": {
+        "required_types": [
+          "go-module",
+          "python"
+        ],
+        "embedded_binary": "agentic_praxis_grimoire/bin/apgr"
+      },
+      "python-sdist": {
+        "required_types": [
+          "python"
+        ]
+      },
+      "npm-launcher": {
+        "required_types": [
+          "npm"
+        ]
+      },
+      "npm-platform": {
+        "required_types": [
+          "go-module",
+          "npm"
+        ],
+        "embedded_binary": "package/bin/apgr"
+      }
+    },
+    "scanner": {
+      "syft": {
+        "binary": "syft",
+        "config": "syft-task.yaml",
+        "version": "1.51.1"
+      },
+      "grype": {
+        "binary": "grype",
+        "config": "grype-task.yaml",
+        "version": "0.118.0",
+        "fail_on": "high",
+        "custom_ignores": []
+      },
+      "database": {
+        "relative_path": "db/6/vulnerability.db",
+        "identity_file": "database-identity.json",
+        "last_update_check": "db/6/last_update_check",
+        "max_age_hours": 120,
+        "require_update_check": true,
+        "validate_by_hash": true
+      }
+    },
+    "coverage": {
+      "required_source_types": [
+        "go-module",
+        "npm"
+      ],
+      "record_digests": true,
+      "require_nonempty_sbom": true,
+      "require_grype_database_identity": true,
+      "require_grype_update_success": true,
+      "blocking_severities": [
+        "high",
+        "critical"
+      ],
+      "no_custom_ignores": true,
+      "conditional_dependency_inventory": {
+        "path": "tools/ci/dependency_inventory.py",
+        "inventory": "runtime",
+        "source": "pyproject.toml",
+        "target_python": "3.10",
+        "required_package": "tomli",
+        "required_types": [
+          "python"
+        ]
+      }
+    }
+  },
+  "targets": {
+    "source": {
+      "type": "directory",
+      "path": ".",
+      "output_format": "spdx-json",
+      "artifact_name": "apgr-source-sbom.spdx.json",
+      "sbom_file": "build/sboms/source.spdx.json",
+      "scope": "all-source-files"
+    },
+    "deliverables": {
+      "python": {
+        "description": "APGR Python distribution packages (wheels and sdist)",
+        "build_command": "bin/apg-build-python-release-bundle",
+        "artifacts_dir": "dist",
+        "patterns": [
+          "*.whl",
+          "*.tar.gz"
+        ],
+        "output_format": "spdx-json",
+        "artifact_name": "apgr-python-deliverables-sbom.spdx.json",
+        "sbom_file": "build/sboms/python-deliverables.spdx.json"
+      },
+      "native_binaries": {
+        "description": "APGR native compiled Go CLI binaries",
+        "targets": [
+          {
+            "os": "darwin",
+            "arch": "arm64",
+            "binary": "apgr-darwin-arm64",
+            "path": "build/apgr-darwin-arm64",
+            "sbom_file": "build/sboms/apgr-darwin-arm64.spdx.json",
+            "build_command": "bin/apg-build-go-cli --target darwin/arm64 --output build/apgr-darwin-arm64"
+          },
+          {
+            "os": "linux",
+            "arch": "amd64",
+            "binary": "apgr-linux-amd64",
+            "path": "build/apgr-linux-amd64",
+            "sbom_file": "build/sboms/apgr-linux-amd64.spdx.json",
+            "build_command": "bin/apg-build-go-cli --target linux/amd64 --output build/apgr-linux-amd64"
+          },
+          {
+            "os": "linux",
+            "arch": "arm64",
+            "binary": "apgr-linux-arm64",
+            "path": "build/apgr-linux-arm64",
+            "sbom_file": "build/sboms/apgr-linux-arm64.spdx.json",
+            "build_command": "bin/apg-build-go-cli --target linux/arm64 --output build/apgr-linux-arm64"
+          }
+        ],
+        "output_format": "spdx-json",
+        "artifact_name": "apgr-binaries-sbom.spdx.json"
+      }
+    }
+  }
+}

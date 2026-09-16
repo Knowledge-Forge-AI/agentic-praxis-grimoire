@@ -6,7 +6,6 @@ import stat
 import subprocess
 import sys
 
-import pytest
 
 from src.test.apg_test_support import repository_root
 

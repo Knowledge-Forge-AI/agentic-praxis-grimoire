@@ -45,7 +45,7 @@ npx @knowledge-forge-ai/apgr@__APG_VERSION__ --version
 - `linux/arm64` (Linux aarch64) -> `@knowledge-forge-ai/apgr-linux-arm64`
 
 Requirements: Node.js `>=22.0.0`.
-Developer qualification gate status: Darwin arm64 passed the [integrated source qualification](https://github.com/Knowledge-Forge-AI/agentic-praxis-grimoire/blob/v__APG_VERSION__/docs/status/2026/09/06/00159-apg114-v090-integrated-source-qualification-exit.md). Developer qualification on Linux x86_64 remains pending.
+Developer qualification gate status: Darwin arm64 has historical [integrated source qualification](https://github.com/Knowledge-Forge-AI/agentic-praxis-grimoire/blob/v0.9.0/docs/status/2026/09/06/00159-apg114-v090-integrated-source-qualification-exit.md). Current candidate qualification is separate; developer qualification on Linux x86_64 remains pending.
 
 ## License
 

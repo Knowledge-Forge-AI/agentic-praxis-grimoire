@@ -9,3 +9,16 @@ Unless a file states otherwise, this project is licensed under the GNU Affero Ge
 Commercial licenses are available for proprietary terms. Commercial licensing contact: lair001@gmail.com.
 
 Third-party material remains subject to its own license and notice terms. The project provenance policy records material source relationships and applicable notice requirements.
+
+## Adapted CI checks
+
+The pre-review check, result classification, evidence, and scanner-support
+code under tools/ci includes adaptations of RepoMap CI tooling, including
+the LF physical-line counter, threshold classification and file-length CLI.
+Copyright (c) 2026 Samuel Leighton Lair and RepoMap contributors.
+The adapted material is licensed under AGPL-3.0-or-later; see LICENSE.
+APGR modifications adapt source inventories, checks, and policy to this project.
+This attribution does not grant separate proprietary relicensing rights.
+
+RepoMap's notice preserves Apache-2.0 grants for code at or before its
+apache-2.0-final tag. The material adapted here is from its later AGPL line.

@@ -683,3 +683,19 @@ policy. The APG123 amendment awaits dispatcher pre-final and closeout.
 [ADR 0054](2026/09/0054-js-qd-005-refresh-trigger-interpretation.md) — Accepted.
 APG132 records canonical refresh-field precedence and the historical generator
 interpretation without changing the accepted debt object or stable-maturity block.
+
+## ADR 0055 — v0.11 Capacity and Closure Governance
+
+[ADR 0055](2026/09/0055-v0-11-capacity-and-closure-governance.md) — Accepted
+by the APG143 manager disposition on 2026-09-12. The APG138 proposal and
+measurements remain historical; fresh APG143 measurement supports unchanged
+45-leaf admission and the retained 11,507-byte ceiling.
+
+- [`0056 — Versioned Hotspot History`](2026/09/0056-versioned-hotspot-history.md) — Accepted with amendment
+
+- [`0057 — Public Staging PR Release Procedure`](2026/09/0057-public-staging-pr-release-procedure.md) — User-directed staging route; accepted implementation under APG144
+
+The v0.11 release route uses exact branch `staging`, PR validation, squash merge
+to `main`, and post-merge source qualification before tagging. Historical
+release validators remain version-bound; public settings and execution await
+V0110-G.

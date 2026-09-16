@@ -12,6 +12,7 @@ import argparse
 import os
 from pathlib import Path
 import stat
+import subprocess
 import sys
 from typing import Any, Mapping, Sequence
 
@@ -32,13 +33,106 @@ for _module in (_contract, _archives):
     )
 
 
+# Keep the compatibility re-export loop above observable while giving static
+# analyzers explicit bindings for the facade's implementation dependencies.
+DistributionCandidateError = _contract.DistributionCandidateError
+MANIFEST_SCHEMA = _contract.MANIFEST_SCHEMA
+MODULE = _contract.MODULE
+BINARY_MANIFEST_SCHEMA = _contract.BINARY_MANIFEST_SCHEMA
+BUILD_INFO_SCHEMA = _contract.BUILD_INFO_SCHEMA
+CHECKSUM_NAME = _contract.CHECKSUM_NAME
+MANIFEST_NAME = _contract.MANIFEST_NAME
+PYTHON_PACKAGE = _contract.PYTHON_PACKAGE
+TARGETS = _contract.TARGETS
+TARGET_BY_GO = _contract.TARGET_BY_GO
+_absolute_clean = _contract._absolute_clean
+_canonical_value = _contract._canonical_value
+_directory = _contract._directory
+_fail = _contract._fail
+_load_go_artifacts = _contract._load_go_artifacts
+_read_direct = _contract._read_direct
+_sha256_file = _contract._sha256_file
+_source_identity = _contract._source_identity
+canonical_json = _contract.canonical_json
+source_candidate_identity = _contract.source_candidate_identity
+_find_npm_files = _archives._find_npm_files
+_find_python_files = _archives._find_python_files
+_validate_npm_package = _archives._validate_npm_package
+_validate_sdist = _archives._validate_sdist
+_validate_wheel = _archives._validate_wheel
+
+
+def _source_revision_identity(source_root: Path | str, version: str) -> dict[str, str]:
+    """Bind v0.11 distribution metadata to a source Git revision.
+
+    Historical manifests intentionally retain their existing schema and do not
+    gain a revision claim.  The public v0.11 publisher, however, must be able
+    to compare the exact source used for artifacts with the observed post-merge
+    commit and tree.  A non-Git source cannot provide that contract.
+    """
+
+    core = version.split("+", 1)[0].split("-", 1)[0]
+    if core != "0.11.0":
+        return {}
+    root = _directory(source_root, "source root")
+    git_prefix = ["git", "-C", os.fspath(root)]
+
+    def status() -> str:
+        result = subprocess.run(
+            [*git_prefix, "status", "--porcelain=v1", "--untracked-files=all"],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        if result.returncode:
+            _fail("v0.11 source revision identity requires a Git checkout")
+        return result.stdout
+
+    def identity() -> tuple[str, str]:
+        # One commit-object read supplies HEAD and HEAD^{tree} together.  A
+        # second read below detects a moving ref or tree during capture.
+        result = subprocess.run(
+            [*git_prefix, "show", "-s", "--format=%H%x00%T", "HEAD"],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        if result.returncode:
+            _fail("v0.11 source revision identity requires a Git checkout")
+        values = result.stdout.rstrip("\n").split("\x00")
+        if len(values) != 2 or any(
+            len(value) != 40
+            or any(character not in "0123456789abcdef" for character in value)
+            for value in values
+        ):
+            _fail("v0.11 source Git revision identity is malformed")
+        return values[0], values[1]
+
+    try:
+        before = status()
+        first = identity()
+        between = status()
+        second = identity()
+        after = status()
+    except OSError as error:
+        raise DistributionCandidateError(
+            "v0.11 source revision identity requires Git"
+        ) from error
+    if before or between or after:
+        _fail("v0.11 source revision identity requires a clean Git checkout")
+    if first != second:
+        _fail("v0.11 source Git revision changed during identity capture")
+    return {"source_commit": first[0], "source_tree": first[1]}
+
+
 def _load_all(
     source_root: Path | str,
     go_artifacts: Path | str,
     python_artifacts: Path | str,
     npm_artifacts: Path | str,
 ) -> tuple[dict[str, Any], dict[str, Path]]:
-    version, corpus = _source_identity(source_root)
+    root = _directory(source_root, "source root")
+    version, corpus = _source_identity(root)
     binaries, paths = _load_go_artifacts(go_artifacts, version=version, corpus=corpus)
     wheel_paths, sdist_path = _find_python_files(
         _directory(python_artifacts, "Python artifact root"), version=version
@@ -96,6 +190,7 @@ def _load_all(
         "python": {"package": PYTHON_PACKAGE, "wheels": wheels, "sdist": sdist},
         "npm": {"launcher": launcher, "platform_packages": platforms},
     }
+    manifest.update(_source_revision_identity(root, version))
     return manifest, paths
 
 

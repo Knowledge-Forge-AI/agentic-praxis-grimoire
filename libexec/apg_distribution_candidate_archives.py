@@ -222,6 +222,12 @@ def _validate_sdist(path: Path, *, version: str) -> dict[str, Any]:
         f"{expected_root}/libexec/apg_go_build.py",
         f"{expected_root}/libexec/apg_python_build_backend.py",
     }
+    if _version_tuple(version) >= (0, 11, 0):
+        required.update(f"{expected_root}/{relative}" for relative in (
+            "README.md", *LICENSE_FILES, "CLA.md", "CONTRIBUTING.md",
+            "docs/README.md", "docs/reference/cli.md", "docs/reference/go-library.md",
+            "docs/distribution.md", "docs/public-pr-ci.md", "release/v0.11.0-notes.md",
+        ))
     if not required.issubset(names) or not any(
         name.startswith(f"{expected_root}/skills/") and name.endswith("/SKILL.md") for name in names
     ):

@@ -127,6 +127,24 @@
       ]
     },
     {
+      "path": "libexec/apg_roadmap_closure.py",
+      "rationale": "maintained executable Python source",
+      "suites": [
+        "unit",
+        "integration",
+        "combined"
+      ]
+    },
+    {
+      "path": "libexec/apg_roadmap_contract.py",
+      "rationale": "maintained executable Python source",
+      "suites": [
+        "unit",
+        "integration",
+        "combined"
+      ]
+    },
+    {
       "path": "libexec/apg_skill_library_check.py",
       "rationale": "maintained executable Python source",
       "suites": [
@@ -137,6 +155,24 @@
     },
     {
       "path": "libexec/apg_skill_topology.py",
+      "rationale": "maintained executable Python source",
+      "suites": [
+        "unit",
+        "integration",
+        "combined"
+      ]
+    },
+    {
+      "path": "libexec/apg_source_capture.py",
+      "rationale": "maintained prospective-source capture adapter",
+      "suites": [
+        "unit",
+        "integration",
+        "combined"
+      ]
+    },
+    {
+      "path": "libexec/apg_staging_correction.py",
       "rationale": "maintained executable Python source",
       "suites": [
         "unit",
@@ -429,6 +465,14 @@
     {
       "path": "bin/install-global-skills",
       "reason": "thin import and exit adapter"
+    },
+    {
+      "path": "bin/apg-check-roadmap-closure",
+      "reason": "thin import and exit adapter"
+    },
+    {
+      "path": "bin/apg-capture-source",
+      "reason": "thin import and exit adapter"
     }
   ],
   "schema_version": 2,
@@ -546,6 +590,11 @@
     {
       "owner": "libexec/apg_skill_topology.py",
       "path": "src/test/int/python/agentic-praxis-grimoire/libexec/apg_skill_topology.int.test.py",
+      "suite": "integration"
+    },
+    {
+      "owner": "libexec/apg_staging_correction.py",
+      "path": "src/test/int/python/agentic-praxis-grimoire/libexec/apg_staging_correction.int.test.py",
       "suite": "integration"
     },
     {
@@ -731,6 +780,11 @@
     {
       "owner": "libexec/apg_skill_topology.py",
       "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_skill_topology.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "libexec/apg_staging_correction.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_staging_correction.unit.test.py",
       "suite": "unit"
     },
     {
@@ -1197,6 +1251,176 @@
       "owner": "src/test/support/apg_worker_temp_root_binding_contract.py",
       "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_worker_temp_root_binding_contract.unit.test.py",
       "suite": "unit"
+    },
+    {
+      "owner": "libexec/apg_roadmap_closure.py",
+      "path": "src/test/int/python/agentic-praxis-grimoire/libexec/apg_roadmap_closure.int.test.py",
+      "suite": "integration"
+    },
+    {
+      "owner": "libexec/apg_roadmap_contract.py",
+      "path": "src/test/int/python/agentic-praxis-grimoire/libexec/apg_roadmap_contract.int.test.py",
+      "suite": "integration"
+    },
+    {
+      "owner": "libexec/apg_roadmap_closure.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_roadmap_closure.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "libexec/apg_roadmap_contract.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_roadmap_contract.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "src/test/support/apg140_migration_fixture.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg140_migration_fixture.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "src/test/support/apg_external_compatibility_fixture.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg_external_compatibility_fixture.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "libexec/apg_source_capture.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_source_capture.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "libexec/apg_source_capture.py",
+      "path": "src/test/int/python/agentic-praxis-grimoire/libexec/apg_source_capture.int.test.py",
+      "suite": "integration"
+    },
+    {
+      "owner": "release/ci/matrix_receipts.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/release/ci/matrix_receipts.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "tools/ci/bootstrap_runtime.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/tools/ci/bootstrap_runtime.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "tools/ci/check_generated_drift.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/tools/ci/check_generated_drift.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "tools/ci/ci_topology.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/tools/ci/ci_topology.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "tools/ci/codeql_policy.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/tools/ci/codeql_policy.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "tools/ci/dependency_inventory.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/tools/ci/dependency_inventory.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "tools/ci/pre_review_checks.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/tools/ci/pre_review_checks.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "tools/ci/pre_review_evaluation.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/tools/ci/pre_review_evaluation.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "tools/ci/pre_review_evidence.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/tools/ci/pre_review_evidence.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "tools/ci/pre_review_records.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/tools/ci/pre_review_records.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "tools/ci/retained_python_ratchets.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/tools/ci/retained_python_ratchets.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "tools/ci/sbom_records.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/tools/ci/sbom_records.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "tools/ci/workflow_model.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/tools/ci/workflow_model.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": ".github/workflows/public-pr.yml",
+      "path": "src/test/int/python/agentic-praxis-grimoire/.github/workflows/public-pr.yml.int.test.py",
+      "suite": "integration"
+    },
+    {
+      "owner": "tools/ci/run_pre_review.py",
+      "path": "src/test/int/python/agentic-praxis-grimoire/tools/ci/run_pre_review.int.test.py",
+      "suite": "integration"
+    },
+    {
+      "owner": "tools/ci/scanner_suppressions.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/tools/ci/scanner_suppressions.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "tools/ci/ci_topology.py",
+      "path": "src/test/int/python/agentic-praxis-grimoire/tools/ci/ci_topology.int.test.py",
+      "suite": "integration"
+    },
+    {
+      "owner": "tools/ci/pre_review_checks.py",
+      "path": "src/test/int/python/agentic-praxis-grimoire/tools/ci/pre_review_checks.int.test.py",
+      "suite": "integration"
+    },
+    {
+      "owner": "tools/ci/betterleaks_dispositions.py",
+      "path": "src/test/int/python/agentic-praxis-grimoire/tools/ci/betterleaks_dispositions.int.test.py",
+      "suite": "integration"
+    },
+    {
+      "owner": "tools/ci/file_length_policy.py",
+      "path": "src/test/int/python/agentic-praxis-grimoire/tools/ci/file_length_policy.int.test.py",
+      "suite": "integration"
+    },
+    {
+      "owner": "tools/ci/python_retention_inventory.py",
+      "path": "src/test/int/python/agentic-praxis-grimoire/tools/ci/python_retention_inventory.int.test.py",
+      "suite": "integration"
+    },
+    {
+      "owner": "tools/ci/scanner_suppressions.py",
+      "path": "src/test/int/python/agentic-praxis-grimoire/tools/ci/scanner_suppressions.int.test.py",
+      "suite": "integration"
+    },
+    {
+      "owner": "tools/ci/betterleaks_dispositions.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/tools/ci/betterleaks_dispositions.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "tools/ci/file_length_policy.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/tools/ci/file_length_policy.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "tools/ci/python_retention_inventory.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/tools/ci/python_retention_inventory.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "bin/apg-capture-source",
+      "path": "src/test/int/python/agentic-praxis-grimoire/bin/apg-capture-source.int.test.py",
+      "suite": "integration"
     }
   ]
 }

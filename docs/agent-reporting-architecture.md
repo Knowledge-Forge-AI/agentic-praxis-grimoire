@@ -356,3 +356,13 @@ stopped partial before commit; APG27A independently freezes historical v0.3.0
 policy, removes the Red path-safety signal, and adopts the implementation. No
 managed report migration is required because common envelope version 1,
 Git-show format version 2, and operational format version 1 remain compatible.
+
+## APG141 project-key consistency candidate
+
+Modern CLI validation now agrees with the existing Go collector and legacy
+commands when stripping leading ASCII dots from the repository basename.
+Explicit report project selection must equal that normalized key. The
+[bounded contract](governance/optional/apg141/project-key-contract.md) records
+collision limitations, response precedence and rollback. No public identity
+registry, envelope change or implicit remote mapping is introduced. Caller-owned
+result text and in-memory Evidence fields retain their existing contracts.

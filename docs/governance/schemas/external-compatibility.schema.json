@@ -1,0 +1,189 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "external-compatibility",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "apg.compatibility-ledger/v1",
+      "type": "string"
+    },
+    "release": {
+      "const": "v0.11",
+      "type": "string"
+    },
+    "owner_phase": {
+      "type": "string",
+      "minLength": 1
+    },
+    "watches": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "watch_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "apgr_identity": {
+            "type": "string",
+            "minLength": 1
+          },
+          "consumer_project": {
+            "type": "string",
+            "minLength": 1
+          },
+          "observed_revision": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "observed_contract": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "observation_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "fixture_identity": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "path": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "inherited_item_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "WATCH",
+              "QUALIFIED",
+              "HANDOFF_CLOSED"
+            ]
+          },
+          "supported_cases": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true
+          },
+          "unsupported_cases": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true
+          },
+          "ownership_split": {
+            "type": "string",
+            "minLength": 1
+          },
+          "refresh_owner": {
+            "type": "string",
+            "minLength": 1
+          },
+          "refresh_trigger": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source_authority": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true
+          },
+          "qualification_evidence": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true
+          },
+          "adoption_claimed": {
+            "const": false,
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "watch_id",
+          "apgr_identity",
+          "consumer_project",
+          "observed_revision",
+          "observed_contract",
+          "observation_date",
+          "fixture_identity",
+          "inherited_item_ids",
+          "status",
+          "supported_cases",
+          "unsupported_cases",
+          "ownership_split",
+          "refresh_owner",
+          "refresh_trigger",
+          "source_authority",
+          "qualification_evidence",
+          "adoption_claimed"
+        ],
+        "additionalProperties": false
+      },
+      "uniqueItems": true
+    }
+  },
+  "required": [
+    "schema_version",
+    "release",
+    "owner_phase",
+    "watches"
+  ],
+  "additionalProperties": false
+}

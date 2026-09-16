@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from io import BytesIO, StringIO
 from pathlib import Path
-import stat
 import sys
 
 import pytest
@@ -304,7 +303,7 @@ def test_compatibility_readers_cover_regular_chunked_and_refusal_paths(
     with pytest.raises(response.ResponseUsageError, match="exactly one"):
         response._read_input(body=None, source=source, input_path=source, stdin=None)
     with pytest.raises(response.ResponseInputError, match="bytes"):
-        response._read_input(body="text", source=None, input_path=None, stdin=None)  # type: ignore[arg-type]
+        response._read_input(body="text", source=None, input_path=None, stdin=None)
 
 
 def test_reservation_listing_validates_directory_and_entries(tmp_path: Path) -> None:

@@ -9,7 +9,6 @@ lifecycle suppression, pack tarball, config precedence, and exec --no.
 
 from __future__ import annotations
 
-from pathlib import Path
 import sys
 import pytest
 
@@ -25,7 +24,6 @@ from apg124_npm import (  # noqa: E402
     LIFECYCLE_EXECUTION_SCENARIOS,
     MANIFEST_LOCK_SCENARIOS,
     NpmHarnessConfig,
-    NpmHarnessReceipt,
     execute_npm_harness,
     observe_npm_harness_config,
 )

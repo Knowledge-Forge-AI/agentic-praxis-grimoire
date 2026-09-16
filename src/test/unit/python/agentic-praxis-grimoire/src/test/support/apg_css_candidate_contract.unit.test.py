@@ -22,14 +22,12 @@ from apg_css_candidate_contract import (  # noqa: E402
     ACTION_VOCABULARY,
     ContractError,
     assert_case_expected,
-    canonical_contract_bytes,
     classify_growth,
     count_nonblank_css,
     evaluate_case,
     governing_growth,
     load_contract,
     validate_collected_case_ids,
-    validate_contract,
 )
 
 

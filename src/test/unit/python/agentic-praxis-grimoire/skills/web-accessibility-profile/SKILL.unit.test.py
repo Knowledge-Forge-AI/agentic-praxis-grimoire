@@ -8,10 +8,7 @@ focus order, ARIA snapshots, and SVG semantics for scenarios AX01-AX11.
 
 from __future__ import annotations
 
-import json
-from pathlib import Path
 import sys
-import pytest
 
 from src.test.apg_test_support import repository_root
 

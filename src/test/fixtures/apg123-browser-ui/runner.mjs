@@ -701,19 +701,41 @@ export function startServer() {
         const safeFilePath = path.resolve(__dirname, fileName);
 
         // Verify resolved path is direct regular file inside fixtures
-        const stat = fs.lstatSync(safeFilePath);
-        if (stat.isSymbolicLink() || !stat.isFile() || !safeFilePath.startsWith(__dirname)) {
+        if (!safeFilePath.startsWith(__dirname)) {
           res.statusCode = 403;
           res.setHeader('Content-Type', 'text/plain');
           res.end('Forbidden');
           return;
         }
 
+        let fd;
+        let fileBytes;
+        try {
+          fd = fs.openSync(safeFilePath, fs.constants.O_RDONLY | fs.constants.O_NOFOLLOW);
+          const stat = fs.fstatSync(fd);
+          if (!stat.isFile()) {
+            res.statusCode = 403;
+            res.setHeader('Content-Type', 'text/plain');
+            res.end('Forbidden');
+            return;
+          }
+          fileBytes = fs.readFileSync(fd);
+        } catch {
+          res.statusCode = 403;
+          res.setHeader('Content-Type', 'text/plain');
+          res.end('Forbidden');
+          return;
+        } finally {
+          if (fd !== undefined) {
+            fs.closeSync(fd);
+          }
+        }
+
         const ext = path.extname(safeFilePath).toLowerCase();
         const contentType = MIME_TYPES[ext] || 'application/octet-stream';
         res.statusCode = 200;
         res.setHeader('Content-Type', contentType);
-        res.end(fs.readFileSync(safeFilePath));
+        res.end(fileBytes);
       } catch (err) {
         res.statusCode = 500;
         res.end('Internal Error');
@@ -735,6 +757,9 @@ export function startServer() {
 
 // Start secondary ephemeral loopback server for CORS, preflight, credentials, and redirects
 export function startSecondaryServer(primaryOrigin) {
+  if (typeof primaryOrigin !== 'string' || !primaryOrigin) {
+    throw new TypeError('primaryOrigin must be a non-empty string');
+  }
   return new Promise((resolve, reject) => {
     const observedRequests = [];
 
@@ -757,7 +782,7 @@ export function startSecondaryServer(primaryOrigin) {
         if (pathname === '/cors-allow') {
           res.statusCode = 200;
           res.setHeader('Content-Type', 'application/json');
-          res.setHeader('Access-Control-Allow-Origin', req.headers.origin || primaryOrigin);
+          res.setHeader('Access-Control-Allow-Origin', primaryOrigin);
           res.end(JSON.stringify({ allowed: true, message: 'CORS allowed successfully' }));
           return;
         }
@@ -773,7 +798,7 @@ export function startSecondaryServer(primaryOrigin) {
         if (pathname === '/cors-preflight-allow') {
           if (req.method === 'OPTIONS') {
             res.statusCode = 204;
-            res.setHeader('Access-Control-Allow-Origin', req.headers.origin || primaryOrigin);
+            res.setHeader('Access-Control-Allow-Origin', primaryOrigin);
             res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, OPTIONS');
             res.setHeader('Access-Control-Allow-Headers', 'X-Custom-Header, Content-Type');
             res.setHeader('Access-Control-Max-Age', '86400');
@@ -783,7 +808,7 @@ export function startSecondaryServer(primaryOrigin) {
           if (req.method === 'PUT') {
             res.statusCode = 200;
             res.setHeader('Content-Type', 'application/json');
-            res.setHeader('Access-Control-Allow-Origin', req.headers.origin || primaryOrigin);
+            res.setHeader('Access-Control-Allow-Origin', primaryOrigin);
             res.end(JSON.stringify({ preflightSuccess: true, method: req.method }));
             return;
           }
@@ -806,7 +831,7 @@ export function startSecondaryServer(primaryOrigin) {
         if (pathname === '/credentials') {
           res.statusCode = 200;
           res.setHeader('Content-Type', 'application/json');
-          res.setHeader('Access-Control-Allow-Origin', req.headers.origin || primaryOrigin);
+          res.setHeader('Access-Control-Allow-Origin', primaryOrigin);
           res.setHeader('Access-Control-Allow-Credentials', 'true');
           const hasSyntheticCookie = Boolean(req.headers.cookie && req.headers.cookie.includes('apg_auth_cred=synthetic_token_125'));
           res.end(JSON.stringify({
@@ -819,7 +844,7 @@ export function startSecondaryServer(primaryOrigin) {
         if (pathname === '/redirect') {
           res.statusCode = 302;
           res.setHeader('Location', '/redirect-target');
-          res.setHeader('Access-Control-Allow-Origin', req.headers.origin || primaryOrigin);
+          res.setHeader('Access-Control-Allow-Origin', primaryOrigin);
           res.end();
           return;
         }
@@ -827,7 +852,7 @@ export function startSecondaryServer(primaryOrigin) {
         if (pathname === '/redirect-target') {
           res.statusCode = 200;
           res.setHeader('Content-Type', 'application/json');
-          res.setHeader('Access-Control-Allow-Origin', req.headers.origin || primaryOrigin);
+          res.setHeader('Access-Control-Allow-Origin', primaryOrigin);
           res.end(JSON.stringify({ redirected: true, message: 'Target reached successfully' }));
           return;
         }

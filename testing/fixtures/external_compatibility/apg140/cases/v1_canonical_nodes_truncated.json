@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "result_kind": "canonical_nodes",
+  "items": [
+    {
+      "canonical_key": "n:auth:authenticator",
+      "kind": "service",
+      "metadata": {
+        "layer": "security"
+      }
+    },
+    {
+      "canonical_key": "n:core:router",
+      "kind": "router",
+      "metadata": {
+        "layer": "transport"
+      }
+    }
+  ],
+  "page": {
+    "limit": 2,
+    "offset": 0,
+    "returned": 2,
+    "truncated": true,
+    "next_offset": 2
+  },
+  "diagnostics": [
+    {
+      "code": "result_truncated",
+      "message": "additional results are available"
+    }
+  ]
+}

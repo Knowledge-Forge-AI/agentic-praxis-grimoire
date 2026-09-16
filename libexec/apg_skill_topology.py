@@ -628,3 +628,45 @@ def check_router_maps(
             "general and ChatGPT router maps are incomplete, cyclic, or cross-domain",
             "restore disjoint general-subrouter and ChatGPT-leaf ownership",
         )
+
+
+def format_embedded_corpus_failure(
+    returncode: int,
+    stdout: bytes | str | None = None,
+    stderr: bytes | str | None = None,
+    error: Exception | str | None = None,
+) -> str | None:
+    """Format diagnostic message for Go embedded-corpus verification failures."""
+    if error is not None:
+        return f"Go embedded-corpus verification could not run: {error}"
+    if returncode != 0:
+        def _decode(stream: bytes | str | None) -> str:
+            if stream is None:
+                return ""
+            if isinstance(stream, bytes):
+                return stream.decode("utf-8", errors="replace")
+            return stream
+
+        raw_output = (_decode(stderr) or _decode(stdout) or "").strip()
+        bounded_detail = raw_output[:512] if raw_output else "no error detail reported"
+        if (
+            "disagrees with the embedded canonical corpus" in raw_output
+            or "disagrees with repository truth" in raw_output
+        ):
+            return f"Go embedded-corpus verification disagrees with repository truth: {bounded_detail}"
+        return (
+            f"Go embedded-corpus verification prerequisite or execution failed "
+            f"(exit {returncode}): {bounded_detail}"
+        )
+    text = ""
+    for stream in (stderr, stdout):
+        if stream:
+            if isinstance(stream, bytes):
+                text += stream.decode("utf-8", errors="replace")
+            else:
+                text += stream
+    text = text.strip()
+    if text:
+        return f"Go embedded-corpus verification produced unexpected output: {text[:512]}"
+    return None
+

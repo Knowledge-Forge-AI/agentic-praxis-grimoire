@@ -1,0 +1,66 @@
+{
+  "schema_version": "apg140-support-bindings-v1",
+  "scope": "APGR-local; not consumer adoption",
+  "members": [
+    {
+      "path": "testing/fixtures/jaca_ci/valid-apg-pr.json",
+      "sha256": "1b5b305211c8c3cccef7b120639b32c23885f08cb51b3450524183902317c88a"
+    },
+    {
+      "path": "testing/fixtures/jaca_ci/invalid-role-pr.json",
+      "sha256": "7b1cbb2171d4d8289c81f763b9bfc680eaf29eff432ecae4510566346da27fc4"
+    },
+    {
+      "path": "testing/fixtures/jaca_ci/drift-pr.json",
+      "sha256": "24e9d072cc317da18171bd77d7cf0788fc18a40e999f1f287ec6de274033daa3"
+    },
+    {
+      "path": "testing/fixtures/jaca_ci/sample-summary-pass.json",
+      "sha256": "a27c361fc8800895aeb279821fa5a313d7c08ebf4f1ceba6ccff24be8f569872"
+    },
+    {
+      "path": "testing/fixtures/jaca_ci/sample-summary-fail.json",
+      "sha256": "3dd3234a3af1a83e3559ac843eba0297f4a4b3bc6da72570470a3ce3ffc3d1a9"
+    },
+    {
+      "path": "testing/fixtures/xo_consumer/adapter.go",
+      "sha256": "d92dc920c37a2b2fb48d0c7af28e2395f6792dc5cd411e83aecb3e034ec49d2b"
+    },
+    {
+      "path": "testing/fixtures/xo_consumer/adapter_test.go",
+      "sha256": "9eabbacf425961c01b760b98e6befa8b35a9c50c3042255091436ecb49a30782"
+    },
+    {
+      "path": "testing/fixtures/xo_consumer/fixture-go.mod",
+      "sha256": "26a99e106f08e5061d914ae7e8ef4150870fd3a24abe7940792f6eaf9148674e"
+    },
+    {
+      "path": "report/types.go",
+      "sha256": "e3f1b2b4243d2374792b6f54c5ff35b91452c1acf806d809ad46e40cd7eadc43"
+    },
+    {
+      "path": "report/parser.go",
+      "sha256": "43ee7162b52e58d61e2ea6d057d7bcd532751aa0d83f299eb814f8ca4bb55d8c"
+    },
+    {
+      "path": "schema/identity.go",
+      "sha256": "73e5c7567eea5ee4d9711d2cc3343b4e4fe1e2f252276b7b64cc8a5cc6fef226"
+    },
+    {
+      "path": "docs/governance/external/apg140/migration-fixture.json",
+      "sha256": "fb0729f360eb613def7427c34f57b60cc13799f68d5969f646b997f37095ef0b"
+    },
+    {
+      "path": "src/test/support/apg140_migration_fixture.py",
+      "sha256": "71ea88458d8b1cf71a7aba1dc0d6df5eba2947250eec4e862c4d726117a706d8"
+    },
+    {
+      "path": "src/test/support/apg_external_compatibility_fixture.py",
+      "sha256": "40b7e98fd862977d83a5e6a01113435bc1b6c47a710668c82faf5d45ff10369e"
+    },
+    {
+      "path": "testing/fixtures/external_compatibility/apg140/manifest.json",
+      "sha256": "6cddcc54283c9e1aadde2e66bf25513a09d8d05365d1be5cba8b327dfb337a48"
+    }
+  ]
+}

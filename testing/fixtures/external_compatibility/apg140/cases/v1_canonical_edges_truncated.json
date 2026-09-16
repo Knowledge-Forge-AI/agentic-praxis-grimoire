@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "result_kind": "canonical_edges",
+  "items": [
+    {
+      "source_key": "n:auth:authenticator",
+      "edge_kind": "verifies",
+      "target_key": "n:core:router",
+      "identity_metadata_hash": "h:auth:router:tls",
+      "identity_metadata": {
+        "protocol": "tls"
+      }
+    }
+  ],
+  "page": {
+    "limit": 1,
+    "offset": 0,
+    "returned": 1,
+    "truncated": true,
+    "next_offset": 1
+  },
+  "diagnostics": [
+    {
+      "code": "result_truncated",
+      "message": "additional results are available"
+    }
+  ]
+}

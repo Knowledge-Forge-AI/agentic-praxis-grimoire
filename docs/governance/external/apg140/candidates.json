@@ -1,0 +1,78 @@
+{
+  "schema_version": "apg140-external-closure-candidates-v1",
+  "status": "PENDING_DISPATCHER_PRE_FINAL",
+  "actual_accounting": {
+    "inherited": 55,
+    "terminal": 31,
+    "open": 24,
+    "invalid": 0
+  },
+  "proposed_accounting": {
+    "inherited": 55,
+    "terminal": 43,
+    "open": 12,
+    "invalid": 0
+  },
+  "candidates": [
+    {
+      "item_id": "APGR-CI-QUAL",
+      "outcome": "CONSUMER_HANDOFF_CLOSED",
+      "candidate_ref": "docs/governance/external/apg140/candidates/APGR-CI-QUAL.json"
+    },
+    {
+      "item_id": "APGR-REPORT-OUTBOX",
+      "outcome": "CONSUMER_HANDOFF_CLOSED",
+      "candidate_ref": "docs/governance/external/apg140/candidates/APGR-REPORT-OUTBOX.json"
+    },
+    {
+      "item_id": "APGR-XO-COMPAT",
+      "outcome": "CONSUMER_HANDOFF_CLOSED",
+      "candidate_ref": "docs/governance/external/apg140/candidates/APGR-XO-COMPAT.json"
+    },
+    {
+      "item_id": "RM-S0",
+      "outcome": "DELIVERED",
+      "candidate_ref": "docs/governance/external/apg140/candidates/RM-S0.json"
+    },
+    {
+      "item_id": "RM-S1",
+      "outcome": "REJECTED",
+      "candidate_ref": "docs/governance/external/apg140/candidates/RM-S1.json"
+    },
+    {
+      "item_id": "RM-S2",
+      "outcome": "REJECTED",
+      "candidate_ref": "docs/governance/external/apg140/candidates/RM-S2.json"
+    },
+    {
+      "item_id": "RM-S3",
+      "outcome": "REJECTED",
+      "candidate_ref": "docs/governance/external/apg140/candidates/RM-S3.json"
+    },
+    {
+      "item_id": "RM-S4",
+      "outcome": "DELIVERED",
+      "candidate_ref": "docs/governance/external/apg140/candidates/RM-S4.json"
+    },
+    {
+      "item_id": "RM-S5",
+      "outcome": "DELIVERED",
+      "candidate_ref": "docs/governance/external/apg140/candidates/RM-S5.json"
+    },
+    {
+      "item_id": "SKILL-KG-QUALITY",
+      "outcome": "REJECTED",
+      "candidate_ref": "docs/governance/external/apg140/candidates/SKILL-KG-QUALITY.json"
+    },
+    {
+      "item_id": "SKILL-MIGRATION",
+      "outcome": "REJECTED",
+      "candidate_ref": "docs/governance/external/apg140/candidates/SKILL-MIGRATION.json"
+    },
+    {
+      "item_id": "SKILL-VER-PROTO",
+      "outcome": "REJECTED",
+      "candidate_ref": "docs/governance/external/apg140/candidates/SKILL-VER-PROTO.json"
+    }
+  ]
+}

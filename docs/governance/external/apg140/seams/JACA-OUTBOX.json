@@ -1,0 +1,19 @@
+{
+  "schema_version": "apg140-seam-bindings-v1",
+  "watch_id": "JACA-OUTBOX",
+  "scope": "APGR-local evidence only; no consumer adoption",
+  "members": [
+    {
+      "path": "report/types.go",
+      "sha256": "e3f1b2b4243d2374792b6f54c5ff35b91452c1acf806d809ad46e40cd7eadc43"
+    },
+    {
+      "path": "report/parser.go",
+      "sha256": "43ee7162b52e58d61e2ea6d057d7bcd532751aa0d83f299eb814f8ca4bb55d8c"
+    },
+    {
+      "path": "schema/identity.go",
+      "sha256": "73e5c7567eea5ee4d9711d2cc3343b4e4fe1e2f252276b7b64cc8a5cc6fef226"
+    }
+  ]
+}

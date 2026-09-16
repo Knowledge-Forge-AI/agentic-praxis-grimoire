@@ -339,8 +339,8 @@ def observe_browser_harness_config(
     if libexec_dir not in sys.path:
         sys.path.insert(0, libexec_dir)
     try:
-        import apg_test  # noqa: E402
-        import apg_playwright_runtime  # noqa: E402
+        import apg_test
+        import apg_playwright_runtime
         apg_test.validate_javascript_engine(repo_root)
         apg_playwright_runtime.validate(repo_root)
     except Exception as err:
@@ -1039,7 +1039,7 @@ def execute_browser_harness(
         raise BrowserHarnessExecutionError(f"Unknown scenario group: {group}")
 
     # Resolve authority ONCE BEFORE execution
-    expected_authority = resolve_scenario_family_authority(family_table, target_scenarios)
+    resolve_scenario_family_authority(family_table, target_scenarios)
 
     run_id = f"run-{uuid.uuid4().hex[:10]}"
     run_dir = config.scratch_root / run_id

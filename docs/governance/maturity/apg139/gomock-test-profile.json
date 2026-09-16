@@ -1,0 +1,75 @@
+{
+  "schema_version": "apg.maturity-candidate/v1",
+  "phase": "APG139",
+  "skill_id": "gomock-test-profile",
+  "proposed_outcome": "PROVISIONAL_MAINTENANCE",
+  "review_status": "PENDING_DISPATCHER_PRE_FINAL",
+  "independent_review": null,
+  "evidence": {
+    "repeated_positive_use": {
+      "assessment": "LIMITED",
+      "references": [
+        "skills/gomock-test-profile/SKILL.md",
+        "docs/evaluations/apg86-gomock-vitest-profiles-and-context-budget-enforcement.md",
+        "src/test/fixtures/apg86-profile-boundary-scenarios.json"
+      ],
+      "observation": "APG86 maps controller, generation, expectations and matcher ownership in eight boundary cases. It did not install GoMock, run mockgen, compile target mocks or establish repeated actual guidance-use outcomes."
+    },
+    "representative_non_triggers": {
+      "assessment": "LIMITED",
+      "references": [
+        "skills/gomock-test-profile/SKILL.md",
+        "docs/evaluations/apg86-gomock-vitest-profiles-and-context-budget-enforcement.md",
+        "src/test/fixtures/apg86-profile-boundary-scenarios.json"
+      ],
+      "observation": "Dependency adoption, native testing lifecycle, value-diff semantics and Go interface semantics remain separate."
+    },
+    "defect_debt_disposition": {
+      "assessment": "SUPPORTED",
+      "references": [
+        "docs/governance/language-profile-known-debt.json",
+        "skills/gomock-test-profile/SKILL.md",
+        "docs/evaluations/apg86-gomock-vitest-profiles-and-context-budget-enforcement.md",
+        "src/test/fixtures/apg86-profile-boundary-scenarios.json"
+      ],
+      "observation": "No active entry for this leaf in the maintained language-profile debt authority. This is not proof that all semantic defects are absent. Current independent semantic review remains pending. No debt is resolved by this inventory."
+    },
+    "rollback": {
+      "assessment": "SUPPORTED",
+      "references": [
+        "skills/gomock-test-profile/SKILL.md",
+        "docs/skill-authoring-and-maintenance.md",
+        "docs/evaluations/apg86-gomock-vitest-profiles-and-context-budget-enforcement.md",
+        "src/test/fixtures/apg86-profile-boundary-scenarios.json"
+      ],
+      "observation": "Use the canonical removal boundary and referenced integration history to reconcile the leaf, projection, catalog and focused fixtures while preserving historical decisions. Do not revert unrelated runner policy, target dependencies, generated mocks or target configuration."
+    },
+    "provenance": {
+      "assessment": "SUPPORTED",
+      "references": [
+        "skills/gomock-test-profile/SKILL.md",
+        "docs/provenance.md",
+        "docs/evaluations/apg86-gomock-vitest-profiles-and-context-budget-enforcement.md",
+        "src/test/fixtures/apg86-profile-boundary-scenarios.json"
+      ],
+      "observation": "Retained canonical source/maintenance boundary and APG provenance record remain the source authority. Historical evaluations identify their original phase and scope; they are reused only for the observations stated here. No external source text is copied or new source refresh claimed."
+    },
+    "independent_review": {
+      "assessment": "PENDING",
+      "references": [],
+      "observation": "Dispatcher pre-final review of this individual APG139 disposition is pending. Historical non-author review in referenced phases is evidence about those phases, not acceptance of this candidate."
+    },
+    "current_validation": {
+      "assessment": "LIMITED",
+      "references": [
+        "docs/governance/maturity/apg139/qualification.md",
+        "skills/gomock-test-profile/SKILL.md"
+      ],
+      "observation": "APG139 checks record/schema, catalog, projection and changed governance behavior. Canonical procedure is unchanged and inspected for scope. Historical semantic qualification is bounded by the referenced phase; this campaign does not rerun every historical technology fixture or establish new real-use evidence."
+    }
+  },
+  "next_lifecycle_trigger": "Supply repeated actual guidance-use decisions for already selected GoMock v0.6.0, binding generator mode/input, controller lifetime and expectations to observed outcomes, with native-testing and value-diff non-trigger handoffs and independent validation.",
+  "controlling_debt_ids": [],
+  "consumer_limitations": "No new consumer execution or deployment was performed. Technology execution, source inspection, catalog presence and projection integrity do not establish guidance invocation or effective use.",
+  "rationale": "Retain the selected framework owner. Historical authored scenarios and bounded static guidance application are relevant but do not supply a complete individually reviewed repeated-use and non-trigger promotion case. Additional repositories are not required; APG tasks can supply the missing evidence."
+}

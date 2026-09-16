@@ -1,0 +1,13 @@
+{
+  "fail-on-severity": "high",
+  "only-fixed": false,
+  "add-cpes-if-none": true,
+  "db": {
+    "auto-update": true,
+    "validate-by-hash-on-start": true,
+    "validate-age": true,
+    "max-allowed-built-age": "120h0m0s",
+    "require-update-check": true
+  },
+  "ignore": []
+}

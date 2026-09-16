@@ -254,7 +254,7 @@ func pythonStyleJSON(value any) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	result := make([]byte, 0, len(compact)+64)
+	result := make([]byte, 0, len(compact))
 	quoted, escaped := false, false
 	for _, character := range compact {
 		result = append(result, byte(character))

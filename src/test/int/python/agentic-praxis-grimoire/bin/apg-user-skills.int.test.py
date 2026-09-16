@@ -19,7 +19,7 @@ from src.test.apg_test_support import repository_root
 
 REPOSITORY_ROOT = repository_root(__file__)
 sys.path.insert(0, str(REPOSITORY_ROOT / "libexec"))
-import apg_public_release as public_release
+import apg_public_release as public_release  # noqa: E402
 
 COMMAND = REPOSITORY_ROOT / "bin" / "apg-user-skills"
 SKILLS = (

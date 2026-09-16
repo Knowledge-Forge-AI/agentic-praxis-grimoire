@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from collections import Counter
-from copy import deepcopy
 import json
 from pathlib import Path
 from typing import Any, NoReturn
@@ -140,6 +139,35 @@ ACTION_VOCABULARY = frozenset(REQUIRED_ACTIONS | FORBIDDEN_ACTIONS)
 LEVEL_ORDER = {"Green": 0, "Yellow": 1, "Orange": 2, "Red": 3}
 EXCEPTION_GRANT_SOURCES = {"human-instruction", "repository-policy"}
 
+PUBLIC_STATE_TOP_KEYS = {
+    "amendment",
+    "artifact",
+    "candidate",
+    "history",
+    "refusal",
+    "schema_version",
+    "source_boundary",
+    "states",
+}
+PUBLIC_STATE_STATE_KEYS = {
+    "candidate_surface",
+    "canonical_skills",
+    "catalog_rows",
+    "general_routes",
+    "known_debt",
+    "local_routes",
+    "projections",
+    "provisional",
+    "stable",
+    "state",
+}
+PUBLIC_STATE_HISTORY_KEYS = {
+    "candidate_surface",
+    "public_adr",
+    "public_evaluation",
+    "public_exit",
+}
+
 
 def fail(message: str) -> NoReturn:
     raise ContractError(message)
@@ -205,6 +233,103 @@ def _nonempty_string_sequence(value: Any, context: str) -> list[str]:
         fail(f"{context} must contain nonempty strings")
     if len(value) != len(set(value)):
         fail(f"{context} must contain unique strings")
+    return value
+
+
+def _public_relative_path(value: Any, context: str) -> str:
+    if not isinstance(value, str) or not value or value.startswith("/"):
+        fail(f"{context} must be a nonempty relative path")
+    if "\\" in value or ".." in value.split("/"):
+        fail(f"{context} must be a safe relative path")
+    if value == ".git" or value.startswith(".git/") or "/.git/" in value:
+        fail(f"{context} must not name Git metadata")
+    if value == "private" or value.startswith("private/") or "/private/" in value:
+        fail(f"{context} must not name publication-excluded content")
+    return value
+
+
+def validate_public_state_fixture(value: Any) -> dict[str, Any]:
+    """Validate synthetic public state, without asserting exact Git history."""
+    _exact_keys(value, PUBLIC_STATE_TOP_KEYS, "public state fixture")
+    if (
+        value["schema_version"] != 1
+        or value["artifact"] != "apg60-css-public-state-fixture"
+        or value["candidate"] != "css-language-profile"
+        or value["source_boundary"]
+        != (
+            "synthetic public behavior; exact historical Git evidence remains "
+            "outside this fixture"
+        )
+    ):
+        fail("public state fixture identity or boundary is invalid")
+
+    amendment = value["amendment"]
+    _exact_keys(
+        amendment,
+        {"allowed_exception_case", "contract_revision", "exception_grant_source"},
+        "public state amendment",
+    )
+    if amendment != {
+        "allowed_exception_case": "APG60-CSS-024",
+        "contract_revision": "APG60A",
+        "exception_grant_source": "repository-policy",
+    }:
+        fail("public state amendment is invalid")
+
+    states = value["states"]
+    if not isinstance(states, list) or [state.get("state") for state in states] != [
+        "preintegration",
+        "rejected",
+        "current",
+    ]:
+        fail("public state fixture states are incomplete or reordered")
+    for index, state in enumerate(states):
+        _exact_keys(state, PUBLIC_STATE_STATE_KEYS, f"public state {index}")
+        for field in (
+            "canonical_skills",
+            "catalog_rows",
+            "general_routes",
+            "local_routes",
+            "projections",
+            "provisional",
+            "stable",
+        ):
+            count = state[field]
+            if isinstance(count, bool) or not isinstance(count, int) or count < 0:
+                fail(f"public state {index} {field} is invalid")
+        if state["candidate_surface"] not in {"absent", "present"}:
+            fail(f"public state {index} candidate surface is invalid")
+        if state["known_debt"] not in {"absent", "present"}:
+            fail(f"public state {index} known debt state is invalid")
+        if state["stable"] + state["provisional"] != state["catalog_rows"]:
+            fail(f"public state {index} maturity counts do not close")
+        if (
+            state["canonical_skills"] != state["catalog_rows"]
+            or state["catalog_rows"] != state["projections"]
+        ):
+            fail(f"public state {index} skill surface counts do not close")
+
+    history = value["history"]
+    _exact_keys(history, {"apg58", "apg59"}, "public state history")
+    for phase_id, entry in history.items():
+        _exact_keys(entry, PUBLIC_STATE_HISTORY_KEYS, f"public state {phase_id}")
+        if entry["candidate_surface"] not in {"absent", "present"}:
+            fail(f"public state {phase_id} candidate surface is invalid")
+        for field in ("public_adr", "public_evaluation", "public_exit"):
+            _public_relative_path(entry[field], f"public state {phase_id} {field}")
+
+    refusal = value["refusal"]
+    _exact_keys(
+        refusal,
+        {"expected_error", "restored_surface", "synthetic_lifecycle"},
+        "public state refusal",
+    )
+    if refusal != {
+        "expected_error": "current candidate surface",
+        "restored_surface": "rejected",
+        "synthetic_lifecycle": "rejected",
+    }:
+        fail("public state refusal contract is invalid")
     return value
 
 
@@ -330,6 +455,27 @@ def load_contract(path: Path, root: Path) -> dict[str, Any]:
         fail(f"contract fixture is unreadable: {error}")
     validate_contract(value)
     return value
+
+
+def load_public_state_fixture(path: Path, root: Path) -> dict[str, Any]:
+    """Load the public synthetic state fixture through a direct repository path."""
+    try:
+        relative = path.relative_to(root).as_posix()
+        with RepositoryPathContract(root) as repository:
+            text = repository.read_text(relative)
+        value = json.loads(text, object_pairs_hook=_strict_object)
+    except (
+        OSError,
+        UnicodeError,
+        ValueError,
+        RepositoryPathError,
+        json.JSONDecodeError,
+    ) as error:
+        fail(f"public state fixture is unreadable: {error}")
+    expected = json.dumps(value, indent=2, sort_keys=True) + "\n"
+    if text != expected:
+        fail("public state fixture is not canonical JSON")
+    return validate_public_state_fixture(value)
 
 
 def classify_growth(count: int) -> str:

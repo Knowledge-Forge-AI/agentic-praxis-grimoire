@@ -32,7 +32,9 @@ docs/status/YYYY/MM/DD/NNNNN-<phase>-<slug>-exit.md
   one.
 - An assigned exit number and date are stable and are never reused or changed,
   including when a phase is partial, blocked, rejected, stopped, or its record
-  later moves explicitly.
+  later moves explicitly. A manager-authorized forward correction may replace
+  an invalid allocation that collided with a prior reservation; preserve that
+  reservation and the introduction date, and record the old and corrected paths.
 - Each exit number must be unique within the exit-record namespace.
 - Exit numbering is independent of the ADR namespace under `docs/adr/`.
 - Compute the next exit only from this namespace; do not compare it with an ADR
@@ -246,3 +248,21 @@ a public exit record.
 - [`00179 — APG134 v0.10.0 Release Wording Amendment Exit`](2026/09/10/00179-apg134-v0100-release-wording-amendment-exit.md)
 - [`00180 — APG135 v0.10.0 Release Freeze Qualification Boundary Exit`](2026/09/10/00180-apg135-v0100-release-freeze-qualification-boundary-exit.md)
 - [`00181 — APG136 v0.10.0 Release Harness and Source Correction Exit`](2026/09/10/00181-apg136-v0100-release-harness-source-correction-exit.md)
+
+- [`00183 — APG138 v0.11 Foundation Closure Exit`](2026/09/12/00183-apg138-v0-11-foundation-closure-exit.md)
+
+Exit 00182 remains privately reserved for APG137; APG138 uses corrected exit 00183.
+
+- [`00184 — APG139 Individual Maturity Closure Exit`](2026/09/12/00184-apg139-individual-maturity-closure-exit.md)
+
+- [`00185 — APG140 External Contract and Support Closure Exit`](2026/09/12/00185-apg140-external-contract-support-closure-exit.md)
+
+- [`00186 — APG141 Optional Work Closure Exit`](2026/09/12/00186-apg141-optional-work-closure-exit.md)
+
+- [`00187 — APG142 Exact-Trigger and Maintenance Closure Exit`](2026/09/12/00187-apg142-exact-trigger-maintenance-closure-exit.md)
+
+- [`00188 — APG143 Integrated Readiness Prerequisite Exit`](2026/09/12/00188-apg143-integrated-readiness-prerequisite-exit.md)
+
+- [`00189 — APG144 Public Staging Candidate and Operator Handoff Exit`](2026/09/13/00189-apg144-public-staging-candidate-and-operator-handoff-exit.md)
+
+- [`00190 — APG145 Hosted CI Repair and Staging Correction Exit`](2026/09/13/00190-apg145-hosted-ci-repair-and-staging-correction-exit.md)

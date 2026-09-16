@@ -9,7 +9,7 @@ from typing import Any, Callable, NoReturn
 
 from apg_candidate_required_role_registry import (
     REGISTRY_PATH,
-    validate_required_role_registry,
+    validate_required_role_registry as validate_required_role_registry,
 )
 
 

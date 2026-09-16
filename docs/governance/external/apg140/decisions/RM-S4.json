@@ -1,0 +1,23 @@
+{
+  "schema_version": "apg.roadmap-decision/v1",
+  "item_id": "RM-S4",
+  "outcome": "DELIVERED",
+  "closure_phase": "V0110-C",
+  "author": "APG140 producer",
+  "reviewer": "Dispatcher-selected independent APG140 work reviewer",
+  "evidence": {
+    "implementation": [
+      "docs/governance/external/apg140/source-inventory.md",
+      "docs/governance/external/apg140/support-bindings.json"
+    ],
+    "qualification": [
+      "docs/governance/external/apg140/qualification.md"
+    ],
+    "compatibility": [
+      "docs/governance/external-compatibility.json"
+    ],
+    "rollback": [
+      "docs/governance/external/apg140/maintenance.md"
+    ]
+  }
+}

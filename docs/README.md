@@ -18,9 +18,9 @@ start with the [root README](../README.md).
   highlights and publication reconciliation.
 
 This documentation covers v0.10.0. The retained CI-first interfaces are preserved.
-Once this version is published, its packages are available across supported
-registries. The preceding **v0.9.0** and **v0.8.1** releases remain frozen.
-The [v0.10 roadmap](v0-10-roadmap.md) consolidates the six provisional web profiles.
+v0.10.0 is publicly released across GitHub, Go, PyPI and npm. The preceding **v0.9.0** and **v0.8.1** releases remain frozen.
+The [v0.11 closure roadmap](v0-11-roadmap.md) owns current development planning.
+The [v0.10 roadmap](v0-10-roadmap.md) is a historical release record.
 
 ## Use the CLI
 
@@ -104,8 +104,10 @@ does not equal JACA registration, and the XO consumer fixture is not JACA's prod
 
 ## Plan Repo Map support
 
-- [Repo Map support roadmap](repo-map-support-roadmap.md) separates reusable
-  v0.10 support from future protocol, graph-quality and migration gates.
+- [v0.11 external closure](v0-11-roadmap.md#v0110-c--external-contract-and-support-closure)
+  owns current Repo Map and JACA disposition work.
+- [Repo Map support roadmap](repo-map-support-roadmap.md) preserves the v0.10
+  source milestones; its inherited gates now belong to v0.11.
 
 ## Review architecture and decisions
 
@@ -119,6 +121,9 @@ does not equal JACA registration, and the XO consumer fixture is not JACA's prod
   phase IDs and independent record sequences.
 
 ## Inspect governance, maturity, and debt
+
+- [v0.11 closure governance](governance/v0-11-closure-governance.md) owns closure
+  accounting, maintenance triggers, compatibility watches and maturity records.
 
 - [Project model](project-model.md) is the governance entry point.
 - [Skill catalog](../skills/README.md) owns current skill maturity.
@@ -135,7 +140,10 @@ does not equal JACA registration, and the XO consumer fixture is not JACA's prod
 - [v0.7 roadmap](v0-7-roadmap.md) preserves the published v0.7 release sequence.
 - [v0.8 roadmap](v0-8-roadmap.md) records the completed v0.8.1 context-footprint program.
 - [v0.9 roadmap](v0-9-roadmap.md) records the released CI-first program and remaining consumer-owned work.
-- [Project roadmap](roadmap.md) provides the durable cross-release ledger.
+- [v0.11 roadmap](v0-11-roadmap.md) owns the inherited closure program.
+- [APG138 reconciliation](evaluations/apg138-v0-11-foundation-closure.md) records
+  terminal v0.10 publication and foundation scope.
+- [Project roadmap](roadmap.md) provides current navigation and phase history.
 - [Status index](status/README.md) lists terminal phase exit records.
 - [Public release process](public-release-process.md) owns publication
   procedure and boundaries.

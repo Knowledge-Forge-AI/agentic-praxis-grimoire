@@ -5,6 +5,7 @@ from __future__ import annotations
 import os
 from pathlib import Path
 import sys
+from typing import Any
 
 import pytest
 
@@ -360,14 +361,13 @@ def test_post_mkdir_descriptor_acquisition_failures_roll_back_created_directory(
         def fail_open(
             path: os.PathLike[str] | str,
             flags: int,
-            mode: int = 0o777,
-            *,
-            dir_fd: int | None = None,
+            *args: Any,
+            **kwargs: Any,
         ) -> int:
             nonlocal destination_descriptor
             if Path(path) == base and boundary.startswith("open"):
                 raise failure
-            descriptor = original_open(path, flags, mode, dir_fd=dir_fd)
+            descriptor = original_open(path, flags, *args, **kwargs)
             if Path(path) == base:
                 destination_descriptor = descriptor
             return descriptor
@@ -421,13 +421,12 @@ def test_pre_capture_replacement_is_never_adopted_for_cleanup(
     def fail_after_capture(
         path: os.PathLike[str] | str,
         flags: int,
-        mode: int = 0o777,
-        *,
-        dir_fd: int | None = None,
+        *args: Any,
+        **kwargs: Any,
     ) -> int:
         if Path(path) == base and replacement_identity is not None:
             raise OSError("injected open failure after replacement capture")
-        return original_open(path, flags, mode, dir_fd=dir_fd)
+        return original_open(path, flags, *args, **kwargs)
 
     monkeypatch.setattr(transaction.os, "stat", replace_before_capture)
     monkeypatch.setattr(transaction.os, "open", fail_after_capture)
@@ -780,8 +779,8 @@ def test_source_replacement_is_detected_inside_link_and_state_install(
                 return original_atomic(
                     destination,
                     target,
-                    register,  # type: ignore[arg-type]
-                    validate,  # type: ignore[arg-type]
+                    register,
+                    validate,
                 )
 
             monkeypatch.setattr(
@@ -802,8 +801,8 @@ def test_source_replacement_is_detected_inside_link_and_state_install(
                     destination,
                     value,
                     expected,
-                    validate,  # type: ignore[arg-type]
-                    committed,  # type: ignore[arg-type]
+                    validate,
+                    committed,
                 )
 
             monkeypatch.setattr(transaction, "write_state", race_state)
@@ -832,17 +831,16 @@ def test_marker_path_replacement_after_open_is_rejected_before_commit(
     def replace_after_open(
         path: os.PathLike[str] | str,
         flags: int,
-        mode: int = 0o777,
-        *,
-        dir_fd: int | None = None,
+        *args: Any,
+        **kwargs: Any,
     ) -> int:
         candidate = Path(path)
         if candidate != marker:
-            return original_open(path, flags, mode, dir_fd=dir_fd)
+            return original_open(path, flags, *args, **kwargs)
         if saved.exists():
             marker.unlink()
             saved.rename(marker)
-        descriptor = original_open(path, flags, mode, dir_fd=dir_fd)
+        descriptor = original_open(path, flags, *args, **kwargs)
         marker.rename(saved)
         marker.write_bytes(payload)
         return descriptor

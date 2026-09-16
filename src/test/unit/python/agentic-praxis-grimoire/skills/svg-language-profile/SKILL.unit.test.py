@@ -12,7 +12,6 @@ from __future__ import annotations
 import math
 from pathlib import Path
 import sys
-import xml.etree.ElementTree as ET
 import pytest
 
 from src.test.apg_test_support import repository_root

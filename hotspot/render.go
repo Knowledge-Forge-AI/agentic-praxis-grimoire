@@ -63,6 +63,10 @@ func RenderTerminal(report Report) ([]byte, error) {
 
 // RenderMarkdown returns a deterministic detailed report with a complete file appendix.
 func RenderMarkdown(report Report) ([]byte, error) {
+	return renderMarkdown(report, false)
+}
+
+func renderMarkdown(report Report, historySelected bool) ([]byte, error) {
 	if err := validateReport(report); err != nil {
 		return nil, err
 	}
@@ -74,7 +78,7 @@ func RenderMarkdown(report Report) ([]byte, error) {
 	renderMarkdownSizes(&output, report)
 	renderMarkdownOwners(&output, report)
 	renderMarkdownRegionsAndCandidates(&output, report)
-	renderMarkdownLimitationsAndAppendix(&output, report)
+	renderMarkdownLimitationsAndAppendix(&output, report, historySelected)
 	return output.Bytes(), nil
 }
 
@@ -148,8 +152,14 @@ func renderMarkdownRegionsAndCandidates(output *bytes.Buffer, report Report) {
 	}
 }
 
-func renderMarkdownLimitationsAndAppendix(output *bytes.Buffer, report Report) {
-	output.WriteString("\n## Unavailable and deferred metrics\n\n- `growth/churn`: deferred; this analyzer does not inspect Git history.\n- Unsupported semantic metrics remain explicit `unavailable` values and contribute no ranking weight.\n\n## Warnings and limitations\n\n")
+func renderMarkdownLimitationsAndAppendix(output *bytes.Buffer, report Report, historySelected bool) {
+	output.WriteString("\n## Unavailable and deferred metrics\n\n")
+	if historySelected {
+		output.WriteString("- File-level history is explicitly selected in the v2 appendix; structural rankings above are unchanged.\n")
+	} else {
+		output.WriteString("- `growth/churn`: deferred; this analyzer does not inspect Git history.\n")
+	}
+	output.WriteString("- Unsupported semantic metrics remain explicit `unavailable` values and contribute no ranking weight.\n\n## Warnings and limitations\n\n")
 	if len(report.Warnings) == 0 {
 		output.WriteString("No parse warnings were recorded. Structural scanners remain bounded lexical evidence, not grammar validity.\n")
 	} else {

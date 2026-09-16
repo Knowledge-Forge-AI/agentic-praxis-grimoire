@@ -190,10 +190,7 @@ func validateExplicit(configuration config, repositoryRequired bool) error {
 		if configuration.repository == "" || !filepath.IsAbs(configuration.repository) || filepath.Clean(configuration.repository) != configuration.repository {
 			return usageError{"an absolute clean --repository is required"}
 		}
-		expected := filepath.Base(configuration.repository)
-		if configuration.compatibility {
-			expected = strings.TrimLeft(expected, ".")
-		}
+		expected := strings.TrimLeft(filepath.Base(configuration.repository), ".")
 		if configuration.project != expected {
 			return usageError{"--project must match the repository basename for report writes"}
 		}

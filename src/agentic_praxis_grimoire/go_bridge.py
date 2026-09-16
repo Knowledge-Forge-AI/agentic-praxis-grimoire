@@ -22,7 +22,8 @@ import stat
 import subprocess
 import sys
 import tempfile
-from typing import Mapping, Sequence
+from types import FrameType
+from typing import Any, Callable, Mapping, Sequence
 
 
 MODULE_PATH = "github.com/Knowledge-Forge-AI/agentic-praxis-grimoire"
@@ -32,6 +33,7 @@ BUILD_INFO_SCHEMA = "apg.build-info/v1"
 BUILD_FLAGS = ("CGO_ENABLED=0", "-trimpath", "-buildvcs=false", "-buildid=")
 CORPUS_RESOURCE = "resources/skill-metadata.json"
 SUPPORTED_TARGETS = frozenset({"darwin/arm64", "linux/amd64", "linux/arm64"})
+_SignalHandler = Callable[[int, FrameType | None], Any] | int | signal.Handlers | None
 
 
 class GoBridgeError(RuntimeError):
@@ -465,10 +467,10 @@ def _execute_capture(
 
 
 def _wait_with_forwarding(process: subprocess.Popen[bytes]) -> int:
-    handled = [signal.SIGINT, signal.SIGTERM]
+    handled: list[signal.Signals] = [signal.SIGINT, signal.SIGTERM]
     if hasattr(signal, "SIGHUP"):
         handled.append(signal.SIGHUP)
-    previous: dict[signal.Signals, object] = {}
+    previous: dict[signal.Signals, _SignalHandler] = {}
 
     def forward(signum: int, _frame: object) -> None:
         try:
@@ -489,10 +491,10 @@ def _wait_with_forwarding(process: subprocess.Popen[bytes]) -> int:
 def _communicate_with_forwarding(
     process: subprocess.Popen[bytes], input_bytes: bytes | None
 ) -> tuple[bytes, bytes]:
-    handled = [signal.SIGINT, signal.SIGTERM]
+    handled: list[signal.Signals] = [signal.SIGINT, signal.SIGTERM]
     if hasattr(signal, "SIGHUP"):
         handled.append(signal.SIGHUP)
-    previous: dict[signal.Signals, object] = {}
+    previous: dict[signal.Signals, _SignalHandler] = {}
 
     def forward(signum: int, _frame: object) -> None:
         try:

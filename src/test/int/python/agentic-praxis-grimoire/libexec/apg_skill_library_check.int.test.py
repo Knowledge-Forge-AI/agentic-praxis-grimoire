@@ -15,7 +15,6 @@ from src.test.apg_test_support import repository_root
 REPOSITORY_ROOT = repository_root(__file__)
 sys.path.insert(0, str(REPOSITORY_ROOT / "libexec"))
 
-import apg_skill_library_check as checker  # noqa: E402
 from apg_skill_library_check import (  # noqa: E402
     check_library,
     _resolve_discovery_policy,
@@ -26,11 +25,13 @@ from apg_skill_library_check import (  # noqa: E402
     DISCOVERY_POLICY_VERSION_V010,
     DISCOVERY_POLICY_VERSION_V010_BROWSER_UI,
     DISCOVERY_POLICY_VERSION_V010_TOOLCHAIN,
-    V010_BROWSER_UI_ADMISSION_CEILING,
     V010_BROWSER_UI_ADMITTED_CANDIDATES,
-    V010_TOOLCHAIN_ADMISSION_CEILING,
     V010_TOOLCHAIN_ADMITTED_CANDIDATES,
     REQUIRED_H2S,
+    FROZEN_VITE_SKILL_DESCRIPTION,
+    FROZEN_NPM_SKILL_DESCRIPTION,
+    DISCOVERY_POLICY_VERSION_V010_BROWSER_RUNTIME,
+    V010_BROWSER_RUNTIME_ADMITTED_CANDIDATES,
 )
 
 
@@ -587,7 +588,6 @@ if __name__ == "__main__":
     unittest.main()
 
 
-from apg_skill_library_check import (FROZEN_VITE_SKILL_DESCRIPTION, FROZEN_NPM_SKILL_DESCRIPTION, DISCOVERY_POLICY_VERSION_V010_BROWSER_RUNTIME, V010_BROWSER_RUNTIME_ADMISSION_CEILING, V010_BROWSER_RUNTIME_ADMITTED_CANDIDATES)
 
 def _apg125_build_skill_md(name: str, description: str, body_extra: str = "") -> str:
     sections = "".join(f"\n## {heading}\nEvidence for {heading.lower()}.\n" for heading in REQUIRED_H2S)

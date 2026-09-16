@@ -1,0 +1,68 @@
+{
+  "amendment": {
+    "allowed_exception_case": "APG60-CSS-024",
+    "contract_revision": "APG60A",
+    "exception_grant_source": "repository-policy"
+  },
+  "artifact": "apg60-css-public-state-fixture",
+  "candidate": "css-language-profile",
+  "history": {
+    "apg58": {
+      "candidate_surface": "present",
+      "public_adr": "docs/adr/2026/07/0035-css-language-profile-and-policy-selected-structural-limits.md",
+      "public_evaluation": "docs/evaluations/apg58-css-language-profile-pilot-authoring.md",
+      "public_exit": "docs/status/2026/07/29/00078-apg58-css-language-profile-pilot-authoring-exit.md"
+    },
+    "apg59": {
+      "candidate_surface": "absent",
+      "public_adr": "docs/adr/2026/07/0035-css-language-profile-and-policy-selected-structural-limits.md",
+      "public_evaluation": "docs/evaluations/apg59-css-language-profile-validation-and-integration.md",
+      "public_exit": "docs/status/2026/07/29/00079-apg59-css-language-profile-validation-and-integration-exit.md"
+    }
+  },
+  "refusal": {
+    "expected_error": "current candidate surface",
+    "restored_surface": "rejected",
+    "synthetic_lifecycle": "rejected"
+  },
+  "schema_version": 1,
+  "source_boundary": "synthetic public behavior; exact historical Git evidence remains outside this fixture",
+  "states": [
+    {
+      "candidate_surface": "absent",
+      "canonical_skills": 30,
+      "catalog_rows": 30,
+      "general_routes": 28,
+      "known_debt": "absent",
+      "local_routes": 1,
+      "projections": 30,
+      "provisional": 16,
+      "stable": 14,
+      "state": "preintegration"
+    },
+    {
+      "candidate_surface": "absent",
+      "canonical_skills": 28,
+      "catalog_rows": 28,
+      "general_routes": 26,
+      "known_debt": "absent",
+      "local_routes": 1,
+      "projections": 28,
+      "provisional": 14,
+      "stable": 14,
+      "state": "rejected"
+    },
+    {
+      "candidate_surface": "present",
+      "canonical_skills": 45,
+      "catalog_rows": 45,
+      "general_routes": 43,
+      "known_debt": "present",
+      "local_routes": 1,
+      "projections": 45,
+      "provisional": 31,
+      "stable": 14,
+      "state": "current"
+    }
+  ]
+}

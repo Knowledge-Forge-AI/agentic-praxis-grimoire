@@ -1,0 +1,40 @@
+{
+  "schema_version": "apg142-maintenance-closure-candidate-v1",
+  "item_id": "APGR-CXT-BUDGET-COMPRESSION",
+  "trigger_id": "APGR-CXT-BUDGET-COMPRESSION",
+  "finding": "FALSE",
+  "review_status": "PENDING_DISPATCHER_PRE_FINAL",
+  "review_ref": null,
+  "review_sha256": null,
+  "receipt": {
+    "schema_version": "apg.roadmap-decision/v1",
+    "item_id": "APGR-CXT-BUDGET-COMPRESSION",
+    "outcome": "MAINTENANCE_TRIGGER",
+    "closure_phase": "V0110-E",
+    "author": "APG142 producer",
+    "reviewer": null,
+    "evidence": {
+      "trigger_observation": [
+        "docs/adr/2026/09/0055-v0-11-capacity-and-closure-governance.md",
+        "docs/governance/maintenance/apg142/context-compression.md"
+      ],
+      "refresh_procedure": [
+        "docs/governance/maintenance/apg142/context-compression.md"
+      ],
+      "independent_review": []
+    }
+  },
+  "proposed_disposition": {
+    "decision_ref": "docs/governance/maintenance/apg142/decisions/APGR-CXT-BUDGET-COMPRESSION.json",
+    "qualification_refs": [
+      "docs/adr/2026/09/0055-v0-11-capacity-and-closure-governance.md",
+      "docs/governance/maintenance/apg142/context-compression.md",
+      "docs/governance/maintenance/apg142/qualification.md"
+    ],
+    "review_ref": null,
+    "rationale": "APG142 individual APGR-CXT-BUDGET-COMPRESSION audit finds the exact recurring condition FALSE in the inspected accepted/current source scope; active debt and maturity consequences are preserved. Pending actual dispatcher review.",
+    "maintenance_ref": "APGR-CXT-BUDGET-COMPRESSION",
+    "compatibility_ref": null,
+    "maturity_ref": null
+  }
+}

@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import importlib
 import json
-import os
 from pathlib import Path
 import subprocess
 import sys
@@ -135,7 +134,7 @@ def test_worker_receives_only_stripped_environment_and_one_temp_family(
         worker_root = Path(kwargs["env"]["TMPDIR"])
         assert worker_root.parent == selected
         assert worker_root.is_dir()
-        assert not repository in worker_root.parents
+        assert repository not in worker_root.parents
         return _successful_result(args)
 
     monkeypatch.setattr(module.subprocess, "run", capture)

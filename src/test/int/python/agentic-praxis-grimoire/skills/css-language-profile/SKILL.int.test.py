@@ -126,7 +126,6 @@ def test_candidate_fixture_debt_and_repository_lifecycle_agree() -> None:
         "low": 1,
         "medium": 4,
     }
-    assert validate_current_contract(ROOT)["current_machine_bytes"] == 161893
     for text in (
         LEAF.read_text(encoding="utf-8"),
         SPECIFICATION.read_text(encoding="utf-8"),
@@ -159,6 +158,11 @@ def test_candidate_fixture_debt_and_repository_lifecycle_agree() -> None:
         expected = marker(CANDIDATE, "retained-provisional")
         assert text.count(expected) == 1
         assert text.count(f"<!-- APG-CANDIDATE-STATE: {CANDIDATE} ") == 1
+
+
+def test_private_current_machine_contract_remains_source_bound() -> None:
+    """Private exact-source evidence; public projection uses the state fixture."""
+    assert validate_current_contract(ROOT)["current_machine_bytes"] == 161893
 
 
 def test_catalog_projection_maturity_routes_and_project_set_are_exact() -> None:

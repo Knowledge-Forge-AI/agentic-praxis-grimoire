@@ -1,0 +1,20 @@
+{
+  "schema_version": "apg.roadmap-decision/v1",
+  "item_id": "APGR-DEBT-JS-QD-005",
+  "outcome": "MAINTENANCE_TRIGGER",
+  "closure_phase": "V0110-E",
+  "author": "APG142 producer",
+  "reviewer": "Dispatcher-supplied APG142 independent pre-final reviewer",
+  "evidence": {
+    "trigger_observation": [
+      "docs/adr/2026/09/0054-js-qd-005-refresh-trigger-interpretation.md",
+      "docs/governance/maintenance/apg142/js-qd-005.md"
+    ],
+    "refresh_procedure": [
+      "docs/governance/maintenance/apg142/js-qd-005.md"
+    ],
+    "independent_review": [
+      "docs/governance/maintenance/apg142/work-review.md"
+    ]
+  }
+}

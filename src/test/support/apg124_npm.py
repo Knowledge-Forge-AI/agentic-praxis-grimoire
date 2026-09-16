@@ -20,7 +20,6 @@ import shutil
 import signal
 import stat
 import subprocess
-import sys
 import time
 from typing import Any, Dict, List, Optional, Sequence, Set, Tuple
 import uuid

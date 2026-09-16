@@ -1,0 +1,1054 @@
+{
+  "schema_version": "apg.maintenance-ledger/v1",
+  "release": "v0.11",
+  "owner_phase": "APG139",
+  "triggers": [
+    {
+      "trigger_id": "APGR-CXT-BUDGET-COMPRESSION",
+      "owner": "APGR",
+      "source_authority": [
+        "docs/v0-10-backlog-consolidation.md",
+        "docs/adr/2026/09/0053-v0-10-discovery-capacity-and-svg.md"
+      ],
+      "refresh_condition": "Exhaustion of ADR 0053 capacity ceiling (11,507 bytes) or explicit operator rejection of reservation model",
+      "repair_condition": "Semantic discovery parity tests demonstrating no loss of routing precision across benchmark queries",
+      "current_state": "FALSE",
+      "state_evidence": [
+        "docs/adr/2026/09/0055-v0-11-capacity-and-closure-governance.md",
+        "docs/governance/maintenance/apg142/context-compression.md"
+      ],
+      "interpretation": "APG142 supplied independent review supports the bounded FALSE finding. Fresh maintained measurement gives 11,142 UTF-8 description bytes below the unchanged 11,507 ceiling for 45 leaves; the assignment retains the reservation model. Neither accepted branch fires. ADR 0055 status reconciliation remains V0110-F work; no compression or capacity change occurs.",
+      "affected_behavior": "Semantic compression of the current 45 skill descriptions; the historical APG126 estimate covered 39 descriptions and targeted 1,200\u20132,000 reclaimed bytes, not a current compression requirement.",
+      "blocks_stable": false,
+      "evidence_required": [
+        "Exhaustion of ADR 0053 capacity ceiling (11,507 bytes) or explicit operator rejection of reservation model",
+        "Semantic discovery parity tests demonstrating no loss of routing precision across benchmark queries"
+      ],
+      "refresh_procedure": "Evaluate the exact recorded condition using current source-bound evidence; document the decision before repair or roadmap closure.",
+      "affected_skills": []
+    },
+    {
+      "trigger_id": "APGR-REPORT-PUREGO-GIT",
+      "owner": "APGR",
+      "source_authority": [
+        "docs/v0-10-backlog-consolidation.md",
+        "docs/architecture/v0-7-embeddable-toolkit.md"
+      ],
+      "refresh_condition": "Only triggered if an environment strictly prohibits subprocess execution or Git CLI binary availability.",
+      "repair_condition": "Bit-for-bit parity with Git CLI diffs without launching subprocesses",
+      "current_state": "FALSE",
+      "state_evidence": [
+        "docs/governance/maintenance/apg142/purego-git.md"
+      ],
+      "interpretation": "APG142 supplied independent review supports the bounded FALSE finding. The supported APG-JACA reporting contract expressly permits native Git subprocesses and current development operations use Git. No exact prohibition is observed in that bounded scope; no universal consumer-runtime claim or backend repair is made.",
+      "affected_behavior": "Replacement of internal Git CLI exec in `report.Service` with in-process pure-Go Git object reading",
+      "blocks_stable": false,
+      "evidence_required": [
+        "Demonstrated inadequacy, security defect, or platform restriction of sanitized `git` CLI subprocess invocation",
+        "Bit-for-bit parity with Git CLI diffs without launching subprocesses"
+      ],
+      "refresh_procedure": "Evaluate the exact recorded condition using current source-bound evidence; document the decision before repair or roadmap closure.",
+      "affected_skills": []
+    },
+    {
+      "trigger_id": "CSS-QD-001",
+      "owner": "CSS profile maintainers",
+      "source_authority": [
+        "docs/governance/language-profile-known-debt.json"
+      ],
+      "refresh_condition": "TARGET-007 purpose, source IDs, target identity, or source registry changes",
+      "repair_condition": "Introduce a compact independent source-purpose binding when future TARGET-007 maintenance justifies it.",
+      "current_state": "FALSE",
+      "state_evidence": [
+        "docs/governance/maintenance/apg142/css-qd-001.md"
+      ],
+      "interpretation": "APG142 supplied independent review supports the bounded FALSE finding. Public APG77D target-first manifest, scenario fixture and candidate/retention contracts preserve TARGET-007 purpose, source IDs, target identity and source-registry semantics. Later lifecycle metadata does not change those named inputs. Active stable-blocking debt remains.",
+      "affected_behavior": "qualification machinery only",
+      "blocks_stable": true,
+      "evidence_required": [
+        "Treat compact-v3 source validation as supporting evidence only and require explicit primary-source and non-author review for any TARGET-007 authority change."
+      ],
+      "refresh_procedure": "Introduce a compact independent source-purpose binding when future TARGET-007 maintenance justifies it. Refresh only under the named condition and preserve historical evidence.",
+      "affected_skills": [
+        "css-language-profile"
+      ]
+    },
+    {
+      "trigger_id": "CSS-QD-002",
+      "owner": "CSS profile maintainers",
+      "source_authority": [
+        "docs/governance/language-profile-known-debt.json"
+      ],
+      "refresh_condition": "Lane N, Lane T2, compact v3, Selection, or Response changes",
+      "repair_condition": "Add an independently frozen disagreement index if the lane mechanism becomes current authority again.",
+      "current_state": "FALSE",
+      "state_evidence": [
+        "docs/governance/maintenance/apg142/css-qd-002.md"
+      ],
+      "interpretation": "APG142 supplied independent review supports the bounded FALSE finding. Public APG77D scenario and retention contracts preserve the closed Selection/Response vocabularies and compact authority. Supporting private lane/compact comparisons observe no Lane N, Lane T2 or compact v3 change; those complete private vectors are not publicly reproducible here. The exact refresh is FALSE, independently of the narrower disagreement-index repair threshold. Active stable-blocking debt remains.",
+      "affected_behavior": "qualification machinery only",
+      "blocks_stable": true,
+      "evidence_required": [
+        "Do not treat adjudication count alone as proof of complete disagreement coverage; require fresh human comparison for lane or compact-row changes."
+      ],
+      "refresh_procedure": "Add an independently frozen disagreement index if the lane mechanism becomes current authority again. Refresh only under the named condition and preserve historical evidence.",
+      "affected_skills": [
+        "css-language-profile"
+      ]
+    },
+    {
+      "trigger_id": "CSS-QD-003",
+      "owner": "CSS profile maintainers",
+      "source_authority": [
+        "docs/governance/language-profile-known-debt.json"
+      ],
+      "refresh_condition": "Adjudication, source registry, purpose, or authority changes",
+      "repair_condition": "Add a bounded row/source relation only when a real maintenance workflow needs machine generation or automatic adjudication.",
+      "current_state": "FALSE",
+      "state_evidence": [
+        "docs/governance/maintenance/apg142/css-qd-003.md"
+      ],
+      "interpretation": "APG142 supplied independent review supports the bounded FALSE finding. Public APG77D target-first registry, scenario fixture and retention/candidate contracts preserve source, purpose and adjudication authority; lifecycle annotations do not revise it. Private purpose/compact comparisons support the unchanged named rows with limited public reproducibility. The refresh is FALSE independently of machine-generation or automatic-adjudication need. Active stable-blocking debt remains.",
+      "affected_behavior": "qualification machinery only",
+      "blocks_stable": true,
+      "evidence_required": [
+        "Require row-specific non-author review for every changed adjudication source."
+      ],
+      "refresh_procedure": "Add a bounded row/source relation only when a real maintenance workflow needs machine generation or automatic adjudication. Refresh only under the named condition and preserve historical evidence.",
+      "affected_skills": [
+        "css-language-profile"
+      ]
+    },
+    {
+      "trigger_id": "CSS-QD-004",
+      "owner": "CSS profile maintainers",
+      "source_authority": [
+        "docs/governance/language-profile-known-debt.json"
+      ],
+      "refresh_condition": "Route owner, decision scope, stop state, or obligation schema changes",
+      "repair_condition": "Add the invariant during the next material route-schema revision.",
+      "current_state": "FALSE",
+      "state_evidence": [
+        "docs/governance/maintenance/apg142/css-qd-004.md"
+      ],
+      "interpretation": "APG142 supplied independent review supports the bounded FALSE finding. The preserved public CSS retention contract and route vocabulary retain owner, decision scope, stop state and obligation schema. No CSS route-schema revision occurred; unrelated governance and hotspot schemas do not change that authority. Active stable-blocking debt remains.",
+      "affected_behavior": "qualification machinery only",
+      "blocks_stable": true,
+      "evidence_required": [
+        "Inspect owner and decision scope independently of obligation ID whenever route rows change."
+      ],
+      "refresh_procedure": "Add the invariant during the next material route-schema revision. Refresh only under the named condition and preserve historical evidence.",
+      "affected_skills": [
+        "css-language-profile"
+      ]
+    },
+    {
+      "trigger_id": "CSS-QD-005",
+      "owner": "CSS profile maintainers",
+      "source_authority": [
+        "docs/governance/language-profile-known-debt.json"
+      ],
+      "refresh_condition": "Compact schema revision",
+      "repair_condition": "Remove the arrays during a future compatible compact-schema revision.",
+      "current_state": "FALSE",
+      "state_evidence": [
+        "docs/governance/maintenance/apg142/css-qd-005.md"
+      ],
+      "interpretation": "APG142 supplied independent review supports the bounded FALSE finding. The named CSS compact schema and retained arrays are unchanged from accepted APG77D authority. No compatible compact-schema revision triggers removal of redundant arrays. The debt remains active and non-stable-blocking.",
+      "affected_behavior": "compact schema redundancy",
+      "blocks_stable": false,
+      "evidence_required": [
+        "No operational workaround is required; retain the arrays until a compatible schema revision."
+      ],
+      "refresh_procedure": "Remove the arrays during a future compatible compact-schema revision. Refresh only under the named condition and preserve historical evidence.",
+      "affected_skills": [
+        "css-language-profile"
+      ]
+    },
+    {
+      "trigger_id": "JS-QD-005",
+      "owner": "JavaScript profile maintainers and APG managed-report maintainers",
+      "source_authority": [
+        "docs/governance/language-profile-known-debt.json",
+        "docs/adr/2026/09/0054-js-qd-005-refresh-trigger-interpretation.md"
+      ],
+      "refresh_condition": "APG79B managed-report path, bytes, record order, report IDs, generator, operational associations, source-role record, historical-false-identity disposition, or managed-report integrity contract changes",
+      "repair_condition": "Add one proportionate direct managed-report identity binding, preferably an existing report ID plus exact full-file digest or reusable report-integrity owner, that rejects a changed APG79B report without making the large report a semantic oracle, release payload, or duplicated current evidence system.",
+      "current_state": "FALSE",
+      "state_evidence": [
+        "docs/adr/2026/09/0054-js-qd-005-refresh-trigger-interpretation.md",
+        "docs/governance/maintenance/apg142/js-qd-005.md"
+      ],
+      "interpretation": "JS_QD_005_REFRESH_NOT_TRIGGERED",
+      "affected_behavior": "supporting Test262 source-role and historical managed-report integrity qualification only",
+      "blocks_stable": true,
+      "evidence_required": [
+        "Before current JavaScript integration and after every future material change to the Test262 source-role owner, report generator, report format, APG79B commit/report identities, or managed report, directly locate the canonical APG79B report, parse it through EOF, regenerate its Git-show payloads from the immutable commits, verify operational associations, and compare the exact full-file byte digest; do not rely on the compact mutation alone."
+      ],
+      "refresh_procedure": "Add one proportionate direct managed-report identity binding, preferably an existing report ID plus exact full-file digest or reusable report-integrity owner, that rejects a changed APG79B report without making the large report a semantic oracle, release payload, or duplicated current evidence system. Refresh only under the named condition and preserve historical evidence.",
+      "affected_skills": [
+        "javascript-language-profile"
+      ]
+    },
+    {
+      "trigger_id": "MATURITY:astro-profile",
+      "owner": "astro-profile maintainers",
+      "source_authority": [
+        "docs/governance/maturity/apg139/astro-profile.json",
+        "skills/astro-profile/SKILL.md",
+        "docs/governance/language-profile-known-debt.json"
+      ],
+      "refresh_condition": "Supply actual Astro execution-boundary and client-directive/content-adapter guidance-use receipts across materially distinct tasks, including a non-trigger handoff to the relevant JSX, React or browser owner; bind compiler and adapter context and obtain current independent validation.",
+      "repair_condition": "No procedure repair is authorized by this maturity observation. No controlling debt is recorded for this leaf; reopening requires the named guidance-use and independent-validation evidence.",
+      "current_state": "FALSE",
+      "state_evidence": [
+        "docs/governance/maturity/apg139/astro-profile.json"
+      ],
+      "interpretation": "MATURITY_REOPENING_EVIDENCE_INCOMPLETE",
+      "affected_behavior": "astro",
+      "affected_skills": [
+        "astro-profile"
+      ],
+      "blocks_stable": false,
+      "evidence_required": [
+        "Supply actual Astro execution-boundary and client-directive/content-adapter guidance-use receipts across materially distinct tasks, including a non-trigger handoff to the relevant JSX, React or browser owner; bind compiler and adapter context and obtain current independent validation.",
+        "Actual independent per-leaf maturity review",
+        "Preserve exact controlling debt IDs: none"
+      ],
+      "refresh_procedure": "When the named evidence is supplied, inspect its guidance-use custody and non-trigger outcome; review this leaf independently, verify exact debt status, and deliberately update its maturity record and binding. This grants no consumer execution or debt repair authority."
+    },
+    {
+      "trigger_id": "MATURITY:browser-runtime-profile",
+      "owner": "browser-runtime-profile maintainers",
+      "source_authority": [
+        "docs/governance/maturity/apg139/browser-runtime-profile.json",
+        "skills/browser-runtime-profile/SKILL.md",
+        "docs/governance/language-profile-known-debt.json"
+      ],
+      "refresh_condition": "Supply repeated actual browser-host guidance decisions bound to engine, version, platform, origin and context with executed host predicates, plus a language-only non-trigger and explicit WebView/assistive-technology limits for independent review.",
+      "repair_condition": "No procedure repair is authorized by this maturity observation. No controlling debt is recorded for this leaf; reopening requires the named guidance-use and independent-validation evidence.",
+      "current_state": "FALSE",
+      "state_evidence": [
+        "docs/governance/maturity/apg139/browser-runtime-profile.json"
+      ],
+      "interpretation": "MATURITY_REOPENING_EVIDENCE_INCOMPLETE",
+      "affected_behavior": "browser host/origin/context",
+      "affected_skills": [
+        "browser-runtime-profile"
+      ],
+      "blocks_stable": false,
+      "evidence_required": [
+        "Supply repeated actual browser-host guidance decisions bound to engine, version, platform, origin and context with executed host predicates, plus a language-only non-trigger and explicit WebView/assistive-technology limits for independent review.",
+        "Actual independent per-leaf maturity review",
+        "Preserve exact controlling debt IDs: none"
+      ],
+      "refresh_procedure": "When the named evidence is supplied, inspect its guidance-use custody and non-trigger outcome; review this leaf independently, verify exact debt status, and deliberately update its maturity record and binding. This grants no consumer execution or debt repair authority."
+    },
+    {
+      "trigger_id": "MATURITY:chatgpt-manager-workflow",
+      "owner": "chatgpt-manager-workflow maintainers",
+      "source_authority": [
+        "docs/governance/maturity/apg139/chatgpt-manager-workflow.json",
+        "skills/chatgpt/chatgpt-manager-workflow/SKILL.md",
+        "docs/governance/language-profile-known-debt.json"
+      ],
+      "refresh_condition": "Supply repeated actual manager-routing decisions across distinct tasks, preserving exact source/map identity, an ordinary-Codex non-trigger and authority stop cases; bind client discovery observations and independently validate the outcomes.",
+      "repair_condition": "No procedure repair is authorized by this maturity observation. No controlling debt is recorded for this leaf; reopening requires the named guidance-use and independent-validation evidence.",
+      "current_state": "FALSE",
+      "state_evidence": [
+        "docs/governance/maturity/apg139/chatgpt-manager-workflow.json"
+      ],
+      "interpretation": "MATURITY_REOPENING_EVIDENCE_INCOMPLETE",
+      "affected_behavior": "manager route/source-map selection",
+      "affected_skills": [
+        "chatgpt-manager-workflow"
+      ],
+      "blocks_stable": false,
+      "evidence_required": [
+        "Supply repeated actual manager-routing decisions across distinct tasks, preserving exact source/map identity, an ordinary-Codex non-trigger and authority stop cases; bind client discovery observations and independently validate the outcomes.",
+        "Actual independent per-leaf maturity review",
+        "Preserve exact controlling debt IDs: none"
+      ],
+      "refresh_procedure": "When the named evidence is supplied, inspect its guidance-use custody and non-trigger outcome; review this leaf independently, verify exact debt status, and deliberately update its maturity record and binding. This grants no consumer execution or debt repair authority."
+    },
+    {
+      "trigger_id": "MATURITY:composing-approved-roadmap-assignments",
+      "owner": "composing-approved-roadmap-assignments maintainers",
+      "source_authority": [
+        "docs/governance/maturity/apg139/composing-approved-roadmap-assignments.json",
+        "skills/chatgpt/composing-approved-roadmap-assignments/SKILL.md",
+        "docs/governance/language-profile-known-debt.json"
+      ],
+      "refresh_condition": "Supply repeated actual assignments from already approved roadmap phases, each binding approval, semantic phase identity, scope, acceptance, stop and rollback; include direct-task and unapproved-roadmap non-triggers and independent validation.",
+      "repair_condition": "No procedure repair is authorized by this maturity observation. No controlling debt is recorded for this leaf; reopening requires the named guidance-use and independent-validation evidence.",
+      "current_state": "FALSE",
+      "state_evidence": [
+        "docs/governance/maturity/apg139/composing-approved-roadmap-assignments.json"
+      ],
+      "interpretation": "MATURITY_REOPENING_EVIDENCE_INCOMPLETE",
+      "affected_behavior": "approval-bound phase assignment",
+      "affected_skills": [
+        "composing-approved-roadmap-assignments"
+      ],
+      "blocks_stable": false,
+      "evidence_required": [
+        "Supply repeated actual assignments from already approved roadmap phases, each binding approval, semantic phase identity, scope, acceptance, stop and rollback; include direct-task and unapproved-roadmap non-triggers and independent validation.",
+        "Actual independent per-leaf maturity review",
+        "Preserve exact controlling debt IDs: none"
+      ],
+      "refresh_procedure": "When the named evidence is supplied, inspect its guidance-use custody and non-trigger outcome; review this leaf independently, verify exact debt status, and deliberately update its maturity record and binding. This grants no consumer execution or debt repair authority."
+    },
+    {
+      "trigger_id": "MATURITY:converting-bash-scripts-to-python",
+      "owner": "converting-bash-scripts-to-python maintainers",
+      "source_authority": [
+        "docs/governance/maturity/apg139/converting-bash-scripts-to-python.json",
+        "skills/converting-bash-scripts-to-python/SKILL.md",
+        "docs/governance/language-profile-known-debt.json"
+      ],
+      "refresh_condition": "Supply actual authorized Bash-to-Python migration guidance use with caller/behavior characterization, old/new parity and intentional deltas, rollout and rollback evidence; establish repeated use across distinct migration decisions and include a new-Python non-trigger for independent review.",
+      "repair_condition": "No procedure repair is authorized by this maturity observation. No controlling debt is recorded for this leaf; reopening requires the named guidance-use and independent-validation evidence.",
+      "current_state": "FALSE",
+      "state_evidence": [
+        "docs/governance/maturity/apg139/converting-bash-scripts-to-python.json"
+      ],
+      "interpretation": "MATURITY_REOPENING_EVIDENCE_INCOMPLETE",
+      "affected_behavior": "Bash contract/parity/cutover",
+      "affected_skills": [
+        "converting-bash-scripts-to-python"
+      ],
+      "blocks_stable": false,
+      "evidence_required": [
+        "Supply actual authorized Bash-to-Python migration guidance use with caller/behavior characterization, old/new parity and intentional deltas, rollout and rollback evidence; establish repeated use across distinct migration decisions and include a new-Python non-trigger for independent review.",
+        "Actual independent per-leaf maturity review",
+        "Preserve exact controlling debt IDs: none"
+      ],
+      "refresh_procedure": "When the named evidence is supplied, inspect its guidance-use custody and non-trigger outcome; review this leaf independently, verify exact debt status, and deliberately update its maturity record and binding. This grants no consumer execution or debt repair authority."
+    },
+    {
+      "trigger_id": "MATURITY:css-language-profile",
+      "owner": "css-language-profile maintainers",
+      "source_authority": [
+        "docs/governance/maturity/apg139/css-language-profile.json",
+        "skills/css-language-profile/SKILL.md",
+        "docs/governance/language-profile-known-debt.json"
+      ],
+      "refresh_condition": "After an authorized phase resolves CSS-QD-001, CSS-QD-002, CSS-QD-003, CSS-QD-004 under the exact linked known-debt records, supply repeated actual static CSS guidance decisions binding complete artifact and cascade inputs, with DOM/rendering and preprocessor non-trigger handoffs and fresh independent semantic validation.",
+      "repair_condition": "No procedure repair is authorized by this maturity observation. Controlling debt IDs: CSS-QD-001, CSS-QD-002, CSS-QD-003, CSS-QD-004; use their exact known-debt refresh and repair records.",
+      "current_state": "FALSE",
+      "state_evidence": [
+        "docs/governance/maturity/apg139/css-language-profile.json"
+      ],
+      "interpretation": "MATURITY_REOPENING_EVIDENCE_INCOMPLETE",
+      "affected_behavior": "static artifact/cascade authority",
+      "affected_skills": [
+        "css-language-profile"
+      ],
+      "blocks_stable": false,
+      "evidence_required": [
+        "Supply repeated actual static CSS guidance decisions binding complete artifact and cascade inputs, with DOM/rendering and preprocessor non-trigger handoffs and fresh independent semantic validation.",
+        "Actual independent per-leaf maturity review",
+        "Preserve exact controlling debt IDs: CSS-QD-001, CSS-QD-002, CSS-QD-003, CSS-QD-004"
+      ],
+      "refresh_procedure": "When the named evidence is supplied, inspect its guidance-use custody and non-trigger outcome; review this leaf independently, verify exact debt status, and deliberately update its maturity record and binding. This grants no consumer execution or debt repair authority."
+    },
+    {
+      "trigger_id": "MATURITY:dockerfile-profile",
+      "owner": "dockerfile-profile maintainers",
+      "source_authority": [
+        "docs/governance/maturity/apg139/dockerfile-profile.json",
+        "skills/dockerfile-profile/SKILL.md",
+        "docs/governance/language-profile-known-debt.json"
+      ],
+      "refresh_condition": "Supply repeated actual Dockerfile stage/context/copy/mount/cache/ownership/platform guidance decisions with frontend, builder and platform facts and authorized build/runtime evidence for claimed outcomes; include orchestrator-policy and shell non-triggers in independent validation.",
+      "repair_condition": "No procedure repair is authorized by this maturity observation. No controlling debt is recorded for this leaf; reopening requires the named guidance-use and independent-validation evidence.",
+      "current_state": "FALSE",
+      "state_evidence": [
+        "docs/governance/maturity/apg139/dockerfile-profile.json"
+      ],
+      "interpretation": "MATURITY_REOPENING_EVIDENCE_INCOMPLETE",
+      "affected_behavior": "Dockerfile stage/context/build boundary",
+      "affected_skills": [
+        "dockerfile-profile"
+      ],
+      "blocks_stable": false,
+      "evidence_required": [
+        "Supply repeated actual Dockerfile stage/context/copy/mount/cache/ownership/platform guidance decisions with frontend, builder and platform facts and authorized build/runtime evidence for claimed outcomes; include orchestrator-policy and shell non-triggers in independent validation.",
+        "Actual independent per-leaf maturity review",
+        "Preserve exact controlling debt IDs: none"
+      ],
+      "refresh_procedure": "When the named evidence is supplied, inspect its guidance-use custody and non-trigger outcome; review this leaf independently, verify exact debt status, and deliberately update its maturity record and binding. This grants no consumer execution or debt repair authority."
+    },
+    {
+      "trigger_id": "MATURITY:go-cmp-test-profile",
+      "owner": "go-cmp-test-profile maintainers",
+      "source_authority": [
+        "docs/governance/maturity/apg139/go-cmp-test-profile.json",
+        "skills/go-cmp-test-profile/SKILL.md",
+        "docs/governance/language-profile-known-debt.json"
+      ],
+      "refresh_condition": "Supply repeated actual guidance use for an already selected go-cmp version within the canonical baseline or a separately reviewed refresh, binding option composition, diff behavior and protected-data diagnostics; include simple-assertion and native-lifecycle non-triggers and independent validation.",
+      "repair_condition": "No procedure repair is authorized by this maturity observation. No controlling debt is recorded for this leaf; reopening requires the named guidance-use and independent-validation evidence.",
+      "current_state": "FALSE",
+      "state_evidence": [
+        "docs/governance/maturity/apg139/go-cmp-test-profile.json"
+      ],
+      "interpretation": "MATURITY_REOPENING_EVIDENCE_INCOMPLETE",
+      "affected_behavior": "comparison option/diff semantics",
+      "affected_skills": [
+        "go-cmp-test-profile"
+      ],
+      "blocks_stable": false,
+      "evidence_required": [
+        "Supply repeated actual guidance use for an already selected go-cmp version within the canonical baseline or a separately reviewed refresh, binding option composition, diff behavior and protected-data diagnostics; include simple-assertion and native-lifecycle non-triggers and independent validation.",
+        "Actual independent per-leaf maturity review",
+        "Preserve exact controlling debt IDs: none"
+      ],
+      "refresh_procedure": "When the named evidence is supplied, inspect its guidance-use custody and non-trigger outcome; review this leaf independently, verify exact debt status, and deliberately update its maturity record and binding. This grants no consumer execution or debt repair authority."
+    },
+    {
+      "trigger_id": "MATURITY:go-language-profile",
+      "owner": "go-language-profile maintainers",
+      "source_authority": [
+        "docs/governance/maturity/apg139/go-language-profile.json",
+        "skills/go-language-profile/SKILL.md",
+        "docs/governance/language-profile-known-debt.json"
+      ],
+      "refresh_condition": "Supply repeated actual Go guidance decisions involving errors, cancellation, concurrency, API or resource semantics with exact toolchain context and claim-appropriate validation; include mechanical-edit non-triggers and unsafe/cgo stops where applicable, then independent review.",
+      "repair_condition": "No procedure repair is authorized by this maturity observation. No controlling debt is recorded for this leaf; reopening requires the named guidance-use and independent-validation evidence.",
+      "current_state": "FALSE",
+      "state_evidence": [
+        "docs/governance/maturity/apg139/go-language-profile.json"
+      ],
+      "interpretation": "MATURITY_REOPENING_EVIDENCE_INCOMPLETE",
+      "affected_behavior": "Go error/concurrency/API semantics",
+      "affected_skills": [
+        "go-language-profile"
+      ],
+      "blocks_stable": false,
+      "evidence_required": [
+        "Supply repeated actual Go guidance decisions involving errors, cancellation, concurrency, API or resource semantics with exact toolchain context and claim-appropriate validation; include mechanical-edit non-triggers and unsafe/cgo stops where applicable, then independent review.",
+        "Actual independent per-leaf maturity review",
+        "Preserve exact controlling debt IDs: none"
+      ],
+      "refresh_procedure": "When the named evidence is supplied, inspect its guidance-use custody and non-trigger outcome; review this leaf independently, verify exact debt status, and deliberately update its maturity record and binding. This grants no consumer execution or debt repair authority."
+    },
+    {
+      "trigger_id": "MATURITY:go-test-profile",
+      "owner": "go-test-profile maintainers",
+      "source_authority": [
+        "docs/governance/maturity/apg139/go-test-profile.json",
+        "skills/go-test-profile/SKILL.md",
+        "docs/governance/language-profile-known-debt.json"
+      ],
+      "refresh_condition": "Supply distinct actual native testing lifecycle and false-pass guidance-use decisions with module/file/toolchain context and claim-appropriate observed results, plus ordinary-Go and comparison-library non-trigger handoffs; independently review the complete individual inventory.",
+      "repair_condition": "No procedure repair is authorized by this maturity observation. No controlling debt is recorded for this leaf; reopening requires the named guidance-use and independent-validation evidence.",
+      "current_state": "FALSE",
+      "state_evidence": [
+        "docs/governance/maturity/apg139/go-test-profile.json"
+      ],
+      "interpretation": "MATURITY_REOPENING_EVIDENCE_INCOMPLETE",
+      "affected_behavior": "native testing lifecycle and false-pass controls",
+      "affected_skills": [
+        "go-test-profile"
+      ],
+      "blocks_stable": false,
+      "evidence_required": [
+        "Supply distinct actual native testing lifecycle and false-pass guidance-use decisions with module/file/toolchain context and claim-appropriate observed results, plus ordinary-Go and comparison-library non-trigger handoffs; independently review the complete individual inventory.",
+        "Actual independent per-leaf maturity review",
+        "Preserve exact controlling debt IDs: none"
+      ],
+      "refresh_procedure": "When the named evidence is supplied, inspect its guidance-use custody and non-trigger outcome; review this leaf independently, verify exact debt status, and deliberately update its maturity record and binding. This grants no consumer execution or debt repair authority."
+    },
+    {
+      "trigger_id": "MATURITY:gomock-test-profile",
+      "owner": "gomock-test-profile maintainers",
+      "source_authority": [
+        "docs/governance/maturity/apg139/gomock-test-profile.json",
+        "skills/gomock-test-profile/SKILL.md",
+        "docs/governance/language-profile-known-debt.json"
+      ],
+      "refresh_condition": "Supply repeated actual guidance-use decisions for already selected GoMock v0.6.0, binding generator mode/input, controller lifetime and expectations to observed outcomes, with native-testing and value-diff non-trigger handoffs and independent validation.",
+      "repair_condition": "No procedure repair is authorized by this maturity observation. No controlling debt is recorded for this leaf; reopening requires the named guidance-use and independent-validation evidence.",
+      "current_state": "FALSE",
+      "state_evidence": [
+        "docs/governance/maturity/apg139/gomock-test-profile.json"
+      ],
+      "interpretation": "MATURITY_REOPENING_EVIDENCE_INCOMPLETE",
+      "affected_behavior": "generator/controller/expectation custody",
+      "affected_skills": [
+        "gomock-test-profile"
+      ],
+      "blocks_stable": false,
+      "evidence_required": [
+        "Supply repeated actual guidance-use decisions for already selected GoMock v0.6.0, binding generator mode/input, controller lifetime and expectations to observed outcomes, with native-testing and value-diff non-trigger handoffs and independent validation.",
+        "Actual independent per-leaf maturity review",
+        "Preserve exact controlling debt IDs: none"
+      ],
+      "refresh_procedure": "When the named evidence is supplied, inspect its guidance-use custody and non-trigger outcome; review this leaf independently, verify exact debt status, and deliberately update its maturity record and binding. This grants no consumer execution or debt repair authority."
+    },
+    {
+      "trigger_id": "MATURITY:javascript-language-profile",
+      "owner": "javascript-language-profile maintainers",
+      "source_authority": [
+        "docs/governance/maturity/apg139/javascript-language-profile.json",
+        "skills/javascript-language-profile/SKILL.md",
+        "docs/governance/language-profile-known-debt.json"
+      ],
+      "refresh_condition": "After an authorized phase resolves JS-QD-005 under the exact linked known-debt records, supply repeated actual ECMAScript semantic guidance decisions bound to exact bytes, parse goal, strictness, edition, whole-file owner and host inputs, with Node/browser and transform non-trigger handoffs and current independent validation.",
+      "repair_condition": "No procedure repair is authorized by this maturity observation. Controlling debt IDs: JS-QD-005; use their exact known-debt refresh and repair records.",
+      "current_state": "FALSE",
+      "state_evidence": [
+        "docs/governance/maturity/apg139/javascript-language-profile.json"
+      ],
+      "interpretation": "MATURITY_REOPENING_EVIDENCE_INCOMPLETE",
+      "affected_behavior": "ECMAScript parse-goal/host boundary",
+      "affected_skills": [
+        "javascript-language-profile"
+      ],
+      "blocks_stable": false,
+      "evidence_required": [
+        "Supply repeated actual ECMAScript semantic guidance decisions bound to exact bytes, parse goal, strictness, edition, whole-file owner and host inputs, with Node/browser and transform non-trigger handoffs and current independent validation.",
+        "Actual independent per-leaf maturity review",
+        "Preserve exact controlling debt IDs: JS-QD-005"
+      ],
+      "refresh_procedure": "When the named evidence is supplied, inspect its guidance-use custody and non-trigger outcome; review this leaf independently, verify exact debt status, and deliberately update its maturity record and binding. This grants no consumer execution or debt repair authority."
+    },
+    {
+      "trigger_id": "MATURITY:jsx-language-profile",
+      "owner": "jsx-language-profile maintainers",
+      "source_authority": [
+        "docs/governance/maturity/apg139/jsx-language-profile.json",
+        "skills/jsx-language-profile/SKILL.md",
+        "docs/governance/language-profile-known-debt.json"
+      ],
+      "refresh_condition": "Supply repeated actual JSX syntax/transform guidance decisions bound to parser and runtime options, plus React-rendering and TypeScript-checking non-trigger handoffs and current independent validation.",
+      "repair_condition": "No procedure repair is authorized by this maturity observation. No controlling debt is recorded for this leaf; reopening requires the named guidance-use and independent-validation evidence.",
+      "current_state": "FALSE",
+      "state_evidence": [
+        "docs/governance/maturity/apg139/jsx-language-profile.json"
+      ],
+      "interpretation": "MATURITY_REOPENING_EVIDENCE_INCOMPLETE",
+      "affected_behavior": "JSX syntax/transform options",
+      "affected_skills": [
+        "jsx-language-profile"
+      ],
+      "blocks_stable": false,
+      "evidence_required": [
+        "Supply repeated actual JSX syntax/transform guidance decisions bound to parser and runtime options, plus React-rendering and TypeScript-checking non-trigger handoffs and current independent validation.",
+        "Actual independent per-leaf maturity review",
+        "Preserve exact controlling debt IDs: none"
+      ],
+      "refresh_procedure": "When the named evidence is supplied, inspect its guidance-use custody and non-trigger outcome; review this leaf independently, verify exact debt status, and deliberately update its maturity record and binding. This grants no consumer execution or debt repair authority."
+    },
+    {
+      "trigger_id": "MATURITY:markdown-language-profile",
+      "owner": "markdown-language-profile maintainers",
+      "source_authority": [
+        "docs/governance/maturity/apg139/markdown-language-profile.json",
+        "skills/markdown-language-profile/SKILL.md",
+        "docs/governance/language-profile-known-debt.json"
+      ],
+      "refresh_condition": "Supply repeated actual Markdown parser/renderer-bound guidance decisions and representative dialect, raw-HTML and frontmatter non-trigger cases; bind parser settings and independently validate the current semantic outcome.",
+      "repair_condition": "No procedure repair is authorized by this maturity observation. No controlling debt is recorded for this leaf; reopening requires the named guidance-use and independent-validation evidence.",
+      "current_state": "FALSE",
+      "state_evidence": [
+        "docs/governance/maturity/apg139/markdown-language-profile.json"
+      ],
+      "interpretation": "MATURITY_REOPENING_EVIDENCE_INCOMPLETE",
+      "affected_behavior": "dialect/parser/renderer boundary",
+      "affected_skills": [
+        "markdown-language-profile"
+      ],
+      "blocks_stable": false,
+      "evidence_required": [
+        "Supply repeated actual Markdown parser/renderer-bound guidance decisions and representative dialect, raw-HTML and frontmatter non-trigger cases; bind parser settings and independently validate the current semantic outcome.",
+        "Actual independent per-leaf maturity review",
+        "Preserve exact controlling debt IDs: none"
+      ],
+      "refresh_procedure": "When the named evidence is supplied, inspect its guidance-use custody and non-trigger outcome; review this leaf independently, verify exact debt status, and deliberately update its maturity record and binding. This grants no consumer execution or debt repair authority."
+    },
+    {
+      "trigger_id": "MATURITY:mdx-profile",
+      "owner": "mdx-profile maintainers",
+      "source_authority": [
+        "docs/governance/maturity/apg139/mdx-profile.json",
+        "skills/mdx-profile/SKILL.md",
+        "docs/governance/language-profile-known-debt.json"
+      ],
+      "refresh_condition": "Supply repeated actual MDX import/expression/component/provider seam guidance decisions, with pure-Markdown, JSX and React non-trigger handoffs, compiler context and current independent validation.",
+      "repair_condition": "No procedure repair is authorized by this maturity observation. No controlling debt is recorded for this leaf; reopening requires the named guidance-use and independent-validation evidence.",
+      "current_state": "FALSE",
+      "state_evidence": [
+        "docs/governance/maturity/apg139/mdx-profile.json"
+      ],
+      "interpretation": "MATURITY_REOPENING_EVIDENCE_INCOMPLETE",
+      "affected_behavior": "MDX component/provider seam",
+      "affected_skills": [
+        "mdx-profile"
+      ],
+      "blocks_stable": false,
+      "evidence_required": [
+        "Supply repeated actual MDX import/expression/component/provider seam guidance decisions, with pure-Markdown, JSX and React non-trigger handoffs, compiler context and current independent validation.",
+        "Actual independent per-leaf maturity review",
+        "Preserve exact controlling debt IDs: none"
+      ],
+      "refresh_procedure": "When the named evidence is supplied, inspect its guidance-use custody and non-trigger outcome; review this leaf independently, verify exact debt status, and deliberately update its maturity record and binding. This grants no consumer execution or debt repair authority."
+    },
+    {
+      "trigger_id": "MATURITY:minitest-test-profile",
+      "owner": "minitest-test-profile maintainers",
+      "source_authority": [
+        "docs/governance/maturity/apg139/minitest-test-profile.json",
+        "skills/minitest-test-profile/SKILL.md",
+        "docs/governance/language-profile-known-debt.json"
+      ],
+      "refresh_condition": "Supply repeated actual Minitest lifecycle/assertion/isolation guidance-use decisions bound to engine, framework, mock, plugin and reporter context, with Ruby-only and harness-neutral non-triggers and current independent validation.",
+      "repair_condition": "No procedure repair is authorized by this maturity observation. No controlling debt is recorded for this leaf; reopening requires the named guidance-use and independent-validation evidence.",
+      "current_state": "FALSE",
+      "state_evidence": [
+        "docs/governance/maturity/apg139/minitest-test-profile.json"
+      ],
+      "interpretation": "MATURITY_REOPENING_EVIDENCE_INCOMPLETE",
+      "affected_behavior": "lifecycle/mock/plugin/reporter context",
+      "affected_skills": [
+        "minitest-test-profile"
+      ],
+      "blocks_stable": false,
+      "evidence_required": [
+        "Supply repeated actual Minitest lifecycle/assertion/isolation guidance-use decisions bound to engine, framework, mock, plugin and reporter context, with Ruby-only and harness-neutral non-triggers and current independent validation.",
+        "Actual independent per-leaf maturity review",
+        "Preserve exact controlling debt IDs: none"
+      ],
+      "refresh_procedure": "When the named evidence is supplied, inspect its guidance-use custody and non-trigger outcome; review this leaf independently, verify exact debt status, and deliberately update its maturity record and binding. This grants no consumer execution or debt repair authority."
+    },
+    {
+      "trigger_id": "MATURITY:nix-test-profile",
+      "owner": "nix-test-profile maintainers",
+      "source_authority": [
+        "docs/governance/maturity/apg139/nix-test-profile.json",
+        "skills/nix-test-profile/SKILL.md",
+        "docs/governance/language-profile-known-debt.json"
+      ],
+      "refresh_condition": "Supply repeated actual claim-relative Nix test guidance decisions bound to selected surface, system and platform with corresponding evaluation/build/helper/VM evidence as applicable; include expression-only and deployment non-trigger handoffs and independent validation without authorizing activation.",
+      "repair_condition": "No procedure repair is authorized by this maturity observation. No controlling debt is recorded for this leaf; reopening requires the named guidance-use and independent-validation evidence.",
+      "current_state": "FALSE",
+      "state_evidence": [
+        "docs/governance/maturity/apg139/nix-test-profile.json"
+      ],
+      "interpretation": "MATURITY_REOPENING_EVIDENCE_INCOMPLETE",
+      "affected_behavior": "claim-relative Nix evidence class",
+      "affected_skills": [
+        "nix-test-profile"
+      ],
+      "blocks_stable": false,
+      "evidence_required": [
+        "Supply repeated actual claim-relative Nix test guidance decisions bound to selected surface, system and platform with corresponding evaluation/build/helper/VM evidence as applicable; include expression-only and deployment non-trigger handoffs and independent validation without authorizing activation.",
+        "Actual independent per-leaf maturity review",
+        "Preserve exact controlling debt IDs: none"
+      ],
+      "refresh_procedure": "When the named evidence is supplied, inspect its guidance-use custody and non-trigger outcome; review this leaf independently, verify exact debt status, and deliberately update its maturity record and binding. This grants no consumer execution or debt repair authority."
+    },
+    {
+      "trigger_id": "MATURITY:nodejs-runtime-profile",
+      "owner": "nodejs-runtime-profile maintainers",
+      "source_authority": [
+        "docs/governance/maturity/apg139/nodejs-runtime-profile.json",
+        "skills/nodejs-runtime-profile/SKILL.md",
+        "docs/governance/language-profile-known-debt.json"
+      ],
+      "refresh_condition": "Supply repeated actual Node-host guidance decisions carrying runtime, platform, architecture, flags, package scope, loader, invocation and owner, with ECMAScript and npm non-trigger handoffs and current independent validation.",
+      "repair_condition": "No procedure repair is authorized by this maturity observation. No controlling debt is recorded for this leaf; reopening requires the named guidance-use and independent-validation evidence.",
+      "current_state": "FALSE",
+      "state_evidence": [
+        "docs/governance/maturity/apg139/nodejs-runtime-profile.json"
+      ],
+      "interpretation": "MATURITY_REOPENING_EVIDENCE_INCOMPLETE",
+      "affected_behavior": "Node runtime/loader/invocation custody",
+      "affected_skills": [
+        "nodejs-runtime-profile"
+      ],
+      "blocks_stable": false,
+      "evidence_required": [
+        "Supply repeated actual Node-host guidance decisions carrying runtime, platform, architecture, flags, package scope, loader, invocation and owner, with ECMAScript and npm non-trigger handoffs and current independent validation.",
+        "Actual independent per-leaf maturity review",
+        "Preserve exact controlling debt IDs: none"
+      ],
+      "refresh_procedure": "When the named evidence is supplied, inspect its guidance-use custody and non-trigger outcome; review this leaf independently, verify exact debt status, and deliberately update its maturity record and binding. This grants no consumer execution or debt repair authority."
+    },
+    {
+      "trigger_id": "MATURITY:npm-package-manager-profile",
+      "owner": "npm-package-manager-profile maintainers",
+      "source_authority": [
+        "docs/governance/maturity/apg139/npm-package-manager-profile.json",
+        "skills/npm-package-manager-profile/SKILL.md",
+        "docs/governance/language-profile-known-debt.json"
+      ],
+      "refresh_condition": "Supply repeated actual npm install/lockfile/script-policy guidance decisions with named npm, Node and configuration, including refusal cases and Node-runtime non-trigger handoffs; independently validate resulting lock and script-policy claims.",
+      "repair_condition": "No procedure repair is authorized by this maturity observation. No controlling debt is recorded for this leaf; reopening requires the named guidance-use and independent-validation evidence.",
+      "current_state": "FALSE",
+      "state_evidence": [
+        "docs/governance/maturity/apg139/npm-package-manager-profile.json"
+      ],
+      "interpretation": "MATURITY_REOPENING_EVIDENCE_INCOMPLETE",
+      "affected_behavior": "install/lockfile/script policy",
+      "affected_skills": [
+        "npm-package-manager-profile"
+      ],
+      "blocks_stable": false,
+      "evidence_required": [
+        "Supply repeated actual npm install/lockfile/script-policy guidance decisions with named npm, Node and configuration, including refusal cases and Node-runtime non-trigger handoffs; independently validate resulting lock and script-policy claims.",
+        "Actual independent per-leaf maturity review",
+        "Preserve exact controlling debt IDs: none"
+      ],
+      "refresh_procedure": "When the named evidence is supplied, inspect its guidance-use custody and non-trigger outcome; review this leaf independently, verify exact debt status, and deliberately update its maturity record and binding. This grants no consumer execution or debt repair authority."
+    },
+    {
+      "trigger_id": "MATURITY:playwright-test-profile",
+      "owner": "playwright-test-profile maintainers",
+      "source_authority": [
+        "docs/governance/maturity/apg139/playwright-test-profile.json",
+        "skills/playwright-test-profile/SKILL.md",
+        "docs/governance/language-profile-known-debt.json"
+      ],
+      "refresh_condition": "Supply repeated actual selected Playwright guidance-use decisions bound to configuration and engine identities, negative controls and cleanup/interruption custody; include browser-runtime and accessibility-standard handoffs and explicit sharding/cross-worker evidence limits in independent review.",
+      "repair_condition": "No procedure repair is authorized by this maturity observation. No controlling debt is recorded for this leaf; reopening requires the named guidance-use and independent-validation evidence.",
+      "current_state": "FALSE",
+      "state_evidence": [
+        "docs/governance/maturity/apg139/playwright-test-profile.json"
+      ],
+      "interpretation": "MATURITY_REOPENING_EVIDENCE_INCOMPLETE",
+      "affected_behavior": "runner/engine negative-control custody",
+      "affected_skills": [
+        "playwright-test-profile"
+      ],
+      "blocks_stable": false,
+      "evidence_required": [
+        "Supply repeated actual selected Playwright guidance-use decisions bound to configuration and engine identities, negative controls and cleanup/interruption custody; include browser-runtime and accessibility-standard handoffs and explicit sharding/cross-worker evidence limits in independent review.",
+        "Actual independent per-leaf maturity review",
+        "Preserve exact controlling debt IDs: none"
+      ],
+      "refresh_procedure": "When the named evidence is supplied, inspect its guidance-use custody and non-trigger outcome; review this leaf independently, verify exact debt status, and deliberately update its maturity record and binding. This grants no consumer execution or debt repair authority."
+    },
+    {
+      "trigger_id": "MATURITY:postgresql-database-profile",
+      "owner": "postgresql-database-profile maintainers",
+      "source_authority": [
+        "docs/governance/maturity/apg139/postgresql-database-profile.json",
+        "skills/postgresql-database-profile/SKILL.md",
+        "docs/governance/language-profile-known-debt.json"
+      ],
+      "refresh_condition": "Supply repeated actual PostgreSQL guidance decisions bound to server version, driver, schema, privileges, topology and recovery facts, with ordinary-query non-triggers and authorized operational evidence where the claim requires it; independently review outcomes.",
+      "repair_condition": "No procedure repair is authorized by this maturity observation. No controlling debt is recorded for this leaf; reopening requires the named guidance-use and independent-validation evidence.",
+      "current_state": "FALSE",
+      "state_evidence": [
+        "docs/governance/maturity/apg139/postgresql-database-profile.json"
+      ],
+      "interpretation": "MATURITY_REOPENING_EVIDENCE_INCOMPLETE",
+      "affected_behavior": "PostgreSQL recovery/privilege/topology",
+      "affected_skills": [
+        "postgresql-database-profile"
+      ],
+      "blocks_stable": false,
+      "evidence_required": [
+        "Supply repeated actual PostgreSQL guidance decisions bound to server version, driver, schema, privileges, topology and recovery facts, with ordinary-query non-triggers and authorized operational evidence where the claim requires it; independently review outcomes.",
+        "Actual independent per-leaf maturity review",
+        "Preserve exact controlling debt IDs: none"
+      ],
+      "refresh_procedure": "When the named evidence is supplied, inspect its guidance-use custody and non-trigger outcome; review this leaf independently, verify exact debt status, and deliberately update its maturity record and binding. This grants no consumer execution or debt repair authority."
+    },
+    {
+      "trigger_id": "MATURITY:pytest-test-profile",
+      "owner": "pytest-test-profile maintainers",
+      "source_authority": [
+        "docs/governance/maturity/apg139/pytest-test-profile.json",
+        "skills/pytest-test-profile/SKILL.md",
+        "docs/governance/language-profile-known-debt.json"
+      ],
+      "refresh_condition": "Supply distinct actual pytest collection/fixture and isolation/xdist guidance-use decisions with versions, roots, workers and coverage context and meaningful observed outcomes; include ordinary-Python and policy-selection non-triggers, then independently adjudicate the individual inventory.",
+      "repair_condition": "No procedure repair is authorized by this maturity observation. No controlling debt is recorded for this leaf; reopening requires the named guidance-use and independent-validation evidence.",
+      "current_state": "FALSE",
+      "state_evidence": [
+        "docs/governance/maturity/apg139/pytest-test-profile.json"
+      ],
+      "interpretation": "MATURITY_REOPENING_EVIDENCE_INCOMPLETE",
+      "affected_behavior": "collection/fixture/xdist boundaries",
+      "affected_skills": [
+        "pytest-test-profile"
+      ],
+      "blocks_stable": false,
+      "evidence_required": [
+        "Supply distinct actual pytest collection/fixture and isolation/xdist guidance-use decisions with versions, roots, workers and coverage context and meaningful observed outcomes; include ordinary-Python and policy-selection non-triggers, then independently adjudicate the individual inventory.",
+        "Actual independent per-leaf maturity review",
+        "Preserve exact controlling debt IDs: none"
+      ],
+      "refresh_procedure": "When the named evidence is supplied, inspect its guidance-use custody and non-trigger outcome; review this leaf independently, verify exact debt status, and deliberately update its maturity record and binding. This grants no consumer execution or debt repair authority."
+    },
+    {
+      "trigger_id": "MATURITY:react-component-profile",
+      "owner": "react-component-profile maintainers",
+      "source_authority": [
+        "docs/governance/maturity/apg139/react-component-profile.json",
+        "skills/react-component-profile/SKILL.md",
+        "docs/governance/language-profile-known-debt.json"
+      ],
+      "refresh_condition": "Supply repeated actual props/render/state/effects/hooks guidance decisions with JSX-syntax and host/browser non-trigger handoffs, explicit renderer context and fresh independent validation.",
+      "repair_condition": "No procedure repair is authorized by this maturity observation. No controlling debt is recorded for this leaf; reopening requires the named guidance-use and independent-validation evidence.",
+      "current_state": "FALSE",
+      "state_evidence": [
+        "docs/governance/maturity/apg139/react-component-profile.json"
+      ],
+      "interpretation": "MATURITY_REOPENING_EVIDENCE_INCOMPLETE",
+      "affected_behavior": "component render/state/effects",
+      "affected_skills": [
+        "react-component-profile"
+      ],
+      "blocks_stable": false,
+      "evidence_required": [
+        "Supply repeated actual props/render/state/effects/hooks guidance decisions with JSX-syntax and host/browser non-trigger handoffs, explicit renderer context and fresh independent validation.",
+        "Actual independent per-leaf maturity review",
+        "Preserve exact controlling debt IDs: none"
+      ],
+      "refresh_procedure": "When the named evidence is supplied, inspect its guidance-use custody and non-trigger outcome; review this leaf independently, verify exact debt status, and deliberately update its maturity record and binding. This grants no consumer execution or debt repair authority."
+    },
+    {
+      "trigger_id": "MATURITY:ruby-language-profile",
+      "owner": "ruby-language-profile maintainers",
+      "source_authority": [
+        "docs/governance/maturity/apg139/ruby-language-profile.json",
+        "skills/ruby-language-profile/SKILL.md",
+        "docs/governance/language-profile-known-debt.json"
+      ],
+      "refresh_condition": "Supply repeated actual Ruby guidance decisions involving dynamic dispatch, shared state, concurrency, compatibility, serialization or subprocess behavior with declared engine/version context, adverse cases and mechanical-edit non-triggers for independent validation.",
+      "repair_condition": "No procedure repair is authorized by this maturity observation. No controlling debt is recorded for this leaf; reopening requires the named guidance-use and independent-validation evidence.",
+      "current_state": "FALSE",
+      "state_evidence": [
+        "docs/governance/maturity/apg139/ruby-language-profile.json"
+      ],
+      "interpretation": "MATURITY_REOPENING_EVIDENCE_INCOMPLETE",
+      "affected_behavior": "Ruby dispatch/state/compatibility",
+      "affected_skills": [
+        "ruby-language-profile"
+      ],
+      "blocks_stable": false,
+      "evidence_required": [
+        "Supply repeated actual Ruby guidance decisions involving dynamic dispatch, shared state, concurrency, compatibility, serialization or subprocess behavior with declared engine/version context, adverse cases and mechanical-edit non-triggers for independent validation.",
+        "Actual independent per-leaf maturity review",
+        "Preserve exact controlling debt IDs: none"
+      ],
+      "refresh_procedure": "When the named evidence is supplied, inspect its guidance-use custody and non-trigger outcome; review this leaf independently, verify exact debt status, and deliberately update its maturity record and binding. This grants no consumer execution or debt repair authority."
+    },
+    {
+      "trigger_id": "MATURITY:sqlite-database-profile",
+      "owner": "sqlite-database-profile maintainers",
+      "source_authority": [
+        "docs/governance/maturity/apg139/sqlite-database-profile.json",
+        "skills/sqlite-database-profile/SKILL.md",
+        "docs/governance/language-profile-known-debt.json"
+      ],
+      "refresh_condition": "Supply repeated actual SQLite transaction/writer/WAL/rebuild/path/integrity guidance decisions bound to library, driver and filesystem facts, with ordinary-query non-triggers and authorized validation appropriate to recovery claims; obtain independent review.",
+      "repair_condition": "No procedure repair is authorized by this maturity observation. No controlling debt is recorded for this leaf; reopening requires the named guidance-use and independent-validation evidence.",
+      "current_state": "FALSE",
+      "state_evidence": [
+        "docs/governance/maturity/apg139/sqlite-database-profile.json"
+      ],
+      "interpretation": "MATURITY_REOPENING_EVIDENCE_INCOMPLETE",
+      "affected_behavior": "SQLite writer/WAL/rebuild/recovery",
+      "affected_skills": [
+        "sqlite-database-profile"
+      ],
+      "blocks_stable": false,
+      "evidence_required": [
+        "Supply repeated actual SQLite transaction/writer/WAL/rebuild/path/integrity guidance decisions bound to library, driver and filesystem facts, with ordinary-query non-triggers and authorized validation appropriate to recovery claims; obtain independent review.",
+        "Actual independent per-leaf maturity review",
+        "Preserve exact controlling debt IDs: none"
+      ],
+      "refresh_procedure": "When the named evidence is supplied, inspect its guidance-use custody and non-trigger outcome; review this leaf independently, verify exact debt status, and deliberately update its maturity record and binding. This grants no consumer execution or debt repair authority."
+    },
+    {
+      "trigger_id": "MATURITY:svg-language-profile",
+      "owner": "svg-language-profile maintainers",
+      "source_authority": [
+        "docs/governance/maturity/apg139/svg-language-profile.json",
+        "skills/svg-language-profile/SKILL.md",
+        "docs/governance/language-profile-known-debt.json"
+      ],
+      "refresh_condition": "Supply repeated actual SVG representation and embedding guidance decisions with viewBox/path/namespace evidence and explicit CSS, HTML, browser and accessibility handoffs; independently validate claimed structural outcomes.",
+      "repair_condition": "No procedure repair is authorized by this maturity observation. No controlling debt is recorded for this leaf; reopening requires the named guidance-use and independent-validation evidence.",
+      "current_state": "FALSE",
+      "state_evidence": [
+        "docs/governance/maturity/apg139/svg-language-profile.json"
+      ],
+      "interpretation": "MATURITY_REOPENING_EVIDENCE_INCOMPLETE",
+      "affected_behavior": "SVG representation/embedding",
+      "affected_skills": [
+        "svg-language-profile"
+      ],
+      "blocks_stable": false,
+      "evidence_required": [
+        "Supply repeated actual SVG representation and embedding guidance decisions with viewBox/path/namespace evidence and explicit CSS, HTML, browser and accessibility handoffs; independently validate claimed structural outcomes.",
+        "Actual independent per-leaf maturity review",
+        "Preserve exact controlling debt IDs: none"
+      ],
+      "refresh_procedure": "When the named evidence is supplied, inspect its guidance-use custody and non-trigger outcome; review this leaf independently, verify exact debt status, and deliberately update its maturity record and binding. This grants no consumer execution or debt repair authority."
+    },
+    {
+      "trigger_id": "MATURITY:typescript-language-profile",
+      "owner": "typescript-language-profile maintainers",
+      "source_authority": [
+        "docs/governance/maturity/apg139/typescript-language-profile.json",
+        "skills/typescript-language-profile/SKILL.md",
+        "docs/governance/language-profile-known-debt.json"
+      ],
+      "refresh_condition": "Supply repeated actual TypeScript static-semantic guidance decisions carrying compiler role/version/options, source kind and declaration provenance, plus JavaScript-runtime and transform non-trigger handoffs and compiler-backed current independent validation.",
+      "repair_condition": "No procedure repair is authorized by this maturity observation. No controlling debt is recorded for this leaf; reopening requires the named guidance-use and independent-validation evidence.",
+      "current_state": "FALSE",
+      "state_evidence": [
+        "docs/governance/maturity/apg139/typescript-language-profile.json"
+      ],
+      "interpretation": "MATURITY_REOPENING_EVIDENCE_INCOMPLETE",
+      "affected_behavior": "compiler static-semantics authority",
+      "affected_skills": [
+        "typescript-language-profile"
+      ],
+      "blocks_stable": false,
+      "evidence_required": [
+        "Supply repeated actual TypeScript static-semantic guidance decisions carrying compiler role/version/options, source kind and declaration provenance, plus JavaScript-runtime and transform non-trigger handoffs and compiler-backed current independent validation.",
+        "Actual independent per-leaf maturity review",
+        "Preserve exact controlling debt IDs: none"
+      ],
+      "refresh_procedure": "When the named evidence is supplied, inspect its guidance-use custody and non-trigger outcome; review this leaf independently, verify exact debt status, and deliberately update its maturity record and binding. This grants no consumer execution or debt repair authority."
+    },
+    {
+      "trigger_id": "MATURITY:vagrantfile-profile",
+      "owner": "vagrantfile-profile maintainers",
+      "source_authority": [
+        "docs/governance/maturity/apg139/vagrantfile-profile.json",
+        "skills/vagrantfile-profile/SKILL.md",
+        "docs/governance/language-profile-known-debt.json"
+      ],
+      "refresh_condition": "Supply repeated actual Vagrantfile guidance decisions bound to config, Ruby, host, provider, box, plugin and machine-state facts, with authorized live evidence only where needed and Ruby/provider-administration non-trigger stops; independently validate outcomes.",
+      "repair_condition": "No procedure repair is authorized by this maturity observation. No controlling debt is recorded for this leaf; reopening requires the named guidance-use and independent-validation evidence.",
+      "current_state": "FALSE",
+      "state_evidence": [
+        "docs/governance/maturity/apg139/vagrantfile-profile.json"
+      ],
+      "interpretation": "MATURITY_REOPENING_EVIDENCE_INCOMPLETE",
+      "affected_behavior": "Vagrant config/provider/state boundary",
+      "affected_skills": [
+        "vagrantfile-profile"
+      ],
+      "blocks_stable": false,
+      "evidence_required": [
+        "Supply repeated actual Vagrantfile guidance decisions bound to config, Ruby, host, provider, box, plugin and machine-state facts, with authorized live evidence only where needed and Ruby/provider-administration non-trigger stops; independently validate outcomes.",
+        "Actual independent per-leaf maturity review",
+        "Preserve exact controlling debt IDs: none"
+      ],
+      "refresh_procedure": "When the named evidence is supplied, inspect its guidance-use custody and non-trigger outcome; review this leaf independently, verify exact debt status, and deliberately update its maturity record and binding. This grants no consumer execution or debt repair authority."
+    },
+    {
+      "trigger_id": "MATURITY:vite-build-profile",
+      "owner": "vite-build-profile maintainers",
+      "source_authority": [
+        "docs/governance/maturity/apg139/vite-build-profile.json",
+        "skills/vite-build-profile/SKILL.md",
+        "docs/governance/language-profile-known-debt.json"
+      ],
+      "refresh_condition": "Supply repeated actual Vite build/config/environment guidance decisions with asserted outputs, failure cases and npm/framework/browser non-trigger handoffs; bind current Vite context and obtain independent validation.",
+      "repair_condition": "No procedure repair is authorized by this maturity observation. No controlling debt is recorded for this leaf; reopening requires the named guidance-use and independent-validation evidence.",
+      "current_state": "FALSE",
+      "state_evidence": [
+        "docs/governance/maturity/apg139/vite-build-profile.json"
+      ],
+      "interpretation": "MATURITY_REOPENING_EVIDENCE_INCOMPLETE",
+      "affected_behavior": "Vite config/environment/output",
+      "affected_skills": [
+        "vite-build-profile"
+      ],
+      "blocks_stable": false,
+      "evidence_required": [
+        "Supply repeated actual Vite build/config/environment guidance decisions with asserted outputs, failure cases and npm/framework/browser non-trigger handoffs; bind current Vite context and obtain independent validation.",
+        "Actual independent per-leaf maturity review",
+        "Preserve exact controlling debt IDs: none"
+      ],
+      "refresh_procedure": "When the named evidence is supplied, inspect its guidance-use custody and non-trigger outcome; review this leaf independently, verify exact debt status, and deliberately update its maturity record and binding. This grants no consumer execution or debt repair authority."
+    },
+    {
+      "trigger_id": "MATURITY:vitest-test-profile",
+      "owner": "vitest-test-profile maintainers",
+      "source_authority": [
+        "docs/governance/maturity/apg139/vitest-test-profile.json",
+        "skills/vitest-test-profile/SKILL.md",
+        "docs/governance/language-profile-known-debt.json"
+      ],
+      "refresh_condition": "Supply repeated actual Vitest 4.1.x guidance-use decisions with effective config, project, environment and pool bound to observed runner outcomes; include language/component and coverage-policy non-triggers and current independent validation.",
+      "repair_condition": "No procedure repair is authorized by this maturity observation. No controlling debt is recorded for this leaf; reopening requires the named guidance-use and independent-validation evidence.",
+      "current_state": "FALSE",
+      "state_evidence": [
+        "docs/governance/maturity/apg139/vitest-test-profile.json"
+      ],
+      "interpretation": "MATURITY_REOPENING_EVIDENCE_INCOMPLETE",
+      "affected_behavior": "runner config/project/environment/pool",
+      "affected_skills": [
+        "vitest-test-profile"
+      ],
+      "blocks_stable": false,
+      "evidence_required": [
+        "Supply repeated actual Vitest 4.1.x guidance-use decisions with effective config, project, environment and pool bound to observed runner outcomes; include language/component and coverage-policy non-triggers and current independent validation.",
+        "Actual independent per-leaf maturity review",
+        "Preserve exact controlling debt IDs: none"
+      ],
+      "refresh_procedure": "When the named evidence is supplied, inspect its guidance-use custody and non-trigger outcome; review this leaf independently, verify exact debt status, and deliberately update its maturity record and binding. This grants no consumer execution or debt repair authority."
+    },
+    {
+      "trigger_id": "MATURITY:web-accessibility-profile",
+      "owner": "web-accessibility-profile maintainers",
+      "source_authority": [
+        "docs/governance/maturity/apg139/web-accessibility-profile.json",
+        "skills/web-accessibility-profile/SKILL.md",
+        "docs/governance/language-profile-known-debt.json"
+      ],
+      "refresh_condition": "Supply repeated actual accessibility-semantic guidance decisions with DOM/tree/keyboard/render/manual evidence as applicable and representative runner/visual-design handoffs; explicitly disposition AT and WCAG limits in independent review.",
+      "repair_condition": "No procedure repair is authorized by this maturity observation. No controlling debt is recorded for this leaf; reopening requires the named guidance-use and independent-validation evidence.",
+      "current_state": "FALSE",
+      "state_evidence": [
+        "docs/governance/maturity/apg139/web-accessibility-profile.json"
+      ],
+      "interpretation": "MATURITY_REOPENING_EVIDENCE_INCOMPLETE",
+      "affected_behavior": "layered semantic/keyboard evidence",
+      "affected_skills": [
+        "web-accessibility-profile"
+      ],
+      "blocks_stable": false,
+      "evidence_required": [
+        "Supply repeated actual accessibility-semantic guidance decisions with DOM/tree/keyboard/render/manual evidence as applicable and representative runner/visual-design handoffs; explicitly disposition AT and WCAG limits in independent review.",
+        "Actual independent per-leaf maturity review",
+        "Preserve exact controlling debt IDs: none"
+      ],
+      "refresh_procedure": "When the named evidence is supplied, inspect its guidance-use custody and non-trigger outcome; review this leaf independently, verify exact debt status, and deliberately update its maturity record and binding. This grants no consumer execution or debt repair authority."
+    },
+    {
+      "trigger_id": "SKILL-MIGRATION",
+      "owner": "APGR",
+      "source_authority": [
+        "docs/v0-10-backlog-consolidation.md",
+        "docs/v0-9-roadmap.md"
+      ],
+      "refresh_condition": "Demonstration that existing process skills (`designing-significant-changes`, `planning-repository-work`, `implementing-with-test-discipline`, `converting-bash-scripts-to-python`, `synthesizing-repository-guidance`) leave a demonstrable gap",
+      "repair_condition": "Demonstrable gap evidence across multi-language migration scenarios that cannot be resolved by composing existing process skills",
+      "current_state": "FALSE",
+      "state_evidence": [
+        "docs/governance/external/apg140/decisions.md"
+      ],
+      "interpretation": "No reusable gap was demonstrated by the inspected single-language Python/PostgreSQL identity-migration scenario composed with the five frozen process owners. The supplied independent review accepts this bounded FALSE assessment, not a proof that gaps are absent across all multi-language migrations. The migration refresh remains live; no migration execution or new leaf is authorized.",
+      "affected_behavior": "Ownership analysis document and potential generalized migration skill leaf (`migrating-system-implementations`)",
+      "blocks_stable": false,
+      "evidence_required": [
+        "Demonstration that existing process skills (`designing-significant-changes`, `planning-repository-work`, `implementing-with-test-discipline`, `converting-bash-scripts-to-python`, `synthesizing-repository-guidance`) leave a demonstrable gap",
+        "Demonstrable gap evidence across multi-language migration scenarios that cannot be resolved by composing existing process skills"
+      ],
+      "refresh_procedure": "Evaluate the exact recorded condition using current source-bound evidence; document the decision before repair or roadmap closure.",
+      "affected_skills": []
+    }
+  ]
+}

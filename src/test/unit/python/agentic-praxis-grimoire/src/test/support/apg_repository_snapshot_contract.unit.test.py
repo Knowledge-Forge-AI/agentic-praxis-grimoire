@@ -530,6 +530,11 @@ def test_cleanup_does_not_chmod_through_a_replacement_root_symlink(
         with pytest.raises(_module().SnapshotCleanupError, match="residue"):
             with _module().worker_snapshot(fd) as snapshot:
                 original_snapshot = snapshot.with_name(snapshot.name + "-original")
+                dir_fd = os.open(snapshot, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+                try:
+                    os.fchmod(dir_fd, 0o700)
+                finally:
+                    os.close(dir_fd)
                 snapshot.rename(original_snapshot)
                 snapshot.symlink_to(outside, target_is_directory=True)
                 replacement = snapshot

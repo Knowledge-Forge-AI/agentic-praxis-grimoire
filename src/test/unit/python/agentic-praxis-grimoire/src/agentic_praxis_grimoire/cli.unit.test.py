@@ -21,6 +21,9 @@ from agentic_praxis_grimoire import go_bridge  # noqa: E402
 from agentic_praxis_grimoire import __main__ as module_main  # noqa: E402
 
 
+CURRENT_VERSION = "0.11.0"
+
+
 def test_help_and_version_are_checkout_independent(capsys: pytest.CaptureFixture[str]) -> None:
     assert cli.main(["--help"]) == 0
     help_text = capsys.readouterr().out
@@ -30,14 +33,14 @@ def test_help_and_version_are_checkout_independent(capsys: pytest.CaptureFixture
         assert family in help_text
 
     assert cli.main(["--version"]) == 0
-    assert capsys.readouterr().out == "apgr 0.10.0\n"
+    assert capsys.readouterr().out == f"apgr {CURRENT_VERSION}\n"
 
 
 def test_python_module_entry_point_routes_the_same_version_contract(
     capsys: pytest.CaptureFixture[str],
 ) -> None:
     assert module_main.main(["--version"]) == 0
-    assert capsys.readouterr().out == "apgr 0.10.0\n"
+    assert capsys.readouterr().out == f"apgr {CURRENT_VERSION}\n"
     completed = subprocess.run(
         [sys.executable, "-m", "agentic_praxis_grimoire", "--version"],
         cwd=REPOSITORY_ROOT,
@@ -49,7 +52,7 @@ def test_python_module_entry_point_routes_the_same_version_contract(
         check=False,
     )
     assert completed.returncode == 0, completed.stderr
-    assert completed.stdout == "apgr 0.10.0\n"
+    assert completed.stdout == f"apgr {CURRENT_VERSION}\n"
 
 
 @pytest.mark.parametrize(

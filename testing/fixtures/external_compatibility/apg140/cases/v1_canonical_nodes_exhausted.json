@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "result_kind": "canonical_nodes",
+  "items": [
+    {
+      "canonical_key": "n:auth:authenticator",
+      "kind": "service",
+      "metadata": {
+        "layer": "security"
+      }
+    },
+    {
+      "canonical_key": "n:core:router",
+      "kind": "router",
+      "metadata": {
+        "layer": "transport"
+      }
+    },
+    {
+      "canonical_key": "n:store:database",
+      "kind": "storage",
+      "metadata": {
+        "layer": "persistence"
+      }
+    }
+  ],
+  "page": {
+    "limit": 50,
+    "offset": 0,
+    "returned": 3,
+    "truncated": false,
+    "next_offset": null
+  },
+  "diagnostics": []
+}

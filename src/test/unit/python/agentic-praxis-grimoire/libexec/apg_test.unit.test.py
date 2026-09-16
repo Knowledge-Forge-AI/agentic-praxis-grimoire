@@ -324,6 +324,138 @@ def test_typescript_prerequisite_follows_validated_test_ownership() -> None:
     assert apg_test.requires_typescript_compiler(current)
 
 
+def _public_selection_fixture() -> tuple[apg_test.Inventory, dict[str, object]]:
+    unit_path = (
+        f"{apg_test.UNIT_ROOT.as_posix()}/owner.unit.test.py"
+    )
+    integration_path = (
+        f"{apg_test.INTEGRATION_ROOT.as_posix()}/owner.int.test.py"
+    )
+    inventory = apg_test.Inventory(
+        {},
+        {},
+        {
+            unit_path: ("libexec/owner.py", "unit"),
+            integration_path: ("libexec/owner.py", "integration"),
+        },
+    )
+    policy = {
+        "required_test_entrypoints": [
+            integration_path,
+            unit_path,
+            "cmd/apgr/main_test.go",
+        ]
+    }
+    return inventory, policy
+
+
+def _patch_public_release_selection(
+    monkeypatch: pytest.MonkeyPatch,
+    policy: dict[str, object],
+    deselections: tuple[str, ...] = (),
+) -> None:
+    import apg_public_release as public_release
+
+    monkeypatch.setattr(
+        public_release,
+        "resolve_repository",
+        lambda _root, _label: object(),
+    )
+    monkeypatch.setattr(
+        public_release,
+        "committed_bytes",
+        lambda _repository, _path: b"0.11.0\n",
+    )
+    monkeypatch.setattr(
+        public_release,
+        "validate_public_release_surface",
+        lambda _repository, _version: None,
+    )
+    monkeypatch.setattr(
+        public_release,
+        "audited_policy_surfaces",
+        lambda _version: ({"required_test_entrypoints": tuple(policy["required_test_entrypoints"])},),
+    )
+    monkeypatch.setattr(
+        public_release,
+        "load_policy",
+        lambda _repository, *, expected_surfaces: policy,
+    )
+    monkeypatch.setattr(
+        public_release,
+        "resolve_public_validation_deselections",
+        lambda _version, _policy: deselections,
+    )
+
+
+def test_public_selection_uses_audited_python_files_and_deselections(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    root = tmp_path / "public"
+    (root / "src/agentic_praxis_grimoire").mkdir(parents=True)
+    (root / "src/agentic_praxis_grimoire/VERSION").write_text(
+        "0.11.0\n", encoding="ascii"
+    )
+    inventory, policy = _public_selection_fixture()
+    integration_path = policy["required_test_entrypoints"][0]
+    _patch_public_release_selection(
+        monkeypatch,
+        policy,
+        (f"{integration_path}::test_private_history",),
+    )
+
+    selection = apg_test.load_public_test_selection(root, inventory, "0.11.0")
+    assert selection.files == {
+        "unit": (policy["required_test_entrypoints"][1],),
+        "integration": (integration_path,),
+    }
+    assert selection.deselections == {
+        "unit": (),
+        "integration": (f"{integration_path}::test_private_history",),
+    }
+
+
+def test_public_selection_rejects_wrong_version_and_private_directory(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    root = tmp_path / "public"
+    version_path = root / "src/agentic_praxis_grimoire/VERSION"
+    version_path.parent.mkdir(parents=True)
+    version_path.write_text("0.10.0\n", encoding="ascii")
+    inventory, policy = _public_selection_fixture()
+    _patch_public_release_selection(monkeypatch, policy)
+    with pytest.raises(apg_test.InvocationError, match="does not match"):
+        apg_test.load_public_test_selection(root, inventory, "0.11.0")
+
+    version_path.write_text("0.11.0\n", encoding="ascii")
+    (root / "private").mkdir()
+    with pytest.raises(apg_test.InvocationError, match="private directory"):
+        apg_test.load_public_test_selection(root, inventory, "0.11.0")
+
+
+def test_public_selection_rejects_tampered_policy(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import apg_public_release as public_release
+
+    root = tmp_path / "public"
+    (root / "src/agentic_praxis_grimoire").mkdir(parents=True)
+    (root / "src/agentic_praxis_grimoire/VERSION").write_text(
+        "0.11.0\n", encoding="ascii"
+    )
+    inventory, policy = _public_selection_fixture()
+    _patch_public_release_selection(monkeypatch, policy)
+    monkeypatch.setattr(
+        public_release,
+        "load_policy",
+        lambda _repository, *, expected_surfaces: (_ for _ in ()).throw(
+            public_release.ToolError("tampered policy")
+        ),
+    )
+    with pytest.raises(apg_test.InvocationError, match="tampered policy"):
+        apg_test.load_public_test_selection(root, inventory, "0.11.0")
+
+
 def test_javascript_engine_prerequisite_is_missing_unsafe_wrong_or_exact(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -1969,11 +2101,15 @@ def test_pytest_command_disables_worker_restart_and_uses_selected_root(tmp_path:
         tmp_path / "report.json",
         "run-id",
         [f"{apg_test.INTEGRATION_ROOT.as_posix()}/.github/workflows/release.yml.int.test.py"],
+        [
+            f"{apg_test.INTEGRATION_ROOT.as_posix()}/.github/workflows/release.yml.int.test.py::test_old_private_history",
+        ],
     )
     assert command[command.index("-n") + 1] == "8"
     assert "--max-worker-restart=0" in command
     assert "xdist.plugin" in command
     assert "pytest_cov.plugin" in command
+    assert command[command.index("--deselect") + 1].endswith("::test_old_private_history")
     assert command[-1].endswith("/.github/workflows/release.yml.int.test.py")
 
 
@@ -2166,6 +2302,126 @@ def _collection_events(nodes: list[str]) -> list[dict[str, object]]:
     return events
 
 
+def test_worker_manifest_accounts_for_explicit_deselected_nodes(
+    tmp_path: Path,
+) -> None:
+    root = apg_test.UNIT_ROOT.as_posix()
+    nodes = [
+        f"{root}/owner.unit.test.py::test_public",
+        f"{root}/owner.unit.test.py::test_private_history",
+    ]
+    events = [
+        event
+        for event in _collection_events(nodes)
+        if not (
+            event.get("event") == "test-result"
+            and event.get("nodeid") == nodes[1]
+        )
+    ]
+    manifest = tmp_path / "deselected-workers.jsonl"
+    manifest.write_text(
+        "".join(json.dumps(event) + "\n" for event in events),
+        encoding="utf-8",
+    )
+    apg_test.validate_worker_manifest(
+        manifest,
+        "collection-run",
+        "unit",
+        2,
+        root,
+        [f"{root}/owner.unit.test.py"],
+        deselections=(nodes[1],),
+    )
+    with pytest.raises(apg_test.HarnessError, match="deselection set"):
+        apg_test.validate_worker_manifest(
+            manifest,
+            "collection-run",
+            "unit",
+            2,
+            root,
+            [f"{root}/owner.unit.test.py"],
+            deselections=(nodes[0] + "_foreign",),
+        )
+
+
+def _enriched_collection_events(
+    nodes: list[str], remaining: list[str], deselected: list[str]
+) -> list[dict[str, object]]:
+    events = [
+        event
+        for event in _collection_events(nodes)
+        if not (
+            event.get("event") == "test-result"
+            and event.get("nodeid") in set(deselected)
+        )
+    ]
+    for event in events:
+        if event.get("event") == "collection":
+            event["remaining_node_ids"] = list(remaining)
+            event["deselected_node_ids"] = list(deselected)
+    return events
+
+
+def test_worker_manifest_closes_raw_post_deselection_and_results(
+    tmp_path: Path,
+) -> None:
+    root = apg_test.UNIT_ROOT.as_posix()
+    nodes = [
+        f"{root}/owner.unit.test.py::test_public",
+        f"{root}/owner.unit.test.py::test_private_history",
+    ]
+    manifest = tmp_path / "enriched-workers.jsonl"
+    events = _enriched_collection_events(nodes, nodes[:1], nodes[1:])
+    manifest.write_text(
+        "".join(json.dumps(event) + "\n" for event in events),
+        encoding="utf-8",
+    )
+    apg_test.validate_worker_manifest(
+        manifest,
+        "collection-run",
+        "unit",
+        2,
+        root,
+        [f"{root}/owner.unit.test.py"],
+        deselections=(nodes[1],),
+    )
+
+
+@pytest.mark.parametrize("fault", ("partition", "worker-disagreement", "approved"))
+def test_worker_manifest_rejects_untrusted_post_deselection_evidence(
+    tmp_path: Path, fault: str
+) -> None:
+    root = apg_test.UNIT_ROOT.as_posix()
+    nodes = [
+        f"{root}/owner.unit.test.py::test_public",
+        f"{root}/owner.unit.test.py::test_private_history",
+    ]
+    manifest = tmp_path / f"enriched-{fault}.jsonl"
+    events = _enriched_collection_events(nodes, nodes[:1], nodes[1:])
+    collections = [event for event in events if event.get("event") == "collection"]
+    if fault == "partition":
+        collections[0]["deselected_node_ids"] = [nodes[0]]
+    elif fault == "worker-disagreement":
+        collections[1]["remaining_node_ids"] = list(nodes)
+    manifest.write_text(
+        "".join(json.dumps(event) + "\n" for event in events),
+        encoding="utf-8",
+    )
+    approved = (nodes[1],) if fault != "approved" else (nodes[0],)
+    with pytest.raises(
+        apg_test.HarnessError, match="deselection|partition|post-deselection"
+    ):
+        apg_test.validate_worker_manifest(
+            manifest,
+            "collection-run",
+            "unit",
+            2,
+            root,
+            [f"{root}/owner.unit.test.py"],
+            deselections=approved,
+        )
+
+
 @pytest.mark.parametrize("fault", (
     "none", "hidden-omitted", "ordinary-omitted", "foreign", "duplicate-node",
     "subset", "duplicate-receipt", "worker-disagreement",
@@ -2273,6 +2529,25 @@ def test_main_maps_combined_name_and_returns_bounded_error(
     assert apg_test.main(["unit"]) == 1
 
 
+def test_main_propagates_explicit_public_version(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    observed: list[dict[str, object]] = []
+
+    def successful(
+        _suite: str, _workers: int, _root: Path, **kwargs: object
+    ) -> None:
+        observed.append(kwargs)
+
+    monkeypatch.setattr(apg_test, "run", successful)
+    assert apg_test.main(["unit-integration", "--public-version", "0.11.0"]) == 0
+    assert observed == [{
+        "keep_artifacts_on_failure": False,
+        "failure_mode": None,
+        "public_version": "0.11.0",
+    }]
+
+
 def test_resolve_source_commit_returns_head_commit_hash_or_fails(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
@@ -2337,6 +2612,7 @@ def test_run_policy_executes_validators_and_fails_on_defect(
     monkeypatch.setattr("apg_skill_library_check.check_library", lambda _root: GoodSkillResult())
     monkeypatch.setattr("apg_skill_library_check._embedded_corpus_failure", lambda _root: None)
     monkeypatch.setattr("apg_record_identity.check_records", lambda _root: GoodRecordResult())
+    monkeypatch.setattr("apg_roadmap_closure.check_roadmap_closure", lambda _root: {"passed": True})
 
     apg_test.run_policy(REPOSITORY_ROOT)
 
@@ -2358,6 +2634,11 @@ def test_run_policy_executes_validators_and_fails_on_defect(
     monkeypatch.setattr("apg_skill_library_check._embedded_corpus_failure", lambda _root: None)
     monkeypatch.setattr("apg_record_identity.check_records", lambda _root: BadRecordResult())
     with pytest.raises(apg_test.ToolError, match="record identity policy check failed"):
+        apg_test.run_policy(REPOSITORY_ROOT)
+
+    monkeypatch.setattr("apg_record_identity.check_records", lambda _root: GoodRecordResult())
+    monkeypatch.setattr("apg_roadmap_closure.check_roadmap_closure", lambda _root: {"passed": False})
+    with pytest.raises(apg_test.ToolError, match="roadmap closure policy check failed"):
         apg_test.run_policy(REPOSITORY_ROOT)
 
 
@@ -2830,7 +3111,6 @@ def test_combined_coverage_harness_error_dominance_and_outcomes(
     tmp_path: Path,
 ) -> None:
     # 1. Union _combine_coverage raises HarnessError -> reports error/error, not fail/fail
-    mock_cr = apg_test.ComponentResult(tmp_path / "fake.cov", {}, apg_test.CoverageCounts(100, 100, 50, 50))
     mock_inv = apg_test.Inventory(coverage_sources={}, excluded_launchers={}, tests={})
     monkeypatch.setattr(apg_test, "load_inventory", lambda _root: mock_inv)
     monkeypatch.setattr(apg_test, "validate_inventory", lambda _r, _i: None)

@@ -261,6 +261,7 @@ def _dispatch_analyze(options: dict[str, str], arguments: list[str]) -> int:
     if any(key in options for key in ("apgr_home", "outbox_root", "project")):
         raise CliError("analyze accepts only --project-root from Python global options")
     explicit = options.get("project_root")
+    root: Path
     if explicit is None:
         try:
             root = Path.cwd().resolve(strict=True)
@@ -269,9 +270,10 @@ def _dispatch_analyze(options: dict[str, str], arguments: list[str]) -> int:
         if not root.is_dir():
             raise CliError("analysis root must be a directory")
     else:
-        root = _repository_root(options)
-        if root is None:
+        resolved_root = _repository_root(options)
+        if resolved_root is None:
             raise CliError("analysis root is unavailable")
+        root = resolved_root
     from . import go_bridge
 
     return go_bridge.run(

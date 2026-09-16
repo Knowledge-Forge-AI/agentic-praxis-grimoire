@@ -1,0 +1,75 @@
+{
+  "schema_version": "apg.maturity-candidate/v1",
+  "phase": "APG139",
+  "skill_id": "vitest-test-profile",
+  "proposed_outcome": "PROVISIONAL_MAINTENANCE",
+  "review_status": "PENDING_DISPATCHER_PRE_FINAL",
+  "independent_review": null,
+  "evidence": {
+    "repeated_positive_use": {
+      "assessment": "LIMITED",
+      "references": [
+        "skills/vitest-test-profile/SKILL.md",
+        "docs/evaluations/apg86-gomock-vitest-profiles-and-context-budget-enforcement.md",
+        "src/test/fixtures/apg86-profile-boundary-scenarios.json"
+      ],
+      "observation": "APG86 maps Vitest runner, mocks, timers, isolation and provider boundaries in eight cases. It does not run a target Vitest runner or establish repeated actual guidance-use results."
+    },
+    "representative_non_triggers": {
+      "assessment": "LIMITED",
+      "references": [
+        "skills/vitest-test-profile/SKILL.md",
+        "docs/evaluations/apg86-gomock-vitest-profiles-and-context-budget-enforcement.md",
+        "src/test/fixtures/apg86-profile-boundary-scenarios.json"
+      ],
+      "observation": "Language, Node, React/DOM semantics, sufficiency, dependency/provider adoption and coverage policy remain separate."
+    },
+    "defect_debt_disposition": {
+      "assessment": "SUPPORTED",
+      "references": [
+        "docs/governance/language-profile-known-debt.json",
+        "skills/vitest-test-profile/SKILL.md",
+        "docs/evaluations/apg86-gomock-vitest-profiles-and-context-budget-enforcement.md",
+        "src/test/fixtures/apg86-profile-boundary-scenarios.json"
+      ],
+      "observation": "No active entry for this leaf in the maintained language-profile debt authority. This is not proof that all semantic defects are absent. Current independent semantic review remains pending. No debt is resolved by this inventory."
+    },
+    "rollback": {
+      "assessment": "SUPPORTED",
+      "references": [
+        "skills/vitest-test-profile/SKILL.md",
+        "docs/skill-authoring-and-maintenance.md",
+        "docs/evaluations/apg86-gomock-vitest-profiles-and-context-budget-enforcement.md",
+        "src/test/fixtures/apg86-profile-boundary-scenarios.json"
+      ],
+      "observation": "Use the canonical removal boundary and referenced integration history to reconcile the leaf, projection, catalog and focused fixtures while preserving historical decisions. Do not revert unrelated runner policy, target dependencies, generated mocks or target configuration."
+    },
+    "provenance": {
+      "assessment": "SUPPORTED",
+      "references": [
+        "skills/vitest-test-profile/SKILL.md",
+        "docs/provenance.md",
+        "docs/evaluations/apg86-gomock-vitest-profiles-and-context-budget-enforcement.md",
+        "src/test/fixtures/apg86-profile-boundary-scenarios.json"
+      ],
+      "observation": "Retained canonical source/maintenance boundary and APG provenance record remain the source authority. Historical evaluations identify their original phase and scope; they are reused only for the observations stated here. No external source text is copied or new source refresh claimed."
+    },
+    "independent_review": {
+      "assessment": "PENDING",
+      "references": [],
+      "observation": "Dispatcher pre-final review of this individual APG139 disposition is pending. Historical non-author review in referenced phases is evidence about those phases, not acceptance of this candidate."
+    },
+    "current_validation": {
+      "assessment": "LIMITED",
+      "references": [
+        "docs/governance/maturity/apg139/qualification.md",
+        "skills/vitest-test-profile/SKILL.md"
+      ],
+      "observation": "APG139 checks record/schema, catalog, projection and changed governance behavior. Canonical procedure is unchanged and inspected for scope. Historical semantic qualification is bounded by the referenced phase; this campaign does not rerun every historical technology fixture or establish new real-use evidence."
+    }
+  },
+  "next_lifecycle_trigger": "Supply repeated actual Vitest 4.1.x guidance-use decisions with effective config, project, environment and pool bound to observed runner outcomes; include language/component and coverage-policy non-triggers and current independent validation.",
+  "controlling_debt_ids": [],
+  "consumer_limitations": "No new consumer execution or deployment was performed. Technology execution, source inspection, catalog presence and projection integrity do not establish guidance invocation or effective use.",
+  "rationale": "Retain the selected framework owner. Historical authored scenarios and bounded static guidance application are relevant but do not supply a complete individually reviewed repeated-use and non-trigger promotion case. Additional repositories are not required; APG tasks can supply the missing evidence."
+}

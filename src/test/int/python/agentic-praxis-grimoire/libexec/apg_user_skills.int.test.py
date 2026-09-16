@@ -20,7 +20,7 @@ assert SPEC is not None and SPEC.loader is not None
 EXISTING = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(EXISTING)
 
-import apg_user_skills as user_skills
+import apg_user_skills as user_skills  # noqa: E402
 
 V03_ADDITIONS = (
     "agentic-praxis-grimoire-workflow",

@@ -1,0 +1,37 @@
+{
+  "schema_version": "apg140-external-closure-candidate-v1",
+  "item_id": "SKILL-KG-QUALITY",
+  "review_status": "PENDING_DISPATCHER_PRE_FINAL",
+  "review_ref": null,
+  "review_sha256": null,
+  "receipt": {
+    "schema_version": "apg.roadmap-decision/v1",
+    "item_id": "SKILL-KG-QUALITY",
+    "outcome": "REJECTED",
+    "closure_phase": "V0110-C",
+    "author": "APG140 producer",
+    "reviewer": null,
+    "evidence": {
+      "evaluation": [
+        "docs/governance/external/apg140/source-inventory.md",
+        "docs/governance/external/apg140/support-bindings.json"
+      ],
+      "rejection_rationale": [
+        "docs/governance/external/apg140/decisions.md"
+      ]
+    }
+  },
+  "proposed_disposition": {
+    "decision_ref": "docs/governance/external/apg140/candidates/SKILL-KG-QUALITY.json",
+    "qualification_refs": [
+      "docs/governance/external/apg140/qualification.md",
+      "docs/governance/external/apg140/source-inventory.md",
+      "docs/governance/external/apg140/decisions.md"
+    ],
+    "review_ref": null,
+    "rationale": "APG140 SKILL-KG-QUALITY source-bound outcome: REJECTED; see item-specific reasoning in decisions.md.",
+    "maintenance_ref": null,
+    "compatibility_ref": null,
+    "maturity_ref": null
+  }
+}

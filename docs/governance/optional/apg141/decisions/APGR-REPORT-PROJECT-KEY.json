@@ -1,0 +1,22 @@
+{
+  "schema_version": "apg.roadmap-decision/v1",
+  "item_id": "APGR-REPORT-PROJECT-KEY",
+  "outcome": "DELIVERED",
+  "closure_phase": "V0110-D",
+  "author": "APG141 terminal closeout author",
+  "reviewer": "Dispatcher-selected independent APG141 work reviewer",
+  "evidence": {
+    "implementation": [
+      "internal/cli/cli.go"
+    ],
+    "qualification": [
+      "docs/governance/optional/apg141/qualification.md"
+    ],
+    "compatibility": [
+      "docs/governance/optional/apg141/project-key-contract.md"
+    ],
+    "rollback": [
+      "docs/governance/optional/apg141/project-key-contract.md"
+    ]
+  }
+}

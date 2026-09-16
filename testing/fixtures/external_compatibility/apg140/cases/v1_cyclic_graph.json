@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "result_kind": "canonical_nodes",
+  "items": [
+    {
+      "canonical_key": "n:cycle:alpha",
+      "kind": "module"
+    },
+    {
+      "canonical_key": "n:cycle:beta",
+      "kind": "module"
+    },
+    {
+      "canonical_key": "n:cycle:gamma",
+      "kind": "module"
+    }
+  ],
+  "page": {
+    "limit": 50,
+    "offset": 0,
+    "returned": 3,
+    "truncated": false,
+    "next_offset": null
+  },
+  "diagnostics": []
+}

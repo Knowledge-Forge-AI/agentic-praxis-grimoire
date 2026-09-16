@@ -4,11 +4,9 @@
 from __future__ import annotations
 
 import json
-import os
 from pathlib import Path
 import sys
 import tempfile
-import unittest
 
 from src.test.apg_test_support import repository_root
 from unittest import mock

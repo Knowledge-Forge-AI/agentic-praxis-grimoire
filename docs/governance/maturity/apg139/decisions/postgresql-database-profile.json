@@ -1,0 +1,32 @@
+{
+  "schema_version": "apg.roadmap-decision/v1",
+  "item_id": "MATURITY:postgresql-database-profile",
+  "outcome": "PROVISIONAL_MAINTENANCE",
+  "closure_phase": "V0110-B",
+  "author": "APG139 Codex terminal author",
+  "reviewer": "APG139 dispatcher-selected independent pre-final work reviewer",
+  "evidence": {
+    "repeated_positive_use": [
+      "docs/governance/maturity/apg139/postgresql-database-profile.json"
+    ],
+    "representative_non_triggers": [
+      "docs/governance/maturity/apg139/postgresql-database-profile.json"
+    ],
+    "defect_debt_disposition": [
+      "docs/governance/maturity/apg139/postgresql-database-profile.json"
+    ],
+    "rollback": [
+      "docs/governance/maturity/apg139/postgresql-database-profile.json"
+    ],
+    "provenance": [
+      "docs/governance/maturity/apg139/postgresql-database-profile.json"
+    ],
+    "independent_review": [
+      "docs/governance/maturity/apg139/independent-review.md"
+    ],
+    "current_validation": [
+      "docs/governance/maturity/apg139/postgresql-database-profile.json",
+      "docs/governance/maturity/apg139/qualification.md"
+    ]
+  }
+}

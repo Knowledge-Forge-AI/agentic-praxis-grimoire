@@ -2,7 +2,6 @@
 """Mutation checks for the maintained CSS profile contract."""
 
 from copy import deepcopy
-from pathlib import Path
 import re
 import sys
 

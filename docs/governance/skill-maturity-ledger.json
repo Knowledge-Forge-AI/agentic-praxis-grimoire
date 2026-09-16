@@ -1,0 +1,2188 @@
+{
+  "schema_version": "apg.maturity-ledger/v1",
+  "release": "v0.11",
+  "owner_phase": "APG139",
+  "skills": [
+    {
+      "skill_id": "agentic-praxis-grimoire-workflow",
+      "path": "skills/agentic-praxis-grimoire-workflow/SKILL.md",
+      "current_maturity": "stable",
+      "blocking_debts": [],
+      "source_references": [
+        "skills/agentic-praxis-grimoire-workflow/SKILL.md",
+        "skills/README.md",
+        "docs/provenance.md",
+        "docs/skill-authoring-and-maintenance.md"
+      ],
+      "required_evidence_categories": [
+        "repeated_positive_use",
+        "representative_non_triggers",
+        "defect_debt_disposition",
+        "rollback",
+        "provenance",
+        "independent_review",
+        "current_validation"
+      ],
+      "evidence": {
+        "repeated_positive_use": [],
+        "representative_non_triggers": [],
+        "defect_debt_disposition": [],
+        "rollback": [],
+        "provenance": [],
+        "independent_review": [],
+        "current_validation": []
+      },
+      "independent_review": null,
+      "next_lifecycle_trigger": "Individual agentic-praxis-grimoire-workflow review when repeated-use and non-trigger evidence is available under the maintained skill lifecycle; reassess named debt if its exact condition changes.",
+      "disposition_status": "EXISTING_STABLE",
+      "maintenance_ref": null,
+      "debt_authority": "docs/governance/language-profile-known-debt.json",
+      "active_debts": [],
+      "resolved_debts": []
+    },
+    {
+      "skill_id": "astro-profile",
+      "path": "skills/astro-profile/SKILL.md",
+      "current_maturity": "provisional",
+      "blocking_debts": [],
+      "source_references": [
+        "skills/astro-profile/SKILL.md",
+        "skills/README.md",
+        "docs/provenance.md",
+        "docs/skill-authoring-and-maintenance.md",
+        "docs/governance/maturity/apg139/astro-profile.json"
+      ],
+      "required_evidence_categories": [
+        "repeated_positive_use",
+        "representative_non_triggers",
+        "defect_debt_disposition",
+        "rollback",
+        "provenance",
+        "independent_review",
+        "current_validation"
+      ],
+      "evidence": {
+        "repeated_positive_use": [
+          "docs/governance/maturity/apg139/astro-profile.json"
+        ],
+        "representative_non_triggers": [
+          "docs/governance/maturity/apg139/astro-profile.json"
+        ],
+        "defect_debt_disposition": [
+          "docs/governance/maturity/apg139/astro-profile.json"
+        ],
+        "rollback": [
+          "docs/governance/maturity/apg139/astro-profile.json"
+        ],
+        "provenance": [
+          "docs/governance/maturity/apg139/astro-profile.json"
+        ],
+        "independent_review": [
+          "docs/governance/maturity/apg139/independent-review.md"
+        ],
+        "current_validation": [
+          "docs/governance/maturity/apg139/astro-profile.json",
+          "docs/governance/maturity/apg139/qualification.md"
+        ]
+      },
+      "independent_review": "docs/governance/maturity/apg139/independent-review.md",
+      "next_lifecycle_trigger": "Supply actual Astro execution-boundary and client-directive/content-adapter guidance-use receipts across materially distinct tasks, including a non-trigger handoff to the relevant JSX, React or browser owner; bind compiler and adapter context and obtain current independent validation.",
+      "disposition_status": "PROVISIONAL_MAINTENANCE",
+      "maintenance_ref": "MATURITY:astro-profile",
+      "debt_authority": "docs/governance/language-profile-known-debt.json",
+      "active_debts": [],
+      "resolved_debts": []
+    },
+    {
+      "skill_id": "bash-language-profile",
+      "path": "skills/bash-language-profile/SKILL.md",
+      "current_maturity": "stable",
+      "blocking_debts": [],
+      "source_references": [
+        "skills/bash-language-profile/SKILL.md",
+        "skills/README.md",
+        "docs/provenance.md",
+        "docs/skill-authoring-and-maintenance.md"
+      ],
+      "required_evidence_categories": [
+        "repeated_positive_use",
+        "representative_non_triggers",
+        "defect_debt_disposition",
+        "rollback",
+        "provenance",
+        "independent_review",
+        "current_validation"
+      ],
+      "evidence": {
+        "repeated_positive_use": [],
+        "representative_non_triggers": [],
+        "defect_debt_disposition": [],
+        "rollback": [],
+        "provenance": [],
+        "independent_review": [],
+        "current_validation": []
+      },
+      "independent_review": null,
+      "next_lifecycle_trigger": "Individual bash-language-profile review when repeated-use and non-trigger evidence is available under the maintained skill lifecycle; reassess named debt if its exact condition changes.",
+      "disposition_status": "EXISTING_STABLE",
+      "maintenance_ref": null,
+      "debt_authority": "docs/governance/language-profile-known-debt.json",
+      "active_debts": [],
+      "resolved_debts": []
+    },
+    {
+      "skill_id": "bats-test-profile",
+      "path": "skills/bats-test-profile/SKILL.md",
+      "current_maturity": "stable",
+      "blocking_debts": [],
+      "source_references": [
+        "skills/bats-test-profile/SKILL.md",
+        "skills/README.md",
+        "docs/provenance.md",
+        "docs/skill-authoring-and-maintenance.md"
+      ],
+      "required_evidence_categories": [
+        "repeated_positive_use",
+        "representative_non_triggers",
+        "defect_debt_disposition",
+        "rollback",
+        "provenance",
+        "independent_review",
+        "current_validation"
+      ],
+      "evidence": {
+        "repeated_positive_use": [],
+        "representative_non_triggers": [],
+        "defect_debt_disposition": [],
+        "rollback": [],
+        "provenance": [],
+        "independent_review": [],
+        "current_validation": []
+      },
+      "independent_review": null,
+      "next_lifecycle_trigger": "Individual bats-test-profile review when repeated-use and non-trigger evidence is available under the maintained skill lifecycle; reassess named debt if its exact condition changes.",
+      "disposition_status": "EXISTING_STABLE",
+      "maintenance_ref": null,
+      "debt_authority": "docs/governance/language-profile-known-debt.json",
+      "active_debts": [],
+      "resolved_debts": []
+    },
+    {
+      "skill_id": "browser-runtime-profile",
+      "path": "skills/browser-runtime-profile/SKILL.md",
+      "current_maturity": "provisional",
+      "blocking_debts": [],
+      "source_references": [
+        "skills/browser-runtime-profile/SKILL.md",
+        "skills/README.md",
+        "docs/provenance.md",
+        "docs/skill-authoring-and-maintenance.md",
+        "docs/governance/maturity/apg139/browser-runtime-profile.json"
+      ],
+      "required_evidence_categories": [
+        "repeated_positive_use",
+        "representative_non_triggers",
+        "defect_debt_disposition",
+        "rollback",
+        "provenance",
+        "independent_review",
+        "current_validation"
+      ],
+      "evidence": {
+        "repeated_positive_use": [
+          "docs/governance/maturity/apg139/browser-runtime-profile.json"
+        ],
+        "representative_non_triggers": [
+          "docs/governance/maturity/apg139/browser-runtime-profile.json"
+        ],
+        "defect_debt_disposition": [
+          "docs/governance/maturity/apg139/browser-runtime-profile.json"
+        ],
+        "rollback": [
+          "docs/governance/maturity/apg139/browser-runtime-profile.json"
+        ],
+        "provenance": [
+          "docs/governance/maturity/apg139/browser-runtime-profile.json"
+        ],
+        "independent_review": [
+          "docs/governance/maturity/apg139/independent-review.md"
+        ],
+        "current_validation": [
+          "docs/governance/maturity/apg139/browser-runtime-profile.json",
+          "docs/governance/maturity/apg139/qualification.md"
+        ]
+      },
+      "independent_review": "docs/governance/maturity/apg139/independent-review.md",
+      "next_lifecycle_trigger": "Supply repeated actual browser-host guidance decisions bound to engine, version, platform, origin and context with executed host predicates, plus a language-only non-trigger and explicit WebView/assistive-technology limits for independent review.",
+      "disposition_status": "PROVISIONAL_MAINTENANCE",
+      "maintenance_ref": "MATURITY:browser-runtime-profile",
+      "debt_authority": "docs/governance/language-profile-known-debt.json",
+      "active_debts": [],
+      "resolved_debts": []
+    },
+    {
+      "skill_id": "chatgpt-manager-workflow",
+      "path": "skills/chatgpt/chatgpt-manager-workflow/SKILL.md",
+      "current_maturity": "provisional",
+      "blocking_debts": [],
+      "source_references": [
+        "skills/chatgpt/chatgpt-manager-workflow/SKILL.md",
+        "skills/README.md",
+        "docs/provenance.md",
+        "docs/skill-authoring-and-maintenance.md",
+        "docs/governance/maturity/apg139/chatgpt-manager-workflow.json"
+      ],
+      "required_evidence_categories": [
+        "repeated_positive_use",
+        "representative_non_triggers",
+        "defect_debt_disposition",
+        "rollback",
+        "provenance",
+        "independent_review",
+        "current_validation"
+      ],
+      "evidence": {
+        "repeated_positive_use": [
+          "docs/governance/maturity/apg139/chatgpt-manager-workflow.json"
+        ],
+        "representative_non_triggers": [
+          "docs/governance/maturity/apg139/chatgpt-manager-workflow.json"
+        ],
+        "defect_debt_disposition": [
+          "docs/governance/maturity/apg139/chatgpt-manager-workflow.json"
+        ],
+        "rollback": [
+          "docs/governance/maturity/apg139/chatgpt-manager-workflow.json"
+        ],
+        "provenance": [
+          "docs/governance/maturity/apg139/chatgpt-manager-workflow.json"
+        ],
+        "independent_review": [
+          "docs/governance/maturity/apg139/independent-review.md"
+        ],
+        "current_validation": [
+          "docs/governance/maturity/apg139/chatgpt-manager-workflow.json",
+          "docs/governance/maturity/apg139/qualification.md"
+        ]
+      },
+      "independent_review": "docs/governance/maturity/apg139/independent-review.md",
+      "next_lifecycle_trigger": "Supply repeated actual manager-routing decisions across distinct tasks, preserving exact source/map identity, an ordinary-Codex non-trigger and authority stop cases; bind client discovery observations and independently validate the outcomes.",
+      "disposition_status": "PROVISIONAL_MAINTENANCE",
+      "maintenance_ref": "MATURITY:chatgpt-manager-workflow",
+      "debt_authority": "docs/governance/language-profile-known-debt.json",
+      "active_debts": [],
+      "resolved_debts": []
+    },
+    {
+      "skill_id": "composing-approved-roadmap-assignments",
+      "path": "skills/chatgpt/composing-approved-roadmap-assignments/SKILL.md",
+      "current_maturity": "provisional",
+      "blocking_debts": [],
+      "source_references": [
+        "skills/chatgpt/composing-approved-roadmap-assignments/SKILL.md",
+        "skills/README.md",
+        "docs/provenance.md",
+        "docs/skill-authoring-and-maintenance.md",
+        "docs/governance/maturity/apg139/composing-approved-roadmap-assignments.json"
+      ],
+      "required_evidence_categories": [
+        "repeated_positive_use",
+        "representative_non_triggers",
+        "defect_debt_disposition",
+        "rollback",
+        "provenance",
+        "independent_review",
+        "current_validation"
+      ],
+      "evidence": {
+        "repeated_positive_use": [
+          "docs/governance/maturity/apg139/composing-approved-roadmap-assignments.json"
+        ],
+        "representative_non_triggers": [
+          "docs/governance/maturity/apg139/composing-approved-roadmap-assignments.json"
+        ],
+        "defect_debt_disposition": [
+          "docs/governance/maturity/apg139/composing-approved-roadmap-assignments.json"
+        ],
+        "rollback": [
+          "docs/governance/maturity/apg139/composing-approved-roadmap-assignments.json"
+        ],
+        "provenance": [
+          "docs/governance/maturity/apg139/composing-approved-roadmap-assignments.json"
+        ],
+        "independent_review": [
+          "docs/governance/maturity/apg139/independent-review.md"
+        ],
+        "current_validation": [
+          "docs/governance/maturity/apg139/composing-approved-roadmap-assignments.json",
+          "docs/governance/maturity/apg139/qualification.md"
+        ]
+      },
+      "independent_review": "docs/governance/maturity/apg139/independent-review.md",
+      "next_lifecycle_trigger": "Supply repeated actual assignments from already approved roadmap phases, each binding approval, semantic phase identity, scope, acceptance, stop and rollback; include direct-task and unapproved-roadmap non-triggers and independent validation.",
+      "disposition_status": "PROVISIONAL_MAINTENANCE",
+      "maintenance_ref": "MATURITY:composing-approved-roadmap-assignments",
+      "debt_authority": "docs/governance/language-profile-known-debt.json",
+      "active_debts": [],
+      "resolved_debts": []
+    },
+    {
+      "skill_id": "composing-bounded-worker-assignments",
+      "path": "skills/composing-bounded-worker-assignments/SKILL.md",
+      "current_maturity": "stable",
+      "blocking_debts": [],
+      "source_references": [
+        "skills/composing-bounded-worker-assignments/SKILL.md",
+        "skills/README.md",
+        "docs/provenance.md",
+        "docs/skill-authoring-and-maintenance.md"
+      ],
+      "required_evidence_categories": [
+        "repeated_positive_use",
+        "representative_non_triggers",
+        "defect_debt_disposition",
+        "rollback",
+        "provenance",
+        "independent_review",
+        "current_validation"
+      ],
+      "evidence": {
+        "repeated_positive_use": [],
+        "representative_non_triggers": [],
+        "defect_debt_disposition": [],
+        "rollback": [],
+        "provenance": [],
+        "independent_review": [],
+        "current_validation": []
+      },
+      "independent_review": null,
+      "next_lifecycle_trigger": "Individual composing-bounded-worker-assignments review when repeated-use and non-trigger evidence is available under the maintained skill lifecycle; reassess named debt if its exact condition changes.",
+      "disposition_status": "EXISTING_STABLE",
+      "maintenance_ref": null,
+      "debt_authority": "docs/governance/language-profile-known-debt.json",
+      "active_debts": [],
+      "resolved_debts": []
+    },
+    {
+      "skill_id": "converting-bash-scripts-to-python",
+      "path": "skills/converting-bash-scripts-to-python/SKILL.md",
+      "current_maturity": "provisional",
+      "blocking_debts": [],
+      "source_references": [
+        "skills/converting-bash-scripts-to-python/SKILL.md",
+        "skills/README.md",
+        "docs/provenance.md",
+        "docs/skill-authoring-and-maintenance.md",
+        "docs/governance/maturity/apg139/converting-bash-scripts-to-python.json"
+      ],
+      "required_evidence_categories": [
+        "repeated_positive_use",
+        "representative_non_triggers",
+        "defect_debt_disposition",
+        "rollback",
+        "provenance",
+        "independent_review",
+        "current_validation"
+      ],
+      "evidence": {
+        "repeated_positive_use": [
+          "docs/governance/maturity/apg139/converting-bash-scripts-to-python.json"
+        ],
+        "representative_non_triggers": [
+          "docs/governance/maturity/apg139/converting-bash-scripts-to-python.json"
+        ],
+        "defect_debt_disposition": [
+          "docs/governance/maturity/apg139/converting-bash-scripts-to-python.json"
+        ],
+        "rollback": [
+          "docs/governance/maturity/apg139/converting-bash-scripts-to-python.json"
+        ],
+        "provenance": [
+          "docs/governance/maturity/apg139/converting-bash-scripts-to-python.json"
+        ],
+        "independent_review": [
+          "docs/governance/maturity/apg139/independent-review.md"
+        ],
+        "current_validation": [
+          "docs/governance/maturity/apg139/converting-bash-scripts-to-python.json",
+          "docs/governance/maturity/apg139/qualification.md"
+        ]
+      },
+      "independent_review": "docs/governance/maturity/apg139/independent-review.md",
+      "next_lifecycle_trigger": "Supply actual authorized Bash-to-Python migration guidance use with caller/behavior characterization, old/new parity and intentional deltas, rollout and rollback evidence; establish repeated use across distinct migration decisions and include a new-Python non-trigger for independent review.",
+      "disposition_status": "PROVISIONAL_MAINTENANCE",
+      "maintenance_ref": "MATURITY:converting-bash-scripts-to-python",
+      "debt_authority": "docs/governance/language-profile-known-debt.json",
+      "active_debts": [],
+      "resolved_debts": []
+    },
+    {
+      "skill_id": "css-language-profile",
+      "path": "skills/css-language-profile/SKILL.md",
+      "current_maturity": "provisional",
+      "blocking_debts": [
+        "CSS-QD-001",
+        "CSS-QD-002",
+        "CSS-QD-003",
+        "CSS-QD-004"
+      ],
+      "source_references": [
+        "skills/css-language-profile/SKILL.md",
+        "skills/README.md",
+        "docs/provenance.md",
+        "docs/skill-authoring-and-maintenance.md",
+        "docs/governance/maturity/apg139/css-language-profile.json"
+      ],
+      "required_evidence_categories": [
+        "repeated_positive_use",
+        "representative_non_triggers",
+        "defect_debt_disposition",
+        "rollback",
+        "provenance",
+        "independent_review",
+        "current_validation"
+      ],
+      "evidence": {
+        "repeated_positive_use": [
+          "docs/governance/maturity/apg139/css-language-profile.json"
+        ],
+        "representative_non_triggers": [
+          "docs/governance/maturity/apg139/css-language-profile.json"
+        ],
+        "defect_debt_disposition": [
+          "docs/governance/maturity/apg139/css-language-profile.json"
+        ],
+        "rollback": [
+          "docs/governance/maturity/apg139/css-language-profile.json"
+        ],
+        "provenance": [
+          "docs/governance/maturity/apg139/css-language-profile.json"
+        ],
+        "independent_review": [
+          "docs/governance/maturity/apg139/independent-review.md"
+        ],
+        "current_validation": [
+          "docs/governance/maturity/apg139/css-language-profile.json",
+          "docs/governance/maturity/apg139/qualification.md"
+        ]
+      },
+      "independent_review": "docs/governance/maturity/apg139/independent-review.md",
+      "next_lifecycle_trigger": "After an authorized phase resolves CSS-QD-001, CSS-QD-002, CSS-QD-003, CSS-QD-004 under the exact linked known-debt records, supply repeated actual static CSS guidance decisions binding complete artifact and cascade inputs, with DOM/rendering and preprocessor non-trigger handoffs and fresh independent semantic validation.",
+      "disposition_status": "PROVISIONAL_MAINTENANCE",
+      "maintenance_ref": "MATURITY:css-language-profile",
+      "debt_authority": "docs/governance/language-profile-known-debt.json",
+      "active_debts": [
+        "CSS-QD-001",
+        "CSS-QD-002",
+        "CSS-QD-003",
+        "CSS-QD-004",
+        "CSS-QD-005"
+      ],
+      "resolved_debts": []
+    },
+    {
+      "skill_id": "debugging-systematically",
+      "path": "skills/debugging-systematically/SKILL.md",
+      "current_maturity": "stable",
+      "blocking_debts": [],
+      "source_references": [
+        "skills/debugging-systematically/SKILL.md",
+        "skills/README.md",
+        "docs/provenance.md",
+        "docs/skill-authoring-and-maintenance.md"
+      ],
+      "required_evidence_categories": [
+        "repeated_positive_use",
+        "representative_non_triggers",
+        "defect_debt_disposition",
+        "rollback",
+        "provenance",
+        "independent_review",
+        "current_validation"
+      ],
+      "evidence": {
+        "repeated_positive_use": [],
+        "representative_non_triggers": [],
+        "defect_debt_disposition": [],
+        "rollback": [],
+        "provenance": [],
+        "independent_review": [],
+        "current_validation": []
+      },
+      "independent_review": null,
+      "next_lifecycle_trigger": "Individual debugging-systematically review when repeated-use and non-trigger evidence is available under the maintained skill lifecycle; reassess named debt if its exact condition changes.",
+      "disposition_status": "EXISTING_STABLE",
+      "maintenance_ref": null,
+      "debt_authority": "docs/governance/language-profile-known-debt.json",
+      "active_debts": [],
+      "resolved_debts": []
+    },
+    {
+      "skill_id": "designing-significant-changes",
+      "path": "skills/designing-significant-changes/SKILL.md",
+      "current_maturity": "stable",
+      "blocking_debts": [],
+      "source_references": [
+        "skills/designing-significant-changes/SKILL.md",
+        "skills/README.md",
+        "docs/provenance.md",
+        "docs/skill-authoring-and-maintenance.md"
+      ],
+      "required_evidence_categories": [
+        "repeated_positive_use",
+        "representative_non_triggers",
+        "defect_debt_disposition",
+        "rollback",
+        "provenance",
+        "independent_review",
+        "current_validation"
+      ],
+      "evidence": {
+        "repeated_positive_use": [],
+        "representative_non_triggers": [],
+        "defect_debt_disposition": [],
+        "rollback": [],
+        "provenance": [],
+        "independent_review": [],
+        "current_validation": []
+      },
+      "independent_review": null,
+      "next_lifecycle_trigger": "Individual designing-significant-changes review when repeated-use and non-trigger evidence is available under the maintained skill lifecycle; reassess named debt if its exact condition changes.",
+      "disposition_status": "EXISTING_STABLE",
+      "maintenance_ref": null,
+      "debt_authority": "docs/governance/language-profile-known-debt.json",
+      "active_debts": [],
+      "resolved_debts": []
+    },
+    {
+      "skill_id": "dockerfile-profile",
+      "path": "skills/dockerfile-profile/SKILL.md",
+      "current_maturity": "provisional",
+      "blocking_debts": [],
+      "source_references": [
+        "skills/dockerfile-profile/SKILL.md",
+        "skills/README.md",
+        "docs/provenance.md",
+        "docs/skill-authoring-and-maintenance.md",
+        "docs/governance/maturity/apg139/dockerfile-profile.json"
+      ],
+      "required_evidence_categories": [
+        "repeated_positive_use",
+        "representative_non_triggers",
+        "defect_debt_disposition",
+        "rollback",
+        "provenance",
+        "independent_review",
+        "current_validation"
+      ],
+      "evidence": {
+        "repeated_positive_use": [
+          "docs/governance/maturity/apg139/dockerfile-profile.json"
+        ],
+        "representative_non_triggers": [
+          "docs/governance/maturity/apg139/dockerfile-profile.json"
+        ],
+        "defect_debt_disposition": [
+          "docs/governance/maturity/apg139/dockerfile-profile.json"
+        ],
+        "rollback": [
+          "docs/governance/maturity/apg139/dockerfile-profile.json"
+        ],
+        "provenance": [
+          "docs/governance/maturity/apg139/dockerfile-profile.json"
+        ],
+        "independent_review": [
+          "docs/governance/maturity/apg139/independent-review.md"
+        ],
+        "current_validation": [
+          "docs/governance/maturity/apg139/dockerfile-profile.json",
+          "docs/governance/maturity/apg139/qualification.md"
+        ]
+      },
+      "independent_review": "docs/governance/maturity/apg139/independent-review.md",
+      "next_lifecycle_trigger": "Supply repeated actual Dockerfile stage/context/copy/mount/cache/ownership/platform guidance decisions with frontend, builder and platform facts and authorized build/runtime evidence for claimed outcomes; include orchestrator-policy and shell non-triggers in independent validation.",
+      "disposition_status": "PROVISIONAL_MAINTENANCE",
+      "maintenance_ref": "MATURITY:dockerfile-profile",
+      "debt_authority": "docs/governance/language-profile-known-debt.json",
+      "active_debts": [],
+      "resolved_debts": []
+    },
+    {
+      "skill_id": "go-cmp-test-profile",
+      "path": "skills/go-cmp-test-profile/SKILL.md",
+      "current_maturity": "provisional",
+      "blocking_debts": [],
+      "source_references": [
+        "skills/go-cmp-test-profile/SKILL.md",
+        "skills/README.md",
+        "docs/provenance.md",
+        "docs/skill-authoring-and-maintenance.md",
+        "docs/governance/maturity/apg139/go-cmp-test-profile.json"
+      ],
+      "required_evidence_categories": [
+        "repeated_positive_use",
+        "representative_non_triggers",
+        "defect_debt_disposition",
+        "rollback",
+        "provenance",
+        "independent_review",
+        "current_validation"
+      ],
+      "evidence": {
+        "repeated_positive_use": [
+          "docs/governance/maturity/apg139/go-cmp-test-profile.json"
+        ],
+        "representative_non_triggers": [
+          "docs/governance/maturity/apg139/go-cmp-test-profile.json"
+        ],
+        "defect_debt_disposition": [
+          "docs/governance/maturity/apg139/go-cmp-test-profile.json"
+        ],
+        "rollback": [
+          "docs/governance/maturity/apg139/go-cmp-test-profile.json"
+        ],
+        "provenance": [
+          "docs/governance/maturity/apg139/go-cmp-test-profile.json"
+        ],
+        "independent_review": [
+          "docs/governance/maturity/apg139/independent-review.md"
+        ],
+        "current_validation": [
+          "docs/governance/maturity/apg139/go-cmp-test-profile.json",
+          "docs/governance/maturity/apg139/qualification.md"
+        ]
+      },
+      "independent_review": "docs/governance/maturity/apg139/independent-review.md",
+      "next_lifecycle_trigger": "Supply repeated actual guidance use for an already selected go-cmp version within the canonical baseline or a separately reviewed refresh, binding option composition, diff behavior and protected-data diagnostics; include simple-assertion and native-lifecycle non-triggers and independent validation.",
+      "disposition_status": "PROVISIONAL_MAINTENANCE",
+      "maintenance_ref": "MATURITY:go-cmp-test-profile",
+      "debt_authority": "docs/governance/language-profile-known-debt.json",
+      "active_debts": [],
+      "resolved_debts": []
+    },
+    {
+      "skill_id": "go-language-profile",
+      "path": "skills/go-language-profile/SKILL.md",
+      "current_maturity": "provisional",
+      "blocking_debts": [],
+      "source_references": [
+        "skills/go-language-profile/SKILL.md",
+        "skills/README.md",
+        "docs/provenance.md",
+        "docs/skill-authoring-and-maintenance.md",
+        "docs/governance/maturity/apg139/go-language-profile.json"
+      ],
+      "required_evidence_categories": [
+        "repeated_positive_use",
+        "representative_non_triggers",
+        "defect_debt_disposition",
+        "rollback",
+        "provenance",
+        "independent_review",
+        "current_validation"
+      ],
+      "evidence": {
+        "repeated_positive_use": [
+          "docs/governance/maturity/apg139/go-language-profile.json"
+        ],
+        "representative_non_triggers": [
+          "docs/governance/maturity/apg139/go-language-profile.json"
+        ],
+        "defect_debt_disposition": [
+          "docs/governance/maturity/apg139/go-language-profile.json"
+        ],
+        "rollback": [
+          "docs/governance/maturity/apg139/go-language-profile.json"
+        ],
+        "provenance": [
+          "docs/governance/maturity/apg139/go-language-profile.json"
+        ],
+        "independent_review": [
+          "docs/governance/maturity/apg139/independent-review.md"
+        ],
+        "current_validation": [
+          "docs/governance/maturity/apg139/go-language-profile.json",
+          "docs/governance/maturity/apg139/qualification.md"
+        ]
+      },
+      "independent_review": "docs/governance/maturity/apg139/independent-review.md",
+      "next_lifecycle_trigger": "Supply repeated actual Go guidance decisions involving errors, cancellation, concurrency, API or resource semantics with exact toolchain context and claim-appropriate validation; include mechanical-edit non-triggers and unsafe/cgo stops where applicable, then independent review.",
+      "disposition_status": "PROVISIONAL_MAINTENANCE",
+      "maintenance_ref": "MATURITY:go-language-profile",
+      "debt_authority": "docs/governance/language-profile-known-debt.json",
+      "active_debts": [],
+      "resolved_debts": []
+    },
+    {
+      "skill_id": "go-test-profile",
+      "path": "skills/go-test-profile/SKILL.md",
+      "current_maturity": "provisional",
+      "blocking_debts": [],
+      "source_references": [
+        "skills/go-test-profile/SKILL.md",
+        "skills/README.md",
+        "docs/provenance.md",
+        "docs/skill-authoring-and-maintenance.md",
+        "docs/governance/maturity/apg139/go-test-profile.json"
+      ],
+      "required_evidence_categories": [
+        "repeated_positive_use",
+        "representative_non_triggers",
+        "defect_debt_disposition",
+        "rollback",
+        "provenance",
+        "independent_review",
+        "current_validation"
+      ],
+      "evidence": {
+        "repeated_positive_use": [
+          "docs/governance/maturity/apg139/go-test-profile.json"
+        ],
+        "representative_non_triggers": [
+          "docs/governance/maturity/apg139/go-test-profile.json"
+        ],
+        "defect_debt_disposition": [
+          "docs/governance/maturity/apg139/go-test-profile.json"
+        ],
+        "rollback": [
+          "docs/governance/maturity/apg139/go-test-profile.json"
+        ],
+        "provenance": [
+          "docs/governance/maturity/apg139/go-test-profile.json"
+        ],
+        "independent_review": [
+          "docs/governance/maturity/apg139/independent-review.md"
+        ],
+        "current_validation": [
+          "docs/governance/maturity/apg139/go-test-profile.json",
+          "docs/governance/maturity/apg139/qualification.md"
+        ]
+      },
+      "independent_review": "docs/governance/maturity/apg139/independent-review.md",
+      "next_lifecycle_trigger": "Supply distinct actual native testing lifecycle and false-pass guidance-use decisions with module/file/toolchain context and claim-appropriate observed results, plus ordinary-Go and comparison-library non-trigger handoffs; independently review the complete individual inventory.",
+      "disposition_status": "PROVISIONAL_MAINTENANCE",
+      "maintenance_ref": "MATURITY:go-test-profile",
+      "debt_authority": "docs/governance/language-profile-known-debt.json",
+      "active_debts": [],
+      "resolved_debts": []
+    },
+    {
+      "skill_id": "gomock-test-profile",
+      "path": "skills/gomock-test-profile/SKILL.md",
+      "current_maturity": "provisional",
+      "blocking_debts": [],
+      "source_references": [
+        "skills/gomock-test-profile/SKILL.md",
+        "skills/README.md",
+        "docs/provenance.md",
+        "docs/skill-authoring-and-maintenance.md",
+        "docs/governance/maturity/apg139/gomock-test-profile.json"
+      ],
+      "required_evidence_categories": [
+        "repeated_positive_use",
+        "representative_non_triggers",
+        "defect_debt_disposition",
+        "rollback",
+        "provenance",
+        "independent_review",
+        "current_validation"
+      ],
+      "evidence": {
+        "repeated_positive_use": [
+          "docs/governance/maturity/apg139/gomock-test-profile.json"
+        ],
+        "representative_non_triggers": [
+          "docs/governance/maturity/apg139/gomock-test-profile.json"
+        ],
+        "defect_debt_disposition": [
+          "docs/governance/maturity/apg139/gomock-test-profile.json"
+        ],
+        "rollback": [
+          "docs/governance/maturity/apg139/gomock-test-profile.json"
+        ],
+        "provenance": [
+          "docs/governance/maturity/apg139/gomock-test-profile.json"
+        ],
+        "independent_review": [
+          "docs/governance/maturity/apg139/independent-review.md"
+        ],
+        "current_validation": [
+          "docs/governance/maturity/apg139/gomock-test-profile.json",
+          "docs/governance/maturity/apg139/qualification.md"
+        ]
+      },
+      "independent_review": "docs/governance/maturity/apg139/independent-review.md",
+      "next_lifecycle_trigger": "Supply repeated actual guidance-use decisions for already selected GoMock v0.6.0, binding generator mode/input, controller lifetime and expectations to observed outcomes, with native-testing and value-diff non-trigger handoffs and independent validation.",
+      "disposition_status": "PROVISIONAL_MAINTENANCE",
+      "maintenance_ref": "MATURITY:gomock-test-profile",
+      "debt_authority": "docs/governance/language-profile-known-debt.json",
+      "active_debts": [],
+      "resolved_debts": []
+    },
+    {
+      "skill_id": "implementing-with-test-discipline",
+      "path": "skills/implementing-with-test-discipline/SKILL.md",
+      "current_maturity": "stable",
+      "blocking_debts": [],
+      "source_references": [
+        "skills/implementing-with-test-discipline/SKILL.md",
+        "skills/README.md",
+        "docs/provenance.md",
+        "docs/skill-authoring-and-maintenance.md"
+      ],
+      "required_evidence_categories": [
+        "repeated_positive_use",
+        "representative_non_triggers",
+        "defect_debt_disposition",
+        "rollback",
+        "provenance",
+        "independent_review",
+        "current_validation"
+      ],
+      "evidence": {
+        "repeated_positive_use": [],
+        "representative_non_triggers": [],
+        "defect_debt_disposition": [],
+        "rollback": [],
+        "provenance": [],
+        "independent_review": [],
+        "current_validation": []
+      },
+      "independent_review": null,
+      "next_lifecycle_trigger": "Individual implementing-with-test-discipline review when repeated-use and non-trigger evidence is available under the maintained skill lifecycle; reassess named debt if its exact condition changes.",
+      "disposition_status": "EXISTING_STABLE",
+      "maintenance_ref": null,
+      "debt_authority": "docs/governance/language-profile-known-debt.json",
+      "active_debts": [],
+      "resolved_debts": []
+    },
+    {
+      "skill_id": "javascript-language-profile",
+      "path": "skills/javascript-language-profile/SKILL.md",
+      "current_maturity": "provisional",
+      "blocking_debts": [
+        "JS-QD-005"
+      ],
+      "source_references": [
+        "skills/javascript-language-profile/SKILL.md",
+        "skills/README.md",
+        "docs/provenance.md",
+        "docs/skill-authoring-and-maintenance.md",
+        "docs/governance/maturity/apg139/javascript-language-profile.json"
+      ],
+      "required_evidence_categories": [
+        "repeated_positive_use",
+        "representative_non_triggers",
+        "defect_debt_disposition",
+        "rollback",
+        "provenance",
+        "independent_review",
+        "current_validation"
+      ],
+      "evidence": {
+        "repeated_positive_use": [
+          "docs/governance/maturity/apg139/javascript-language-profile.json"
+        ],
+        "representative_non_triggers": [
+          "docs/governance/maturity/apg139/javascript-language-profile.json"
+        ],
+        "defect_debt_disposition": [
+          "docs/governance/maturity/apg139/javascript-language-profile.json"
+        ],
+        "rollback": [
+          "docs/governance/maturity/apg139/javascript-language-profile.json"
+        ],
+        "provenance": [
+          "docs/governance/maturity/apg139/javascript-language-profile.json"
+        ],
+        "independent_review": [
+          "docs/governance/maturity/apg139/independent-review.md"
+        ],
+        "current_validation": [
+          "docs/governance/maturity/apg139/javascript-language-profile.json",
+          "docs/governance/maturity/apg139/qualification.md"
+        ]
+      },
+      "independent_review": "docs/governance/maturity/apg139/independent-review.md",
+      "next_lifecycle_trigger": "After an authorized phase resolves JS-QD-005 under the exact linked known-debt records, supply repeated actual ECMAScript semantic guidance decisions bound to exact bytes, parse goal, strictness, edition, whole-file owner and host inputs, with Node/browser and transform non-trigger handoffs and current independent validation.",
+      "disposition_status": "PROVISIONAL_MAINTENANCE",
+      "maintenance_ref": "MATURITY:javascript-language-profile",
+      "debt_authority": "docs/governance/language-profile-known-debt.json",
+      "active_debts": [
+        "JS-QD-005"
+      ],
+      "resolved_debts": [
+        "JS-QD-001",
+        "JS-QD-002",
+        "JS-QD-003",
+        "JS-QD-004"
+      ]
+    },
+    {
+      "skill_id": "jsx-language-profile",
+      "path": "skills/jsx-language-profile/SKILL.md",
+      "current_maturity": "provisional",
+      "blocking_debts": [],
+      "source_references": [
+        "skills/jsx-language-profile/SKILL.md",
+        "skills/README.md",
+        "docs/provenance.md",
+        "docs/skill-authoring-and-maintenance.md",
+        "docs/governance/maturity/apg139/jsx-language-profile.json"
+      ],
+      "required_evidence_categories": [
+        "repeated_positive_use",
+        "representative_non_triggers",
+        "defect_debt_disposition",
+        "rollback",
+        "provenance",
+        "independent_review",
+        "current_validation"
+      ],
+      "evidence": {
+        "repeated_positive_use": [
+          "docs/governance/maturity/apg139/jsx-language-profile.json"
+        ],
+        "representative_non_triggers": [
+          "docs/governance/maturity/apg139/jsx-language-profile.json"
+        ],
+        "defect_debt_disposition": [
+          "docs/governance/maturity/apg139/jsx-language-profile.json"
+        ],
+        "rollback": [
+          "docs/governance/maturity/apg139/jsx-language-profile.json"
+        ],
+        "provenance": [
+          "docs/governance/maturity/apg139/jsx-language-profile.json"
+        ],
+        "independent_review": [
+          "docs/governance/maturity/apg139/independent-review.md"
+        ],
+        "current_validation": [
+          "docs/governance/maturity/apg139/jsx-language-profile.json",
+          "docs/governance/maturity/apg139/qualification.md"
+        ]
+      },
+      "independent_review": "docs/governance/maturity/apg139/independent-review.md",
+      "next_lifecycle_trigger": "Supply repeated actual JSX syntax/transform guidance decisions bound to parser and runtime options, plus React-rendering and TypeScript-checking non-trigger handoffs and current independent validation.",
+      "disposition_status": "PROVISIONAL_MAINTENANCE",
+      "maintenance_ref": "MATURITY:jsx-language-profile",
+      "debt_authority": "docs/governance/language-profile-known-debt.json",
+      "active_debts": [],
+      "resolved_debts": []
+    },
+    {
+      "skill_id": "markdown-language-profile",
+      "path": "skills/markdown-language-profile/SKILL.md",
+      "current_maturity": "provisional",
+      "blocking_debts": [],
+      "source_references": [
+        "skills/markdown-language-profile/SKILL.md",
+        "skills/README.md",
+        "docs/provenance.md",
+        "docs/skill-authoring-and-maintenance.md",
+        "docs/governance/maturity/apg139/markdown-language-profile.json"
+      ],
+      "required_evidence_categories": [
+        "repeated_positive_use",
+        "representative_non_triggers",
+        "defect_debt_disposition",
+        "rollback",
+        "provenance",
+        "independent_review",
+        "current_validation"
+      ],
+      "evidence": {
+        "repeated_positive_use": [
+          "docs/governance/maturity/apg139/markdown-language-profile.json"
+        ],
+        "representative_non_triggers": [
+          "docs/governance/maturity/apg139/markdown-language-profile.json"
+        ],
+        "defect_debt_disposition": [
+          "docs/governance/maturity/apg139/markdown-language-profile.json"
+        ],
+        "rollback": [
+          "docs/governance/maturity/apg139/markdown-language-profile.json"
+        ],
+        "provenance": [
+          "docs/governance/maturity/apg139/markdown-language-profile.json"
+        ],
+        "independent_review": [
+          "docs/governance/maturity/apg139/independent-review.md"
+        ],
+        "current_validation": [
+          "docs/governance/maturity/apg139/markdown-language-profile.json",
+          "docs/governance/maturity/apg139/qualification.md"
+        ]
+      },
+      "independent_review": "docs/governance/maturity/apg139/independent-review.md",
+      "next_lifecycle_trigger": "Supply repeated actual Markdown parser/renderer-bound guidance decisions and representative dialect, raw-HTML and frontmatter non-trigger cases; bind parser settings and independently validate the current semantic outcome.",
+      "disposition_status": "PROVISIONAL_MAINTENANCE",
+      "maintenance_ref": "MATURITY:markdown-language-profile",
+      "debt_authority": "docs/governance/language-profile-known-debt.json",
+      "active_debts": [],
+      "resolved_debts": []
+    },
+    {
+      "skill_id": "mdx-profile",
+      "path": "skills/mdx-profile/SKILL.md",
+      "current_maturity": "provisional",
+      "blocking_debts": [],
+      "source_references": [
+        "skills/mdx-profile/SKILL.md",
+        "skills/README.md",
+        "docs/provenance.md",
+        "docs/skill-authoring-and-maintenance.md",
+        "docs/governance/maturity/apg139/mdx-profile.json"
+      ],
+      "required_evidence_categories": [
+        "repeated_positive_use",
+        "representative_non_triggers",
+        "defect_debt_disposition",
+        "rollback",
+        "provenance",
+        "independent_review",
+        "current_validation"
+      ],
+      "evidence": {
+        "repeated_positive_use": [
+          "docs/governance/maturity/apg139/mdx-profile.json"
+        ],
+        "representative_non_triggers": [
+          "docs/governance/maturity/apg139/mdx-profile.json"
+        ],
+        "defect_debt_disposition": [
+          "docs/governance/maturity/apg139/mdx-profile.json"
+        ],
+        "rollback": [
+          "docs/governance/maturity/apg139/mdx-profile.json"
+        ],
+        "provenance": [
+          "docs/governance/maturity/apg139/mdx-profile.json"
+        ],
+        "independent_review": [
+          "docs/governance/maturity/apg139/independent-review.md"
+        ],
+        "current_validation": [
+          "docs/governance/maturity/apg139/mdx-profile.json",
+          "docs/governance/maturity/apg139/qualification.md"
+        ]
+      },
+      "independent_review": "docs/governance/maturity/apg139/independent-review.md",
+      "next_lifecycle_trigger": "Supply repeated actual MDX import/expression/component/provider seam guidance decisions, with pure-Markdown, JSX and React non-trigger handoffs, compiler context and current independent validation.",
+      "disposition_status": "PROVISIONAL_MAINTENANCE",
+      "maintenance_ref": "MATURITY:mdx-profile",
+      "debt_authority": "docs/governance/language-profile-known-debt.json",
+      "active_debts": [],
+      "resolved_debts": []
+    },
+    {
+      "skill_id": "minitest-test-profile",
+      "path": "skills/minitest-test-profile/SKILL.md",
+      "current_maturity": "provisional",
+      "blocking_debts": [],
+      "source_references": [
+        "skills/minitest-test-profile/SKILL.md",
+        "skills/README.md",
+        "docs/provenance.md",
+        "docs/skill-authoring-and-maintenance.md",
+        "docs/governance/maturity/apg139/minitest-test-profile.json"
+      ],
+      "required_evidence_categories": [
+        "repeated_positive_use",
+        "representative_non_triggers",
+        "defect_debt_disposition",
+        "rollback",
+        "provenance",
+        "independent_review",
+        "current_validation"
+      ],
+      "evidence": {
+        "repeated_positive_use": [
+          "docs/governance/maturity/apg139/minitest-test-profile.json"
+        ],
+        "representative_non_triggers": [
+          "docs/governance/maturity/apg139/minitest-test-profile.json"
+        ],
+        "defect_debt_disposition": [
+          "docs/governance/maturity/apg139/minitest-test-profile.json"
+        ],
+        "rollback": [
+          "docs/governance/maturity/apg139/minitest-test-profile.json"
+        ],
+        "provenance": [
+          "docs/governance/maturity/apg139/minitest-test-profile.json"
+        ],
+        "independent_review": [
+          "docs/governance/maturity/apg139/independent-review.md"
+        ],
+        "current_validation": [
+          "docs/governance/maturity/apg139/minitest-test-profile.json",
+          "docs/governance/maturity/apg139/qualification.md"
+        ]
+      },
+      "independent_review": "docs/governance/maturity/apg139/independent-review.md",
+      "next_lifecycle_trigger": "Supply repeated actual Minitest lifecycle/assertion/isolation guidance-use decisions bound to engine, framework, mock, plugin and reporter context, with Ruby-only and harness-neutral non-triggers and current independent validation.",
+      "disposition_status": "PROVISIONAL_MAINTENANCE",
+      "maintenance_ref": "MATURITY:minitest-test-profile",
+      "debt_authority": "docs/governance/language-profile-known-debt.json",
+      "active_debts": [],
+      "resolved_debts": []
+    },
+    {
+      "skill_id": "nix-language-profile",
+      "path": "skills/nix-language-profile/SKILL.md",
+      "current_maturity": "stable",
+      "blocking_debts": [],
+      "source_references": [
+        "skills/nix-language-profile/SKILL.md",
+        "skills/README.md",
+        "docs/provenance.md",
+        "docs/skill-authoring-and-maintenance.md"
+      ],
+      "required_evidence_categories": [
+        "repeated_positive_use",
+        "representative_non_triggers",
+        "defect_debt_disposition",
+        "rollback",
+        "provenance",
+        "independent_review",
+        "current_validation"
+      ],
+      "evidence": {
+        "repeated_positive_use": [],
+        "representative_non_triggers": [],
+        "defect_debt_disposition": [],
+        "rollback": [],
+        "provenance": [],
+        "independent_review": [],
+        "current_validation": []
+      },
+      "independent_review": null,
+      "next_lifecycle_trigger": "Individual nix-language-profile review when repeated-use and non-trigger evidence is available under the maintained skill lifecycle; reassess named debt if its exact condition changes.",
+      "disposition_status": "EXISTING_STABLE",
+      "maintenance_ref": null,
+      "debt_authority": "docs/governance/language-profile-known-debt.json",
+      "active_debts": [],
+      "resolved_debts": []
+    },
+    {
+      "skill_id": "nix-test-profile",
+      "path": "skills/nix-test-profile/SKILL.md",
+      "current_maturity": "provisional",
+      "blocking_debts": [],
+      "source_references": [
+        "skills/nix-test-profile/SKILL.md",
+        "skills/README.md",
+        "docs/provenance.md",
+        "docs/skill-authoring-and-maintenance.md",
+        "docs/governance/maturity/apg139/nix-test-profile.json"
+      ],
+      "required_evidence_categories": [
+        "repeated_positive_use",
+        "representative_non_triggers",
+        "defect_debt_disposition",
+        "rollback",
+        "provenance",
+        "independent_review",
+        "current_validation"
+      ],
+      "evidence": {
+        "repeated_positive_use": [
+          "docs/governance/maturity/apg139/nix-test-profile.json"
+        ],
+        "representative_non_triggers": [
+          "docs/governance/maturity/apg139/nix-test-profile.json"
+        ],
+        "defect_debt_disposition": [
+          "docs/governance/maturity/apg139/nix-test-profile.json"
+        ],
+        "rollback": [
+          "docs/governance/maturity/apg139/nix-test-profile.json"
+        ],
+        "provenance": [
+          "docs/governance/maturity/apg139/nix-test-profile.json"
+        ],
+        "independent_review": [
+          "docs/governance/maturity/apg139/independent-review.md"
+        ],
+        "current_validation": [
+          "docs/governance/maturity/apg139/nix-test-profile.json",
+          "docs/governance/maturity/apg139/qualification.md"
+        ]
+      },
+      "independent_review": "docs/governance/maturity/apg139/independent-review.md",
+      "next_lifecycle_trigger": "Supply repeated actual claim-relative Nix test guidance decisions bound to selected surface, system and platform with corresponding evaluation/build/helper/VM evidence as applicable; include expression-only and deployment non-trigger handoffs and independent validation without authorizing activation.",
+      "disposition_status": "PROVISIONAL_MAINTENANCE",
+      "maintenance_ref": "MATURITY:nix-test-profile",
+      "debt_authority": "docs/governance/language-profile-known-debt.json",
+      "active_debts": [],
+      "resolved_debts": []
+    },
+    {
+      "skill_id": "nodejs-runtime-profile",
+      "path": "skills/nodejs-runtime-profile/SKILL.md",
+      "current_maturity": "provisional",
+      "blocking_debts": [],
+      "source_references": [
+        "skills/nodejs-runtime-profile/SKILL.md",
+        "skills/README.md",
+        "docs/provenance.md",
+        "docs/skill-authoring-and-maintenance.md",
+        "docs/governance/maturity/apg139/nodejs-runtime-profile.json"
+      ],
+      "required_evidence_categories": [
+        "repeated_positive_use",
+        "representative_non_triggers",
+        "defect_debt_disposition",
+        "rollback",
+        "provenance",
+        "independent_review",
+        "current_validation"
+      ],
+      "evidence": {
+        "repeated_positive_use": [
+          "docs/governance/maturity/apg139/nodejs-runtime-profile.json"
+        ],
+        "representative_non_triggers": [
+          "docs/governance/maturity/apg139/nodejs-runtime-profile.json"
+        ],
+        "defect_debt_disposition": [
+          "docs/governance/maturity/apg139/nodejs-runtime-profile.json"
+        ],
+        "rollback": [
+          "docs/governance/maturity/apg139/nodejs-runtime-profile.json"
+        ],
+        "provenance": [
+          "docs/governance/maturity/apg139/nodejs-runtime-profile.json"
+        ],
+        "independent_review": [
+          "docs/governance/maturity/apg139/independent-review.md"
+        ],
+        "current_validation": [
+          "docs/governance/maturity/apg139/nodejs-runtime-profile.json",
+          "docs/governance/maturity/apg139/qualification.md"
+        ]
+      },
+      "independent_review": "docs/governance/maturity/apg139/independent-review.md",
+      "next_lifecycle_trigger": "Supply repeated actual Node-host guidance decisions carrying runtime, platform, architecture, flags, package scope, loader, invocation and owner, with ECMAScript and npm non-trigger handoffs and current independent validation.",
+      "disposition_status": "PROVISIONAL_MAINTENANCE",
+      "maintenance_ref": "MATURITY:nodejs-runtime-profile",
+      "debt_authority": "docs/governance/language-profile-known-debt.json",
+      "active_debts": [],
+      "resolved_debts": []
+    },
+    {
+      "skill_id": "npm-package-manager-profile",
+      "path": "skills/npm-package-manager-profile/SKILL.md",
+      "current_maturity": "provisional",
+      "blocking_debts": [],
+      "source_references": [
+        "skills/npm-package-manager-profile/SKILL.md",
+        "skills/README.md",
+        "docs/provenance.md",
+        "docs/skill-authoring-and-maintenance.md",
+        "docs/governance/maturity/apg139/npm-package-manager-profile.json"
+      ],
+      "required_evidence_categories": [
+        "repeated_positive_use",
+        "representative_non_triggers",
+        "defect_debt_disposition",
+        "rollback",
+        "provenance",
+        "independent_review",
+        "current_validation"
+      ],
+      "evidence": {
+        "repeated_positive_use": [
+          "docs/governance/maturity/apg139/npm-package-manager-profile.json"
+        ],
+        "representative_non_triggers": [
+          "docs/governance/maturity/apg139/npm-package-manager-profile.json"
+        ],
+        "defect_debt_disposition": [
+          "docs/governance/maturity/apg139/npm-package-manager-profile.json"
+        ],
+        "rollback": [
+          "docs/governance/maturity/apg139/npm-package-manager-profile.json"
+        ],
+        "provenance": [
+          "docs/governance/maturity/apg139/npm-package-manager-profile.json"
+        ],
+        "independent_review": [
+          "docs/governance/maturity/apg139/independent-review.md"
+        ],
+        "current_validation": [
+          "docs/governance/maturity/apg139/npm-package-manager-profile.json",
+          "docs/governance/maturity/apg139/qualification.md"
+        ]
+      },
+      "independent_review": "docs/governance/maturity/apg139/independent-review.md",
+      "next_lifecycle_trigger": "Supply repeated actual npm install/lockfile/script-policy guidance decisions with named npm, Node and configuration, including refusal cases and Node-runtime non-trigger handoffs; independently validate resulting lock and script-policy claims.",
+      "disposition_status": "PROVISIONAL_MAINTENANCE",
+      "maintenance_ref": "MATURITY:npm-package-manager-profile",
+      "debt_authority": "docs/governance/language-profile-known-debt.json",
+      "active_debts": [],
+      "resolved_debts": []
+    },
+    {
+      "skill_id": "planning-repository-work",
+      "path": "skills/planning-repository-work/SKILL.md",
+      "current_maturity": "stable",
+      "blocking_debts": [],
+      "source_references": [
+        "skills/planning-repository-work/SKILL.md",
+        "skills/README.md",
+        "docs/provenance.md",
+        "docs/skill-authoring-and-maintenance.md"
+      ],
+      "required_evidence_categories": [
+        "repeated_positive_use",
+        "representative_non_triggers",
+        "defect_debt_disposition",
+        "rollback",
+        "provenance",
+        "independent_review",
+        "current_validation"
+      ],
+      "evidence": {
+        "repeated_positive_use": [],
+        "representative_non_triggers": [],
+        "defect_debt_disposition": [],
+        "rollback": [],
+        "provenance": [],
+        "independent_review": [],
+        "current_validation": []
+      },
+      "independent_review": null,
+      "next_lifecycle_trigger": "Individual planning-repository-work review when repeated-use and non-trigger evidence is available under the maintained skill lifecycle; reassess named debt if its exact condition changes.",
+      "disposition_status": "EXISTING_STABLE",
+      "maintenance_ref": null,
+      "debt_authority": "docs/governance/language-profile-known-debt.json",
+      "active_debts": [],
+      "resolved_debts": []
+    },
+    {
+      "skill_id": "playwright-test-profile",
+      "path": "skills/playwright-test-profile/SKILL.md",
+      "current_maturity": "provisional",
+      "blocking_debts": [],
+      "source_references": [
+        "skills/playwright-test-profile/SKILL.md",
+        "skills/README.md",
+        "docs/provenance.md",
+        "docs/skill-authoring-and-maintenance.md",
+        "docs/governance/maturity/apg139/playwright-test-profile.json"
+      ],
+      "required_evidence_categories": [
+        "repeated_positive_use",
+        "representative_non_triggers",
+        "defect_debt_disposition",
+        "rollback",
+        "provenance",
+        "independent_review",
+        "current_validation"
+      ],
+      "evidence": {
+        "repeated_positive_use": [
+          "docs/governance/maturity/apg139/playwright-test-profile.json"
+        ],
+        "representative_non_triggers": [
+          "docs/governance/maturity/apg139/playwright-test-profile.json"
+        ],
+        "defect_debt_disposition": [
+          "docs/governance/maturity/apg139/playwright-test-profile.json"
+        ],
+        "rollback": [
+          "docs/governance/maturity/apg139/playwright-test-profile.json"
+        ],
+        "provenance": [
+          "docs/governance/maturity/apg139/playwright-test-profile.json"
+        ],
+        "independent_review": [
+          "docs/governance/maturity/apg139/independent-review.md"
+        ],
+        "current_validation": [
+          "docs/governance/maturity/apg139/playwright-test-profile.json",
+          "docs/governance/maturity/apg139/qualification.md"
+        ]
+      },
+      "independent_review": "docs/governance/maturity/apg139/independent-review.md",
+      "next_lifecycle_trigger": "Supply repeated actual selected Playwright guidance-use decisions bound to configuration and engine identities, negative controls and cleanup/interruption custody; include browser-runtime and accessibility-standard handoffs and explicit sharding/cross-worker evidence limits in independent review.",
+      "disposition_status": "PROVISIONAL_MAINTENANCE",
+      "maintenance_ref": "MATURITY:playwright-test-profile",
+      "debt_authority": "docs/governance/language-profile-known-debt.json",
+      "active_debts": [],
+      "resolved_debts": []
+    },
+    {
+      "skill_id": "postgresql-database-profile",
+      "path": "skills/postgresql-database-profile/SKILL.md",
+      "current_maturity": "provisional",
+      "blocking_debts": [],
+      "source_references": [
+        "skills/postgresql-database-profile/SKILL.md",
+        "skills/README.md",
+        "docs/provenance.md",
+        "docs/skill-authoring-and-maintenance.md",
+        "docs/governance/maturity/apg139/postgresql-database-profile.json"
+      ],
+      "required_evidence_categories": [
+        "repeated_positive_use",
+        "representative_non_triggers",
+        "defect_debt_disposition",
+        "rollback",
+        "provenance",
+        "independent_review",
+        "current_validation"
+      ],
+      "evidence": {
+        "repeated_positive_use": [
+          "docs/governance/maturity/apg139/postgresql-database-profile.json"
+        ],
+        "representative_non_triggers": [
+          "docs/governance/maturity/apg139/postgresql-database-profile.json"
+        ],
+        "defect_debt_disposition": [
+          "docs/governance/maturity/apg139/postgresql-database-profile.json"
+        ],
+        "rollback": [
+          "docs/governance/maturity/apg139/postgresql-database-profile.json"
+        ],
+        "provenance": [
+          "docs/governance/maturity/apg139/postgresql-database-profile.json"
+        ],
+        "independent_review": [
+          "docs/governance/maturity/apg139/independent-review.md"
+        ],
+        "current_validation": [
+          "docs/governance/maturity/apg139/postgresql-database-profile.json",
+          "docs/governance/maturity/apg139/qualification.md"
+        ]
+      },
+      "independent_review": "docs/governance/maturity/apg139/independent-review.md",
+      "next_lifecycle_trigger": "Supply repeated actual PostgreSQL guidance decisions bound to server version, driver, schema, privileges, topology and recovery facts, with ordinary-query non-triggers and authorized operational evidence where the claim requires it; independently review outcomes.",
+      "disposition_status": "PROVISIONAL_MAINTENANCE",
+      "maintenance_ref": "MATURITY:postgresql-database-profile",
+      "debt_authority": "docs/governance/language-profile-known-debt.json",
+      "active_debts": [],
+      "resolved_debts": []
+    },
+    {
+      "skill_id": "pytest-test-profile",
+      "path": "skills/pytest-test-profile/SKILL.md",
+      "current_maturity": "provisional",
+      "blocking_debts": [],
+      "source_references": [
+        "skills/pytest-test-profile/SKILL.md",
+        "skills/README.md",
+        "docs/provenance.md",
+        "docs/skill-authoring-and-maintenance.md",
+        "docs/governance/maturity/apg139/pytest-test-profile.json"
+      ],
+      "required_evidence_categories": [
+        "repeated_positive_use",
+        "representative_non_triggers",
+        "defect_debt_disposition",
+        "rollback",
+        "provenance",
+        "independent_review",
+        "current_validation"
+      ],
+      "evidence": {
+        "repeated_positive_use": [
+          "docs/governance/maturity/apg139/pytest-test-profile.json"
+        ],
+        "representative_non_triggers": [
+          "docs/governance/maturity/apg139/pytest-test-profile.json"
+        ],
+        "defect_debt_disposition": [
+          "docs/governance/maturity/apg139/pytest-test-profile.json"
+        ],
+        "rollback": [
+          "docs/governance/maturity/apg139/pytest-test-profile.json"
+        ],
+        "provenance": [
+          "docs/governance/maturity/apg139/pytest-test-profile.json"
+        ],
+        "independent_review": [
+          "docs/governance/maturity/apg139/independent-review.md"
+        ],
+        "current_validation": [
+          "docs/governance/maturity/apg139/pytest-test-profile.json",
+          "docs/governance/maturity/apg139/qualification.md"
+        ]
+      },
+      "independent_review": "docs/governance/maturity/apg139/independent-review.md",
+      "next_lifecycle_trigger": "Supply distinct actual pytest collection/fixture and isolation/xdist guidance-use decisions with versions, roots, workers and coverage context and meaningful observed outcomes; include ordinary-Python and policy-selection non-triggers, then independently adjudicate the individual inventory.",
+      "disposition_status": "PROVISIONAL_MAINTENANCE",
+      "maintenance_ref": "MATURITY:pytest-test-profile",
+      "debt_authority": "docs/governance/language-profile-known-debt.json",
+      "active_debts": [],
+      "resolved_debts": []
+    },
+    {
+      "skill_id": "python-language-profile",
+      "path": "skills/python-language-profile/SKILL.md",
+      "current_maturity": "stable",
+      "blocking_debts": [],
+      "source_references": [
+        "skills/python-language-profile/SKILL.md",
+        "skills/README.md",
+        "docs/provenance.md",
+        "docs/skill-authoring-and-maintenance.md"
+      ],
+      "required_evidence_categories": [
+        "repeated_positive_use",
+        "representative_non_triggers",
+        "defect_debt_disposition",
+        "rollback",
+        "provenance",
+        "independent_review",
+        "current_validation"
+      ],
+      "evidence": {
+        "repeated_positive_use": [],
+        "representative_non_triggers": [],
+        "defect_debt_disposition": [],
+        "rollback": [],
+        "provenance": [],
+        "independent_review": [],
+        "current_validation": []
+      },
+      "independent_review": null,
+      "next_lifecycle_trigger": "Individual python-language-profile review when repeated-use and non-trigger evidence is available under the maintained skill lifecycle; reassess named debt if its exact condition changes.",
+      "disposition_status": "EXISTING_STABLE",
+      "maintenance_ref": null,
+      "debt_authority": "docs/governance/language-profile-known-debt.json",
+      "active_debts": [],
+      "resolved_debts": []
+    },
+    {
+      "skill_id": "react-component-profile",
+      "path": "skills/react-component-profile/SKILL.md",
+      "current_maturity": "provisional",
+      "blocking_debts": [],
+      "source_references": [
+        "skills/react-component-profile/SKILL.md",
+        "skills/README.md",
+        "docs/provenance.md",
+        "docs/skill-authoring-and-maintenance.md",
+        "docs/governance/maturity/apg139/react-component-profile.json"
+      ],
+      "required_evidence_categories": [
+        "repeated_positive_use",
+        "representative_non_triggers",
+        "defect_debt_disposition",
+        "rollback",
+        "provenance",
+        "independent_review",
+        "current_validation"
+      ],
+      "evidence": {
+        "repeated_positive_use": [
+          "docs/governance/maturity/apg139/react-component-profile.json"
+        ],
+        "representative_non_triggers": [
+          "docs/governance/maturity/apg139/react-component-profile.json"
+        ],
+        "defect_debt_disposition": [
+          "docs/governance/maturity/apg139/react-component-profile.json"
+        ],
+        "rollback": [
+          "docs/governance/maturity/apg139/react-component-profile.json"
+        ],
+        "provenance": [
+          "docs/governance/maturity/apg139/react-component-profile.json"
+        ],
+        "independent_review": [
+          "docs/governance/maturity/apg139/independent-review.md"
+        ],
+        "current_validation": [
+          "docs/governance/maturity/apg139/react-component-profile.json",
+          "docs/governance/maturity/apg139/qualification.md"
+        ]
+      },
+      "independent_review": "docs/governance/maturity/apg139/independent-review.md",
+      "next_lifecycle_trigger": "Supply repeated actual props/render/state/effects/hooks guidance decisions with JSX-syntax and host/browser non-trigger handoffs, explicit renderer context and fresh independent validation.",
+      "disposition_status": "PROVISIONAL_MAINTENANCE",
+      "maintenance_ref": "MATURITY:react-component-profile",
+      "debt_authority": "docs/governance/language-profile-known-debt.json",
+      "active_debts": [],
+      "resolved_debts": []
+    },
+    {
+      "skill_id": "reviewing-and-verifying-repository-work",
+      "path": "skills/reviewing-and-verifying-repository-work/SKILL.md",
+      "current_maturity": "stable",
+      "blocking_debts": [],
+      "source_references": [
+        "skills/reviewing-and-verifying-repository-work/SKILL.md",
+        "skills/README.md",
+        "docs/provenance.md",
+        "docs/skill-authoring-and-maintenance.md"
+      ],
+      "required_evidence_categories": [
+        "repeated_positive_use",
+        "representative_non_triggers",
+        "defect_debt_disposition",
+        "rollback",
+        "provenance",
+        "independent_review",
+        "current_validation"
+      ],
+      "evidence": {
+        "repeated_positive_use": [],
+        "representative_non_triggers": [],
+        "defect_debt_disposition": [],
+        "rollback": [],
+        "provenance": [],
+        "independent_review": [],
+        "current_validation": []
+      },
+      "independent_review": null,
+      "next_lifecycle_trigger": "Individual reviewing-and-verifying-repository-work review when repeated-use and non-trigger evidence is available under the maintained skill lifecycle; reassess named debt if its exact condition changes.",
+      "disposition_status": "EXISTING_STABLE",
+      "maintenance_ref": null,
+      "debt_authority": "docs/governance/language-profile-known-debt.json",
+      "active_debts": [],
+      "resolved_debts": []
+    },
+    {
+      "skill_id": "ruby-language-profile",
+      "path": "skills/ruby-language-profile/SKILL.md",
+      "current_maturity": "provisional",
+      "blocking_debts": [],
+      "source_references": [
+        "skills/ruby-language-profile/SKILL.md",
+        "skills/README.md",
+        "docs/provenance.md",
+        "docs/skill-authoring-and-maintenance.md",
+        "docs/governance/maturity/apg139/ruby-language-profile.json"
+      ],
+      "required_evidence_categories": [
+        "repeated_positive_use",
+        "representative_non_triggers",
+        "defect_debt_disposition",
+        "rollback",
+        "provenance",
+        "independent_review",
+        "current_validation"
+      ],
+      "evidence": {
+        "repeated_positive_use": [
+          "docs/governance/maturity/apg139/ruby-language-profile.json"
+        ],
+        "representative_non_triggers": [
+          "docs/governance/maturity/apg139/ruby-language-profile.json"
+        ],
+        "defect_debt_disposition": [
+          "docs/governance/maturity/apg139/ruby-language-profile.json"
+        ],
+        "rollback": [
+          "docs/governance/maturity/apg139/ruby-language-profile.json"
+        ],
+        "provenance": [
+          "docs/governance/maturity/apg139/ruby-language-profile.json"
+        ],
+        "independent_review": [
+          "docs/governance/maturity/apg139/independent-review.md"
+        ],
+        "current_validation": [
+          "docs/governance/maturity/apg139/ruby-language-profile.json",
+          "docs/governance/maturity/apg139/qualification.md"
+        ]
+      },
+      "independent_review": "docs/governance/maturity/apg139/independent-review.md",
+      "next_lifecycle_trigger": "Supply repeated actual Ruby guidance decisions involving dynamic dispatch, shared state, concurrency, compatibility, serialization or subprocess behavior with declared engine/version context, adverse cases and mechanical-edit non-triggers for independent validation.",
+      "disposition_status": "PROVISIONAL_MAINTENANCE",
+      "maintenance_ref": "MATURITY:ruby-language-profile",
+      "debt_authority": "docs/governance/language-profile-known-debt.json",
+      "active_debts": [],
+      "resolved_debts": []
+    },
+    {
+      "skill_id": "sqlite-database-profile",
+      "path": "skills/sqlite-database-profile/SKILL.md",
+      "current_maturity": "provisional",
+      "blocking_debts": [],
+      "source_references": [
+        "skills/sqlite-database-profile/SKILL.md",
+        "skills/README.md",
+        "docs/provenance.md",
+        "docs/skill-authoring-and-maintenance.md",
+        "docs/governance/maturity/apg139/sqlite-database-profile.json"
+      ],
+      "required_evidence_categories": [
+        "repeated_positive_use",
+        "representative_non_triggers",
+        "defect_debt_disposition",
+        "rollback",
+        "provenance",
+        "independent_review",
+        "current_validation"
+      ],
+      "evidence": {
+        "repeated_positive_use": [
+          "docs/governance/maturity/apg139/sqlite-database-profile.json"
+        ],
+        "representative_non_triggers": [
+          "docs/governance/maturity/apg139/sqlite-database-profile.json"
+        ],
+        "defect_debt_disposition": [
+          "docs/governance/maturity/apg139/sqlite-database-profile.json"
+        ],
+        "rollback": [
+          "docs/governance/maturity/apg139/sqlite-database-profile.json"
+        ],
+        "provenance": [
+          "docs/governance/maturity/apg139/sqlite-database-profile.json"
+        ],
+        "independent_review": [
+          "docs/governance/maturity/apg139/independent-review.md"
+        ],
+        "current_validation": [
+          "docs/governance/maturity/apg139/sqlite-database-profile.json",
+          "docs/governance/maturity/apg139/qualification.md"
+        ]
+      },
+      "independent_review": "docs/governance/maturity/apg139/independent-review.md",
+      "next_lifecycle_trigger": "Supply repeated actual SQLite transaction/writer/WAL/rebuild/path/integrity guidance decisions bound to library, driver and filesystem facts, with ordinary-query non-triggers and authorized validation appropriate to recovery claims; obtain independent review.",
+      "disposition_status": "PROVISIONAL_MAINTENANCE",
+      "maintenance_ref": "MATURITY:sqlite-database-profile",
+      "debt_authority": "docs/governance/language-profile-known-debt.json",
+      "active_debts": [],
+      "resolved_debts": []
+    },
+    {
+      "skill_id": "svg-language-profile",
+      "path": "skills/svg-language-profile/SKILL.md",
+      "current_maturity": "provisional",
+      "blocking_debts": [],
+      "source_references": [
+        "skills/svg-language-profile/SKILL.md",
+        "skills/README.md",
+        "docs/provenance.md",
+        "docs/skill-authoring-and-maintenance.md",
+        "docs/governance/maturity/apg139/svg-language-profile.json"
+      ],
+      "required_evidence_categories": [
+        "repeated_positive_use",
+        "representative_non_triggers",
+        "defect_debt_disposition",
+        "rollback",
+        "provenance",
+        "independent_review",
+        "current_validation"
+      ],
+      "evidence": {
+        "repeated_positive_use": [
+          "docs/governance/maturity/apg139/svg-language-profile.json"
+        ],
+        "representative_non_triggers": [
+          "docs/governance/maturity/apg139/svg-language-profile.json"
+        ],
+        "defect_debt_disposition": [
+          "docs/governance/maturity/apg139/svg-language-profile.json"
+        ],
+        "rollback": [
+          "docs/governance/maturity/apg139/svg-language-profile.json"
+        ],
+        "provenance": [
+          "docs/governance/maturity/apg139/svg-language-profile.json"
+        ],
+        "independent_review": [
+          "docs/governance/maturity/apg139/independent-review.md"
+        ],
+        "current_validation": [
+          "docs/governance/maturity/apg139/svg-language-profile.json",
+          "docs/governance/maturity/apg139/qualification.md"
+        ]
+      },
+      "independent_review": "docs/governance/maturity/apg139/independent-review.md",
+      "next_lifecycle_trigger": "Supply repeated actual SVG representation and embedding guidance decisions with viewBox/path/namespace evidence and explicit CSS, HTML, browser and accessibility handoffs; independently validate claimed structural outcomes.",
+      "disposition_status": "PROVISIONAL_MAINTENANCE",
+      "maintenance_ref": "MATURITY:svg-language-profile",
+      "debt_authority": "docs/governance/language-profile-known-debt.json",
+      "active_debts": [],
+      "resolved_debts": []
+    },
+    {
+      "skill_id": "synthesizing-repository-guidance",
+      "path": "skills/synthesizing-repository-guidance/SKILL.md",
+      "current_maturity": "stable",
+      "blocking_debts": [],
+      "source_references": [
+        "skills/synthesizing-repository-guidance/SKILL.md",
+        "skills/README.md",
+        "docs/provenance.md",
+        "docs/skill-authoring-and-maintenance.md"
+      ],
+      "required_evidence_categories": [
+        "repeated_positive_use",
+        "representative_non_triggers",
+        "defect_debt_disposition",
+        "rollback",
+        "provenance",
+        "independent_review",
+        "current_validation"
+      ],
+      "evidence": {
+        "repeated_positive_use": [],
+        "representative_non_triggers": [],
+        "defect_debt_disposition": [],
+        "rollback": [],
+        "provenance": [],
+        "independent_review": [],
+        "current_validation": []
+      },
+      "independent_review": null,
+      "next_lifecycle_trigger": "Individual synthesizing-repository-guidance review when repeated-use and non-trigger evidence is available under the maintained skill lifecycle; reassess named debt if its exact condition changes.",
+      "disposition_status": "EXISTING_STABLE",
+      "maintenance_ref": null,
+      "debt_authority": "docs/governance/language-profile-known-debt.json",
+      "active_debts": [],
+      "resolved_debts": []
+    },
+    {
+      "skill_id": "typescript-language-profile",
+      "path": "skills/typescript-language-profile/SKILL.md",
+      "current_maturity": "provisional",
+      "blocking_debts": [],
+      "source_references": [
+        "skills/typescript-language-profile/SKILL.md",
+        "skills/README.md",
+        "docs/provenance.md",
+        "docs/skill-authoring-and-maintenance.md",
+        "docs/governance/maturity/apg139/typescript-language-profile.json"
+      ],
+      "required_evidence_categories": [
+        "repeated_positive_use",
+        "representative_non_triggers",
+        "defect_debt_disposition",
+        "rollback",
+        "provenance",
+        "independent_review",
+        "current_validation"
+      ],
+      "evidence": {
+        "repeated_positive_use": [
+          "docs/governance/maturity/apg139/typescript-language-profile.json"
+        ],
+        "representative_non_triggers": [
+          "docs/governance/maturity/apg139/typescript-language-profile.json"
+        ],
+        "defect_debt_disposition": [
+          "docs/governance/maturity/apg139/typescript-language-profile.json"
+        ],
+        "rollback": [
+          "docs/governance/maturity/apg139/typescript-language-profile.json"
+        ],
+        "provenance": [
+          "docs/governance/maturity/apg139/typescript-language-profile.json"
+        ],
+        "independent_review": [
+          "docs/governance/maturity/apg139/independent-review.md"
+        ],
+        "current_validation": [
+          "docs/governance/maturity/apg139/typescript-language-profile.json",
+          "docs/governance/maturity/apg139/qualification.md"
+        ]
+      },
+      "independent_review": "docs/governance/maturity/apg139/independent-review.md",
+      "next_lifecycle_trigger": "Supply repeated actual TypeScript static-semantic guidance decisions carrying compiler role/version/options, source kind and declaration provenance, plus JavaScript-runtime and transform non-trigger handoffs and compiler-backed current independent validation.",
+      "disposition_status": "PROVISIONAL_MAINTENANCE",
+      "maintenance_ref": "MATURITY:typescript-language-profile",
+      "debt_authority": "docs/governance/language-profile-known-debt.json",
+      "active_debts": [],
+      "resolved_debts": []
+    },
+    {
+      "skill_id": "vagrantfile-profile",
+      "path": "skills/vagrantfile-profile/SKILL.md",
+      "current_maturity": "provisional",
+      "blocking_debts": [],
+      "source_references": [
+        "skills/vagrantfile-profile/SKILL.md",
+        "skills/README.md",
+        "docs/provenance.md",
+        "docs/skill-authoring-and-maintenance.md",
+        "docs/governance/maturity/apg139/vagrantfile-profile.json"
+      ],
+      "required_evidence_categories": [
+        "repeated_positive_use",
+        "representative_non_triggers",
+        "defect_debt_disposition",
+        "rollback",
+        "provenance",
+        "independent_review",
+        "current_validation"
+      ],
+      "evidence": {
+        "repeated_positive_use": [
+          "docs/governance/maturity/apg139/vagrantfile-profile.json"
+        ],
+        "representative_non_triggers": [
+          "docs/governance/maturity/apg139/vagrantfile-profile.json"
+        ],
+        "defect_debt_disposition": [
+          "docs/governance/maturity/apg139/vagrantfile-profile.json"
+        ],
+        "rollback": [
+          "docs/governance/maturity/apg139/vagrantfile-profile.json"
+        ],
+        "provenance": [
+          "docs/governance/maturity/apg139/vagrantfile-profile.json"
+        ],
+        "independent_review": [
+          "docs/governance/maturity/apg139/independent-review.md"
+        ],
+        "current_validation": [
+          "docs/governance/maturity/apg139/vagrantfile-profile.json",
+          "docs/governance/maturity/apg139/qualification.md"
+        ]
+      },
+      "independent_review": "docs/governance/maturity/apg139/independent-review.md",
+      "next_lifecycle_trigger": "Supply repeated actual Vagrantfile guidance decisions bound to config, Ruby, host, provider, box, plugin and machine-state facts, with authorized live evidence only where needed and Ruby/provider-administration non-trigger stops; independently validate outcomes.",
+      "disposition_status": "PROVISIONAL_MAINTENANCE",
+      "maintenance_ref": "MATURITY:vagrantfile-profile",
+      "debt_authority": "docs/governance/language-profile-known-debt.json",
+      "active_debts": [],
+      "resolved_debts": []
+    },
+    {
+      "skill_id": "vite-build-profile",
+      "path": "skills/vite-build-profile/SKILL.md",
+      "current_maturity": "provisional",
+      "blocking_debts": [],
+      "source_references": [
+        "skills/vite-build-profile/SKILL.md",
+        "skills/README.md",
+        "docs/provenance.md",
+        "docs/skill-authoring-and-maintenance.md",
+        "docs/governance/maturity/apg139/vite-build-profile.json"
+      ],
+      "required_evidence_categories": [
+        "repeated_positive_use",
+        "representative_non_triggers",
+        "defect_debt_disposition",
+        "rollback",
+        "provenance",
+        "independent_review",
+        "current_validation"
+      ],
+      "evidence": {
+        "repeated_positive_use": [
+          "docs/governance/maturity/apg139/vite-build-profile.json"
+        ],
+        "representative_non_triggers": [
+          "docs/governance/maturity/apg139/vite-build-profile.json"
+        ],
+        "defect_debt_disposition": [
+          "docs/governance/maturity/apg139/vite-build-profile.json"
+        ],
+        "rollback": [
+          "docs/governance/maturity/apg139/vite-build-profile.json"
+        ],
+        "provenance": [
+          "docs/governance/maturity/apg139/vite-build-profile.json"
+        ],
+        "independent_review": [
+          "docs/governance/maturity/apg139/independent-review.md"
+        ],
+        "current_validation": [
+          "docs/governance/maturity/apg139/vite-build-profile.json",
+          "docs/governance/maturity/apg139/qualification.md"
+        ]
+      },
+      "independent_review": "docs/governance/maturity/apg139/independent-review.md",
+      "next_lifecycle_trigger": "Supply repeated actual Vite build/config/environment guidance decisions with asserted outputs, failure cases and npm/framework/browser non-trigger handoffs; bind current Vite context and obtain independent validation.",
+      "disposition_status": "PROVISIONAL_MAINTENANCE",
+      "maintenance_ref": "MATURITY:vite-build-profile",
+      "debt_authority": "docs/governance/language-profile-known-debt.json",
+      "active_debts": [],
+      "resolved_debts": []
+    },
+    {
+      "skill_id": "vitest-test-profile",
+      "path": "skills/vitest-test-profile/SKILL.md",
+      "current_maturity": "provisional",
+      "blocking_debts": [],
+      "source_references": [
+        "skills/vitest-test-profile/SKILL.md",
+        "skills/README.md",
+        "docs/provenance.md",
+        "docs/skill-authoring-and-maintenance.md",
+        "docs/governance/maturity/apg139/vitest-test-profile.json"
+      ],
+      "required_evidence_categories": [
+        "repeated_positive_use",
+        "representative_non_triggers",
+        "defect_debt_disposition",
+        "rollback",
+        "provenance",
+        "independent_review",
+        "current_validation"
+      ],
+      "evidence": {
+        "repeated_positive_use": [
+          "docs/governance/maturity/apg139/vitest-test-profile.json"
+        ],
+        "representative_non_triggers": [
+          "docs/governance/maturity/apg139/vitest-test-profile.json"
+        ],
+        "defect_debt_disposition": [
+          "docs/governance/maturity/apg139/vitest-test-profile.json"
+        ],
+        "rollback": [
+          "docs/governance/maturity/apg139/vitest-test-profile.json"
+        ],
+        "provenance": [
+          "docs/governance/maturity/apg139/vitest-test-profile.json"
+        ],
+        "independent_review": [
+          "docs/governance/maturity/apg139/independent-review.md"
+        ],
+        "current_validation": [
+          "docs/governance/maturity/apg139/vitest-test-profile.json",
+          "docs/governance/maturity/apg139/qualification.md"
+        ]
+      },
+      "independent_review": "docs/governance/maturity/apg139/independent-review.md",
+      "next_lifecycle_trigger": "Supply repeated actual Vitest 4.1.x guidance-use decisions with effective config, project, environment and pool bound to observed runner outcomes; include language/component and coverage-policy non-triggers and current independent validation.",
+      "disposition_status": "PROVISIONAL_MAINTENANCE",
+      "maintenance_ref": "MATURITY:vitest-test-profile",
+      "debt_authority": "docs/governance/language-profile-known-debt.json",
+      "active_debts": [],
+      "resolved_debts": []
+    },
+    {
+      "skill_id": "web-accessibility-profile",
+      "path": "skills/web-accessibility-profile/SKILL.md",
+      "current_maturity": "provisional",
+      "blocking_debts": [],
+      "source_references": [
+        "skills/web-accessibility-profile/SKILL.md",
+        "skills/README.md",
+        "docs/provenance.md",
+        "docs/skill-authoring-and-maintenance.md",
+        "docs/governance/maturity/apg139/web-accessibility-profile.json"
+      ],
+      "required_evidence_categories": [
+        "repeated_positive_use",
+        "representative_non_triggers",
+        "defect_debt_disposition",
+        "rollback",
+        "provenance",
+        "independent_review",
+        "current_validation"
+      ],
+      "evidence": {
+        "repeated_positive_use": [
+          "docs/governance/maturity/apg139/web-accessibility-profile.json"
+        ],
+        "representative_non_triggers": [
+          "docs/governance/maturity/apg139/web-accessibility-profile.json"
+        ],
+        "defect_debt_disposition": [
+          "docs/governance/maturity/apg139/web-accessibility-profile.json"
+        ],
+        "rollback": [
+          "docs/governance/maturity/apg139/web-accessibility-profile.json"
+        ],
+        "provenance": [
+          "docs/governance/maturity/apg139/web-accessibility-profile.json"
+        ],
+        "independent_review": [
+          "docs/governance/maturity/apg139/independent-review.md"
+        ],
+        "current_validation": [
+          "docs/governance/maturity/apg139/web-accessibility-profile.json",
+          "docs/governance/maturity/apg139/qualification.md"
+        ]
+      },
+      "independent_review": "docs/governance/maturity/apg139/independent-review.md",
+      "next_lifecycle_trigger": "Supply repeated actual accessibility-semantic guidance decisions with DOM/tree/keyboard/render/manual evidence as applicable and representative runner/visual-design handoffs; explicitly disposition AT and WCAG limits in independent review.",
+      "disposition_status": "PROVISIONAL_MAINTENANCE",
+      "maintenance_ref": "MATURITY:web-accessibility-profile",
+      "debt_authority": "docs/governance/language-profile-known-debt.json",
+      "active_debts": [],
+      "resolved_debts": []
+    },
+    {
+      "skill_id": "zsh-language-profile",
+      "path": "skills/zsh-language-profile/SKILL.md",
+      "current_maturity": "stable",
+      "blocking_debts": [],
+      "source_references": [
+        "skills/zsh-language-profile/SKILL.md",
+        "skills/README.md",
+        "docs/provenance.md",
+        "docs/skill-authoring-and-maintenance.md"
+      ],
+      "required_evidence_categories": [
+        "repeated_positive_use",
+        "representative_non_triggers",
+        "defect_debt_disposition",
+        "rollback",
+        "provenance",
+        "independent_review",
+        "current_validation"
+      ],
+      "evidence": {
+        "repeated_positive_use": [],
+        "representative_non_triggers": [],
+        "defect_debt_disposition": [],
+        "rollback": [],
+        "provenance": [],
+        "independent_review": [],
+        "current_validation": []
+      },
+      "independent_review": null,
+      "next_lifecycle_trigger": "Individual zsh-language-profile review when repeated-use and non-trigger evidence is available under the maintained skill lifecycle; reassess named debt if its exact condition changes.",
+      "disposition_status": "EXISTING_STABLE",
+      "maintenance_ref": null,
+      "debt_authority": "docs/governance/language-profile-known-debt.json",
+      "active_debts": [],
+      "resolved_debts": []
+    },
+    {
+      "skill_id": "zunit-test-profile",
+      "path": "skills/zunit-test-profile/SKILL.md",
+      "current_maturity": "stable",
+      "blocking_debts": [],
+      "source_references": [
+        "skills/zunit-test-profile/SKILL.md",
+        "skills/README.md",
+        "docs/provenance.md",
+        "docs/skill-authoring-and-maintenance.md"
+      ],
+      "required_evidence_categories": [
+        "repeated_positive_use",
+        "representative_non_triggers",
+        "defect_debt_disposition",
+        "rollback",
+        "provenance",
+        "independent_review",
+        "current_validation"
+      ],
+      "evidence": {
+        "repeated_positive_use": [],
+        "representative_non_triggers": [],
+        "defect_debt_disposition": [],
+        "rollback": [],
+        "provenance": [],
+        "independent_review": [],
+        "current_validation": []
+      },
+      "independent_review": null,
+      "next_lifecycle_trigger": "Individual zunit-test-profile review when repeated-use and non-trigger evidence is available under the maintained skill lifecycle; reassess named debt if its exact condition changes.",
+      "disposition_status": "EXISTING_STABLE",
+      "maintenance_ref": null,
+      "debt_authority": "docs/governance/language-profile-known-debt.json",
+      "active_debts": [],
+      "resolved_debts": []
+    }
+  ]
+}

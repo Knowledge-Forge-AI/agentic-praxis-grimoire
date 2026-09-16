@@ -1,0 +1,23 @@
+{
+  "schema_version": "apg140-seam-bindings-v1",
+  "watch_id": "REPO-MAP",
+  "scope": "APGR-local evidence only; no consumer adoption",
+  "members": [
+    {
+      "path": "docs/governance/external/apg140/migration-fixture.json",
+      "sha256": "fb0729f360eb613def7427c34f57b60cc13799f68d5969f646b997f37095ef0b"
+    },
+    {
+      "path": "src/test/support/apg140_migration_fixture.py",
+      "sha256": "71ea88458d8b1cf71a7aba1dc0d6df5eba2947250eec4e862c4d726117a706d8"
+    },
+    {
+      "path": "src/test/support/apg_external_compatibility_fixture.py",
+      "sha256": "40b7e98fd862977d83a5e6a01113435bc1b6c47a710668c82faf5d45ff10369e"
+    },
+    {
+      "path": "testing/fixtures/external_compatibility/apg140/manifest.json",
+      "sha256": "6cddcc54283c9e1aadde2e66bf25513a09d8d05365d1be5cba8b327dfb337a48"
+    }
+  ]
+}

@@ -21,15 +21,12 @@ ROOT = repository_root(__file__)
 sys.path.insert(0, str(ROOT / "src/test/support"))
 
 from apg123_browser_ui import (  # noqa: E402
-    ACCESSIBILITY_SCENARIOS,
-    ALL_SCENARIOS,
-    APG123_BROWSER_UI_AUTHORITY,
-    APG125_BROWSER_MIXED_AUTHORITY,
+    ACCESSIBILITY_SCENARIOS, ALL_SCENARIOS,
+    APG123_BROWSER_UI_AUTHORITY, APG125_BROWSER_MIXED_AUTHORITY,
     APG125_BROWSER_RUNTIME_AUTHORITY,
     APG123_SCENARIOS,
     BROWSER_CORROBORATION_DISCLAIMER,
     BROWSER_RUNTIME_SCENARIOS,
-    EXPECTED_NODE_SHA256,
     EXPECTED_NODE_VERSION,
     EXPECTED_PLAYWRIGHT_VERSION,
     FAMILY_TABLE_AUTHORITY,
@@ -39,10 +36,8 @@ from apg123_browser_ui import (  # noqa: E402
     SUPPORTED_BROWSERS,
     SVG_SCENARIOS,
     BrowserHarnessConfig,
-    BrowserHarnessError,
     BrowserHarnessExecutionError,
     BrowserHarnessPrerequisiteError,
-    BrowserHarnessReceipt,
     BrowserHarnessValidationError,
     cleanup_retained_failure_evidence,
     execute_browser_harness,
@@ -72,11 +67,16 @@ def test_supervisor_report_rejects_unrelated_or_incomplete_results(failed: bool,
     test = {"projectName": "chromium", "status": "unexpected" if failed else "expected", "results": [result]}
     spec = {"title": title, "tests": [test]}
     report = {"stats": {"expected": int(not failed), "unexpected": int(failed), "skipped": 0, "flaky": 0}, "errors": [], "suites": [{"specs": [spec]}]}
-    if mutation == "skip": report["stats"]["skipped"] = 1
-    elif mutation == "wrong-project": test["projectName"] = "webkit"
-    elif mutation == "wrong-title": spec["title"] = "unrelated"
-    elif mutation == "extra-result": test["results"].append(result.copy())
-    elif mutation == "global-error": report["errors"].append({"message": "fixture failed"})
+    if mutation == "skip":
+        report["stats"]["skipped"] = 1
+    elif mutation == "wrong-project":
+        test["projectName"] = "webkit"
+    elif mutation == "wrong-title":
+        spec["title"] = "unrelated"
+    elif mutation == "extra-result":
+        test["results"].append(result.copy())
+    elif mutation == "global-error":
+        report["errors"].append({"message": "fixture failed"})
     elif mutation == "unrelated-failure":
         result["status"] = "failed"
         result["error"]["message"] = "navigation timeout"
@@ -1481,7 +1481,7 @@ def test_altered_table_authority_consumed_consistently_python(tmp_path: Path) ->
 def test_receipt_hash_binding_and_table_register_agreement_python(tmp_path: Path) -> None:
     """Verify validate_receipt checks hash digest equality and table/register agreement."""
     import hashlib
-    table = load_family_table(FIXTURES_DIR)
+    load_family_table(FIXTURES_DIR)
     register = load_scenarios_register(FIXTURES_DIR)
 
     fake_fixtures = tmp_path / "fixtures-hash"

@@ -169,7 +169,7 @@ def test_unmanaged_and_changed_owned_outputs_are_refused(tmp_path: Path) -> None
 def test_check_dry_run_replace_and_owned_clean_paths(tmp_path: Path) -> None:
     source = tmp_path / "source"
     old = add_skill(source, "old")
-    new = add_skill(source, "new")
+    add_skill(source, "new")
     output = tmp_path / "output"
     output.mkdir()
     (output / "old").symlink_to(old)

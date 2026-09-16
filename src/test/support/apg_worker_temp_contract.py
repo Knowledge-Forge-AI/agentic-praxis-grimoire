@@ -9,7 +9,7 @@ from typing import Iterator
 
 from apg_worker_temp_cleanup_contract import descriptor_child
 from apg_worker_temp_root_binding_contract import (
-    WorkerTempCleanupError,
+    WorkerTempCleanupError as WorkerTempCleanupError,
     WorkerTempError,
     selected_worker_temp_root,
 )

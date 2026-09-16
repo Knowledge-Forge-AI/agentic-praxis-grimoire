@@ -78,7 +78,7 @@ func runResponse(ctx context.Context, configuration config, arguments []string, 
 		if !filepath.IsAbs(configuration.repository) || filepath.Clean(configuration.repository) != configuration.repository {
 			return usageError{"an absolute clean --repository is required"}
 		}
-		repositoryProject := filepath.Base(configuration.repository)
+		repositoryProject := strings.TrimLeft(filepath.Base(configuration.repository), ".")
 		if project == "" {
 			project = repositoryProject
 		} else if project != repositoryProject {

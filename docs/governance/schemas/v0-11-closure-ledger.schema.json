@@ -1,0 +1,206 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "v0-11-closure-ledger",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "apg.closure-ledger/v1",
+      "type": "string"
+    },
+    "release": {
+      "const": "v0.11",
+      "type": "string"
+    },
+    "owner_phase": {
+      "type": "string",
+      "minLength": 1
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "item_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sources": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true
+          },
+          "inherited_class": {
+            "type": "string",
+            "enum": [
+              "EXTERNAL_GATE",
+              "CONDITION_TRIGGERED",
+              "OPTIONAL_LATER",
+              "PROVISIONAL_MATURITY"
+            ]
+          },
+          "closure_phase": {
+            "type": "string",
+            "enum": [
+              "V0110-B",
+              "V0110-C",
+              "V0110-D",
+              "V0110-E"
+            ]
+          },
+          "allowed_outcomes": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true
+          },
+          "prerequisites": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true
+          },
+          "trigger_ref": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "consequence": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "OPEN",
+              "DELIVERED",
+              "REJECTED",
+              "CONSUMER_HANDOFF_CLOSED",
+              "MAINTENANCE_TRIGGER",
+              "STABLE",
+              "PROVISIONAL_MAINTENANCE",
+              "DEPRECATED_OR_SUPERSEDED"
+            ]
+          },
+          "disposition": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "decision_ref": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "qualification_refs": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "uniqueItems": true
+                  },
+                  "review_ref": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "rationale": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "maintenance_ref": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "compatibility_ref": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "maturity_ref": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "decision_ref",
+                  "qualification_refs",
+                  "review_ref",
+                  "rationale",
+                  "maintenance_ref",
+                  "compatibility_ref",
+                  "maturity_ref"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "item_id",
+          "sources",
+          "inherited_class",
+          "closure_phase",
+          "allowed_outcomes",
+          "prerequisites",
+          "trigger_ref",
+          "consequence",
+          "status",
+          "disposition"
+        ],
+        "additionalProperties": false
+      },
+      "uniqueItems": true
+    },
+    "historical_exclusions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    }
+  },
+  "required": [
+    "schema_version",
+    "release",
+    "owner_phase",
+    "items",
+    "historical_exclusions"
+  ],
+  "additionalProperties": false
+}

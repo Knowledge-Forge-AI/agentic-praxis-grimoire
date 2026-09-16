@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from pathlib import Path
 import sys
 
 from src.test.apg_test_support import repository_root
@@ -91,7 +90,7 @@ def test_evaluation_reports_each_control_aggregate_unique_blobs_and_rewrites() -
         *(checker.Change("add", item.path, None, None, item) for item in entries[1:]),
     ]
     result = checker.evaluate(
-        Repository(blobs),  # type: ignore[arg-type]
+        Repository(blobs),
         configured_policy(),
         changes,
         mode="staged",
@@ -134,7 +133,7 @@ def test_exact_exception_overrides_controls_and_tree_has_no_aggregate_violation(
         expiry_condition="any-exact-binding-change",
     )
     result = checker.evaluate(
-        Repository({item.oid: b"a\0b"}),  # type: ignore[arg-type]
+        Repository({item.oid: b"a\0b"}),
         configured_policy(exception=exception),
         checker.tree_changes({item.path: item}),
         mode="tree",
@@ -144,7 +143,7 @@ def test_exact_exception_overrides_controls_and_tree_has_no_aggregate_violation(
     assert result["exceptions_used"] == ["asset"]
     assert result["violations"] == []
     empty = checker.evaluate(
-        Repository({}),  # type: ignore[arg-type]
+        Repository({}),
         configured_policy(),
         [],
         mode="staged",
@@ -159,7 +158,7 @@ def test_same_blob_is_classified_per_path_and_counted_generated_once() -> None:
     ordinary = entry("a.txt", oid, 9)
     generated = entry("private/evaluations/apg99/bulk.jsonl", oid, 9)
     result = checker.evaluate(
-        Repository({oid: b"row\n"}),  # type: ignore[arg-type]
+        Repository({oid: b"row\n"}),
         configured_policy(),
         [
             checker.Change("add", ordinary.path, None, None, ordinary),
@@ -197,7 +196,7 @@ def test_exact_generated_aggregate_exception_excludes_only_bound_blob() -> None:
         expiry_condition="any-exact-binding-change",
     )
     result = checker.evaluate(
-        Repository({first.oid: b"a\n", second.oid: b"b\n"}),  # type: ignore[arg-type]
+        Repository({first.oid: b"a\n", second.oid: b"b\n"}),
         configured_policy(exception=exception),
         [
             checker.Change("add", first.path, None, None, first),
@@ -223,7 +222,7 @@ def test_generated_aggregate_counts_added_paths_reusing_existing_blobs() -> None
         "fixtures/b.txt": entry("fixtures/b.txt", second.oid, second.size),
     }
     result = checker.evaluate(
-        Repository({first.oid: b"a\n", second.oid: b"b\n"}),  # type: ignore[arg-type]
+        Repository({first.oid: b"a\n", second.oid: b"b\n"}),
         configured_policy(),
         [
             checker.Change("add", first.path, None, None, first),
@@ -247,7 +246,7 @@ def test_generated_aggregate_counts_renames_into_generated_paths() -> None:
     old_first = entry("fixtures/a.txt", first.oid, first.size)
     old_second = entry("fixtures/b.txt", second.oid, second.size)
     result = checker.evaluate(
-        Repository({first.oid: b"a\n", second.oid: b"b\n"}),  # type: ignore[arg-type]
+        Repository({first.oid: b"a\n", second.oid: b"b\n"}),
         configured_policy(),
         [
             checker.Change("rename", first.path, old_first.path, old_first, first),

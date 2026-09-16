@@ -1,0 +1,122 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "maintenance-triggers",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "apg.maintenance-ledger/v1",
+      "type": "string"
+    },
+    "release": {
+      "const": "v0.11",
+      "type": "string"
+    },
+    "owner_phase": {
+      "type": "string",
+      "minLength": 1
+    },
+    "triggers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "trigger_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "owner": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source_authority": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true
+          },
+          "refresh_condition": {
+            "type": "string",
+            "minLength": 1
+          },
+          "repair_condition": {
+            "type": "string",
+            "minLength": 1
+          },
+          "current_state": {
+            "type": "string",
+            "enum": [
+              "FALSE",
+              "TRUE",
+              "UNKNOWN"
+            ]
+          },
+          "state_evidence": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true
+          },
+          "interpretation": {
+            "type": "string",
+            "minLength": 1
+          },
+          "affected_behavior": {
+            "type": "string",
+            "minLength": 1
+          },
+          "affected_skills": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true
+          },
+          "blocks_stable": {
+            "type": "boolean"
+          },
+          "evidence_required": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true
+          },
+          "refresh_procedure": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "trigger_id",
+          "owner",
+          "source_authority",
+          "refresh_condition",
+          "repair_condition",
+          "current_state",
+          "state_evidence",
+          "interpretation",
+          "affected_behavior",
+          "affected_skills",
+          "blocks_stable",
+          "evidence_required",
+          "refresh_procedure"
+        ],
+        "additionalProperties": false
+      },
+      "uniqueItems": true
+    }
+  },
+  "required": [
+    "schema_version",
+    "release",
+    "owner_phase",
+    "triggers"
+  ],
+  "additionalProperties": false
+}

@@ -7,6 +7,7 @@ import json
 import os
 from pathlib import Path
 import shlex
+import shutil
 import stat
 import subprocess
 import sys
@@ -22,15 +23,14 @@ COMMAND = REPOSITORY_ROOT / "bin" / "apg-test"
 sys.path.insert(0, str(REPOSITORY_ROOT / "libexec"))
 
 import apg_test  # noqa: E402
+import apg_public_release as release  # noqa: E402
 
 
 def run_command(
     *arguments: str, environment: dict[str, str] | None = None
 ) -> subprocess.CompletedProcess[str]:
     environment = os.environ.copy() if environment is None else environment.copy()
-    environment["PATH"] = str(Path(sys.executable).parent) + os.pathsep + environment.get(
-        "PATH", ""
-    )
+    environment["PATH"] = str(Path(sys.executable).parent) + os.pathsep + environment.get("PATH", "")
     worker_root = Path(environment["TMPDIR"]).resolve(strict=True)
     with tempfile.TemporaryDirectory(
         prefix="apg-nested-pytest-", dir=worker_root.parent
@@ -73,6 +73,7 @@ def test_help_exposes_supported_suites_and_worker_override() -> None:
     assert "{unit,integration,unit-integration,policy}" in result.stdout
     assert "--workers WORKERS" in result.stdout
     assert "--summary-file" in result.stdout
+    assert "--public-version PUBLIC_VERSION" in result.stdout
 
 
 def test_invalid_worker_count_fails_before_test_execution() -> None:
@@ -130,6 +131,141 @@ def test_standalone_unit_runner_executes_real_pytest_xdist_and_coverage_boundary
     assert "branches" in result.stdout
 
 
+def _run_manifest_boundary(
+    tmp_path: Path, deselected_node: str
+) -> tuple[subprocess.CompletedProcess[str], Path, str, str]:
+    selected_file = (
+        "src/test/int/python/agentic-praxis-grimoire/"
+        "manifest_fixture_test.py"
+    )
+    fixture = tmp_path / selected_file
+    fixture.parent.mkdir(parents=True)
+    fixture.write_text(
+        "def test_keep():\n    assert True\n\n"
+        "def test_drop():\n    assert True\n",
+        encoding="utf-8",
+    )
+    manifest = tmp_path / "integration.workers.jsonl"
+    manifest.touch(mode=0o600)
+    artifacts = tmp_path / "artifacts"
+    artifacts.mkdir(mode=0o700)
+    environment = os.environ.copy()
+    environment.update(
+        {
+            "PYTEST_DISABLE_PLUGIN_AUTOLOAD": "1",
+            "PYTHONPATH": os.pathsep.join(
+                part
+                for part in (
+                    str(REPOSITORY_ROOT),
+                    str(REPOSITORY_ROOT / "src"),
+                    environment.get("PYTHONPATH", ""),
+                )
+                if part
+            ),
+            "APG_TEST_RUN_ID": "manifest-boundary-run",
+            "APG_TEST_SUITE": "integration",
+            "APG_TEST_SELECTED_ROOT": apg_test.INTEGRATION_ROOT.as_posix(),
+            "APG_TEST_SELECTED_FILES": json.dumps([selected_file]),
+            "APG_TEST_WORKER_MANIFEST": str(manifest),
+            "APG_TEST_CHILD_MANIFEST": str(tmp_path / "children.jsonl"),
+            "APG_TEST_ARTIFACT_DIRECTORY": str(artifacts),
+            "COVERAGE_FILE": str(tmp_path / "integration.coverage"),
+        }
+    )
+    environment.pop("PYTEST_ADDOPTS", None)
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "pytest",
+            "-p",
+            "xdist.plugin",
+            "-p",
+            "pytest_cov.plugin",
+            "-n",
+            "2",
+            "--dist=load",
+            "--max-worker-restart=0",
+            "-p",
+            "src.test.apg_pytest_plugin",
+            f"--cov={REPOSITORY_ROOT / 'libexec'}",
+            "--cov-report=",
+            "--deselect",
+            deselected_node,
+            selected_file,
+        ],
+        cwd=tmp_path,
+        env=environment,
+        check=False,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+    )
+    return result, manifest, apg_test.INTEGRATION_ROOT.as_posix(), selected_file
+
+
+def test_real_xdist_manifest_records_raw_and_post_deselection_collections(
+    tmp_path: Path,
+) -> None:
+    selected_file = (
+        "src/test/int/python/agentic-praxis-grimoire/"
+        "manifest_fixture_test.py"
+    )
+    deselected_node = f"{selected_file}::test_drop"
+    result, manifest, selected_root, selected_path = _run_manifest_boundary(
+        tmp_path, deselected_node
+    )
+    assert result.returncode == 0, f"{result.stderr}\n{result.stdout}"
+    events = [
+        json.loads(line)
+        for line in manifest.read_text(encoding="utf-8").splitlines()
+        if line
+    ]
+    collections = [event for event in events if event.get("event") == "collection"]
+    assert len(collections) == 2
+    expected_keep = f"{selected_path}::test_keep"
+    for event in collections:
+        assert event["node_ids"] == [
+            f"{selected_path}::test_keep",
+            f"{selected_path}::test_drop",
+        ]
+        assert event["remaining_node_ids"] == [expected_keep]
+        assert event["deselected_node_ids"] == [deselected_node]
+    apg_test.validate_worker_manifest(
+        manifest,
+        "manifest-boundary-run",
+        "integration",
+        2,
+        selected_root,
+        [selected_path],
+        deselections=(deselected_node,),
+    )
+
+
+def test_real_xdist_manifest_rejects_unobserved_deselection(
+    tmp_path: Path,
+) -> None:
+    selected_file = (
+        "src/test/int/python/agentic-praxis-grimoire/"
+        "manifest_fixture_test.py"
+    )
+    unknown_node = f"{selected_file}::test_missing"
+    result, manifest, selected_root, selected_path = _run_manifest_boundary(
+        tmp_path, unknown_node
+    )
+    assert result.returncode == 0, f"{result.stderr}\n{result.stdout}"
+    with pytest.raises(apg_test.HarnessError, match="deselection set"):
+        apg_test.validate_worker_manifest(
+            manifest,
+            "manifest-boundary-run",
+            "integration",
+            2,
+            selected_root,
+            [selected_path],
+            deselections=(unknown_node,),
+        )
+
+
 def test_missing_child_contribution_fixture_fails_the_real_runner() -> None:
     result = run_command(
         "unit",
@@ -165,7 +301,7 @@ def test_policy_suite_executes_real_validation_and_writes_summary_file(
     result = run_command("policy", "--summary-file", str(summary_file))
     assert result.returncode == 0, f"{result.stderr}\n{result.stdout}"
     assert (
-        "PASS policy: inventory, skill-library, and record-identity checks passed"
+        "PASS policy: inventory, skill-library, record-identity, and roadmap-closure checks passed"
         in result.stdout
     )
     assert summary_file.is_file()
@@ -374,6 +510,198 @@ def _clone_disposable_repo(target_dir: Path) -> Path:
     if candidate_apg_test.is_file():
         shutil.copy2(candidate_apg_test, target_dir / "libexec" / "apg_test.py")
     return target_dir
+
+
+_PUBLIC_POLICY_PATH_KEYS = (
+    "critical_files",
+    "required_helpers",
+    "required_licensing_files",
+    "required_projections",
+    "required_skills",
+    "required_test_entrypoints",
+    "required_wrappers",
+)
+
+
+def _public_fixture_paths() -> tuple[str, ...]:
+    """Select current public bytes without copying publication-excluded paths."""
+    tracked = subprocess.check_output(
+        ["git", "-C", str(REPOSITORY_ROOT), "ls-files", "-z"],
+    )
+    paths = {
+        os.fsdecode(path)
+        for path in tracked.split(b"\0")
+        if path
+    }
+    policy = json.loads(
+        (REPOSITORY_ROOT / "release" / "public-surface.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    declared = {
+        path
+        for key in _PUBLIC_POLICY_PATH_KEYS
+        for path in policy[key]
+    }
+    assert not any(
+        path == "private" or path.startswith("private/") for path in declared
+    )
+    selected = {
+        path
+        for path in paths | declared
+        if path != "private" and not path.startswith("private/")
+    }
+    return tuple(
+        sorted(path for path in selected if release.is_v011_candidate_path(path))
+    )
+
+
+def _fixture_git(root: Path, *arguments: str) -> None:
+    result = subprocess.run(
+        ["git", "-C", str(root), *arguments],
+        check=False,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+    )
+    assert result.returncode == 0, result.stderr
+
+
+def _make_public_selection_fixture(
+    target: Path,
+    *,
+    committed_version: str = "0.11.0",
+) -> Path:
+    """Materialize a clean public Git fixture from maintained public paths."""
+    target.mkdir()
+    _fixture_git(target, "init", "-q", "-b", "main")
+    _fixture_git(target, "config", "user.name", "APG public selection test")
+    _fixture_git(target, "config", "user.email", "selection@example.invalid")
+    for relative in _public_fixture_paths():
+        source = REPOSITORY_ROOT / relative
+        assert os.path.lexists(source), f"public fixture source is missing: {relative}"
+        destination = target / relative
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        metadata = source.lstat()
+        if stat.S_ISLNK(metadata.st_mode):
+            destination.symlink_to(os.readlink(source))
+        elif stat.S_ISREG(metadata.st_mode):
+            shutil.copy2(source, destination, follow_symlinks=False)
+        else:
+            raise AssertionError(f"unsupported public fixture source: {relative}")
+    version_path = target / "src/agentic_praxis_grimoire/VERSION"
+    version_path.write_text(f"{committed_version}\n", encoding="ascii")
+    _fixture_git(target, "add", "-A")
+    _fixture_git(target, "commit", "-q", "-m", "public selection fixture")
+    status = subprocess.check_output(
+        [
+            "git",
+            "-C",
+            str(target),
+            "status",
+            "--porcelain=v1",
+            "--untracked-files=all",
+        ],
+        text=True,
+    )
+    assert status == ""
+    assert not (target / "private").exists()
+    return target
+
+
+def _public_selection_fixture_inventory(root: Path) -> apg_test.Inventory:
+    return apg_test.load_inventory(root)
+
+
+def test_public_version_selection_accepts_clean_disposable_public_source(
+    tmp_path: Path,
+) -> None:
+    public = _make_public_selection_fixture(tmp_path / "public")
+    inventory = _public_selection_fixture_inventory(public)
+    selection = apg_test.load_public_test_selection(public, inventory, "0.11.0")
+    repository = release.resolve_repository(public, "public selection fixture")
+    policy = release.load_policy(
+        repository,
+        expected_surfaces=release.audited_policy_surfaces("0.11.0"),
+    )
+    audited_python = tuple(
+        path
+        for path in policy["required_test_entrypoints"]
+        if path.endswith(".py")
+    )
+    expected_files = {
+        suite: tuple(
+            sorted(path for path in audited_python if inventory.tests[path][1] == suite)
+        )
+        for suite in ("unit", "integration")
+    }
+    assert selection.version == "0.11.0"
+    assert selection.files == expected_files
+
+    expected_deselections = release.resolve_public_validation_deselections(
+        "0.11.0", policy
+    )
+    expected_by_suite = {"unit": [], "integration": []}
+    for node in expected_deselections:
+        node_file = node.split("::", 1)[0]
+        expected_by_suite[inventory.tests[node_file][1]].append(node)
+    assert selection.deselections == {
+        suite: tuple(nodes) for suite, nodes in expected_by_suite.items()
+    }
+    assert all(
+        not path.startswith("private/")
+        for paths in selection.files.values()
+        for path in paths
+    )
+
+
+def test_public_version_selection_refuses_dirty_disposable_source(
+    tmp_path: Path,
+) -> None:
+    public = _make_public_selection_fixture(tmp_path / "dirty")
+    (public / "README.md").write_text(
+        (public / "README.md").read_text(encoding="utf-8") + "\ndirty\n",
+        encoding="utf-8",
+    )
+    inventory = _public_selection_fixture_inventory(public)
+    with pytest.raises(apg_test.InvocationError, match="must be clean"):
+        apg_test.load_public_test_selection(public, inventory, "0.11.0")
+
+
+def test_public_version_selection_refuses_private_directory(
+    tmp_path: Path,
+) -> None:
+    public = _make_public_selection_fixture(tmp_path / "private-present")
+    (public / "private").mkdir()
+    (public / "private" / "unexpected.txt").write_text(
+        "private\n", encoding="utf-8"
+    )
+    inventory = _public_selection_fixture_inventory(public)
+    with pytest.raises(apg_test.InvocationError, match="private directory"):
+        apg_test.load_public_test_selection(public, inventory, "0.11.0")
+
+
+def test_public_version_selection_refuses_version_mismatch(
+    tmp_path: Path,
+) -> None:
+    public = _make_public_selection_fixture(tmp_path / "version-mismatch")
+    (public / "src/agentic_praxis_grimoire/VERSION").write_text(
+        "0.10.0\n", encoding="ascii"
+    )
+    inventory = _public_selection_fixture_inventory(public)
+    with pytest.raises(apg_test.InvocationError, match="VERSION does not match"):
+        apg_test.load_public_test_selection(public, inventory, "0.11.0")
+
+
+def test_public_version_selection_refuses_unsupported_version(
+    tmp_path: Path,
+) -> None:
+    public = _make_public_selection_fixture(
+        tmp_path / "unsupported-version", committed_version="0.12.0"
+    )
+    inventory = _public_selection_fixture_inventory(public)
+    with pytest.raises(apg_test.InvocationError, match="unsupported"):
+        apg_test.load_public_test_selection(public, inventory, "0.12.0")
 
 
 def test_policy_inventory_failure_writes_fail_summary(
@@ -815,7 +1143,8 @@ def test_real_bounded_sigint_process_cancellation(
     tmp_path: Path,
     repo_state_snapshot: None,
 ) -> None:
-    import signal, time
+    import signal
+    import time
     # Cancellation is read-only; exercise the complete current runner dependency
     # closure instead of mixing a candidate runner with historical clone helpers.
     sigint_repo = REPOSITORY_ROOT
@@ -945,7 +1274,7 @@ def test_node_profile_runtime_binding_showlocals_cannot_disclose_raw_streams(tmp
         ("start", f"OSError('spawn-failed:' + bytes.fromhex('{encoded}').decode())"),
         ("interruption", f"KeyboardInterrupt(bytes.fromhex('{encoded}').decode())"),
         ("parser", f"subprocess.CompletedProcess(args, 0, bytes.fromhex('{encoded}').decode() + '\\n', '')"),
-        ("post_binding", f"subprocess.CompletedProcess(args, 0, json.dumps({{'identity': expected_identity, 'execArgv': [], 'nodeOptions': False}}), '')"),
+        ("post_binding", "subprocess.CompletedProcess(args, 0, json.dumps({'identity': expected_identity, 'execArgv': [], 'nodeOptions': False}), '')"),
     ]
 
     for name, proc_expr in scenarios:
