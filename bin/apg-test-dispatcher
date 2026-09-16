@@ -1,0 +1,41 @@
+#!/usr/bin/env python3
+"""Dedicated dispatcher qualification runner for migrated single-phase test suites."""
+
+from __future__ import annotations
+
+import os
+from pathlib import Path
+import subprocess
+import sys
+
+
+def main() -> int:
+    root = Path(__file__).resolve().parent.parent
+    venv_pytest = root / ".venv/bin/pytest"
+    pytest_cmd = [str(venv_pytest)] if venv_pytest.is_file() else ["pytest"]
+
+    env = dict(os.environ)
+    existing_pythonpath = env.get("PYTHONPATH", "")
+    new_paths = [str(root / "libexec"), str(root / "src/test/dispatcher")]
+    if existing_pythonpath:
+        new_paths.append(existing_pythonpath)
+    env["PYTHONPATH"] = ":".join(new_paths)
+
+    has_target = any(
+        arg.endswith(".py") or (root / arg).exists() or Path(arg).exists()
+        for arg in sys.argv[1:]
+    )
+    targets = [] if has_target else [str(root / "src/test/dispatcher")]
+
+    arguments = [
+        *pytest_cmd,
+        *targets,
+        "-o",
+        "python_files=test_*.py",
+        *sys.argv[1:],
+    ]
+    return subprocess.run(arguments, cwd=str(root), env=env).returncode
+
+
+if __name__ == "__main__":
+    sys.exit(main())

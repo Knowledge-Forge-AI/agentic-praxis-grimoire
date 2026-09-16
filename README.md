@@ -11,12 +11,13 @@ task-scoped guidance, collecting immutable evidence, capturing curated
 environments, inspecting repository structures, and measuring context footprints
 without dictating an orchestration workflow.
 
-This documentation covers the **unreleased v0.11.0 candidate**. It retains 45
-canonical skills and adds closure governance, hotspot schema v2, report-key
-support, and preparation for public staging PR validation. v0.10.0 remains the
-published release across GitHub, Go, PyPI and npm; earlier releases stay frozen.
-See the [candidate notes](release/v0.11.0-notes.md) and
-[v0.11 closure roadmap](docs/v0-11-roadmap.md). Candidate preparation does not
+This documentation covers the **unreleased v0.12.0 candidate**. It retains 45
+canonical skills, transfers the single-phase execution runtime, achieves provider
+parity across Codex, Claude, and Antigravity, and hardens the attended multi-channel
+release operator. v0.11.0 remains the published release across GitHub Releases,
+Go, PyPI, npm, and Homebrew tap; earlier releases stay frozen. See the
+[candidate notes](release/v0.12.0-notes.md) and
+[v0.12 roadmap](docs/v0-12-roadmap.md). Candidate preparation does not
 establish hosted CI acceptance or publication.
 
 APGR includes:
@@ -80,7 +81,7 @@ frameworks invoke APGR as an in-process library or CLI subprocess.
 
 ### Skill corpus and maturity
 
-APGR v0.11.0 retains 45 canonical leaves: 14 stable and 31 provisional. Canonical Markdown
+APGR v0.12.0 retains 45 canonical leaves: 14 stable and 31 provisional. Canonical Markdown
 under `skills/` is the maintained body authority; embedded metadata and package
 resources are verified projections of it:
 
@@ -90,7 +91,7 @@ resources are verified projections of it:
 
 ## Quick start
 
-v0.10.0 packages are published and can be installed from the supported
+v0.11.0 packages are published and can be installed from the supported
 registries using the version-pinned commands in the
 [upgrade guidance](#upgrade-guidance-and-release-status).
 
@@ -435,33 +436,34 @@ can dispatch through that checkout; the native/npm binary cannot run `test`.
 
 ## Upgrade guidance and release status
 
-### Preparing v0.11.0
+### Preparing v0.12.0
 
-v0.11.0 is unreleased. Exercise candidate features from a source checkout or
+v0.12.0 is unreleased. Exercise candidate features from a source checkout or
 locally qualified wheel/npm artifacts; registry installation commands below
 refer to the published predecessor. The release route is public `staging` →
 pull request → squash merge to `main` → release. See the
 [release procedure](docs/public-release-process.md). Homebrew tap distribution
-(`brew install Knowledge-Forge-AI/tap/agentic-praxis-grimoire`) is added as an
-additive channel for v0.11.0, pending post-release tap publication. See
+(`brew install Knowledge-Forge-AI/tap/agentic-praxis-grimoire`) is supported
+alongside GitHub Release, PyPI, npm, and Go. See
 [distribution documentation](docs/distribution.md). Local preparation does not
 mean a public PR has run or that branch protection is configured.
 
-### Upgrading to v0.10.0
+### Upgrading to v0.11.0
 
-The published v0.10.0 release adds six frontend profiles,
-report verification and qualification maintenance; see the
-[v0.10.0 release notes](release/v0.10.0-notes.md). The CI-first qualification
+The published v0.11.0 release adds Homebrew tap distribution,
+pull-request release staging, and qualification maintenance; see the
+[v0.11.0 release notes](release/v0.11.0-notes.md). The CI-first qualification
 interface (`--summary-file`, `policy` role) and Go consumer interfaces remain.
 
-Install the published v0.10.0 packages with these commands:
+Install the published v0.11.0 packages with these commands:
 
-- **Go consumers**: Require `github.com/Knowledge-Forge-AI/agentic-praxis-grimoire v0.10.0`
-  or run `go get github.com/Knowledge-Forge-AI/agentic-praxis-grimoire@v0.10.0`.
+- **Go consumers**: Require `github.com/Knowledge-Forge-AI/agentic-praxis-grimoire v0.11.0`
+  or run `go get github.com/Knowledge-Forge-AI/agentic-praxis-grimoire@v0.11.0`.
   Public APIs in `schema`, `report`, `skills`, `envsnap`, `hotspot`, and `footprint`
-  preserve v0.8.1 compatibility.
-- **Python users**: `pip install agentic-praxis-grimoire==0.10.0`.
-- **npm users**: `npm install -g @knowledge-forge-ai/apgr@0.10.0`.
+  preserve backward compatibility.
+- **Python users**: `pip install agentic-praxis-grimoire==0.11.0`.
+- **npm users**: `npm install -g @knowledge-forge-ai/apgr@0.11.0`.
+- **Homebrew users**: `brew install Knowledge-Forge-AI/tap/agentic-praxis-grimoire`.
 
 APGR-side JACA CI/XO compatibility work is complete. Actual JACA adoption and
 activation remain JACA-owned. Linux runtime execution is separate from Darwin
@@ -546,7 +548,7 @@ The release retains these limits:
   profiles, under the 11,507-byte discovery integrity ceiling.
 - **Frontend profile qualification**: Desktop browser execution does not qualify the
   Tauri embedded WebView, native host, sidecars, or assistive technology.
-- **Platform qualification gate**: v0.11 requires fresh candidate evidence on
+- **Platform qualification gate**: v0.12 requires fresh candidate evidence on
   macOS Apple Silicon (`darwin/arm64`); prior release results are not inherited.
   Linux cross-build and archive inspection remain separate from Linux execution.
   Prepared hosted jobs do not establish hosted runtime qualification.

@@ -112,7 +112,7 @@ def _fixture(
             },
         },
     }
-    if active_version == "0.11.0":
+    if active_version in ("0.11.0", "0.12.0"):
         manifest_obj["source_commit"] = "a" * 40 if manifest_source_mismatch else "b" * 40
         manifest_obj["source_tree"] = "e" * 40 if manifest_source_mismatch else "f" * 40
 
@@ -240,6 +240,8 @@ def _run(
     include_non_python_assets: bool = True,
     approved_review: bool = True,
     review_changed_after_approval: bool = False,
+    governance_waiver: str | None = None,
+    raw_pr_body: str | None = None,
     workflow_bound: bool = True,
     manifest_source_mismatch: bool = False,
     aggregate_missing: bool = False,
@@ -283,6 +285,7 @@ import sys
 
 event_path = Path(os.environ["GITHUB_EVENT_PATH"])
 event = json.loads(event_path.read_text(encoding="utf-8"))
+event_tag = event.get("release", {}).get("tag_name", "v0.12.0")
 api_path = sys.argv[-1]
 accepted_base = "a" * 40
 merged_commit = "b" * 40
@@ -291,20 +294,22 @@ accepted_tag_object = "d" * 40
 pr_head = "e" * 40
 tested_sha = "6" * 40
 run_id = "123"
-if api_path.endswith("/git/ref/tags/v0.11.0"):
+if api_path.endswith("/git/ref/tags/" + event_tag) or api_path.endswith("/git/ref/tags/v0.12.0"):
     value = {"object": {"sha": tag_object, "type": "tag"}}
 elif api_path.endswith("/git/tags/" + tag_object):
     value = {"object": {"sha": merged_commit, "type": "commit"}}
-elif api_path.endswith("/git/ref/tags/v0.10.0"):
+elif api_path.endswith("/git/ref/tags/v0.11.0"):
     value = {"object": {"sha": accepted_tag_object, "type": "tag"}}
 elif api_path.endswith("/git/tags/" + accepted_tag_object):
     value = {"object": {"sha": accepted_base, "type": "commit"}}
+elif f"/compare/{accepted_base}..." in api_path:
+    value = {"status": "ahead", "behind_by": 0}
 elif api_path.endswith("/commits/" + merged_commit):
     value = {
         "parents": [{"sha": accepted_base}],
         "commit": {
             "tree": {"sha": "f" * 40},
-            "message": "Release v0.11.0\\n\\nfixture",
+            "message": f"Release {event_tag}\\n\\nfixture",
         },
     }
 elif api_path.endswith("/commits/" + tested_sha):
@@ -346,6 +351,7 @@ elif api_path.endswith("/pulls/42"):
             "repo": {"full_name": "Knowledge-Forge-AI/agentic-praxis-grimoire"},
             "sha": pr_head,
         },
+        "body": os.environ.get("APG_PR_BODY", ""),
         "merged_at": "2026-09-12T00:00:00Z",
         "merge_commit_sha": merged_commit,
     }
@@ -437,6 +443,11 @@ print(json.dumps(value), end="")
         "GH_TOKEN": "bounded-test-token",
         "APG_APPROVED_REVIEW": "1" if approved_review else "0",
         "APG_REVIEW_CHANGED_AFTER_APPROVAL": "1" if review_changed_after_approval else "0",
+        "APG_PR_BODY": (
+            raw_pr_body
+            if raw_pr_body is not None
+            else (f"<!-- BEGIN_GOVERNANCE_WAIVER -->\n{governance_waiver}\n<!-- END_GOVERNANCE_WAIVER -->" if governance_waiver else "")
+        ),
         "APG_WORKFLOW_BOUND": "1" if workflow_bound else "0",
         "APG_AGGREGATE_MISSING": "1" if aggregate_missing else "0",
         "APG_AGGREGATE_MISMATCH": "1" if aggregate_mismatch else "0",
@@ -586,6 +597,30 @@ def test_verification_step_rejects_a_later_changes_requested_review(
     tmp_path: Path,
 ) -> None:
     result = _run(tmp_path, review_changed_after_approval=True)
+
+    assert result.returncode != 0
+
+
+def test_verification_step_accepts_governance_waiver_when_approved_review_absent(
+    tmp_path: Path,
+) -> None:
+    result = _run(
+        tmp_path,
+        approved_review=False,
+        governance_waiver="Manager authorization per ADR 0068 / Scope D",
+    )
+
+    assert result.returncode == 0
+
+
+def test_verification_step_rejects_unbounded_governance_waiver(
+    tmp_path: Path,
+) -> None:
+    result = _run(
+        tmp_path,
+        approved_review=False,
+        raw_pr_body="Governance Waiver: Manager authorization per ADR 0068 / Scope D",
+    )
 
     assert result.returncode != 0
 

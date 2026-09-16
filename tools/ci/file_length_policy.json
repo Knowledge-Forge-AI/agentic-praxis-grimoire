@@ -1,6 +1,78 @@
 {
   "allowances": [
     {
+      "count": 2132,
+      "maintenance": "No growth beyond the entry bound. Review reductions; retire when at or below 1000 lines. No transfer or automatic increase.",
+      "owner": "dispatcher",
+      "path": "libexec/agent_phase/dispatch.py",
+      "rationale": "Migrated Agent-Central single-phase dispatcher module exceeding failure limit",
+      "role": "maintained-source",
+      "sha256": "ee3936385780cda571c6e28d7b3857c0b86dda80701701a881895d674c38efb9"
+    },
+    {
+      "count": 1101,
+      "maintenance": "No growth beyond the entry bound. Review reductions; retire when at or below 1000 lines. No transfer or automatic increase.",
+      "owner": "dispatcher",
+      "path": "libexec/agent_phase/gitstate.py",
+      "rationale": "Migrated Agent-Central single-phase dispatcher module exceeding failure limit",
+      "role": "maintained-source",
+      "sha256": "81ff7a16e9ac45cae92b5ed166e25ba66a0acf00085165d2d6d61010d281f0fe"
+    },
+    {
+      "count": 1421,
+      "maintenance": "No growth beyond the entry bound. Review reductions; retire when at or below 1000 lines. No transfer or automatic increase.",
+      "owner": "dispatcher",
+      "path": "libexec/agent_phase/provider.py",
+      "rationale": "Migrated Agent-Central single-phase dispatcher module exceeding failure limit",
+      "role": "maintained-source",
+      "sha256": "0aa8b8a2d2ffb8fc525a7b7aa360e686cb12ecf8b6cbac23cd6e88e86b8eb29a"
+    },
+    {
+      "count": 1844,
+      "maintenance": "No growth beyond the entry bound. Review reductions; retire when at or below 1000 lines. No transfer or automatic increase.",
+      "owner": "dispatcher",
+      "path": "libexec/agent_phase/result_artifacts.py",
+      "rationale": "Migrated Agent-Central single-phase dispatcher module exceeding failure limit",
+      "role": "maintained-source",
+      "sha256": "847afeb5a55fe3e2fd0c5f26a2dcc15532248c3ebe341e8c28243c71018e3700"
+    },
+    {
+      "count": 1864,
+      "maintenance": "No growth beyond the entry bound. Review reductions; retire when at or below 1000 lines. No transfer or automatic increase.",
+      "owner": "dispatcher",
+      "path": "libexec/agent_phase/result_repair.py",
+      "rationale": "Migrated Agent-Central single-phase dispatcher module exceeding failure limit",
+      "role": "maintained-source",
+      "sha256": "9544f4f58006395532d2ca33a92b9a36879d1f5cb79800822b0ff39123680ad0"
+    },
+    {
+      "count": 1637,
+      "maintenance": "No growth beyond the entry bound. Review reductions; retire when at or below 1000 lines. No transfer or automatic increase.",
+      "owner": "dispatcher",
+      "path": "libexec/agent_phase/resume_dispatch.py",
+      "rationale": "Migrated Agent-Central single-phase dispatcher module exceeding failure limit",
+      "role": "maintained-source",
+      "sha256": "b5217ecdaebfcb817f14ca4006ba19a2dc9b6685a41b51c2ed05bdd3f561fa35"
+    },
+    {
+      "count": 2001,
+      "maintenance": "No growth beyond the entry bound. Review reductions; retire when at or below 1000 lines. No transfer or automatic increase.",
+      "owner": "dispatcher",
+      "path": "libexec/agent_phase/stage_delta.py",
+      "rationale": "Migrated Agent-Central single-phase dispatcher module exceeding failure limit",
+      "role": "maintained-source",
+      "sha256": "d8eab2a345583a25604ae5ca51eba32c918d9737b3d2613a2bfe52a0d374e3b7"
+    },
+    {
+      "count": 1780,
+      "maintenance": "No growth beyond the entry bound. Review reductions; retire when at or below 1000 lines. No transfer or automatic increase.",
+      "owner": "dispatcher",
+      "path": "libexec/antigravity_profile.py",
+      "rationale": "Migrated Agent-Central single-phase dispatcher module exceeding failure limit",
+      "role": "maintained-source",
+      "sha256": "7c4c00475ba034482eea7b6d94710352e5d737f4cef28b26f4d2337a28de0a8d"
+    },
+    {
       "count": 1017,
       "maintenance": "No growth beyond the entry bound. Review reductions; retire when at or below 1000 lines. No transfer or automatic increase.",
       "owner": "npm-distribution",
@@ -44,6 +116,87 @@
       "rationale": "Pre-existing user skills management CLI and execution adapter exceeding failure limit",
       "role": "maintained-source",
       "sha256": "9a6d213b80944021f22b97c9063f82c6bf0a46a543ddddd05de83154947fd1b9"
+    },
+    {
+      "count": 1240,
+      "maintenance": "No growth beyond the entry bound. Review reductions; retire when at or below 1000 lines. No transfer or automatic increase.",
+      "owner": "dispatcher",
+      "path": "libexec/claude_vc_profile.py",
+      "rationale": "Migrated Agent-Central single-phase dispatcher module exceeding failure limit",
+      "role": "maintained-source",
+      "sha256": "b05d907b5de045ec350293b22c7f6e8947d04d5b0265e9176d558ca16532630b"
+    },
+    {
+      "count": 1173,
+      "maintenance": "No growth beyond the entry bound. Review reductions; retire when at or below 1000 lines. No transfer or automatic increase.",
+      "owner": "dispatcher",
+      "path": "src/test/dispatcher/test_agent_phase_closeout.py",
+      "rationale": "Migrated Agent-Central single-phase dispatcher test suite exceeding failure limit",
+      "role": "fixture-or-test",
+      "sha256": "f050dc4dd976ef152230cc4f407d72922d1a00d342af1b3e114dc0645855573a"
+    },
+    {
+      "count": 1526,
+      "maintenance": "No growth beyond the entry bound. Review reductions; retire when at or below 1000 lines. No transfer or automatic increase.",
+      "owner": "dispatcher",
+      "path": "src/test/dispatcher/test_agent_phase_dispatch.py",
+      "rationale": "Migrated Agent-Central single-phase dispatcher test suite exceeding failure limit",
+      "role": "fixture-or-test",
+      "sha256": "9411742050ea01773e5d4f0ad03c38427bb97aeaf2663669fc1a2a3936abf9dd"
+    },
+    {
+      "count": 1030,
+      "maintenance": "No growth beyond the entry bound. Review reductions; retire when at or below 1000 lines. No transfer or automatic increase.",
+      "owner": "dispatcher",
+      "path": "src/test/dispatcher/test_agent_phase_disposition_flow.py",
+      "rationale": "Migrated Agent-Central single-phase dispatcher test suite exceeding failure limit",
+      "role": "fixture-or-test",
+      "sha256": "d82152f57864a9156f12dab4a18f8d3a5a8762d7f5ec0f4ab14617b91378fbbb"
+    },
+    {
+      "count": 1112,
+      "maintenance": "No growth beyond the entry bound. Review reductions; retire when at or below 1000 lines. No transfer or automatic increase.",
+      "owner": "dispatcher",
+      "path": "src/test/dispatcher/test_agent_phase_entry_adoption_boundary.py",
+      "rationale": "Migrated Agent-Central single-phase dispatcher test suite exceeding failure limit",
+      "role": "fixture-or-test",
+      "sha256": "12d63881cd3424dbef7f7bb3f814951025c6ef42e98d9cd97657976b73836990"
+    },
+    {
+      "count": 1098,
+      "maintenance": "No growth beyond the entry bound. Review reductions; retire when at or below 1000 lines. No transfer or automatic increase.",
+      "owner": "dispatcher",
+      "path": "src/test/dispatcher/test_agent_phase_lifecycle_dispatch.py",
+      "rationale": "Migrated Agent-Central single-phase dispatcher test suite exceeding failure limit",
+      "role": "fixture-or-test",
+      "sha256": "de2464b289baf29a378cde6df4992f743ddb3a489f88df99299bf7af6d1e298c"
+    },
+    {
+      "count": 1410,
+      "maintenance": "No growth beyond the entry bound. Review reductions; retire when at or below 1000 lines. No transfer or automatic increase.",
+      "owner": "dispatcher",
+      "path": "src/test/dispatcher/test_agent_phase_provider_stream.py",
+      "rationale": "Migrated Agent-Central single-phase dispatcher test suite exceeding failure limit",
+      "role": "fixture-or-test",
+      "sha256": "1bd97e8b41d172a69cc746666deafdf1d9f85da7da8a3f58bc1170a761e27353"
+    },
+    {
+      "count": 1046,
+      "maintenance": "No growth beyond the entry bound. Review reductions; retire when at or below 1000 lines. No transfer or automatic increase.",
+      "owner": "dispatcher",
+      "path": "src/test/dispatcher/test_agent_phase_result.py",
+      "rationale": "Migrated Agent-Central single-phase dispatcher test suite exceeding failure limit",
+      "role": "fixture-or-test",
+      "sha256": "b2ad081290040a6cdcfa24e095a99e281f91fafd4ec8353e9c79f7c5e5f8b5f1"
+    },
+    {
+      "count": 1469,
+      "maintenance": "No growth beyond the entry bound. Review reductions; retire when at or below 1000 lines. No transfer or automatic increase.",
+      "owner": "dispatcher",
+      "path": "src/test/dispatcher/test_agent_phase_result_repair.py",
+      "rationale": "Migrated Agent-Central single-phase dispatcher test suite exceeding failure limit",
+      "role": "fixture-or-test",
+      "sha256": "428b505323445db54b2a2bb92ed9dbff4e36f65e8dd64d63de7fe99439531dca"
     },
     {
       "count": 1026,

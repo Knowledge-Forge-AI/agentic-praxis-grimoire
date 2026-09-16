@@ -1,0 +1,9 @@
+#!/usr/bin/env python3
+"""Inspect or conservatively collect controller generations without providers."""
+from pathlib import Path
+import sys
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "libexec"))
+from controller_generation_admin import main
+
+raise SystemExit(main())

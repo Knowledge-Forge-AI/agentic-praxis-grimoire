@@ -1,0 +1,717 @@
+{
+  "schema": "apgr-go-api-manifest-v1",
+  "generated_at": "2026-09-17T00:00:00Z",
+  "version": "v0.12.0-provisional",
+  "maturity": "experimental",
+  "packages": [
+    {
+      "path": "github.com/Knowledge-Forge-AI/agentic-praxis-grimoire/candidate",
+      "doc": "Package candidate provides immutable candidate identity definitions, artifact\nmanifest specifications, and pure in-memory validation routines.\n\nStability: Experimental / Provisional for APGR v0.12 (ICR-004 / ICR-005).\nExported candidate contracts are candidate surfaces for JACA XO evaluation.\nTransition to Supported status occurs upon production qualification in v1.0.\n\nAuthority Boundary:\nThis package owns data models and pure validation only. Repository mutation,\nGit commit creation, publication, and workspace custody remain behind caller-owned\nauthority implementations (e.g. JACA repository mutation fence).\n\nConcurrency and Immutability:\nAll types and values in this package are immutable once constructed and safe\nfor concurrent access across goroutines.",
+      "constants": [
+        {
+          "name": "ArtifactManifestSchema",
+          "value": "\"agent-phase-artifact-manifest-v1\""
+        }
+      ],
+      "types": [
+        {
+          "name": "Artifact",
+          "doc": "Artifact describes a single immutable evidence file emitted during phase execution.",
+          "kind": "struct",
+          "def": "struct {\n\tArtifactID   string `json:\"artifact_id\"`\n\tRunID        string `json:\"run_id\"`\n\tPhaseID      string `json:\"phase_id\"`\n\tRelativePath string `json:\"relative_path\"`\n\tMediaType    string `json:\"media_type\"`\n\tByteSize     int64  `json:\"byte_size\"`\n\tSHA256       string `json:\"sha256\"`\n}"
+        },
+        {
+          "name": "ArtifactManifest",
+          "doc": "ArtifactManifest lists all artifacts emitted by a single phase run.",
+          "kind": "struct",
+          "def": "struct {\n\tSchema    string     `json:\"schema\"`\n\tProjectID string     `json:\"project_id\"`\n\tPhaseID   string     `json:\"phase_id\"`\n\tArtifacts []Artifact `json:\"artifacts\"`\n}"
+        },
+        {
+          "name": "CandidateIdentity",
+          "doc": "CandidateIdentity represents an immutable proposed workspace state produced by a mutating role.",
+          "kind": "struct",
+          "def": "struct {\n\tCandidateID       string  `json:\"candidate_id\"`\n\tGeneration        int     `json:\"generation\"`\n\tProducerRole      string  `json:\"producer_role\"`\n\tProducerAttemptID string  `json:\"producer_attempt_id\"`\n\tPredecessorID     *string `json:\"predecessor_id,omitempty\"`\n\tCommit            string  `json:\"commit,omitempty\"`\n\tTreeDigest        string  `json:\"tree_digest,omitempty\"`\n\tExpectedBase      string  `json:\"expected_base,omitempty\"`\n}"
+        }
+      ],
+      "functions": [
+        {
+          "name": "ValidateArtifact",
+          "doc": "ValidateArtifact verifies path safety, non-negative size, and SHA-256 formatting.",
+          "signature": "func(a Artifact) error"
+        },
+        {
+          "name": "ValidateCandidate",
+          "doc": "ValidateCandidate validates structural invariants on CandidateIdentity.",
+          "signature": "func(c CandidateIdentity) error"
+        },
+        {
+          "name": "ValidateManifest",
+          "doc": "ValidateManifest validates all artifacts in the manifest.",
+          "signature": "func(m ArtifactManifest) error"
+        }
+      ]
+    },
+    {
+      "path": "github.com/Knowledge-Forge-AI/agentic-praxis-grimoire/evidence",
+      "doc": "Package evidence defines structured models for review findings, severities,\ncategories, dispositions, review bindings, and completion receipts.\n\nStability: Experimental / Provisional for APGR v0.12 (ICR-004 / ICR-005).\nExported evidence types are candidate surfaces for JACA XO evaluation. Transition\nto Supported status occurs upon production qualification in v1.0.\n\nSecurity \u0026 Path Safety:\nReview findings strictly reject path traversal tokens (\"..\", leading slashes,\nor non-normalized forms) to protect consumer systems from path leakage or tampering.\n\nConcurrency and Immutability:\nAll types and values in this package are immutable once constructed and safe\nfor concurrent access across goroutines.",
+      "constants": [
+        {
+          "name": "BasisAcceptedAuthority",
+          "value": "\"accepted_authority\""
+        },
+        {
+          "name": "BasisCanonicalEvidence",
+          "value": "\"canonical_evidence\""
+        },
+        {
+          "name": "BasisNone",
+          "value": "\"none\""
+        },
+        {
+          "name": "BasisScopeOwner",
+          "value": "\"scope_owner\""
+        },
+        {
+          "name": "CategoryClarity",
+          "value": "\"clarity\""
+        },
+        {
+          "name": "CategoryContractViolation",
+          "value": "\"contract_violation\""
+        },
+        {
+          "name": "CategoryCorrectness",
+          "value": "\"correctness\""
+        },
+        {
+          "name": "CategoryEvidence",
+          "value": "\"evidence\""
+        },
+        {
+          "name": "CategoryScope",
+          "value": "\"scope\""
+        },
+        {
+          "name": "CategorySecurity",
+          "value": "\"security\""
+        },
+        {
+          "name": "DispositionAccept",
+          "value": "\"accept\""
+        },
+        {
+          "name": "DispositionAmend",
+          "value": "\"amend\""
+        },
+        {
+          "name": "DispositionDefer",
+          "value": "\"defer\""
+        },
+        {
+          "name": "DispositionReject",
+          "value": "\"reject\""
+        },
+        {
+          "name": "OutcomeReviewedWithFindings",
+          "value": "\"reviewed_with_findings\""
+        },
+        {
+          "name": "OutcomeReviewedWithNoFindings",
+          "value": "\"reviewed_with_no_findings\""
+        },
+        {
+          "name": "OutcomeUnreviewable",
+          "value": "\"unreviewable\""
+        },
+        {
+          "name": "SeverityAdvisory",
+          "value": "\"advisory\""
+        },
+        {
+          "name": "SeverityBlocking",
+          "value": "\"blocking\""
+        },
+        {
+          "name": "SeveritySubstantive",
+          "value": "\"substantive\""
+        }
+      ],
+      "types": [
+        {
+          "name": "BasisType",
+          "doc": "BasisType represents the authoritative rationale basis for the disposition.",
+          "kind": "type",
+          "def": "string"
+        },
+        {
+          "name": "CompletionReceipt",
+          "doc": "CompletionReceipt represents a verifiable finalization receipt for a completed phase run.",
+          "kind": "struct",
+          "def": "struct {\n\tReceiptID      string `json:\"receipt_id\"`\n\tRunID          string `json:\"run_id\"`\n\tPhaseID        string `json:\"phase_id\"`\n\tCompletedAt    string `json:\"completed_at\"`\n\tTerminalStatus string `json:\"terminal_status\"`\n\tArchiveSHA256  string `json:\"archive_sha256\"`\n}"
+        },
+        {
+          "name": "DispositionAction",
+          "doc": "DispositionAction represents the disposition action taken on a review finding.",
+          "kind": "type",
+          "def": "string"
+        },
+        {
+          "name": "FindingCategory",
+          "doc": "FindingCategory represents the domain category of a review finding.",
+          "kind": "type",
+          "def": "string"
+        },
+        {
+          "name": "FindingDisposition",
+          "doc": "FindingDisposition records the single-source disposition of a review finding.",
+          "kind": "struct",
+          "def": "struct {\n\tFindingID string            `json:\"finding_id\"`\n\tAction    DispositionAction `json:\"action\"`\n\tBasis     BasisType         `json:\"basis\"`\n\tRationale string            `json:\"rationale\"`\n}"
+        },
+        {
+          "name": "FindingSeverity",
+          "doc": "FindingSeverity represents the severity level of a review finding.",
+          "kind": "type",
+          "def": "string"
+        },
+        {
+          "name": "ReviewBinding",
+          "doc": "ReviewBinding links a review execution attempt with candidate identity, outcome, and findings.",
+          "kind": "struct",
+          "def": "struct {\n\tReviewID         string          `json:\"review_id\"`\n\tRunID            string          `json:\"run_id\"`\n\tCandidateID      string          `json:\"candidate_id\"`\n\tReviewerProvider string          `json:\"reviewer_provider\"`\n\tReviewerProfile  string          `json:\"reviewer_profile\"`\n\tOutcome          ReviewOutcome   `json:\"outcome\"`\n\tFindings         []ReviewFinding `json:\"findings,omitempty\"`\n}"
+        },
+        {
+          "name": "ReviewFinding",
+          "doc": "ReviewFinding represents a structured finding reported by a Plan Reviewer or Work Reviewer.",
+          "kind": "struct",
+          "def": "struct {\n\tFindingID string          `json:\"finding_id\"`\n\tSeverity  FindingSeverity `json:\"severity\"`\n\tCategory  FindingCategory `json:\"category\"`\n\tSummary   string          `json:\"summary\"`\n\tFilePath  string          `json:\"file_path,omitempty\"`\n\tLineStart int             `json:\"line_start,omitempty\"`\n\tLineEnd   int             `json:\"line_end,omitempty\"`\n}"
+        },
+        {
+          "name": "ReviewOutcome",
+          "doc": "ReviewOutcome represents the result classification of a review attempt.",
+          "kind": "type",
+          "def": "string"
+        }
+      ],
+      "functions": [
+        {
+          "name": "ValidAction",
+          "doc": "ValidAction reports whether a is one of the four canonical disposition actions.",
+          "signature": "func(a DispositionAction) bool"
+        },
+        {
+          "name": "ValidBasis",
+          "doc": "ValidBasis reports whether b is one of the four canonical basis types.",
+          "signature": "func(b BasisType) bool"
+        },
+        {
+          "name": "ValidCategory",
+          "doc": "ValidCategory reports whether c is one of the six canonical finding categories.",
+          "signature": "func(c FindingCategory) bool"
+        },
+        {
+          "name": "ValidReviewOutcome",
+          "doc": "ValidReviewOutcome reports whether o is one of the three canonical review outcomes.",
+          "signature": "func(o ReviewOutcome) bool"
+        },
+        {
+          "name": "ValidSeverity",
+          "doc": "ValidSeverity reports whether s is one of the three canonical severities.",
+          "signature": "func(s FindingSeverity) bool"
+        },
+        {
+          "name": "ValidateDisposition",
+          "doc": "ValidateDisposition validates invariants on a FindingDisposition.",
+          "signature": "func(d FindingDisposition) error"
+        },
+        {
+          "name": "ValidateFinding",
+          "doc": "ValidateFinding validates boundary invariants on a ReviewFinding.",
+          "signature": "func(f ReviewFinding) error"
+        },
+        {
+          "name": "ValidateReceipt",
+          "doc": "ValidateReceipt checks structural validity and SHA-256 formatting of a CompletionReceipt.",
+          "signature": "func(r CompletionReceipt) error"
+        },
+        {
+          "name": "ValidateReviewBinding",
+          "doc": "ValidateReviewBinding validates structural consistency of a ReviewBinding.",
+          "signature": "func(rb ReviewBinding) error"
+        }
+      ]
+    },
+    {
+      "path": "github.com/Knowledge-Forge-AI/agentic-praxis-grimoire/phase",
+      "doc": "Package phase provides reusable, deterministic domain contracts for single-phase\nlifecycles, work-only Request V2 parsing, semantic responsibility definitions,\nactor binding topologies, and invocation attempt models.\n\nStability: Experimental / Provisional for APGR v0.12 (ICR-004 / ICR-005).\nExported domain types are candidate surfaces for JACA XO evaluation. Transition\nto Supported status occurs upon production qualification in v1.0.\n\nRequest V2 enforces a strict work-only schema: schema, phase_type, and prompt.\nRuntime policy fields such as execution_mode, constraints, provider, model, or\nprofile are strictly rejected at parse time.\n\nConcurrency and Immutability:\nAll types and values in this package are immutable once constructed and safe\nfor concurrent access across goroutines.",
+      "constants": [
+        {
+          "name": "FailureOperatorInterrupt",
+          "value": "\"operator_interrupted\""
+        },
+        {
+          "name": "FailurePreLaunch",
+          "value": "\"failed_pre_launch\""
+        },
+        {
+          "name": "FailureReviewFindings",
+          "value": "\"review_findings_unresolved\""
+        },
+        {
+          "name": "FailureRunner",
+          "value": "\"runner_failure\""
+        },
+        {
+          "name": "FailureTimeout",
+          "value": "\"timeout\""
+        },
+        {
+          "name": "FailureUnrecordedMutation",
+          "value": "\"unrecorded_mutation\""
+        },
+        {
+          "name": "FailureVerification",
+          "value": "\"verification_failure\""
+        },
+        {
+          "name": "MaxPromptBytes",
+          "value": "256 * 1024"
+        },
+        {
+          "name": "MaxRequestBytes",
+          "value": "MaxPromptBytes + 64*1024"
+        },
+        {
+          "name": "PhaseTypeArchitectureDocs",
+          "value": "\"architecture_docs\""
+        },
+        {
+          "name": "PhaseTypeImplementationTesting",
+          "value": "\"implementation_testing\""
+        },
+        {
+          "name": "PhaseTypeSysadmin",
+          "value": "\"sysadmin\""
+        },
+        {
+          "name": "RoleCloseoutAgent",
+          "value": "\"Closeout Agent\""
+        },
+        {
+          "name": "RolePlanReviewDisposition",
+          "value": "\"Plan Review Disposition\""
+        },
+        {
+          "name": "RolePlanReviewer",
+          "value": "\"Plan Reviewer\""
+        },
+        {
+          "name": "RolePlanner",
+          "value": "\"Planner\""
+        },
+        {
+          "name": "RoleProducer",
+          "value": "\"Producer\""
+        },
+        {
+          "name": "RoleReviser",
+          "value": "\"Reviser\""
+        },
+        {
+          "name": "RoleWorkReviewDisposition",
+          "value": "\"Work Review Disposition\""
+        },
+        {
+          "name": "RoleWorkReviewer",
+          "value": "\"Work Reviewer\""
+        },
+        {
+          "name": "SchemaNameV2",
+          "value": "\"agent-phase-request-v2\""
+        },
+        {
+          "name": "StatusCompleted",
+          "value": "\"completed\""
+        },
+        {
+          "name": "StatusFailed",
+          "value": "\"failed\""
+        },
+        {
+          "name": "StatusFailedPreLaunch",
+          "value": "\"failed_pre_launch\""
+        },
+        {
+          "name": "StatusInterrupted",
+          "value": "\"interrupted\""
+        },
+        {
+          "name": "StatusRunning",
+          "value": "\"running\""
+        },
+        {
+          "name": "StatusStaged",
+          "value": "\"staged\""
+        },
+        {
+          "name": "TerminalStatusCompleted",
+          "value": "\"completed\""
+        },
+        {
+          "name": "TerminalStatusFailed",
+          "value": "\"failed\""
+        },
+        {
+          "name": "TerminalStatusInterrupted",
+          "value": "\"interrupted\""
+        }
+      ],
+      "types": [
+        {
+          "name": "ActorBinding",
+          "doc": "ActorBinding groups one or more semantic responsibilities into an invocation turn.\nThis decouples the 8 invariant roles from execution topologies (ADR 0059 / ADR 0064).",
+          "kind": "struct",
+          "def": "struct {\n\tBindingID            string         `json:\"binding_id\"`\n\tRoles                []SemanticRole `json:\"roles\"`\n\tPolicyName           string         `json:\"policy_name\"`\n\tIsMutating           bool           `json:\"is_mutating\"`\n\tProcessReadOnly      bool           `json:\"process_read_only\"`\n\tRequiredCapabilities []string       `json:\"required_capabilities\"`\n}"
+        },
+        {
+          "name": "AttemptStatus",
+          "doc": "AttemptStatus represents the lifecycle state of an invocation attempt.",
+          "kind": "type",
+          "def": "string"
+        },
+        {
+          "name": "FailureCategory",
+          "doc": "FailureCategory classifies phase-level failures for deterministic recovery.",
+          "kind": "type",
+          "def": "string"
+        },
+        {
+          "name": "InvocationAttempt",
+          "doc": "InvocationAttempt records a single provider invocation attempt for an actor binding turn.",
+          "kind": "struct",
+          "def": "struct {\n\tAttemptID     string        `json:\"attempt_id\"`\n\tBindingID     string        `json:\"binding_id\"`\n\tPredecessorID *string       `json:\"predecessor_id,omitempty\"`\n\tStatus        AttemptStatus `json:\"status\"`\n\tStartedAt     string        `json:\"started_at\"`\n\tCompletedAt   *string       `json:\"completed_at,omitempty\"`\n\tExitCode      *int          `json:\"exit_code,omitempty\"`\n}"
+        },
+        {
+          "name": "RequestV2",
+          "doc": "RequestV2 represents a validated, work-only single-phase request envelope.\nIn accordance with ADR 0058 and ADR 0066, Request V2 contains no runtime routing\nor execution mode fields; policy remains external to the task contract.",
+          "kind": "struct",
+          "def": "struct {\n\tSchema    string `json:\"schema\"`\n\tPhaseType string `json:\"phase_type\"`\n\tPrompt    string `json:\"prompt\"`\n}"
+        },
+        {
+          "name": "SemanticRole",
+          "doc": "SemanticRole represents one of the 8 canonical semantic responsibilities (ADR 0059).",
+          "kind": "type",
+          "def": "string"
+        },
+        {
+          "name": "TerminalStatus",
+          "doc": "TerminalStatus represents the final outcome of an executed phase.",
+          "kind": "type",
+          "def": "string"
+        }
+      ],
+      "functions": [
+        {
+          "name": "BuildRouteRequirements",
+          "doc": "BuildRouteRequirements maps an APGR ActorBinding and prior resolutions into policy-neutral\nRouteRequirements consumed by routing.Resolve.",
+          "signature": "func(\n\tbinding ActorBinding,\n\tphaseType string,\n\tpriorResolutions map[string]routing.ResolvedActorRoute,\n) routing.RouteRequirements"
+        },
+        {
+          "name": "DefaultBindings",
+          "doc": "DefaultBindings returns the standard 5-turn topology merging adjacent responsibilities.",
+          "signature": "func() []ActorBinding"
+        },
+        {
+          "name": "IsMutating",
+          "doc": "IsMutating reports whether the role is authorized to perform repository mutations.",
+          "signature": "func(r SemanticRole) bool"
+        },
+        {
+          "name": "IsReadOnly",
+          "doc": "IsReadOnly reports whether the role is strictly read-only by process invariant.",
+          "signature": "func(r SemanticRole) bool"
+        },
+        {
+          "name": "MustNewActorBinding",
+          "doc": "MustNewActorBinding is a helper that panics if NewActorBinding fails (for static topologies).",
+          "signature": "func(bindingID string, roles []SemanticRole, policyName string) ActorBinding"
+        },
+        {
+          "name": "NewActorBinding",
+          "doc": "NewActorBinding constructs a validated ActorBinding, automatically computing\nthe required capability union, mutating flag, and read-only status.",
+          "signature": "func(bindingID string, roles []SemanticRole, policyName string) (ActorBinding, error)"
+        },
+        {
+          "name": "ParseRequestV2",
+          "doc": "ParseRequestV2 parses and strictly validates raw JSON bytes as RequestV2.\nAny unknown or prohibited fields (e.g. execution_mode, constraints) fail closed.",
+          "signature": "func(data []byte) (RequestV2, error)"
+        },
+        {
+          "name": "RequiredCapabilities",
+          "doc": "RequiredCapabilities returns the minimal capability strings required for the role.",
+          "signature": "func(r SemanticRole) []string"
+        },
+        {
+          "name": "ResolveActorBindingRoute",
+          "doc": "ResolveActorBindingRoute is a convenience helper that builds route requirements and calls routing.Resolve.",
+          "signature": "func(\n\tctx context.Context,\n\tbinding ActorBinding,\n\tphaseType string,\n\tcatalog map[string]routing.EndpointCapabilities,\n\tobservations []routing.OperationalObservation,\n\tpriorResolutions map[string]routing.ResolvedActorRoute,\n\tnow float64,\n) (*routing.ResolvedActorRoute, error)"
+        },
+        {
+          "name": "UnmergedBindings",
+          "doc": "UnmergedBindings returns the discrete 8-turn topology where each role maps to one binding.",
+          "signature": "func() []ActorBinding"
+        },
+        {
+          "name": "ValidPhaseType",
+          "doc": "ValidPhaseType returns true if phaseType is one of the supported APGR phase types.",
+          "signature": "func(phaseType string) bool"
+        },
+        {
+          "name": "ValidRole",
+          "doc": "ValidRole reports whether r is one of the 8 canonical semantic responsibilities.",
+          "signature": "func(r SemanticRole) bool"
+        },
+        {
+          "name": "ValidateRequestV2",
+          "doc": "ValidateRequestV2 checks domain invariants on an existing RequestV2 struct.",
+          "signature": "func(req RequestV2) error"
+        }
+      ]
+    },
+    {
+      "path": "github.com/Knowledge-Forge-AI/agentic-praxis-grimoire/provider",
+      "doc": "Package provider defines machine-readable capability and conformance row types\nrepresenting evaluated features across the Codex, Claude, and Antigravity provider\nfamilies (ADR 0061 / ADR 0065).\n\nStability: Experimental / Provisional for APGR v0.12 (ICR-004 / ICR-005).\nExported conformance types are candidate surfaces for JACA XO evaluation.\nTransition to Supported status occurs upon production qualification in v1.0.\n\nConcurrency and Immutability:\nAll types and values in this package are immutable once constructed and safe\nfor concurrent access across goroutines.",
+      "constants": [
+        {
+          "name": "ConformanceMatrixSchema",
+          "value": "\"apgr-provider-conformance-matrix-v1\""
+        },
+        {
+          "name": "FamilyAntigravity",
+          "value": "\"antigravity\""
+        },
+        {
+          "name": "FamilyClaude",
+          "value": "\"claude\""
+        },
+        {
+          "name": "FamilyCodex",
+          "value": "\"codex\""
+        },
+        {
+          "name": "RequiredRowCount",
+          "value": "22"
+        }
+      ],
+      "types": [
+        {
+          "name": "ConformanceMatrix",
+          "doc": "ConformanceMatrix represents the complete 22-row capability evaluation matrix.",
+          "kind": "struct",
+          "def": "struct {\n\tSchema      string           `json:\"schema\"`\n\tGeneratedAt string           `json:\"generated_at\"`\n\tProviders   []ProviderFamily `json:\"providers\"`\n\tRows        []ConformanceRow `json:\"rows\"`\n}"
+        },
+        {
+          "name": "ConformanceRow",
+          "doc": "ConformanceRow represents one evaluated provider capability dimension.",
+          "kind": "struct",
+          "def": "struct {\n\tID          string                           `json:\"id\"`\n\tName        string                           `json:\"name\"`\n\tDescription string                           `json:\"description\"`\n\tSupport     map[ProviderFamily]SupportStatus `json:\"support\"`\n}"
+        },
+        {
+          "name": "ProviderFamily",
+          "doc": "ProviderFamily identifies one of the three first-class supported provider families.",
+          "kind": "type",
+          "def": "string"
+        },
+        {
+          "name": "SupportStatus",
+          "doc": "SupportStatus records whether a capability is supported and any operational notes.",
+          "kind": "struct",
+          "def": "struct {\n\tSupported bool   `json:\"supported\"`\n\tNotes     string `json:\"notes\"`\n}"
+        }
+      ],
+      "functions": [
+        {
+          "name": "LoadConformanceMatrix",
+          "doc": "LoadConformanceMatrix unmarshals and validates a conformance matrix JSON payload.",
+          "signature": "func(data []byte) (*ConformanceMatrix, error)"
+        },
+        {
+          "name": "ValidateMatrix",
+          "doc": "ValidateMatrix verifies all 22 required rows are present with evaluations for all 3 families.",
+          "signature": "func(m *ConformanceMatrix) error"
+        }
+      ]
+    },
+    {
+      "path": "github.com/Knowledge-Forge-AI/agentic-praxis-grimoire/routing",
+      "doc": "Package routing provides pure, deterministic route eligibility, ranking,\ntie-breaking evaluation, and operational observation models.\n\nStability: Experimental / Provisional for APGR v0.12 (ICR-004 / ICR-005).\nExported resolver primitives and observation types are candidate surfaces for\nJACA XO evaluation. Transition to Supported status occurs upon production qualification.\n\nPolicy Neutrality \u0026 Non-Authority Contract:\nThe resolver in this package is an unprivileged, pure in-memory calculation engine.\nIt accepts caller-supplied capability catalogs, observations, and requirement structs.\nExporting or invoking routing.Resolve transfers NO route-policy authority to APGR.\nWhen consumed by JACA XO or external orchestrators, JACA retains complete policy,\nselection, and accounting authority over route decisions.\n\nEnvironment Invariants:\nThis package contains zero subprocess execution, zero filesystem access, zero SQLite\npersistence, and zero reliance on ambient working directory or environment variables.\n\nConcurrency:\nAll exported structures, observation digests, and resolver functions are safe for\nconcurrent use by multiple goroutines.",
+      "constants": [
+        {
+          "name": "CapExecution",
+          "value": "\"execution\""
+        },
+        {
+          "name": "CapMutation",
+          "value": "\"mutation\""
+        },
+        {
+          "name": "CapRead",
+          "value": "\"read\""
+        },
+        {
+          "name": "CapReasoning",
+          "value": "\"reasoning\""
+        },
+        {
+          "name": "CapStructuredOutput",
+          "value": "\"structured_output\""
+        },
+        {
+          "name": "CapSubagentWorkers",
+          "value": "\"subagent_workers\""
+        },
+        {
+          "name": "ObservationTypeAuthentication",
+          "value": "\"authentication\""
+        },
+        {
+          "name": "ObservationTypeAvailability",
+          "value": "\"availability\""
+        },
+        {
+          "name": "ObservationTypeCooldown",
+          "value": "\"cooldown\""
+        },
+        {
+          "name": "ObservationTypeQuota",
+          "value": "\"quota\""
+        },
+        {
+          "name": "PostureMutating",
+          "value": "\"mutating\""
+        },
+        {
+          "name": "PostureReadOnly",
+          "value": "\"read_only\""
+        },
+        {
+          "name": "StateActiveCooldown",
+          "value": "\"active_cooldown\""
+        },
+        {
+          "name": "StateAvailable",
+          "value": "\"available\""
+        },
+        {
+          "name": "StateConstrained",
+          "value": "\"constrained\""
+        },
+        {
+          "name": "StateCooldown",
+          "value": "\"cooldown\""
+        },
+        {
+          "name": "StateExhausted",
+          "value": "\"exhausted\""
+        },
+        {
+          "name": "StateHealthy",
+          "value": "\"healthy\""
+        },
+        {
+          "name": "StateUnavailable",
+          "value": "\"unavailable\""
+        },
+        {
+          "name": "StateUnknown",
+          "value": "\"unknown\""
+        },
+        {
+          "name": "StateUnusable",
+          "value": "\"unusable\""
+        },
+        {
+          "name": "StateUsable",
+          "value": "\"usable\""
+        }
+      ],
+      "types": [
+        {
+          "name": "EndpointCapabilities",
+          "doc": "EndpointCapabilities describes the capabilities and posture of an endpoint.",
+          "kind": "struct",
+          "def": "struct {\n\tEndpointAlias string   `json:\"endpoint_alias\"`\n\tProvider      string   `json:\"provider\"`\n\tProfile       string   `json:\"profile\"`\n\tCapabilities  []string `json:\"capabilities\"`\n\tPosture       string   `json:\"posture\"`\n}",
+          "methods": [
+            {
+              "name": "IsMutating",
+              "doc": "IsMutating reports whether the endpoint posture allows repository mutations.",
+              "signature": "func() bool"
+            },
+            {
+              "name": "IsReadOnly",
+              "doc": "IsReadOnly reports whether the endpoint posture is strictly read-only.",
+              "signature": "func() bool"
+            },
+            {
+              "name": "Satisfies",
+              "doc": "Satisfies reports whether ep provides all required capabilities and satisfies posture bounds.",
+              "signature": "func(required []string, requiresMutating bool) bool"
+            }
+          ]
+        },
+        {
+          "name": "EndpointIdentity",
+          "doc": "EndpointIdentity identifies a provider execution endpoint.",
+          "kind": "struct",
+          "def": "struct {\n\tProvider      string `json:\"provider\"`\n\tProfile       string `json:\"profile\"`\n\tEndpointAlias string `json:\"endpoint_alias\"`\n}"
+        },
+        {
+          "name": "OperationalObservation",
+          "doc": "OperationalObservation represents an observed provider availability, auth, quota, or cooldown record.",
+          "kind": "struct",
+          "def": "struct {\n\tObservationID   string         `json:\"observation_id\"`\n\tProducer        string         `json:\"producer\"`\n\tObservationType string         `json:\"observation_type\"`\n\tProvider        string         `json:\"provider\"`\n\tProfile         *string        `json:\"profile,omitempty\"`\n\tTimestamp       float64        `json:\"timestamp\"`\n\tExpiresAt       *float64       `json:\"expires_at,omitempty\"`\n\tStateValue      string         `json:\"state_value\"`\n\tDetail          map[string]any `json:\"detail,omitempty\"`\n\tDigest          string         `json:\"digest,omitempty\"`\n}",
+          "methods": [
+            {
+              "name": "IsActive",
+              "doc": "IsActive reports whether the observation is currently active relative to the given timestamp.",
+              "signature": "func(now float64) bool"
+            }
+          ]
+        },
+        {
+          "name": "ResolveRequest",
+          "doc": "ResolveRequest wraps all in-memory inputs required to resolve a route deterministically.",
+          "kind": "struct",
+          "def": "struct {\n\tRequirements        RouteRequirements               `json:\"requirements\"`\n\tBindingID           string                          `json:\"binding_id\"`\n\tRoles               []string                        `json:\"roles,omitempty\"`\n\tCapabilitiesCatalog map[string]EndpointCapabilities `json:\"capabilities_catalog\"`\n\tObservations        []OperationalObservation        `json:\"observations,omitempty\"`\n\tNow                 float64                         `json:\"now\"`\n}"
+        },
+        {
+          "name": "ResolvedActorRoute",
+          "doc": "ResolvedActorRoute represents a selected endpoint and its provenance.",
+          "kind": "struct",
+          "def": "struct {\n\tBindingID          string   `json:\"binding_id\"`\n\tProvider           string   `json:\"provider\"`\n\tProfile            string   `json:\"profile\"`\n\tEndpointAlias      string   `json:\"endpoint_alias\"`\n\tCapabilities       []string `json:\"capabilities\"`\n\tSelectionRationale string   `json:\"selection_rationale\"`\n\tRoles              []string `json:\"roles,omitempty\"`\n\tObservationIDs     []string `json:\"observation_ids,omitempty\"`\n}"
+        },
+        {
+          "name": "RouteRequirements",
+          "doc": "RouteRequirements holds the policy-neutral requirements for resolving a route.",
+          "kind": "struct",
+          "def": "struct {\n\tPhaseType            string   `json:\"phase_type\"`\n\tRequiredCapabilities []string `json:\"required_capabilities\"`\n\tRequiresMutating     bool     `json:\"requires_mutating\"`\n\tIsReviewTurn         bool     `json:\"is_review_turn\"`\n\tIsProducerTurn       bool     `json:\"is_producer_turn\"`\n\tDistinctProviders    []string `json:\"distinct_providers,omitempty\"`\n}"
+        }
+      ],
+      "functions": [
+        {
+          "name": "CanonicalDigest",
+          "doc": "CanonicalDigest computes the deterministic SHA-256 digest over the compact,\nkey-sorted JSON representation matching the APGR Python runtime oracle.",
+          "signature": "func(obs OperationalObservation) (string, error)"
+        },
+        {
+          "name": "MarshalJSON",
+          "signature": "func() ([]byte, error)"
+        },
+        {
+          "name": "Resolve",
+          "doc": "Resolve executes the pure, deterministic 6-stage decision ladder.\nIt performs no filesystem, subprocess, or database operations.",
+          "signature": "func(ctx context.Context, req ResolveRequest) (*ResolvedActorRoute, error)"
+        }
+      ]
+    }
+  ]
+}

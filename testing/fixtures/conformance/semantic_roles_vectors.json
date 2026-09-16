@@ -1,0 +1,257 @@
+{
+  "roles": [
+    {
+      "is_mutating": false,
+      "is_read_only": true,
+      "name": "Planner",
+      "required_capabilities": [
+        "read",
+        "reasoning"
+      ]
+    },
+    {
+      "is_mutating": false,
+      "is_read_only": true,
+      "name": "Plan Reviewer",
+      "required_capabilities": [
+        "read",
+        "reasoning"
+      ]
+    },
+    {
+      "is_mutating": false,
+      "is_read_only": false,
+      "name": "Plan Review Disposition",
+      "required_capabilities": [
+        "read"
+      ]
+    },
+    {
+      "is_mutating": true,
+      "is_read_only": false,
+      "name": "Producer",
+      "required_capabilities": [
+        "execution",
+        "mutation",
+        "read"
+      ]
+    },
+    {
+      "is_mutating": false,
+      "is_read_only": true,
+      "name": "Work Reviewer",
+      "required_capabilities": [
+        "read",
+        "reasoning"
+      ]
+    },
+    {
+      "is_mutating": false,
+      "is_read_only": false,
+      "name": "Work Review Disposition",
+      "required_capabilities": [
+        "read"
+      ]
+    },
+    {
+      "is_mutating": true,
+      "is_read_only": false,
+      "name": "Reviser",
+      "required_capabilities": [
+        "execution",
+        "mutation",
+        "read"
+      ]
+    },
+    {
+      "is_mutating": true,
+      "is_read_only": false,
+      "name": "Closeout Agent",
+      "required_capabilities": [
+        "execution",
+        "read"
+      ]
+    }
+  ],
+  "schema": "apgr-conformance-semantic-roles-v1",
+  "topologies": {
+    "default_standard": [
+      {
+        "binding_id": "binding_plan",
+        "is_mutating": false,
+        "policy_name": "default_standard",
+        "process_read_only": true,
+        "required_capabilities": [
+          "read",
+          "reasoning"
+        ],
+        "roles": [
+          "Planner"
+        ]
+      },
+      {
+        "binding_id": "binding_plan_review",
+        "is_mutating": false,
+        "policy_name": "default_standard",
+        "process_read_only": true,
+        "required_capabilities": [
+          "read",
+          "reasoning"
+        ],
+        "roles": [
+          "Plan Reviewer"
+        ]
+      },
+      {
+        "binding_id": "binding_work",
+        "is_mutating": true,
+        "policy_name": "default_standard",
+        "process_read_only": false,
+        "required_capabilities": [
+          "execution",
+          "mutation",
+          "read"
+        ],
+        "roles": [
+          "Plan Review Disposition",
+          "Producer"
+        ]
+      },
+      {
+        "binding_id": "binding_work_review",
+        "is_mutating": false,
+        "policy_name": "default_standard",
+        "process_read_only": true,
+        "required_capabilities": [
+          "read",
+          "reasoning"
+        ],
+        "roles": [
+          "Work Reviewer"
+        ]
+      },
+      {
+        "binding_id": "binding_closeout",
+        "is_mutating": true,
+        "policy_name": "default_standard",
+        "process_read_only": false,
+        "required_capabilities": [
+          "execution",
+          "mutation",
+          "read"
+        ],
+        "roles": [
+          "Work Review Disposition",
+          "Reviser",
+          "Closeout Agent"
+        ]
+      }
+    ],
+    "unmerged_discrete": [
+      {
+        "binding_id": "binding_planner",
+        "is_mutating": false,
+        "policy_name": "unmerged_discrete",
+        "process_read_only": true,
+        "required_capabilities": [
+          "read",
+          "reasoning"
+        ],
+        "roles": [
+          "Planner"
+        ]
+      },
+      {
+        "binding_id": "binding_plan_reviewer",
+        "is_mutating": false,
+        "policy_name": "unmerged_discrete",
+        "process_read_only": true,
+        "required_capabilities": [
+          "read",
+          "reasoning"
+        ],
+        "roles": [
+          "Plan Reviewer"
+        ]
+      },
+      {
+        "binding_id": "binding_plan_review_disposition",
+        "is_mutating": false,
+        "policy_name": "unmerged_discrete",
+        "process_read_only": false,
+        "required_capabilities": [
+          "read"
+        ],
+        "roles": [
+          "Plan Review Disposition"
+        ]
+      },
+      {
+        "binding_id": "binding_producer",
+        "is_mutating": true,
+        "policy_name": "unmerged_discrete",
+        "process_read_only": false,
+        "required_capabilities": [
+          "execution",
+          "mutation",
+          "read"
+        ],
+        "roles": [
+          "Producer"
+        ]
+      },
+      {
+        "binding_id": "binding_work_reviewer",
+        "is_mutating": false,
+        "policy_name": "unmerged_discrete",
+        "process_read_only": true,
+        "required_capabilities": [
+          "read",
+          "reasoning"
+        ],
+        "roles": [
+          "Work Reviewer"
+        ]
+      },
+      {
+        "binding_id": "binding_work_review_disposition",
+        "is_mutating": false,
+        "policy_name": "unmerged_discrete",
+        "process_read_only": false,
+        "required_capabilities": [
+          "read"
+        ],
+        "roles": [
+          "Work Review Disposition"
+        ]
+      },
+      {
+        "binding_id": "binding_reviser",
+        "is_mutating": true,
+        "policy_name": "unmerged_discrete",
+        "process_read_only": false,
+        "required_capabilities": [
+          "execution",
+          "mutation",
+          "read"
+        ],
+        "roles": [
+          "Reviser"
+        ]
+      },
+      {
+        "binding_id": "binding_closeout_agent",
+        "is_mutating": true,
+        "policy_name": "unmerged_discrete",
+        "process_read_only": false,
+        "required_capabilities": [
+          "execution",
+          "read"
+        ],
+        "roles": [
+          "Closeout Agent"
+        ]
+      }
+    ]
+  }
+}

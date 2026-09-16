@@ -2,7 +2,17 @@
 
 ## Status
 
-Accepted
+Accepted; amended in part by
+[ADR 0058](../09/0058-apgr-jaca-product-boundary-and-runtime-ownership.md)
+(2026-09-16).
+
+> **Amendment notice.** Decision 1 below states that "APG does not import JACA or
+> own orchestration." The one-way dependency half of that statement is unchanged
+> and remains binding: APGR never imports JACA. ADR 0058 amends the second half by
+> classifying *single-phase execution* as execution runtime rather than
+> orchestration, and assigning permanent ownership of that runtime to APGR.
+> Multi-phase orchestration remains exclusively JACA's. Read Decision 1 as
+> "APG does not import JACA or own multi-phase orchestration."
 
 ## Decision date
 

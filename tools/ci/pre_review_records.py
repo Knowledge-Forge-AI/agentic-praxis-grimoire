@@ -26,6 +26,7 @@ POLICY_CHECKS = {
     "pyflakes",
     "python-compile",
     "python-retention-inventory",
+    "release-matrix",
     "retained-python-ratchets",
     "ruff",
     "scanner-suppressions",

@@ -155,13 +155,15 @@ def build_untagged_candidate(
     _fail = fail or release.fail
     _unsafe = unsafe or release.unsafe
 
-    if version.split("+", 1)[0].split("-", 1)[0] != "0.11.0":
-        _unsafe("untagged candidate mode is only available for v0.11.0")
+    core = version.split("+", 1)[0].split("-", 1)[0]
+    if core not in ("0.11.0", "0.12.0"):
+        _unsafe("untagged candidate mode is only available for v0.11.0 and v0.12.0")
     release.validate_repository_separation(source, base)
     release.verify_public_release_lineage(
         base,
         accepted_commit=release.PUBLIC_V01_COMMIT,
         accepted_tree=release.PUBLIC_V01_TREE,
+        allow_advanced_head=(core == "0.12.0"),
     )
     policy = release.load_policy(
         source,
@@ -170,6 +172,7 @@ def build_untagged_candidate(
         allow_v08_compatibility=True,
         allow_v09_compatibility=True,
         allow_v010_compatibility=True,
+        allow_v011_compatibility=True,
     )
     entries = release.public_candidate_entries(source, version, excluded_prefix=b"private/")
     release.validate_versioned_policy_exclusions(entries, version)

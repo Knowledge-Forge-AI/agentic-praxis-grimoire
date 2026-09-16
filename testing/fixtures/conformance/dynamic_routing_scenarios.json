@@ -1,0 +1,783 @@
+{
+  "catalog": {
+    "antigravity-primary": {
+      "capabilities": [
+        "execution",
+        "mutation",
+        "read",
+        "reasoning",
+        "subagent_workers"
+      ],
+      "endpoint_alias": "antigravity-primary",
+      "posture": "mutating",
+      "profile": "antigravity_implementation",
+      "provider": "antigravity"
+    },
+    "antigravity-review": {
+      "capabilities": [
+        "read",
+        "reasoning"
+      ],
+      "endpoint_alias": "antigravity-review",
+      "posture": "read_only",
+      "profile": "antigravity_review",
+      "provider": "antigravity"
+    },
+    "claude-primary": {
+      "capabilities": [
+        "execution",
+        "mutation",
+        "read",
+        "reasoning",
+        "structured_output"
+      ],
+      "endpoint_alias": "claude-primary",
+      "posture": "mutating",
+      "profile": "claude_architecture",
+      "provider": "claude"
+    },
+    "claude-review": {
+      "capabilities": [
+        "read",
+        "reasoning",
+        "structured_output"
+      ],
+      "endpoint_alias": "claude-review",
+      "posture": "read_only",
+      "profile": "claude_review",
+      "provider": "claude"
+    },
+    "codex-primary": {
+      "capabilities": [
+        "execution",
+        "mutation",
+        "read",
+        "reasoning",
+        "structured_output"
+      ],
+      "endpoint_alias": "codex-primary",
+      "posture": "mutating",
+      "profile": "codex_implementation",
+      "provider": "codex"
+    },
+    "codex-review": {
+      "capabilities": [
+        "read",
+        "reasoning",
+        "structured_output"
+      ],
+      "endpoint_alias": "codex-review",
+      "posture": "read_only",
+      "profile": "codex_review",
+      "provider": "codex"
+    }
+  },
+  "scenarios": [
+    {
+      "binding_id": "binding_closeout",
+      "description": "Baseline routing for binding_closeout in implementation_testing",
+      "expected_profile": "codex_implementation",
+      "expected_provider": "codex",
+      "expected_rationale": "selected with score 55 for binding_closeout (implementation_testing)",
+      "expected_winner": "codex-primary",
+      "id": "baseline_implementation_testing_binding_closeout",
+      "is_mutating": true,
+      "now": 1726500000.0,
+      "observations": [],
+      "phase_type": "implementation_testing",
+      "prior_resolutions": {},
+      "required_capabilities": [
+        "execution",
+        "mutation",
+        "read"
+      ]
+    },
+    {
+      "binding_id": "binding_plan",
+      "description": "Baseline routing for binding_plan in implementation_testing",
+      "expected_profile": "codex_implementation",
+      "expected_provider": "codex",
+      "expected_rationale": "selected with score 30 for binding_plan (implementation_testing)",
+      "expected_winner": "codex-primary",
+      "id": "baseline_implementation_testing_binding_plan",
+      "is_mutating": false,
+      "now": 1726500000.0,
+      "observations": [],
+      "phase_type": "implementation_testing",
+      "prior_resolutions": {},
+      "required_capabilities": [
+        "read",
+        "reasoning"
+      ]
+    },
+    {
+      "binding_id": "binding_plan_review",
+      "description": "Baseline routing for binding_plan_review in implementation_testing",
+      "expected_profile": "codex_review",
+      "expected_provider": "codex",
+      "expected_rationale": "selected with score 40 for binding_plan_review (implementation_testing)",
+      "expected_winner": "codex-review",
+      "id": "baseline_implementation_testing_binding_plan_review",
+      "is_mutating": false,
+      "now": 1726500000.0,
+      "observations": [],
+      "phase_type": "implementation_testing",
+      "prior_resolutions": {},
+      "required_capabilities": [
+        "read",
+        "reasoning"
+      ]
+    },
+    {
+      "binding_id": "binding_work",
+      "description": "Baseline routing for binding_work in implementation_testing",
+      "expected_profile": "codex_implementation",
+      "expected_provider": "codex",
+      "expected_rationale": "selected with score 55 for binding_work (implementation_testing)",
+      "expected_winner": "codex-primary",
+      "id": "baseline_implementation_testing_binding_work",
+      "is_mutating": true,
+      "now": 1726500000.0,
+      "observations": [],
+      "phase_type": "implementation_testing",
+      "prior_resolutions": {},
+      "required_capabilities": [
+        "execution",
+        "mutation",
+        "read"
+      ]
+    },
+    {
+      "binding_id": "binding_work_review",
+      "description": "Baseline routing for binding_work_review in implementation_testing",
+      "expected_profile": "codex_review",
+      "expected_provider": "codex",
+      "expected_rationale": "selected with score 40 for binding_work_review (implementation_testing)",
+      "expected_winner": "codex-review",
+      "id": "baseline_implementation_testing_binding_work_review",
+      "is_mutating": false,
+      "now": 1726500000.0,
+      "observations": [],
+      "phase_type": "implementation_testing",
+      "prior_resolutions": {},
+      "required_capabilities": [
+        "read",
+        "reasoning"
+      ]
+    },
+    {
+      "binding_id": "binding_closeout",
+      "description": "Baseline routing for binding_closeout in architecture_docs",
+      "expected_profile": "claude_architecture",
+      "expected_provider": "claude",
+      "expected_rationale": "selected with score 55 for binding_closeout (architecture_docs)",
+      "expected_winner": "claude-primary",
+      "id": "baseline_architecture_docs_binding_closeout",
+      "is_mutating": true,
+      "now": 1726500000.0,
+      "observations": [],
+      "phase_type": "architecture_docs",
+      "prior_resolutions": {},
+      "required_capabilities": [
+        "execution",
+        "mutation",
+        "read"
+      ]
+    },
+    {
+      "binding_id": "binding_plan",
+      "description": "Baseline routing for binding_plan in architecture_docs",
+      "expected_profile": "claude_architecture",
+      "expected_provider": "claude",
+      "expected_rationale": "selected with score 30 for binding_plan (architecture_docs)",
+      "expected_winner": "claude-primary",
+      "id": "baseline_architecture_docs_binding_plan",
+      "is_mutating": false,
+      "now": 1726500000.0,
+      "observations": [],
+      "phase_type": "architecture_docs",
+      "prior_resolutions": {},
+      "required_capabilities": [
+        "read",
+        "reasoning"
+      ]
+    },
+    {
+      "binding_id": "binding_plan_review",
+      "description": "Baseline routing for binding_plan_review in architecture_docs",
+      "expected_profile": "claude_review",
+      "expected_provider": "claude",
+      "expected_rationale": "selected with score 40 for binding_plan_review (architecture_docs)",
+      "expected_winner": "claude-review",
+      "id": "baseline_architecture_docs_binding_plan_review",
+      "is_mutating": false,
+      "now": 1726500000.0,
+      "observations": [],
+      "phase_type": "architecture_docs",
+      "prior_resolutions": {},
+      "required_capabilities": [
+        "read",
+        "reasoning"
+      ]
+    },
+    {
+      "binding_id": "binding_work",
+      "description": "Baseline routing for binding_work in architecture_docs",
+      "expected_profile": "claude_architecture",
+      "expected_provider": "claude",
+      "expected_rationale": "selected with score 55 for binding_work (architecture_docs)",
+      "expected_winner": "claude-primary",
+      "id": "baseline_architecture_docs_binding_work",
+      "is_mutating": true,
+      "now": 1726500000.0,
+      "observations": [],
+      "phase_type": "architecture_docs",
+      "prior_resolutions": {},
+      "required_capabilities": [
+        "execution",
+        "mutation",
+        "read"
+      ]
+    },
+    {
+      "binding_id": "binding_work_review",
+      "description": "Baseline routing for binding_work_review in architecture_docs",
+      "expected_profile": "claude_review",
+      "expected_provider": "claude",
+      "expected_rationale": "selected with score 40 for binding_work_review (architecture_docs)",
+      "expected_winner": "claude-review",
+      "id": "baseline_architecture_docs_binding_work_review",
+      "is_mutating": false,
+      "now": 1726500000.0,
+      "observations": [],
+      "phase_type": "architecture_docs",
+      "prior_resolutions": {},
+      "required_capabilities": [
+        "read",
+        "reasoning"
+      ]
+    },
+    {
+      "binding_id": "binding_closeout",
+      "description": "Baseline routing for binding_closeout in sysadmin",
+      "expected_profile": "claude_architecture",
+      "expected_provider": "claude",
+      "expected_rationale": "selected with score 35 for binding_closeout (sysadmin)",
+      "expected_winner": "claude-primary",
+      "id": "baseline_sysadmin_binding_closeout",
+      "is_mutating": true,
+      "now": 1726500000.0,
+      "observations": [],
+      "phase_type": "sysadmin",
+      "prior_resolutions": {},
+      "required_capabilities": [
+        "execution",
+        "mutation",
+        "read"
+      ]
+    },
+    {
+      "binding_id": "binding_plan",
+      "description": "Baseline routing for binding_plan in sysadmin",
+      "expected_profile": "claude_architecture",
+      "expected_provider": "claude",
+      "expected_rationale": "selected with score 10 for binding_plan (sysadmin)",
+      "expected_winner": "claude-primary",
+      "id": "baseline_sysadmin_binding_plan",
+      "is_mutating": false,
+      "now": 1726500000.0,
+      "observations": [],
+      "phase_type": "sysadmin",
+      "prior_resolutions": {},
+      "required_capabilities": [
+        "read",
+        "reasoning"
+      ]
+    },
+    {
+      "binding_id": "binding_plan_review",
+      "description": "Baseline routing for binding_plan_review in sysadmin",
+      "expected_profile": "claude_review",
+      "expected_provider": "claude",
+      "expected_rationale": "selected with score 40 for binding_plan_review (sysadmin)",
+      "expected_winner": "claude-review",
+      "id": "baseline_sysadmin_binding_plan_review",
+      "is_mutating": false,
+      "now": 1726500000.0,
+      "observations": [],
+      "phase_type": "sysadmin",
+      "prior_resolutions": {},
+      "required_capabilities": [
+        "read",
+        "reasoning"
+      ]
+    },
+    {
+      "binding_id": "binding_work",
+      "description": "Baseline routing for binding_work in sysadmin",
+      "expected_profile": "claude_architecture",
+      "expected_provider": "claude",
+      "expected_rationale": "selected with score 35 for binding_work (sysadmin)",
+      "expected_winner": "claude-primary",
+      "id": "baseline_sysadmin_binding_work",
+      "is_mutating": true,
+      "now": 1726500000.0,
+      "observations": [],
+      "phase_type": "sysadmin",
+      "prior_resolutions": {},
+      "required_capabilities": [
+        "execution",
+        "mutation",
+        "read"
+      ]
+    },
+    {
+      "binding_id": "binding_work_review",
+      "description": "Baseline routing for binding_work_review in sysadmin",
+      "expected_profile": "claude_review",
+      "expected_provider": "claude",
+      "expected_rationale": "selected with score 40 for binding_work_review (sysadmin)",
+      "expected_winner": "claude-review",
+      "id": "baseline_sysadmin_binding_work_review",
+      "is_mutating": false,
+      "now": 1726500000.0,
+      "observations": [],
+      "phase_type": "sysadmin",
+      "prior_resolutions": {},
+      "required_capabilities": [
+        "read",
+        "reasoning"
+      ]
+    },
+    {
+      "binding_id": "binding_work",
+      "description": "Codex marked unavailable, implementation falls back to antigravity",
+      "expected_profile": "antigravity_implementation",
+      "expected_provider": "antigravity",
+      "expected_rationale": "selected with score 43 for binding_work (implementation_testing)",
+      "expected_winner": "antigravity-primary",
+      "id": "codex_unavailable_fallback_to_antigravity",
+      "is_mutating": true,
+      "now": 1726500000.0,
+      "observations": [
+        {
+          "expires_at": null,
+          "observation_id": "obs-codex-unavail",
+          "observation_type": "availability",
+          "producer": "probe",
+          "profile": null,
+          "provider": "codex",
+          "state_value": "unavailable",
+          "timestamp": 1726500000.0
+        }
+      ],
+      "phase_type": "implementation_testing",
+      "prior_resolutions": {},
+      "required_capabilities": [
+        "execution",
+        "mutation",
+        "read"
+      ]
+    },
+    {
+      "binding_id": "binding_plan_review",
+      "description": "Planner was Codex, Plan Reviewer must not choose Codex",
+      "expected_profile": "claude_review",
+      "expected_provider": "claude",
+      "expected_rationale": "selected with score 40 for binding_plan_review (architecture_docs)",
+      "expected_winner": "claude-review",
+      "id": "plan_reviewer_independence_excludes_codex",
+      "is_mutating": false,
+      "now": 1726500000.0,
+      "observations": [],
+      "phase_type": "architecture_docs",
+      "prior_resolutions": {
+        "binding_plan": {
+          "binding_id": "binding_plan",
+          "endpoint_alias": "codex-primary",
+          "profile": "codex_implementation",
+          "provider": "codex",
+          "roles": [
+            "Planner"
+          ]
+        }
+      },
+      "required_capabilities": [
+        "read",
+        "reasoning"
+      ]
+    },
+    {
+      "binding_id": "binding_work_review",
+      "description": "Producer was Claude, Work Reviewer must not choose Claude",
+      "expected_profile": "codex_review",
+      "expected_provider": "codex",
+      "expected_rationale": "selected with score 38 for binding_work_review (architecture_docs)",
+      "expected_winner": "codex-review",
+      "id": "work_reviewer_independence_excludes_claude",
+      "is_mutating": false,
+      "now": 1726500000.0,
+      "observations": [],
+      "phase_type": "architecture_docs",
+      "prior_resolutions": {
+        "binding_work": {
+          "binding_id": "binding_work",
+          "endpoint_alias": "claude-primary",
+          "profile": "claude_architecture",
+          "provider": "claude",
+          "roles": [
+            "Producer"
+          ]
+        }
+      },
+      "required_capabilities": [
+        "read",
+        "reasoning"
+      ]
+    },
+    {
+      "binding_id": "binding_plan",
+      "description": "Claude quota exhausted, falls back to codex or antigravity",
+      "expected_profile": "codex_implementation",
+      "expected_provider": "codex",
+      "expected_rationale": "selected with score -2 for binding_plan (architecture_docs)",
+      "expected_winner": "codex-primary",
+      "id": "claude_quota_exhausted_fallback",
+      "is_mutating": false,
+      "now": 1726500000.0,
+      "observations": [
+        {
+          "expires_at": null,
+          "observation_id": "obs-claude-quota-exhausted",
+          "observation_type": "quota",
+          "producer": "quota",
+          "profile": null,
+          "provider": "claude",
+          "state_value": "exhausted",
+          "timestamp": 1726500000.0
+        }
+      ],
+      "phase_type": "architecture_docs",
+      "prior_resolutions": {},
+      "required_capabilities": [
+        "read",
+        "reasoning"
+      ]
+    },
+    {
+      "binding_id": "binding_work",
+      "description": "Antigravity in active cooldown, fallback to alternative",
+      "expected_profile": "claude_architecture",
+      "expected_provider": "claude",
+      "expected_rationale": "selected with score 25 for binding_work (sysadmin)",
+      "expected_winner": "claude-primary",
+      "id": "antigravity_active_cooldown_fallback",
+      "is_mutating": true,
+      "now": 1726500000.0,
+      "observations": [
+        {
+          "expires_at": null,
+          "observation_id": "obs-antigravity-cooldown",
+          "observation_type": "cooldown",
+          "producer": "cooldown",
+          "profile": null,
+          "provider": "antigravity",
+          "state_value": "active_cooldown",
+          "timestamp": 1726500000.0
+        }
+      ],
+      "phase_type": "sysadmin",
+      "prior_resolutions": {},
+      "required_capabilities": [
+        "execution",
+        "mutation",
+        "read"
+      ]
+    },
+    {
+      "binding_id": "binding_work",
+      "description": "All providers unavailable raises NoRouteAvailableError",
+      "error_message": "no available or usable routes for binding 'binding_work'. Rejections: {'codex-review': \"missing required capabilities ['execution', 'mutation'] or posture conflict (ep: read_only, binding mutating: True)\", 'claude-review': \"missing required capabilities ['execution', 'mutation'] or posture conflict (ep: read_only, binding mutating: True)\", 'antigravity-review': \"missing required capabilities ['execution', 'mutation'] or posture conflict (ep: read_only, binding mutating: True)\", 'codex-primary': 'marked unavailable by observation obs-codex-unavail', 'claude-primary': 'marked unavailable by observation obs-claude-unavail', 'antigravity-primary': 'marked unavailable by observation obs-antigravity-unavail'}",
+      "expected_error": "no_route",
+      "id": "all_providers_unavailable_fails_closed",
+      "is_mutating": true,
+      "now": 1726500000.0,
+      "observations": [
+        {
+          "expires_at": null,
+          "observation_id": "obs-codex-unavail",
+          "observation_type": "availability",
+          "producer": "probe",
+          "profile": null,
+          "provider": "codex",
+          "state_value": "unavailable",
+          "timestamp": 1726500000.0
+        },
+        {
+          "expires_at": null,
+          "observation_id": "obs-claude-unavail",
+          "observation_type": "availability",
+          "producer": "probe",
+          "profile": null,
+          "provider": "claude",
+          "state_value": "unavailable",
+          "timestamp": 1726500000.0
+        },
+        {
+          "expires_at": null,
+          "observation_id": "obs-antigravity-unavail",
+          "observation_type": "availability",
+          "producer": "probe",
+          "profile": null,
+          "provider": "antigravity",
+          "state_value": "unavailable",
+          "timestamp": 1726500000.0
+        }
+      ],
+      "phase_type": "implementation_testing",
+      "prior_resolutions": {},
+      "required_capabilities": [
+        "execution",
+        "mutation",
+        "read"
+      ]
+    },
+    {
+      "binding_id": "binding_plan",
+      "description": "Active provider-wide quota exhausted excludes every profile in that provider",
+      "expected_profile": "antigravity_implementation",
+      "expected_provider": "antigravity",
+      "expected_rationale": "selected with score 18 for binding_plan (implementation_testing)",
+      "expected_winner": "antigravity-primary",
+      "id": "active_exhausted_quota_excludes_all_profiles_of_provider",
+      "is_mutating": false,
+      "now": 1726500000.0,
+      "observations": [
+        {
+          "expires_at": 1726503600.0,
+          "observation_id": "obs-codex-quota-exhausted-feedback",
+          "observation_type": "quota",
+          "producer": "feedback",
+          "profile": null,
+          "provider": "codex",
+          "state_value": "exhausted",
+          "timestamp": 1726500000.0
+        }
+      ],
+      "phase_type": "implementation_testing",
+      "prior_resolutions": {},
+      "required_capabilities": [
+        "read",
+        "reasoning"
+      ]
+    },
+    {
+      "binding_id": "binding_plan",
+      "description": "Tokenless unknown quota probe does not erase stronger active exhausted observation",
+      "expected_profile": "antigravity_implementation",
+      "expected_provider": "antigravity",
+      "expected_rationale": "selected with score 18 for binding_plan (implementation_testing)",
+      "expected_winner": "antigravity-primary",
+      "id": "tokenless_unknown_does_not_erase_exhausted",
+      "is_mutating": false,
+      "now": 1726500000.0,
+      "observations": [
+        {
+          "expires_at": 1726503600.0,
+          "observation_id": "obs-codex-quota-exhausted-feedback",
+          "observation_type": "quota",
+          "producer": "feedback",
+          "profile": null,
+          "provider": "codex",
+          "state_value": "exhausted",
+          "timestamp": 1726500000.0
+        },
+        {
+          "expires_at": null,
+          "observation_id": "obs-codex-quota-unknown-probe",
+          "observation_type": "quota",
+          "producer": "probe",
+          "profile": null,
+          "provider": "codex",
+          "state_value": "unknown",
+          "timestamp": 1726500000.0
+        }
+      ],
+      "phase_type": "implementation_testing",
+      "prior_resolutions": {},
+      "required_capabilities": [
+        "read",
+        "reasoning"
+      ]
+    },
+    {
+      "binding_id": "binding_plan",
+      "description": "Expired quota exhaustion observation no longer excludes; codex readmitted",
+      "expected_profile": "codex_implementation",
+      "expected_provider": "codex",
+      "expected_rationale": "selected with score 30 for binding_plan (implementation_testing)",
+      "expected_winner": "codex-primary",
+      "id": "expired_quota_exhaustion_readmits_codex",
+      "is_mutating": false,
+      "now": 1726500000.0,
+      "observations": [
+        {
+          "expires_at": 1726499900.0,
+          "observation_id": "obs-codex-quota-expired",
+          "observation_type": "quota",
+          "producer": "feedback",
+          "profile": null,
+          "provider": "codex",
+          "state_value": "exhausted",
+          "timestamp": 1726496400.0
+        }
+      ],
+      "phase_type": "implementation_testing",
+      "prior_resolutions": {},
+      "required_capabilities": [
+        "read",
+        "reasoning"
+      ]
+    },
+    {
+      "binding_id": "binding_plan",
+      "description": "All providers quota exhausted raises NoRouteAvailableError",
+      "expected_error": "no_route",
+      "expected_profile": "",
+      "expected_provider": "",
+      "expected_rationale": "",
+      "expected_winner": "",
+      "id": "all_providers_quota_exhausted_fails_closed",
+      "is_mutating": false,
+      "now": 1726500000.0,
+      "observations": [
+        {
+          "expires_at": null,
+          "observation_id": "obs-codex-exhausted",
+          "observation_type": "quota",
+          "producer": "feedback",
+          "profile": null,
+          "provider": "codex",
+          "state_value": "exhausted",
+          "timestamp": 1726500000.0
+        },
+        {
+          "expires_at": null,
+          "observation_id": "obs-claude-exhausted",
+          "observation_type": "quota",
+          "producer": "feedback",
+          "profile": null,
+          "provider": "claude",
+          "state_value": "exhausted",
+          "timestamp": 1726500000.0
+        },
+        {
+          "expires_at": null,
+          "observation_id": "obs-antigravity-exhausted",
+          "observation_type": "quota",
+          "producer": "feedback",
+          "profile": null,
+          "provider": "antigravity",
+          "state_value": "exhausted",
+          "timestamp": 1726500000.0
+        }
+      ],
+      "phase_type": "implementation_testing",
+      "prior_resolutions": {},
+      "required_capabilities": [
+        "read",
+        "reasoning"
+      ]
+    },
+    {
+      "binding_id": "binding_plan",
+      "description": "Profile-specific quota exhaustion excludes matching profile from route selection",
+      "expected_profile": "codex_implementation",
+      "expected_provider": "codex",
+      "expected_rationale": "selected with score 20 for binding_plan (implementation_testing)",
+      "expected_winner": "codex-primary",
+      "id": "profile_specific_quota_exhaustion_excludes_matching_profile",
+      "is_mutating": false,
+      "now": 1726500000.0,
+      "observations": [
+        {
+          "expires_at": 1726503600.0,
+          "observation_id": "obs-codex-review-quota-exhausted",
+          "observation_type": "quota",
+          "producer": "feedback",
+          "profile": "codex_review",
+          "provider": "codex",
+          "state_value": "exhausted",
+          "timestamp": 1726500000.0
+        }
+      ],
+      "phase_type": "implementation_testing",
+      "prior_resolutions": {},
+      "required_capabilities": [
+        "read",
+        "reasoning"
+      ]
+    },
+    {
+      "binding_id": "binding_work",
+      "description": "Profile-specific quota exhaustion on review profile does not exclude implementation profile",
+      "expected_profile": "codex_implementation",
+      "expected_provider": "codex",
+      "expected_rationale": "selected with score 45 for binding_work (implementation_testing)",
+      "expected_winner": "codex-primary",
+      "id": "profile_specific_quota_exhaustion_admits_other_profile_of_same_provider",
+      "is_mutating": true,
+      "now": 1726500000.0,
+      "observations": [
+        {
+          "expires_at": 1726503600.0,
+          "observation_id": "obs-codex-review-quota-exhausted",
+          "observation_type": "quota",
+          "producer": "feedback",
+          "profile": "codex_review",
+          "provider": "codex",
+          "state_value": "exhausted",
+          "timestamp": 1726500000.0
+        }
+      ],
+      "phase_type": "implementation_testing",
+      "prior_resolutions": {},
+      "required_capabilities": [
+        "execution",
+        "mutation",
+        "read"
+      ]
+    },
+    {
+      "binding_id": "binding_work",
+      "description": "Deterministic next route selection falls back to antigravity-primary on codex exhaustion",
+      "expected_profile": "antigravity_implementation",
+      "expected_provider": "antigravity",
+      "expected_rationale": "selected with score 43 for binding_work (implementation_testing)",
+      "expected_winner": "antigravity-primary",
+      "id": "deterministic_next_route_selection_on_exhaustion",
+      "is_mutating": true,
+      "now": 1726500000.0,
+      "observations": [
+        {
+          "expires_at": 1726503600.0,
+          "observation_id": "obs-codex-quota-exhausted-feedback",
+          "observation_type": "quota",
+          "producer": "feedback",
+          "profile": null,
+          "provider": "codex",
+          "state_value": "exhausted",
+          "timestamp": 1726500000.0
+        }
+      ],
+      "phase_type": "implementation_testing",
+      "prior_resolutions": {},
+      "required_capabilities": [
+        "execution",
+        "mutation",
+        "read"
+      ]
+    }
+  ],
+  "schema": "apgr-conformance-dynamic-routing-v1"
+}

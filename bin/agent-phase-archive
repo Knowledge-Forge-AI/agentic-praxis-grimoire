@@ -1,0 +1,9 @@
+#!/usr/bin/env python3
+"""Build a review transport without loading dispatcher/provider/Git machinery."""
+from pathlib import Path
+import sys
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "libexec"))
+from agent_phase.archive_recovery import main
+
+raise SystemExit(main())

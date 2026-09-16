@@ -4,6 +4,8 @@
 from __future__ import annotations
 
 import json
+import os
+import tempfile
 from pathlib import Path
 import sys
 from unittest import mock
@@ -671,3 +673,102 @@ class APGPublicReleaseCaseMixin:
             ):
                 with self.assertRaisesRegex(release.ToolError, message):
                     release.check_candidate(source, base, candidate, "0.4.0", None)
+
+    def test_isolated_environment_and_checked_command_failures_are_bounded(self) -> None:
+        candidate = release.Repository(Path("candidate"), "a" * 40, "b" * 40)
+        base = release.Repository(Path("base"), "c" * 40, "d" * 40)
+        historical = release.Repository(Path("historical"), release.PUBLIC_V01_COMMIT, release.PUBLIC_V01_TREE)
+        bindings = {
+            name: f"/qualified/{name}" for name in (
+                "APG_JAVASCRIPT_NODE", "APG_NODEJS_PRIMARY_NODE", "APG_NODEJS_SECONDARY_NODE",
+                "APG_NODEJS_OWNED_SCRATCH_ROOT", "APG_TYPESCRIPT_TSC",
+                "APG_NPM_OWNED_SCRATCH_ROOT", "APG_NPM_PACKAGE_ROOT",
+                "APG_PLAYWRIGHT_OWNED_SCRATCH_ROOT", "APG_PLAYWRIGHT_PACKAGE_ROOT",
+                "APG_VITE_OWNED_SCRATCH_ROOT", "APG_VITE_PACKAGE_ROOT",
+                "PLAYWRIGHT_BROWSERS_PATH", "APGR_TEST_PYTHON", "APG_BATS", "APG_BASH", "PATH",
+            )
+        }
+        with tempfile.TemporaryDirectory() as temporary, mock.patch.dict(os.environ, bindings):
+            environment = release.isolated_validation_environment(Path(temporary), candidate, base, historical)
+            self.assertEqual({name: environment[name] for name in bindings}, bindings)
+            self.assertEqual(environment["PWD"], "candidate")
+            self.assertEqual(environment["APG12_PUBLIC_V01_ROOT"], "historical")
+            self.assertTrue(
+                environment["PYTHONPATH"].startswith(
+                    os.pathsep.join(("candidate/src", "candidate"))
+                )
+            )
+            pytest_root = Path(environment["PYTEST_DEBUG_TEMPROOT"])
+            worker_root = Path(environment["TMPDIR"])
+            self.assertTrue(pytest_root.is_dir())
+            self.assertEqual(pytest_root.parent, worker_root.parent)
+            self.assertNotEqual(pytest_root, worker_root)
+            self.assertNotIn("OLDPWD", environment)
+        with mock.patch.object(
+            release.subprocess,
+            "run",
+            return_value=mock.Mock(returncode=1, stderr=b"failed", stdout=b""),
+        ):
+            with self.assertRaisesRegex(release.ToolError, "configured validation failed"):
+                release.run_checked_command(["tool"], Path("."))
+
+
+class HistoricalValidationCaseMixin:
+    def setUp(self) -> None:
+        self.temporary = tempfile.TemporaryDirectory(prefix="apg-historical-validation-")
+        self.addCleanup(self.temporary.cleanup)
+        self.root = Path(self.temporary.name)
+        self.base = self.root / "advanced-main"
+        release.run_git(self.root, ["init", "-q", "-b", "main", str(self.base)])
+        release.run_git(self.base, ["config", "user.name", "APG Test"])
+        release.run_git(self.base, ["config", "user.email", "test@example.invalid"])
+        (self.base / "README.md").write_text("bootstrap release\n")
+        release.run_git(self.base, ["add", "."])
+        release.run_git(self.base, ["commit", "-qm", "Release v0.1.0"])
+        self.commit = release.text_git(self.base, ["rev-parse", "HEAD"])
+        self.tree = release.text_git(self.base, ["rev-parse", "HEAD^{tree}"])
+        release.run_git(self.base, ["tag", "v0.1.0"])
+        for subject in ("Release v0.11.0", "Advanced premerge main"):
+            release.run_git(self.base, ["commit", "--allow-empty", "-qm", subject])
+            if subject == "Release v0.11.0":
+                release.run_git(self.base, ["tag", "-a", "v0.11.0", "-m", subject])
+        for name, value in (("PUBLIC_V01_COMMIT", self.commit), ("PUBLIC_V01_TREE", self.tree)):
+            patch = mock.patch.object(release, name, value)
+            patch.start()
+            self.addCleanup(patch.stop)
+        self.repository = release.resolve_repository(self.base, "advanced base")
+
+    def test_historical_copy_has_only_bootstrap_identity_and_refs(self) -> None:
+        before = release.repository_fingerprint(self.repository)
+        historical = release.initialize_historical_validation_copy(self.root / "historical", self.repository)
+        self.assertEqual((historical.head, historical.tree), (self.commit, self.tree))
+        self.assertEqual(release.reference_map(historical, "refs"), {
+            "refs/heads/main": self.commit, "refs/tags/v0.1.0": self.commit,
+        })
+        self.assertNotEqual(historical.root, self.repository.root)
+        self.assertEqual(release.run_git(historical.root, ["status", "--porcelain"]).stdout, b"")
+        self.assertEqual(release.repository_fingerprint(self.repository), before)
+        with mock.patch.object(release, "PUBLIC_V01_TREE", "0" * 40):
+            with self.assertRaisesRegex(release.ToolError, "does not match"):
+                release.initialize_historical_validation_copy(self.root / "wrong", self.repository)
+        self.assertFalse((self.root / "wrong").exists())
+
+    def test_isolation_binds_historical_root_and_detects_each_mutation(self) -> None:
+        before = release.repository_fingerprint(self.repository)
+        for victim in (None, "candidate", "base", "historical"):
+            with self.subTest(victim=victim):
+                def configured(candidate, base, policy, environment, version):
+                    historical = release.resolve_repository(Path(environment["APG12_PUBLIC_V01_ROOT"]), "historical")
+                    self.assertEqual((historical.head, historical.tree), (self.commit, self.tree))
+                    self.assertEqual(base.head, self.repository.head)
+                    release.validate_repository_separation(candidate, base, historical, self.repository)
+                    if victim:
+                        target = {"candidate": candidate, "base": base, "historical": historical}[victim]
+                        (target.root / "unexpected").write_text("mutation\n")
+                with mock.patch.object(release, "validate_categories", side_effect=configured):
+                    if victim:
+                        with self.assertRaisesRegex(release.ToolError, "modified the disposable"):
+                            release.validate_categories_in_isolation(self.repository, self.repository, {}, "0.12.0")
+                    else:
+                        release.validate_categories_in_isolation(self.repository, self.repository, {}, "0.12.0")
+                self.assertEqual(release.repository_fingerprint(self.repository), before)

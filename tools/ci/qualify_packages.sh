@@ -16,14 +16,15 @@ cp "$pkg_root/python"/*.whl "$pkg_root/python"/*.tar.gz "$RUNNER_TEMP/deliverabl
 cp -R "$pkg_root/npm-a" "$RUNNER_TEMP/deliverables/npm"
 cp "$pkg_root/manifest/apg-distribution-manifest.json" "$pkg_root/manifest/SHA256SUMS" "$RUNNER_TEMP/deliverables/"
 (cd "$RUNNER_TEMP/deliverables" && sha256sum --check SHA256SUMS)
-python3 bin/apg-public-release manifest --source "$GITHUB_WORKSPACE" --version 0.11.0 --format json > "$RUNNER_TEMP/public-projection-manifest.json"
+canonical_version=$(tr -d '[:space:]' < "$GITHUB_WORKSPACE/src/agentic_praxis_grimoire/VERSION")
+python3 bin/apg-public-release manifest --source "$GITHUB_WORKSPACE" --version "$canonical_version" --format json > "$RUNNER_TEMP/public-projection-manifest.json"
 python3 -m venv "$pkg_root/python-install"
-"$pkg_root/python-install/bin/python" -m pip install --no-index --no-deps "$pkg_root/python/agentic_praxis_grimoire-0.11.0-py3-none-manylinux_2_17_x86_64.whl"
+"$pkg_root/python-install/bin/python" -m pip install --no-index --no-deps "$pkg_root/python/agentic_praxis_grimoire-${canonical_version}-py3-none-manylinux_2_17_x86_64.whl"
 "$pkg_root/python-install/bin/apgr" --version
 "$pkg_root/python-install/bin/apgr" report verify "$GITHUB_WORKSPACE/report/testdata/persisted/diff.report.txt"
 mkdir -p "$pkg_root/npm-install"
 printf '%s\n' '{"name":"apgr-ci-install","private":true}' > "$pkg_root/npm-install/package.json"
-npm install --prefix "$pkg_root/npm-install" --ignore-scripts --offline --no-audit --no-fund --package-lock=false "$pkg_root/npm-a/knowledge-forge-ai-apgr-0.11.0.tgz" "$pkg_root/npm-a/knowledge-forge-ai-apgr-linux-x64-0.11.0.tgz"
+npm install --prefix "$pkg_root/npm-install" --ignore-scripts --offline --no-audit --no-fund --package-lock=false "$pkg_root/npm-a/knowledge-forge-ai-apgr-${canonical_version}.tgz" "$pkg_root/npm-a/knowledge-forge-ai-apgr-linux-x64-${canonical_version}.tgz"
 "$pkg_root/npm-install/node_modules/.bin/apgr" --version
 "$pkg_root/npm-install/node_modules/.bin/apgr" report verify "$GITHUB_WORKSPACE/report/testdata/persisted/diff.report.txt"
 test -z "$(git status --porcelain --untracked-files=all)"

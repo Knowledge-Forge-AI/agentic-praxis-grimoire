@@ -17,11 +17,17 @@ consumers import root packages directly; they do not import `cmd/apgr` or any
 | `envsnap` | Strict profiles, canonical snapshots, storage, loading, and resolution | [Environment snapshots](../guides/environment-snapshots.md) |
 | `hotspot` | Bounded structural analysis, stable results, and renderers | [Hotspot analysis](../guides/hotspot-analysis.md) |
 | `footprint` | Deterministic context-footprint records, comparisons, measurements, projections, and component/control registries | [Context footprints](#context-footprints) |
+| `phase` | Immutable work-only Request V2 envelope, attempt identifiers, execution status, semantic role constants, and routing adapters (Experimental / Provisional) | [Single-Phase Envelopes](#single-phase-envelopes) |
+| `routing` | Policy-neutral deterministic routing ladder and canonical observation digest calculation (Experimental / Provisional) | [Routing Primitives](#routing-primitives) |
+| `evidence` | Path-traversal-safe review finding structures, finding dispositions, and validation receipts (Experimental / Provisional) | [Evidence Primitives](#evidence-primitives) |
+| `candidate` | Immutable candidate identity and artifact manifest structures with path traversal rejection (Experimental / Provisional) | [Candidate Primitives](#candidate-primitives) |
+| `provider` | Static provider capability matrix and validation (22 rows across Codex, Claude, Antigravity) (Experimental / Provisional) | [Provider Capability Matrix](#provider-capability-matrix) |
 
 APG exposes no orchestration package. A consumer supplies context, structured
 requests, repository or storage authority, and its own lifecycle decisions.
 The [APG–JACA boundary](../architecture/apg-jaca-integration.md) is the
 controlling integration contract.
+
 
 ## Context footprints
 
@@ -249,8 +255,12 @@ delegation. The [distribution contract](../distribution.md) documents
 supported targets, the multi-registry packaging model, and the package
 architecture. The published v0.9.0 release includes the public `footprint`
 package alongside the core Go packages (`schema`, `report`, `skills`, `envsnap`, `hotspot`).
-This documentation covers v0.10.0. APGR retains compatibility with v0.8.1 across all
-six public Go packages (`schema`, `report`, `skills`, `envsnap`, `hotspot`, `footprint`).
-Once published, Go consumers can require `github.com/Knowledge-Forge-AI/agentic-praxis-grimoire v0.10.0`
-(or `go get github.com/Knowledge-Forge-AI/agentic-praxis-grimoire@v0.10.0`) through the normal
+This documentation covers v0.10.0 and preview additions for v0.12.0. APGR retains compatibility with v0.8.1 across all
+six public Go packages (`schema`, `report`, `skills`, `envsnap`, `hotspot`, `footprint`). In v0.12, five additive
+domain packages (`phase`, `routing`, `evidence`, `candidate`, `provider`) are added with Provisional / Experimental
+stability (ICR-004 / ICR-005) for JACA XO consumer qualification. (Note: `phase` imports `routing` for route binding adapters;
+`routing` may be consumed independently, while `phase` brings in `routing`.)
+Once published, Go consumers can require `github.com/Knowledge-Forge-AI/agentic-praxis-grimoire v0.12.0`
+(or `go get github.com/Knowledge-Forge-AI/agentic-praxis-grimoire@v0.12.0`) through the normal
 public Go proxy and checksum database.
+

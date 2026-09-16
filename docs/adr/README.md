@@ -699,3 +699,28 @@ The v0.11 release route uses exact branch `staging`, PR validation, squash merge
 to `main`, and post-merge source qualification before tagging. Historical
 release validators remain version-bound; public settings and execution await
 V0110-G.
+
+- [`0058 — APGR-JACA Product Boundary and Single-Phase Runtime Ownership`](2026/09/0058-apgr-jaca-product-boundary-and-runtime-ownership.md) — Accepted
+
+- [`0059 — Decoupled Semantic Role Graph and Flexible Actor Binding`](2026/09/0059-decoupled-semantic-role-graph-and-flexible-actor-binding.md) — Accepted
+
+- [`0060 — Request V2 Protocol, Bounded Dynamic Routing, and SQLite Dispatcher Persistence`](2026/09/0060-request-v2-dynamic-routing-and-sqlite-persistence.md) — Accepted
+
+- [`0061 — First-Class Provider Capability Matrix and Asymmetry Reconciliation`](2026/09/0061-provider-capability-matrix-and-parity.md) — Accepted
+
+- [`0062 — v0.12 Release Hardening, Operator Discipline, and Conditional Nixpkgs Policy`](2026/09/0062-v012-release-hardening-and-conditional-nixpkgs.md) — Accepted
+
+- [`0063 — Agent-Central Single-Phase Dispatcher Parity Migration and Normalization`](2026/09/0063-agent-central-dispatcher-parity-migration-and-normalization.md) — Accepted
+
+- [`0064 — Request V2 Policy Externalization and Dynamic Role Routing`](2026/09/0064-request-v2-policy-externalization-and-dynamic-role-routing.md) — Accepted
+
+- [`0065 — Operational Observation Model, Provider Parity Closure, and V2 Semantic Execution Runtime`](2026/09/0065-operational-observation-model-and-provider-parity-closure.md) — Accepted
+
+- [`0066 — Public Go Domain Surfaces, Rejection of Duplicate Go Runtime, and JACA XO Boundary`](2026/09/0066-apgr-public-go-surfaces-and-jaca-xo-boundary.md) — Accepted
+
+- [`0067 — Provider Failure Feedback, SQLite Schema v2, and Bounded Dynamic Reroute`](2026/09/0067-provider-failure-feedback-and-dynamic-reroute.md) — Accepted
+
+- [`0068 — Release Authority Reconciliation with Advanced Public Main and Hardened Attended Release Operator`](2026/09/0068-release-authority-reconciliation-with-advanced-public-main.md) — Accepted
+
+
+
