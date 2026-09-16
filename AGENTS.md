@@ -105,6 +105,84 @@ it for qualification/runtime temporary storage, which remains external to the
 repository. Missing local scratch must result in reconstruction or an explicit
 prerequisite, never a fabricated fact.
 
+## Current development authority
+
+Public v0.10.0 is released across GitHub, Go, PyPI and npm. The
+[v0.11 roadmap](docs/v0-11-roadmap.md) and
+[closure governance](docs/governance/v0-11-closure-governance.md) own inherited
+scheduling. At the historical foundation entry, APG138 implemented V0110-A only:
+55 inherited closure rows, separate maintenance and compatibility records,
+a 45-leaf maturity ledger and measured
+capacity governance. All 31 provisional leaves retain maturity. ADR 0055
+retains the existing effective ceiling and enforcement identity; no new leaf
+is admitted. Historical phase sections below preserve their original states.
+At that historical APG138 entry, V0110-B through V0110-G required bounded
+dispatch; publication and external consumer/host mutation were outside the
+foundation.
+
+APG139 closes V0110-B with 31 individual PROVISIONAL_MAINTENANCE decisions
+and corrects APG138's exit identity to 00183. Maturity remains 14 stable /
+31 provisional; closure accounting is 31 terminal / 24 open / zero invalid.
+V0110-C through V0110-G remain outside this assignment.
+
+APG140 closes V0110-C external contracts/support after supplied independent
+review and terminal verification: 43 terminal / 12 open / zero invalid. All
+twelve outcomes bind separate decision receipts and the actual review. No new
+leaf, consumer adoption or V0110-D/E/release work is included.
+
+APG142 closes V0110-E with eight individual FALSE maintenance findings after
+supplied independent review and scoped terminal verification: 55 terminal /
+zero OPEN / zero invalid. Receipts and ledger transitions are post-review
+amendments, not independently re-reviewed bytes. All active debts and 14 stable /
+31 provisional maturity remain intact. At that historical APG142 exit,
+V0110-F/G remained outside the assignment.
+
+APG143 preserves the historical blocked READINESS1, READINESS2, and READINESS3 attempts
+under V0110-F and exit 00188. READINESS4 completes local technical readiness qualification
+under Manager Decisions A–D: all 20 static checks pass cleanly (exit=0), canonical test
+suites pass through qualified runtime (4,232 unit, 893 integration, union statements 90.63%
+and branches 87.09% >= 80% gates), package builds and Syft/Grype deliverable scans report zero
+High/Critical vulnerabilities, and 225 scanner suppressions and nonsecrets are formally
+approved following independent pre-final work-review verification. The original READINESS4
+dispatcher attempt encountered a terminal commit-message/protocol validation failure
+followed by a recovery digest-binding defect and remains historically blocked; the
+operator's manually verified private checkpoint on main is accepted as entry basis.
+Public PR CI is not run; public release is not started; hosted settings remain unverified.
+
+APG144 continues the approved v0.11 program as the bounded V0110-G preparation slice
+and its corrective follow-up (STAGING-PREP4), allocating exit 00189. Following STAGING-PREP1/2
+unaccepted handoffs and STAGING-PREP3 candidate-check exit 1 under isolated test execution,
+STAGING-PREP4 repairs candidate test doubles, provisions pinned runtimes, and establishes
+factual acceptance boundaries. The phase constructs a disclosure-safe, locally verified untagged
+public staging candidate from prospective source against the accepted public base, closes the
+pre-disclosure documentation gap with semantic labels, and delivers a tested, attended
+stage-only operator handoff. Accounting remains 55 terminal / zero OPEN / zero invalid; inventory
+retains 45 canonical leaves (14 stable / 31 provisional), six active CSS/JS debts, and 11,142
+description bytes under the 11,507-byte ceiling. Public staging push, PR creation, hosted CI,
+protection settings configuration, and release tagging remain unperformed. This dispatch
+performs no public mutation; the dispatcher owns private Git publication.
+
+APG145 continues the approved v0.11 program as the hosted-CI repair and staging
+correction slice under V0110-G, allocating exit 00190. Following the 7 failed jobs and
+1 skipped job observed in public PR #1 run 34796052087, APG145 incorporates 9
+independent plan-review findings, deliberately reversing advisory finding E2
+(mapping index == -1 to driver) per OASIS SARIF §3.54.4, to resolve root causes across
+toolchain bootstrap (tomli==2.4.1 pin in bootstrap_static.sh), package qualification (python-work directory
+creation in qualify_packages.sh), macOS Go toolchain provisioning (actions/setup-go in
+public-pr.yml and error differentiation in apg_skill_library_check.py), CodeQL SARIF
+tool extension rule resolution in codeql_policy.py, source and fixture security
+remediations (skills.go slice allocation, runner.mjs descriptor-based O_NOFOLLOW file read
+and origin reflection elimination, test permission normalization to 0o700/0o600/0o710),
+matrix receipt resilience (prescribed artifacts and honest failure receipts recording
+unavailable_artifacts in matrix_receipts.py), linear staging correction operator
+discipline (stage_operator.py and apg_public_release.py update mode on staging parent
+24adef16955d6a3a3096d9765c8f09d9b6b13040, public base ancestry 250ce73a..., and PR #1
+reuse without force-push), and user-authorized Homebrew tap publication preparation
+under gemini_flash_opus_sub. Accounting remains 55 terminal / zero OPEN / zero invalid;
+inventory retains 45 canonical leaves (14 stable / 31 provisional), six active CSS/JS debts,
+and 11,142 description bytes under the 11,507-byte ceiling. This dispatch performs no
+Git publication or remote mutations; the dispatcher owns private Git publication.
+
 ## Project map
 
 - [Project model](docs/project-model.md): artifact ownership and practice
@@ -1380,3 +1458,13 @@ Zero implementation-ready items remain and integrated readiness is next, with
 the APG126 browser fallback and APG127 verifier responsiveness limitations.
 No successor or publication authority is granted. See the
 [APG128 evaluation](docs/evaluations/apg128-javascript-qualification-debt-consolidation.md).
+
+## APG141 V0110-D closure
+
+APG141 closes [optional work](docs/evaluations/apg141-optional-work-closure.md)
+after supplied independent review and scoped terminal verification: 55 inherited /
+47 terminal / 8 open / zero invalid. Separate decisions deliver bounded hotspot
+history v2 and the report-key repair, and reject the Caveman adapter and result-field
+restriction. Combined complexity/churn scoring is explicitly abandoned for the
+inherited hotspot item. At that historical APG141 exit, V0110-E/F/G
+and release remained unstarted.

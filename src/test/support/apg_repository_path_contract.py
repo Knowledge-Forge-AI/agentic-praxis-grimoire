@@ -9,7 +9,7 @@ from pathlib import Path
 import stat
 from typing import NoReturn, Sequence
 
-from apg_exact_read_contract import READ_CHUNK_BYTES, read_exact
+from apg_exact_read_contract import read_exact
 from apg_repository_absence_contract import confirm_component_absent
 
 

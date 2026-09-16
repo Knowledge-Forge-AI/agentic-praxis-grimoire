@@ -1,0 +1,19 @@
+{
+  "schema": "apg-retained-python-ratchets-v1",
+  "paths": [
+    "src/agentic_praxis_grimoire/__init__.py",
+    "src/agentic_praxis_grimoire/__main__.py",
+    "src/agentic_praxis_grimoire/cli.py",
+    "src/agentic_praxis_grimoire/config.py",
+    "src/agentic_praxis_grimoire/go_bridge.py",
+    "src/agentic_praxis_grimoire/paths.py",
+    "src/agentic_praxis_grimoire/reports.py",
+    "src/agentic_praxis_grimoire/resources/__init__.py",
+    "src/agentic_praxis_grimoire/response.py",
+    "src/agentic_praxis_grimoire/version.py"
+  ],
+  "quality": {
+    "ruff_f": 0,
+    "mypy": 0
+  }
+}

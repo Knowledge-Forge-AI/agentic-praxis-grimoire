@@ -51,7 +51,7 @@ class Repository:
     ],
 )
 def test_selected_state_modes(arguments: Namespace, revision: str) -> None:
-    selected = cli._selected_state(Repository(), arguments)  # type: ignore[arg-type]
+    selected = cli._selected_state(Repository(), arguments)
     assert selected[0] == revision
     assert selected[-1]
 

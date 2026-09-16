@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from collections import Counter
 import json
 from pathlib import Path
 import re
@@ -12,7 +11,7 @@ from apg_markdown_clause_guard_contract import (
     CONFLICTED,
     NEGATIVE,
     POSITIVE,
-    TARGETED_GUARD_MARKERS,
+    TARGETED_GUARD_MARKERS as TARGETED_GUARD_MARKERS,
     local_guard_observations,
     targeted_guard_states,
     unconditional_rollback_state,

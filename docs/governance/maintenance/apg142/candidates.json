@@ -1,0 +1,83 @@
+{
+  "schema_version": "apg142-maintenance-closure-candidates-v1",
+  "status": "PENDING_DISPATCHER_PRE_FINAL",
+  "actual_accounting": {
+    "inherited": 55,
+    "terminal": 47,
+    "open": 8,
+    "invalid": 0
+  },
+  "proposed_accounting": {
+    "inherited": 55,
+    "terminal": 55,
+    "open": 0,
+    "invalid": 0
+  },
+  "actual_review_ref": null,
+  "candidates": [
+    {
+      "item_id": "APGR-CXT-BUDGET-COMPRESSION",
+      "trigger_id": "APGR-CXT-BUDGET-COMPRESSION",
+      "finding": "FALSE",
+      "proposed_outcome": "MAINTENANCE_TRIGGER",
+      "candidate_ref": "docs/governance/maintenance/apg142/candidates/APGR-CXT-BUDGET-COMPRESSION.json",
+      "audit_ref": "docs/governance/maintenance/apg142/context-compression.md"
+    },
+    {
+      "item_id": "APGR-DEBT-CSS-QD-001",
+      "trigger_id": "CSS-QD-001",
+      "finding": "FALSE",
+      "proposed_outcome": "MAINTENANCE_TRIGGER",
+      "candidate_ref": "docs/governance/maintenance/apg142/candidates/APGR-DEBT-CSS-QD-001.json",
+      "audit_ref": "docs/governance/maintenance/apg142/css-qd-001.md"
+    },
+    {
+      "item_id": "APGR-DEBT-CSS-QD-002",
+      "trigger_id": "CSS-QD-002",
+      "finding": "FALSE",
+      "proposed_outcome": "MAINTENANCE_TRIGGER",
+      "candidate_ref": "docs/governance/maintenance/apg142/candidates/APGR-DEBT-CSS-QD-002.json",
+      "audit_ref": "docs/governance/maintenance/apg142/css-qd-002.md"
+    },
+    {
+      "item_id": "APGR-DEBT-CSS-QD-003",
+      "trigger_id": "CSS-QD-003",
+      "finding": "FALSE",
+      "proposed_outcome": "MAINTENANCE_TRIGGER",
+      "candidate_ref": "docs/governance/maintenance/apg142/candidates/APGR-DEBT-CSS-QD-003.json",
+      "audit_ref": "docs/governance/maintenance/apg142/css-qd-003.md"
+    },
+    {
+      "item_id": "APGR-DEBT-CSS-QD-004",
+      "trigger_id": "CSS-QD-004",
+      "finding": "FALSE",
+      "proposed_outcome": "MAINTENANCE_TRIGGER",
+      "candidate_ref": "docs/governance/maintenance/apg142/candidates/APGR-DEBT-CSS-QD-004.json",
+      "audit_ref": "docs/governance/maintenance/apg142/css-qd-004.md"
+    },
+    {
+      "item_id": "APGR-DEBT-CSS-QD-005",
+      "trigger_id": "CSS-QD-005",
+      "finding": "FALSE",
+      "proposed_outcome": "MAINTENANCE_TRIGGER",
+      "candidate_ref": "docs/governance/maintenance/apg142/candidates/APGR-DEBT-CSS-QD-005.json",
+      "audit_ref": "docs/governance/maintenance/apg142/css-qd-005.md"
+    },
+    {
+      "item_id": "APGR-DEBT-JS-QD-005",
+      "trigger_id": "JS-QD-005",
+      "finding": "FALSE",
+      "proposed_outcome": "MAINTENANCE_TRIGGER",
+      "candidate_ref": "docs/governance/maintenance/apg142/candidates/APGR-DEBT-JS-QD-005.json",
+      "audit_ref": "docs/governance/maintenance/apg142/js-qd-005.md"
+    },
+    {
+      "item_id": "APGR-REPORT-PUREGO-GIT",
+      "trigger_id": "APGR-REPORT-PUREGO-GIT",
+      "finding": "FALSE",
+      "proposed_outcome": "MAINTENANCE_TRIGGER",
+      "candidate_ref": "docs/governance/maintenance/apg142/candidates/APGR-REPORT-PUREGO-GIT.json",
+      "audit_ref": "docs/governance/maintenance/apg142/purego-git.md"
+    }
+  ]
+}

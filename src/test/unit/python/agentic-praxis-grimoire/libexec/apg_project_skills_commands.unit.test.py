@@ -5,7 +5,6 @@ from __future__ import annotations
 import argparse
 from contextlib import contextmanager
 from pathlib import Path
-from types import SimpleNamespace
 import sys
 
 import pytest
@@ -29,7 +28,7 @@ from apg_project_skills_core import (  # noqa: E402
 
 def parser() -> argparse.ArgumentParser:
     value = argparse.ArgumentParser()
-    value.exit = lambda status=0, message=None: (_ for _ in ()).throw(  # type: ignore[method-assign]
+    value.exit = lambda status=0, message=None: (_ for _ in ()).throw(
         ValueError(message or status)
     )
     return value
@@ -299,7 +298,7 @@ def test_signal_handlers_translate_process_signals_to_bounded_tool_errors(
     commands.install_signal_handlers()
     handler = handlers[commands.signal.SIGINT]
     with pytest.raises(ToolError, match="SIGINT"):
-        handler(commands.signal.SIGINT, None)  # type: ignore[operator]
+        handler(commands.signal.SIGINT, None)
     monkeypatch.delattr(commands.signal, "SIGHUP")
     commands.install_signal_handlers()
 

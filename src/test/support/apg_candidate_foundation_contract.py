@@ -5,7 +5,6 @@ from __future__ import annotations
 from typing import Any, Callable, NoReturn
 
 from apg_candidate_lifecycle_schema_contract import (
-    DERIVED_SKILL_SET_CONTRACT,
     DYNAMIC_CONSUMER_ROOT_BINDING,
     SEMANTIC_ROLE_REGISTRY,
 )

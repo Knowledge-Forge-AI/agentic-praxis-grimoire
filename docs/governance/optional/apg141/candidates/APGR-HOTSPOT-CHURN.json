@@ -1,0 +1,41 @@
+{
+  "schema_version": "apg141-optional-closure-candidate-v1",
+  "item_id": "APGR-HOTSPOT-CHURN",
+  "review_status": "PENDING_DISPATCHER_PRE_FINAL",
+  "review_ref": null,
+  "review_sha256": null,
+  "receipt": {
+    "schema_version": "apg.roadmap-decision/v1",
+    "item_id": "APGR-HOTSPOT-CHURN",
+    "outcome": "DELIVERED",
+    "closure_phase": "V0110-D",
+    "author": "APG141 producer",
+    "reviewer": null,
+    "evidence": {
+      "implementation": [
+        "hotspot/analyze_v2.go"
+      ],
+      "qualification": [
+        "docs/governance/optional/apg141/qualification.md"
+      ],
+      "compatibility": [
+        "docs/guides/hotspot-history.md"
+      ],
+      "rollback": [
+        "docs/guides/hotspot-history.md"
+      ]
+    }
+  },
+  "proposed_disposition": {
+    "decision_ref": "docs/governance/optional/apg141/candidates/APGR-HOTSPOT-CHURN.json",
+    "qualification_refs": [
+      "docs/governance/optional/apg141/qualification.md",
+      "docs/guides/hotspot-history.md"
+    ],
+    "review_ref": null,
+    "rationale": "APG141 APGR-HOTSPOT-CHURN proposed DELIVERED; item-specific contract and rationale remain pending actual review.",
+    "maintenance_ref": null,
+    "compatibility_ref": null,
+    "maturity_ref": null
+  }
+}

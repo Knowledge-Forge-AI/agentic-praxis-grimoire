@@ -1,0 +1,133 @@
+{
+  "schema_version": "apg140-source-observations-v1",
+  "observations": [
+    {
+      "observation_id": "APG140-RM-MAIN-20260912",
+      "source": "repo-map",
+      "date": "2026-09-12",
+      "evidence_class": "source-inspection-not-runtime-execution",
+      "files": [
+        {
+          "path": "docs/specs/public-read-contract.md",
+          "sha256": "33ea384c98ba7f9bec98a25d0d39cd4817adfa22b71909289f1e3893084df206"
+        },
+        {
+          "path": "docs/specs/durable-job-and-coordinator-contract.md",
+          "sha256": "0b871d378cbc21fd9e8bf49f5ad260e59db61b7ac52295613368edea3599c756"
+        },
+        {
+          "path": "docs/adr/2026/08/0056-reconciled-investigation-and-program-direction.md",
+          "sha256": "7e23162bb92f6ce85a5b79d5c448de1f52cdc842d743d2d6be125b3deee3a3c7"
+        },
+        {
+          "path": "src/main/python/repomap_kg/coordinator/_protocol_core.py",
+          "sha256": "e4bf316eabc92a20adec214aac8bd9b66f6a780346458b328b11bfbfb27ca13e"
+        },
+        {
+          "path": "src/main/python/repomap_kg/storage/read_pages.py",
+          "sha256": "22277d0f7dd7a87083374c4955b50e3b07d856781688e797e48f7add1a0e4b0a"
+        },
+        {
+          "path": "src/main/python/repomap_kg/runtime/repository_identity_migration.py",
+          "sha256": "5108ac910c16e3681d4bc5692fcb712e951feb9ca65504d1da7d877c2f6004e6"
+        },
+        {
+          "path": "src/main/python/repomap_kg/runtime/schema_upgrade.py",
+          "sha256": "5b59eec70fda90b527ef26fc62d179f2bafdf6a3b8ee9db6fbaded05f59c8ef4"
+        },
+        {
+          "path": "src/main/python/repomap_kg/runtime/backup.py",
+          "sha256": "77697c6d93f2fc7c164403686c01c4a66ca9eaf82681aadeeccb559dec16338d"
+        },
+        {
+          "path": "src/main/python/repomap_kg/storage/repository_identity.py",
+          "sha256": "bd55634fd22f4e7557b7ec0b696a13d525af9c0312f2a25a8d4becf6d30c7886"
+        },
+        {
+          "path": "src/main/python/repomap_kg/storage/publication.py",
+          "sha256": "9462d2cb96aae646caec5b8050f93666a6f60b3dc5e947dcc3a98f44c974b9f6"
+        },
+        {
+          "path": "src/main/resources/rdbms/2026/06/29-002-core-create_canonical_graph_tables.sql",
+          "sha256": "bbb210bdf84d7dfe9d1f1ff864a974f6c038211ee844cbc6ed9513ad5abb180e"
+        },
+        {
+          "path": "src/test/unit/python/repomap_kg/coordinator/protocol.unit.test.py",
+          "sha256": "f0ce0294133f6cad80a847db7ad602882c81b8eaddd567e4a10737cee1342dd9"
+        },
+        {
+          "path": "src/test/int/python/repomap_kg/canonical_contract/core_graph_keys.int.test.py",
+          "sha256": "6fc302d87767cdf34488aee55f365b828feac52f67a8a2e18e29828d882d6028"
+        },
+        {
+          "path": "docs/specs/raw-observation-schema.md",
+          "sha256": "f0e6cb84a74e95eaeda13623561fa55b30ea3164bdddcd5602b7157811f5bfb4"
+        },
+        {
+          "path": "src/main/python/repomap_kg/runtime/schema_decommission.py",
+          "sha256": "a31e74823087c409cc403ac974a63129ad74e707d89706da6c1ec3950ca536a7"
+        },
+        {
+          "path": "src/main/resources/rdbms/2026/07/16-001-arch5c-add-repository-identity.sql",
+          "sha256": "3f1e6f547bb7dd37880e6dbb0cf977d4f1a241587e8b84e05945afce6dd91e98"
+        },
+        {
+          "path": "src/main/resources/rdbms/2026/07/16-002-arch5d-drop-legacy-graph-schema.sql",
+          "sha256": "ef2611e0c71fc27d6bb0cb80ad27839c53e471f0991e996d5f2dc2edf5bcfaa8"
+        },
+        {
+          "path": "src/main/go/internal/protocol/protocol.go",
+          "sha256": "3e9c0c5da0cef0ad593099df496153130b67dec38576331a0f429ca3007093eb"
+        }
+      ]
+    },
+    {
+      "observation_id": "APG140-JACA-MAIN-20260912",
+      "source": "jaca",
+      "date": "2026-09-12",
+      "evidence_class": "source-inspection-not-runtime-execution",
+      "files": [
+        {
+          "path": "docs/architecture/xo-reference-patterns-and-interface-control.md",
+          "sha256": "a787c74e52b06b15b020ae9fc002ac02fb4a3e58843a72a4ec8725f0bcd4c971"
+        },
+        {
+          "path": "docs/specs/ci-cd/project-onboarding-contract.md",
+          "sha256": "ed16ac81a9624ff8fd88dd8302053824df3e79557732ceaa1ce7b61e16d755e7"
+        },
+        {
+          "path": "xo/src/main/go/go.mod",
+          "sha256": "d8dae358959c9753f27f21bd223f18b383994553beab39e0d428986d708536e7"
+        },
+        {
+          "path": "tools/ci/evidence.go",
+          "sha256": "eb44818c332e451f4147ec08dab8bed0cfc948e38908d1cebd079a64da52ca04"
+        },
+        {
+          "path": "tools/ci/executor.go",
+          "sha256": "6b1f270d23de34952a64b0d7d1c8cfc99d4864afa29cd86d9fbfb05052f4bc88"
+        },
+        {
+          "path": "tools/ci/model.go",
+          "sha256": "903fa83da17505d7938ecbb96ce85e60c78080d32562b66b5ea64c7010e65b46"
+        },
+        {
+          "path": "tools/ci/fixture.go",
+          "sha256": "80d483b30e24113c311095039acc1b3cf103f99581c2843cbef3b32e1e08ed39"
+        },
+        {
+          "path": "docs/specs/roadmap/xo-capability-roadmap.md",
+          "sha256": "2e4657424d18784477064277fc319dd4eeac984105a36e6ee38a276467115149"
+        },
+        {
+          "path": "xo/src/main/go/internal/orchestration/state/report_artifact.go",
+          "sha256": "4b89ab722d7311d85b3f918f50db0f098841e176439981a5f1f1db41f9b89910"
+        },
+        {
+          "path": "xo/src/main/go/internal/orchestration/state/report_payload.go",
+          "sha256": "d0d09208cd250ef9f9aaf76be692e59f1d8d662f3c7e90bf083c7ae8e0638ce6"
+        }
+      ]
+    }
+  ]
+}

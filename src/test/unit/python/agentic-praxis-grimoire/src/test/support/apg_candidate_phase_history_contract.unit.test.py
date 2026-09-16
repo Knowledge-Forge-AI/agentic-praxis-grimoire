@@ -392,14 +392,14 @@ def test_terminal_states_require_each_apg61_and_apg62_record(
         materialize_actual_retained(
             tmp_path, ROOT, PLAN, maturity="stable"
         )
-        check = lambda: assert_actual_retained(  # noqa: E731
-            tmp_path, MANIFEST, PLAN, CANDIDATE, "stable"
-        )
+        def check():
+            return assert_actual_retained(
+                tmp_path, MANIFEST, PLAN, CANDIDATE, "stable"
+            )
     else:
         materialize_actual_rejected_preserved(tmp_path, MANIFEST, PLAN)
-        check = lambda: assert_actual_rejected_preserved(  # noqa: E731
-            tmp_path, MANIFEST, PLAN
-        )
+        def check():
+            return assert_actual_rejected_preserved(tmp_path, MANIFEST, PLAN)
     (tmp_path / relative).unlink()
 
     with pytest.raises(SurfaceContractError):

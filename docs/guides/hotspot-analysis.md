@@ -1,6 +1,6 @@
 # Structural Hotspot Analysis
 
-APG's public Go package `hotspot` analyzes one exact source root in process. It
+The default v1 API in APG's public Go package `hotspot` analyzes one exact source root in process. It
 does not execute source, invoke a shell, load target plugins or configuration,
 follow symlinks, read outside the root, or inspect Git history. The canonical
 machine schema is `apg.hotspot-report/v1`; terminal and Markdown output render
@@ -258,3 +258,10 @@ unavailable reasons. It may not rewrite metric/rank/fingerprint authority,
 convert structural guesses into semantic facts, or claim that a high score
 proves a design violation. Growth/churn, Git history, PR deltas, AI-authored
 refactoring plans, and skill authoring are outside hotspot v1.
+
+## Explicit history selection
+
+The optional [v2 history interface](hotspot-history.md) adds bounded file-level
+churn and endpoint growth under an explicit immutable range. The v1 APIs,
+default invocation, structural ranking, golden bytes and deferred declarations
+above are preserved. History is a separate opt-in dimension, not a v1 extension.

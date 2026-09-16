@@ -16,6 +16,8 @@ from libexec.apg_test import HarnessError, record_worker_coverage_sentinel, vali
 
 _RESULTS: dict[str, str] = {}
 _CONTEXT_WORKERS: set[str] = set()
+_RAW_COLLECTION: tuple[str, ...] | None = None
+_DESELECTED_NODE_IDS: list[str] = []
 
 
 def _settings() -> tuple[str, str, Path]:
@@ -43,18 +45,28 @@ def _worker_id(config: pytest.Config) -> str | None:
 
 
 def pytest_configure(config: pytest.Config) -> None:
+    global _RAW_COLLECTION
     config.addinivalue_line("markers", "unit: APG isolated unit contract")
     config.addinivalue_line("markers", "integration: APG real-boundary contract")
     worker = _worker_id(config)
     if worker is not None:
+        _RAW_COLLECTION = None
+        _DESELECTED_NODE_IDS.clear()
         _append({"event": "worker-start", "worker": worker})
 
 
+@pytest.hookimpl(tryfirst=True)
 def pytest_collection_modifyitems(
     config: pytest.Config, items: list[pytest.Item]
 ) -> None:
+    global _RAW_COLLECTION
     suite = os.environ["APG_TEST_SUITE"]
     selected_root = os.environ["APG_TEST_SELECTED_ROOT"].rstrip("/")
+    worker = _worker_id(config)
+    if worker is not None:
+        if _RAW_COLLECTION is not None:
+            raise pytest.UsageError("worker collection was observed more than once")
+        _RAW_COLLECTION = tuple(item.nodeid for item in items)
     if not items:
         # Preserve pytest's no-tests exit status; the runner rejects status 5.
         return
@@ -77,13 +89,27 @@ def pytest_collection_modifyitems(
         item.add_marker(suite)
 
 
-@pytest.hookimpl(optionalhook=True)
-def pytest_xdist_node_collection_finished(node: Any, ids: list[str]) -> None:
+def pytest_deselected(items: list[pytest.Item]) -> None:
+    """Retain pytest's exact worker-side deselection observation."""
+    if not items or _worker_id(items[0].config) is None:
+        return
+    _DESELECTED_NODE_IDS.extend(item.nodeid for item in items)
+
+
+def pytest_collection_finish(session: pytest.Session) -> None:
+    """Record both raw and post-deselection worker collections."""
+    worker = _worker_id(session.config)
+    if worker is None:
+        return
+    if _RAW_COLLECTION is None:
+        raise pytest.UsageError("worker collection snapshot was not recorded")
     _append(
         {
             "event": "collection",
-            "worker": node.gateway.id,
-            "node_ids": list(ids),
+            "worker": worker,
+            "node_ids": list(_RAW_COLLECTION),
+            "remaining_node_ids": [item.nodeid for item in session.items],
+            "deselected_node_ids": list(_DESELECTED_NODE_IDS),
         }
     )
 

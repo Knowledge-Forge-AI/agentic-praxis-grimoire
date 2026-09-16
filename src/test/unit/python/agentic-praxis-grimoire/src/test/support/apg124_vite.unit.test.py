@@ -10,9 +10,7 @@ from __future__ import annotations
 import json
 import os
 from pathlib import Path
-import stat
 import sys
-import tempfile
 import pytest
 
 from src.test.apg_test_support import repository_root
@@ -27,11 +25,7 @@ from apg124_vite import (  # noqa: E402
     EXPECTED_ROLLDOWN_VERSION,
     EXPECTED_VITE_VERSION,
     VITE_TOOLCHAIN_DISCLAIMER,
-    ViteHarnessConfig,
-    ViteHarnessError,
-    ViteHarnessExecutionError,
     ViteHarnessPrerequisiteError,
-    ViteHarnessReceipt,
     ViteHarnessValidationError,
     load_scenarios_register,
     observe_vite_harness_config,

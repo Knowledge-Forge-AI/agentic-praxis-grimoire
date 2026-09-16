@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "result_kind": "canonical_nodes",
+  "items": [
+    {
+      "canonical_key": "n:conflict:node_a",
+      "kind": "worker",
+      "metadata": {
+        "version": 2
+      }
+    },
+    {
+      "canonical_key": "n:conflict:node_a",
+      "kind": "worker",
+      "metadata": {
+        "version": 2
+      }
+    },
+    {
+      "canonical_key": "n:conflict:node_b",
+      "kind": "service_modified",
+      "metadata": {
+        "env": "prod"
+      }
+    },
+    {
+      "canonical_key": "n:conflict:spurious",
+      "kind": "unexpected",
+      "metadata": {}
+    }
+  ],
+  "page": {
+    "limit": 50,
+    "offset": 0,
+    "returned": 4,
+    "truncated": false,
+    "next_offset": null
+  },
+  "diagnostics": []
+}

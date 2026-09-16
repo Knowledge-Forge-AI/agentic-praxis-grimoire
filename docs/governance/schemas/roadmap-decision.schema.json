@@ -1,0 +1,621 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "anyOf": [
+    {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "type": "string",
+          "const": "apg.roadmap-decision/v1"
+        },
+        "item_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "outcome": {
+          "type": "string",
+          "const": "DELIVERED"
+        },
+        "closure_phase": {
+          "type": "string",
+          "enum": [
+            "V0110-B",
+            "V0110-C",
+            "V0110-D",
+            "V0110-E"
+          ]
+        },
+        "author": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reviewer": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidence": {
+          "type": "object",
+          "properties": {
+            "implementation": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "qualification": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "compatibility": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "rollback": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            }
+          },
+          "required": [
+            "implementation",
+            "qualification",
+            "compatibility",
+            "rollback"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "schema_version",
+        "item_id",
+        "outcome",
+        "closure_phase",
+        "author",
+        "reviewer",
+        "evidence"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "type": "string",
+          "const": "apg.roadmap-decision/v1"
+        },
+        "item_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "outcome": {
+          "type": "string",
+          "const": "REJECTED"
+        },
+        "closure_phase": {
+          "type": "string",
+          "enum": [
+            "V0110-B",
+            "V0110-C",
+            "V0110-D",
+            "V0110-E"
+          ]
+        },
+        "author": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reviewer": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidence": {
+          "type": "object",
+          "properties": {
+            "evaluation": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "rejection_rationale": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            }
+          },
+          "required": [
+            "evaluation",
+            "rejection_rationale"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "schema_version",
+        "item_id",
+        "outcome",
+        "closure_phase",
+        "author",
+        "reviewer",
+        "evidence"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "type": "string",
+          "const": "apg.roadmap-decision/v1"
+        },
+        "item_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "outcome": {
+          "type": "string",
+          "const": "CONSUMER_HANDOFF_CLOSED"
+        },
+        "closure_phase": {
+          "type": "string",
+          "enum": [
+            "V0110-B",
+            "V0110-C",
+            "V0110-D",
+            "V0110-E"
+          ]
+        },
+        "author": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reviewer": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidence": {
+          "type": "object",
+          "properties": {
+            "provider_delivery": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "ownership": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            }
+          },
+          "required": [
+            "provider_delivery",
+            "ownership"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "schema_version",
+        "item_id",
+        "outcome",
+        "closure_phase",
+        "author",
+        "reviewer",
+        "evidence"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "type": "string",
+          "const": "apg.roadmap-decision/v1"
+        },
+        "item_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "outcome": {
+          "type": "string",
+          "const": "MAINTENANCE_TRIGGER"
+        },
+        "closure_phase": {
+          "type": "string",
+          "enum": [
+            "V0110-B",
+            "V0110-C",
+            "V0110-D",
+            "V0110-E"
+          ]
+        },
+        "author": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reviewer": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidence": {
+          "type": "object",
+          "properties": {
+            "trigger_observation": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "refresh_procedure": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "independent_review": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            }
+          },
+          "required": [
+            "trigger_observation",
+            "refresh_procedure",
+            "independent_review"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "schema_version",
+        "item_id",
+        "outcome",
+        "closure_phase",
+        "author",
+        "reviewer",
+        "evidence"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "type": "string",
+          "const": "apg.roadmap-decision/v1"
+        },
+        "item_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "outcome": {
+          "type": "string",
+          "const": "STABLE"
+        },
+        "closure_phase": {
+          "type": "string",
+          "enum": [
+            "V0110-B",
+            "V0110-C",
+            "V0110-D",
+            "V0110-E"
+          ]
+        },
+        "author": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reviewer": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidence": {
+          "type": "object",
+          "properties": {
+            "repeated_positive_use": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "representative_non_triggers": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "defect_debt_disposition": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "rollback": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "provenance": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "independent_review": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "current_validation": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            }
+          },
+          "required": [
+            "repeated_positive_use",
+            "representative_non_triggers",
+            "defect_debt_disposition",
+            "rollback",
+            "provenance",
+            "independent_review",
+            "current_validation"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "schema_version",
+        "item_id",
+        "outcome",
+        "closure_phase",
+        "author",
+        "reviewer",
+        "evidence"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "type": "string",
+          "const": "apg.roadmap-decision/v1"
+        },
+        "item_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "outcome": {
+          "type": "string",
+          "const": "PROVISIONAL_MAINTENANCE"
+        },
+        "closure_phase": {
+          "type": "string",
+          "enum": [
+            "V0110-B",
+            "V0110-C",
+            "V0110-D",
+            "V0110-E"
+          ]
+        },
+        "author": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reviewer": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidence": {
+          "type": "object",
+          "properties": {
+            "repeated_positive_use": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "representative_non_triggers": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "defect_debt_disposition": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "rollback": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "provenance": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "independent_review": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "current_validation": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            }
+          },
+          "required": [
+            "repeated_positive_use",
+            "representative_non_triggers",
+            "defect_debt_disposition",
+            "rollback",
+            "provenance",
+            "independent_review",
+            "current_validation"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "schema_version",
+        "item_id",
+        "outcome",
+        "closure_phase",
+        "author",
+        "reviewer",
+        "evidence"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "type": "string",
+          "const": "apg.roadmap-decision/v1"
+        },
+        "item_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "outcome": {
+          "type": "string",
+          "const": "DEPRECATED_OR_SUPERSEDED"
+        },
+        "closure_phase": {
+          "type": "string",
+          "enum": [
+            "V0110-B",
+            "V0110-C",
+            "V0110-D",
+            "V0110-E"
+          ]
+        },
+        "author": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reviewer": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidence": {
+          "type": "object",
+          "properties": {
+            "evaluation": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "replacement_or_retirement": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "rollback": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            }
+          },
+          "required": [
+            "evaluation",
+            "replacement_or_retirement",
+            "rollback"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "schema_version",
+        "item_id",
+        "outcome",
+        "closure_phase",
+        "author",
+        "reviewer",
+        "evidence"
+      ],
+      "additionalProperties": false
+    }
+  ]
+}

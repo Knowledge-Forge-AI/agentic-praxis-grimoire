@@ -1598,7 +1598,6 @@ def _check_leaf(
     declared: list[tuple[str, str]],
     policy: str | None = None,
 ) -> None:
-    leaf_relative = _relative(leaf, root)
     skill_file = leaf / "SKILL.md"
     skill_relative = _relative(skill_file, root)
     if not _ordinary_file(skill_file):
@@ -2206,15 +2205,13 @@ def _embedded_corpus_failure(root: Path) -> str | None:
             shell=False,
             timeout=120,
         )
-    except (OSError, subprocess.TimeoutExpired):
-        return "Go embedded-corpus verification could not run"
-    if completed.returncode != 0:
-        return "Go embedded-corpus verification disagrees with repository truth"
-    if completed.stdout or completed.stderr:
-        text = (completed.stderr + completed.stdout).decode("utf-8", errors="replace").strip()
-        if text:
-            return f"Go embedded-corpus verification produced unexpected output: {text}"
-    return None
+    except (OSError, subprocess.TimeoutExpired) as error:
+        return apg_skill_topology.format_embedded_corpus_failure(1, error=error)
+    return apg_skill_topology.format_embedded_corpus_failure(
+        completed.returncode,
+        completed.stdout,
+        completed.stderr,
+    )
 
 
 def _summary(result: CheckResult) -> dict[str, int]:

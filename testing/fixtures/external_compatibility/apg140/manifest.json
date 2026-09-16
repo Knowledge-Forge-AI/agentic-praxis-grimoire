@@ -1,0 +1,194 @@
+{
+  "manifest_schema_version": 1,
+  "fixture_id": "apg140-external-compatibility",
+  "public_source_contract": {
+    "public_contract_id": "APG140-RM-MAIN-20260912",
+    "observation_date": "2026-09-12",
+    "specifications": [
+      {
+        "document": "docs/specs/public-read-contract.md",
+        "clauses": [
+          "ARCH7A1 (Direct canonical list envelope)",
+          "ARCH7A2 (Embedded neighborhood / explanation collections)",
+          "Version 1 Envelope",
+          "Version 1 Embedded Envelope",
+          "Bounds And Ordering"
+        ]
+      },
+      {
+        "document": "docs/specs/durable-job-and-coordinator-contract.md",
+        "clauses": [
+          "ADR-0039",
+          "ASYNC1-CLOSE",
+          "Versioned Request Envelope",
+          "Durable State Machine"
+        ]
+      }
+    ],
+    "provenance_statement": "Independently authored APGR-local synthetic consumer fixture; admission evidence only, not Repo Map runtime conformance; zero copied source."
+  },
+  "members": [
+    {
+      "path": "cases/identity_drift_binding.json",
+      "sha256": "bcc1d093505f41057054365db48565df8aa0e103bfa3d46757ba438fbef66d5b",
+      "size_bytes": 216,
+      "case_id": "APG140-CASE-018",
+      "case_kind": "identity_drift_binding",
+      "contract_clause": "APG140 / Consumer / Caller Expected Binding Separation",
+      "description": "Envelope payload for canonical_edges used against a caller expectation of canonical_nodes."
+    },
+    {
+      "path": "cases/malformed_syntax.json",
+      "sha256": "18d3c50e563f8540d338c9b220103bf43b5888ef3fe58daaaf4fc6445633ed33",
+      "size_bytes": 78,
+      "case_id": "APG140-CASE-017",
+      "case_kind": "malformed_syntax",
+      "contract_clause": "APG140 / Parser / Malformed Payload Refusal",
+      "description": "Syntactically invalid JSON payload demonstrating malformed parse error rejection."
+    },
+    {
+      "path": "cases/v0_legacy_nodes_array.json",
+      "sha256": "1485a425ea0f2d51ff7fc0bb9be77ee3c4fcf08f3c8c2059884f6caed508498e",
+      "size_bytes": 143,
+      "case_id": "APG140-CASE-005",
+      "case_kind": "v0_legacy_nodes_array",
+      "contract_clause": "ARCH7A1 / CLI Contract / Legacy JSON Array Alias",
+      "description": "Version 0 legacy bounded JSON array compatibility alias; cannot prove completeness."
+    },
+    {
+      "path": "cases/v1_canonical_edges_exhausted.json",
+      "sha256": "d79362a87a39c21d2179d7c3687984baadd4f5c1082029c9f63be0149989feda",
+      "size_bytes": 698,
+      "case_id": "APG140-CASE-003",
+      "case_kind": "v1_canonical_edges_exhausted",
+      "contract_clause": "ARCH7A1 / Version 1 Envelope / Canonical Edges",
+      "description": "Version 1 canonical edges presentation envelope exhausted page."
+    },
+    {
+      "path": "cases/v1_canonical_edges_truncated.json",
+      "sha256": "f844971ebcbe5eb1dbf73eff85315aec037f705dbeed7627fbfcaf5bdf697fce",
+      "size_bytes": 555,
+      "case_id": "APG140-CASE-004",
+      "case_kind": "v1_canonical_edges_truncated",
+      "contract_clause": "ARCH7A1 / Version 1 Envelope / Canonical Edges",
+      "description": "Version 1 canonical edges presentation envelope truncated page with continuation."
+    },
+    {
+      "path": "cases/v1_canonical_nodes_exhausted.json",
+      "sha256": "74053f5bf5aca54d386139e40cbf738a806624e61fb43e1aeb6984d1ca9fd7ac",
+      "size_bytes": 633,
+      "case_id": "APG140-CASE-001",
+      "case_kind": "v1_canonical_nodes_exhausted",
+      "contract_clause": "ARCH7A1 / Version 1 Envelope",
+      "description": "Version 1 canonical nodes presentation envelope exhausted page (truncated=false, next_offset=null, empty diagnostics)."
+    },
+    {
+      "path": "cases/v1_canonical_nodes_truncated.json",
+      "sha256": "146e1c4999b7fe4732c069b7d027fef703084b25271abd9d2582e0a09fe5c8de",
+      "size_bytes": 589,
+      "case_id": "APG140-CASE-002",
+      "case_kind": "v1_canonical_nodes_truncated",
+      "contract_clause": "ARCH7A1 / Version 1 Envelope / Bounds And Ordering",
+      "description": "Version 1 canonical nodes presentation envelope truncated page with lookahead continuation."
+    },
+    {
+      "path": "cases/v1_count_mismatch.json",
+      "sha256": "f23b09ad841c0b5520cad2f198991825d3ee519f039a15993f8da219235dc3b9",
+      "size_bytes": 294,
+      "case_id": "APG140-CASE-016",
+      "case_kind": "v1_count_mismatch",
+      "contract_clause": "ARCH7A1 / Version 1 Envelope / Count Consistency",
+      "description": "Adverse case where page.returned does not match len(items)."
+    },
+    {
+      "path": "cases/v1_cyclic_graph.json",
+      "sha256": "05e89fac3518fcf4bf267eefde485c97a75ee06563c2a5e4bf9a6b5303918431",
+      "size_bytes": 445,
+      "case_id": "APG140-CASE-006",
+      "case_kind": "v1_cyclic_graph_nodes",
+      "contract_clause": "APG140 / Graph Checker / Cycle Tolerance",
+      "description": "Version 1 canonical nodes participating in directed cyclic graph structure."
+    },
+    {
+      "path": "cases/v1_cyclic_graph_edges.json",
+      "sha256": "ebc2f158168bf87354250e0c39f6fd6c8fa408e1bf2126166d6a45a7d45a861c",
+      "size_bytes": 897,
+      "case_id": "APG140-CASE-007",
+      "case_kind": "v1_cyclic_graph_edges",
+      "contract_clause": "APG140 / Graph Checker / Cycle Tolerance",
+      "description": "Version 1 canonical edges forming a closed directed cycle (alpha->beta->gamma->alpha)."
+    },
+    {
+      "path": "cases/v1_diagnostic_inconsistent_exhausted.json",
+      "sha256": "f33f6eb94c0d466fa2d20c817432bb400742c8685ea8699ebfe13e143ba0c787",
+      "size_bytes": 317,
+      "case_id": "APG140-CASE-015",
+      "case_kind": "v1_diagnostic_inconsistent_exhausted",
+      "contract_clause": "ARCH7A1 / Version 1 Envelope / Diagnostic Consistency",
+      "description": "Adverse case where truncated=false but result_truncated diagnostic is erroneously present."
+    },
+    {
+      "path": "cases/v1_diagnostic_inconsistent_truncated.json",
+      "sha256": "36cc5bd86a440d4c08a56341c17020f3abc57f584b6f8742c6f77755f55766bf",
+      "size_bytes": 287,
+      "case_id": "APG140-CASE-014",
+      "case_kind": "v1_diagnostic_inconsistent_truncated",
+      "contract_clause": "ARCH7A1 / Version 1 Envelope / Diagnostic Consistency",
+      "description": "Adverse case where truncated=true but result_truncated diagnostic is omitted."
+    },
+    {
+      "path": "cases/v1_embedded_neighborhood_exhausted.json",
+      "sha256": "b3b223e62856b9fa0a0db47fdbe96daba9b77af314f54e24aa89b2e15ad77266",
+      "size_bytes": 835,
+      "case_id": "APG140-CASE-009",
+      "case_kind": "v1_embedded_neighborhood_exhausted",
+      "contract_clause": "ARCH7A2 / Version 1 Embedded Envelope",
+      "description": "Version 1 canonical neighborhood embedded envelope with independent collections."
+    },
+    {
+      "path": "cases/v1_embedded_neighborhood_truncated.json",
+      "sha256": "95200467d69564cbf1ff9b7271bc858aaf18cc072789773cc8009fc8c609065d",
+      "size_bytes": 876,
+      "case_id": "APG140-CASE-010",
+      "case_kind": "v1_embedded_neighborhood_truncated",
+      "contract_clause": "ARCH7A2 / Version 1 Embedded Envelope / Truncated Collection",
+      "description": "Version 1 canonical neighborhood embedded envelope with truncated nodes collection."
+    },
+    {
+      "path": "cases/v1_graph_with_conflicts.json",
+      "sha256": "7b63e99fc2129c3786ce4dac376374133b3a1c5412a9d5fb3e6cfc6f3ed337fc",
+      "size_bytes": 727,
+      "case_id": "APG140-CASE-008",
+      "case_kind": "v1_graph_with_conflicts",
+      "contract_clause": "APG140 / Graph Checker / Known Conflicts and Dedup",
+      "description": "Version 1 nodes payload containing duplicate records, conflicting attributes, and spurious nodes."
+    },
+    {
+      "path": "cases/v1_partial_missing_limit.json",
+      "sha256": "66526a1c3895585e00a45dcce9b44450dd1fd9eb2dde0ffda33c9670cfeccae4",
+      "size_bytes": 199,
+      "case_id": "APG140-CASE-013",
+      "case_kind": "v1_partial_missing_limit",
+      "contract_clause": "ARCH7A1 / Version 1 Envelope / Page Limits",
+      "description": "Adverse envelope page descriptor missing mandatory limit field."
+    },
+    {
+      "path": "cases/v1_partial_missing_page.json",
+      "sha256": "8744b2d92c0cbc022b1c9888d2493be5eff5754a2271ede347a1341311dfe753",
+      "size_bytes": 98,
+      "case_id": "APG140-CASE-012",
+      "case_kind": "v1_partial_missing_page",
+      "contract_clause": "ARCH7A1 / Version 1 Envelope / Required Page",
+      "description": "Adverse envelope missing mandatory page descriptor object."
+    },
+    {
+      "path": "cases/v1_unknown_envelope_field.json",
+      "sha256": "0cc6ff6f10bb6e34963419a9800d0fdd30fdfacb91008125146cfec822af5709",
+      "size_bytes": 271,
+      "case_id": "APG140-CASE-011",
+      "case_kind": "v1_unknown_envelope_field",
+      "contract_clause": "APG140 / Policy / Unknown Envelope Fields Fail Closed",
+      "description": "Adverse envelope with unexpected field that must fail closed under APGR policy."
+    }
+  ]
+}

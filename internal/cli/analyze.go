@@ -29,13 +29,17 @@ Options:
   --include-path RELATIVE-PATH    include one literal relative subtree (repeatable)
   --exclude-path RELATIVE-PATH    exclude one literal relative subtree (repeatable)
   --disable-default-exclusions    scan ordinary default-excluded directories
+  --history-start OID             start commit OID (excluded) along first-parent chain
+  --history-end OID               end commit OID (included) along first-parent chain
   -h, --help                      show this help
 `
 
 type analyzeOptions struct {
-	format  string
-	output  string
-	request hotspot.Request
+	format       string
+	output       string
+	request      hotspot.Request
+	historyStart string
+	historyEnd   string
 }
 
 func runAnalyze(ctx context.Context, configuration config, arguments []string, stdout io.Writer) error {
@@ -54,6 +58,33 @@ func runAnalyze(ctx context.Context, configuration config, arguments []string, s
 			return err
 		}
 	}
+
+	if options.historyStart != "" || options.historyEnd != "" {
+		if options.historyStart == "" || options.historyEnd == "" {
+			return usageError{"both --history-start and --history-end must be specified together"}
+		}
+		reqV2 := hotspot.DefaultRequestV2(options.request.Root, options.historyStart, options.historyEnd)
+		reqV2.RootID = options.request.RootID
+		reqV2.ToolVersion = options.request.ToolVersion
+		reqV2.Limits = options.request.Limits
+		reqV2.Filters = options.request.Filters
+		reqV2.DisplayTopN = options.request.DisplayTopN
+
+		reportV2, err := hotspot.AnalyzeV2(ctx, reqV2)
+		if err != nil {
+			return err
+		}
+		content, err := renderAnalyzeReportV2(options.format, reportV2)
+		if err != nil {
+			return err
+		}
+		if options.output == "" {
+			_, err = stdout.Write(content)
+			return err
+		}
+		return writeAnalyzeOutput(options.output, content)
+	}
+
 	report, err := hotspot.Analyze(ctx, options.request)
 	if err != nil {
 		return err
@@ -77,6 +108,18 @@ func renderAnalyzeReport(format string, report hotspot.Report) ([]byte, error) {
 		return hotspot.MarshalJSON(report)
 	case "markdown":
 		return hotspot.RenderMarkdown(report)
+	}
+	return nil, usageError{"format must be terminal, json, or markdown"}
+}
+
+func renderAnalyzeReportV2(format string, report hotspot.ReportV2) ([]byte, error) {
+	switch format {
+	case "terminal":
+		return hotspot.RenderTerminalV2(report)
+	case "json":
+		return hotspot.MarshalJSONV2(report)
+	case "markdown":
+		return hotspot.RenderMarkdownV2(report)
 	}
 	return nil, usageError{"format must be terminal, json, or markdown"}
 }
@@ -160,7 +203,7 @@ func parseAnalyzeOptions(root string, arguments []string) (analyzeOptions, error
 
 func singleAnalyzeOption(value string) bool {
 	switch value {
-	case "--format", "--output", "--root-id", "--top", "--max-files", "--max-bytes-per-file", "--max-total-bytes", "--timeout":
+	case "--format", "--output", "--root-id", "--top", "--max-files", "--max-bytes-per-file", "--max-total-bytes", "--timeout", "--history-start", "--history-end":
 		return true
 	default:
 		return false
@@ -204,6 +247,10 @@ func applyAnalyzeOption(options *analyzeOptions, name, value string) error {
 			return usageError{"timeout must be a duration"}
 		}
 		options.request.Limits.MaxDuration = parsed
+	case "--history-start":
+		options.historyStart = value
+	case "--history-end":
+		options.historyEnd = value
 	}
 	return nil
 }

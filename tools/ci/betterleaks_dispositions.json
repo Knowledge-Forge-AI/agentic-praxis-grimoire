@@ -1,0 +1,35 @@
+{
+  "records": [
+    {
+      "context_sha256": "72c66abb1fdff43cae528baff77fae24fe3f5c3231d2f61581d80f079f7a8842",
+      "disposition": "reviewed_nonsecret",
+      "match_sha256": "f73e52ccd0d8ee58ae3c021b78a1cf6765192327b2c2865473554255298c307e",
+      "owner": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg123_browser_ui.unit.test.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg123_browser_ui.unit.test.py",
+      "reason": "Deliberately synthetic URL userinfo in test_evidence_nested_credential_redaction verifies string and nested receipt sanitization.",
+      "review": "APGR-V0110-READINESS4 pre_final review; manager decision D; exact current-source readback",
+      "rule": "generic-credential-uri"
+    },
+    {
+      "context_sha256": "244e18d02174d63fb1e4c3ff3e7dd74a859f8d121792db82bd4599aff106f193",
+      "disposition": "reviewed_nonsecret",
+      "match_sha256": "f5573d755612dea22623235ebe751475abcdfa27ee374c9513c1a10e5632a9c6",
+      "owner": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg123_browser_ui.unit.test.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg123_browser_ui.unit.test.py",
+      "reason": "Deliberately synthetic URL userinfo in test_evidence_nested_credential_redaction verifies string and nested receipt sanitization.",
+      "review": "APGR-V0110-READINESS4 pre_final review; manager decision D; exact current-source readback",
+      "rule": "generic-credential-uri"
+    },
+    {
+      "context_sha256": "56e74cfbf95b2a85dd52ae6f0912dc6b662e9db103ab69010f68f3f3dc4b5984",
+      "disposition": "reviewed_nonsecret",
+      "match_sha256": "7102d3295dcdfaa36dc0b932ad55ca5c8bea1539afcd9f0a7e643c6dd0bfd62b",
+      "owner": "libexec/apg_roadmap_contract.py",
+      "path": "libexec/apg_roadmap_contract.py",
+      "reason": "Public SHA-256 integrity binding in ITEM_BINDINGS for APGR-REPORT-PROJECT-KEY; not an API credential.",
+      "review": "APGR-V0110-READINESS4 pre_final review; manager decision D; exact current-source readback",
+      "rule": "generic-api-key"
+    }
+  ],
+  "schema": "apg-betterleaks-dispositions-v1"
+}

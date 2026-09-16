@@ -1,0 +1,46 @@
+{
+  "schema": "apg-codeql-policy-v1",
+  "product": "agentic-praxis-grimoire",
+  "languages": {
+    "go": {
+      "matrix_member": "codeql-go",
+      "build_mode": "manual",
+      "build_command": "go build ./cmd/apgr",
+      "category": "/language:go",
+      "sarif_file": "codeql-go.sarif",
+      "required_sarif": true
+    },
+    "python": {
+      "matrix_member": "codeql-python",
+      "build_mode": "none",
+      "category": "/language:python",
+      "sarif_file": "codeql-python.sarif",
+      "required_sarif": true
+    },
+    "javascript-typescript": {
+      "matrix_member": "codeql-javascript-typescript",
+      "build_mode": "none",
+      "category": "/language:javascript-typescript",
+      "sarif_file": "codeql-javascript-typescript.sarif",
+      "required_sarif": true
+    },
+    "actions": {
+      "matrix_member": "codeql-actions",
+      "build_mode": "none",
+      "category": "/language:actions",
+      "sarif_file": "codeql-actions.sarif",
+      "required_sarif": true
+    }
+  },
+  "alert_merge_protection": {
+    "enforced_levels": ["error", "high"],
+    "high_security_severity_threshold": 7.0,
+    "analysis_errors_block": true,
+    "blocking_action": "PR merge blocked on GitHub repository ruleset when alerts at or above threshold exist",
+    "sarif_upload": true
+  },
+  "hosted_success_claim": {
+    "claimed": false,
+    "rationale": "Hosted code scanning status and security alert resolution require GitHub-hosted Advanced Security infrastructure. Local runs provide syntactic and structural qualification without claiming hosted execution success."
+  }
+}

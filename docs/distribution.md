@@ -1,7 +1,7 @@
 # APG Distribution
 
-This documentation covers v0.10.0. The preceding **v0.9.0** and **v0.8.1** releases
-remain frozen. The distribution architecture preserves the multi-registry packaging
+This documentation covers the **unreleased v0.11.0 candidate**. The published
+**v0.10.0** and preceding releases remain frozen. The distribution architecture preserves the multi-registry packaging
 model and provides the 45-skill corpus. Local build and inspection do not publish
 packages.
 
@@ -100,6 +100,34 @@ The per-invocation full binary SHA-256 hash check provides complete fail-closed
 tamper resistance at the deliberate cost of ~6.5 MB hashing latency on each
 wrapper launch.
 
+## Homebrew tap distribution
+
+APG provides a Homebrew formula targeting the [`Knowledge-Forge-AI/homebrew-tap`](https://github.com/Knowledge-Forge-AI/homebrew-tap) repository:
+- Formula: `Formula/agentic-praxis-grimoire.rb`
+- Class: `AgenticPraxisGrimoire`
+- Executable: `apgr`
+- Planned installation command: `brew install Knowledge-Forge-AI/tap/agentic-praxis-grimoire`
+
+Homebrew tap distribution is **unreleased and pending post-release tap publication** for v0.11.0.
+
+### Supported targets and platform qualification
+
+The Homebrew formula packages the canonical native Go executable and binary manifest directly from official release deliverables:
+
+| Platform | Go target | Deliverable package | Qualification status |
+| --- | --- | --- | --- |
+| macOS Apple Silicon | `darwin/arm64` | `knowledge-forge-ai-apgr-darwin-arm64-<version>.tgz` | Native runtime qualified; Homebrew formula load, test, and coexistence pending initial tap release |
+| Linux x86_64 | `linux/amd64` | `knowledge-forge-ai-apgr-linux-x64-<version>.tgz` | Native runtime supported; developer/CI qualification hosted-pending; Homebrew testing pending |
+| Linux ARM64 | `linux/arm64` | `knowledge-forge-ai-apgr-linux-arm64-<version>.tgz` | Native runtime supported; developer/CI qualification hosted-pending; Homebrew testing pending |
+
+Intel macOS (`darwin/amd64`) is intentionally omitted and is not distributed or supported.
+
+### Installation footprint and coexistence
+
+The Homebrew formula installs the native portable `bin/apgr` executable into linked `bin/`, and its binary manifest (`apgr.binary-manifest.json`) and licensing documents into Homebrew prefix share storage (`pkgshare`). It requires no runtime Python, Node.js, or Go compilers. It does not install development test suites (`apgr test`).
+
+Homebrew installation coexistence alongside existing pip, npm, or Nix installations is designed to avoid overwriting, relinking, or force-replacing other package managers, with live verification recorded as pending until executed against the published tap.
+
 ## Candidate manifest and qualification
 
 `apg.distribution-manifest/v1` is the release-candidate checksum authority. It
@@ -122,7 +150,11 @@ source build uses the current checkout's version and corpus and is removed after
 the invocation. Installed wheels always use their bundled binary and never
 require a runtime compiler or network access.
 
-Once v0.10.0 is published, install Python with
+v0.11.0 candidate artifacts require local qualification before any release.
+The public staging PR and post-merge artifact qualification are separate gates;
+see the [release procedure](public-release-process.md).
+
+v0.10.0 remains publicly released across GitHub, Go, PyPI and npm. Install Python with
 `pip install agentic-praxis-grimoire==0.10.0`, npm with
 `npm install -g @knowledge-forge-ai/apgr@0.10.0`, or the Go module with
 `go get github.com/Knowledge-Forge-AI/agentic-praxis-grimoire@v0.10.0`.

@@ -1,0 +1,21 @@
+rules:
+  - id: apg-no-eval
+    patterns:
+      - pattern: eval(...)
+    message: "Avoid dynamic code execution with eval()"
+    languages: [python]
+    severity: ERROR
+
+  - id: apg-no-exec
+    patterns:
+      - pattern: exec(...)
+    message: "Avoid dynamic code execution with exec()"
+    languages: [python]
+    severity: ERROR
+
+  - id: apg-subprocess-shell-true
+    patterns:
+      - pattern: subprocess.$METHOD(..., shell=True, ...)
+    message: "subprocess invocation with shell=True is forbidden"
+    languages: [python]
+    severity: ERROR

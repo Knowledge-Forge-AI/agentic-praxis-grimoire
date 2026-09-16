@@ -9,10 +9,7 @@ and fail-closed prerequisite validation.
 
 from __future__ import annotations
 
-import os
-from pathlib import Path
 import sys
-import pytest
 
 from src.test.apg_test_support import repository_root
 
@@ -24,9 +21,6 @@ from apg124_vite import (  # noqa: E402
     EXPECTED_NODE_VERSION,
     EXPECTED_ROLLDOWN_VERSION,
     EXPECTED_VITE_VERSION,
-    ViteHarnessConfig,
-    ViteHarnessPrerequisiteError,
-    ViteHarnessReceipt,
     execute_vite_harness,
     observe_vite_harness_config,
     validate_prerequisites,

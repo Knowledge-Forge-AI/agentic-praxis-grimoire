@@ -563,7 +563,7 @@ class APGPublicReleaseTests(unittest.TestCase):
             ("omit", lambda repo: (repo / "ordinary.txt").unlink()),
             ("extra", lambda repo: (repo / "extra.txt").write_text("extra\n")),
             ("bytes", lambda repo: (repo / "ordinary.txt").write_text("changed\n")),
-            ("mode", lambda repo: os.chmod(repo / "bin" / "apg-project-skills", 0o644)),
+            ("mode", lambda repo: os.chmod(repo / "bin" / "apg-project-skills", 0o600)),
             ("link", lambda repo: (repo / "relative-link").unlink()),
             ("private", lambda repo: ((repo / "private").mkdir(), (repo / "private" / "leak").write_text("leak\n"))),
         )
@@ -587,7 +587,7 @@ class APGPublicReleaseTests(unittest.TestCase):
             "NOTICE",
         ):
             with self.subTest(path=path):
-                policy = self.policy()
+                self.policy()
                 source = self.make_source(self.root / path.replace("/", "-"))
                 (source / path).unlink()
                 self.commit_all(source, f"omit {path}")

@@ -12,7 +12,7 @@ import unittest
 from unittest import mock
 
 from src.test.apg_test_support import repository_root
-from src.test.apg_skill_library_cases import CompleteCheckerBoundaryTests
+from src.test.apg_skill_library_cases import CompleteCheckerBoundaryTests as CompleteCheckerBoundaryTests
 
 
 REPOSITORY_ROOT = repository_root(__file__)
@@ -27,8 +27,6 @@ from apg_skill_library_check import (  # noqa: E402
     main,
     parse_catalog,
     parse_frontmatter,
-    render_json,
-    render_text,
     valid_skill_name,
     visible_lines,
 )
@@ -46,11 +44,9 @@ class EmbeddedCorpusConvergenceTests(unittest.TestCase):
 
     @mock.patch("apg_skill_library_check.subprocess.run")
     def test_go_embedded_corpus_verification_fails_closed(self, run: mock.Mock) -> None:
-        run.return_value = mock.Mock(returncode=1, stdout=b"", stderr=b"bounded")
-        self.assertEqual(
-            checker._embedded_corpus_failure(REPOSITORY_ROOT),
-            "Go embedded-corpus verification disagrees with repository truth",
-        )
+        run.return_value = mock.Mock(returncode=1, stdout=b"", stderr=b"Go toolchain is required")
+        failure = checker._embedded_corpus_failure(REPOSITORY_ROOT)
+        self.assertIn("Go embedded-corpus verification", failure or "")
 
     @mock.patch("apg_skill_library_check._embedded_corpus_failure")
     @mock.patch("apg_skill_library_check.check_library")

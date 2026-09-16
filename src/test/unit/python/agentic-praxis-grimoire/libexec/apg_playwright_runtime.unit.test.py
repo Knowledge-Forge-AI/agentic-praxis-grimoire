@@ -1,7 +1,6 @@
 """Refusal evidence for the external Playwright prerequisite boundary."""
 
 import json
-from pathlib import Path
 import sys
 
 import pytest
@@ -10,7 +9,7 @@ from src.test.apg_test_support import repository_root
 
 ROOT = repository_root(__file__)
 sys.path.insert(0, str(ROOT / "libexec"))
-import apg_playwright_runtime as subject
+import apg_playwright_runtime as subject  # noqa: E402
 
 
 def environment(tmp_path, monkeypatch):

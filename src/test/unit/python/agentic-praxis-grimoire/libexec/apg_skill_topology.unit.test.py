@@ -630,7 +630,9 @@ def test_apg81h_independence_mutations(tmp_path: Path) -> None:
     with pytest.raises(ValueError, match="disagree"):
         _require_independent_rows(lambda: production, lambda: altered_authority)
 
-    producer = lambda: production
+    def producer():
+        return production
+
     with pytest.raises(ValueError, match="not independent"):
         _require_independent_rows(producer, producer)
 
@@ -743,5 +745,37 @@ def test_apg81h_exact_transition_case(case: int) -> None:
         )
 
 
+def test_format_embedded_corpus_failure() -> None:
+    formatter = checker.apg_skill_topology.format_embedded_corpus_failure
+
+    # 1. Error / could not run
+    err_msg = formatter(1, error="toolchain missing")
+    assert err_msg == "Go embedded-corpus verification could not run: toolchain missing"
+
+    # 2. Prerequisite or execution failure (e.g. toolchain error)
+    prereq = formatter(
+        1, stderr=b"Go toolchain is required for the source-checkout bridge"
+    )
+    assert prereq is not None
+    assert prereq.startswith("Go embedded-corpus verification prerequisite or execution failed (exit 1):")
+    assert "Go toolchain is required" in prereq
+
+    # 3. Genuine corpus disagreement
+    corpus = formatter(
+        1, stderr=b"checkout skill metadata disagrees with the embedded canonical corpus"
+    )
+    assert corpus is not None
+    assert corpus.startswith("Go embedded-corpus verification disagrees with repository truth:")
+    assert "checkout skill metadata disagrees" in corpus
+
+    # 4. Unexpected output on exit 0
+    unexpected = formatter(0, stdout=b"extra warning output")
+    assert unexpected == "Go embedded-corpus verification produced unexpected output: extra warning output"
+
+    # 5. Clean exit 0 with no output
+    assert formatter(0, b"", b"") is None
+
+
 if __name__ == "__main__":
     unittest.main()
+

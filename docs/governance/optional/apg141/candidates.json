@@ -1,0 +1,38 @@
+{
+  "schema_version": "apg141-optional-closure-candidates-v1",
+  "status": "PENDING_DISPATCHER_PRE_FINAL",
+  "actual_accounting": {
+    "inherited": 55,
+    "terminal": 43,
+    "open": 12,
+    "invalid": 0
+  },
+  "proposed_accounting": {
+    "inherited": 55,
+    "terminal": 47,
+    "open": 8,
+    "invalid": 0
+  },
+  "candidates": [
+    {
+      "item_id": "APGR-HOTSPOT-CHURN",
+      "outcome": "DELIVERED",
+      "candidate_ref": "docs/governance/optional/apg141/candidates/APGR-HOTSPOT-CHURN.json"
+    },
+    {
+      "item_id": "APGR-CXT2B",
+      "outcome": "REJECTED",
+      "candidate_ref": "docs/governance/optional/apg141/candidates/APGR-CXT2B.json"
+    },
+    {
+      "item_id": "APGR-REPORT-PROJECT-KEY",
+      "outcome": "DELIVERED",
+      "candidate_ref": "docs/governance/optional/apg141/candidates/APGR-REPORT-PROJECT-KEY.json"
+    },
+    {
+      "item_id": "APGR-REPORT-RESULT-FIELDS",
+      "outcome": "REJECTED",
+      "candidate_ref": "docs/governance/optional/apg141/candidates/APGR-REPORT-RESULT-FIELDS.json"
+    }
+  ]
+}
