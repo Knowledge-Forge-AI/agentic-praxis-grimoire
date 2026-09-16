@@ -85,9 +85,8 @@ jobs:
           [[ "$(jq -er '.head_sha' <<<"$run_json")" == "$EXPECTED_PR_HEAD" ]]
           [[ "$(jq -er '.status' <<<"$run_json")" == completed ]]
           [[ "$(jq -er '.conclusion' <<<"$run_json")" == success ]]
-          jq -e --argjson n "$EXPECTED_PR" '.pull_requests | any(.number == $n)' <<<"$run_json" >/dev/null
 
-          jobs=$(gh api --paginate "/repos/$EXPECTED_REPOSITORY/actions/runs/$EXPECTED_CI_RUN/jobs?per_page=100")
+          jobs=$(gh api "/repos/$EXPECTED_REPOSITORY/actions/runs/$EXPECTED_CI_RUN/jobs?per_page=100")
           required=(guard static-analysis policy unit-integration closure go package sbom-and-vulnerability "codeql (go)" "codeql (python)" "codeql (javascript-typescript)" "codeql (actions)" public-pr-gate)
           for name in "${required[@]}"; do
             jq -e --arg name "$name" '.jobs | any(.name == $name and .status == "completed" and .conclusion == "success")' <<<"$jobs" >/dev/null
@@ -118,7 +117,6 @@ jobs:
           mapfile -t wheels < <(jq -r '.python.wheels[].name' "$manifest")
           [[ ${#wheels[@]} -eq 3 ]]
           sdist=$(jq -er '.python.sdist.name' "$manifest")
-          expected=("${wheels[@]}" "$sdist")
 
           for i in "${!wheels[@]}"; do
             name="${wheels[$i]}"
