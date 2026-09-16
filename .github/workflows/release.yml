@@ -3,6 +3,12 @@ name: Publish Python distribution
 on:
   release:
     types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Exact published release tag to verify and publish
+        required: true
+        default: v0.11.0
 
 permissions: {}
 
@@ -16,7 +22,7 @@ jobs:
       id-token: write
       pull-requests: read
     steps:
-      - name: Verify release identity and hosted qualification
+      - name: Verify publication request, release identity and hosted qualification
         env:
           GH_TOKEN: ${{ github.token }}
           EXPECTED_REPOSITORY: Knowledge-Forge-AI/agentic-praxis-grimoire
@@ -32,9 +38,25 @@ jobs:
         run: |
           set -euo pipefail
           [[ "$GITHUB_REPOSITORY" == "$EXPECTED_REPOSITORY" ]]
-          [[ "$(jq -r '.release.tag_name' "$GITHUB_EVENT_PATH")" == "$EXPECTED_TAG" ]]
-          [[ "$(jq -r '.release.draft' "$GITHUB_EVENT_PATH")" == false ]]
-          [[ "$(jq -r '.release.prerelease' "$GITHUB_EVENT_PATH")" == false ]]
+
+          case "$GITHUB_EVENT_NAME" in
+            release)
+              requested_tag=$(jq -er '.release.tag_name' "$GITHUB_EVENT_PATH")
+              ;;
+            workflow_dispatch)
+              requested_tag=$(jq -er '.inputs.tag' "$GITHUB_EVENT_PATH")
+              ;;
+            *)
+              echo "unsupported publication event: $GITHUB_EVENT_NAME" >&2
+              exit 1
+              ;;
+          esac
+          [[ "$requested_tag" == "$EXPECTED_TAG" ]]
+
+          release_json=$(gh api "/repos/$EXPECTED_REPOSITORY/releases/tags/$EXPECTED_TAG")
+          [[ "$(jq -r '.draft' <<<"$release_json")" == false ]]
+          [[ "$(jq -r '.prerelease' <<<"$release_json")" == false ]]
+          [[ "$(jq -r '.tag_name' <<<"$release_json")" == "$EXPECTED_TAG" ]]
 
           tag_ref=$(gh api "/repos/$EXPECTED_REPOSITORY/git/ref/tags/$EXPECTED_TAG")
           tag_sha=$(jq -er '.object.sha' <<<"$tag_ref")
