@@ -1,0 +1,8 @@
+{
+  "modelRole": "review",
+  "effort": "high",
+  "permissionMode": "acceptEdits",
+  "additionalDirectories": [
+    "scratch"
+  ]
+}

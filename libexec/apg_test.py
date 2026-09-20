@@ -5,7 +5,7 @@ from __future__ import annotations
 import argparse
 from contextlib import contextmanager
 from copy import deepcopy
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import hashlib
 from importlib import metadata
 import json
@@ -156,6 +156,7 @@ class Inventory:
     coverage_sources: dict[str, tuple[str, ...]]
     excluded_launchers: dict[str, str]
     tests: dict[str, tuple[str, str]]
+    dispatcher_sources: dict[str, str] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -469,12 +470,9 @@ def load_inventory(root: Path) -> Inventory:
         value = json.loads(raw, object_pairs_hook=_unique_object)
     except (OSError, UnicodeError, ValueError) as error:
         fail_invocation(f"test inventory is unreadable or malformed: {error}")
-    if not isinstance(value, dict) or set(value) != {
-        "coverage_sources",
-        "excluded_python_launchers",
-        "schema_version",
-        "tests",
-    }:
+    allowed_keys = {"coverage_sources", "excluded_python_launchers", "schema_version", "tests", "dispatcher_sources"}
+    required_keys = {"coverage_sources", "excluded_python_launchers", "schema_version", "tests"}
+    if not isinstance(value, dict) or not set(value).issubset(allowed_keys) or not required_keys.issubset(set(value)):
         fail_invocation("test inventory has unknown or missing top-level fields")
     if value["schema_version"] != 2:
         fail_invocation("test inventory schema_version must be 2")
@@ -530,7 +528,18 @@ def load_inventory(root: Path) -> Inventory:
         if path in tests:
             fail_invocation(f"duplicate mirrored test: {path}")
         tests[path] = (owner, suite)
-    return Inventory(coverage_sources, excluded_launchers, tests)
+    dispatcher_sources: dict[str, str] = {}
+    for entry in value.get("dispatcher_sources", []):
+        if not isinstance(entry, dict) or set(entry) != {"path", "rationale"}:
+            fail_invocation("dispatcher source entry has unknown or missing fields")
+        path = _relative_path(entry["path"], "dispatcher source path")
+        rationale = entry["rationale"]
+        if not isinstance(rationale, str) or not rationale.strip():
+            fail_invocation(f"dispatcher source rationale is invalid: {path}")
+        if path in dispatcher_sources:
+            fail_invocation(f"duplicate dispatcher source: {path}")
+        dispatcher_sources[path] = rationale
+    return Inventory(coverage_sources, excluded_launchers, tests, dispatcher_sources)
 
 
 def _expected_test_path(owner: str, suite: str) -> str:
@@ -553,7 +562,7 @@ def validate_inventory(root: Path, inventory: Inventory) -> None:
         for path in source_root.rglob("*.py")
         if "__pycache__" not in path.parts
     }
-    declared_sources = set(inventory.coverage_sources)
+    declared_sources = set(inventory.coverage_sources) | set(inventory.dispatcher_sources)
     if actual_sources != declared_sources:
         missing = sorted(actual_sources - declared_sources)
         stale = sorted(declared_sources - actual_sources)
@@ -1776,15 +1785,17 @@ def coverage_counts(report: dict[str, object], paths: Sequence[str]) -> Coverage
     )
 
 
-def validate_coverage_report(report: dict[str, object], declared: set[str]) -> None:
+def validate_coverage_report(
+    report: dict[str, object], declared: set[str], allowed_sidecar: set[str] = frozenset()
+) -> None:
     """Reject missing, foreign, or non-file coverage measurements."""
     files = report.get("files")
     if not isinstance(files, dict):
         fail_harness("coverage JSON has no files object")
     measured = set(files)
-    if measured != declared:
-        missing = sorted(declared - measured)
-        foreign = sorted(measured - declared)
+    missing = sorted(declared - measured)
+    foreign = sorted(measured - (declared | set(allowed_sidecar)))
+    if missing or foreign:
         fail_harness(f"coverage source set differs: missing={missing}; foreign={foreign}")
 
 
@@ -2395,9 +2406,9 @@ def run(
     if public_selection is not None:
         selected_paths = {path for paths in public_selection.files.values() for path in paths}
         effective_inventory = Inventory(
-            inventory.coverage_sources,
-            inventory.excluded_launchers,
+            inventory.coverage_sources, inventory.excluded_launchers,
             {path: inventory.tests[path] for path in selected_paths},
+            inventory.dispatcher_sources,
         )
     dependency_versions()
     if requires_typescript_compiler(effective_inventory):
@@ -2462,7 +2473,8 @@ def run(
                         else ()
                     ),
                 )
-                validate_coverage_report(report, set(inventory.coverage_sources))
+                validate_coverage_report(report, set(effective_inventory.coverage_sources),
+                                         set(effective_inventory.dispatcher_sources))
                 paths = sorted(
                     path
                     for path, suites in inventory.coverage_sources.items()
@@ -2485,7 +2497,8 @@ def run(
                     [results[name].data_file for name in ("unit", "integration")],
                     artifacts / "combined.coverage",
                 )
-                validate_coverage_report(report, set(inventory.coverage_sources))
+                validate_coverage_report(report, set(effective_inventory.coverage_sources),
+                                         set(effective_inventory.dispatcher_sources))
                 paths = sorted(inventory.coverage_sources)
                 counts = coverage_counts(report, paths)
                 enforce_threshold(counts, *THRESHOLDS["combined"])

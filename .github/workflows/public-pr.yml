@@ -113,7 +113,7 @@
         },
         {
           "name": "Run adapted pre-review static analysis stack",
-          "run": "mkdir -p \"$RUNNER_TEMP/pre-review-evidence\"\n\"$RUNNER_TEMP/apgr-static-tools/python/bin/python\" tools/ci/run_pre_review.py --tool-root \"$RUNNER_TEMP/apgr-static-tools\" --evidence-dir \"$RUNNER_TEMP/pre-review-evidence\"\n"
+          "run": "mkdir -p \"$RUNNER_TEMP/pre-review-evidence\"\n\"$RUNNER_TEMP/apgr-static-tools/python/bin/python\" tools/ci/run_pre_review.py --public-projection --tool-root \"$RUNNER_TEMP/apgr-static-tools\" --evidence-dir \"$RUNNER_TEMP/pre-review-evidence\"\n"
         },
         {
           "name": "Retain bounded sanitized static analysis evidence",
@@ -243,7 +243,7 @@
         },
         {
           "name": "Run unit and integration suite",
-          "run": "set -euo pipefail\n\"${APGR_TEST_PYTHON}\" bin/apg-test policy \\\n  --summary-file \"${RUNNER_TEMP}/apgr-policy-summary.json\"\n\"${APGR_TEST_PYTHON}\" bin/apg-test unit-integration --public-version 0.11.0 \\\n  --summary-file \"${RUNNER_TEMP}/apgr-unit-integration-summary.json\"\n"
+          "run": "set -euo pipefail\n\"${APGR_TEST_PYTHON}\" bin/apg-test policy \\\n  --summary-file \"${RUNNER_TEMP}/apgr-policy-summary.json\"\n\"${APGR_TEST_PYTHON}\" bin/apg-test unit-integration --public-version 0.12.0 \\\n  --summary-file \"${RUNNER_TEMP}/apgr-unit-integration-summary.json\"\n"
         },
         {
           "name": "Emit unit-integration receipt",

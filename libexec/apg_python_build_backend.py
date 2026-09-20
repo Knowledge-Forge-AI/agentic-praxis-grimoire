@@ -41,8 +41,8 @@ SUPPORTED_TARGETS = ("darwin/arm64", "linux/amd64", "linux/arm64")
 # The editable backend defaults to the current release epoch. Historical
 # source archives retain their own backend value, and the historical build
 # helper binds v0.6 explicitly.
-# Unreleased v0.11 candidate archive epoch, not a publication timestamp.
-DEFAULT_EPOCH = 1_789_000_000
+# Unreleased v0.12 candidate archive epoch, not a publication timestamp.
+DEFAULT_EPOCH = 1_789_689_600
 MANIFEST_SCHEMA = "apg.binary-manifest/v1"
 PUBLIC_REPOSITORY_URL = "https://github.com/Knowledge-Forge-AI/agentic-praxis-grimoire"
 

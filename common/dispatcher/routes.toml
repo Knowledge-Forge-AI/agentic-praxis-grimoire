@@ -1,0 +1,212 @@
+schema = "agent-phase-routes-v1"
+generation = 7
+
+[routes.implementation_testing.normal]
+plan = "codex-architecture-docs-primary"
+plan_review = "claude-normal-plan-review"
+work = "antigravity-gemini-high"
+final_review = "claude-normal-final-review"
+closeout = "codex-implementation-testing"
+
+[routes.architecture_docs.normal]
+plan = "codex-architecture-docs-primary"
+plan_review = "claude-normal-plan-review"
+work = "antigravity-gemini-high"
+final_review = "codex-architecture-docs-primary"
+closeout = "fable-architecture-docs-primary"
+
+[routes.sysadmin.normal]
+plan = "codex-architecture-docs-primary"
+plan_review = "claude-normal-sysadmin-plan-review"
+work = "antigravity-gemini-high"
+final_review = "claude-sysadmin-opus-review"
+closeout = "codex-implementation-testing"
+
+[routes.implementation_testing.gemini_sub]
+plan = "codex-architecture-docs-primary"
+plan_review = "claude-normal-plan-review"
+work = "codex-implementation-testing"
+final_review = "claude-normal-final-review"
+closeout = "codex-implementation-testing"
+
+[routes.architecture_docs.gemini_sub]
+plan = "codex-architecture-docs-primary"
+plan_review = "claude-normal-plan-review"
+work = "codex-architecture-docs-primary"
+final_review = "claude-normal-final-review"
+closeout = "fable-architecture-docs-primary"
+
+[routes.sysadmin.gemini_sub]
+plan = "codex-architecture-docs-primary"
+plan_review = "claude-sysadmin-opus-review"
+work = "codex-sysadmin-primary"
+final_review = "claude-sysadmin-opus-review"
+closeout = "codex-implementation-testing"
+
+[routes.implementation_testing.gemini_flash_sub]
+plan = "antigravity-gemini-high"
+plan_review = "claude-normal-plan-review"
+work = "antigravity-gemini-high"
+final_review = "claude-normal-final-review"
+closeout = "antigravity-gemini-high"
+
+[routes.architecture_docs.gemini_flash_sub]
+plan = "antigravity-gemini-high"
+plan_review = "claude-normal-plan-review"
+work = "antigravity-gemini-high"
+final_review = "claude-normal-final-review"
+closeout = "fable-architecture-docs-primary"
+
+[routes.sysadmin.gemini_flash_sub]
+plan = "antigravity-gemini-high"
+plan_review = "claude-sysadmin-opus-review"
+work = "antigravity-gemini-high"
+final_review = "claude-sysadmin-opus-review"
+closeout = "antigravity-gemini-high"
+
+[routes.implementation_testing.gemini_flash_opus_sub]
+plan = "antigravity-gemini-high"
+plan_review = "claude-normal-final-review"
+work = "antigravity-gemini-high"
+final_review = "claude-normal-final-review"
+closeout = "antigravity-gemini-high"
+
+[routes.architecture_docs.gemini_flash_opus_sub]
+plan = "antigravity-gemini-high"
+plan_review = "claude-normal-final-review"
+work = "antigravity-gemini-high"
+final_review = "claude-normal-final-review"
+closeout = "claude-architecture-docs-primary"
+
+[routes.sysadmin.gemini_flash_opus_sub]
+plan = "antigravity-gemini-high"
+plan_review = "claude-sysadmin-opus-review"
+work = "antigravity-gemini-high"
+final_review = "claude-sysadmin-opus-review"
+closeout = "antigravity-gemini-high"
+
+[routes.implementation_testing.conserve_claude]
+plan = "codex-architecture-docs-primary"
+plan_review = "claude-normal-final-review"
+work = "antigravity-gemini-high"
+final_review = "codex-implementation-testing-review"
+closeout = "antigravity-gemini-high"
+
+[routes.architecture_docs.conserve_claude]
+plan = "codex-architecture-docs-primary"
+plan_review = "claude-normal-final-review"
+work = "antigravity-gemini-high"
+final_review = "claude-normal-final-review"
+closeout = "codex-architecture-docs-primary"
+
+[routes.sysadmin.conserve_claude]
+plan = "codex-sysadmin-primary"
+plan_review = "claude-sysadmin-opus-review"
+work = "antigravity-gemini-high"
+final_review = "claude-sysadmin-opus-review"
+closeout = "codex-sysadmin-primary"
+
+[routes.implementation_testing.gemini_only]
+plan = "antigravity-gemini-high"
+plan_review = "antigravity-gemini-high"
+work = "antigravity-gemini-high"
+final_review = "antigravity-gemini-high"
+closeout = "antigravity-gemini-high"
+
+[routes.architecture_docs.gemini_only]
+plan = "antigravity-gemini-high"
+plan_review = "antigravity-gemini-high"
+work = "antigravity-gemini-high"
+final_review = "antigravity-gemini-high"
+closeout = "antigravity-gemini-high"
+
+[routes.implementation_testing.claude_only]
+plan = "claude-implementation-primary"
+plan_review = "claude-implementation-review"
+work = "claude-implementation-primary"
+final_review = "claude-implementation-review"
+closeout = "claude-implementation-primary"
+
+[routes.architecture_docs.claude_only]
+plan = "claude-architecture-docs-primary"
+plan_review = "claude-architecture-docs-review"
+work = "claude-architecture-docs-primary"
+final_review = "claude-architecture-docs-review"
+closeout = "claude-architecture-docs-primary"
+
+[routes.sysadmin.gemini_only]
+plan = "antigravity-gemini-high"
+plan_review = "antigravity-gemini-high"
+work = "antigravity-gemini-high"
+final_review = "antigravity-gemini-high"
+closeout = "antigravity-gemini-high"
+
+[routes.sysadmin.claude_only]
+plan = "claude-sysadmin-primary"
+plan_review = "claude-sysadmin-review"
+work = "claude-sysadmin-primary"
+final_review = "claude-sysadmin-review"
+closeout = "claude-sysadmin-primary"
+
+[routes.implementation_testing.codex_only]
+plan = "codex-implementation-testing"
+plan_review = "codex-implementation-testing-review"
+work = "codex-implementation-testing"
+final_review = "codex-implementation-testing-review"
+closeout = "codex-implementation-testing"
+
+[routes.architecture_docs.codex_only]
+plan = "codex-architecture-docs-primary"
+plan_review = "codex-architecture-docs-review"
+work = "codex-architecture-docs-primary"
+final_review = "codex-architecture-docs-review"
+closeout = "codex-architecture-docs-primary"
+
+[routes.sysadmin.codex_only]
+plan = "codex-sysadmin-primary"
+plan_review = "codex-sysadmin-review"
+work = "codex-sysadmin-primary"
+final_review = "codex-sysadmin-review"
+closeout = "codex-sysadmin-primary"
+
+[routes.implementation_testing.gemini_opus]
+plan = "antigravity-gemini-high"
+plan_review = "claude-normal-final-review"
+work = "antigravity-gemini-high"
+final_review = "claude-normal-final-review"
+closeout = "antigravity-gemini-high"
+
+[routes.implementation_testing.gemini_fable]
+plan = "antigravity-gemini-high"
+plan_review = "claude-normal-plan-review"
+work = "antigravity-gemini-high"
+final_review = "claude-normal-final-review"
+closeout = "antigravity-gemini-high"
+
+[routes.architecture_docs.gemini_opus]
+plan = "antigravity-gemini-high"
+plan_review = "claude-normal-final-review"
+work = "antigravity-gemini-high"
+final_review = "claude-normal-final-review"
+closeout = "antigravity-gemini-high"
+
+[routes.architecture_docs.gemini_fable]
+plan = "antigravity-gemini-high"
+plan_review = "claude-normal-plan-review"
+work = "antigravity-gemini-high"
+final_review = "claude-normal-final-review"
+closeout = "antigravity-gemini-high"
+
+[routes.sysadmin.gemini_opus]
+plan = "antigravity-gemini-high"
+plan_review = "claude-sysadmin-opus-review"
+work = "antigravity-gemini-high"
+final_review = "claude-sysadmin-opus-review"
+closeout = "antigravity-gemini-high"
+
+[routes.sysadmin.gemini_fable]
+plan = "antigravity-gemini-high"
+plan_review = "claude-normal-sysadmin-plan-review"
+work = "antigravity-gemini-high"
+final_review = "claude-sysadmin-opus-review"
+closeout = "antigravity-gemini-high"

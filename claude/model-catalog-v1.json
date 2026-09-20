@@ -1,0 +1,17 @@
+{
+  "schema": "agent-central-claude-model-catalog-v1",
+  "roles": {
+    "primary": "opus-current",
+    "review": "fable-current"
+  },
+  "models": {
+    "opus-current": {
+      "id": "claude-opus-5"
+    },
+    "fable-current": {
+      "id": "claude-fable-5-1",
+      "minimumClaudeCodeVersion": "2.1.250",
+      "adaptiveThinking": true
+    }
+  }
+}

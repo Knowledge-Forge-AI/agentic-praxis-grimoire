@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+source="${BASH_SOURCE[0]}"
+while [ -L "$source" ]; do
+  dir=$(CDPATH= cd -P -- "$(dirname -- "$source")" && pwd -P)
+  source=$(readlink -- "$source")
+  [ "${source#/}" = "$source" ] && source="$dir/$source"
+done
+root=$(CDPATH= cd -P -- "$(dirname -- "$source")/.." && pwd -P)
+exec python3 "$root/libexec/agent_phase/cli.py" native-git "$@"

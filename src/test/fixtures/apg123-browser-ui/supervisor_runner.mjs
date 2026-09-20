@@ -146,6 +146,10 @@ export async function runPlaywrightSupervisor(browserName, scratchDir, serverOri
   }
 
   // Phase 3: Actual SIGINT interruption
+  if (fs.existsSync(testResultsDir)) {
+    fs.rmSync(testResultsDir, { recursive: true, force: true });
+  }
+
   const signalFile = path.join(scratchDir, 'ready.signal');
   if (fs.existsSync(signalFile)) fs.unlinkSync(signalFile);
 
@@ -161,81 +165,7 @@ export async function runPlaywrightSupervisor(browserName, scratchDir, serverOri
     }
   );
 
-  let childStdout = '';
-  let childStderr = '';
-  if (child.stdout) {
-    child.stdout.on('data', (chunk) => { childStdout += chunk.toString(); });
-  }
-  if (child.stderr) {
-    child.stderr.on('data', (chunk) => { childStderr += chunk.toString(); });
-  }
-
-  const childPid = child.pid;
-  const terminateChild = () => {
-    try { process.kill(-childPid, 'SIGKILL'); } catch (error) {
-      if (error.code !== 'ESRCH') throw error;
-    }
-  };
-  // The Python outer timeout signals this parent; its detached runner group
-  // must be closed before the parent exits as well.
-  const terminateWithParent = () => { terminateChild(); process.exit(143); };
-  process.once('SIGTERM', terminateWithParent);
-  process.once('exit', terminateChild);
-  const deadline = Date.now() + 15000;
-  while (!fs.existsSync(signalFile) && Date.now() < deadline) {
-    await new Promise((r) => setTimeout(r, 50));
-  }
-  if (!fs.existsSync(signalFile)) {
-    try { process.kill(-childPid, 'SIGKILL'); } catch (_) {}
-    throw new Error('Child process failed to signal readiness within 15s');
-  }
-
-  // Send SIGINT to process group
-  const sigintSentAt = Date.now();
-  process.kill(-childPid, 'SIGINT');
-
-  const interruptionResult = await new Promise((resolve) => {
-    const timer = setTimeout(() => {
-      const elapsed = Date.now() - sigintSentAt;
-      try { process.kill(-childPid, 'SIGKILL'); } catch (_) {}
-      resolve({ timedOut: true, elapsed });
-    }, 15000);
-    child.on('exit', (code, signal) => {
-      clearTimeout(timer);
-      const elapsed = Date.now() - sigintSentAt;
-      resolve({ code, signal, timedOut: false, elapsed });
-    });
-  });
-
-  if (interruptionResult.timedOut) {
-    throw new Error(`Supervisor runner interruption timed out after ${interruptionResult.elapsed}ms. STDOUT:\n${childStdout}\nSTDERR:\n${childStderr}`);
-  }
-
-  const exitCode = interruptionResult.code !== null ? interruptionResult.code : interruptionResult.signal;
-  if (exitCode !== 130) {
-    throw new Error(`Expected runner interruption exit 130, got: ${exitCode}. STDOUT:\n${childStdout}\nSTDERR:\n${childStderr}`);
-  }
-
-  // Bounded check for process group death
-  await new Promise((r) => setTimeout(r, 100));
-  let pgSurvives = true;
-  try {
-    process.kill(-childPid, 0);
-  } catch (err) {
-    if (err.code === 'ESRCH') {
-      pgSurvives = false;
-    }
-  }
-  if (pgSurvives) {
-    try { process.kill(-childPid, 'SIGKILL'); } catch (_) {}
-    throw new Error('Browser or worker processes survived SIGINT interruption');
-  }
-  process.removeListener('SIGTERM', terminateWithParent);
-  process.removeListener('exit', terminateChild);
-
-  if (fs.existsSync(signalFile)) {
-    fs.unlinkSync(signalFile);
-  }
+  await interruptReadyRunner(child, signalFile);
 
   return [
     { name: 'controlled_failure_status_exact', passed: true },
@@ -245,4 +175,114 @@ export async function runPlaywrightSupervisor(browserName, scratchDir, serverOri
     { name: 'sigint_interruption_exit_130', passed: true },
     { name: 'browser_worker_cleanup_observed', passed: true },
   ];
+}
+
+// Signal the runner that owns Playwright teardown, rather than concurrently
+// interrupting its workers and browser transports. Group signals are reserved
+// for failed-run cleanup; a cleanup kill can never satisfy the exit-130 check.
+export async function interruptReadyRunner(child, signalFile, {
+  readinessMs = 15000, interruptionMs = 15000, cleanupMs = 1000,
+  signalGroup = (pid, signal) => process.kill(pid, signal),
+} = {}) {
+  let stdout = '';
+  let stderr = '';
+  let terminal;
+  let childError;
+  let resolveExit;
+  const exited = new Promise(resolve => { resolveExit = resolve; });
+  const onExit = (code, signal) => { terminal = { code, signal }; resolveExit(terminal); };
+  const onError = error => {
+    childError = error;
+    // A failed spawn has no child to reap. Other errors do not prove exit.
+    if (!child.pid) { terminal = { error }; resolveExit(terminal); }
+  };
+  const onStdout = chunk => { stdout += chunk.toString(); };
+  const onStderr = chunk => { stderr += chunk.toString(); };
+  child.once('exit', onExit);
+  child.on('error', onError);
+  if (child.exitCode != null || child.signalCode != null) onExit(child.exitCode, child.signalCode);
+  child.stdout?.on('data', onStdout);
+  child.stderr?.on('data', onStderr);
+  const alive = () => {
+    if (!child.pid) return false;
+    try { signalGroup(-child.pid, 0); return true; }
+    catch (error) {
+      if (error.code === 'ESRCH') return false;
+      throw new Error(`group probe: ${error.message}`, { cause: error });
+    }
+  };
+  const killGroup = () => {
+    if (!child.pid) return;
+    try { signalGroup(-child.pid, 'SIGKILL'); }
+    catch (error) {
+      if (error.code !== 'ESRCH') throw new Error(`group SIGKILL: ${error.message}`, { cause: error });
+    }
+  };
+  const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
+  const waitExit = async deadline => {
+    if (terminal) return terminal;
+    let timer;
+    try {
+      return await Promise.race([
+        exited,
+        new Promise(resolve => { timer = setTimeout(() => resolve(null), Math.max(0, deadline - performance.now())); }),
+      ]);
+    } finally { clearTimeout(timer); }
+  };
+  const waitDead = async deadline => {
+    while (alive()) {
+      const remaining = deadline - performance.now();
+      if (remaining <= 0) return false;
+      await pause(Math.min(20, remaining));
+    }
+    return true;
+  };
+  const onParentExit = () => {
+    try { killGroup(); }
+    finally { fs.rmSync(signalFile, { force: true }); }
+  };
+  const onParentTermination = () => { process.exit(143); };
+  process.once('SIGTERM', onParentTermination);
+  process.once('exit', onParentExit);
+  let cleanupDeadline;
+  try {
+    const deadline = performance.now() + readinessMs;
+    while (!fs.existsSync(signalFile) && performance.now() < deadline && !terminal && !childError) await pause(20);
+    if (childError) throw childError;
+    if (terminal) throw new Error('Child exited before readiness');
+    if (!fs.existsSync(signalFile)) throw new Error('Child failed to signal readiness');
+    const started = performance.now();
+    child.kill('SIGINT');
+    if (childError) throw childError;
+    const result = await waitExit(started + interruptionMs);
+    if (!result) throw new Error(`Supervisor runner interruption timed out after ${Math.round(performance.now() - started)}ms`);
+    if (result.error) throw result.error;
+    if (result.code !== 130 || result.signal !== null) {
+      throw new Error(`Expected runner interruption exit 130, got code=${result.code}, signal=${result.signal}`);
+    }
+    cleanupDeadline = performance.now() + cleanupMs;
+    if (!await waitDead(cleanupDeadline)) throw new Error('Browser or worker processes survived SIGINT interruption');
+  } catch (error) {
+    cleanupDeadline ??= performance.now() + cleanupMs;
+    const failures = [];
+    try { killGroup(); } catch (cleanupError) { failures.push(cleanupError.message); }
+    // Node's exit observation reaps the directly owned child before a group
+    // probe can encounter a zombie-only group. ESRCH alone is not reaping.
+    if (!await waitExit(cleanupDeadline)) failures.push('child exit deadline exceeded');
+    else {
+      try {
+        if (!await waitDead(cleanupDeadline)) failures.push('process group survived hard cleanup');
+      } catch (cleanupError) { failures.push(cleanupError.message); }
+    }
+    const cleanup = failures.length ? `; cleanup failed: ${failures.join('; ')}` : '';
+    throw new Error(`${error.message}${cleanup}. STDOUT:\n${stdout}\nSTDERR:\n${stderr}`, { cause: error });
+  } finally {
+    process.removeListener('SIGTERM', onParentTermination);
+    process.removeListener('exit', onParentExit);
+    child.removeListener('exit', onExit);
+    child.removeListener('error', onError);
+    child.stdout?.removeListener('data', onStdout);
+    child.stderr?.removeListener('data', onStderr);
+    if (fs.existsSync(signalFile)) fs.unlinkSync(signalFile);
+  }
 }

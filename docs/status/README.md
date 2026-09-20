@@ -266,3 +266,32 @@ Exit 00182 remains privately reserved for APG137; APG138 uses corrected exit 001
 - [`00189 — APG144 Public Staging Candidate and Operator Handoff Exit`](2026/09/13/00189-apg144-public-staging-candidate-and-operator-handoff-exit.md)
 
 - [`00190 — APG145 Hosted CI Repair and Staging Correction Exit`](2026/09/13/00190-apg145-hosted-ci-repair-and-staging-correction-exit.md)
+
+- [`00191 — APG146 v0.11 Reconciliation and v0.12 Architecture Transfer Exit`](2026/09/16/00191-apg146-v0120-a-reconciliation-and-architecture-transfer-exit.md)
+
+- [`00192 — APG147 v0.12 Agent-Central Dispatcher Parity Migration Exit`](2026/09/16/00192-apg147-v0120-b-agent-central-dispatcher-parity-migration-exit.md)
+
+- [`00193 — APG148 v0.12 Semantic Roles, Flexible Actor Binding, and SQLite Dispatcher Persistence Exit`](2026/09/16/00193-apg148-v0120-c-semantic-roles-and-sqlite-persistence-exit.md)
+
+- [`00194 — APG149 v0.12 Provider Parity Closure, V2 Multi-Turn Semantic Runtime, and Dynamic-Routing Hardening Exit`](2026/09/16/00194-apg149-v0120-d-provider-parity-and-dynamic-routing-exit.md)
+
+- [`00195 — APG149A Request V2 Live-Display Contract and Pre-Launch Reconciliation Repair Exit`](2026/09/17/00195-apg149a-v0120-e-bootstrap-display-repair-exit.md)
+
+- [`00196 — APG150 v0.12 Public Go Domain Surfaces and JACA XO Qualification Handoff Exit`](2026/09/17/00196-apg150-v0120-e-go-surfaces-and-jaca-handoff-exit.md)
+
+- [`00197 — APG150A Request V2 Outbox Projection and Truthful Operational Finalization Exit`](2026/09/17/00197-apg150a-v0120-e-recovery1-r2-outbox-and-finalization-exit.md)
+
+- [`00198 — APG150B Provider Failure Feedback and Dynamic Reroute Exit`](2026/09/17/00198-apg150b-v0120-e-harden1-provider-feedback-and-dynamic-reroute-exit.md)
+
+- [`00199 — APG151 v0.12 Release Hardening, Conditional Nixpkgs, and Integrated Readiness Exit`](2026/09/17/00199-apg151-v0120-f-release-hardening-and-integrated-readiness-exit.md)
+
+- [`00200 — APG151A v0.12 Result-Repair Evidence Fail-Closed Hardening Exit`](2026/09/17/00200-apg151a-v0120-f-repair1-result-repair-evidence-hardening-exit.md)
+
+- [`00201 — APG152 v0.12 Publication Preparation, Live Operator Wiring, and Authority Reconciliation Exit`](2026/09/17/00201-apg152-v0120-g1-publication-preparation-and-operator-wiring-exit.md)
+
+- [`00202 — APG152A v0.12 Live Publication Path Reconciliation Exit`](2026/09/18/00202-apg152a-v0120-g1-repair1-live-publication-path-reconciliation-exit.md)
+
+- [`00203 — APG152B v0.12 Real-Schema and Live Fail-Closed Release Path Hardening Exit`](2026/09/18/00203-apg152b-v0120-g1-repair2-real-schema-and-live-fail-closed-exit.md)
+
+- [`00204 — APG152C v0.12 Release Authority Evidence and Crash-Resume Closure Exit`](2026/09/18/00204-apg152c-v0120-g1-repair3-release-authority-evidence-and-crash-resume-closure-exit.md)
+

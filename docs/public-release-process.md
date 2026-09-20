@@ -699,3 +699,15 @@ Under user authorization, the `Knowledge-Forge-AI/homebrew-tap` repository is ad
 4. **Post-publish install verification**: Verify `brew install` and command-line execution (`apgr --version`, `apgr --help`, `apgr skills list`, `apgr build-info`) on supported architectures.
 
 The overall v0.11.0 multi-channel release is declared complete only after all promised channels (GitHub Release, PyPI, npm, Go, Homebrew) are delivered and verified.
+
+## v0.12.0 release architecture and authority reconciliation
+
+The v0.12.0 release architecture hardens the attended release operator and reconciles release authority when the public `main` branch advances beyond the predecessor tag (governed by [ADR 0068](adr/2026/09/0068-release-authority-reconciliation-with-advanced-public-main.md)):
+
+1. **Authority reconciliation with advanced public main**: When public `main` advances via linear single-parent commits descending from the predecessor tag `v0.11.0`, `verify_public_release_lineage` accepts the advanced head `premerge_main`, asserting `git merge-base --is-ancestor refs/tags/v0.11.0 $premerge_main` and that the surface conforms to audited policy.
+2. **Hosted release CI compare API query**: `.github/workflows/release.yml` queries the GitHub Compare API (`gh api repos/{owner}/{repo}/compare/{accepted_base}...{premerge_main}`) asserting status `ahead` or `identical` and `behind_by == 0`, replacing brittle PR association payload filters.
+3. **Numeric draft release ID binding (REG-P1)**: The GitHub Release channel establishes a draft release, binds its integer ID, and executes all asset uploads and the final publication PATCH against that exact numeric release ID.
+4. **npm platform-before-launcher state machine (REG-P6)**: The npm release channel sequences publication of the three platform-specific binary tarballs before publishing the root launcher, verifying registry status after each step.
+5. **Durable multi-channel receipts & resume (REG-P3, REG-P4)**: Each publication channel emits deterministic receipts. Resumption via `--resume` verifies prior steps and refuses re-entry or re-publication of already verified channels.
+6. **Deterministic release epoch**: Formally bound to `1789689600` (`2026-09-18T00:00:00Z`).
+

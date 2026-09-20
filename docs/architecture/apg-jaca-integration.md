@@ -64,6 +64,15 @@ Every JACA call:
 APG does not retain a JACA callback, start a lifecycle goroutine, write JACA
 state, or call a provider.
 
+> **Scope (ADR 0058, v0.12).** The call contract and the sentence above describe
+> the **v0.7 embeddable library surface** (`report`, `skills`, `envsnap`,
+> `hotspot`, `schema`) and continue to bind it unchanged. They do not describe the
+> v0.12 single-phase execution runtime, which by design does invoke provider
+> processes. See "Successor boundary amendment" below. The numbered call-contract
+> clauses (context, exact repository root, no JACA implementation types,
+> deterministic results, `errors.Is` cancellation, sentinel error families) apply
+> to **both** surfaces.
+
 ## Capability promises
 
 | JACA need | APG v0.7 promise | JACA remains responsible for |
@@ -125,8 +134,9 @@ a production landing.
 
 The module path is
 `github.com/Knowledge-Forge-AI/agentic-praxis-grimoire`. The direct public
-boundary is `schema`, `report`, `skills`, `envsnap`, `hotspot`, and the additive
-`footprint` package. JACA imports only those public packages behind one
+boundary is `schema`, `report`, `skills`, `envsnap`, `hotspot`, the additive
+`footprint` package, and in v0.12 the domain packages `phase`, `routing`,
+`evidence`, `candidate`, and `provider`. JACA imports only those public packages behind one
 JACA-owned internal adapter;
 it does not import `cmd/apgr`, an APG `internal/` package, Python, or npm.
 
@@ -134,10 +144,14 @@ Production use requires an exact published semantic version and matching module
 sums. A mutable branch, private source copy, development `replace`, or local
 checkout is not a released dependency. Public v0.8.1 is the published release
 providing the six-package direct-import boundary including `footprint` (`schema`,
-`report`, `skills`, `envsnap`, `hotspot`, `footprint`). CI integration and
+`report`, `skills`, `envsnap`, `hotspot`, `footprint`). In v0.12, five additive
+domain packages (`phase`, `routing`, `evidence`, `candidate`, `provider`) are
+introduced with Provisional / Experimental stability (ICR-004 / ICR-005) for JACA
+XO consumer qualification. CI integration and
 validation handoff for private development channel qualification is specified
 in the [JACA CI Integration Handoff](jaca-ci-handoff.md). XO-facing library
-consumption compatibility is detailed in the [JACA XO Compatibility Handoff](jaca-xo-handoff.md).
+consumption compatibility is detailed in the [JACA XO Compatibility Handoff](jaca-xo-handoff.md)
+and [v0.12 JACA Disposition Handoff](v0-12-jaca-disposition-handoff.md).
 JACA must not consume an unreleased candidate as a released dependency or create a permanent private
 lookalike and later call it the APGR schema.
 
@@ -176,6 +190,11 @@ authorized package-specific start.
 | `report.Operational` | In-memory validation of caller-authored operational bytes and record relations | Not prioritized until JACA identifies a unique gap |
 | `report.Append` | Optional APGR outbox publication | Rejected for JACA adoption while JACA retains one artifact authority |
 | `footprint` / projection | Canonical APGR-domain measurement and bounded derived evidence under `apg.context-footprint/v1`, `apg.context-comparison/v1`, and `apg.context-projection/v1` | Consume only from a released, qualified version; JACA retains separate total-context, custody, and enforcement authority |
+| `phase` | Immutable work-only Request V2 envelope, attempt identifiers, execution status, semantic role constants, and routing adapters | Supporting APGR model only behind caller DTOs; JACA retains XO runtime and lifecycle ownership |
+| `routing` | Pure deterministic routing ladder and observation digest calculation | Policy-neutral resolution algorithm; JACA retains exclusive authority over XO route policy |
+| `evidence` | Path-traversal-safe review finding structures, finding dispositions, and review receipts | JACA adopts to validate and parse review stages; JACA retains review budget policy and authority |
+| `candidate` | Immutable candidate identity and artifact manifest structures with strict path safety | JACA retains candidate custody and repository mutation fencing |
+| `provider` | Machine-readable provider conformance matrix (22 normalized rows across Codex, Claude, Antigravity) | Pure validation and capability inspection; JACA retains provider dispatch and process execution authority |
 
 ### Semantics and errors
 
@@ -317,8 +336,27 @@ writes, mutate JACA state, or interpret a task prompt. JACA does not redefine
 APG record schemas, bundle fingerprints, snapshot validation, or hotspot
 metrics.
 
+> **Scope (ADR 0058, v0.12).** This exclusion list is the **v0.7 library
+> contract** and is not amended for that surface. ADR 0058, ADR 0060, and ADR 0061
+> supersede four of these exclusions for the separate v0.12 single-phase execution
+> runtime, which does persist attempt state (ADR 0060 §4), does select a
+> provider/model/reviewer for the phase it executes (ADR 0060 §3), does retry
+> within its own bounded failure handling, and does enforce review cadence
+> **within one phase** (ADR 0058 §1). Three exclusions remain absolute for every
+> APGR surface: APGR never sequences phases, never mutates JACA state, and never
+> treats its own output as authority to advance work. Cross-phase review-budget
+> accounting and cross-phase cadence remain JACA's.
+
 APG94 modifies neither repository and grants no JACA integration or APG95
 implementation authority.
 
 This revision records documentation and handoff doctrine only. It changes no
 APGR or JACA runtime, dependency, schema, provider route, release, or host state.
+
+## Successor boundary amendment (ADR 0058 / v0.12)
+
+[ADR 0058](../adr/2026/09/0058-apgr-jaca-product-boundary-and-runtime-ownership.md) and the [v0.12 JACA disposition handoff](v0-12-jaca-disposition-handoff.md) formalize the successor product boundary between APGR and JACA:
+1. **APGR executes one phase**: APGR becomes the permanent owner of the lightweight single-phase execution runtime, executing a single phase from a request JSON (`agent-phase-request-v1` or `agent-phase-request-v2`), managing internal stage progression, invoking provider processes, and emitting an authenticated phase result, evidence, and archive references.
+2. **JACA orchestrates across phases**: JACA retains complete policy authority over the multi-phase roadmap agenda, inter-phase sequencing, global review-budget accounting, XO route policy, multi-phase crash recovery, candidate/phase artifact authority, and repository publication.
+3. **One-Way Dependency Invariant Maintained**: APGR never imports JACA. In v0.12 stage `V0120-E`, APGR exports reusable Go packages (`phase`, `routing`, `evidence`, `candidate`, `provider`) that JACA may import directly behind caller DTOs. In accordance with ADR 0066, APGR rejects a duplicate Go `ExecutePhase` dispatcher runtime for v0.12; standalone single-phase execution is owned by the APGR Python dispatcher runtime, while JACA retains its own XO execution loop. APGR Go packages provide immutable types, pure validation, and deterministic algorithms without subprocess invocation or duplicate runtime execution. APGR contains no multi-phase agenda loop, no predictive scheduler, and no background daemon.
+

@@ -1399,6 +1399,19 @@ PUBLIC_VALIDATION_DESELECTIONS_BY_VERSION: dict[str, tuple[str, ...]] = {
             }
         )
     ),
+    "0.12.0": tuple(
+        sorted(
+            {
+                node
+                for node in V07_PUBLIC_VALIDATION_DESELECTIONS
+                if "cli.int.test.py::test_python_skill_bridge_matches_oracle" not in node
+                and "test_candidate_fixture_debt_and_repository_lifecycle_agree" not in node
+            }
+            | {
+                "src/test/int/python/agentic-praxis-grimoire/skills/css-language-profile/SKILL.int.test.py::test_private_current_machine_contract_remains_source_bound"
+            }
+        )
+    ),
 }
 # None preserves historical audited selection without reading current inventory.
 # A tuple requires inventory closure over the audited files plus exactly these
@@ -1420,6 +1433,7 @@ PUBLIC_INVENTORY_SUPPLEMENTS_BY_VERSION: dict[str, tuple[str, ...] | None] = {
     # The v0.11 surface is self-contained: its audited test list is the
     # complete public selection, so no private inventory supplement is read.
     "0.11.0": None,
+    "0.12.0": None,
 }
 V07_CRITICAL = tuple(
     sorted(
@@ -2056,6 +2070,19 @@ V011_LICENSING = tuple(V010_LICENSING)
 V011_PROJECTIONS = tuple(V010_PROJECTIONS)
 V011_SKILLS = tuple(V010_SKILLS)
 V011_CATEGORIES = tuple(V010_CATEGORIES)
+
+V012_CRITICAL_ADDITIONS = (
+    "docs/v0-12-roadmap.md",
+    "release/v0.12.0-notes.md",
+)
+V012_WRAPPERS = tuple(V011_WRAPPERS)
+V012_HELPERS = tuple(V011_HELPERS)
+V012_TESTS = tuple(V011_TESTS)
+V012_CRITICAL = tuple(sorted(set(V011_CRITICAL) | set(V012_CRITICAL_ADDITIONS)))
+V012_LICENSING = tuple(V011_LICENSING)
+V012_PROJECTIONS = tuple(V011_PROJECTIONS)
+V012_SKILLS = tuple(V011_SKILLS)
+V012_CATEGORIES = tuple(V011_CATEGORIES)
 
 # Source-only test oracles and generated/local output never enter the
 # release-shaped v0.7 candidate. The compatibility wrappers above are not
@@ -2724,9 +2751,21 @@ def audited_policy_surfaces(version: str) -> tuple[dict[str, tuple[str, ...]], .
         "critical_files": V011_CRITICAL,
         "validation_categories": V011_CATEGORIES,
     }
+    current_v012 = {
+        "required_helpers": V012_HELPERS,
+        "required_licensing_files": V012_LICENSING,
+        "required_projections": V012_PROJECTIONS,
+        "required_skills": V012_SKILLS,
+        "required_test_entrypoints": V012_TESTS,
+        "required_wrappers": V012_WRAPPERS,
+        "critical_files": V012_CRITICAL,
+        "validation_categories": V012_CATEGORIES,
+    }
     if not SEMVER.fullmatch(version):
         fail("public release policy identity is malformed or unsupported")
     core = version.split("+", 1)[0].split("-", 1)[0]
+    if core == "0.12.0":
+        return (current_v012,)
     if core == "0.11.0":
         return (current_v011,)
     if core == "0.10.0":
@@ -2822,6 +2861,7 @@ def load_policy(
     allow_v08_compatibility: bool = False,
     allow_v09_compatibility: bool = False,
     allow_v010_compatibility: bool = False,
+    allow_v011_compatibility: bool = False,
 ) -> dict[str, object]:
     raw = committed_bytes(repository, POLICY_PATH)
     if len(raw) > 256 * 1024:
@@ -2892,6 +2932,22 @@ def load_policy(
         allowed_surfaces = (
             *allowed_surfaces,
             audited_policy_surfaces("0.10.0")[0],
+        )
+    if allow_v011_compatibility and any(
+        surface in (
+            audited_policy_surfaces("0.6.0")[0],
+            audited_policy_surfaces("0.7.0")[0],
+            audited_policy_surfaces("0.8.0")[0],
+            audited_policy_surfaces("0.8.1")[0],
+            audited_policy_surfaces("0.9.0")[0],
+            audited_policy_surfaces("0.10.0")[0],
+            audited_policy_surfaces("0.11.0")[0],
+        )
+        for surface in allowed_surfaces
+    ):
+        allowed_surfaces = (
+            *allowed_surfaces,
+            audited_policy_surfaces("0.11.0")[0],
         )
     if not any(
         all(tuple(value[key]) == expected for key, expected in surface.items())
@@ -3020,6 +3076,12 @@ def is_v011_candidate_path(path: str | bytes) -> bool:
     return is_v010_candidate_path(path)
 
 
+def is_v012_candidate_path(path: str | bytes) -> bool:
+    """Return whether one source path belongs in the current v0.12 surface."""
+
+    return is_v011_candidate_path(path)
+
+
 def public_candidate_entries(
     repository: Repository,
     version: str,
@@ -3032,6 +3094,8 @@ def public_candidate_entries(
         fail("public candidate version is malformed or unsupported")
     entries = tree_entries(repository, excluded_prefix=excluded_prefix)
     core = version.split("+", 1)[0].split("-", 1)[0]
+    if core == "0.12.0":
+        return tuple(entry for entry in entries if is_v012_candidate_path(entry.path))
     if core == "0.11.0":
         return tuple(entry for entry in entries if is_v011_candidate_path(entry.path))
     if core == "0.10.0":
@@ -3209,6 +3273,14 @@ def validate_versioned_policy_exclusions(
     if not SEMVER.fullmatch(version):
         fail("public release version is malformed or unsupported")
     core = version.split("+", 1)[0].split("-", 1)[0]
+    if core == "0.12.0":
+        for entry in entries:
+            if not is_v012_candidate_path(entry.path):
+                fail(
+                    f"public v{version} contains a publication-excluded path: "
+                    + entry.display_path
+                )
+        return
     if core == "0.11.0":
         for entry in entries:
             if not is_v011_candidate_path(entry.path):
@@ -3453,6 +3525,7 @@ def verify_public_release_lineage(
     *,
     accepted_commit: str,
     accepted_tree: str,
+    allow_advanced_head: bool = False,
 ) -> tuple[ReleaseIdentity, ...]:
     """Verify the exact v0.1 identity and every later linear release commit."""
 
@@ -3502,28 +3575,42 @@ def verify_public_release_lineage(
     ).stdout.decode("ascii").splitlines()
     previous = accepted_commit
     accepted_commits = {accepted_commit}
+    passed_last_tagged = False
     for record in records:
         fields = record.split()
         if len(fields) != 2 or fields[1] != previous:
             fail("public release history must be a strict single-parent release chain")
         commit = fields[0]
         matching = tags_by_commit.get(commit, [])
-        if len(matching) != 1:
+        if passed_last_tagged:
+            if matching:
+                fail("public release tags cannot follow untagged commits on release branch")
+        elif len(matching) == 1:
+            tag, version = matching[0]
+            if text_git(repository.root, ["cat-file", "-t", f"refs/tags/{tag}"]) != "tag":
+                fail("each later public release tag must be annotated")
+            if text_git(repository.root, ["log", "-1", "--format=%s", commit]) != f"Release v{version}":
+                fail("public release commit subject does not match its version tag")
+            tree = text_git(repository.root, ["rev-parse", f"{commit}^{{tree}}"])
+            identities.append(ReleaseIdentity(version, tag, commit, tree))
+            accepted_commits.add(commit)
+        elif len(matching) == 0:
+            if not allow_advanced_head:
+                fail("each public release commit must have exactly one matching v<semver> release tag")
+            passed_last_tagged = True
+        else:
             fail("each public release commit must have exactly one matching v<semver> release tag")
-        tag, version = matching[0]
-        if text_git(repository.root, ["cat-file", "-t", f"refs/tags/{tag}"]) != "tag":
-            fail("each later public release tag must be annotated")
-        if text_git(repository.root, ["log", "-1", "--format=%s", commit]) != f"Release v{version}":
-            fail("public release commit subject does not match its version tag")
-        tree = text_git(repository.root, ["rev-parse", f"{commit}^{{tree}}"])
-        identities.append(ReleaseIdentity(version, tag, commit, tree))
-        accepted_commits.add(commit)
         previous = commit
     if previous != repository.head:
         fail("public release history is truncated or does not reach HEAD")
     if set(tags_by_commit) != accepted_commits:
         fail("public release tags include history outside the accepted release chain")
-    validate_public_release_surface(repository, identities[-1].version)
+    last_release_repo = (
+        repository
+        if repository.head == identities[-1].commit
+        else Repository(repository.root, identities[-1].commit, identities[-1].tree)
+    )
+    validate_public_release_surface(last_release_repo, identities[-1].version)
     return tuple(identities)
 
 
@@ -3578,6 +3665,26 @@ def initialize_validation_copy(output: Path, repository: Repository) -> Reposito
     return resolve_repository(output, "validation copy")
 
 
+def initialize_historical_validation_copy(output: Path, base: Repository) -> Repository:
+    """Copy only the immutable bootstrap release and its minimal public refs."""
+    commit = text_git(base.root, ["rev-parse", "refs/tags/v0.1.0^{commit}"])
+    tree = text_git(base.root, ["rev-parse", f"{commit}^{{tree}}"])
+    if (commit, tree) != (PUBLIC_V01_COMMIT, PUBLIC_V01_TREE):
+        fail("historical validation source does not match public v0.1.0")
+    validate_output_path(output, base.root, base.root)
+    run_git(output.parent, ["init", "-q", "-b", "main", str(output)])
+    objects = text_git(base.root, ["rev-list", "--objects", "--no-object-names", commit]).splitlines()
+    tag = text_git(base.root, ["rev-parse", "refs/tags/v0.1.0"])
+    for oid in sorted(set(objects) | {tag}):
+        import_object(base, output, oid)
+    run_git(output, ["update-ref", "refs/heads/main", commit])
+    run_git(output, ["update-ref", "refs/tags/v0.1.0", tag])
+    run_git(output, ["reset", "-q", "--hard", commit])
+    historical = resolve_repository(output, "historical validation source")
+    verify_public_release_lineage(historical, accepted_commit=PUBLIC_V01_COMMIT, accepted_tree=PUBLIC_V01_TREE)
+    return historical
+
+
 def deterministic_tagger(parsed: datetime) -> str:
     offset = parsed.strftime("%z")
     return f"{int(parsed.timestamp())} {offset}"
@@ -3593,10 +3700,12 @@ def build_candidate(
     author_email: str,
 ) -> tuple[str, str, str]:
     validate_repository_separation(source, base)
+    core = version.split("+", 1)[0].split("-", 1)[0]
     verify_public_release_lineage(
         base,
         accepted_commit=PUBLIC_V01_COMMIT,
         accepted_tree=PUBLIC_V01_TREE,
+        allow_advanced_head=(core == "0.12.0"),
     )
     policy = load_policy(
         source,
@@ -3605,6 +3714,7 @@ def build_candidate(
         allow_v08_compatibility=True,
         allow_v09_compatibility=True,
         allow_v010_compatibility=True,
+        allow_v011_compatibility=True,
     )
     entries = public_candidate_entries(source, version, excluded_prefix=b"private/")
     validate_versioned_policy_exclusions(entries, version)
@@ -3803,13 +3913,35 @@ def public_python_selection(
     return selected
 
 
+# Local pre-staging only; never part of version-global public selection.
+LOCAL_BROWSER_DEFERRAL_NODES = (
+    "src/test/int/python/agentic-praxis-grimoire/skills/playwright-test-profile/SKILL.int.test.py::test_playwright_and_svg_real_browser_lanes",
+    "src/test/int/python/agentic-praxis-grimoire/skills/web-accessibility-profile/SKILL.int.test.py::test_web_accessibility_real_browser_lanes",
+    "src/test/int/python/agentic-praxis-grimoire/src/test/support/apg123_browser_ui.int.test.py::test_browser_runtime_scenarios_matrix_distinct_verification",
+    "src/test/int/python/agentic-praxis-grimoire/src/test/support/apg123_browser_ui.int.test.py::test_apg123_scenarios_matrix_distinct_verification",
+)
+
+
+def validate_confidentiality(candidate: Repository) -> None:
+    for entry in tree_entries(candidate):
+        try:
+            content = entry_bytes(candidate, entry).decode("utf-8")
+        except UnicodeError:
+            continue
+        if any(marker in content for marker in LOCAL_PATH_MARKERS):
+            fail(f"generic local-path confidentiality check failed: {entry.display_path}")
+
+
 def validate_categories(
     candidate: Repository,
     base: Repository,
     policy: dict[str, object],
     environment: dict[str, str],
     version: str,
+    *, local_browser_deselections: tuple[str, ...] = (),
 ) -> None:
+    if local_browser_deselections and (version != "0.12.0" or local_browser_deselections != LOCAL_BROWSER_DEFERRAL_NODES):
+        fail("local browser deferral must contain the exact four v0.12.0 nodes")
     categories = set(policy["validation_categories"])
     wrappers = tuple(policy["required_wrappers"])
     helpers = tuple(policy["required_helpers"])
@@ -3831,6 +3963,8 @@ def validate_categories(
                 run_checked_command([bash_bin, "-n", path], candidate.root, environment)
     if "python-compile" in categories:
         run_checked_command([sys.executable, "-m", "compileall", "-q", "libexec", "src/test"], candidate.root, environment)
+    if "confidentiality" in categories:
+        validate_confidentiality(candidate)
     if "configured-tests" in categories:
         bash_tests = [path for path in tests if path.endswith(".bats")]
         python_tests = [path for path in tests if path.endswith(".py")]
@@ -3841,6 +3975,7 @@ def validate_categories(
             "/agentic-praxis-grimoire/" in path for path in python_tests
         ):
             deselections = resolve_public_validation_deselections(version, policy)
+            deselections = (*deselections, *local_browser_deselections)
             python_tests = public_python_selection(candidate, version, python_tests)
             run_checked_command(
                 [
@@ -3864,20 +3999,13 @@ def validate_categories(
         else:
             for path in python_tests:
                 run_checked_command([sys.executable, path], candidate.root, environment)
-    if "confidentiality" in categories:
-        for entry in tree_entries(candidate):
-            try:
-                content = entry_bytes(candidate, entry).decode("utf-8")
-            except UnicodeError:
-                continue
-            if any(marker in content for marker in LOCAL_PATH_MARKERS):
-                fail(f"generic local-path confidentiality check failed: {entry.display_path}")
 
 
 def isolated_validation_environment(
     root: Path,
     candidate: Repository,
     base: Repository,
+    historical: Repository,
 ) -> dict[str, str]:
     locations = {
         "HOME": root / "home",
@@ -3929,7 +4057,7 @@ def isolated_validation_environment(
     )
     environment["PWD"] = str(candidate.root)
     environment.pop("OLDPWD", None)
-    environment["APG12_PUBLIC_V01_ROOT"] = str(base.root)
+    environment["APG12_PUBLIC_V01_ROOT"] = str(historical.root)
     environment["LC_ALL"] = "C"
     environment["LANG"] = "C"
     return environment
@@ -3940,17 +4068,21 @@ def validate_categories_in_isolation(
     base: Repository,
     policy: dict[str, object],
     version: str,
+    *, local_browser_deselections: tuple[str, ...] = (),
 ) -> None:
     with tempfile.TemporaryDirectory(prefix="apg-public-validation-") as temporary:
         root = Path(temporary)
         validation_candidate = initialize_validation_copy(root / "candidate", candidate)
         validation_base = initialize_validation_copy(root / "base", base)
+        historical = initialize_historical_validation_copy(root / "historical-v01", base)
+        historical_before = repository_fingerprint(historical)
         candidate_before = repository_fingerprint(validation_candidate)
         base_before = repository_fingerprint(validation_base)
         environment = isolated_validation_environment(
             root / "environment",
             validation_candidate,
             validation_base,
+            historical,
         )
         validation_error: ToolError | None = None
         try:
@@ -3960,6 +4092,7 @@ def validate_categories_in_isolation(
                 policy,
                 environment,
                 version,
+                **({"local_browser_deselections": local_browser_deselections} if local_browser_deselections else {}),
             )
         except ToolError as error:
             validation_error = error
@@ -3967,6 +4100,8 @@ def validate_categories_in_isolation(
             fail("configured validation modified the disposable candidate repository")
         if repository_fingerprint(validation_base) != base_before:
             fail("configured validation modified the disposable base repository")
+        if repository_fingerprint(historical) != historical_before:
+            fail("configured validation modified the disposable historical base repository")
         if validation_error is not None:
             raise validation_error
 
@@ -3982,12 +4117,17 @@ def check_candidate(
     allow_staging_correction: bool = False,
     correction_parent: str | None = None,
     correction_subject: str | None = None,
+    local_browser_deselections: tuple[str, ...] = (),
 ) -> dict[str, object]:
+    if local_browser_deselections and (not untagged or version != "0.12.0" or local_browser_deselections != LOCAL_BROWSER_DEFERRAL_NODES):
+        fail("local browser deferral is restricted to the exact pre-staging v0.12.0 selection")
     validate_repository_separation(source, base, candidate)
+    core = version.split("+", 1)[0].split("-", 1)[0]
     verify_public_release_lineage(
         base,
         accepted_commit=PUBLIC_V01_COMMIT,
         accepted_tree=PUBLIC_V01_TREE,
+        allow_advanced_head=(core == "0.12.0"),
     )
     policy = load_policy(
         source,
@@ -3996,13 +4136,13 @@ def check_candidate(
         allow_v08_compatibility=True,
         allow_v09_compatibility=True,
         allow_v010_compatibility=True,
+        allow_v011_compatibility=True,
     )
     source_entries = public_candidate_entries(
         source, version, excluded_prefix=b"private/"
     )
     candidate_entries = public_candidate_entries(candidate, version)
-    core = version.split("+", 1)[0].split("-", 1)[0]
-    if core in {"0.7.0", "0.8.0", "0.8.1", "0.9.0", "0.10.0", "0.11.0"}:
+    if core in {"0.7.0", "0.8.0", "0.8.1", "0.9.0", "0.10.0", "0.11.0", "0.12.0"}:
         # The development source may retain publication-excluded oracle files,
         # but a v0.7+ release candidate must not project them.  Inspect the
         # unfiltered candidate tree so the check cannot pass merely because
@@ -4091,7 +4231,8 @@ def check_candidate(
     base_before = repository_fingerprint(base)
     candidate_before = repository_fingerprint(candidate)
     try:
-        validate_categories_in_isolation(candidate, base, policy, version)
+        validate_categories_in_isolation(candidate, base, policy, version,
+            **({"local_browser_deselections": local_browser_deselections} if local_browser_deselections else {}))
     finally:
         require_unchanged(source, source_before, "source")
         require_unchanged(base, base_before, "base")
@@ -4130,8 +4271,9 @@ def check_merged_source(
     derives a prospective GitHub commit identity.
     """
 
-    if version.split("+", 1)[0].split("-", 1)[0] != "0.11.0":
-        unsafe("merged-source verification is only available for v0.11.0")
+    core = version.split("+", 1)[0].split("-", 1)[0]
+    if core not in ("0.11.0", "0.12.0"):
+        unsafe("merged-source verification is only available for v0.11.0 and v0.12.0")
     if not isinstance(approved_pr, str) or not approved_pr.strip():
         unsafe("an approved public staging PR is required")
     checks = _normalise_required_checks(required_checks)
@@ -4152,14 +4294,29 @@ def check_merged_source(
             base,
             accepted_commit=PUBLIC_V01_COMMIT,
             accepted_tree=PUBLIC_V01_TREE,
+            allow_advanced_head=(core == "0.12.0"),
         )
-        if not identities or identities[-1].version != "0.10.0":
-            fail("accepted public base must be the v0.10.0 release")
+        expected_base_version = "0.11.0" if core == "0.12.0" else "0.10.0"
+        if not identities or identities[-1].version != expected_base_version:
+            fail(f"accepted public base must be the v{expected_base_version} release")
         accepted_base = identities[-1]
-        if base.head != accepted_base.commit or base.tree != accepted_base.tree:
-            fail("accepted public base does not match the latest v0.10.0 release")
-        if premerge_main != accepted_base.commit:
-            fail("public main moved before merge; rebind and requalify the candidate")
+        if core == "0.12.0":
+            if base.head != premerge_main:
+                fail("public main moved before merge; rebind and requalify the candidate")
+            is_ancestor = run_git(
+                base.root,
+                ["merge-base", "--is-ancestor", accepted_base.commit, premerge_main],
+                allow_failure=True,
+            )
+            if is_ancestor.returncode:
+                fail(f"accepted v{expected_base_version} release is not an ancestor of pre-merge public main")
+            expected_parent = premerge_main
+        else:
+            if base.head != accepted_base.commit or base.tree != accepted_base.tree:
+                fail(f"accepted public base does not match the latest v{expected_base_version} release")
+            if premerge_main != accepted_base.commit:
+                fail("public main moved before merge; rebind and requalify the candidate")
+            expected_parent = accepted_base.commit
 
         if merged_commit is not None and merged.head != merged_commit:
             fail("supplied merged commit does not match the observed public main")
@@ -4167,9 +4324,12 @@ def check_merged_source(
             merged.root,
             ["rev-list", "--parents", "-n", "1", "HEAD"],
         ).split()
-        if len(parent_record) != 2 or parent_record[1] != accepted_base.commit:
-            fail("merged release commit must have exactly the accepted v0.10 base as parent")
-        if text_git(merged.root, ["rev-list", "--count", f"{accepted_base.commit}..HEAD"]) != "1":
+        if len(parent_record) != 2 or parent_record[1] != expected_parent:
+            if core == "0.12.0":
+                fail("merged release commit must have exactly the pre-merge public main as parent")
+            else:
+                fail(f"merged release commit must have exactly the accepted v{expected_base_version} base as parent")
+        if text_git(merged.root, ["rev-list", "--count", f"{expected_parent}..HEAD"]) != "1":
             fail("merged public history must add exactly one commit after the accepted base")
         if text_git(merged.root, ["log", "-1", "--format=%s"]) != f"Release v{version}":
             fail("merged release commit subject is incorrect")
@@ -4181,6 +4341,7 @@ def check_merged_source(
             allow_v08_compatibility=True,
             allow_v09_compatibility=True,
             allow_v010_compatibility=True,
+            allow_v011_compatibility=True,
         )
         source_entries = public_candidate_entries(
             source, version, excluded_prefix=b"private/"
@@ -4220,7 +4381,7 @@ def check_merged_source(
             fail("merged public source must preserve the accepted historical tags")
         release_tag = f"refs/tags/v{version}"
         if release_tag in reference_map(merged, "refs/tags"):
-            fail("merged-source verification rejects a premature v0.11 release tag")
+            fail(f"merged-source verification rejects a premature v{core} release tag")
         validate_markdown_links(merged)
         validate_private_policy(merged, private_policy)
     finally:
@@ -4255,7 +4416,7 @@ def parser() -> argparse.ArgumentParser:
     build.add_argument(
         "--untagged",
         action="store_true",
-        help="build the v0.11.0 candidate on the exact staging branch without a tag",
+        help="build the candidate on the exact staging branch without a tag",
     )
     build.add_argument("--staging-parent", help="staging parent commit for linear correction builds")
     build.add_argument("--subject", help="commit subject message")

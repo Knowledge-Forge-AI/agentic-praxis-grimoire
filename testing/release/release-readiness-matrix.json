@@ -1,0 +1,469 @@
+{
+  "f_traceability": [
+    {
+      "classification": "durable",
+      "historical_source": "F1",
+      "mapped_regression_ids": [
+        "REG-P9"
+      ],
+      "notes": "Deterministic epoch resolution; reject stale prior-version epoch",
+      "status": "verified",
+      "theme": "Epoch binding"
+    },
+    {
+      "classification": "durable",
+      "historical_source": "F2",
+      "mapped_regression_ids": [
+        "REG-P10"
+      ],
+      "notes": "merged-check performs no GitHub contact or approval gate",
+      "status": "verified",
+      "theme": "Maintained check reconciliation"
+    },
+    {
+      "classification": "durable",
+      "historical_source": "F3",
+      "mapped_regression_ids": [
+        "REG-P11",
+        "REG-P2"
+      ],
+      "notes": "--premerge-main, required-check flags, tag parity",
+      "status": "verified",
+      "theme": "Invocation and preconditions"
+    },
+    {
+      "classification": "durable",
+      "historical_source": "F4",
+      "mapped_regression_ids": [
+        "REG-P11"
+      ],
+      "notes": "Governance waiver preserved verbatim, not normalized",
+      "status": "verified",
+      "theme": "PR attestation"
+    },
+    {
+      "classification": "durable",
+      "historical_source": "F5",
+      "mapped_regression_ids": [
+        "REG-P6"
+      ],
+      "notes": "Refresh tap baseline from live remote; emit before/after patch",
+      "status": "verified",
+      "theme": "Tap baseline"
+    },
+    {
+      "classification": "durable",
+      "historical_source": "F6",
+      "mapped_regression_ids": [
+        "REG-P12"
+      ],
+      "notes": "Idempotent republish detection, no --skip-existing",
+      "status": "verified",
+      "theme": "PyPI verification-only fail-closed"
+    },
+    {
+      "classification": "durable",
+      "historical_source": "F7",
+      "mapped_regression_ids": [
+        "REG-P13"
+      ],
+      "notes": "Non-destructive coexistence; no blind unlink/force-link",
+      "status": "verified",
+      "theme": "Destructive risk: pre-existing host apgr"
+    },
+    {
+      "classification": "one-time-scheduling",
+      "historical_source": "F8",
+      "mapped_regression_ids": [
+        "REG-P4"
+      ],
+      "notes": "npm recovery covered by REG-P4; remainder is closeout-record completeness enforced by V0120-G contract",
+      "status": "verified_contractual",
+      "theme": "Missing closeout content"
+    },
+    {
+      "classification": "durable",
+      "historical_source": "F9",
+      "mapped_regression_ids": [
+        "REG-R11"
+      ],
+      "notes": "Full release-tool suite executed before publication",
+      "status": "verified",
+      "theme": "Verification gap: test suite"
+    },
+    {
+      "classification": "durable",
+      "historical_source": "F10",
+      "mapped_regression_ids": [
+        "REG-R12",
+        "REG-P8"
+      ],
+      "notes": "Complete operator packet file set",
+      "status": "verified",
+      "theme": "Operator pattern completeness"
+    },
+    {
+      "classification": "durable",
+      "historical_source": "F11",
+      "mapped_regression_ids": [
+        "REG-P8"
+      ],
+      "notes": "Deliverable inventory reconciles to the manifest",
+      "status": "verified",
+      "theme": "Deliverables count consistency"
+    },
+    {
+      "classification": "one-time-scheduling",
+      "historical_source": "F12",
+      "mapped_regression_ids": [
+        "REG-P3"
+      ],
+      "notes": "Scheduling artifact; superseded by REG-P3",
+      "status": "verified_superseded",
+      "theme": "PyPI alignment proposal"
+    }
+  ],
+  "reg_p_cases": [
+    {
+      "classification": "durable",
+      "disposition": "private_only",
+      "fixture": "test_dry_run_github_draft_already_exists, test_dry_run_github_id_tag_mismatch",
+      "historical_source": "ADR 0062 / F1-F12",
+      "owning_code": "private/releases/v0.12.0/release_operator/channels/github_release.py",
+      "regression_id": "REG-P1",
+      "requirement": "Numeric Draft Release ID Binding",
+      "status": "verified",
+      "test_command": "PYTHONPATH=private/releases/v0.12.0 python3 private/releases/v0.12.0/test_release_operator_dry_runs.py",
+      "test_path": "private/releases/v0.12.0/test_release_operator_dry_runs.py",
+      "public_evidence": "testing/release/public-projection-contract.md#reg-p1"
+    },
+    {
+      "classification": "durable",
+      "disposition": "private_only",
+      "fixture": "test_release_candidate_authority_checks",
+      "historical_source": "ADR 0062 / F3",
+      "owning_code": "private/releases/v0.12.0/release_operator/authority.py",
+      "regression_id": "REG-P2",
+      "requirement": "Release Authority Pre-Check",
+      "status": "verified",
+      "test_command": "PYTHONPATH=private/releases/v0.12.0 python3 private/releases/v0.12.0/test_release_operator_dry_runs.py",
+      "test_path": "private/releases/v0.12.0/test_release_operator_dry_runs.py",
+      "public_evidence": "testing/release/public-projection-contract.md#reg-p2"
+    },
+    {
+      "classification": "durable",
+      "disposition": "private_only",
+      "fixture": "test_workflow_pypi_oidc_validation",
+      "historical_source": "ADR 0062 / F12",
+      "owning_code": ".github/workflows/release.yml",
+      "regression_id": "REG-P3",
+      "requirement": "PyPI OIDC Trusted Publishing Alignment",
+      "status": "verified_repo_side",
+      "test_command": "PYTHONPATH=private/releases/v0.12.0 python3 private/releases/v0.12.0/test_release_operator_dry_runs.py",
+      "test_path": "private/releases/v0.12.0/test_release_operator_dry_runs.py",
+      "public_evidence": "testing/release/public-projection-contract.md#reg-p3"
+    },
+    {
+      "classification": "durable",
+      "disposition": "private_only",
+      "fixture": "test_dry_run_npm_lifecycle_accepted_processing_published, test_dry_run_npm_partial_recoverable_state",
+      "historical_source": "ADR 0062 / F8",
+      "owning_code": "private/releases/v0.12.0/release_operator/channels/npm.py",
+      "regression_id": "REG-P4",
+      "requirement": "npm Distribution State Machine",
+      "status": "verified",
+      "test_command": "PYTHONPATH=private/releases/v0.12.0 python3 private/releases/v0.12.0/test_release_operator_dry_runs.py",
+      "test_path": "private/releases/v0.12.0/test_release_operator_dry_runs.py",
+      "public_evidence": "testing/release/public-projection-contract.md#reg-p4"
+    },
+    {
+      "classification": "durable",
+      "disposition": "private_only",
+      "fixture": "test_dry_run_middle_channel_failure_and_resume",
+      "historical_source": "ADR 0062",
+      "owning_code": "private/releases/v0.12.0/release_operator/state_machine.py",
+      "regression_id": "REG-P5",
+      "requirement": "Resumable Multi-Channel Receipts",
+      "status": "verified",
+      "test_command": "PYTHONPATH=private/releases/v0.12.0 python3 private/releases/v0.12.0/test_release_operator_dry_runs.py",
+      "test_path": "private/releases/v0.12.0/test_release_operator_dry_runs.py",
+      "public_evidence": "testing/release/public-projection-contract.md#reg-p5"
+    },
+    {
+      "classification": "durable",
+      "disposition": "private_only",
+      "fixture": "test_dry_run_stale_homebrew_baseline, test_dry_run_correct_refreshed_homebrew_baseline",
+      "historical_source": "ADR 0062 / F5",
+      "owning_code": "private/releases/v0.12.0/release_operator/channels/homebrew.py",
+      "regression_id": "REG-P6",
+      "requirement": "Homebrew Formula Generation, Validation, and Live Tap Baseline",
+      "status": "verified",
+      "test_command": "PYTHONPATH=private/releases/v0.12.0 python3 private/releases/v0.12.0/test_release_operator_dry_runs.py",
+      "test_path": "private/releases/v0.12.0/test_release_operator_dry_runs.py",
+      "public_evidence": "testing/release/public-projection-contract.md#reg-p6"
+    },
+    {
+      "classification": "durable",
+      "disposition": "private_only",
+      "fixture": "test_dry_run_postmerge_tree_mismatch",
+      "historical_source": "ADR 0062",
+      "owning_code": "private/releases/v0.12.0/release_operator/postmerge.py",
+      "regression_id": "REG-P7",
+      "requirement": "Postmerge Source Proof (reconcile_postmerge.py)",
+      "status": "verified",
+      "test_command": "PYTHONPATH=private/releases/v0.12.0 python3 private/releases/v0.12.0/test_release_operator_dry_runs.py",
+      "test_path": "private/releases/v0.12.0/test_release_operator_dry_runs.py",
+      "public_evidence": "testing/release/public-projection-contract.md#reg-p7"
+    },
+    {
+      "classification": "durable",
+      "disposition": "private_only",
+      "fixture": "test_dry_run_manifest_uppercase_checksum_rejection",
+      "historical_source": "ADR 0062 / F10, F11",
+      "owning_code": "private/releases/v0.12.0/release_operator/receipts.py",
+      "regression_id": "REG-P8",
+      "requirement": "Manifest and Receipt Serialization Integrity",
+      "status": "verified",
+      "test_command": "PYTHONPATH=private/releases/v0.12.0 python3 private/releases/v0.12.0/test_release_operator_dry_runs.py",
+      "test_path": "private/releases/v0.12.0/test_release_operator_dry_runs.py",
+      "public_evidence": "testing/release/public-projection-contract.md#reg-p8"
+    },
+    {
+      "classification": "durable",
+      "disposition": "private_only",
+      "fixture": "test_dry_run_wrong_release_epoch",
+      "historical_source": "ADR 0062 / F1",
+      "owning_code": "libexec/apg_python_distribution.py",
+      "regression_id": "REG-P9",
+      "requirement": "Deterministic Release Epoch Binding",
+      "status": "verified",
+      "test_command": "PYTHONPATH=private/releases/v0.12.0 python3 private/releases/v0.12.0/test_release_operator_dry_runs.py",
+      "test_path": "private/releases/v0.12.0/test_release_operator_dry_runs.py",
+      "public_evidence": "testing/release/public-projection-contract.md#reg-p9"
+    },
+    {
+      "classification": "durable",
+      "disposition": "private_only",
+      "fixture": "test_merged_check_contract_stability",
+      "historical_source": "ADR 0062 / F2",
+      "owning_code": "libexec/apg_public_release.py",
+      "regression_id": "REG-P10",
+      "requirement": "merged-check Contract Stability",
+      "status": "verified",
+      "test_command": "PYTHONPATH=private/releases/v0.12.0 python3 private/releases/v0.12.0/test_release_operator_dry_runs.py",
+      "test_path": "private/releases/v0.12.0/test_release_operator_dry_runs.py",
+      "public_evidence": "testing/release/public-projection-contract.md#reg-p10"
+    },
+    {
+      "classification": "durable",
+      "disposition": "private_only",
+      "fixture": "test_operator_attestation_waiver_preserved",
+      "historical_source": "ADR 0062 / F3, F4",
+      "owning_code": "private/releases/v0.12.0/release_operator/authority.py",
+      "regression_id": "REG-P11",
+      "requirement": "Operator Precondition and Attestation Binding",
+      "status": "verified",
+      "test_command": "PYTHONPATH=private/releases/v0.12.0 python3 private/releases/v0.12.0/test_release_operator_dry_runs.py",
+      "test_path": "private/releases/v0.12.0/test_release_operator_dry_runs.py",
+      "public_evidence": "testing/release/public-projection-contract.md#reg-p11"
+    },
+    {
+      "classification": "durable",
+      "disposition": "private_only",
+      "fixture": "test_dry_run_pypi_already_complete_byte_identical, test_dry_run_pypi_partial_mismatch",
+      "historical_source": "ADR 0062 / F6",
+      "owning_code": "private/releases/v0.12.0/release_operator/channels/pypi.py",
+      "regression_id": "REG-P12",
+      "requirement": "PyPI Verification-Only Fail-Closed Path",
+      "status": "verified",
+      "test_command": "PYTHONPATH=private/releases/v0.12.0 python3 private/releases/v0.12.0/test_release_operator_dry_runs.py",
+      "test_path": "private/releases/v0.12.0/test_release_operator_dry_runs.py",
+      "public_evidence": "testing/release/public-projection-contract.md#reg-p12"
+    },
+    {
+      "classification": "durable",
+      "disposition": "private_only",
+      "fixture": "test_dry_run_host_apgr_collision",
+      "historical_source": "ADR 0062 / F7",
+      "owning_code": "private/releases/v0.12.0/release_operator/coexistence.py",
+      "regression_id": "REG-P13",
+      "requirement": "Non-Destructive Host Binary Coexistence",
+      "status": "verified",
+      "test_command": "PYTHONPATH=private/releases/v0.12.0 python3 private/releases/v0.12.0/test_release_operator_dry_runs.py",
+      "test_path": "private/releases/v0.12.0/test_release_operator_dry_runs.py",
+      "public_evidence": "testing/release/public-projection-contract.md#reg-p13"
+    }
+  ],
+  "reg_r_cases": [
+    {
+      "classification": "durable",
+      "disposition": "private_only",
+      "fixture": "test_reg_r1_bootstrap_static_dependency_pinning",
+      "historical_source": "R1 / exit 00190",
+      "owning_code": "tools/ci/bootstrap_static.sh",
+      "regression_id": "REG-R1",
+      "requirement": "Static Analysis Bootstrap Dependency Isolation",
+      "status": "verified",
+      "test_command": "python3 private/releases/v0.12.0/test_hosted_ci_regressions.py",
+      "test_path": "private/releases/v0.12.0/test_hosted_ci_regressions.py",
+      "public_evidence": "testing/release/public-projection-contract.md#reg-r1"
+    },
+    {
+      "classification": "durable",
+      "disposition": "private_only",
+      "fixture": "test_reg_r2_package_qualification_scratch_dir_precreated",
+      "historical_source": "R2 / exit 00190",
+      "owning_code": "tools/ci/qualify_packages.sh",
+      "regression_id": "REG-R2",
+      "requirement": "Clean-Root Package Qualification Directory Preparation",
+      "status": "verified",
+      "test_command": "python3 private/releases/v0.12.0/test_hosted_ci_regressions.py",
+      "test_path": "private/releases/v0.12.0/test_hosted_ci_regressions.py",
+      "public_evidence": "testing/release/public-projection-contract.md#reg-r2"
+    },
+    {
+      "classification": "durable",
+      "disposition": "private_only",
+      "fixture": "test_reg_r3_go_toolchain_preflight_and_diagnostic_capture",
+      "historical_source": "R3 / exit 00190",
+      "owning_code": "libexec/apg_skill_topology.py",
+      "regression_id": "REG-R3",
+      "requirement": "Go Toolchain Preflight and Diagnostic Capture on macOS Runners",
+      "status": "verified",
+      "test_command": "python3 private/releases/v0.12.0/test_hosted_ci_regressions.py",
+      "test_path": "private/releases/v0.12.0/test_hosted_ci_regressions.py",
+      "public_evidence": "testing/release/public-projection-contract.md#reg-r3"
+    },
+    {
+      "classification": "durable",
+      "disposition": "private_only",
+      "fixture": "test_reg_r4_sarif_tool_component_reference",
+      "historical_source": "R4 / exit 00190",
+      "owning_code": "tools/ci/codeql_policy.py",
+      "regression_id": "REG-R4",
+      "requirement": "OASIS SARIF 2.1.0 Component Resolution",
+      "status": "verified",
+      "test_command": "python3 private/releases/v0.12.0/test_hosted_ci_regressions.py",
+      "test_path": "private/releases/v0.12.0/test_hosted_ci_regressions.py",
+      "public_evidence": "testing/release/public-projection-contract.md#reg-r4"
+    },
+    {
+      "classification": "durable",
+      "disposition": "private_only",
+      "fixture": "test_reg_r5_source_vulnerability_and_permission_defenses",
+      "historical_source": "R5 / exit 00190",
+      "owning_code": "internal/cli/skills.go",
+      "regression_id": "REG-R5",
+      "requirement": "Source Vulnerability and Permission Defenses",
+      "status": "verified",
+      "test_command": "python3 private/releases/v0.12.0/test_hosted_ci_regressions.py",
+      "test_path": "private/releases/v0.12.0/test_hosted_ci_regressions.py",
+      "public_evidence": "testing/release/public-projection-contract.md#reg-r5"
+    },
+    {
+      "classification": "durable",
+      "disposition": "private_only",
+      "fixture": "test_reg_r6_matrix_receipt_resilience",
+      "historical_source": "R6 / exit 00190",
+      "owning_code": "release/ci/matrix_receipts.py",
+      "regression_id": "REG-R6",
+      "requirement": "Matrix Receipt Resilience and Honest Failure Reporting",
+      "status": "verified",
+      "test_command": "python3 private/releases/v0.12.0/test_hosted_ci_regressions.py",
+      "test_path": "private/releases/v0.12.0/test_hosted_ci_regressions.py",
+      "public_evidence": "testing/release/public-projection-contract.md#reg-r6"
+    },
+    {
+      "classification": "durable",
+      "disposition": "private_only",
+      "fixture": "test_reg_r7_linear_staging_correction_discipline",
+      "historical_source": "R7 / exit 00190",
+      "owning_code": "libexec/apg_staging_correction.py",
+      "regression_id": "REG-R7",
+      "requirement": "Linear Staging Correction Discipline",
+      "status": "verified",
+      "test_command": "python3 private/releases/v0.12.0/test_hosted_ci_regressions.py",
+      "test_path": "private/releases/v0.12.0/test_hosted_ci_regressions.py",
+      "public_evidence": "testing/release/public-projection-contract.md#reg-r7"
+    },
+    {
+      "classification": "durable",
+      "disposition": "private_only",
+      "fixture": "test_reg_r8_r9_file_length_policy_and_cohesive_extraction",
+      "historical_source": "R8 / exit 00190",
+      "owning_code": "tools/ci/file_length_policy.py",
+      "regression_id": "REG-R8",
+      "requirement": "Static File Length Policy Enforcement",
+      "status": "verified",
+      "test_command": "python3 private/releases/v0.12.0/test_hosted_ci_regressions.py",
+      "test_path": "private/releases/v0.12.0/test_hosted_ci_regressions.py",
+      "public_evidence": "testing/release/public-projection-contract.md#reg-r8"
+    },
+    {
+      "classification": "durable",
+      "disposition": "private_only",
+      "fixture": "test_reg_r8_r9_file_length_policy_and_cohesive_extraction",
+      "historical_source": "R9 / exit 00190",
+      "owning_code": "libexec/apg_staging_correction.py",
+      "regression_id": "REG-R9",
+      "requirement": "Cohesive Extraction Discipline",
+      "status": "verified",
+      "test_command": "python3 private/releases/v0.12.0/test_hosted_ci_regressions.py",
+      "test_path": "private/releases/v0.12.0/test_hosted_ci_regressions.py",
+      "public_evidence": "testing/release/public-projection-contract.md#reg-r9"
+    },
+    {
+      "classification": "durable",
+      "disposition": "private_only",
+      "fixture": "test_reg_r10_apfs_rename_permissions_and_cleanup",
+      "historical_source": "R10 / exit 00190",
+      "owning_code": "src/test/fixtures/apg123-browser-ui/supervisor.spec.js",
+      "regression_id": "REG-R10",
+      "requirement": "APFS Directory Rename Permissions and Playwright Cleanup",
+      "status": "verified",
+      "test_command": "python3 private/releases/v0.12.0/test_hosted_ci_regressions.py",
+      "test_path": "private/releases/v0.12.0/test_hosted_ci_regressions.py",
+      "public_evidence": "testing/release/public-projection-contract.md#reg-r10"
+    },
+    {
+      "classification": "durable",
+      "disposition": "private_only",
+      "fixture": "test_reg_r11_test_coverage_enforcement",
+      "historical_source": "R11 / exit 00190",
+      "owning_code": "libexec/apg_test.py",
+      "regression_id": "REG-R11",
+      "requirement": "Test Coverage Enforcement (>=80%)",
+      "status": "verified",
+      "test_command": "python3 private/releases/v0.12.0/test_hosted_ci_regressions.py",
+      "test_path": "private/releases/v0.12.0/test_hosted_ci_regressions.py",
+      "public_evidence": "testing/release/public-projection-contract.md#reg-r11"
+    },
+    {
+      "classification": "durable",
+      "disposition": "private_only",
+      "fixture": "test_reg_r12_single_root_operator_handoff",
+      "historical_source": "R12 / exit 00190",
+      "owning_code": "private/releases/v0.11.0/settings-handoff.md",
+      "regression_id": "REG-R12",
+      "requirement": "Single-Root Operator Handoff Structure",
+      "status": "verified",
+      "test_command": "python3 private/releases/v0.12.0/test_hosted_ci_regressions.py",
+      "test_path": "private/releases/v0.12.0/test_hosted_ci_regressions.py",
+      "public_evidence": "testing/release/public-projection-contract.md#reg-r12"
+    },
+    {
+      "classification": "durable",
+      "disposition": "private_only",
+      "fixture": "test_reg_r13_govulncheck_symbol_level_classification",
+      "historical_source": "R13 / exit 00190",
+      "owning_code": "tools/ci/pre_review_evaluation.py",
+      "regression_id": "REG-R13",
+      "requirement": "Govulncheck Symbol-Level Classification",
+      "status": "verified",
+      "test_command": "python3 private/releases/v0.12.0/test_hosted_ci_regressions.py",
+      "test_path": "private/releases/v0.12.0/test_hosted_ci_regressions.py",
+      "public_evidence": "testing/release/public-projection-contract.md#reg-r13"
+    }
+  ],
+  "schema_version": 1
+}

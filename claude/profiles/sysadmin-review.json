@@ -1,0 +1,9 @@
+{
+  "modelRole": "review",
+  "effort": "high",
+  "permissionMode": "plan",
+  "additionalDirectories": [
+    "user-home",
+    "scratch"
+  ]
+}

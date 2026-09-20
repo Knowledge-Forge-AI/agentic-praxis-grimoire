@@ -8,25 +8,22 @@ still requires human review.
 
 ## Roadmap policy
 
-**v0.10.0 is publicly released** across GitHub Release, Go, PyPI and npm.
-[APG138 reconciliation](evaluations/apg138-v0-11-foundation-closure.md)
-records the operator-supplied terminal publication authority. Earlier release
+**v0.11.0 is publicly released** across GitHub Release, Go, PyPI, npm, and Homebrew tap.
+APGR v0.11.0 publication is terminal. The [v0.11 closure roadmap](v0-11-roadmap.md)
+remains an immutable historical record with a closed 55/55/0/0 ledger.
+The [v0.12 architecture and runtime transfer roadmap](v0-12-roadmap.md) is the current authorized
+development line, initiated by APG146 (stage V0120-A). Earlier release
 preparation, qualification, blocked and recovery records remain historical.
 
-The [v0.11 closure roadmap](v0-11-roadmap.md) is the current authorized
-development line. APG138 established V0110-A foundation governance and the
-[closure ledger](governance/v0-11-closure-ledger.json). Historical APG139,
-APG140 and APG141 exits closed V0110-B/C/D with respectively 31, 43 and 47
-terminal rows. APG142 closed V0110-E: current accounting is 55 inherited /
-55 terminal / zero OPEN / zero invalid. The release exit is
-`inherited_roadmap_open_items = 0`, through terminal dispositions rather than
-mandatory implementation of every idea. APG143 is the partial V0110-F readiness
-phase; zero accounting alone does not qualify release readiness. V0110-G
-remains unauthorized.
+Historical APG139, APG140, APG141, and APG142 exits closed stages V0110-B through V0110-E.
+APG143 qualified integrated technical readiness under V0110-F. APG144 prepared the
+public staging candidate and attended operator handoffs, and APG145 executed hosted CI
+repairs and staging corrections under V0110-G. Operator execution `publication1` finalized
+the v0.11.0 release.
 
 The v0.9/v0.10 roadmaps, v0.10 backlog consolidation and Repo Map support
 roadmap remain historical source records. Their optional, external-gated and
-condition-triggered rows no longer compete with v0.11 scheduling. Consumer
+condition-triggered rows no longer compete with active scheduling. Consumer
 adoption, DINAS deployment and host activation remain separately owned.
 
 The human maintainer retains ultimate roadmap authority. ChatGPT may advance
@@ -2531,3 +2528,33 @@ dispatcher pre-final review; local qualification and evidence applicability are
 recorded by the current APG143 evaluation and managed records. READINESS1/2
 remain historical blocked attempts. No readiness acceptance, V0110-G, public
 operation, consumer adoption or host mutation follows automatically.
+
+### READINESS4 and V0110-F qualification
+
+READINESS4 completes local technical readiness qualification under APG143 / exit 00188.
+All static checks pass cleanly, canonical test suites pass through qualified runtime,
+package builds and deliverable scans report zero High/Critical vulnerabilities, and
+scanner suppressions/nonsecrets are formally approved.
+
+## APG144 V0110-G public staging preparation
+
+The [APG144 exit](status/2026/09/13/00189-apg144-public-staging-candidate-and-operator-handoff-exit.md)
+and [evaluation](evaluations/apg144-public-staging-candidate-and-operator-handoff.md) record the construction
+and qualification of the untagged public staging candidate, test boundary containment, and attended operator
+handoffs (STAGING-PREP4).
+
+## APG145 V0110-G hosted CI repair and staging correction
+
+The [APG145 exit](status/2026/09/13/00190-apg145-hosted-ci-repair-and-staging-correction-exit.md)
+records the resolution of hosted CI failures on public PR #1, incorporating toolchain bootstrap pins,
+macOS Go toolchain provisioning, CodeQL SARIF component resolution, source and fixture security remediations,
+and linear staging correction discipline. Operator publication1 finalized terminal publication of v0.11.0.
+
+## APG146 (V0120-A) v0.11 reconciliation and v0.12 architecture transfer
+
+The [APG146 exit](status/2026/09/16/00191-apg146-v0120-a-reconciliation-and-architecture-transfer-exit.md)
+and [evaluation](evaluations/apg146-v0120-a-reconciliation-and-architecture-transfer.md) reconcile v0.11.0
+terminal publication across documentation, establish the [v0.12 roadmap](v0-12-roadmap.md), author foundational
+ADRs 0058–0062, formalize Agent-Central migration and JACA handoffs, and codify v0.11 publication repair cases
+as regression inputs for v0.12.
+

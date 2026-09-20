@@ -1,0 +1,125 @@
+schema = "agent-phase-capabilities-v1"
+generation = 1
+
+# Canonical capabilities: read, mutation, execution, reasoning, structured_output, subagent_workers
+# Default postures: mutating, read_only
+
+[endpoints.antigravity-gemini-medium]
+provider = "antigravity"
+profile = "gemini-3.8-flash-medium"
+capabilities = ["read", "mutation", "execution", "reasoning", "subagent_workers"]
+posture = "mutating"
+
+[endpoints.antigravity-gemini-high]
+provider = "antigravity"
+profile = "gemini-3.8-flash-high"
+capabilities = ["read", "mutation", "execution", "reasoning", "subagent_workers"]
+posture = "mutating"
+
+[endpoints.antigravity-claude-opus-review]
+provider = "antigravity"
+profile = "claude-opus-4-6-thinking-review"
+capabilities = ["read", "reasoning"]
+posture = "read_only"
+
+[endpoints.claude-normal-plan-review]
+provider = "claude"
+profile = "normal-plan-review"
+capabilities = ["read", "reasoning"]
+posture = "read_only"
+
+[endpoints.claude-normal-final-review]
+provider = "claude"
+profile = "normal-final-review"
+capabilities = ["read", "reasoning"]
+posture = "read_only"
+
+[endpoints.claude-normal-sysadmin-plan-review]
+provider = "claude"
+profile = "normal-sysadmin-plan-review"
+capabilities = ["read", "reasoning"]
+posture = "read_only"
+
+[endpoints.claude-sysadmin-opus-review]
+provider = "claude"
+profile = "sysadmin-opus-review"
+capabilities = ["read", "reasoning"]
+posture = "read_only"
+
+[endpoints.claude-implementation-primary]
+provider = "claude"
+profile = "implementation-primary"
+capabilities = ["read", "mutation", "execution", "reasoning", "structured_output"]
+posture = "mutating"
+
+[endpoints.claude-implementation-review]
+provider = "claude"
+profile = "implementation-review"
+capabilities = ["read", "reasoning", "structured_output"]
+posture = "read_only"
+
+[endpoints.claude-architecture-docs-primary]
+provider = "claude"
+profile = "architecture-docs-primary"
+capabilities = ["read", "mutation", "execution", "reasoning", "structured_output"]
+posture = "mutating"
+
+[endpoints.fable-architecture-docs-primary]
+provider = "claude"
+profile = "fable-architecture-docs-primary"
+capabilities = ["read", "mutation", "execution", "reasoning", "structured_output"]
+posture = "mutating"
+
+[endpoints.claude-architecture-docs-review]
+provider = "claude"
+profile = "architecture-docs-review"
+capabilities = ["read", "reasoning", "structured_output"]
+posture = "read_only"
+
+[endpoints.claude-sysadmin-primary]
+provider = "claude"
+profile = "sysadmin-primary"
+capabilities = ["read", "mutation", "execution", "reasoning", "structured_output"]
+posture = "mutating"
+
+[endpoints.claude-sysadmin-review]
+provider = "claude"
+profile = "sysadmin-review"
+capabilities = ["read", "reasoning", "structured_output"]
+posture = "read_only"
+
+[endpoints.codex-implementation-testing]
+provider = "codex"
+profile = "implementation-testing"
+capabilities = ["read", "mutation", "execution", "reasoning", "structured_output"]
+posture = "mutating"
+
+[endpoints.codex-implementation-testing-review]
+provider = "codex"
+profile = "implementation-testing-review"
+capabilities = ["read", "reasoning", "structured_output"]
+posture = "read_only"
+
+[endpoints.codex-architecture-docs-primary]
+provider = "codex"
+profile = "architecture-docs-primary"
+capabilities = ["read", "mutation", "execution", "reasoning", "structured_output"]
+posture = "mutating"
+
+[endpoints.codex-architecture-docs-review]
+provider = "codex"
+profile = "architecture-docs-review"
+capabilities = ["read", "reasoning", "structured_output"]
+posture = "read_only"
+
+[endpoints.codex-sysadmin-primary]
+provider = "codex"
+profile = "sysadmin-primary"
+capabilities = ["read", "mutation", "execution", "reasoning", "structured_output"]
+posture = "mutating"
+
+[endpoints.codex-sysadmin-review]
+provider = "codex"
+profile = "sysadmin-review"
+capabilities = ["read", "reasoning", "structured_output"]
+posture = "read_only"

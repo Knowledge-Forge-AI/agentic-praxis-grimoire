@@ -17,10 +17,10 @@ start with the [root README](../README.md).
 - [Release notes (v0.9.0)](../release/v0.9.0-notes.md) — preceding release
   highlights and publication reconciliation.
 
-This documentation covers v0.10.0. The retained CI-first interfaces are preserved.
-v0.10.0 is publicly released across GitHub, Go, PyPI and npm. The preceding **v0.9.0** and **v0.8.1** releases remain frozen.
-The [v0.11 closure roadmap](v0-11-roadmap.md) owns current development planning.
-The [v0.10 roadmap](v0-10-roadmap.md) is a historical release record.
+This documentation covers v0.11.0. The retained CI-first interfaces are preserved.
+v0.11.0 is publicly released across GitHub, Go, PyPI, npm, and Homebrew tap. Preceding releases remain frozen.
+The [v0.12 architecture transfer roadmap](v0-12-roadmap.md) owns current development planning.
+The [v0.11 closure roadmap](v0-11-roadmap.md) and [v0.10 roadmap](v0-10-roadmap.md) are historical release records.
 
 ## Use the CLI
 
@@ -43,6 +43,14 @@ The [v0.10 roadmap](v0-10-roadmap.md) is a historical release record.
 - [v0.8 context-footprint and skill-inventory contract](architecture/v0-8-context-footprint-and-skill-inventory.md)
   owns the additive APGR program boundary, capacity decisions, and JACA
   handoff pointer.
+- [v0.12 Agent-Central migration inventory](architecture/v0-12-agent-central-migration-inventory.md)
+  details Agent-Central runtime migration and component dispositions.
+- [v0.12 JACA disposition handoff](architecture/v0-12-jaca-disposition-handoff.md)
+  defines §18.13 ownership alignment and exported Go interfaces.
+- [v0.12 Agent-Central ownership transition](architecture/v0-12-agent-central-ownership-transition.md)
+  coordinates staged transfer and compatibility wrappers.
+- [v0.12 v0.11 publication regression inputs](architecture/v0-12-v011-publication-regression-inputs.md)
+  codifies v0.11 repair and publication findings as regression specifications.
 
 ## Select skills and build task context
 
@@ -140,7 +148,8 @@ does not equal JACA registration, and the XO consumer fixture is not JACA's prod
 - [v0.7 roadmap](v0-7-roadmap.md) preserves the published v0.7 release sequence.
 - [v0.8 roadmap](v0-8-roadmap.md) records the completed v0.8.1 context-footprint program.
 - [v0.9 roadmap](v0-9-roadmap.md) records the released CI-first program and remaining consumer-owned work.
-- [v0.11 roadmap](v0-11-roadmap.md) owns the inherited closure program.
+- [v0.12 roadmap](v0-12-roadmap.md) owns the authorized architecture transfer and runtime program.
+- [v0.11 roadmap](v0-11-roadmap.md) preserves the historical v0.11 closure program.
 - [APG138 reconciliation](evaluations/apg138-v0-11-foundation-closure.md) records
   terminal v0.10 publication and foundation scope.
 - [Project roadmap](roadmap.md) provides current navigation and phase history.

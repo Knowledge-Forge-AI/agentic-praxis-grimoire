@@ -186,7 +186,7 @@ Member jobs are wired to existing repository commands:
 - `static-analysis`: `tools/ci/run_pre_review.py`
 - `policy`: `bin/apg-check-skill-library`, `bin/apg-check-record-identity`, `bin/apg-check-change-size`
 - `unit-integration`: `bin/apg-test policy` followed by
-  `bin/apg-test unit-integration --public-version 0.11.0` using the bootstrapped runtime. This explicit public mode uses the versioned release owner's six exact private-history deselections; public behavioral fixture companions run, and component/union thresholds remain unchanged
+  `bin/apg-test unit-integration --public-version 0.12.0` using the bootstrapped runtime. This explicit public mode uses the versioned release owner's six exact private-history deselections; public behavioral fixture companions run, and component/union thresholds remain unchanged
 - `closure`: both normal and `--require-zero` roadmap-closure modes
 - `go`: `go test ./...`, `go vet ./...`, `go test -race ./...`
 - `package`: all three Go targets, the maintained Python and npm builders,
@@ -222,7 +222,7 @@ and the following exact required checks from GitHub Actions: `guard`,
 `codeql (javascript-typescript)`, `codeql (actions)` and `public-pr-gate`.
 Require CodeQL code-scanning merge protection at **High or higher** security
 severity and **Errors** alert severity. Permit squash promotion only, with subject
-`Release v0.11.0`; disallow force pushes and deletion of protected release history.
+`Release v0.12.0`; disallow force pushes and deletion of protected release history.
 Verify public `main` still equals the accepted public base immediately before
 merge. A moved base requires a newly bound candidate and qualification.
 

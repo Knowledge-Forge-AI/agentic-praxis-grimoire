@@ -72,7 +72,7 @@ def _source_revision_identity(source_root: Path | str, version: str) -> dict[str
     """
 
     core = version.split("+", 1)[0].split("-", 1)[0]
-    if core != "0.11.0":
+    if core not in ("0.11.0", "0.12.0"):
         return {}
     root = _directory(source_root, "source root")
     git_prefix = ["git", "-C", os.fspath(root)]

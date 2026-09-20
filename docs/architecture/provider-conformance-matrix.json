@@ -1,0 +1,227 @@
+{
+  "schema": "apgr-provider-conformance-matrix-v1",
+  "generated_at": "2026-09-16T20:30:00Z",
+  "providers": ["codex", "claude", "antigravity"],
+  "rows": [
+    {
+      "id": "executable_version_provenance",
+      "name": "Executable & Version Provenance",
+      "description": "Subprocess execution and version query of provider tooling without interactive TTY or GUI requirement.",
+      "support": {
+        "codex": {"supported": true, "notes": "Discovered from PATH via codex --version."},
+        "claude": {"supported": true, "notes": "Discovered via bin/claude-profile or PATH."},
+        "antigravity": {"supported": true, "notes": "Discovered via bin/antigravity-profile or PATH."}
+      }
+    },
+    {
+      "id": "profile_resolution",
+      "name": "Profile Resolution & Pinning",
+      "description": "Deterministic resolution and pinning of profile configuration parameters into execution arguments.",
+      "support": {
+        "codex": {"supported": true, "notes": "Compiled profile arguments via controller_generation.codex_profile_arguments."},
+        "claude": {"supported": true, "notes": "Wrapper-owned profile configuration resolution."},
+        "antigravity": {"supported": true, "notes": "Wrapper-owned profile configuration resolution."}
+      }
+    },
+    {
+      "id": "requested_model_readback",
+      "name": "Requested Model Readback",
+      "description": "Explicit verification and readback of the requested model in provider configuration.",
+      "support": {
+        "codex": {"supported": true, "notes": "Verified via profile and endpoint configuration."},
+        "claude": {"supported": true, "notes": "Verified via profile and endpoint configuration."},
+        "antigravity": {"supported": true, "notes": "Verified via profile and endpoint configuration."}
+      }
+    },
+    {
+      "id": "reasoning_effort_readback",
+      "name": "Reasoning / Effort Readback",
+      "description": "Configuration and readback of reasoning/thinking effort settings where supported.",
+      "support": {
+        "codex": {"supported": true, "notes": "Supported via reasoning effort profile parameters."},
+        "claude": {"supported": true, "notes": "Supported via thinking budget profile parameters."},
+        "antigravity": {"supported": true, "notes": "Supported via thinking/effort parameters in Gemini and Claude profiles."}
+      }
+    },
+    {
+      "id": "planner_role_qualification",
+      "name": "Planner Eligibility",
+      "description": "Eligibility to serve as the Planner producing structured implementation plans.",
+      "support": {
+        "codex": {"supported": true, "notes": "Qualified via codex primary endpoints."},
+        "claude": {"supported": true, "notes": "Qualified via claude primary endpoints."},
+        "antigravity": {"supported": true, "notes": "Qualified via antigravity-gemini-* endpoints."}
+      }
+    },
+    {
+      "id": "reviewer_role_qualification",
+      "name": "Reviewer Role Qualification",
+      "description": "Qualification as independent Plan Reviewer or Work Reviewer satisfying independence invariants.",
+      "support": {
+        "codex": {"supported": true, "notes": "Qualified for review via codex-*-review endpoints with -s read-only sandbox posture in capabilities.toml."},
+        "claude": {"supported": true, "notes": "Qualified for review via claude-*-review endpoints with --read-only launcher argument in capabilities.toml."},
+        "antigravity": {"supported": true, "notes": "Qualified for review via antigravity-claude-opus-review endpoint with --reviewer argument in capabilities.toml."}
+      }
+    },
+    {
+      "id": "producer_role_qualification",
+      "name": "Producer Eligibility",
+      "description": "Eligibility to serve as the Producer executing mutating implementation work.",
+      "support": {
+        "codex": {"supported": true, "notes": "Qualified with mutation capability and workspace execution."},
+        "claude": {"supported": true, "notes": "Qualified with mutation capability and workspace execution."},
+        "antigravity": {"supported": true, "notes": "Qualified with mutation capability and workspace execution."}
+      }
+    },
+    {
+      "id": "reviser_role_qualification",
+      "name": "Reviser Eligibility",
+      "description": "Eligibility to serve as Reviser incorporating work-review findings into amended candidate trees.",
+      "support": {
+        "codex": {"supported": true, "notes": "Qualified for post-review revisions."},
+        "claude": {"supported": true, "notes": "Qualified for post-review revisions."},
+        "antigravity": {"supported": true, "notes": "Qualified for post-review revisions."}
+      }
+    },
+    {
+      "id": "closeout_role_qualification",
+      "name": "Closeout Eligibility",
+      "description": "Eligibility to serve as Closeout Agent producing terminal verification and closeout receipts.",
+      "support": {
+        "codex": {"supported": true, "notes": "Qualified for closeout execution."},
+        "claude": {"supported": true, "notes": "Qualified for closeout execution."},
+        "antigravity": {"supported": true, "notes": "Qualified for closeout execution."}
+      }
+    },
+    {
+      "id": "adapter_structured_output",
+      "name": "Adapter Structured Output CLI Flag",
+      "description": "Direct CLI-level native JSON schema enforcement flag in upstream vendor adapter.",
+      "support": {
+        "codex": {"supported": false, "notes": "Truthful claim: upstream CLI flag unsupported; APGR uses nonce-fenced structured decoding."},
+        "claude": {"supported": false, "notes": "Truthful claim: upstream CLI flag unsupported; APGR uses nonce-fenced structured decoding."},
+        "antigravity": {"supported": false, "notes": "Truthful claim: upstream CLI flag unsupported; APGR uses nonce-fenced structured decoding."}
+      }
+    },
+    {
+      "id": "process_group_cleanup",
+      "name": "Process Group Supervision & Cleanup",
+      "description": "Clean termination of entire process trees and nested process groups upon completion or cancellation.",
+      "support": {
+        "codex": {"supported": true, "notes": "Process group kill via SIGTERM/SIGKILL with custody tracking."},
+        "claude": {"supported": true, "notes": "Process group kill via SIGTERM/SIGKILL with custody tracking."},
+        "antigravity": {"supported": true, "notes": "Process group kill via SIGTERM/SIGKILL and activity pipe pgid tracking."}
+      }
+    },
+    {
+      "id": "stdout_overflow_protection",
+      "name": "Bounded Stdout Capture",
+      "description": "Strict bounding of captured stdout buffer (4 MiB ceiling) with fatal overflow exception.",
+      "support": {
+        "codex": {"supported": true, "notes": "Enforced by supervisor reader thread."},
+        "claude": {"supported": true, "notes": "Enforced by supervisor reader thread."},
+        "antigravity": {"supported": true, "notes": "Enforced by supervisor reader thread."}
+      }
+    },
+    {
+      "id": "stderr_overflow_drain",
+      "name": "Stderr Overflow Draining",
+      "description": "Non-fatal draining and truncation of noisy stderr streams exceeding capture buffer limits.",
+      "support": {
+        "codex": {"supported": true, "notes": "Supervisor drains excess stderr without terminating execution."},
+        "claude": {"supported": true, "notes": "Supervisor drains excess stderr without terminating execution."},
+        "antigravity": {"supported": true, "notes": "Supervisor drains excess stderr without terminating execution."}
+      }
+    },
+    {
+      "id": "liveness_outer_ceiling",
+      "name": "Absolute Timeout / Outer Ceiling",
+      "description": "Enforcement of absolute execution time limit (default 90,000s) to prevent unbounded execution.",
+      "support": {
+        "codex": {"supported": true, "notes": "Enforced by provider execution supervisor."},
+        "claude": {"supported": true, "notes": "Enforced by provider execution supervisor."},
+        "antigravity": {"supported": true, "notes": "Enforced by provider execution supervisor."}
+      }
+    },
+    {
+      "id": "liveness_advisory_silence",
+      "name": "Liveness / Advisory Silence Observation",
+      "description": "Tracking silence periods without premature hard termination of active background work.",
+      "support": {
+        "codex": {"supported": true, "notes": "Monitored via 900s advisory notice intervals without termination."},
+        "claude": {"supported": true, "notes": "Monitored via 900s advisory notice intervals without termination."},
+        "antigravity": {"supported": true, "notes": "Monitored via 900s advisory notice intervals without termination."}
+      }
+    },
+    {
+      "id": "interruption_cleanup",
+      "name": "Interruption & Signal Cleanup",
+      "description": "Orderly termination and worktree preservation upon SIGINT/SIGTERM operator interruption.",
+      "support": {
+        "codex": {"supported": true, "notes": "Supervisor traps signals and cleanly kills child process group."},
+        "claude": {"supported": true, "notes": "Supervisor traps signals and cleanly kills child process group."},
+        "antigravity": {"supported": true, "notes": "Supervisor traps signals and cleanly kills child process group."}
+      }
+    },
+    {
+      "id": "tokenless_auth_probe",
+      "name": "Tokenless Authentication Probe",
+      "description": "Free, non-intrusive, tokenless query to verify authentication status without credentials scraping.",
+      "support": {
+        "codex": {"supported": false, "notes": "Truthful claim: no non-intrusive probe exists; returns unknown fail-open."},
+        "claude": {"supported": false, "notes": "Truthful claim: no non-intrusive probe exists; returns unknown fail-open."},
+        "antigravity": {"supported": false, "notes": "Truthful claim: no non-intrusive probe exists; returns unknown fail-open."}
+      }
+    },
+    {
+      "id": "tokenless_quota_probe",
+      "name": "Tokenless Quota Usage Observation",
+      "description": "Free, non-intrusive query of remaining rate limit / token quota without model burn.",
+      "support": {
+        "codex": {"supported": false, "notes": "Truthful claim: quota unobservable without model turn; returns unknown fail-open."},
+        "claude": {"supported": false, "notes": "Truthful claim: quota unobservable without model turn; returns unknown fail-open."},
+        "antigravity": {"supported": false, "notes": "Truthful claim: quota unobservable without model turn; returns unknown fail-open."}
+      }
+    },
+    {
+      "id": "subagent_worker_support",
+      "name": "Subagent / Worker Support",
+      "description": "Support for provider-local internal worker delegation beneath the parent process.",
+      "support": {
+        "codex": {"supported": false, "notes": "Provider lacks internal supervisor worker protocol in APGR runtime."},
+        "claude": {"supported": false, "notes": "Provider lacks internal supervisor worker protocol in APGR runtime."},
+        "antigravity": {"supported": true, "notes": "Supported via agent-worker supervisor facility and gemini_sub / gemini_flash_sub modes."}
+      }
+    },
+    {
+      "id": "failure_cooldown_tracking",
+      "name": "Failure Cooldown Tracking",
+      "description": "Tracking of provider failure events in SQLite to enforce transient cooldowns in dynamic router.",
+      "support": {
+        "codex": {"supported": true, "notes": "Probed via SQLite invocation_attempts failure history within window_seconds."},
+        "claude": {"supported": true, "notes": "Probed via SQLite invocation_attempts failure history within window_seconds."},
+        "antigravity": {"supported": true, "notes": "Probed via SQLite invocation_attempts failure history within window_seconds."}
+      }
+    },
+    {
+      "id": "run_resumption",
+      "name": "Resume & Recovery Evidence",
+      "description": "Resumption of multi-turn phase execution preserving attempt lineage and route pinning.",
+      "support": {
+        "codex": {"supported": true, "notes": "Supported via V2 dispatch resume_from_run_id and attempt derivation."},
+        "claude": {"supported": true, "notes": "Supported via V2 dispatch resume_from_run_id and attempt derivation."},
+        "antigravity": {"supported": true, "notes": "Supported via V2 dispatch resume_from_run_id and attempt derivation."}
+      }
+    },
+    {
+      "id": "activity_pipe_telemetry",
+      "name": "Activity Pipe Telemetry",
+      "description": "Out-of-band progress telemetry and process group reporting via dedicated file descriptor pipe.",
+      "support": {
+        "codex": {"supported": false, "notes": "Upstream CLI does not expose progress token pipe."},
+        "claude": {"supported": false, "notes": "Upstream CLI does not expose progress token pipe."},
+        "antigravity": {"supported": true, "notes": "Supported via AGENT_CENTRAL_ANTIGRAVITY_ACTIVITY_FD token pipe."}
+      }
+    }
+  ]
+}

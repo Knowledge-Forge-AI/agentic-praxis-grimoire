@@ -34,26 +34,11 @@ def write_inventory(root: Path, value: object) -> None:
 def minimal_inventory() -> dict[str, object]:
     return {
         "schema_version": 2,
-        "coverage_sources": [
-            {
-                "path": "libexec/tool.py",
-                "rationale": "unit policy owner",
-                "suites": ["unit", "integration", "combined"],
-            }
-        ],
-        "excluded_python_launchers": [
-            {"path": "bin/tool", "reason": "thin import and exit adapter"}
-        ],
-        "tests": [
-            {
-                "owner": "libexec/tool.py",
-                "path": (
-                    "src/test/unit/python/agentic-praxis-grimoire/"
-                    "libexec/tool.unit.test.py"
-                ),
-                "suite": "unit",
-            }
-        ],
+        "coverage_sources": [{"path": "libexec/tool.py", "rationale": "unit policy owner",
+                             "suites": ["unit", "integration", "combined"]}],
+        "excluded_python_launchers": [{"path": "bin/tool", "reason": "thin import and exit adapter"}],
+        "tests": [{"owner": "libexec/tool.py", "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/tool.unit.test.py",
+                   "suite": "unit"}],
     }
 
 
@@ -81,18 +66,9 @@ def test_exact_threshold_arithmetic_does_not_use_display_rounding() -> None:
 
 
 def test_coverage_counts_require_exact_sources_and_measurable_branches() -> None:
-    report = {
-        "files": {
-            "libexec/a.py": {
-                "summary": {
-                    "covered_lines": 8,
-                    "num_statements": 10,
-                    "covered_branches": 4,
-                    "num_branches": 5,
-                }
-            }
-        }
-    }
+    report = {"files": {"libexec/a.py": {
+        "summary": {"covered_lines": 8, "num_statements": 10, "covered_branches": 4, "num_branches": 5}
+    }}}
     assert apg_test.coverage_counts(report, ["libexec/a.py"]) == apg_test.CoverageCounts(
         8, 10, 4, 5
     )
@@ -126,23 +102,17 @@ def test_coverage_counts_reject_malformed_and_impossible_values(
     field: str, value: object, message: str
 ) -> None:
     summary: dict[str, object] = {
-        "covered_lines": 8,
-        "num_statements": 10,
-        "covered_branches": 4,
-        "num_branches": 5,
+        "covered_lines": 8, "num_statements": 10, "covered_branches": 4, "num_branches": 5,
     }
     summary[field] = value
     with pytest.raises(apg_test.ToolError, match=message):
         apg_test.coverage_counts(
-            {"files": {"libexec/a.py": {"summary": summary}}},
-            ["libexec/a.py"],
+            {"files": {"libexec/a.py": {"summary": summary}}}, ["libexec/a.py"]
         )
 
 
 def test_coverage_report_rejects_missing_and_foreign_sources() -> None:
-    apg_test.validate_coverage_report(
-        {"files": {"libexec/a.py": {}}}, {"libexec/a.py"}
-    )
+    apg_test.validate_coverage_report({"files": {"libexec/a.py": {}}}, {"libexec/a.py"})
     with pytest.raises(apg_test.ToolError, match="missing=.*b.py"):
         apg_test.validate_coverage_report(
             {"files": {"libexec/a.py": {}}},
@@ -153,6 +123,36 @@ def test_coverage_report_rejects_missing_and_foreign_sources() -> None:
             {"files": {"libexec/a.py": {}, "outside.py": {}}},
             {"libexec/a.py"},
         )
+    core = {"libexec/a.py", "libexec/b.py"}
+    sidecar = {"libexec/agent_phase/d1.py", "libexec/agent_phase/d2.py"}
+    # 1. exact core-only coverage report passes
+    apg_test.validate_coverage_report({"files": {p: {} for p in core}}, core, sidecar)
+    # 2. core + any declared dispatcher sidecar subset passes
+    apg_test.validate_coverage_report(
+        {"files": {p: {} for p in core | {"libexec/agent_phase/d1.py"}}}, core, sidecar
+    )
+    # 3. core + all declared dispatcher sidecar files passes
+    apg_test.validate_coverage_report({"files": {p: {} for p in core | sidecar}}, core, sidecar)
+    # 4. missing core file fails
+    with pytest.raises(apg_test.ToolError, match="missing=.*a.py"):
+        apg_test.validate_coverage_report(
+            {"files": {"libexec/b.py": {}, "libexec/agent_phase/d1.py": {}}}, core, sidecar
+        )
+    # 5. an undeclared extra file fails
+    with pytest.raises(apg_test.ToolError, match="foreign=.*outside.py"):
+        apg_test.validate_coverage_report(
+            {"files": {p: {} for p in core | sidecar | {"outside.py"}}}, core, sidecar
+        )
+    # 6. dispatcher sidecar measurements do not change threshold denominators
+    rep = {"files": {
+        "libexec/a.py": {"summary": {"covered_lines": 8, "num_statements": 10, "covered_branches": 4, "num_branches": 5}},
+        "libexec/agent_phase/d1.py": {"summary": {"covered_lines": 1, "num_statements": 100, "covered_branches": 0, "num_branches": 50}},
+    }}
+    counts = apg_test.coverage_counts(rep, sorted(core - {"libexec/b.py"}))
+    assert counts.statements_total == 10 and counts.branches_total == 5
+    assert counts.statements_covered == 8 and counts.branches_covered == 4
+    # 7. combined coverage applies the same contract
+    apg_test.validate_coverage_report({"files": {p: {} for p in core | sidecar}}, core, sidecar)
 
 
 def test_strict_inventory_rejects_duplicate_and_unknown_data(tmp_path: Path) -> None:
@@ -239,7 +239,13 @@ def test_inventory_detects_missing_stale_wrong_mirror_and_legacy_tests(
     (tmp_path / "libexec/extra.py").write_text("value = 2\n", encoding="utf-8")
     with pytest.raises(apg_test.PolicyCheckError, match="coverage source inventory differs"):
         apg_test.validate_inventory(tmp_path, inventory)
+    inventory.dispatcher_sources["libexec/extra.py"] = "maintained dispatcher source"
+    apg_test.validate_inventory(tmp_path, inventory)
     (tmp_path / "libexec/extra.py").unlink()
+    with pytest.raises(apg_test.PolicyCheckError, match="stale=.*extra.py"):
+        apg_test.validate_inventory(tmp_path, inventory)
+    inventory.dispatcher_sources.clear()
+    apg_test.validate_inventory(tmp_path, inventory)
 
     value = minimal_inventory()
     value["tests"][0]["path"] = (
@@ -2122,47 +2128,16 @@ def test_mirror_path_mapping_handles_markdown_and_extensionless_owners() -> None
     )
 
 
+@pytest.mark.parametrize("variant", (
+    "core-only", "subset", "all", "missing-core", "foreign", "below-gate",
+))
 def test_run_enforces_each_suite_then_combined_union(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys, variant: str
 ) -> None:
-    inventory = apg_test.Inventory(
-        {"libexec/tool.py": ("unit", "integration", "combined")}, {}, {
-            f"{apg_test.UNIT_ROOT.as_posix()}/.github/hidden.unit.test.py": ("owner", "unit"),
-            f"{apg_test.INTEGRATION_ROOT.as_posix()}/owner.int.test.py": ("owner", "integration"),
-        }
-    )
-    monkeypatch.setattr(apg_test, "load_inventory", lambda _root: inventory)
-    monkeypatch.setattr(apg_test, "validate_inventory", lambda _root, _inventory: None)
-    monkeypatch.setattr(apg_test, "dependency_versions", lambda: {})
-    artifact_root = tmp_path / "artifacts"
-    artifact_root.mkdir()
-    metadata = artifact_root.stat()
-    ownership = apg_test.ArtifactDirectory(
-        artifact_root, metadata.st_dev, metadata.st_ino
-    )
-    monkeypatch.setattr(apg_test, "_artifact_directory", lambda _root: ownership)
-    report = {"files": {"libexec/tool.py": {"summary": {
-        "covered_lines": 9, "num_statements": 10,
-        "covered_branches": 9, "num_branches": 10,
-    }}}}
-    calls: list[str] = []
+    from src.test.apg_test_sidecar_cases import assert_combined_sidecar_contract
 
-    def run_suite(
-        _root: Path, suite: str, workers: int, _artifacts: Path, **_kwargs: object
-    ):
-        calls.append(f"{suite}:{workers}")
-        assert _kwargs["selected_files"] == tuple(sorted(
-            path for path, (_owner, selected_suite) in inventory.tests.items()
-            if selected_suite == suite
-        ))
-        return artifact_root / suite / f"{suite}.coverage", report
+    assert_combined_sidecar_contract(apg_test, tmp_path, monkeypatch, capsys, variant)
 
-    monkeypatch.setattr(apg_test, "_run_pytest", run_suite)
-    monkeypatch.setattr(apg_test, "_combine_coverage", lambda *_args: report)
-    apg_test.run("combined", 8, tmp_path)
-    assert calls == ["unit:8", "integration:8"]
-    with pytest.raises(apg_test.ToolError, match="workers"):
-        apg_test.run("unit", 0, tmp_path)
 
 
 def test_combined_reports_both_components_and_union_after_a_component_gate_failure(

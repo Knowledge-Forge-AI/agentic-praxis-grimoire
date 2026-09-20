@@ -1,0 +1,22 @@
+#!/usr/bin/env python3
+"""Maintained launcher for release readiness regression matrix verification.
+
+Mechanical checker enforcing complete coverage of REG-R1..R13, REG-P1..P13, and F1..F12 traceability.
+"""
+
+from __future__ import annotations
+
+from pathlib import Path
+import subprocess
+import sys
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+CHECKER = REPO_ROOT / "testing/release/check_release_matrix.py"
+
+
+def main() -> int:
+    return subprocess.run([sys.executable, str(CHECKER)], cwd=REPO_ROOT).returncode
+
+
+if __name__ == "__main__":
+    sys.exit(main())

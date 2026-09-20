@@ -8,11 +8,11 @@ the four official APGR npm packages:
 - `@knowledge-forge-ai/apgr-linux-x64`; and
 - `@knowledge-forge-ai/apgr-linux-arm64`.
 
-This documentation covers the **unreleased v0.11.0 candidate**. Public v0.10.0
+This documentation covers the **unreleased v0.12.0 candidate**. Public v0.11.0
 and earlier releases remain frozen. Test candidate tarballs in a disposable
 npm project. After publication, install the launcher with
-`npm install -g @knowledge-forge-ai/apgr@0.11.0` (or
-`npm install @knowledge-forge-ai/apgr@0.11.0`). These commands are not a claim
+`npm install -g @knowledge-forge-ai/apgr@0.12.0` (or
+`npm install @knowledge-forge-ai/apgr@0.12.0`). These commands are not a claim
 that candidate packages are available in the registry.
 
 `libexec/apg_npm_distribution.py` renders package metadata from the single

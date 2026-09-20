@@ -1,0 +1,90 @@
+{
+  "schema": "apgr-conformance-observation-digest-v1",
+  "vectors": [
+    {
+      "detail": {
+        "path": "/usr/local/bin/codex",
+        "version": "0.1.0"
+      },
+      "expected_digest": "ebd65968ca4c040c52018e54dcb5e165867b70b1252ac141d6724bf894212cfc",
+      "expires_at": 1726500060.0,
+      "observation_id": "obs-avail-codex-1000",
+      "observation_type": "availability",
+      "producer": "apgr_operational_probe",
+      "profile": null,
+      "provider": "codex",
+      "state_value": "available",
+      "timestamp": 1726500000.0
+    },
+    {
+      "detail": {
+        "reason": "executable_not_found"
+      },
+      "expected_digest": "c409489ae13c6a637a7add42b4b727bf002b4d5b4f2c2f886a20f2a2fae2e414",
+      "expires_at": 1726500160.5,
+      "observation_id": "obs-avail-claude-2000",
+      "observation_type": "availability",
+      "producer": "apgr_operational_probe",
+      "profile": "claude_review",
+      "provider": "claude",
+      "state_value": "unavailable",
+      "timestamp": 1726500100.5
+    },
+    {
+      "detail": {
+        "error_code": 401,
+        "message": "unauthenticated"
+      },
+      "expected_digest": "bb3e0fa487d3a408e42df0701dc03fafbdc514cd3a5e780dedc5d91824b0a25b",
+      "expires_at": null,
+      "observation_id": "obs-auth-antigravity-3000",
+      "observation_type": "authentication",
+      "producer": "apgr_auth_check",
+      "profile": "gemini_flash",
+      "provider": "antigravity",
+      "state_value": "unusable",
+      "timestamp": 1726500200.0
+    },
+    {
+      "detail": null,
+      "expected_digest": "ce4d578a87a317ee1e8e673609bcbd948dcdecd3e20b7b2136d521c8fcad3f14",
+      "expires_at": 1726500900.0,
+      "observation_id": "obs-quota-codex-4000",
+      "observation_type": "quota",
+      "producer": "apgr_quota_monitor",
+      "profile": null,
+      "provider": "codex",
+      "state_value": "exhausted",
+      "timestamp": 1726500300.0
+    },
+    {
+      "detail": {
+        "remaining_tokens": 500000
+      },
+      "expected_digest": "4c7fe3b53aa1d9871e8c7d694262bb8f58de8daea5e942a031505ec81ba04b0a",
+      "expires_at": 1726501000.0,
+      "observation_id": "obs-quota-claude-5000",
+      "observation_type": "quota",
+      "producer": "apgr_quota_monitor",
+      "profile": "claude_sonnet",
+      "provider": "claude",
+      "state_value": "healthy",
+      "timestamp": 1726500400.0
+    },
+    {
+      "detail": {
+        "failure_count": 3,
+        "last_failure": "rate_limit"
+      },
+      "expected_digest": "6e73474005ada5b24f98ec9acab294ddc342ce78722325425792a63b9f7d1b83",
+      "expires_at": 1726500800.0,
+      "observation_id": "obs-cooldown-antigravity-6000",
+      "observation_type": "cooldown",
+      "producer": "apgr_cooldown_tracker",
+      "profile": null,
+      "provider": "antigravity",
+      "state_value": "active_cooldown",
+      "timestamp": 1726500500.0
+    }
+  ]
+}

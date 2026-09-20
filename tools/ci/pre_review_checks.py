@@ -217,6 +217,11 @@ def checks(scratch_dir: Path, tool_root: Path | None = None) -> tuple[Check, ...
             ),
             python_owned=True,
         ),
+        Check(
+            "release-matrix",
+            (python, "testing/release/check_release_matrix.py"),
+            python_owned=True,
+        ),
     )
 
 

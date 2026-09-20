@@ -29,8 +29,10 @@ V081_RELEASE_EPOCH = 1_788_393_600
 V09_RELEASE_EPOCH = 1_788_739_200
 # Candidate archive timestamp; public commit/tag timestamp is frozen separately.
 V010_RELEASE_EPOCH = 1_788_996_391
-# Unreleased candidate archive epoch; not a publication timestamp.
+# Historical v0.11 candidate archive epoch.
 V011_RELEASE_EPOCH = 1_789_000_000
+# Immutable manager-selected v0.12 release epoch (UTC: 2026-09-18T00:00:00Z).
+V012_RELEASE_EPOCH = 1_789_689_600
 RELEASE_EPOCHS = (
     V05_RELEASE_EPOCH,
     V06_RELEASE_EPOCH,
@@ -40,6 +42,7 @@ RELEASE_EPOCHS = (
     V09_RELEASE_EPOCH,
     V010_RELEASE_EPOCH,
     V011_RELEASE_EPOCH,
+    V012_RELEASE_EPOCH,
 )
 RELEASE_EPOCH_BY_VERSION = {
     "0.5.0": V05_RELEASE_EPOCH,
@@ -50,6 +53,7 @@ RELEASE_EPOCH_BY_VERSION = {
     "0.9.0": V09_RELEASE_EPOCH,
     "0.10.0": V010_RELEASE_EPOCH,
     "0.11.0": V011_RELEASE_EPOCH,
+    "0.12.0": V012_RELEASE_EPOCH,
 }
 # The gzip header is the tighter of the gzip uint32 and tar timestamp bounds.
 MAX_ARCHIVE_MTIME = 0xFFFFFFFF

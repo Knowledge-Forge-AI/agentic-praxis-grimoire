@@ -616,13 +616,13 @@ def _public_selection_fixture_inventory(root: Path) -> apg_test.Inventory:
 def test_public_version_selection_accepts_clean_disposable_public_source(
     tmp_path: Path,
 ) -> None:
-    public = _make_public_selection_fixture(tmp_path / "public")
+    public = _make_public_selection_fixture(tmp_path / "public", committed_version="0.12.0")
     inventory = _public_selection_fixture_inventory(public)
-    selection = apg_test.load_public_test_selection(public, inventory, "0.11.0")
+    selection = apg_test.load_public_test_selection(public, inventory, "0.12.0")
     repository = release.resolve_repository(public, "public selection fixture")
     policy = release.load_policy(
         repository,
-        expected_surfaces=release.audited_policy_surfaces("0.11.0"),
+        expected_surfaces=release.audited_policy_surfaces("0.12.0"),
     )
     audited_python = tuple(
         path
@@ -635,11 +635,11 @@ def test_public_version_selection_accepts_clean_disposable_public_source(
         )
         for suite in ("unit", "integration")
     }
-    assert selection.version == "0.11.0"
+    assert selection.version == "0.12.0"
     assert selection.files == expected_files
 
     expected_deselections = release.resolve_public_validation_deselections(
-        "0.11.0", policy
+        "0.12.0", policy
     )
     expected_by_suite = {"unit": [], "integration": []}
     for node in expected_deselections:
@@ -697,11 +697,11 @@ def test_public_version_selection_refuses_unsupported_version(
     tmp_path: Path,
 ) -> None:
     public = _make_public_selection_fixture(
-        tmp_path / "unsupported-version", committed_version="0.12.0"
+        tmp_path / "unsupported-version", committed_version="0.13.0"
     )
     inventory = _public_selection_fixture_inventory(public)
     with pytest.raises(apg_test.InvocationError, match="unsupported"):
-        apg_test.load_public_test_selection(public, inventory, "0.12.0")
+        apg_test.load_public_test_selection(public, inventory, "0.13.0")
 
 
 def test_policy_inventory_failure_writes_fail_summary(

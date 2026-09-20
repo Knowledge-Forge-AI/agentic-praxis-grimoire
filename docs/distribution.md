@@ -1,7 +1,9 @@
 # APG Distribution
 
-This documentation covers the **unreleased v0.11.0 candidate**. The published
-**v0.10.0** and preceding releases remain frozen. The distribution architecture preserves the multi-registry packaging
+This documentation covers the **unreleased v0.12.0 candidate**. Preceding releases
+(v0.11.0, v0.10.0, and earlier) remain frozen. Active planning and
+implementation are tracked in the [v0.12 roadmap](v0-12-roadmap.md).
+The distribution architecture preserves the multi-registry packaging
 model and provides the 45-skill corpus. Local build and inspection do not publish
 packages.
 
@@ -106,9 +108,9 @@ APG provides a Homebrew formula targeting the [`Knowledge-Forge-AI/homebrew-tap`
 - Formula: `Formula/agentic-praxis-grimoire.rb`
 - Class: `AgenticPraxisGrimoire`
 - Executable: `apgr`
-- Planned installation command: `brew install Knowledge-Forge-AI/tap/agentic-praxis-grimoire`
+- Installation command: `brew install Knowledge-Forge-AI/tap/agentic-praxis-grimoire`
 
-Homebrew tap distribution is **unreleased and pending post-release tap publication** for v0.11.0.
+Homebrew tap distribution is **published and verified** for v0.11.0.
 
 ### Supported targets and platform qualification
 
@@ -116,9 +118,9 @@ The Homebrew formula packages the canonical native Go executable and binary mani
 
 | Platform | Go target | Deliverable package | Qualification status |
 | --- | --- | --- | --- |
-| macOS Apple Silicon | `darwin/arm64` | `knowledge-forge-ai-apgr-darwin-arm64-<version>.tgz` | Native runtime qualified; Homebrew formula load, test, and coexistence pending initial tap release |
-| Linux x86_64 | `linux/amd64` | `knowledge-forge-ai-apgr-linux-x64-<version>.tgz` | Native runtime supported; developer/CI qualification hosted-pending; Homebrew testing pending |
-| Linux ARM64 | `linux/arm64` | `knowledge-forge-ai-apgr-linux-arm64-<version>.tgz` | Native runtime supported; developer/CI qualification hosted-pending; Homebrew testing pending |
+| macOS Apple Silicon | `darwin/arm64` | `knowledge-forge-ai-apgr-darwin-arm64-<version>.tgz` | Native runtime qualified; Homebrew formula load, test, and tap publication verified |
+| Linux x86_64 | `linux/amd64` | `knowledge-forge-ai-apgr-linux-x64-<version>.tgz` | Native runtime supported; developer/CI qualification hosted-pending; Homebrew packaging verified |
+| Linux ARM64 | `linux/arm64` | `knowledge-forge-ai-apgr-linux-arm64-<version>.tgz` | Native runtime supported; developer/CI qualification hosted-pending; Homebrew packaging verified |
 
 Intel macOS (`darwin/amd64`) is intentionally omitted and is not distributed or supported.
 
@@ -150,11 +152,14 @@ source build uses the current checkout's version and corpus and is removed after
 the invocation. Installed wheels always use their bundled binary and never
 require a runtime compiler or network access.
 
-v0.11.0 candidate artifacts require local qualification before any release.
-The public staging PR and post-merge artifact qualification are separate gates;
+v0.11.0 artifacts received complete local and hosted qualification prior to release.
+The public staging PR, hosted CI repairs, and post-merge artifact qualification are recorded in the
+[APG144 exit](status/2026/09/13/00189-apg144-public-staging-candidate-and-operator-handoff-exit.md) and
+[APG145 exit](status/2026/09/13/00190-apg145-hosted-ci-repair-and-staging-correction-exit.md);
 see the [release procedure](public-release-process.md).
 
-v0.10.0 remains publicly released across GitHub, Go, PyPI and npm. Install Python with
-`pip install agentic-praxis-grimoire==0.10.0`, npm with
-`npm install -g @knowledge-forge-ai/apgr@0.10.0`, or the Go module with
-`go get github.com/Knowledge-Forge-AI/agentic-praxis-grimoire@v0.10.0`.
+v0.11.0 is publicly released across GitHub, Go, PyPI, npm, and Homebrew tap. Install Python with
+`pip install agentic-praxis-grimoire==0.11.0`, npm with
+`npm install -g @knowledge-forge-ai/apgr@0.11.0`, Homebrew with
+`brew install Knowledge-Forge-AI/tap/agentic-praxis-grimoire`, or the Go module with
+`go get github.com/Knowledge-Forge-AI/agentic-praxis-grimoire@v0.11.0`.

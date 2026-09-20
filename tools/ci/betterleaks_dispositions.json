@@ -29,6 +29,16 @@
       "reason": "Public SHA-256 integrity binding in ITEM_BINDINGS for APGR-REPORT-PROJECT-KEY; not an API credential.",
       "review": "APGR-V0110-READINESS4 pre_final review; manager decision D; exact current-source readback",
       "rule": "generic-api-key"
+    },
+    {
+      "path": "src/test/dispatcher/test_agent_phase_push.py",
+      "rule": "generic-credential-uri",
+      "match_sha256": "e9137b833ec1374e631f053b12967b80d4ea83c8f632b24e16f4c2ab7e8f5d90",
+      "context_sha256": "52ce6ba139923393ab04187fa262d9b8d76b1b87d6c57ba0fdc031a500b843fc",
+      "reason": "Deliberate synthetic credentialed URL on reserved example.invalid verifies push diagnostics redact credentials; no usable account or secret.",
+      "owner": "APGR dispatcher tests",
+      "review": "APG155 source inspection: synthetic redaction negative control",
+      "disposition": "reviewed_nonsecret"
     }
   ],
   "schema": "apg-betterleaks-dispositions-v1"
