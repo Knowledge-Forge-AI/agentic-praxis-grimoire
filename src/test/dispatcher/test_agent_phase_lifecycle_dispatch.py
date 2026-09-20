@@ -351,7 +351,8 @@ def test_require_unchanged_normalizes_staged_metadata_before_capture(
     assert ".pytest_cache/index-only.txt" in stage["operational_metadata_paths"]
 
 
-def dispatcher(repository: Path, tmp_path: Path, runner: LifecycleRunner) -> Dispatcher:
+def dispatcher(repository: Path, tmp_path: Path, runner: LifecycleRunner, **kwargs: Any) -> Dispatcher:
+    kwargs.setdefault("review_mutation_policy", "block")
     return Dispatcher(
         ROOT,
         repository,
@@ -360,6 +361,7 @@ def dispatcher(repository: Path, tmp_path: Path, runner: LifecycleRunner) -> Dis
         scanner_executable=None,
         resolve_scanner=False,
         runner=runner,
+        **kwargs,
     )
 
 

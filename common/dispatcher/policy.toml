@@ -1,0 +1,7 @@
+schema = "agent-phase-policy-v1"
+generation = 9
+
+[review_mutation]
+worktree = "warn"
+index = "block"
+head = "block"

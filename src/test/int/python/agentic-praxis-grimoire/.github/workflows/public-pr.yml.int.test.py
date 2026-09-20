@@ -92,6 +92,11 @@ def test_all_shipped_workflows_structural_assertion() -> None:
     assert doc_pr.get("permissions") == {"contents": "read"}
     assert "pull_request" in doc_pr.get("on", {})
     assert "public-pr-gate" in doc_pr["jobs"]
+    assert not {"nix", "package", "sbom-and-vulnerability"} & set(doc_pr["jobs"])
+    native = parse_yaml_or_json((ROOT / ".github/workflows/native-qualification.yml").read_text())
+    assert {native["jobs"][name]["runs-on"] for name in (
+        "native-darwin-arm64", "native-linux-x64", "native-linux-arm64"
+    )} == {"macos-15", "ubuntu-24.04", "ubuntu-24.04-arm"}
 
     # 2. release.yml structural assertion
     doc_rel = parse_yaml_or_json(RELEASE_WORKFLOW_PATH.read_text(encoding="utf-8"))
@@ -103,6 +108,42 @@ def test_all_shipped_workflows_structural_assertion() -> None:
 
     # 3. Structural and topology validation via existing ci_topology tool
     assert validate_all_workflows() == []
+
+
+def test_native_jobs_own_nix_qualification() -> None:
+    doc = parse_yaml_or_json((ROOT / ".github/workflows/native-qualification.yml").read_text())
+    for lane in ("native-darwin-arm64", "native-linux-x64", "native-linux-arm64"):
+        steps = doc["jobs"][lane]["steps"]
+        assert any("install-nix-action" in step.get("uses", "") for step in steps)
+        assert any(f"native_lane.py qualify --lane {lane}" in step.get("run", "") for step in steps)
+        assert any("--workflow native-qualification" in step.get("run", "") for step in steps)
+
+
+def test_failure_upload_matches_only_sanitized_browser_writer(tmp_path):
+    """Exercise the maintained writer and the workflow's exact upload glob."""
+    import sys
+    import json
+    sys.path.insert(0, str(ROOT / "src/test/support"))
+    from apg123_browser_ui import BrowserHarnessConfig, retain_failure_evidence
+
+    scratch = tmp_path.resolve() / "apgr-runtime"
+    scratch.mkdir(mode=0o700)
+    config = BrowserHarnessConfig(ROOT, scratch, Path(sys.executable), "fake", scratch, "fake", scratch)
+    _, retained = retain_failure_evidence(config, "run-upload", scratch / "receipt.json", 1,
+                                         "Authorization=fixture-secret", "Bearer fixture-token",
+                                         str(scratch / "private-run"))
+    (retained.parent / "run-npm-failure.json").write_text("npm private diagnostics")
+    doc = parse_yaml_or_json(WORKFLOW_PATH.read_text())
+    upload = next(step for step in doc["jobs"]["unit-integration"]["steps"]
+                  if step.get("with", {}).get("name") == "browser-failure-evidence")
+    assert upload["if"] == "${{ failure() }}"
+    assert upload["with"]["if-no-files-found"] == "ignore"
+    assert upload["with"]["retention-days"] == 7
+    pattern = upload["with"]["path"].removeprefix("${{ runner.temp }}/")
+    assert list(tmp_path.resolve().glob(pattern)) == [retained]
+    serialized = json.dumps(json.loads(retained.read_text()))
+    assert "fixture-secret" not in serialized and "fixture-token" not in serialized
+    assert str(scratch) not in serialized
 
 
 def test_package_export_copies_only_distribution_artifacts(tmp_path):

@@ -6,6 +6,7 @@ prompt travels on stdin rather than as an argument.
 
 from __future__ import annotations
 
+from contextvars import ContextVar
 from dataclasses import dataclass
 from datetime import datetime, timezone
 import math
@@ -16,7 +17,12 @@ import signal
 import subprocess
 import threading
 import time
-from typing import Any, Callable, NamedTuple, Sequence
+from typing import Any, Callable, Mapping, NamedTuple, Sequence
+from .provider_environment import process_options, is_managed_antigravity_launcher
+
+PROCESS_CREATION_HOOK: ContextVar[Callable[[subprocess.Popen, Sequence[str], str, Mapping[str, str] | None], None] | None] = ContextVar(
+    "provider_process_creation_hook", default=None
+)
 
 from .routing import (
     Endpoint,
@@ -73,7 +79,7 @@ STALL_WARNING_RECORD_LIMIT = 16
 # The managed Antigravity wrapper is the only provider which can report nested
 # activity.  The pipe is private to the wrapper and this provider; its contents
 # are a closed, bounded token vocabulary rather than provider-controlled text.
-ACTIVITY_PIPE_ENV = "AGENT_CENTRAL_ANTIGRAVITY_ACTIVITY_FD"
+ACTIVITY_PIPE_ENV = "APGR_ANTIGRAVITY_ACTIVITY_FD"
 ACTIVITY_MAX_TOKEN_BYTES = 64
 ACTIVITY_MAX_BUFFER_BYTES = 4096
 ACTIVITY_STDOUT_TOKEN = b"O\n"
@@ -98,6 +104,10 @@ STREAM_STDERR = "stderr"
 
 class ProviderError(RuntimeError):
     """A provider could not be invoked as the dispatcher requires."""
+
+
+class ProviderStartFailed(ProviderError):
+    """Process creation failed before any stdin delivery was possible."""
 
 
 @dataclass(frozen=True)
@@ -161,29 +171,19 @@ class ProviderInterrupted(BaseException):
     """
 
     def __init__(
-        self,
-        stdout: bytes,
-        stderr: bytes,
-        truncated: bool = False,
-        stderr_truncated: bool = False,
-        *,
+        self, stdout: bytes, stderr: bytes, truncated: bool = False,
+        stderr_truncated: bool = False, *,
         termination: dict[str, Any] | None = None,
         cleanup: dict[str, Any] | None = None,
     ) -> None:
         super().__init__("provider stage interrupted by operator")
-        self.stdout = stdout
-        self.stderr = stderr
-        self.truncated = truncated
-        self.stderr_truncated = stderr_truncated
-        self.partial_stdout = stdout
-        self.partial_stderr = stderr
-        self.stdout_truncated = truncated
-        self.partial_stdout_truncated = truncated
+        self.stdout, self.stderr = stdout, stderr
+        self.truncated, self.stderr_truncated = truncated, stderr_truncated
+        self.partial_stdout, self.partial_stderr = stdout, stderr
+        self.stdout_truncated, self.partial_stdout_truncated = truncated, truncated
         self.partial_stderr_truncated = stderr_truncated
-        self.termination = termination or {}
-        self.cleanup = cleanup or {}
-        self.termination_facts = self.termination
-        self.cleanup_facts = self.cleanup
+        self.termination, self.cleanup = termination or {}, cleanup or {}
+        self.termination_facts, self.cleanup_facts = self.termination, self.cleanup
 
 
 class ProviderCleanupFailed(ProviderError):
@@ -197,36 +197,23 @@ class ProviderCleanupFailed(ProviderError):
     """
 
     def __init__(
-        self,
-        stdout: bytes,
-        stderr: bytes,
-        truncated: bool = False,
-        stderr_truncated: bool = False,
-        *,
-        cleanup: dict[str, Any],
+        self, stdout: bytes, stderr: bytes, truncated: bool = False,
+        stderr_truncated: bool = False, *, cleanup: dict[str, Any],
         termination: dict[str, Any] | None = None,
-        exit_code: int | None = None,
-        started: float | None = None,
+        exit_code: int | None = None, started: float | None = None,
         ended: float | None = None,
     ) -> None:
         super().__init__("provider cleanup could not be proven complete")
-        self.stdout = stdout
-        self.stderr = stderr
-        self.truncated = truncated
-        self.stderr_truncated = stderr_truncated
-        self.partial_stdout = stdout
-        self.partial_stderr = stderr
-        self.stdout_truncated = truncated
-        self.partial_stdout_truncated = truncated
+        self.stdout, self.stderr = stdout, stderr
+        self.truncated, self.stderr_truncated = truncated, stderr_truncated
+        self.partial_stdout, self.partial_stderr = stdout, stderr
+        self.stdout_truncated, self.partial_stdout_truncated = truncated, truncated
         self.partial_stderr_truncated = stderr_truncated
-        self.cleanup = cleanup
-        self.cleanup_facts = cleanup
+        self.cleanup, self.cleanup_facts = cleanup, cleanup
         self.termination = termination or {}
         self.termination_facts = self.termination
-        self.exit_code = exit_code
-        self.returncode = exit_code
-        self.started = started
-        self.ended = ended
+        self.exit_code, self.returncode = exit_code, exit_code
+        self.started, self.ended = started, ended
 
 
 class ProviderLivenessExpired(BaseException):
@@ -240,55 +227,33 @@ class ProviderLivenessExpired(BaseException):
     """
 
     def __init__(
-        self,
-        stdout: bytes,
-        stderr: bytes,
-        truncated: bool,
-        stderr_truncated: bool,
-        *,
-        policy: LivenessPolicy,
-        reason: str,
-        elapsed_seconds: float,
-        silent_seconds: float,
-        last_activity_monotonic: float,
-        last_activity_stream: str | None,
-        termination: dict[str, Any],
-        cleanup: dict[str, Any],
+        self, stdout: bytes, stderr: bytes, truncated: bool,
+        stderr_truncated: bool, *, policy: LivenessPolicy, reason: str,
+        elapsed_seconds: float, silent_seconds: float,
+        last_activity_monotonic: float, last_activity_stream: str | None,
+        termination: dict[str, Any], cleanup: dict[str, Any],
         activity_counts: dict[str, dict[str, int]] | None = None,
     ) -> None:
         super().__init__(
             f"provider liveness expired ({reason}); "
             f"silent={silent_seconds:.3f}s elapsed={elapsed_seconds:.3f}s"
         )
-        self.stdout = stdout
-        self.stderr = stderr
-        self.truncated = truncated
-        self.stderr_truncated = stderr_truncated
-        self.partial_stdout = stdout
-        self.partial_stderr = stderr
-        self.stdout_truncated = truncated
-        self.partial_stdout_truncated = truncated
+        self.stdout, self.stderr = stdout, stderr
+        self.truncated, self.stderr_truncated = truncated, stderr_truncated
+        self.partial_stdout, self.partial_stderr = stdout, stderr
+        self.stdout_truncated, self.partial_stdout_truncated = truncated, truncated
         self.partial_stderr_truncated = stderr_truncated
-        self.policy = policy
-        self.reason = reason
-        self.expiry_reason = reason
-        self.elapsed_seconds = elapsed_seconds
-        self.elapsed = elapsed_seconds
-        self.silent_seconds = silent_seconds
-        self.silent = silent_seconds
-        self.silent_for = silent_seconds
-        self.last_activity_monotonic = last_activity_monotonic
-        self.last_activity = last_activity_monotonic
-        self.last_activity_stream = last_activity_stream
-        self.last_activity_kind = last_activity_stream
+        self.policy, self.reason, self.expiry_reason = policy, reason, reason
+        self.elapsed_seconds, self.elapsed = elapsed_seconds, elapsed_seconds
+        self.silent_seconds, self.silent, self.silent_for = silent_seconds, silent_seconds, silent_seconds
+        self.last_activity_monotonic, self.last_activity = last_activity_monotonic, last_activity_monotonic
+        self.last_activity_stream, self.last_activity_kind = last_activity_stream, last_activity_stream
         self.last_activity_age_seconds = silent_seconds
-        # Bounded, closed-vocabulary counters. Diagnosing a future stall needs to
-        # separate "the provider went quiet" from "the provider only ever emitted
-        # noise that no longer counts", without retaining any pipe payload.
+        self.termination, self.cleanup = termination, cleanup
+        self.termination_facts, self.cleanup_facts = termination, cleanup
         self.activity_counts = activity_counts or {"progress": {}, "non_progress": {}}
         self.activity_facts = {
-            "elapsed_seconds": elapsed_seconds,
-            "silent_seconds": silent_seconds,
+            "elapsed_seconds": elapsed_seconds, "silent_seconds": silent_seconds,
             "last_activity_monotonic": last_activity_monotonic,
             "last_activity_stream": last_activity_stream,
             "activity_counts": self.activity_counts,
@@ -394,7 +359,8 @@ def build_argv(
             argv.extend(["-s", "read-only"])
         # Primaries get no sandbox flag: the compiled base config owns that policy.
         argv.append("-")
-        return argv
+        from .runtime_models import apply_selection
+        return apply_selection(argv, endpoint, root) if pin_profile else argv
     if endpoint.provider == PROVIDER_ANTIGRAVITY:
         launcher = antigravity_launcher or os.fspath(root / ANTIGRAVITY_LAUNCHER)
         argv = [launcher, endpoint.profile, "-p"]
@@ -407,17 +373,7 @@ def build_argv(
 
 
 def _is_managed_antigravity_launcher(argv: Sequence[str], cwd: Path) -> bool:
-    """Recognize only this checkout's Antigravity wrapper for activity wiring."""
-    if not argv:
-        return False
-    candidate = Path(argv[0])
-    if not candidate.is_absolute():
-        candidate = cwd / candidate
-    managed = Path(__file__).resolve().parents[2] / ANTIGRAVITY_LAUNCHER
-    try:
-        return candidate.resolve(strict=False) == managed.resolve(strict=False)
-    except OSError:
-        return False
+    return is_managed_antigravity_launcher(argv, cwd, ANTIGRAVITY_LAUNCHER)
 
 
 def _effective_liveness_policy(override: LivenessPolicy | None) -> LivenessPolicy:
@@ -976,15 +932,35 @@ def _cleanup_process_groups(
 
 
 def run(
-    argv: Sequence[str],
-    prompt: bytes,
-    cwd: Path,
+    argv: Sequence[str], prompt: bytes, cwd: Path,
     max_output: int = MAX_STAGE_OUTPUT_BYTES,
-    on_output: Callable[[str, bytes], None] | None = None,
-    *,
+    on_output: Callable[[str, bytes], None] | None = None, *,
     liveness_policy: LivenessPolicy | None = None,
     on_notice: Callable[[dict[str, Any]], None] | None = None,
+    environment: Mapping[str, str] | None = None,
 ) -> Result:
+    # A dispatcher attempt binds durable launch evidence; the provider then
+    # starts only behind the pre-exec gate. Unbound callers keep a direct spawn.
+    from .provider_launch import BOUND, record_terminal
+    binding = BOUND.get()
+    try:
+        return _run(argv, prompt, cwd, max_output, on_output, liveness_policy=liveness_policy,
+                    on_notice=on_notice, environment=environment, binding=binding)
+    finally:
+        if binding is not None:
+            record_terminal(binding)
+
+
+def _run(
+    argv: Sequence[str], prompt: bytes, cwd: Path, max_output: int,
+    on_output: Callable[[str, bytes], None] | None, *,
+    liveness_policy: LivenessPolicy | None,
+    on_notice: Callable[[dict[str, Any]], None] | None,
+    environment: Mapping[str, str] | None, binding: Any,
+) -> Result:
+    from .context_adapter import ACTIVE_TRANSPORT
+    from . import provider_launch
+    transport = ACTIVE_TRANSPORT.get()
     # `on_notice` is deliberately separate from `on_output`. Advisory notices are
     # local observations, not provider bytes; routing them through the output
     # observer would break its documented mirror-of-the-record invariant.
@@ -992,33 +968,45 @@ def run(
     policy = _effective_liveness_policy(liveness_policy)
     started = time.time()
     started_monotonic = time.monotonic()
-    activity_read_fd: int | None = None
-    activity_write_fd: int | None = None
-    popen_options: dict[str, Any] = {}
-    if managed_antigravity:
-        activity_read_fd, activity_write_fd = os.pipe()
-        activity_environment = os.environ.copy()
-        activity_environment[ACTIVITY_PIPE_ENV] = str(activity_write_fd)
-        popen_options.update(
-            env=activity_environment,
-            pass_fds=(activity_write_fd,),
-        )
-    try:
-        process = subprocess.Popen(
-            list(argv),
+    popen_options, activity_read_fd, activity_write_fd = process_options(
+        argv, environment, transport, managed=managed_antigravity, activity_key=ACTIVITY_PIPE_ENV)
+    hook = PROCESS_CREATION_HOOK.get()
+    hook_environment = popen_options.get("env", dict(os.environ))
+
+    def popen(args: Sequence[str], gate_fds: tuple[int, ...] = ()) -> subprocess.Popen:
+        options = dict(popen_options)
+        if gate_fds:
+            options["pass_fds"] = (*options.get("pass_fds", ()), *gate_fds)
+        return subprocess.Popen(
+            list(args),
             cwd=cwd,
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             start_new_session=True,
-            **popen_options,
+            **options,
         )
-    except OSError as error:
+
+    try:
+        if binding is None:
+            process = popen(argv)
+        else:
+            # The creation hook runs before the provider is authorized, so a
+            # hook failure leaves the provider unexecuted. It sees the
+            # provider argv, not the gate's.
+            process = provider_launch.spawn(
+                binding, argv, popen,
+                before_authorize=(None if hook is None else
+                                  lambda gated: hook(gated, list(argv), cwd, hook_environment)),
+                terminate=_terminate,
+                environment=hook_environment,
+            )
+    except BaseException as error:
         if activity_read_fd is not None:
             os.close(activity_read_fd)
-        if activity_write_fd is not None:
-            os.close(activity_write_fd)
-        raise ProviderError(f"cannot launch {argv[0]}: {error}") from error
+        if isinstance(error, (OSError, provider_launch.LaunchEvidenceError)):
+            raise ProviderStartFailed(f"cannot launch {argv[0]}: {error}") from error
+        raise
     finally:
         # The parent never writes to or retains the inherited writer. The
         # wrapper owns its copy and closes it after its supervised run.
@@ -1027,6 +1015,20 @@ def run(
                 os.close(activity_write_fd)
             except OSError:
                 pass
+
+    try:
+        if hook is not None and binding is None:
+            hook(process, list(process.args), cwd, hook_environment)
+        if transport is not None:
+            transport.process_started(argv)
+    except BaseException:
+        if activity_read_fd is not None:
+            try:
+                os.close(activity_read_fd)
+            except OSError:
+                pass
+        _terminate(process)
+        raise
 
     out_chunks: list[bytes] = []
     err_chunks: list[bytes] = []
@@ -1109,8 +1111,10 @@ def run(
         def feed() -> None:
             try:
                 assert process.stdin is not None
-                process.stdin.write(prompt)
+                written = process.stdin.write(prompt)
                 process.stdin.close()
+                if transport is not None and written == len(prompt):
+                    transport.wrote_stdin(prompt)
             except (OSError, ValueError):
                 pass
 

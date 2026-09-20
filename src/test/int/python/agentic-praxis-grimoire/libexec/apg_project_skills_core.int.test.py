@@ -138,6 +138,14 @@ def test_real_canonical_tree_rejects_leaf_file_and_name_drift(tmp_path: Path) ->
     canonical = project_core.canonical_skills(tmp_path)
     assert tuple(sorted(canonical)) == project_core.EXPECTED_SKILLS
 
+    # The embedded Go catalog snapshot is the one admitted non-Go root file.
+    shutil.copy2(repository_skills / "catalog_generated.json", skills / "catalog_generated.json")
+    assert tuple(sorted(project_core.canonical_skills(tmp_path))) == project_core.EXPECTED_SKILLS
+    (skills / "other_generated.json").write_text("{}\n", encoding="utf-8")
+    with pytest.raises(project_core.ToolError, match="unsupported owner or depth"):
+        project_core.canonical_skills(tmp_path)
+    (skills / "other_generated.json").unlink()
+
     extra = skills / "extra-skill"
     extra.mkdir()
     (extra / "SKILL.md").write_text(

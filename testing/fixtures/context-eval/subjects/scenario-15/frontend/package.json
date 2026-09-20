@@ -1,0 +1,6 @@
+{
+  "name": "fixture-frontend",
+  "private": true,
+  "scripts": {"build": "tsc --noEmit"},
+  "dependencies": {"react": "^19.0.0", "typescript": "^5.5.0"}
+}

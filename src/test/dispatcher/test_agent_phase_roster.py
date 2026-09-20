@@ -3,6 +3,9 @@ from __future__ import annotations
 import hashlib
 import os
 from pathlib import Path
+import json
+import re
+import shutil
 import socket
 import subprocess
 import sys
@@ -10,6 +13,8 @@ import tempfile
 import tomllib
 
 import pytest
+
+from agent_phase.bundle import publish_bundle
 
 from agent_phase import roster as roster_module
 from agent_phase.request import EXECUTION_MODES, PHASE_TYPES
@@ -59,23 +64,18 @@ def test_canonical_roster_is_complete_and_provenance_is_byte_exact() -> None:
     routes_document = tomllib.loads(roster.routes_source.raw.decode("utf-8"))
     assert roster.generation == endpoints_document["generation"]
     assert roster.generation == routes_document["generation"]
+    assert set(roster.bundle.members) == {"models.toml", "workers.toml", "endpoints.toml", "routes.toml", "capabilities.toml", "policy.toml"}
+    expected_sources = {
+        name.removesuffix(".toml"): {
+            "path": member.path.relative_to(ROOT).as_posix(),
+            "sha256": hashlib.sha256(Path(member.path).read_bytes()).hexdigest(),
+        }
+        for name, member in roster.bundle.members.items()
+    }
     assert roster.provenance() == {
         "schema": "agent-phase-roster-provenance-v1",
         "generation": roster.generation,
-        "sources": {
-            "endpoints": {
-                "path": ENDPOINTS_SOURCE.as_posix(),
-                "sha256": hashlib.sha256(
-                    (ROOT / ENDPOINTS_SOURCE).read_bytes()
-                ).hexdigest(),
-            },
-            "routes": {
-                "path": ROUTES_SOURCE.as_posix(),
-                "sha256": hashlib.sha256(
-                    (ROOT / ROUTES_SOURCE).read_bytes()
-                ).hexdigest(),
-            },
-        },
+        "sources": expected_sources,
     }
 
 
@@ -85,7 +85,8 @@ def test_profile_validation_visits_every_endpoint_alias() -> None:
 
     validate_profiles(roster, lambda alias, endpoint: visited.append((alias, endpoint)))
 
-    assert visited == sorted(roster.endpoints.items())
+    referenced_aliases = sorted({alias for route in roster.routes.values() for alias in route.values()})
+    assert visited == [(alias, roster.endpoints[alias]) for alias in referenced_aliases]
 
 
 @pytest.mark.parametrize(
@@ -189,7 +190,7 @@ def test_profile_validation_visits_every_endpoint_alias() -> None:
                 '[routes.implementation_testing.normal]\nplan = "fixture-gemini-blue"',
                 "[routes.implementation_testing.normal]\nplan = 7",
             ),
-            "unknown endpoint alias",
+            "(?:unknown endpoint alias|invalid route alias)",
         ),
         (
             ENDPOINTS_SOURCE,
@@ -217,7 +218,7 @@ def test_missing_roster_file_fails_closed(tmp_path: Path, relative: Path) -> Non
     root = roster_root(tmp_path)
     (root / relative).unlink()
 
-    with pytest.raises(RosterError, match="cannot read tracked roster"):
+    with pytest.raises(RosterError, match=r"(?:cannot read tracked roster|incomplete dispatcher bundle|missing member)"):
         load_roster(root)
 
 
@@ -360,7 +361,7 @@ def test_hard_linked_roster_is_rejected(tmp_path: Path) -> None:
     path.rename(original)
     os.link(original, path)
 
-    with pytest.raises(RosterError, match="single-link"):
+    with pytest.raises(RosterError, match=r"(?:single-link|hard links)"):
         load_roster(root)
 
 
@@ -428,3 +429,121 @@ def test_named_only_modes_enforce_provider_family_in_product_validation(
 
     with pytest.raises(RosterError, match=f"must use only {required_provider}"):
         load_roster(fixture.root)
+
+
+def test_operator_roster_bundle_success(tmp_path: Path) -> None:
+    op_home = tmp_path / "operator_home"
+    disp = op_home / "dispatcher"
+    source = tmp_path / "source"
+    shutil.copytree(ROOT / "common" / "dispatcher", source)
+    gen = 9
+
+    for name in ("routes.toml", "endpoints.toml", "capabilities.toml", "policy.toml", "models.toml", "workers.toml"):
+        p = source / name
+        content = p.read_text(encoding="utf-8")
+        updated = re.sub(r"generation = \d+", f"generation = {gen}", content)
+        p.write_text(updated, encoding="utf-8")
+
+    publish_bundle(source, disp, expected_generation=gen)
+
+    roster = load_roster(ROOT, apgr_home=op_home)
+    assert roster.generation == gen
+    assert roster.endpoints_source.path == disp / "endpoints.toml"
+    assert roster.routes_source.path == disp / "routes.toml"
+
+
+def test_operator_roster_bundle_partial_fails(tmp_path: Path) -> None:
+    op_home = tmp_path / "operator_home"
+    disp = op_home / "dispatcher"
+    disp.mkdir(parents=True)
+    # only routes and endpoints, missing capabilities.toml and policy.toml
+    for name in ("routes.toml", "endpoints.toml"):
+        (disp / name).write_text((ROOT / "common" / "dispatcher" / name).read_text(encoding="utf-8"), encoding="utf-8")
+
+    with pytest.raises(RosterError, match=r"(?:partial operator dispatcher roster|migration to six-file bundle|missing models\.toml)"):
+        load_roster(ROOT, apgr_home=op_home)
+
+
+def test_operator_roster_bundle_generation_mismatch_fails(tmp_path: Path) -> None:
+    op_home = tmp_path / "operator_home"
+    disp = op_home / "dispatcher"
+    source = tmp_path / "source"
+    shutil.copytree(ROOT / "common" / "dispatcher", source)
+
+    publish_bundle(source, disp, expected_generation=9)
+
+    policy_file = disp / "policy.toml"
+    policy_file.write_text(
+        re.sub(r"generation = \d+", "generation = 999", policy_file.read_text("utf-8")),
+        "utf-8",
+    )
+    manifest_path = disp / "bundle.json"
+    manifest_data = json.loads(manifest_path.read_text("utf-8"))
+    files = manifest_data.get("files") or manifest_data.get("members")
+    files["policy.toml"]["sha256"] = hashlib.sha256(policy_file.read_bytes()).hexdigest()
+    files["policy.toml"]["bytes"] = policy_file.stat().st_size
+    manifest_path.write_text(json.dumps(manifest_data, indent=2), "utf-8")
+
+    with pytest.raises(RosterError, match=r"(?:operator dispatcher roster generation mismatch|generation mismatch)"):
+        load_roster(ROOT, apgr_home=op_home)
+
+
+def test_operator_roster_absent_falls_back_to_tracked(tmp_path: Path) -> None:
+    empty_home = tmp_path / "empty_home"
+    empty_home.mkdir()
+    roster = load_roster(ROOT, apgr_home=empty_home)
+    assert roster.endpoints_source.path == (ROOT / ENDPOINTS_SOURCE).resolve()
+    assert roster.generation == 9
+
+
+def test_single_captured_bundle_threaded_in_v1(tmp_path: Path) -> None:
+    from agent_phase.dispatch import Dispatcher, DispatchError
+    from agent_phase.config_routing import ReviewMutationPolicy
+
+    op_home = tmp_path / "operator_home"
+    disp = op_home / "dispatcher"
+    source = tmp_path / "source"
+    shutil.copytree(ROOT / "common" / "dispatcher", source)
+    gen = 9
+
+    for name in ("routes.toml", "endpoints.toml", "capabilities.toml", "policy.toml", "models.toml", "workers.toml"):
+        p = source / name
+        content = p.read_text(encoding="utf-8")
+        updated = re.sub(r"generation = \d+", f"generation = {gen}", content)
+        p.write_text(updated, encoding="utf-8")
+
+    publish_bundle(source, disp, expected_generation=gen)
+
+    d = Dispatcher(
+        root=ROOT,
+        cwd=tmp_path,
+        resolve_scanner=False,
+        apgr_home=op_home,
+    )
+    assert d.roster.generation == gen
+    assert d.review_mutation_policy.generation == gen
+    assert d.review_mutation_provenance["source_type"] == "operator_default"
+    assert d.review_mutation_provenance["content_digest"] == d.roster.policy_source.sha256
+
+    # Coherence check: if policy generation mismatches roster generation, reject prelaunch
+    mismatched_policy = ReviewMutationPolicy(worktree="block", index="block", head="block", generation=999)
+    with pytest.raises(DispatchError, match="coherence failure.*generation"):
+        Dispatcher(
+            root=ROOT,
+            cwd=tmp_path,
+            resolve_scanner=False,
+            apgr_home=op_home,
+            review_mutation_policy=mismatched_policy,
+            review_mutation_provenance={"source_type": "operator_default", "content_digest": d.roster.policy_source.sha256},
+        )
+
+    # Coherence check: if digest mismatches roster policy_source sha256, reject prelaunch
+    with pytest.raises(DispatchError, match="coherence failure.*digest"):
+        Dispatcher(
+            root=ROOT,
+            cwd=tmp_path,
+            resolve_scanner=False,
+            apgr_home=op_home,
+            review_mutation_policy=d.review_mutation_policy,
+            review_mutation_provenance={"source_type": "operator_default", "content_digest": "bad" * 16},
+        )

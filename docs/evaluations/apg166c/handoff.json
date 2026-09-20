@@ -1,0 +1,112 @@
+{
+  "blockers": [
+    "Corrected C1 MCP call succeeds but native Read is denied by workingDir; C2 not completed",
+    "Authorized C1/C2 corrected rerun budget exhausted; no more probes authorized",
+    "Concrete subject factories, provider importers and substantive oracle implementations remain incomplete",
+    "Complete provider/runtime/projection binding and all-subject dry-run remain incomplete",
+    "Independent findings 1-9 dispositioned; repairs and promotion attribution acceptance deferred"
+  ],
+  "complete_execution_package": false,
+  "continuation": "V0130-H-QUAL4",
+  "default_context_mode": "static",
+  "delivered": [
+    "Run/plan/config/executable-bound one-use internal wrapper handoff and exact native MCP tool/permission set",
+    "Observed file_unchanged parser with retained observation and zero new source-payload bytes; synthetic qualification only for final parser",
+    "Five-skill task preregistration: three positive and two semantic non-trigger cases per skill; maturity criteria unchanged",
+    "Fifteen hash-bound symmetric route/cohort/oracle-declaration inventories and unavailable preflight records",
+    "Private runtime identity contract and blocked source inventory"
+  ],
+  "disposition": "blocked",
+  "exit": "00225",
+  "h_main_gate": false,
+  "live_holdout_authorized": false,
+  "live_measured_pairs": 0,
+  "next_authority": "Manager disposition of blocked candidate; further live probes require explicit authority, and a complete execution package remains necessary before live H.",
+  "not_performed": [
+    "H calibration or holdout model tasks",
+    "Skill promotion or reserve substitution",
+    "Scenario 15 live qualification",
+    "Resolver tuning, default flip, V0130-I",
+    "Staging, commit, push, publication",
+    "Producer-selected independent reviewer"
+  ],
+  "phase": "APG166C",
+  "prerequisites_ready": false,
+  "probe_evidence": {
+    "cli_version": "2.1.281",
+    "combined_invocations": 2,
+    "corrected_reruns_per_probe": 1,
+    "final": {
+      "manifest_sha256": "9156792df42f8c5457945317e1d2524050f50f281b3860897c31b2a4b38c226b",
+      "mcp": "successful_context_explain",
+      "permission_mode": "default",
+      "raw_stream_sha256": "083d46609f179b8b2473ed6f4b46144cc980e2e295e6d822531b5cad2fb8b92d",
+      "read": "denied_by_workingDir",
+      "source_before_after_match": true,
+      "source_files": 353
+    },
+    "further_probe_authority": false,
+    "initial": {
+      "manifest_sha256": "5f74b6bf69c1e2b1a5cf47c361b5ecf7a42fc930fd2ad003bbd81dd852098e14",
+      "mcp": "denied_by_plan_mode",
+      "raw_stream_sha256": "e2d9a0d8b37f49ba330e75bdb39651513eef72135dcfedb6460e541b23db310e",
+      "reads": [
+        "text",
+        "file_unchanged"
+      ]
+    },
+    "model": "claude-opus-5",
+    "named_probes": [
+      "C1",
+      "C2"
+    ],
+    "profile": "normal-final-review",
+    "qualification_boundary": "Neither combined attempt establishes C1 plus C2. No final-source complete native Read observation. Source recomputation does not authenticate private payload custody.",
+    "status": "incomplete"
+  },
+  "qualification": {
+    "affected_python_tests": 426,
+    "frozen_files": "44 files byte-identical to entry HEAD",
+    "full_release_suite": "not invoked",
+    "go_tests_vet": "not required: no Go source changed",
+    "initial_test_diagnostics": [
+      "Unquoted pytest glob rejected by shell before tests",
+      "Two mistaken unit-test launcher calls reached installed CLI with no supplied prompt and exited 1; no model result/evidence retained; test rewritten to call rejection functions directly",
+      "One shell heredoc construction failed; test file corrected before collection"
+    ],
+    "native_generation": "passed including handoff module import",
+    "probe_source_payloads": "Complete private final-source payload inventory retained; initial source payloads reconstructed from contemporaneously recorded prospective tree",
+    "required_test_skips": 0,
+    "revise_close": {
+      "first_test_attempt": "collection error: missing dispatcher test import path; corrected run passed",
+      "focused_tests_passed": 141,
+      "live_probes": "not rerun; authorization exhausted",
+      "preflight_unavailable_records": 15,
+      "private_packet": "not reverified",
+      "sealed_source_hashes_matched": 353,
+      "selected_entry_files_matched": 36,
+      "skips": 0,
+      "whitespace": "passed"
+    },
+    "roadmap_closure": "55 terminal; zero open/invalid",
+    "skill_library": "46 skills passed"
+  },
+  "qualified_promotions": 0,
+  "review_disposition": {
+    "disposition": "defer",
+    "findings": "1-9 accepted as findings; unresolved repairs and acceptance boundaries retained",
+    "promotion_preregistration_accepted": false,
+    "record": "docs/evaluations/apg166c-pre-live-readiness.md",
+    "second_independent_review": false,
+    "source_changes": "none during revise-close"
+  },
+  "review_state": "Independent work review received; revise-close deferred readiness; no second independent review",
+  "scenario15": "contingent/unavailable",
+  "schema": "apg.h-prerequisite-handoff/v1",
+  "seal": {
+    "files": 353,
+    "path": "docs/evaluations/apg166c/readiness-seal.json",
+    "sha256": "fd8b6464dc9e8b02ca16d35cc52703c6eab63bc3819ba67c14f910a2e0fcb2f1"
+  },
+  "v0130_i_authorized": false
+}

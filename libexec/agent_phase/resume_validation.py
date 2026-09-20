@@ -16,7 +16,7 @@ from . import review_result as review_result_module
 from . import run as run_module
 from .runtime_exclusion import disposable_runtime
 from .lifecycle import LIFECYCLE_STANDARD, get_lifecycle
-from .request import PhaseRequest
+from .request import PhaseRequest, RequestError, parse_request
 
 
 _STANDARD = get_lifecycle(LIFECYCLE_STANDARD)
@@ -95,27 +95,45 @@ def require_source(path: Path, excluded: list[dict[str, str]] | None = None) -> 
     return source
 
 
+def retained_request(source: Path) -> PhaseRequest:
+    """Parse the retained request with the maintained strict request owner."""
+    try:
+        return parse_request((source / "request.json").read_bytes())
+    except (OSError, RequestError) as error:
+        raise ResumeError(
+            "RESUME_SOURCE_INVALID", f"retained request is unreadable or invalid: {error}"
+        ) from error
+
+
+def require_same_request(source: Path, request: PhaseRequest) -> None:
+    """Semantic identity: byte-different encodings of one request are one task."""
+    if retained_request(source).as_dict() != request.as_dict():
+        raise ResumeError("RESUME_REQUEST_MISMATCH", "request differs from source request.json")
+
+
 def phase_id_for_resume(source_path: Path, request_path: Path) -> str:
-    """Derive resume identity from a structurally validated closed source run."""
+    """Derive resume identity from a structurally validated source run."""
     source = require_source(source_path)
     state = load_json(source, "state.json")
-    result = load_json(source, "result.json")
+    if (source / "result.json").exists():
+        result: dict[str, Any] | None = load_json(source, "result.json")
+    else:
+        # Only a qualified interruption may lack its aggregate result; the
+        # maintained resume path materializes it before any provider runs.
+        from .interrupted_recovery import qualify
+
+        state, result = qualify(source)["state"], None
     run_module.validate_run_topology(
         source, state, result, error_fn=ResumeError
     )
     phase_id = str(state["phase_id"])
     try:
-        supplied = request_path.read_bytes()
-        retained = (source / "request.json").read_bytes()
-    except OSError as error:
+        supplied = parse_request(request_path.read_bytes())
+    except (OSError, RequestError) as error:
         raise ResumeError(
-            "RESUME_SOURCE_INVALID", f"cannot read retained request bytes: {error}"
+            "RESUME_REQUEST_MISMATCH", f"supplied request is not a valid request: {error}"
         ) from error
-    if supplied != retained:
-        raise ResumeError(
-            "RESUME_REQUEST_MISMATCH",
-            "supplied request bytes differ from source request.json",
-        )
+    require_same_request(source, supplied)
     return phase_id
 
 
@@ -385,6 +403,38 @@ def validate_bindings(
             prior_tree_candidate = stage.candidate_key
 
 
+def _entry_adoption_authority(source: Path, state: dict[str, Any],
+                              request: PhaseRequest, root: Path) -> None:
+    """Bind retained entry authority for every durable-core consumer."""
+    from . import adoption, entry_adoption
+
+    record = state.get("entry_adoption")
+    if record is None:
+        return
+    try:
+        if state.get("adoption") is not None:
+            raise ValueError("ordinary and entry adoption are mutually exclusive")
+        if state.get("resumed"):
+            retained = load_json(source / "inherited", "source-state.json").get("entry_adoption")
+        else:
+            retained = load_json(source, "entry-adoption.json")
+        if retained != record:
+            raise ValueError("archived entry adoption differs from state")
+        if (record["phase_id"] != state["phase_id"]
+                or record["request_sha256"] != adoption.digest(request.as_dict())):
+            raise ValueError("entry adoption phase or request binding differs")
+        baseline = state.get("candidate_baseline")
+        if baseline is not None and baseline.get("manifest") != record["candidate_manifest"]:
+            raise ValueError("entry adoption baseline differs")
+        identity = state.get("adopted_candidate_identity")
+        if identity is not None and identity != record["candidate_manifest"]:
+            raise ValueError("adopted candidate identity differs")
+        entry_adoption.validate_retained_entry(root, record)
+    except (ValueError, RuntimeError, OSError, KeyError, TypeError) as error:
+        raise ResumeError("RESUME_ARTIFACT_MISMATCH",
+                          f"entry adoption authority invalid: {error}") from error
+
+
 def load_core(
     source_path: Path,
     phase_id: str,
@@ -397,12 +447,13 @@ def load_core(
 ]:
     """Load and cross-bind the source run's durable core evidence."""
     source = require_source(source_path)
-    request_json = load_json(source, "request.json")
     state = load_json(source, "state.json")
     result = load_json(source, "result.json")
     resolved = load_json(source, "resolved.json")
-    if request_json != request.as_dict():
-        raise ResumeError("RESUME_REQUEST_MISMATCH", "request differs from source request.json")
+    require_same_request(source, request)
+    from . import interrupted_recovery
+    if state.get("interrupted_recovery") is not None or (source / interrupted_recovery.RECEIPT).exists():
+        interrupted_recovery.verify(source, state)
     if (
         state.get("phase_id") != phase_id
         or state.get("phase_type") != request.phase_type
@@ -436,7 +487,7 @@ def load_core(
         "ownership_challenges", "mechanical_phase_owned_paths", "ownership_type_transitions",
         "ownership_candidate_evidence",
         "ownership_challenge_states",
-        "raw_terminal_candidate", "publication_candidate", "mechanical_phase_delta", "adoption",
+        "raw_terminal_candidate", "publication_candidate", "mechanical_phase_delta", "adoption", "entry_adoption",
     ):
         default = [] if key in {"path_dispositions", "path_disposition_noops", "excluded_paths"} else None
         if result.get(key, default) != state.get(key, default):
@@ -459,6 +510,7 @@ def load_core(
     ):
         raise ResumeError("RESUME_ARTIFACT_MISMATCH", "resolved route identity disagrees")
     source_entry = entry(source, state, detached=detached)
+    _entry_adoption_authority(source, state, request, root or source_entry.root)
     if state.get("adoption") is not None:
         from . import adoption
         try:

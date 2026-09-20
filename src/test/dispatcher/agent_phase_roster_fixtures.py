@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import json
+import re
 from pathlib import Path
 from typing import Mapping
 
@@ -194,6 +195,36 @@ def write_roster_sources(
         "\n".join(route_lines), encoding="utf-8"
     )
 
+    canonical = Path(__file__).resolve().parents[3] / "common/dispatcher"
+    for name in ("models.toml", "workers.toml", "policy.toml"):
+        raw = re.sub(r"(?m)^generation = \d+$", f"generation = {generation}", (canonical / name).read_text())
+        if name == "models.toml":
+            # Synthetic profiles own their model inputs as well as their
+            # catalog/profile documents. Do not inherit a different canonical
+            # model selection for the same profile name.
+            for endpoint in endpoints.values():
+                key = (endpoint.provider, endpoint.profile)
+                if endpoint.provider != "claude" or key not in SYNTHETIC_INTELLIGENCE:
+                    continue
+                entry = SYNTHETIC_INTELLIGENCE[key]
+                pattern = rf"(?ms)(^\[providers\.claude\.{re.escape(endpoint.profile)}\]\n)(.*?)(?=^\[|\Z)"
+                def fixture_model(match: re.Match[str], selection=entry) -> str:
+                    body = re.sub(r'(?m)^model = "[^"]+"$', f'model = "{selection["model"]}"', match[2])
+                    body = re.sub(r'(?m)^effort = "[^"]+"$', f'effort = "{selection["effort"]}"', body)
+                    return match[1] + body
+                raw = re.sub(pattern, fixture_model, raw)
+        (dispatcher / name).write_text(raw)
+    with (dispatcher / "models.toml").open("a") as stream:
+        for endpoint in endpoints.values():
+            if endpoint.profile.startswith("fixture-"):
+                entry = SYNTHETIC_INTELLIGENCE[(endpoint.provider, endpoint.profile)]
+                stream.write(f'\n[providers.{endpoint.provider}."{endpoint.profile}"]\nmodel = "{entry["model"]}"\neffort = "{entry.get("effort", "high")}"\n')
+    caps = ['schema = "agent-phase-capabilities-v1"', f"generation = {generation}"]
+    for alias, endpoint in endpoints.items():
+        caps += [f"[endpoints.{alias}]", f'provider = "{endpoint.provider}"', f'profile = "{endpoint.profile}"',
+                 'capabilities = ["read", "reasoning"]', 'posture = "read_only"']
+    (dispatcher / "capabilities.toml").write_text("\n".join(caps) + "\n")
+
 
 def _write_profile_sources(root: Path) -> None:
     claude_dir = root / "claude"
@@ -205,11 +236,11 @@ def _write_profile_sources(root: Path) -> None:
     claude_documents = {
         "implementation-primary": {
             "modelRole": "primary",
-            "effort": "medium",
+            "effort": PROFILE_CONTRACTS["implementation-primary"].effort,
         },
         "implementation-review": {
             "modelRole": "review",
-            "effort": "medium",
+            "effort": PROFILE_CONTRACTS["implementation-review"].effort,
             "permissionMode": "plan",
         },
     }
@@ -233,9 +264,9 @@ def _write_profile_sources(root: Path) -> None:
     worker_source.write_text(
         "[agents]\n"
         "enabled = true\n"
-        'default_subagent_model = "gpt-5.6-luna"\n'
+        'default_subagent_model = "gpt-6-luna"\n'
         'default_subagent_reasoning_effort = "max"\n'
-        "max_concurrent_threads_per_session = 10\n",
+        "max_concurrent_threads_per_session = 4\n",
         encoding="utf-8",
     )
 

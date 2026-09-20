@@ -21,7 +21,7 @@ from agentic_praxis_grimoire import go_bridge  # noqa: E402
 from agentic_praxis_grimoire import __main__ as module_main  # noqa: E402
 
 
-CURRENT_VERSION = "0.12.0"
+CURRENT_VERSION = "0.13.0"
 
 
 def test_help_and_version_are_checkout_independent(capsys: pytest.CaptureFixture[str]) -> None:
@@ -459,3 +459,115 @@ def test_environment_bridge_failure_is_bounded_and_values_safe(
     error = capsys.readouterr().err
     assert error == "apgr env: Go environment bridge unavailable\n"
     assert secret not in error
+
+
+@pytest.mark.parametrize(
+    "arguments, diagnostic",
+    (
+        (["--unknown"], "unknown global option: --unknown"),
+        (["--apgr-home"], "--apgr-home requires a value"),
+        (["--project", "a", "--project", "b", "home", "show"], "--project may be specified only once"),
+        (["home"], "home requires a command"),
+        (["home", "list"], "unknown home command: list"),
+        (["home", "show", "--yaml"], "unknown option for home show: --yaml"),
+        (["integrations"], "integrations requires a command"),
+        (["integrations", "ollama"], "unknown integration: ollama"),
+        (["integrations", "rtk"], "rtk requires a command"),
+        (["integrations", "rtk", "install"], "unknown rtk command: install"),
+        (["integrations", "rtk", "doctor", "--fix"], "unknown option for integrations rtk doctor: --fix"),
+        (["dispatcher"], "dispatcher requires bundle or observations"),
+        (["dispatcher", "routes"], "dispatcher requires bundle or observations"),
+        (["mcp"], "mcp requires serve"),
+        (["mcp", "start"], "mcp requires serve"),
+        (["check"], "check requires a command"),
+        (["build-info", "--json"], "build-info takes no arguments"),
+        (["analyze"], "analyze requires the hotspots command"),
+        (["--apgr-home", "/h", "analyze", "hotspots"], "analyze accepts only --project-root"),
+        (["unknown-family"], "unknown command family: unknown-family"),
+    ),
+)
+def test_new_command_family_usage_failures_return_exit_two(
+    arguments: list[str], diagnostic: str, capsys: pytest.CaptureFixture[str]
+) -> None:
+    assert cli.main(arguments) == 2
+    error = capsys.readouterr().err
+    assert error.startswith("apgr: ") and diagnostic in error and error.count("\n") == 1
+
+
+def test_home_show_reports_the_resolved_layout_as_json_and_text(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    import json
+
+    home = tmp_path / "apgr-home"
+    outbox = tmp_path / "outbox"
+    assert cli.main(["--apgr-home", os.fspath(home), "--outbox-root", os.fspath(outbox), "home", "show", "--json"]) == 0
+    shown = json.loads(capsys.readouterr().out)
+    assert shown["effective_home"] == os.fspath(home)
+    assert shown["precedence_source"] == "cli"
+    assert cli.main(["--apgr-home", os.fspath(home), "--outbox-root", os.fspath(outbox), "home", "show"]) == 0
+    text = capsys.readouterr().out.splitlines()
+    assert text[:3] == [f"layout_version: {shown['layout_version']}", "precedence_source: cli",
+                        f"effective_home: {home}"]
+    assert text[3] == "paths:"
+    assert [line for line in text if line.startswith("  ") and ": " in line] == [
+        f"  {key}: {value}" for key, value in sorted(shown["paths"].items())
+    ] + [f"  - {item}" for item in shown["diagnostics"] if ": " in item]
+    assert ("diagnostics:" in text) == bool(shown["diagnostics"])
+    assert not home.exists() and not outbox.exists()
+
+
+def test_home_show_and_rtk_doctor_map_configuration_errors_to_exit_two(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    assert cli.main(["--apgr-home", "relative/home", "home", "show"]) == 2
+    assert capsys.readouterr().err.startswith("apgr: ")
+    project = tmp_path / "project"
+    (project / ".apgr").mkdir(parents=True)
+    (project / ".apgr/config.toml").write_text("[integrations.rtk]\nrequired = true\n", encoding="utf-8")
+    arguments = ["--apgr-home", os.fspath(tmp_path / "home"), "--project-root", os.fspath(project)]
+    assert cli.main([*arguments, "integrations", "rtk", "doctor"]) == 2
+    assert capsys.readouterr().err == "apgr: strict rtk required=true is deferred; required must be false\n"
+
+
+@pytest.mark.parametrize("json_output", (False, True))
+def test_rtk_doctor_renders_the_read_only_report(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], json_output: bool
+) -> None:
+    from agentic_praxis_grimoire import rtk
+
+    calls: list[tuple[str, object]] = []
+    monkeypatch.setattr(rtk, "doctor_report", lambda **kwargs: calls.append(("report", kwargs)) or {"status": "ok"})
+    monkeypatch.setattr(rtk, "render_doctor_report",
+                        lambda report, json_output=False: calls.append(("render", (report, json_output))) or "done\n")
+    tail = ["--json"] if json_output else []
+    assert cli.main(["--apgr-home", "/h", "--project-root", "/p", "integrations", "rtk", "doctor", *tail]) == 0
+    assert capsys.readouterr().out == "done\n"
+    assert calls == [("report", {"project_root": "/p", "apgr_home": "/h"}),
+                     ("render", ({"status": "ok"}, json_output))]
+
+
+@pytest.mark.parametrize(
+    "arguments, owner, forwarded",
+    (
+        (["dispatcher", "bundle", "show"], "apgr-dispatcher-bundle", ["show"]),
+        (["--apgr-home", "/h", "dispatcher", "bundle", "verify"], "apgr-dispatcher-bundle",
+         ["verify", "--apgr-home", "/h"]),
+        (["dispatcher", "observations", "summarize"], "apgr-dispatcher-observations", ["summarize"]),
+        (["--apgr-home", "/h", "dispatcher", "observations", "explain", "r"], "apgr-dispatcher-observations",
+         ["explain", "r", "--apgr-home", "/h"]),
+        (["--apgr-home", "/h", "dispatcher", "observations", "prune"], "apgr-dispatcher-observations", ["prune"]),
+        (["--outbox-root", "/o/../outbox", "dispatcher", "observations", "list"], "apgr-dispatcher-observations",
+         ["list", "--outbox-root", os.fspath(Path("/outbox").resolve())]),
+        (["--outbox-root", "/o", "dispatcher", "observations", "list", "--outbox-root", "/x"],
+         "apgr-dispatcher-observations", ["list", "--outbox-root", "/x"]),
+        (["--outbox-root", "/o", "dispatcher", "observations", "index"], "apgr-dispatcher-observations", ["index"]),
+    ),
+)
+def test_dispatcher_routes_forward_only_the_supported_global_options(
+    arguments: list[str], owner: str, forwarded: list[str], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    observed: list[tuple[str, list[str]]] = []
+    monkeypatch.setattr(cli, "_repository_route", lambda name, tail, options: observed.append((name, list(tail))) or 5)
+    assert cli.main(arguments) == 5
+    assert observed == [(owner, forwarded)]

@@ -1,0 +1,175 @@
+{
+  "scenario_id": "scenario-01",
+  "name": "Go Language and Test Profile Selection",
+  "subset": "calibration",
+  "cohort": "savings_eligible_calibration_subset",
+  "phase": "APG159A",
+  "task_input": {
+    "instruction": "Implement an HTTP health check handler in pkg/handler/health.go and companion unit test in pkg/handler/health_test.go asserting 200 OK and JSON payload.",
+    "task_authority": "phase_owned",
+    "mutation_scope": [
+      "pkg/handler/health.go",
+      "pkg/handler/health_test.go"
+    ]
+  },
+  "provider": "codex",
+  "role_binding": {
+    "binding_id": "binding-producer-01",
+    "roles": [
+      "Producer"
+    ],
+    "allowed_tools": [
+      "view_file",
+      "replace_file_content",
+      "write_to_file",
+      "run_command"
+    ]
+  },
+  "repository_evidence": {
+    "files": [
+      "main.go",
+      "go.mod",
+      "pkg/handler/handler_test.go"
+    ],
+    "primary_language": "go",
+    "dependency_facts": {
+      "go_mod": "module example.com/service\n\ngo 1.25\n\nrequire github.com/google/go-cmp v0.7.0\n",
+      "direct_dependencies": [
+        "github.com/google/go-cmp"
+      ]
+    }
+  },
+  "mandatory_instructions": {
+    "provider_file": "codex/AGENTS.md",
+    "provider_instruction_bytes": 7939,
+    "measurement_command": "wc -c codex/AGENTS.md (or python3 -c 'print(len(open(\"codex/AGENTS.md\", \"rb\").read()))')",
+    "mandatory_doctrine_bytes": 2500,
+    "tool_schema_overhead": "unavailable_provider_native"
+  },
+  "skill_sources": {
+    "apgr:go-language-profile": {
+      "canonical_path": "skills/go-language-profile/SKILL.md",
+      "whole_bytes": 16733,
+      "body_bytes": 16452,
+      "body_sha256": "a2a1090422ddd0aa38610f7beedad1d6af6d50f7c6c553fc6f1f5aabfb04935f",
+      "source_kind": "canonical_measured"
+    },
+    "apgr:go-test-profile": {
+      "canonical_path": "skills/go-test-profile/SKILL.md",
+      "whole_bytes": 17821,
+      "body_bytes": 17487,
+      "body_sha256": "b675e94daabf185896bba5cf740891215e74741b1088ba2fa74cb9d5576c6e61",
+      "source_kind": "canonical_measured"
+    },
+    "apgr:implementing-with-test-discipline": {
+      "canonical_path": "skills/implementing-with-test-discipline/SKILL.md",
+      "whole_bytes": 5221,
+      "body_bytes": 4990,
+      "body_sha256": "81edd04d465423b3865d155f62ff0eb01fe9462da404a2504beea9d8fe39706d",
+      "source_kind": "canonical_measured"
+    },
+    "apgr:go-cmp-test-profile": {
+      "canonical_path": "skills/go-cmp-test-profile/SKILL.md",
+      "status": "deferred_for_late_acquisition",
+      "whole_bytes": 15677,
+      "body_bytes": 15321,
+      "body_sha256": "daf781fb67e2bbd491bfbc4238d575d1bce78cd5b99f417ab4a33c27ed8180aa",
+      "source_kind": "canonical_measured"
+    }
+  },
+  "budget": {
+    "scope": "apgr_controlled_initial_bytes",
+    "max_initial_controlled_bytes": 55000,
+    "allocated_skill_body_bytes": 42000,
+    "feasible_packing_explanation": "Canonical SKILL.md sources for the three primary skills sum to 39,775 whole-file bytes (38,929 body bytes). The budget scope is APGR-controlled initial bytes, which covers the 7,939 B provider instruction file, the estimated mandatory doctrine slice, and the three complete canonical bodies; provider-native tool-schema and token overhead are accounted separately and remain unavailable. A 55,000 B controlled budget with a 42,000 B skill-body allocation holds all three complete bodies without truncation. Under the originally frozen 25,000 B budget the three bodies cannot fit, so go-test-profile is deferred to turn 2 through late acquisition; that alternative is retained as a deferred plan, not as the calibration expectation.",
+    "superseded_apg159_budget": {
+      "max_initial_controlled_bytes": 25000,
+      "reason": "infeasible for three complete canonical bodies; superseded by this correction revision"
+    }
+  },
+  "expected_outcome": {
+    "mode": "adaptive",
+    "selected_skills": [
+      "apgr:go-language-profile",
+      "apgr:go-test-profile",
+      "apgr:implementing-with-test-discipline"
+    ],
+    "deferred_skills": [
+      "apgr:go-cmp-test-profile"
+    ],
+    "inapplicable_skills": [
+      "apgr:pytest-test-profile",
+      "apgr:ruby-language-profile"
+    ],
+    "mandatory_doctrine_preserved": true,
+    "static_fallback_triggered": false,
+    "quality_oracle": {
+      "command": "go test ./pkg/handler/...",
+      "expected_exit_code": 0,
+      "assertions": "health check endpoint returns 200 and passes test assertions; zero unexpected repo mutations"
+    }
+  },
+  "status": "frozen_corrected",
+  "value_sources": {
+    "mandatory_instructions.provider_instruction_bytes": {
+      "source": "measured",
+      "basis": "wc -c codex/AGENTS.md at the APG159A workspace tree"
+    },
+    "mandatory_instructions.mandatory_doctrine_bytes": {
+      "source": "estimate",
+      "basis": "Planning placeholder. The non-negotiable doctrine slice is not yet a separately measurable artifact; V0130-F must replace this with a measured value before any savings computation uses it."
+    },
+    "skill_sources.apgr:go-language-profile.whole_bytes": {
+      "source": "measured",
+      "basis": "python3 measurement over skills/go-language-profile/SKILL.md"
+    },
+    "skill_sources.apgr:go-language-profile.body_bytes": {
+      "source": "measured",
+      "basis": "python3 measurement over skills/go-language-profile/SKILL.md"
+    },
+    "skill_sources.apgr:go-test-profile.whole_bytes": {
+      "source": "measured",
+      "basis": "python3 measurement over skills/go-test-profile/SKILL.md"
+    },
+    "skill_sources.apgr:go-test-profile.body_bytes": {
+      "source": "measured",
+      "basis": "python3 measurement over skills/go-test-profile/SKILL.md"
+    },
+    "skill_sources.apgr:implementing-with-test-discipline.whole_bytes": {
+      "source": "measured",
+      "basis": "python3 measurement over skills/implementing-with-test-discipline/SKILL.md"
+    },
+    "skill_sources.apgr:implementing-with-test-discipline.body_bytes": {
+      "source": "measured",
+      "basis": "python3 measurement over skills/implementing-with-test-discipline/SKILL.md"
+    },
+    "skill_sources.apgr:go-cmp-test-profile.whole_bytes": {
+      "source": "measured",
+      "basis": "python3 measurement over skills/go-cmp-test-profile/SKILL.md"
+    },
+    "skill_sources.apgr:go-cmp-test-profile.body_bytes": {
+      "source": "measured",
+      "basis": "python3 measurement over skills/go-cmp-test-profile/SKILL.md"
+    },
+    "budget.max_initial_controlled_bytes": {
+      "source": "declared",
+      "basis": "Frozen scenario budget parameter chosen by this correction revision."
+    },
+    "budget.allocated_skill_body_bytes": {
+      "source": "declared",
+      "basis": "Frozen scenario budget parameter chosen by this correction revision."
+    }
+  },
+  "value_source_vocabulary": "measured | synthetic | estimate | declared | unavailable (see context-eval-metrics-and-oracles.json)",
+  "correction_revision": {
+    "revision": "APG159A-CORR1",
+    "supersedes": "APG159 numerical freeze (retained in Git history at Exit 00205)",
+    "nature": "pre-implementation correction, not tuning against a held-out set"
+  },
+  "f_accounting_correction": {
+    "revision": "F-CONTEXT1",
+    "owner": "f-context1-accounting.json",
+    "historical_fields": "mandatory_instructions and value_sources retain the earlier freeze; their estimates are superseded for F packing by measured mandatory_cost in the correction owner",
+    "qualification": "prospective fixture only; normal effective transport remains static; no H benefit claim"
+  }
+}

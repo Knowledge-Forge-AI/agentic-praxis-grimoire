@@ -1,17 +1,17 @@
 # JACA Disposition Handoff: §18.13 Ownership Alignment and Go Interfaces (v0.12)
 
-- Status: **Proposed** — APGR-side decision recorded; delivered unaccepted for JACA team disposition
+- Status: **Historical v0.12 Proposal** — Delivered unaccepted; succeeded for forward development by [v0-13 JACA handoff](v0-13-jaca-disposition-handoff.md)
 - Target Version: APGR v0.12 / JACA Successor Architecture
 - Inspected JACA Baseline: local checkout HEAD `08ca2208805cf446bd15da0a6b4c8c58db737587` (`docs/specs/roadmap/roadmap-orchestration-v1.md` §18.13 quoted verbatim below, plus ADR 0014). Remote `origin/main` was inspected at `20d50433e9e97b0a992110c64fcacb2b3692d666`, and remote dispatcher envelope commit `e1fafd1884e203a94151a3c429cbca6c313c2332` (PR #7) resolves in the git object database. All §18 specifications in `docs/specs/roadmap/` are verified byte-identical across all three commits.
 - Governing Decisions: ADR 0058, ADR 0059, ADR 0060, ADR 0061, ADR 0065, ADR 0066
 
 ## Status and authority
 
-This document has **no** authority over JACA. It records what APGR has decided on
-its own side and what APGR would ask JACA to consider. Nothing here has been
-reviewed or accepted by the JACA team, and no statement in it should be read as
-JACA having agreed to anything. Every proposed matrix row, interface, and
-qualification mode below is declinable in whole or in part.
+This document has **no** authority over JACA. It records what APGR decided during
+v0.12 development and remains historical evidence. Forward v0.13 integration
+proposals are recorded in [v0-13 JACA handoff](v0-13-jaca-disposition-handoff.md).
+Nothing here has been reviewed or accepted by the JACA team, and every proposed
+matrix row and interface remains declinable.
 
 ## Overview
 

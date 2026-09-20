@@ -27,15 +27,7 @@ EXECUTION_MODES = (
     "gemini_opus",
     "gemini_fable",
 )
-WORKER_CAPABLE_MODES = frozenset(
-    {
-        "gemini_sub",
-        "gemini_flash_sub",
-        "gemini_flash_opus_sub",
-        "gemini_opus",
-        "gemini_fable",
-    }
-)
+WORKER_CAPABLE_MODES = frozenset({'gemini_sub', 'gemini_flash_sub', 'gemini_flash_opus_sub', 'gemini_opus', 'gemini_fable', 'claude_only'})
 REQUEST_FIELDS = frozenset({"schema", "phase_type", "execution_mode", "prompt"})
 REQUEST_V2_FIELDS = frozenset({"schema", "phase_type", "prompt"})
 MAX_PROMPT_BYTES = 256 * 1024

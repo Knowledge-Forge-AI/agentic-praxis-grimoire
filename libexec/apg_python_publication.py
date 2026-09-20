@@ -60,7 +60,7 @@ TARGET_TAGS = _canonical_target_tags()
 # ``EPOCH`` is the current release policy alias. Historical reconstruction
 # uses the named v0.6 value explicitly below; it must not silently inherit the
 # current release epoch.
-EPOCH = distribution.RELEASE_EPOCH_BY_VERSION["0.12.0"]
+EPOCH = distribution.RELEASE_EPOCH_BY_VERSION["0.13.0"]
 HISTORICAL_V06_VERSION = "0.6.0"
 HISTORICAL_V06_WHEEL_NAME = (
     f"{DIST_NAME}-{HISTORICAL_V06_VERSION}-py3-none-any.whl"
@@ -776,6 +776,21 @@ def build_historical_bundle(
     return validate_v06_bundle(output)
 
 
+def build_prebuilt_bundle(
+    source: Path, artifact_root: Path, output: Path, work_root: Path
+) -> dict[str, Any]:
+    """Assemble deterministic Python wheels and sdist from prebuilt Go binaries."""
+
+    helper_directory = os.fspath(Path(__file__).resolve().parent)
+    if helper_directory not in sys.path:
+        sys.path.insert(0, helper_directory)
+    import apg_python_prebuilt_publication as prebuilt_publication
+
+    return prebuilt_publication.build_prebuilt_bundle(
+        source, artifact_root, output, work_root
+    )
+
+
 def parser() -> Any:
     import argparse
 
@@ -789,6 +804,13 @@ def parser() -> Any:
     build.add_argument("--output", required=True, type=Path)
     build.add_argument("--work-root", required=True, type=Path)
     build.add_argument("--python", default=Path(sys.executable), type=Path)
+    prebuilt = subcommands.add_parser(
+        "build-prebuilt", help="assemble distribution bundle from prebuilt binaries"
+    )
+    prebuilt.add_argument("--source", required=True, type=Path)
+    prebuilt.add_argument("--artifacts", required=True, type=Path)
+    prebuilt.add_argument("--output", required=True, type=Path)
+    prebuilt.add_argument("--work-root", required=True, type=Path)
     historical = subcommands.add_parser("build-v06", help="reconstruct the historical v0.6 bundle")
     historical.add_argument("--source", required=True, type=Path)
     historical.add_argument("--output", required=True, type=Path)
@@ -806,6 +828,9 @@ def main(arguments: Sequence[str] | None = None) -> int:
     try:
         if args.subcommand == "build":
             paths = build_bundle(args.source, args.output, args.work_root, args.python)
+        elif args.subcommand == "build-prebuilt":
+            result = build_prebuilt_bundle(args.source, args.artifacts, args.output, args.work_root)
+            paths = result["paths"]
         elif args.subcommand == "build-v06":
             paths = build_historical_bundle(args.source, args.output, args.work_root, args.python)
         elif args.subcommand == "check-v06":

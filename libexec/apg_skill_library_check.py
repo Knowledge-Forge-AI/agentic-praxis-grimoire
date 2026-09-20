@@ -78,7 +78,7 @@ V010_CURRENT_ADMITTED_CANDIDATE = "svg-language-profile"
 V010_ADMITTED_SKILL_COUNT = 40
 V010_BROWSER_UI_ADMITTED_SKILL_COUNT = 42
 V010_TOOLCHAIN_ADMITTED_SKILL_COUNT = 44
-V010_BROWSER_RUNTIME_ADMITTED_SKILL_COUNT = 45
+V010_BROWSER_RUNTIME_ADMITTED_SKILL_COUNT = 46
 V010_ELIGIBLE_CANDIDATES = frozenset(
     {
         "svg-language-profile",
@@ -113,6 +113,7 @@ V010_BROWSER_RUNTIME_ADMITTED_CANDIDATES = frozenset(
         "vite-build-profile",
         "npm-package-manager-profile",
         "browser-runtime-profile",
+        "rtk-command-proxy",
     }
 )
 
@@ -144,6 +145,12 @@ FROZEN_NPM_SKILL_DESCRIPTION = (
     "lockfile v3 integrity, install versus ci execution, peer dependencies and overrides, "
     "workspaces, script lifecycle and ignore-scripts, local pack tarballs, caching, or "
     "publication provenance; not for Node host runtime or bundler transforms."
+)
+FROZEN_RTK_COMMAND_PROXY_SKILL_DESCRIPTION = (
+    "Use when Codex or Claude Code needs to run, choose, verify, troubleshoot, or "
+    "explain shell commands through RTK, including ordinary command execution, "
+    "raw-output fallbacks, RTK meta commands, installation checks, name collisions, "
+    "or Claude PreToolUse rewrite behavior."
 )
 
 # Documented update requirement:
@@ -810,6 +817,18 @@ def validate_discovery_policy(
             if desc != FROZEN_NPM_SKILL_DESCRIPTION:
                 failures.append(
                     "candidate 'npm-package-manager-profile' description mutated (reservation theft)"
+                )
+            body_val = item.get("blob_bytes")
+            if body_val is None:
+                body_val = item.get("body_bytes")
+            if body_val is None:
+                body_val = item.get("source_blob_bytes")
+            if body_val is None:
+                failures.append(f"candidate {req_name!r} missing required body bytes measurement")
+        elif req_name == "rtk-command-proxy":
+            if desc != FROZEN_RTK_COMMAND_PROXY_SKILL_DESCRIPTION:
+                failures.append(
+                    "candidate 'rtk-command-proxy' description mutated (reservation theft)"
                 )
             body_val = item.get("blob_bytes")
             if body_val is None:
@@ -1505,6 +1524,16 @@ def _check_frontmatter_and_body(
                         "restore the exact frozen description for the NPM candidate",
                         parsed.line_for("description"),
                     )
+                elif leaf.name == "rtk-command-proxy" and description != FROZEN_RTK_COMMAND_PROXY_SKILL_DESCRIPTION:
+                    _diagnostic(
+                        diagnostics,
+                        "APG044",
+                        relative,
+                        "original-39-description-freeze",
+                        f"description for RTK candidate {leaf.name!r} differs from frozen description (reservation theft)",
+                        "restore the exact frozen description for the RTK candidate",
+                        parsed.line_for("description"),
+                    )
 
     body = markdown_body(text, parsed)
     lines = visible_lines(body)
@@ -2027,7 +2056,7 @@ def check_library(root: Path, policy: str | None = None) -> CheckResult:
         elif resolved_policy == DISCOVERY_POLICY_VERSION_V010_TOOLCHAIN and len(skills_for_policy) != V010_TOOLCHAIN_ADMITTED_SKILL_COUNT:
             policy_failures.append("current policy requires exactly 44 admitted leaves including toolchain profiles")
         elif resolved_policy == DISCOVERY_POLICY_VERSION_V010_BROWSER_RUNTIME and len(skills_for_policy) != V010_BROWSER_RUNTIME_ADMITTED_SKILL_COUNT:
-            policy_failures.append("current policy requires exactly 45 admitted leaves including browser runtime profile")
+            policy_failures.append("current policy requires exactly 46 admitted leaves including browser runtime profile and rtk-command-proxy")
         for failure in policy_failures:
             if "unknown discovery policy" in failure:
                 _diagnostic(

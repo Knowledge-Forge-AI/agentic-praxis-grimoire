@@ -94,26 +94,23 @@ class APGPublicReleaseUnitTests(
                 encoding="utf-8"
             )
         )
-        self.assertEqual(len(surface["required_skills"]), 45)
-        self.assertEqual(len(surface["required_projections"]), 45)
+        self.assertEqual(len(surface["required_skills"]), 46)
+        self.assertEqual(len(surface["required_projections"]), 46)
         expected = {
             "README.md": (
-                "45 canonical agent skills",
-                "APGR v0.12.0 retains 45 canonical leaves: 14 stable and 31 provisional",
-                "45 canonical / 45 catalog / 45 projections / 45\n  discoverable",
+                "46 canonical agent skills",
+                "APGR v0.13.0 has 46 canonical leaves: 14 stable and 32 provisional",
+                "46 canonical / 46 catalog / 46 projections / 46\n  discoverable",
             ),
             "skills/README.md": (
-                "forty-five canonical skills: fourteen\nstable rows and thirty-one provisional rows",
-                "45 canonical leaves, 45 catalog rows and 45 projections",
-            ),
-            "docs/history/releases-and-phases.md": (
-                "forty-five relative symbolic links contain no\n  independent skill content",
+                "forty-six canonical skills: fourteen\nstable rows and thirty-two provisional rows",
+                "46 canonical leaves, 46 catalog\nrows and 46 projections",
             ),
             "AGENTS.md": (
-                "forty-five skill owners, fourteen stable\n  and thirty-one provisional",
+                "forty-six skill owners, fourteen stable\n  and thirty-two provisional",
             ),
             "docs/project-skill-projection.md": (
-                "nineteen\n  skills for public v0.3.0 and forty-five for current development",
+                "nineteen\n  skills for public v0.3.0 and forty-six for current development",
             ),
         }
         for relative, fragments in expected.items():
@@ -132,7 +129,7 @@ class APGPublicReleaseUnitTests(
             "0.5.1",
             "0.6.1",
             "0.10.1",
-            "0.13.0",
+            "0.14.0",
             "1.0.0",
             "invalid",
         ):
@@ -245,8 +242,8 @@ class APGPublicReleaseUnitTests(
         for key, expected in v09.items():
             self.assertTrue(set(expected).issubset(policy[key]), key)
         self.assertNotIn("skills/svg-language-profile/SKILL.md", v09["required_skills"])
-        self.assertEqual(set(policy["required_skills"]), set(v09["required_skills"]) | {"skills/svg-language-profile/SKILL.md", "skills/playwright-test-profile/SKILL.md", "skills/web-accessibility-profile/SKILL.md", "skills/vite-build-profile/SKILL.md", "skills/npm-package-manager-profile/SKILL.md", "skills/browser-runtime-profile/SKILL.md"})
-        self.assertEqual(set(policy["required_projections"]), set(v09["required_projections"]) | {".agents/skills/svg-language-profile", ".agents/skills/playwright-test-profile", ".agents/skills/web-accessibility-profile", ".agents/skills/vite-build-profile", ".agents/skills/npm-package-manager-profile", ".agents/skills/browser-runtime-profile"})
+        self.assertEqual(set(policy["required_skills"]), set(v09["required_skills"]) | {"skills/svg-language-profile/SKILL.md", "skills/playwright-test-profile/SKILL.md", "skills/web-accessibility-profile/SKILL.md", "skills/vite-build-profile/SKILL.md", "skills/npm-package-manager-profile/SKILL.md", "skills/browser-runtime-profile/SKILL.md", "skills/rtk-command-proxy/SKILL.md"})
+        self.assertEqual(set(policy["required_projections"]), set(v09["required_projections"]) | {".agents/skills/svg-language-profile", ".agents/skills/playwright-test-profile", ".agents/skills/web-accessibility-profile", ".agents/skills/vite-build-profile", ".agents/skills/npm-package-manager-profile", ".agents/skills/browser-runtime-profile", ".agents/skills/rtk-command-proxy"})
 
         private = release.Entry("100644", "blob", "a" * 40, b"private/secret.txt")
         oracle = release.Entry("100644", "blob", "b" * 40, b"report/testdata/python_oracle.py")
@@ -313,16 +310,18 @@ class APGPublicReleaseUnitTests(
         ):
             self.assertIn(path, v010["critical_files"])
 
-        # The flat current policy is the v0.12 surface; v0.10 and v0.11 remain
+        # The flat current policy is the v0.13 surface; v0.10 through v0.12 remain
         # frozen in-code historical surfaces used by versioned source policies.
         v012 = release.audited_policy_surfaces("0.12.0")[0]
+        v013 = release.audited_policy_surfaces("0.13.0")[0]
         self.assertTrue(set(v011["critical_files"]).issubset(v012["critical_files"]))
+        self.assertTrue(set(v012["critical_files"]).issubset(v013["critical_files"]))
         policy = json.loads(
             (REPOSITORY_ROOT / "release" / "public-surface.json").read_text(
                 encoding="utf-8"
             )
         )
-        for key, expected in v012.items():
+        for key, expected in v013.items():
             self.assertEqual(policy[key], list(expected), key)
 
         # Candidate path filtering behavior

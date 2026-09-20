@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Developer compatibility path. Hosted native release assembly must not call
+# this cross-target build/qualification script.
 # Task-owned public CI provisioning; no active installation.
 set -euo pipefail
 pkg_root="$RUNNER_TEMP/apgr-packages"

@@ -559,6 +559,20 @@ def run(
     return _normalise_returncode(returncode)
 
 
+def persistent_executable(environment: Mapping[str, str] | None = None) -> Path:
+    """Return a verified executable that outlives one call (override or bundled).
+
+    A long-lived child such as the run-owned MCP server cannot use the
+    source-checkout bridge, whose binary exists only for one invocation.
+    """
+
+    invocation = locate(environment)
+    if invocation.source_root is not None or invocation.kind == "source":
+        raise GoBridgeError("source-checkout bridge has no persistent executable; set APGR_GO_BINARY")
+    _verify_invocation(invocation, _child_environment(environment))
+    return Path(invocation.argv[0])
+
+
 def run_capture(
     arguments: Sequence[str],
     *,

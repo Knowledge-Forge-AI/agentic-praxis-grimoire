@@ -17,6 +17,7 @@ CATALOG_RELATIVE_PATH = "claude/model-catalog-v1.json"
 DOCTOR_SCHEMA = "agent-central-claude-profile-doctor-v1"
 
 SUPPORTED_ROLES = frozenset({"primary", "review"})
+OPTIONAL_ROLES = frozenset({"opus", "worker"})
 REQUIRED_TOP_LEVEL_KEYS = frozenset({"schema", "roles", "models"})
 ALLOWED_MODEL_KEYS = frozenset({"id", "minimumClaudeCodeVersion", "adaptiveThinking"})
 
@@ -118,7 +119,7 @@ def load_catalog(root_or_path: Path) -> CatalogData:
     if not isinstance(roles_raw, dict):
         raise CatalogError("catalog roles must be an object")
 
-    if set(roles_raw) != SUPPORTED_ROLES:
+    if not SUPPORTED_ROLES <= set(roles_raw) or set(roles_raw) - SUPPORTED_ROLES - OPTIONAL_ROLES:
         raise CatalogError(
             f"catalog roles must have exact keys {sorted(SUPPORTED_ROLES)}, got {sorted(roles_raw)}"
         )
@@ -134,13 +135,6 @@ def load_catalog(root_or_path: Path) -> CatalogData:
     models_raw = parsed["models"]
     if not isinstance(models_raw, dict):
         raise CatalogError("catalog models must be an object")
-
-    expected_model_keys = set(roles.values())
-    if set(models_raw) != expected_model_keys:
-        raise CatalogError(
-            f"catalog models must match active referenced roles {sorted(expected_model_keys)}, "
-            f"got {sorted(models_raw)}"
-        )
 
     models: dict[str, ModelRecord] = {}
     seen_model_ids: set[str] = set()
@@ -188,6 +182,10 @@ def load_catalog(root_or_path: Path) -> CatalogData:
             minimum_claude_code_version=min_version,
             adaptive_thinking=adaptive_thinking,
         )
+
+    for role_name, model_key in roles.items():
+        if model_key not in models:
+            raise CatalogError(f"unknown model {model_key!r} referenced by role {role_name!r}")
 
     provenance = CatalogProvenance(
         schema=CATALOG_SCHEMA,
@@ -294,8 +292,8 @@ def run_doctor(
             raise claude_vc_profile.ProfileError(f"unsupported profile: {profile_name}")
 
         contract = claude_vc_profile.PROFILE_CONTRACTS[profile_name]
-        resolution = resolve_role(catalog, contract.model_role)
-        required_version = resolution["minimum_claude_code_version"]
+        resolution = claude_vc_profile.resolve_profile(root, profile_name)
+        required_version = resolution.minimum_version
 
         if required_version is None:
             compatibility = "not-required"
@@ -312,7 +310,7 @@ def run_doctor(
             {
                 "profile": profile_name,
                 "modelRole": contract.model_role,
-                "resolvedModelId": resolution["resolved_model_id"],
+                "resolvedModelId": resolution.resolved_model_id,
                 "requiredClaudeCodeVersion": required_version,
                 "compatibilityStatus": compatibility,
             }

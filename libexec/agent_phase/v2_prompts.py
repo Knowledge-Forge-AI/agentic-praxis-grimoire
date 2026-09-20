@@ -43,6 +43,24 @@ def render_plan_review_prompt(
     return text.encode("utf-8")
 
 
+def format_review_window_mutation_notice(paths: Sequence[str] | None, max_paths: int = 50) -> str:
+    """Format bounded attribution-free review-window mutation notice."""
+    if not paths:
+        return ""
+    sorted_paths = sorted(set(paths))
+    count = len(sorted_paths)
+    shown = sorted_paths[:max_paths]
+    path_list = "\n".join(f"- {p}" for p in shown)
+    if count > max_paths:
+        path_list += f"\n- ... and {count - max_paths} additional path(s)"
+    return (
+        f"### Review-Window Mutation Notice (Dispatcher-Observed)\n"
+        f"The following path(s) were modified in the working tree during a read-only review window:\n"
+        f"{path_list}\n\n"
+        f"These paths are tracked by the dispatcher and must be reconciled or dispositioned.\n"
+    )
+
+
 def render_work_prompt(
     task_prompt: str,
     plan_material_text: str,
@@ -50,6 +68,7 @@ def render_work_prompt(
     plan_findings: Sequence[Mapping[str, Any]],
     plan_disposition: str,
     baseline_tree: str | None = None,
+    review_window_mutations: Sequence[str] | str | None = None,
 ) -> bytes:
     """Render prompt for Turn 3 (Plan Review Disposition + Producer)."""
     findings_summary = (
@@ -63,6 +82,16 @@ def render_work_prompt(
 
     baseline_info = f"Baseline git tree: `{baseline_tree}`\n" if baseline_tree else ""
 
+    mutation_notice = ""
+    if review_window_mutations:
+        notice_text = (
+            review_window_mutations
+            if isinstance(review_window_mutations, str)
+            else format_review_window_mutation_notice(review_window_mutations)
+        )
+        if notice_text.strip():
+            mutation_notice = f"\n{notice_text.strip()}\n"
+
     text = (
         f"# Work / Implementation Phase\n\n"
         f"You are the Producer. Implement the requested changes adhering to the plan and review disposition.\n\n"
@@ -72,7 +101,8 @@ def render_work_prompt(
         f"{plan_material_text.strip()}\n\n"
         f"## Plan Review Findings & Disposition\n"
         f"{findings_summary}\n"
-        f"{baseline_info}\n"
+        f"{baseline_info}"
+        f"{mutation_notice}\n"
         f"## Instructions\n"
         f"Implement the solution completely within repository instructions. Run verification and report stdout.\n"
     )
@@ -113,6 +143,7 @@ def render_closeout_prompt(
     work_findings: Sequence[Mapping[str, Any]],
     work_disposition: str,
     nonce: str,
+    review_window_mutations: Sequence[str] | str | None = None,
 ) -> bytes:
     """Render prompt for Turn 5 (Work Review Disposition + Reviser + Closeout Agent)."""
     findings_summary = (
@@ -123,6 +154,16 @@ def render_closeout_prompt(
         findings_summary += "Findings to address/close:\n"
         for f in work_findings:
             findings_summary += f"- [{f.get('severity', 'advisory')}] {f.get('title', '')}: {f.get('detail', '')}\n"
+
+    mutation_notice = ""
+    if review_window_mutations:
+        notice_text = (
+            review_window_mutations
+            if isinstance(review_window_mutations, str)
+            else format_review_window_mutation_notice(review_window_mutations)
+        )
+        if notice_text.strip():
+            mutation_notice = f"\n{notice_text.strip()}\n"
 
     begin, end = result_module.markers(nonce)
     contract_text = TERMINAL_RESULT_CONTRACT.format(begin=begin, end=end, stage="closeout")
@@ -135,7 +176,8 @@ def render_closeout_prompt(
         f"## Current Candidate Tree\n"
         f"`{candidate_tree}`\n\n"
         f"## Work Review Findings & Disposition\n"
-        f"{findings_summary}\n\n"
+        f"{findings_summary}"
+        f"{mutation_notice}\n"
         f"## Instructions\n"
         f"Perform any required revisions, finalize documentation/receipts, and verify terminal criteria.\n\n"
         f"{contract_text}\n"

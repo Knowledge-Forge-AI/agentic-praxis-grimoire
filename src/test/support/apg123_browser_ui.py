@@ -18,11 +18,12 @@ import os
 from pathlib import Path
 import re
 import shutil
-import signal
 import subprocess
 import sys
 from typing import Any, Dict, FrozenSet, List, Optional, Set, Tuple
 import uuid
+
+from apg123_browser_process import communicate_owned, progress_tail
 
 # Explicit Disclaimers
 BROWSER_CORROBORATION_DISCLAIMER: str = (
@@ -847,6 +848,15 @@ def sanitize_evidence_text(text: Any, max_len: int = 2000) -> str:
     return str_val
 
 
+def sanitize_stream_evidence(text: str, scratch_root: Path) -> str:
+    """Mask complete streams before retaining a bounded head and terminal tail."""
+    masked = text.replace(os.fspath(scratch_root), "<SCRATCH_ROOT>")
+    masked = sanitize_evidence_text(masked, max_len=len(masked))
+    if len(masked) > 5120:
+        return masked[:1024] + "\n...[truncated]...\n" + masked[-4096:]
+    return masked
+
+
 SECRET_KEY_PATTERN = re.compile(
     r"(?i)^[a-z0-9_-]*(?:auth(?!ority)(?:orization)?|token|password|passwd|secret|credential|api[_-]?key)[a-z0-9_-]*$"
 )
@@ -899,6 +909,8 @@ def retain_failure_evidence(
     stdout: str,
     stderr: str,
     error_msg: str,
+    cleanup: Optional[Dict[str, Any]] = None,
+    process_error: Optional[Dict[str, str]] = None,
 ) -> Tuple[Dict[str, Any], Path]:
     """Retain sanitized failure evidence in external scratch before run directory cleanup."""
     scratch_real = config.scratch_root.resolve(strict=True)
@@ -930,7 +942,7 @@ def retain_failure_evidence(
         except OSError:
             pass
 
-    retained_file = evidence_dir / f"{run_id}-failure.json"
+    retained_file = evidence_dir / f"browser-{run_id}-failure.json"
     if retained_file.is_symlink():
         raise BrowserHarnessExecutionError(f"Retained evidence target must not be a symlink: {retained_file}")
 
@@ -955,15 +967,20 @@ def retain_failure_evidence(
     evidence: Dict[str, Any] = {
         "run_id": run_id,
         "returncode": returncode,
-        "error_class": orig_class,
+        "error_class": sanitize_evidence_text(orig_class),
         "error_message": sanitize_evidence_text(orig_msg or error_msg),
         "bounded_cause": sanitize_evidence_text(b_cause) if b_cause else None,
         "failed_scenarios": sanitize_evidence_structure(failed_scenarios),
         "receipt": sanitize_evidence_structure(failure_receipt),
-        "stdout": sanitize_evidence_text(stdout),
-        "stderr": sanitize_evidence_text(stderr),
-        "retained_path": os.fspath(retained_file),
+        "stdout": sanitize_stream_evidence(stdout, config.scratch_root),
+        "stderr": sanitize_stream_evidence(stderr, config.scratch_root),
+        "retained_path": f"<SCRATCH_ROOT>/evidence/{retained_file.name}",
+        "progress_tail": sanitize_evidence_structure(progress_tail(receipt_file.parent / "progress.jsonl")),
+        "cleanup": sanitize_evidence_structure(cleanup),
+        "process_error": sanitize_evidence_structure(process_error),
     }
+    # Configured scratch is private even when the caller did not export its env.
+    evidence = json.loads(json.dumps(evidence).replace(os.fspath(config.scratch_root), "<SCRATCH_ROOT>"))
 
     # Exclusive retained file creation mode 0600
     flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_NOFOLLOW", 0)
@@ -992,7 +1009,7 @@ def cleanup_retained_failure_evidence(scratch_root: Path, run_id: str) -> int:
     if not evidence_dir.is_dir() or evidence_dir.is_symlink():
         return 0
 
-    target = evidence_dir / f"{run_id}-failure.json"
+    target = evidence_dir / f"browser-{run_id}-failure.json"
     if target.is_symlink():
         raise BrowserHarnessPrerequisiteError(f"Retained evidence must not be a symlink: {target}")
     if target.is_file():
@@ -1049,6 +1066,24 @@ def execute_browser_harness(
     except OSError:
         pass
     receipt_file = run_dir / "receipt.json"
+    stdout, stderr, cleanup = "", "", None
+
+    def failure(message, *, error_type=BrowserHarnessExecutionError,
+                returncode=-1, original_class=None, original_message=None, process_error=None):
+        evidence, retained_file = None, None
+        diagnostic = _extract_diagnostic(stderr, receipt_file)
+        try:
+            evidence, retained_file = retain_failure_evidence(
+                config, run_id, receipt_file, returncode, stdout, stderr, message,
+                cleanup=cleanup, process_error=process_error)
+        except Exception:
+            pass
+        reported_class = process_error["class"] if process_error else diagnostic[0] or original_class
+        reported_message = process_error["message"] if process_error else diagnostic[1] or original_message
+        return error_type(message, failure_evidence=evidence, retained_path=retained_file,
+                          original_class=sanitize_evidence_text(reported_class) if reported_class else None,
+                          original_message=sanitize_evidence_text(reported_message) if reported_message else None,
+                          bounded_cause=sanitize_evidence_text(diagnostic[2]) if diagnostic[2] else None)
 
     try:
         for item in fixtures_dir.iterdir():
@@ -1101,117 +1136,33 @@ def execute_browser_harness(
         )
 
         try:
-            stdout, stderr = proc.communicate(timeout=180)
-        except subprocess.TimeoutExpired:
-            try:
-                os.killpg(proc.pid, signal.SIGTERM)
-            except OSError:
-                pass
-            try:
-                stdout, stderr = proc.communicate(timeout=5)
-            except subprocess.TimeoutExpired:
-                try:
-                    os.killpg(proc.pid, signal.SIGKILL)
-                except OSError:
-                    pass
-                stdout, stderr = proc.communicate()
-            evidence = None
-            retained_file = None
-            try:
-                evidence, retained_file = retain_failure_evidence(
-                    config=config,
-                    run_id=run_id,
-                    receipt_file=receipt_file,
-                    returncode=-1,
-                    stdout=stdout,
-                    stderr=stderr,
-                    error_msg="Harness execution timed out after 180s",
-                )
-            except Exception:
-                pass
-            raise BrowserHarnessExecutionError(
-                f"Harness execution timed out after 180s:\n{stdout}\n{stderr}",
-                failure_evidence=evidence,
-                retained_path=retained_file,
-                original_class="TimeoutExpired",
-                original_message="Harness execution timed out after 180s",
-            )
-        except Exception as err:
-            try:
-                os.killpg(proc.pid, signal.SIGKILL)
-            except OSError:
-                pass
-            evidence = None
-            retained_file = None
-            try:
-                evidence, retained_file = retain_failure_evidence(
-                    config=config,
-                    run_id=run_id,
-                    receipt_file=receipt_file,
-                    returncode=-1,
-                    stdout="",
-                    stderr=str(err),
-                    error_msg=f"Harness process execution failed: {err}",
-                )
-            except Exception:
-                pass
-            raise BrowserHarnessExecutionError(
-                f"Harness process execution failed: {err}",
-                failure_evidence=evidence,
-                retained_path=retained_file,
-                original_class=type(err).__name__,
-                original_message=str(err),
-            ) from err
+            stdout, stderr = communicate_owned(proc)
+            cleanup = {"child_reaped": proc.returncode is not None, "detached_descendants": "not_verified"}
+        except BaseException as err:
+            stdout, stderr = getattr(err, "output", ""), getattr(err, "stderr", "")
+            cleanup = getattr(err, "cleanup", None)
+            timed_out = isinstance(err, subprocess.TimeoutExpired)
+            message = (f"Harness execution timed out after 180s:\n{stdout}\n{stderr}" if timed_out
+                       else f"Harness process execution failed: {err}")
+            retained_error = failure(message, returncode=proc.returncode,
+                                     original_class=type(err).__name__,
+                                     process_error={"class": type(err).__name__, "message":
+                                                    "Harness execution timed out after 180s" if timed_out else str(err)})
+            if not isinstance(err, Exception):
+                raise
+            raise retained_error from err
 
         if proc.returncode != 0:
-            evidence = None
-            retained_file = None
-            orig_class = None
-            orig_msg = None
-            b_cause = None
-            try:
-                evidence, retained_file = retain_failure_evidence(
-                    config=config,
-                    run_id=run_id,
-                    receipt_file=receipt_file,
-                    returncode=proc.returncode,
-                    stdout=stdout,
-                    stderr=stderr,
-                    error_msg=f"Runner exited with code {proc.returncode}",
-                )
-                orig_class = evidence.get("error_class")
-                orig_msg = evidence.get("error_message")
-                b_cause = evidence.get("bounded_cause")
-            except Exception:
-                orig_class, orig_msg, b_cause = _extract_diagnostic(stderr, receipt_file)
-            raise BrowserHarnessExecutionError(
+            raise failure(
                 f"Runner exited with code {proc.returncode}:\nSTDOUT: {stdout}\nSTDERR: {stderr}",
-                failure_evidence=evidence,
-                retained_path=retained_file,
-                original_class=orig_class or "BrowserHarnessExecutionError",
-                original_message=orig_msg or f"Runner exited with code {proc.returncode}",
-                bounded_cause=b_cause,
+                returncode=proc.returncode, original_class="BrowserHarnessExecutionError",
+                original_message=f"Runner exited with code {proc.returncode}",
             )
 
         if not receipt_file.is_file():
-            evidence = None
-            retained_file = None
-            try:
-                evidence, retained_file = retain_failure_evidence(
-                    config=config,
-                    run_id=run_id,
-                    receipt_file=receipt_file,
-                    returncode=proc.returncode,
-                    stdout=stdout,
-                    stderr=stderr,
-                    error_msg=f"Runner did not create receipt file at {receipt_file}",
-                )
-            except Exception:
-                pass
-            raise BrowserHarnessExecutionError(
+            raise failure(
                 f"Runner did not create receipt file at {receipt_file}",
-                failure_evidence=evidence,
-                retained_path=retained_file,
+                returncode=proc.returncode,
             )
 
         receipt_data = json.loads(receipt_file.read_text(encoding="utf-8"))
@@ -1221,24 +1172,9 @@ def execute_browser_harness(
         for art_name in receipt_data.get("artifacts", []):
             art_path = artifacts_dir / art_name
             if not art_path.is_file() or art_path.stat().st_size == 0:
-                evidence = None
-                retained_file = None
-                try:
-                    evidence, retained_file = retain_failure_evidence(
-                        config=config,
-                        run_id=run_id,
-                        receipt_file=receipt_file,
-                        returncode=proc.returncode,
-                        stdout=stdout,
-                        stderr=stderr,
-                        error_msg=f"Artifact {art_name} missing or empty on disk at {art_path}",
-                    )
-                except Exception:
-                    pass
-                raise BrowserHarnessValidationError(
+                raise failure(
                     f"Artifact {art_name} missing or empty on disk at {art_path}",
-                    failure_evidence=evidence,
-                    retained_path=retained_file,
+                    error_type=BrowserHarnessValidationError, returncode=proc.returncode,
                 )
 
         try:
@@ -1253,6 +1189,7 @@ def execute_browser_harness(
                     stdout=stdout,
                     stderr=stderr,
                     error_msg=str(val_err),
+                    cleanup=cleanup,
                 )
                 val_err.failure_evidence = evidence
                 val_err.retained_path = retained_file

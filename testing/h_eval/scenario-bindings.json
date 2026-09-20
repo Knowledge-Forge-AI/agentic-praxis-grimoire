@@ -1,0 +1,1766 @@
+{
+  "complete_execution_package": false,
+  "live_results": 0,
+  "metrics_sha256": "477f725e49deecc938eccc2e7e9a603011db486e797fa762bb512ef422196ef6",
+  "phase": "APG166E",
+  "rebinding": {
+    "continuation": "H-COMPLETE1",
+    "historical_blockers": "Scenario row blockers retain APG166E history; READY1 readiness seal owns current prerequisite status",
+    "phase": "APG166V",
+    "previous_binding_sha256": "2579087985f55bf9492f9a1ebc77331c95c6bf76e31a8ff9c6522b378a333947",
+    "previous_record": "APG166V-H-READY1 binding retained in its blocked predecessor packet",
+    "reason": "additive claude_only profile/endpoint/stage-route entries changed common/dispatcher routes.toml, endpoints.toml and models.toml bytes; H provider/profile/model/effort unchanged",
+    "route_authority": "Selected installed APGR home at launch; equality with these source routes required before grant",
+    "scope": "Route source digests only; frozen scenarios, tasks, metrics, budgets, models and efforts unchanged"
+  },
+  "scenarios": [
+    {
+      "acquisition_mechanism": "context-adapter",
+      "authority": {
+        "instruction": "Implement an HTTP health check handler in pkg/handler/health.go and companion unit test in pkg/handler/health_test.go asserting 200 OK and JSON payload.",
+        "mutation_scope": [
+          "pkg/handler/health.go",
+          "pkg/handler/health_test.go"
+        ],
+        "task_authority": "phase_owned"
+      },
+      "blockers": [
+        "Substantive oracle good/bad and actual arm-evidence integration incomplete",
+        "Repository-owned live arm admission and aggregate qualification unavailable",
+        "Final-source D1 and independent preregistration/work acceptance pending"
+      ],
+      "cohorts": {
+        "correctness_only": false,
+        "exact_recovery": false,
+        "fallback": false,
+        "non_synthetic_savings": false,
+        "savings": false,
+        "synthetic": false
+      },
+      "contingency": null,
+      "frozen_oracle": {
+        "assertions": "health check endpoint returns 200 and passes test assertions; zero unexpected repo mutations",
+        "command": "go test ./pkg/handler/...",
+        "expected_exit_code": 0
+      },
+      "native_read_required": false,
+      "prompt_owner": "testing/fixtures/context-eval/scenario-01-go-language-calibration.json#/task_input/instruction",
+      "result_importer": "testing/h_eval/importers.py:import_codex",
+      "routes": {
+        "adaptive": {
+          "effort": "medium",
+          "identity_sources": [
+            "common/dispatcher/routes.toml",
+            "common/dispatcher/endpoints.toml",
+            "codex/profiles/implementation-testing.config.toml",
+            "common/dispatcher/models.toml"
+          ],
+          "model": "gpt-6-astra",
+          "profile": "implementation-testing",
+          "provider": "codex",
+          "requested_mode": "adaptive",
+          "role_binding": {
+            "allowed_tools": [
+              "view_file",
+              "replace_file_content",
+              "write_to_file",
+              "run_command"
+            ],
+            "binding_id": "binding-producer-01",
+            "roles": [
+              "Producer"
+            ]
+          },
+          "source_sha256": {
+            "codex/profiles/implementation-testing.config.toml": "8a786851da04d75b06f62781a418df6959d335d61a03e32613250bb33d588261",
+            "common/dispatcher/endpoints.toml": "3e71f4790fd15497b23afa18e8b71f0806fbf3d6e49cc76b8ce4838467d9367e",
+            "common/dispatcher/models.toml": "9f8fd5229b1e95c9b5655517c2b4612954e888d8f995a877b35869b69f83b609",
+            "common/dispatcher/routes.toml": "a28111c7caa5f7bee801750e417829875ae748b9a96b2cb3207cd13b59e22455"
+          }
+        },
+        "static": {
+          "effort": "medium",
+          "identity_sources": [
+            "common/dispatcher/routes.toml",
+            "common/dispatcher/endpoints.toml",
+            "codex/profiles/implementation-testing.config.toml",
+            "common/dispatcher/models.toml"
+          ],
+          "model": "gpt-6-astra",
+          "profile": "implementation-testing",
+          "provider": "codex",
+          "requested_mode": "static",
+          "role_binding": {
+            "allowed_tools": [
+              "view_file",
+              "replace_file_content",
+              "write_to_file",
+              "run_command"
+            ],
+            "binding_id": "binding-producer-01",
+            "roles": [
+              "Producer"
+            ]
+          },
+          "source_sha256": {
+            "codex/profiles/implementation-testing.config.toml": "8a786851da04d75b06f62781a418df6959d335d61a03e32613250bb33d588261",
+            "common/dispatcher/endpoints.toml": "3e71f4790fd15497b23afa18e8b71f0806fbf3d6e49cc76b8ce4838467d9367e",
+            "common/dispatcher/models.toml": "9f8fd5229b1e95c9b5655517c2b4612954e888d8f995a877b35869b69f83b609",
+            "common/dispatcher/routes.toml": "a28111c7caa5f7bee801750e417829875ae748b9a96b2cb3207cd13b59e22455"
+          }
+        }
+      },
+      "runtime_requirements": [
+        "Exact provider executable/version and resolved profile/model/settings identity",
+        "Exact selected catalog snapshot/override identity",
+        "Qualified projection and recovery authority",
+        "Installed command runtimes for the frozen quality oracle"
+      ],
+      "scenario_id": "scenario-01",
+      "scenario_path": "testing/fixtures/context-eval/scenario-01-go-language-calibration.json",
+      "scenario_sha256": "ac77494048f93f3c859210f821b2a75532e4182c4061f5378ac7f53b7748b68e",
+      "status": "candidate-incomplete",
+      "subject_input_evidence": {
+        "dependency_facts": {
+          "direct_dependencies": [
+            "github.com/google/go-cmp"
+          ],
+          "go_mod": "module example.com/service\n\ngo 1.25\n\nrequire github.com/google/go-cmp v0.7.0\n"
+        },
+        "files": [
+          "main.go",
+          "go.mod",
+          "pkg/handler/handler_test.go"
+        ],
+        "primary_language": "go"
+      },
+      "subject_materializer": "testing/h_eval/subjects.py:materialize",
+      "substantive_oracle_owner": "testing/h_eval/oracles.py:oracle_for"
+    },
+    {
+      "acquisition_mechanism": "context-adapter",
+      "authority": {
+        "instruction": "Disposition plan review findings for Python application refactor and implement test cases in tests/test_app.py.",
+        "mutation_scope": [
+          "tests/test_app.py",
+          "docs/plan-disposition.md"
+        ],
+        "task_authority": "phase_owned"
+      },
+      "blockers": [
+        "Substantive oracle good/bad and actual arm-evidence integration incomplete",
+        "Repository-owned live arm admission and aggregate qualification unavailable",
+        "Final-source D1 and independent preregistration/work acceptance pending"
+      ],
+      "cohorts": {
+        "correctness_only": false,
+        "exact_recovery": false,
+        "fallback": false,
+        "non_synthetic_savings": false,
+        "savings": false,
+        "synthetic": false
+      },
+      "contingency": null,
+      "frozen_oracle": {
+        "assertions": "plan review disposition is recorded and pytest suite passes cleanly",
+        "command": "pytest tests/",
+        "expected_exit_code": 0
+      },
+      "native_read_required": false,
+      "prompt_owner": "testing/fixtures/context-eval/scenario-02-multi-role-binding-calibration.json#/task_input/instruction",
+      "result_importer": "testing/h_eval/importers.py:import_codex",
+      "routes": {
+        "adaptive": {
+          "effort": "medium",
+          "identity_sources": [
+            "common/dispatcher/routes.toml",
+            "common/dispatcher/endpoints.toml",
+            "codex/profiles/implementation-testing.config.toml",
+            "common/dispatcher/models.toml"
+          ],
+          "model": "gpt-6-astra",
+          "profile": "implementation-testing",
+          "provider": "codex",
+          "requested_mode": "adaptive",
+          "role_binding": {
+            "allowed_tools": [
+              "view_file",
+              "replace_file_content",
+              "write_to_file",
+              "run_command"
+            ],
+            "binding_id": "binding-merged-01",
+            "roles": [
+              "Plan Review Disposition",
+              "Producer"
+            ]
+          },
+          "source_sha256": {
+            "codex/profiles/implementation-testing.config.toml": "8a786851da04d75b06f62781a418df6959d335d61a03e32613250bb33d588261",
+            "common/dispatcher/endpoints.toml": "3e71f4790fd15497b23afa18e8b71f0806fbf3d6e49cc76b8ce4838467d9367e",
+            "common/dispatcher/models.toml": "9f8fd5229b1e95c9b5655517c2b4612954e888d8f995a877b35869b69f83b609",
+            "common/dispatcher/routes.toml": "a28111c7caa5f7bee801750e417829875ae748b9a96b2cb3207cd13b59e22455"
+          }
+        },
+        "static": {
+          "effort": "medium",
+          "identity_sources": [
+            "common/dispatcher/routes.toml",
+            "common/dispatcher/endpoints.toml",
+            "codex/profiles/implementation-testing.config.toml",
+            "common/dispatcher/models.toml"
+          ],
+          "model": "gpt-6-astra",
+          "profile": "implementation-testing",
+          "provider": "codex",
+          "requested_mode": "static",
+          "role_binding": {
+            "allowed_tools": [
+              "view_file",
+              "replace_file_content",
+              "write_to_file",
+              "run_command"
+            ],
+            "binding_id": "binding-merged-01",
+            "roles": [
+              "Plan Review Disposition",
+              "Producer"
+            ]
+          },
+          "source_sha256": {
+            "codex/profiles/implementation-testing.config.toml": "8a786851da04d75b06f62781a418df6959d335d61a03e32613250bb33d588261",
+            "common/dispatcher/endpoints.toml": "3e71f4790fd15497b23afa18e8b71f0806fbf3d6e49cc76b8ce4838467d9367e",
+            "common/dispatcher/models.toml": "9f8fd5229b1e95c9b5655517c2b4612954e888d8f995a877b35869b69f83b609",
+            "common/dispatcher/routes.toml": "a28111c7caa5f7bee801750e417829875ae748b9a96b2cb3207cd13b59e22455"
+          }
+        }
+      },
+      "runtime_requirements": [
+        "Exact provider executable/version and resolved profile/model/settings identity",
+        "Exact selected catalog snapshot/override identity",
+        "Qualified projection and recovery authority",
+        "Installed command runtimes for the frozen quality oracle"
+      ],
+      "scenario_id": "scenario-02",
+      "scenario_path": "testing/fixtures/context-eval/scenario-02-multi-role-binding-calibration.json",
+      "scenario_sha256": "02037a53f1c56851e8d13356d55db59c0068ac5b1f25bc22236654545c64c60e",
+      "status": "candidate-incomplete",
+      "subject_input_evidence": {
+        "dependency_facts": {
+          "pyproject_toml": "[project]\nname = \"app\"\ndependencies = [\"pytest>=8.0\"]\n"
+        },
+        "files": [
+          "src/app.py",
+          "tests/test_app.py",
+          "docs/plan.md"
+        ],
+        "primary_language": "python"
+      },
+      "subject_materializer": "testing/h_eval/subjects.py:materialize",
+      "substantive_oracle_owner": "testing/h_eval/oracles.py:oracle_for"
+    },
+    {
+      "acquisition_mechanism": "context-adapter",
+      "authority": {
+        "instruction": "Review markdown architecture documentation for broken internal links and formatting standards.",
+        "mutation_scope": [],
+        "task_authority": "read_only"
+      },
+      "blockers": [
+        "Substantive oracle good/bad and actual arm-evidence integration incomplete",
+        "Repository-owned live arm admission and aggregate qualification unavailable",
+        "Final-source D1 and independent preregistration/work acceptance pending"
+      ],
+      "cohorts": {
+        "correctness_only": true,
+        "exact_recovery": false,
+        "fallback": false,
+        "non_synthetic_savings": false,
+        "savings": false,
+        "synthetic": false
+      },
+      "contingency": null,
+      "frozen_oracle": {
+        "assertions": "zero inapplicable language/database skills selected; reviewer produces structured critique; zero worktree/index/HEAD drift"
+      },
+      "native_read_required": false,
+      "prompt_owner": "testing/fixtures/context-eval/scenario-03-non-trigger-negative-calibration.json#/task_input/instruction",
+      "result_importer": "testing/h_eval/importers.py:import_claude",
+      "routes": {
+        "adaptive": {
+          "effort": "high",
+          "identity_sources": [
+            "common/dispatcher/routes.toml",
+            "common/dispatcher/endpoints.toml",
+            "claude/profiles/normal-final-review.json",
+            "claude/model-catalog-v1.json",
+            "common/dispatcher/models.toml"
+          ],
+          "model": "claude-opus-5",
+          "profile": "normal-final-review",
+          "provider": "claude",
+          "requested_mode": "adaptive",
+          "role_binding": {
+            "allowed_tools": [
+              "view_file"
+            ],
+            "binding_id": "binding-reviewer-01",
+            "roles": [
+              "Work Review"
+            ]
+          },
+          "source_sha256": {
+            "claude/model-catalog-v1.json": "6db05bde65967555c43165017128bc0227049071498dde08b95874d36036f435",
+            "claude/profiles/normal-final-review.json": "8d868e7ad5105ac364dae89d47b7391f9e920539a30b8a900f9d14087858172a",
+            "common/dispatcher/endpoints.toml": "3e71f4790fd15497b23afa18e8b71f0806fbf3d6e49cc76b8ce4838467d9367e",
+            "common/dispatcher/models.toml": "9f8fd5229b1e95c9b5655517c2b4612954e888d8f995a877b35869b69f83b609",
+            "common/dispatcher/routes.toml": "a28111c7caa5f7bee801750e417829875ae748b9a96b2cb3207cd13b59e22455"
+          }
+        },
+        "static": {
+          "effort": "high",
+          "identity_sources": [
+            "common/dispatcher/routes.toml",
+            "common/dispatcher/endpoints.toml",
+            "claude/profiles/normal-final-review.json",
+            "claude/model-catalog-v1.json",
+            "common/dispatcher/models.toml"
+          ],
+          "model": "claude-opus-5",
+          "profile": "normal-final-review",
+          "provider": "claude",
+          "requested_mode": "static",
+          "role_binding": {
+            "allowed_tools": [
+              "view_file"
+            ],
+            "binding_id": "binding-reviewer-01",
+            "roles": [
+              "Work Review"
+            ]
+          },
+          "source_sha256": {
+            "claude/model-catalog-v1.json": "6db05bde65967555c43165017128bc0227049071498dde08b95874d36036f435",
+            "claude/profiles/normal-final-review.json": "8d868e7ad5105ac364dae89d47b7391f9e920539a30b8a900f9d14087858172a",
+            "common/dispatcher/endpoints.toml": "3e71f4790fd15497b23afa18e8b71f0806fbf3d6e49cc76b8ce4838467d9367e",
+            "common/dispatcher/models.toml": "9f8fd5229b1e95c9b5655517c2b4612954e888d8f995a877b35869b69f83b609",
+            "common/dispatcher/routes.toml": "a28111c7caa5f7bee801750e417829875ae748b9a96b2cb3207cd13b59e22455"
+          }
+        }
+      },
+      "runtime_requirements": [
+        "Exact provider executable/version and resolved profile/model/settings identity",
+        "Exact selected catalog snapshot/override identity",
+        "Qualified projection and recovery authority",
+        "Installed command runtimes for the frozen quality oracle"
+      ],
+      "scenario_id": "scenario-03",
+      "scenario_path": "testing/fixtures/context-eval/scenario-03-non-trigger-negative-calibration.json",
+      "scenario_sha256": "201059ef94922e5ed468bdbd4ad19c55ed94732142681c03983d2ac047c8b0f6",
+      "status": "candidate-incomplete",
+      "subject_input_evidence": {
+        "dependency_facts": {},
+        "files": [
+          "README.md",
+          "docs/architecture.md"
+        ],
+        "primary_language": "markdown"
+      },
+      "subject_materializer": "testing/h_eval/subjects.py:materialize",
+      "substantive_oracle_owner": "testing/h_eval/oracles.py:oracle_for"
+    },
+    {
+      "acquisition_mechanism": "context-adapter",
+      "authority": {
+        "instruction": "Update build script in scripts/build.sh to support incremental compilation flags.",
+        "mutation_scope": [
+          "scripts/build.sh"
+        ],
+        "task_authority": "phase_owned"
+      },
+      "blockers": [
+        "Substantive oracle good/bad and actual arm-evidence integration incomplete",
+        "Repository-owned live arm admission and aggregate qualification unavailable",
+        "Final-source D1 and independent preregistration/work acceptance pending"
+      ],
+      "cohorts": {
+        "correctness_only": false,
+        "exact_recovery": false,
+        "fallback": false,
+        "non_synthetic_savings": false,
+        "savings": false,
+        "synthetic": false
+      },
+      "contingency": null,
+      "frozen_oracle": {
+        "assertions": "RTK instructions slice delivered in prompt; bash syntax passes; zero git authority drift",
+        "command": "bash -n scripts/build.sh",
+        "expected_exit_code": 0
+      },
+      "native_read_required": false,
+      "prompt_owner": "testing/fixtures/context-eval/scenario-04-rtk-slice-calibration.json#/task_input/instruction",
+      "result_importer": "testing/h_eval/importers.py:import_codex",
+      "routes": {
+        "adaptive": {
+          "effort": "medium",
+          "identity_sources": [
+            "common/dispatcher/routes.toml",
+            "common/dispatcher/endpoints.toml",
+            "codex/profiles/implementation-testing.config.toml",
+            "common/dispatcher/models.toml"
+          ],
+          "model": "gpt-6-astra",
+          "profile": "implementation-testing",
+          "provider": "codex",
+          "requested_mode": "adaptive",
+          "role_binding": {
+            "allowed_tools": [
+              "view_file",
+              "replace_file_content",
+              "write_to_file",
+              "run_command"
+            ],
+            "binding_id": "binding-producer-02",
+            "roles": [
+              "Producer"
+            ]
+          },
+          "source_sha256": {
+            "codex/profiles/implementation-testing.config.toml": "8a786851da04d75b06f62781a418df6959d335d61a03e32613250bb33d588261",
+            "common/dispatcher/endpoints.toml": "3e71f4790fd15497b23afa18e8b71f0806fbf3d6e49cc76b8ce4838467d9367e",
+            "common/dispatcher/models.toml": "9f8fd5229b1e95c9b5655517c2b4612954e888d8f995a877b35869b69f83b609",
+            "common/dispatcher/routes.toml": "a28111c7caa5f7bee801750e417829875ae748b9a96b2cb3207cd13b59e22455"
+          }
+        },
+        "static": {
+          "effort": "medium",
+          "identity_sources": [
+            "common/dispatcher/routes.toml",
+            "common/dispatcher/endpoints.toml",
+            "codex/profiles/implementation-testing.config.toml",
+            "common/dispatcher/models.toml"
+          ],
+          "model": "gpt-6-astra",
+          "profile": "implementation-testing",
+          "provider": "codex",
+          "requested_mode": "static",
+          "role_binding": {
+            "allowed_tools": [
+              "view_file",
+              "replace_file_content",
+              "write_to_file",
+              "run_command"
+            ],
+            "binding_id": "binding-producer-02",
+            "roles": [
+              "Producer"
+            ]
+          },
+          "source_sha256": {
+            "codex/profiles/implementation-testing.config.toml": "8a786851da04d75b06f62781a418df6959d335d61a03e32613250bb33d588261",
+            "common/dispatcher/endpoints.toml": "3e71f4790fd15497b23afa18e8b71f0806fbf3d6e49cc76b8ce4838467d9367e",
+            "common/dispatcher/models.toml": "9f8fd5229b1e95c9b5655517c2b4612954e888d8f995a877b35869b69f83b609",
+            "common/dispatcher/routes.toml": "a28111c7caa5f7bee801750e417829875ae748b9a96b2cb3207cd13b59e22455"
+          }
+        }
+      },
+      "runtime_requirements": [
+        "Exact provider executable/version and resolved profile/model/settings identity",
+        "Exact selected catalog snapshot/override identity",
+        "Qualified projection and recovery authority",
+        "Installed command runtimes for the frozen quality oracle"
+      ],
+      "scenario_id": "scenario-04",
+      "scenario_path": "testing/fixtures/context-eval/scenario-04-rtk-slice-calibration.json",
+      "scenario_sha256": "48250559edd8cc8066366c6dd85086156a5d9c8e77f49a10de1a2ba371b353e1",
+      "status": "candidate-incomplete",
+      "subject_input_evidence": {
+        "dependency_facts": {},
+        "files": [
+          "Makefile",
+          "scripts/build.sh"
+        ],
+        "primary_language": "bash"
+      },
+      "subject_materializer": "testing/h_eval/subjects.py:materialize",
+      "substantive_oracle_owner": "testing/h_eval/oracles.py:oracle_for"
+    },
+    {
+      "acquisition_mechanism": "context-adapter",
+      "authority": {
+        "instruction": "Implement Go utility function in pkg/util/strings.go with static context delivery.",
+        "mutation_scope": [
+          "pkg/util/strings.go"
+        ],
+        "task_authority": "phase_owned"
+      },
+      "blockers": [
+        "Substantive oracle good/bad and actual arm-evidence integration incomplete",
+        "Repository-owned live arm admission and aggregate qualification unavailable",
+        "Final-source D1 and independent preregistration/work acceptance pending"
+      ],
+      "cohorts": {
+        "correctness_only": false,
+        "exact_recovery": false,
+        "fallback": true,
+        "non_synthetic_savings": false,
+        "savings": false,
+        "synthetic": false
+      },
+      "contingency": null,
+      "frozen_oracle": {
+        "assertions": "static dispatch succeeds cleanly; all canonical skills loaded via global root; no attempted destructive per-run projection"
+      },
+      "native_read_required": false,
+      "prompt_owner": "testing/fixtures/context-eval/scenario-05-antigravity-static-calibration.json#/task_input/instruction",
+      "result_importer": "testing/h_eval/importers.py:import_antigravity",
+      "routes": {
+        "adaptive": {
+          "effort": "high",
+          "identity_sources": [
+            "common/dispatcher/routes.toml",
+            "common/dispatcher/endpoints.toml",
+            "antigravity/profiles/gemini-3.8-flash-high.json",
+            "common/dispatcher/models.toml"
+          ],
+          "model": "gemini-3.8-flash-high",
+          "profile": "gemini-3.8-flash-high",
+          "provider": "antigravity",
+          "requested_mode": "adaptive",
+          "role_binding": {
+            "allowed_tools": [
+              "view_file",
+              "replace_file_content",
+              "write_to_file",
+              "run_command"
+            ],
+            "binding_id": "binding-producer-03",
+            "roles": [
+              "Producer"
+            ]
+          },
+          "source_sha256": {
+            "antigravity/profiles/gemini-3.8-flash-high.json": "27e520268856f24c598ad322f3200a33c3b470a5d3d26e1016f704949bfa77ea",
+            "common/dispatcher/endpoints.toml": "3e71f4790fd15497b23afa18e8b71f0806fbf3d6e49cc76b8ce4838467d9367e",
+            "common/dispatcher/models.toml": "9f8fd5229b1e95c9b5655517c2b4612954e888d8f995a877b35869b69f83b609",
+            "common/dispatcher/routes.toml": "a28111c7caa5f7bee801750e417829875ae748b9a96b2cb3207cd13b59e22455"
+          }
+        },
+        "static": {
+          "effort": "high",
+          "identity_sources": [
+            "common/dispatcher/routes.toml",
+            "common/dispatcher/endpoints.toml",
+            "antigravity/profiles/gemini-3.8-flash-high.json",
+            "common/dispatcher/models.toml"
+          ],
+          "model": "gemini-3.8-flash-high",
+          "profile": "gemini-3.8-flash-high",
+          "provider": "antigravity",
+          "requested_mode": "static",
+          "role_binding": {
+            "allowed_tools": [
+              "view_file",
+              "replace_file_content",
+              "write_to_file",
+              "run_command"
+            ],
+            "binding_id": "binding-producer-03",
+            "roles": [
+              "Producer"
+            ]
+          },
+          "source_sha256": {
+            "antigravity/profiles/gemini-3.8-flash-high.json": "27e520268856f24c598ad322f3200a33c3b470a5d3d26e1016f704949bfa77ea",
+            "common/dispatcher/endpoints.toml": "3e71f4790fd15497b23afa18e8b71f0806fbf3d6e49cc76b8ce4838467d9367e",
+            "common/dispatcher/models.toml": "9f8fd5229b1e95c9b5655517c2b4612954e888d8f995a877b35869b69f83b609",
+            "common/dispatcher/routes.toml": "a28111c7caa5f7bee801750e417829875ae748b9a96b2cb3207cd13b59e22455"
+          }
+        }
+      },
+      "runtime_requirements": [
+        "Exact provider executable/version and resolved profile/model/settings identity",
+        "Exact selected catalog snapshot/override identity",
+        "Qualified projection and recovery authority",
+        "Installed command runtimes for the frozen quality oracle"
+      ],
+      "scenario_id": "scenario-05",
+      "scenario_path": "testing/fixtures/context-eval/scenario-05-antigravity-static-calibration.json",
+      "scenario_sha256": "83f4129fb82738ac4ee3fbc8ef7a0d99899c7f71d88a7e0a5b5a8010440f9131",
+      "status": "candidate-incomplete",
+      "subject_input_evidence": {
+        "dependency_facts": {},
+        "files": [
+          "main.go",
+          "go.mod"
+        ],
+        "primary_language": "go"
+      },
+      "subject_materializer": "testing/h_eval/subjects.py:materialize",
+      "substantive_oracle_owner": "testing/h_eval/oracles.py:oracle_for"
+    },
+    {
+      "acquisition_mechanism": "context-adapter",
+      "authority": {
+        "instruction": "Extend Go server HTTP handler to query SQLite persistence store in schema/db.sqlite and add integration tests.",
+        "mutation_scope": [
+          "cmd/server/main.go",
+          "cmd/server/main_test.go"
+        ],
+        "task_authority": "phase_owned"
+      },
+      "blockers": [
+        "Substantive oracle good/bad and actual arm-evidence integration incomplete",
+        "Repository-owned live arm admission and aggregate qualification unavailable",
+        "Final-source D1 and independent preregistration/work acceptance pending"
+      ],
+      "cohorts": {
+        "correctness_only": false,
+        "exact_recovery": false,
+        "fallback": false,
+        "non_synthetic_savings": true,
+        "savings": true,
+        "synthetic": false
+      },
+      "contingency": null,
+      "frozen_oracle": {
+        "assertions": "server SQLite query handler passes integration tests cleanly",
+        "command": "go test ./cmd/server/...",
+        "expected_exit_code": 0
+      },
+      "native_read_required": false,
+      "prompt_owner": "testing/fixtures/context-eval/scenario-06-mixed-repo-evidence-acceptance.json#/task_input/instruction",
+      "result_importer": "testing/h_eval/importers.py:import_codex",
+      "routes": {
+        "adaptive": {
+          "effort": "medium",
+          "identity_sources": [
+            "common/dispatcher/routes.toml",
+            "common/dispatcher/endpoints.toml",
+            "codex/profiles/implementation-testing.config.toml",
+            "common/dispatcher/models.toml"
+          ],
+          "model": "gpt-6-astra",
+          "profile": "implementation-testing",
+          "provider": "codex",
+          "requested_mode": "adaptive",
+          "role_binding": {
+            "allowed_tools": [
+              "view_file",
+              "replace_file_content",
+              "write_to_file",
+              "run_command"
+            ],
+            "binding_id": "binding-producer-04",
+            "roles": [
+              "Producer"
+            ]
+          },
+          "source_sha256": {
+            "codex/profiles/implementation-testing.config.toml": "8a786851da04d75b06f62781a418df6959d335d61a03e32613250bb33d588261",
+            "common/dispatcher/endpoints.toml": "3e71f4790fd15497b23afa18e8b71f0806fbf3d6e49cc76b8ce4838467d9367e",
+            "common/dispatcher/models.toml": "9f8fd5229b1e95c9b5655517c2b4612954e888d8f995a877b35869b69f83b609",
+            "common/dispatcher/routes.toml": "a28111c7caa5f7bee801750e417829875ae748b9a96b2cb3207cd13b59e22455"
+          }
+        },
+        "static": {
+          "effort": "medium",
+          "identity_sources": [
+            "common/dispatcher/routes.toml",
+            "common/dispatcher/endpoints.toml",
+            "codex/profiles/implementation-testing.config.toml",
+            "common/dispatcher/models.toml"
+          ],
+          "model": "gpt-6-astra",
+          "profile": "implementation-testing",
+          "provider": "codex",
+          "requested_mode": "static",
+          "role_binding": {
+            "allowed_tools": [
+              "view_file",
+              "replace_file_content",
+              "write_to_file",
+              "run_command"
+            ],
+            "binding_id": "binding-producer-04",
+            "roles": [
+              "Producer"
+            ]
+          },
+          "source_sha256": {
+            "codex/profiles/implementation-testing.config.toml": "8a786851da04d75b06f62781a418df6959d335d61a03e32613250bb33d588261",
+            "common/dispatcher/endpoints.toml": "3e71f4790fd15497b23afa18e8b71f0806fbf3d6e49cc76b8ce4838467d9367e",
+            "common/dispatcher/models.toml": "9f8fd5229b1e95c9b5655517c2b4612954e888d8f995a877b35869b69f83b609",
+            "common/dispatcher/routes.toml": "a28111c7caa5f7bee801750e417829875ae748b9a96b2cb3207cd13b59e22455"
+          }
+        }
+      },
+      "runtime_requirements": [
+        "Exact provider executable/version and resolved profile/model/settings identity",
+        "Exact selected catalog snapshot/override identity",
+        "Qualified projection and recovery authority",
+        "Installed command runtimes for the frozen quality oracle"
+      ],
+      "scenario_id": "scenario-06",
+      "scenario_path": "testing/fixtures/context-eval/scenario-06-mixed-repo-evidence-acceptance.json",
+      "scenario_sha256": "435e8de99dd2ce4d96dbf039e1bca66e24287bcd3774d842435e0d1a71efbb99",
+      "status": "candidate-incomplete",
+      "subject_input_evidence": {
+        "dependency_facts": {
+          "go_mod": "module example.com/server\n\ngo 1.25\n"
+        },
+        "files": [
+          "cmd/server/main.go",
+          "tools/generator.py",
+          "docs/index.md",
+          "schema/db.sqlite"
+        ],
+        "primary_language": "go",
+        "secondary_languages": [
+          "python",
+          "markdown",
+          "sqlite"
+        ]
+      },
+      "subject_materializer": "testing/h_eval/subjects.py:materialize",
+      "substantive_oracle_owner": "testing/h_eval/oracles.py:oracle_for"
+    },
+    {
+      "acquisition_mechanism": "context-adapter",
+      "authority": {
+        "instruction": "Review Rust source file under an artificially tiny byte budget.",
+        "mutation_scope": [],
+        "task_authority": "read_only"
+      },
+      "blockers": [
+        "Substantive oracle good/bad and actual arm-evidence integration incomplete",
+        "Repository-owned live arm admission and aggregate qualification unavailable",
+        "Final-source D1 and independent preregistration/work acceptance pending"
+      ],
+      "cohorts": {
+        "correctness_only": true,
+        "exact_recovery": false,
+        "fallback": false,
+        "non_synthetic_savings": false,
+        "savings": false,
+        "synthetic": false
+      },
+      "contingency": null,
+      "frozen_oracle": {
+        "assertions": "planner rejects adaptive context plan due to mandatory doctrine overflow and falls back to qualified static transport with doctrine intact; zero silent doctrine truncation; no pre-launch dispatch abort"
+      },
+      "native_read_required": false,
+      "prompt_owner": "testing/fixtures/context-eval/scenario-07-mandatory-budget-overflow-acceptance.json#/task_input/instruction",
+      "result_importer": "testing/h_eval/importers.py:import_claude",
+      "routes": {
+        "adaptive": {
+          "effort": "high",
+          "identity_sources": [
+            "common/dispatcher/routes.toml",
+            "common/dispatcher/endpoints.toml",
+            "claude/profiles/normal-final-review.json",
+            "claude/model-catalog-v1.json",
+            "common/dispatcher/models.toml"
+          ],
+          "model": "claude-opus-5",
+          "profile": "normal-final-review",
+          "provider": "claude",
+          "requested_mode": "adaptive",
+          "role_binding": {
+            "allowed_tools": [
+              "view_file"
+            ],
+            "binding_id": "binding-reviewer-02",
+            "roles": [
+              "Work Review"
+            ]
+          },
+          "source_sha256": {
+            "claude/model-catalog-v1.json": "6db05bde65967555c43165017128bc0227049071498dde08b95874d36036f435",
+            "claude/profiles/normal-final-review.json": "8d868e7ad5105ac364dae89d47b7391f9e920539a30b8a900f9d14087858172a",
+            "common/dispatcher/endpoints.toml": "3e71f4790fd15497b23afa18e8b71f0806fbf3d6e49cc76b8ce4838467d9367e",
+            "common/dispatcher/models.toml": "9f8fd5229b1e95c9b5655517c2b4612954e888d8f995a877b35869b69f83b609",
+            "common/dispatcher/routes.toml": "a28111c7caa5f7bee801750e417829875ae748b9a96b2cb3207cd13b59e22455"
+          }
+        },
+        "static": {
+          "effort": "high",
+          "identity_sources": [
+            "common/dispatcher/routes.toml",
+            "common/dispatcher/endpoints.toml",
+            "claude/profiles/normal-final-review.json",
+            "claude/model-catalog-v1.json",
+            "common/dispatcher/models.toml"
+          ],
+          "model": "claude-opus-5",
+          "profile": "normal-final-review",
+          "provider": "claude",
+          "requested_mode": "static",
+          "role_binding": {
+            "allowed_tools": [
+              "view_file"
+            ],
+            "binding_id": "binding-reviewer-02",
+            "roles": [
+              "Work Review"
+            ]
+          },
+          "source_sha256": {
+            "claude/model-catalog-v1.json": "6db05bde65967555c43165017128bc0227049071498dde08b95874d36036f435",
+            "claude/profiles/normal-final-review.json": "8d868e7ad5105ac364dae89d47b7391f9e920539a30b8a900f9d14087858172a",
+            "common/dispatcher/endpoints.toml": "3e71f4790fd15497b23afa18e8b71f0806fbf3d6e49cc76b8ce4838467d9367e",
+            "common/dispatcher/models.toml": "9f8fd5229b1e95c9b5655517c2b4612954e888d8f995a877b35869b69f83b609",
+            "common/dispatcher/routes.toml": "a28111c7caa5f7bee801750e417829875ae748b9a96b2cb3207cd13b59e22455"
+          }
+        }
+      },
+      "runtime_requirements": [
+        "Exact provider executable/version and resolved profile/model/settings identity",
+        "Exact selected catalog snapshot/override identity",
+        "Qualified projection and recovery authority",
+        "Installed command runtimes for the frozen quality oracle"
+      ],
+      "scenario_id": "scenario-07",
+      "scenario_path": "testing/fixtures/context-eval/scenario-07-mandatory-budget-overflow-acceptance.json",
+      "scenario_sha256": "b1d47e3676ee01c39c86d6878b19852bc02a931c9ed4eb28bf8f7cc20ceee4d0",
+      "status": "candidate-incomplete",
+      "subject_input_evidence": {
+        "dependency_facts": {},
+        "files": [
+          "src/main.rs"
+        ],
+        "primary_language": "rust"
+      },
+      "subject_materializer": "testing/h_eval/subjects.py:materialize",
+      "substantive_oracle_owner": "testing/h_eval/oracles.py:oracle_for"
+    },
+    {
+      "acquisition_mechanism": "context-adapter",
+      "authority": {
+        "instruction": "Implement project-specific Go logging wrapper in pkg/log/logger.go conforming to project:go-language-profile guidelines.",
+        "mutation_scope": [
+          "pkg/log/logger.go"
+        ],
+        "task_authority": "phase_owned"
+      },
+      "blockers": [
+        "Substantive oracle good/bad and actual arm-evidence integration incomplete",
+        "Repository-owned live arm admission and aggregate qualification unavailable",
+        "Final-source D1 and independent preregistration/work acceptance pending"
+      ],
+      "cohorts": {
+        "correctness_only": false,
+        "exact_recovery": false,
+        "fallback": false,
+        "non_synthetic_savings": false,
+        "savings": true,
+        "synthetic": true
+      },
+      "contingency": null,
+      "frozen_oracle": {
+        "assertions": "both project: and apgr: skills are retained under explicit namespaces; zero silent shadowing; project skill ranked ahead of canonical"
+      },
+      "native_read_required": false,
+      "prompt_owner": "testing/fixtures/context-eval/scenario-08-dependency-collision-acceptance.json#/task_input/instruction",
+      "result_importer": "testing/h_eval/importers.py:import_codex",
+      "routes": {
+        "adaptive": {
+          "effort": "medium",
+          "identity_sources": [
+            "common/dispatcher/routes.toml",
+            "common/dispatcher/endpoints.toml",
+            "codex/profiles/implementation-testing.config.toml",
+            "common/dispatcher/models.toml"
+          ],
+          "model": "gpt-6-astra",
+          "profile": "implementation-testing",
+          "provider": "codex",
+          "requested_mode": "adaptive",
+          "role_binding": {
+            "allowed_tools": [
+              "view_file",
+              "replace_file_content",
+              "write_to_file",
+              "run_command"
+            ],
+            "binding_id": "binding-producer-05",
+            "roles": [
+              "Producer"
+            ]
+          },
+          "source_sha256": {
+            "codex/profiles/implementation-testing.config.toml": "8a786851da04d75b06f62781a418df6959d335d61a03e32613250bb33d588261",
+            "common/dispatcher/endpoints.toml": "3e71f4790fd15497b23afa18e8b71f0806fbf3d6e49cc76b8ce4838467d9367e",
+            "common/dispatcher/models.toml": "9f8fd5229b1e95c9b5655517c2b4612954e888d8f995a877b35869b69f83b609",
+            "common/dispatcher/routes.toml": "a28111c7caa5f7bee801750e417829875ae748b9a96b2cb3207cd13b59e22455"
+          }
+        },
+        "static": {
+          "effort": "medium",
+          "identity_sources": [
+            "common/dispatcher/routes.toml",
+            "common/dispatcher/endpoints.toml",
+            "codex/profiles/implementation-testing.config.toml",
+            "common/dispatcher/models.toml"
+          ],
+          "model": "gpt-6-astra",
+          "profile": "implementation-testing",
+          "provider": "codex",
+          "requested_mode": "static",
+          "role_binding": {
+            "allowed_tools": [
+              "view_file",
+              "replace_file_content",
+              "write_to_file",
+              "run_command"
+            ],
+            "binding_id": "binding-producer-05",
+            "roles": [
+              "Producer"
+            ]
+          },
+          "source_sha256": {
+            "codex/profiles/implementation-testing.config.toml": "8a786851da04d75b06f62781a418df6959d335d61a03e32613250bb33d588261",
+            "common/dispatcher/endpoints.toml": "3e71f4790fd15497b23afa18e8b71f0806fbf3d6e49cc76b8ce4838467d9367e",
+            "common/dispatcher/models.toml": "9f8fd5229b1e95c9b5655517c2b4612954e888d8f995a877b35869b69f83b609",
+            "common/dispatcher/routes.toml": "a28111c7caa5f7bee801750e417829875ae748b9a96b2cb3207cd13b59e22455"
+          }
+        }
+      },
+      "runtime_requirements": [
+        "Exact provider executable/version and resolved profile/model/settings identity",
+        "Exact selected catalog snapshot/override identity",
+        "Qualified projection and recovery authority",
+        "Installed command runtimes for the frozen quality oracle"
+      ],
+      "scenario_id": "scenario-08",
+      "scenario_path": "testing/fixtures/context-eval/scenario-08-dependency-collision-acceptance.json",
+      "scenario_sha256": "c54b22384f167c189b2c4a4cc8274e02b8c5099b349422e7712e5d06bb666d08",
+      "status": "candidate-incomplete",
+      "subject_input_evidence": {
+        "dependency_facts": {},
+        "files": [
+          "main.go",
+          ".apgr/skills/go-language-profile/SKILL.md"
+        ],
+        "primary_language": "go"
+      },
+      "subject_materializer": "testing/h_eval/subjects.py:materialize",
+      "substantive_oracle_owner": "testing/h_eval/oracles.py:oracle_for"
+    },
+    {
+      "acquisition_mechanism": "context-adapter",
+      "authority": {
+        "instruction": "Implement project-specific Go database connector in pkg/db/conn.go conforming to project:go-language-profile which explicitly replaces canonical apgr:go-language-profile.",
+        "mutation_scope": [
+          "pkg/db/conn.go"
+        ],
+        "task_authority": "phase_owned"
+      },
+      "blockers": [
+        "Substantive oracle good/bad and actual arm-evidence integration incomplete",
+        "Repository-owned live arm admission and aggregate qualification unavailable",
+        "Final-source D1 and independent preregistration/work acceptance pending"
+      ],
+      "cohorts": {
+        "correctness_only": false,
+        "exact_recovery": false,
+        "fallback": false,
+        "non_synthetic_savings": false,
+        "savings": true,
+        "synthetic": true
+      },
+      "contingency": null,
+      "frozen_oracle": {
+        "assertions": "canonical apgr: skill is suppressed; project: skill is delivered; replacement provenance is explicitly recorded in plan"
+      },
+      "native_read_required": false,
+      "prompt_owner": "testing/fixtures/context-eval/scenario-09-explicit-source-override-acceptance.json#/task_input/instruction",
+      "result_importer": "testing/h_eval/importers.py:import_codex",
+      "routes": {
+        "adaptive": {
+          "effort": "medium",
+          "identity_sources": [
+            "common/dispatcher/routes.toml",
+            "common/dispatcher/endpoints.toml",
+            "codex/profiles/implementation-testing.config.toml",
+            "common/dispatcher/models.toml"
+          ],
+          "model": "gpt-6-astra",
+          "profile": "implementation-testing",
+          "provider": "codex",
+          "requested_mode": "adaptive",
+          "role_binding": {
+            "allowed_tools": [
+              "view_file",
+              "replace_file_content",
+              "write_to_file",
+              "run_command"
+            ],
+            "binding_id": "binding-producer-06",
+            "roles": [
+              "Producer"
+            ]
+          },
+          "source_sha256": {
+            "codex/profiles/implementation-testing.config.toml": "8a786851da04d75b06f62781a418df6959d335d61a03e32613250bb33d588261",
+            "common/dispatcher/endpoints.toml": "3e71f4790fd15497b23afa18e8b71f0806fbf3d6e49cc76b8ce4838467d9367e",
+            "common/dispatcher/models.toml": "9f8fd5229b1e95c9b5655517c2b4612954e888d8f995a877b35869b69f83b609",
+            "common/dispatcher/routes.toml": "a28111c7caa5f7bee801750e417829875ae748b9a96b2cb3207cd13b59e22455"
+          }
+        },
+        "static": {
+          "effort": "medium",
+          "identity_sources": [
+            "common/dispatcher/routes.toml",
+            "common/dispatcher/endpoints.toml",
+            "codex/profiles/implementation-testing.config.toml",
+            "common/dispatcher/models.toml"
+          ],
+          "model": "gpt-6-astra",
+          "profile": "implementation-testing",
+          "provider": "codex",
+          "requested_mode": "static",
+          "role_binding": {
+            "allowed_tools": [
+              "view_file",
+              "replace_file_content",
+              "write_to_file",
+              "run_command"
+            ],
+            "binding_id": "binding-producer-06",
+            "roles": [
+              "Producer"
+            ]
+          },
+          "source_sha256": {
+            "codex/profiles/implementation-testing.config.toml": "8a786851da04d75b06f62781a418df6959d335d61a03e32613250bb33d588261",
+            "common/dispatcher/endpoints.toml": "3e71f4790fd15497b23afa18e8b71f0806fbf3d6e49cc76b8ce4838467d9367e",
+            "common/dispatcher/models.toml": "9f8fd5229b1e95c9b5655517c2b4612954e888d8f995a877b35869b69f83b609",
+            "common/dispatcher/routes.toml": "a28111c7caa5f7bee801750e417829875ae748b9a96b2cb3207cd13b59e22455"
+          }
+        }
+      },
+      "runtime_requirements": [
+        "Exact provider executable/version and resolved profile/model/settings identity",
+        "Exact selected catalog snapshot/override identity",
+        "Qualified projection and recovery authority",
+        "Installed command runtimes for the frozen quality oracle"
+      ],
+      "scenario_id": "scenario-09",
+      "scenario_path": "testing/fixtures/context-eval/scenario-09-explicit-source-override-acceptance.json",
+      "scenario_sha256": "dd9d856e496caf5ced79c5c20156dbf3e45b6d2d2d4d268b3be8bcf605211cc3",
+      "status": "candidate-incomplete",
+      "subject_input_evidence": {
+        "configuration_facts": {
+          "project_config": "[skills.overrides]\n\"apgr:go-language-profile\" = \"project:go-language-profile\"\n"
+        },
+        "dependency_facts": {},
+        "files": [
+          "main.go",
+          ".apgr/skills/go-language-profile/SKILL.md",
+          ".apgr/config.toml"
+        ],
+        "primary_language": "go"
+      },
+      "subject_materializer": "testing/h_eval/subjects.py:materialize",
+      "substantive_oracle_owner": "testing/h_eval/oracles.py:oracle_for"
+    },
+    {
+      "acquisition_mechanism": "cli",
+      "authority": {
+        "instruction": "Implement integration tests in tests/integration_test.go using go-cmp assertions. Withheld skill apgr:go-cmp-test-profile must be acquired via CLI on demand.",
+        "mutation_scope": [
+          "tests/integration_test.go"
+        ],
+        "task_authority": "phase_owned"
+      },
+      "blockers": [
+        "Substantive oracle good/bad and actual arm-evidence integration incomplete",
+        "Repository-owned live arm admission and aggregate qualification unavailable",
+        "Final-source D1 and independent preregistration/work acceptance pending"
+      ],
+      "cohorts": {
+        "correctness_only": false,
+        "exact_recovery": true,
+        "fallback": false,
+        "non_synthetic_savings": true,
+        "savings": true,
+        "synthetic": false
+      },
+      "contingency": null,
+      "frozen_oracle": {
+        "assertions": "go-cmp integration test compiles and passes; acquired body SHA-256 matches canonical exactly; zero repo mutations outside tests/",
+        "command": "go test ./tests/...",
+        "expected_exit_code": 0
+      },
+      "native_read_required": false,
+      "prompt_owner": "testing/fixtures/context-eval/scenario-10-withheld-skill-cli-acceptance.json#/task_input/instruction",
+      "result_importer": "testing/h_eval/importers.py:import_codex",
+      "routes": {
+        "adaptive": {
+          "effort": "medium",
+          "identity_sources": [
+            "common/dispatcher/routes.toml",
+            "common/dispatcher/endpoints.toml",
+            "codex/profiles/implementation-testing.config.toml",
+            "common/dispatcher/models.toml"
+          ],
+          "model": "gpt-6-astra",
+          "profile": "implementation-testing",
+          "provider": "codex",
+          "requested_mode": "adaptive",
+          "role_binding": {
+            "allowed_tools": [
+              "view_file",
+              "replace_file_content",
+              "write_to_file",
+              "run_command"
+            ],
+            "binding_id": "binding-producer-07",
+            "roles": [
+              "Producer"
+            ]
+          },
+          "source_sha256": {
+            "codex/profiles/implementation-testing.config.toml": "8a786851da04d75b06f62781a418df6959d335d61a03e32613250bb33d588261",
+            "common/dispatcher/endpoints.toml": "3e71f4790fd15497b23afa18e8b71f0806fbf3d6e49cc76b8ce4838467d9367e",
+            "common/dispatcher/models.toml": "9f8fd5229b1e95c9b5655517c2b4612954e888d8f995a877b35869b69f83b609",
+            "common/dispatcher/routes.toml": "a28111c7caa5f7bee801750e417829875ae748b9a96b2cb3207cd13b59e22455"
+          }
+        },
+        "static": {
+          "effort": "medium",
+          "identity_sources": [
+            "common/dispatcher/routes.toml",
+            "common/dispatcher/endpoints.toml",
+            "codex/profiles/implementation-testing.config.toml",
+            "common/dispatcher/models.toml"
+          ],
+          "model": "gpt-6-astra",
+          "profile": "implementation-testing",
+          "provider": "codex",
+          "requested_mode": "static",
+          "role_binding": {
+            "allowed_tools": [
+              "view_file",
+              "replace_file_content",
+              "write_to_file",
+              "run_command"
+            ],
+            "binding_id": "binding-producer-07",
+            "roles": [
+              "Producer"
+            ]
+          },
+          "source_sha256": {
+            "codex/profiles/implementation-testing.config.toml": "8a786851da04d75b06f62781a418df6959d335d61a03e32613250bb33d588261",
+            "common/dispatcher/endpoints.toml": "3e71f4790fd15497b23afa18e8b71f0806fbf3d6e49cc76b8ce4838467d9367e",
+            "common/dispatcher/models.toml": "9f8fd5229b1e95c9b5655517c2b4612954e888d8f995a877b35869b69f83b609",
+            "common/dispatcher/routes.toml": "a28111c7caa5f7bee801750e417829875ae748b9a96b2cb3207cd13b59e22455"
+          }
+        }
+      },
+      "runtime_requirements": [
+        "Exact provider executable/version and resolved profile/model/settings identity",
+        "Exact selected catalog snapshot/override identity",
+        "Qualified projection and recovery authority",
+        "Installed command runtimes for the frozen quality oracle"
+      ],
+      "scenario_id": "scenario-10",
+      "scenario_path": "testing/fixtures/context-eval/scenario-10-withheld-skill-cli-acceptance.json",
+      "scenario_sha256": "f465b9085440f21897a7c7768476a2b1712d0ff8ac5a669efae2e6461b2d6c84",
+      "status": "candidate-incomplete",
+      "subject_input_evidence": {
+        "dependency_facts": {
+          "direct_dependencies": [
+            "github.com/google/go-cmp"
+          ],
+          "go_mod": "module example.com/app\n\ngo 1.25\n\nrequire github.com/google/go-cmp v0.7.0\n"
+        },
+        "files": [
+          "main.go",
+          "tests/integration_test.go"
+        ],
+        "primary_language": "go"
+      },
+      "subject_materializer": "testing/h_eval/subjects.py:materialize",
+      "substantive_oracle_owner": "testing/h_eval/oracles.py:oracle_for"
+    },
+    {
+      "acquisition_mechanism": "mcp-with-native-read-recovery",
+      "authority": {
+        "instruction": "Review Go client implementation in pkg/api/client.go and evaluate test readiness. Withheld skill apgr:go-test-profile must be acquired in-band via MCP tool call.",
+        "mutation_scope": [],
+        "task_authority": "read_only"
+      },
+      "blockers": [
+        "Substantive oracle good/bad and actual arm-evidence integration incomplete",
+        "Repository-owned live arm admission and aggregate qualification unavailable",
+        "Final-source D1 and independent preregistration/work acceptance pending"
+      ],
+      "cohorts": {
+        "correctness_only": false,
+        "exact_recovery": true,
+        "fallback": false,
+        "non_synthetic_savings": true,
+        "savings": true,
+        "synthetic": false
+      },
+      "contingency": null,
+      "frozen_oracle": {
+        "assertions": "reviewer receives full body in MCP result payload without shell access; review findings reference test profile standards; zero git authority drift"
+      },
+      "native_read_required": true,
+      "prompt_owner": "testing/fixtures/context-eval/scenario-11-withheld-skill-mcp-acceptance.json#/task_input/instruction",
+      "result_importer": "testing/h_eval/importers.py:import_claude",
+      "routes": {
+        "adaptive": {
+          "effort": "high",
+          "identity_sources": [
+            "common/dispatcher/routes.toml",
+            "common/dispatcher/endpoints.toml",
+            "claude/profiles/normal-final-review.json",
+            "claude/model-catalog-v1.json",
+            "common/dispatcher/models.toml"
+          ],
+          "model": "claude-opus-5",
+          "profile": "normal-final-review",
+          "provider": "claude",
+          "requested_mode": "adaptive",
+          "role_binding": {
+            "allowed_tools": [
+              "view_file",
+              "skill_search",
+              "skill_acquire",
+              "context_explain"
+            ],
+            "binding_id": "binding-reviewer-03",
+            "roles": [
+              "Work Review"
+            ]
+          },
+          "source_sha256": {
+            "claude/model-catalog-v1.json": "6db05bde65967555c43165017128bc0227049071498dde08b95874d36036f435",
+            "claude/profiles/normal-final-review.json": "8d868e7ad5105ac364dae89d47b7391f9e920539a30b8a900f9d14087858172a",
+            "common/dispatcher/endpoints.toml": "3e71f4790fd15497b23afa18e8b71f0806fbf3d6e49cc76b8ce4838467d9367e",
+            "common/dispatcher/models.toml": "9f8fd5229b1e95c9b5655517c2b4612954e888d8f995a877b35869b69f83b609",
+            "common/dispatcher/routes.toml": "a28111c7caa5f7bee801750e417829875ae748b9a96b2cb3207cd13b59e22455"
+          }
+        },
+        "static": {
+          "effort": "high",
+          "identity_sources": [
+            "common/dispatcher/routes.toml",
+            "common/dispatcher/endpoints.toml",
+            "claude/profiles/normal-final-review.json",
+            "claude/model-catalog-v1.json",
+            "common/dispatcher/models.toml"
+          ],
+          "model": "claude-opus-5",
+          "profile": "normal-final-review",
+          "provider": "claude",
+          "requested_mode": "static",
+          "role_binding": {
+            "allowed_tools": [
+              "view_file",
+              "skill_search",
+              "skill_acquire",
+              "context_explain"
+            ],
+            "binding_id": "binding-reviewer-03",
+            "roles": [
+              "Work Review"
+            ]
+          },
+          "source_sha256": {
+            "claude/model-catalog-v1.json": "6db05bde65967555c43165017128bc0227049071498dde08b95874d36036f435",
+            "claude/profiles/normal-final-review.json": "8d868e7ad5105ac364dae89d47b7391f9e920539a30b8a900f9d14087858172a",
+            "common/dispatcher/endpoints.toml": "3e71f4790fd15497b23afa18e8b71f0806fbf3d6e49cc76b8ce4838467d9367e",
+            "common/dispatcher/models.toml": "9f8fd5229b1e95c9b5655517c2b4612954e888d8f995a877b35869b69f83b609",
+            "common/dispatcher/routes.toml": "a28111c7caa5f7bee801750e417829875ae748b9a96b2cb3207cd13b59e22455"
+          }
+        }
+      },
+      "runtime_requirements": [
+        "Exact provider executable/version and resolved profile/model/settings identity",
+        "Exact selected catalog snapshot/override identity",
+        "Qualified projection and recovery authority",
+        "Installed command runtimes for the frozen quality oracle"
+      ],
+      "scenario_id": "scenario-11",
+      "scenario_path": "testing/fixtures/context-eval/scenario-11-withheld-skill-mcp-acceptance.json",
+      "scenario_sha256": "84afd5268ea75b9c59f5ef592d3c8544c02f37a852c7e042ca1c904cc207d059",
+      "status": "candidate-incomplete",
+      "subject_input_evidence": {
+        "dependency_facts": {},
+        "files": [
+          "pkg/api/client.go"
+        ],
+        "primary_language": "go"
+      },
+      "subject_materializer": "testing/h_eval/subjects.py:materialize",
+      "substantive_oracle_owner": "testing/h_eval/oracles.py:oracle_for"
+    },
+    {
+      "acquisition_mechanism": "mcp-with-native-read-recovery",
+      "authority": {
+        "instruction": "Review Go service implementation in pkg/service/service.go. Withheld skill apgr:go-language-profile is requested mid-turn, during which the MCP server crashes.",
+        "mutation_scope": [],
+        "task_authority": "read_only"
+      },
+      "blockers": [
+        "Substantive oracle good/bad and actual arm-evidence integration incomplete",
+        "Repository-owned live arm admission and aggregate qualification unavailable",
+        "Final-source D1 and independent preregistration/work acceptance pending"
+      ],
+      "cohorts": {
+        "correctness_only": true,
+        "exact_recovery": true,
+        "fallback": false,
+        "non_synthetic_savings": false,
+        "savings": false,
+        "synthetic": false
+      },
+      "contingency": null,
+      "frozen_oracle": {
+        "assertions": "reviewer recovers skill body from pre-materialized snapshot using view_file without shell access; critique is delivered; zero git authority drift"
+      },
+      "native_read_required": true,
+      "prompt_owner": "testing/fixtures/context-eval/scenario-12-mid-turn-mcp-failure-acceptance.json#/task_input/instruction",
+      "result_importer": "testing/h_eval/importers.py:import_claude",
+      "routes": {
+        "adaptive": {
+          "effort": "high",
+          "identity_sources": [
+            "common/dispatcher/routes.toml",
+            "common/dispatcher/endpoints.toml",
+            "claude/profiles/normal-final-review.json",
+            "claude/model-catalog-v1.json",
+            "common/dispatcher/models.toml"
+          ],
+          "model": "claude-opus-5",
+          "profile": "normal-final-review",
+          "provider": "claude",
+          "requested_mode": "adaptive",
+          "role_binding": {
+            "allowed_tools": [
+              "view_file"
+            ],
+            "binding_id": "binding-reviewer-04",
+            "roles": [
+              "Work Review"
+            ]
+          },
+          "source_sha256": {
+            "claude/model-catalog-v1.json": "6db05bde65967555c43165017128bc0227049071498dde08b95874d36036f435",
+            "claude/profiles/normal-final-review.json": "8d868e7ad5105ac364dae89d47b7391f9e920539a30b8a900f9d14087858172a",
+            "common/dispatcher/endpoints.toml": "3e71f4790fd15497b23afa18e8b71f0806fbf3d6e49cc76b8ce4838467d9367e",
+            "common/dispatcher/models.toml": "9f8fd5229b1e95c9b5655517c2b4612954e888d8f995a877b35869b69f83b609",
+            "common/dispatcher/routes.toml": "a28111c7caa5f7bee801750e417829875ae748b9a96b2cb3207cd13b59e22455"
+          }
+        },
+        "static": {
+          "effort": "high",
+          "identity_sources": [
+            "common/dispatcher/routes.toml",
+            "common/dispatcher/endpoints.toml",
+            "claude/profiles/normal-final-review.json",
+            "claude/model-catalog-v1.json",
+            "common/dispatcher/models.toml"
+          ],
+          "model": "claude-opus-5",
+          "profile": "normal-final-review",
+          "provider": "claude",
+          "requested_mode": "static",
+          "role_binding": {
+            "allowed_tools": [
+              "view_file"
+            ],
+            "binding_id": "binding-reviewer-04",
+            "roles": [
+              "Work Review"
+            ]
+          },
+          "source_sha256": {
+            "claude/model-catalog-v1.json": "6db05bde65967555c43165017128bc0227049071498dde08b95874d36036f435",
+            "claude/profiles/normal-final-review.json": "8d868e7ad5105ac364dae89d47b7391f9e920539a30b8a900f9d14087858172a",
+            "common/dispatcher/endpoints.toml": "3e71f4790fd15497b23afa18e8b71f0806fbf3d6e49cc76b8ce4838467d9367e",
+            "common/dispatcher/models.toml": "9f8fd5229b1e95c9b5655517c2b4612954e888d8f995a877b35869b69f83b609",
+            "common/dispatcher/routes.toml": "a28111c7caa5f7bee801750e417829875ae748b9a96b2cb3207cd13b59e22455"
+          }
+        }
+      },
+      "runtime_requirements": [
+        "Exact provider executable/version and resolved profile/model/settings identity",
+        "Exact selected catalog snapshot/override identity",
+        "Qualified projection and recovery authority",
+        "Installed command runtimes for the frozen quality oracle"
+      ],
+      "scenario_id": "scenario-12",
+      "scenario_path": "testing/fixtures/context-eval/scenario-12-mid-turn-mcp-failure-acceptance.json",
+      "scenario_sha256": "09a3ea566f882ae0c780586aca228a0e7a264d749ec54d8c3b944f68fb83c805",
+      "status": "candidate-incomplete",
+      "subject_input_evidence": {
+        "dependency_facts": {},
+        "files": [
+          "pkg/service/service.go"
+        ],
+        "primary_language": "go"
+      },
+      "subject_materializer": "testing/h_eval/subjects.py:materialize",
+      "substantive_oracle_owner": "testing/h_eval/oracles.py:oracle_for"
+    },
+    {
+      "acquisition_mechanism": "prelaunch-static-fallback",
+      "authority": {
+        "instruction": "Review Go auth module in pkg/auth/auth.go when MCP integration is disabled or broken before launch.",
+        "mutation_scope": [],
+        "task_authority": "read_only"
+      },
+      "blockers": [
+        "Substantive oracle good/bad and actual arm-evidence integration incomplete",
+        "Repository-owned live arm admission and aggregate qualification unavailable",
+        "Final-source D1 and independent preregistration/work acceptance pending"
+      ],
+      "cohorts": {
+        "correctness_only": true,
+        "exact_recovery": false,
+        "fallback": true,
+        "non_synthetic_savings": false,
+        "savings": false,
+        "synthetic": false
+      },
+      "contingency": null,
+      "frozen_oracle": {
+        "assertions": "dispatcher detects disabled/unavailable MCP before launch; cleanly chooses static context mode; zero attempted broken JSON-RPC connections"
+      },
+      "native_read_required": false,
+      "prompt_owner": "testing/fixtures/context-eval/scenario-13-prelaunch-no-mcp-fallback-acceptance.json#/task_input/instruction",
+      "result_importer": "testing/h_eval/importers.py:import_claude",
+      "routes": {
+        "adaptive": {
+          "effort": "high",
+          "identity_sources": [
+            "common/dispatcher/routes.toml",
+            "common/dispatcher/endpoints.toml",
+            "claude/profiles/normal-final-review.json",
+            "claude/model-catalog-v1.json",
+            "common/dispatcher/models.toml"
+          ],
+          "model": "claude-opus-5",
+          "profile": "normal-final-review",
+          "provider": "claude",
+          "requested_mode": "adaptive",
+          "role_binding": {
+            "allowed_tools": [
+              "view_file"
+            ],
+            "binding_id": "binding-reviewer-05",
+            "roles": [
+              "Work Review"
+            ]
+          },
+          "source_sha256": {
+            "claude/model-catalog-v1.json": "6db05bde65967555c43165017128bc0227049071498dde08b95874d36036f435",
+            "claude/profiles/normal-final-review.json": "8d868e7ad5105ac364dae89d47b7391f9e920539a30b8a900f9d14087858172a",
+            "common/dispatcher/endpoints.toml": "3e71f4790fd15497b23afa18e8b71f0806fbf3d6e49cc76b8ce4838467d9367e",
+            "common/dispatcher/models.toml": "9f8fd5229b1e95c9b5655517c2b4612954e888d8f995a877b35869b69f83b609",
+            "common/dispatcher/routes.toml": "a28111c7caa5f7bee801750e417829875ae748b9a96b2cb3207cd13b59e22455"
+          }
+        },
+        "static": {
+          "effort": "high",
+          "identity_sources": [
+            "common/dispatcher/routes.toml",
+            "common/dispatcher/endpoints.toml",
+            "claude/profiles/normal-final-review.json",
+            "claude/model-catalog-v1.json",
+            "common/dispatcher/models.toml"
+          ],
+          "model": "claude-opus-5",
+          "profile": "normal-final-review",
+          "provider": "claude",
+          "requested_mode": "static",
+          "role_binding": {
+            "allowed_tools": [
+              "view_file"
+            ],
+            "binding_id": "binding-reviewer-05",
+            "roles": [
+              "Work Review"
+            ]
+          },
+          "source_sha256": {
+            "claude/model-catalog-v1.json": "6db05bde65967555c43165017128bc0227049071498dde08b95874d36036f435",
+            "claude/profiles/normal-final-review.json": "8d868e7ad5105ac364dae89d47b7391f9e920539a30b8a900f9d14087858172a",
+            "common/dispatcher/endpoints.toml": "3e71f4790fd15497b23afa18e8b71f0806fbf3d6e49cc76b8ce4838467d9367e",
+            "common/dispatcher/models.toml": "9f8fd5229b1e95c9b5655517c2b4612954e888d8f995a877b35869b69f83b609",
+            "common/dispatcher/routes.toml": "a28111c7caa5f7bee801750e417829875ae748b9a96b2cb3207cd13b59e22455"
+          }
+        }
+      },
+      "runtime_requirements": [
+        "Exact provider executable/version and resolved profile/model/settings identity",
+        "Exact selected catalog snapshot/override identity",
+        "Qualified projection and recovery authority",
+        "Installed command runtimes for the frozen quality oracle"
+      ],
+      "scenario_id": "scenario-13",
+      "scenario_path": "testing/fixtures/context-eval/scenario-13-prelaunch-no-mcp-fallback-acceptance.json",
+      "scenario_sha256": "0488881524f6521bb39bd7c359859fb730b140e131827357331a4d70b96ff1d5",
+      "status": "candidate-incomplete",
+      "subject_input_evidence": {
+        "dependency_facts": {},
+        "files": [
+          "pkg/auth/auth.go"
+        ],
+        "primary_language": "go"
+      },
+      "subject_materializer": "testing/h_eval/subjects.py:materialize",
+      "substantive_oracle_owner": "testing/h_eval/oracles.py:oracle_for"
+    },
+    {
+      "acquisition_mechanism": "mcp-with-native-read-recovery",
+      "authority": {
+        "instruction": "Review database models in pkg/data/models.go without write authority. Acquire apgr:sqlite-database-profile in-band via MCP.",
+        "mutation_scope": [],
+        "task_authority": "read_only"
+      },
+      "blockers": [
+        "Substantive oracle good/bad and actual arm-evidence integration incomplete",
+        "Repository-owned live arm admission and aggregate qualification unavailable",
+        "Final-source D1 and independent preregistration/work acceptance pending"
+      ],
+      "cohorts": {
+        "correctness_only": true,
+        "exact_recovery": true,
+        "fallback": false,
+        "non_synthetic_savings": false,
+        "savings": false,
+        "synthetic": false
+      },
+      "contingency": null,
+      "frozen_oracle": {
+        "assertions": "in-band MCP acquisition delivers skill body to reviewer without repository writes; worktree, index, and HEAD remain strictly unchanged"
+      },
+      "native_read_required": true,
+      "prompt_owner": "testing/fixtures/context-eval/scenario-14-readonly-fence-safe-acquisition-acceptance.json#/task_input/instruction",
+      "result_importer": "testing/h_eval/importers.py:import_claude",
+      "routes": {
+        "adaptive": {
+          "effort": "high",
+          "identity_sources": [
+            "common/dispatcher/routes.toml",
+            "common/dispatcher/endpoints.toml",
+            "claude/profiles/normal-final-review.json",
+            "claude/model-catalog-v1.json",
+            "common/dispatcher/models.toml"
+          ],
+          "model": "claude-opus-5",
+          "profile": "normal-final-review",
+          "provider": "claude",
+          "requested_mode": "adaptive",
+          "role_binding": {
+            "allowed_tools": [
+              "view_file",
+              "skill_search",
+              "skill_acquire",
+              "context_explain"
+            ],
+            "binding_id": "binding-reviewer-06",
+            "roles": [
+              "Work Review"
+            ]
+          },
+          "source_sha256": {
+            "claude/model-catalog-v1.json": "6db05bde65967555c43165017128bc0227049071498dde08b95874d36036f435",
+            "claude/profiles/normal-final-review.json": "8d868e7ad5105ac364dae89d47b7391f9e920539a30b8a900f9d14087858172a",
+            "common/dispatcher/endpoints.toml": "3e71f4790fd15497b23afa18e8b71f0806fbf3d6e49cc76b8ce4838467d9367e",
+            "common/dispatcher/models.toml": "9f8fd5229b1e95c9b5655517c2b4612954e888d8f995a877b35869b69f83b609",
+            "common/dispatcher/routes.toml": "a28111c7caa5f7bee801750e417829875ae748b9a96b2cb3207cd13b59e22455"
+          }
+        },
+        "static": {
+          "effort": "high",
+          "identity_sources": [
+            "common/dispatcher/routes.toml",
+            "common/dispatcher/endpoints.toml",
+            "claude/profiles/normal-final-review.json",
+            "claude/model-catalog-v1.json",
+            "common/dispatcher/models.toml"
+          ],
+          "model": "claude-opus-5",
+          "profile": "normal-final-review",
+          "provider": "claude",
+          "requested_mode": "static",
+          "role_binding": {
+            "allowed_tools": [
+              "view_file",
+              "skill_search",
+              "skill_acquire",
+              "context_explain"
+            ],
+            "binding_id": "binding-reviewer-06",
+            "roles": [
+              "Work Review"
+            ]
+          },
+          "source_sha256": {
+            "claude/model-catalog-v1.json": "6db05bde65967555c43165017128bc0227049071498dde08b95874d36036f435",
+            "claude/profiles/normal-final-review.json": "8d868e7ad5105ac364dae89d47b7391f9e920539a30b8a900f9d14087858172a",
+            "common/dispatcher/endpoints.toml": "3e71f4790fd15497b23afa18e8b71f0806fbf3d6e49cc76b8ce4838467d9367e",
+            "common/dispatcher/models.toml": "9f8fd5229b1e95c9b5655517c2b4612954e888d8f995a877b35869b69f83b609",
+            "common/dispatcher/routes.toml": "a28111c7caa5f7bee801750e417829875ae748b9a96b2cb3207cd13b59e22455"
+          }
+        }
+      },
+      "runtime_requirements": [
+        "Exact provider executable/version and resolved profile/model/settings identity",
+        "Exact selected catalog snapshot/override identity",
+        "Qualified projection and recovery authority",
+        "Installed command runtimes for the frozen quality oracle"
+      ],
+      "scenario_id": "scenario-14",
+      "scenario_path": "testing/fixtures/context-eval/scenario-14-readonly-fence-safe-acquisition-acceptance.json",
+      "scenario_sha256": "1180bd94f7da395dfa02ded05dcc40e69150fa225cb4d42208ed488103563ac4",
+      "status": "candidate-incomplete",
+      "subject_input_evidence": {
+        "dependency_facts": {},
+        "files": [
+          "pkg/data/models.go"
+        ],
+        "primary_language": "go"
+      },
+      "subject_materializer": "testing/h_eval/subjects.py:materialize",
+      "substantive_oracle_owner": "testing/h_eval/oracles.py:oracle_for"
+    },
+    {
+      "acquisition_mechanism": "context-adapter",
+      "authority": {
+        "instruction": "Implement TypeScript React component in frontend/src/App.tsx using projected typescript-language-profile guidelines under isolated Claude settings.",
+        "mutation_scope": [
+          "frontend/src/App.tsx"
+        ],
+        "task_authority": "phase_owned"
+      },
+      "blockers": [
+        "Substantive oracle good/bad and actual arm-evidence integration incomplete",
+        "Repository-owned live arm admission and aggregate qualification unavailable",
+        "Final-source D1 and independent preregistration/work acceptance pending"
+      ],
+      "cohorts": {
+        "correctness_only": false,
+        "exact_recovery": false,
+        "fallback": false,
+        "non_synthetic_savings": true,
+        "savings": true,
+        "synthetic": false
+      },
+      "contingency": "contingent/unavailable",
+      "frozen_oracle": {
+        "assertions": "component builds cleanly; operator claude settings remain unmutated; zero global discovery pollution",
+        "command": "npm run build --prefix frontend",
+        "expected_exit_code": 0
+      },
+      "native_read_required": false,
+      "prompt_owner": "testing/fixtures/context-eval/scenario-15-claude-isolated-settings-acceptance.json#/task_input/instruction",
+      "result_importer": "testing/h_eval/importers.py:import_claude",
+      "routes": {
+        "adaptive": {
+          "effort": "medium",
+          "identity_sources": [
+            "common/dispatcher/routes.toml",
+            "common/dispatcher/endpoints.toml",
+            "claude/profiles/implementation-primary.json",
+            "claude/model-catalog-v1.json",
+            "common/dispatcher/models.toml"
+          ],
+          "model": "claude-opus-5",
+          "profile": "implementation-primary",
+          "provider": "claude",
+          "requested_mode": "adaptive",
+          "role_binding": {
+            "allowed_tools": [
+              "view_file",
+              "replace_file_content",
+              "write_to_file",
+              "run_command"
+            ],
+            "binding_id": "binding-producer-08",
+            "roles": [
+              "Producer"
+            ]
+          },
+          "source_sha256": {
+            "claude/model-catalog-v1.json": "6db05bde65967555c43165017128bc0227049071498dde08b95874d36036f435",
+            "claude/profiles/implementation-primary.json": "8e890679280a69ef797c37578ec5bd409c86b60f89a9de6fb364f6ec63b10e18",
+            "common/dispatcher/endpoints.toml": "3e71f4790fd15497b23afa18e8b71f0806fbf3d6e49cc76b8ce4838467d9367e",
+            "common/dispatcher/models.toml": "9f8fd5229b1e95c9b5655517c2b4612954e888d8f995a877b35869b69f83b609",
+            "common/dispatcher/routes.toml": "a28111c7caa5f7bee801750e417829875ae748b9a96b2cb3207cd13b59e22455"
+          }
+        },
+        "static": {
+          "effort": "medium",
+          "identity_sources": [
+            "common/dispatcher/routes.toml",
+            "common/dispatcher/endpoints.toml",
+            "claude/profiles/implementation-primary.json",
+            "claude/model-catalog-v1.json",
+            "common/dispatcher/models.toml"
+          ],
+          "model": "claude-opus-5",
+          "profile": "implementation-primary",
+          "provider": "claude",
+          "requested_mode": "static",
+          "role_binding": {
+            "allowed_tools": [
+              "view_file",
+              "replace_file_content",
+              "write_to_file",
+              "run_command"
+            ],
+            "binding_id": "binding-producer-08",
+            "roles": [
+              "Producer"
+            ]
+          },
+          "source_sha256": {
+            "claude/model-catalog-v1.json": "6db05bde65967555c43165017128bc0227049071498dde08b95874d36036f435",
+            "claude/profiles/implementation-primary.json": "8e890679280a69ef797c37578ec5bd409c86b60f89a9de6fb364f6ec63b10e18",
+            "common/dispatcher/endpoints.toml": "3e71f4790fd15497b23afa18e8b71f0806fbf3d6e49cc76b8ce4838467d9367e",
+            "common/dispatcher/models.toml": "9f8fd5229b1e95c9b5655517c2b4612954e888d8f995a877b35869b69f83b609",
+            "common/dispatcher/routes.toml": "a28111c7caa5f7bee801750e417829875ae748b9a96b2cb3207cd13b59e22455"
+          }
+        }
+      },
+      "runtime_requirements": [
+        "Exact provider executable/version and resolved profile/model/settings identity",
+        "Exact selected catalog snapshot/override identity",
+        "Qualified projection and recovery authority",
+        "Installed command runtimes for the frozen quality oracle"
+      ],
+      "scenario_id": "scenario-15",
+      "scenario_path": "testing/fixtures/context-eval/scenario-15-claude-isolated-settings-acceptance.json",
+      "scenario_sha256": "7d92ea27859484372783ab5d27e5827ca1de1de016f5e002eb320af6963bf257",
+      "status": "candidate-incomplete",
+      "subject_input_evidence": {
+        "dependency_facts": {
+          "package_json": "{\"name\": \"frontend\", \"dependencies\": {\"react\": \"^19.0.0\", \"typescript\": \"^5.5.0\"}}"
+        },
+        "files": [
+          "frontend/src/App.tsx",
+          "frontend/package.json"
+        ],
+        "primary_language": "typescript"
+      },
+      "subject_materializer": "testing/h_eval/subjects.py:materialize",
+      "substantive_oracle_owner": "testing/h_eval/oracles.py:oracle_for"
+    }
+  ],
+  "schema": "apg.h-scenario-binding-inventory/v1",
+  "subject_manifest": {
+    "path": "testing/fixtures/context-eval/subjects/manifest.json",
+    "sha256": "917747b094c6ff2ad551849b6ca80e7610bfa60473e5dbdf19e66af3dc366f1a"
+  }
+}

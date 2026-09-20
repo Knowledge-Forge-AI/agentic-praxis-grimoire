@@ -22,7 +22,8 @@ def main() -> int:
     env["PYTHONPATH"] = ":".join(new_paths)
 
     has_target = any(
-        arg.endswith(".py") or (root / arg).exists() or Path(arg).exists()
+        arg.partition("::")[0].endswith(".py")
+        or (root / arg).exists() or Path(arg).exists()
         for arg in sys.argv[1:]
     )
     targets = [] if has_target else [str(root / "src/test/dispatcher")]

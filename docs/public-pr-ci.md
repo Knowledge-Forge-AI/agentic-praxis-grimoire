@@ -23,9 +23,11 @@ and pending finding dispositions block readiness; hosted acceptance is unobserve
 ## Trust boundary and threat model
 
 1. **Standard GitHub-hosted runners only**:
-   Static, packaging, scanner, and CodeQL jobs execute on standard `ubuntu-latest`
-   GitHub-hosted runners. The canonical APGR suite runs on standard `macos-15`
-   arm64 because its qualified Node and browser inputs are Darwin-specific. No
+   Ordinary static and CodeQL jobs execute on standard GitHub-hosted Linux
+   runners. The canonical APGR suite runs on standard `macos-15` ARM64 because
+   its qualified Node and browser inputs are Darwin-specific. The separate
+   `native-qualification.yml` has explicit Darwin ARM64 (`macos-15`), Linux x64
+   (`ubuntu-24.04`) and Linux ARM64 (`ubuntu-24.04-arm`) Go and Nix lanes. No
    self-hosted runners, ephemeral private runners, or Tart VM orchestrators are used.
 
 2. **Least privilege permissions**:
@@ -66,7 +68,8 @@ fabricated:
 | `actions/setup-node` | v6.5.0 | `249970729cb0ef3589644e2896645e5dc5ba9c38` |
 | `actions/setup-java` | v5.7.0 | `b6effb05e454b25005698d916606bdc6ffcbf961` |
 | `actions/upload-artifact` | v6.0.0 | `b7c566a772e6b6bfb58ed0dc250532a479d7789f` |
-| `actions/download-artifact` | v4.1.8 | `fa0a91b85d4f404e444e00e005971372dc801d16` |
+| `actions/download-artifact` (ordinary receipts) | v4.1.8 | `fa0a91b85d4f404e444e00e005971372dc801d16` |
+| `actions/download-artifact` (native immutable IDs) | v4.3.0 | `d3f86a106a0bac45b974a628896c90dbdf5c8093` |
 | `github/codeql-action/init` | v4.38.0 | `b96794f015dfd88f77b49b1c93e0fa7110f94c63` |
 | `github/codeql-action/analyze` | v4.38.0 | `b96794f015dfd88f77b49b1c93e0fa7110f94c63` |
 
@@ -83,6 +86,11 @@ changes the action runtime to Node 24; download v4 supports `pattern` and
 This is supported by the pinned [upload documentation](https://github.com/actions/upload-artifact/blob/b7c566a772e6b6bfb58ed0dc250532a479d7789f/README.md)
 and [download documentation](https://github.com/actions/download-artifact/blob/fa0a91b85d4f404e444e00e005971372dc801d16/README.md).
 Hosted execution of this pairing remains pending.
+
+The native workflow requires `artifact-ids`; that input is absent from the old
+ordinary receipt download pin. The native pin's official action metadata
+provides it. Uploads expose artifact ID and SHA-256 digest; internal per-file
+seals and native source identity are independently checked.
 
 Pinned native tools and SHA-256 archive hashes are managed in
 [`tools/ci/pre_review_tools.json`](../tools/ci/pre_review_tools.json).
@@ -128,8 +136,16 @@ The maintained `bin/apg-check-change-size` checker remains owned by the separate
 `testing/apg-change-size-policy.json`. The static runner does not apply a copied
 whole-history line-count baseline to inherited release evidence.
 
-Missing applicable tools fail closed with classification `tool-failure`. No automatic
-debt baseline is accepted by this lane, and mass reformatting is prohibited. Evidence logs are capped at 200 KB per check, sealed in
+Missing applicable tools fail closed with classification `tool-failure`, and mass
+reformatting is prohibited. No automatic baseline refresh or growth and no count-only
+debt waiver is accepted. For v0.13, exactly 512 reviewed pre-existing Ruff findings
+are grandfathered under schema `apg-ruff-baseline-v2`; their exact identity binds
+path, rule, row, column, source-derived context hash, and message. The baseline
+artifact is pinned by cryptographic digest, count, and provenance in the v0.13 release
+authority. New, moved, or content-changed findings fail closed; finding reductions
+pass without baseline edits; and future baseline changes require an intentional
+versioned release-policy change. This is grandfathering of visible debt, not a claim
+that the debt is fixed. Evidence logs are capped at 200 KB per check, sealed in
 an evidence envelope (<= 5 MB total), and verified via SHA-256 manifest.
 
 ## Syft SBOM and Grype vulnerability policy
@@ -186,15 +202,28 @@ Member jobs are wired to existing repository commands:
 - `static-analysis`: `tools/ci/run_pre_review.py`
 - `policy`: `bin/apg-check-skill-library`, `bin/apg-check-record-identity`, `bin/apg-check-change-size`
 - `unit-integration`: `bin/apg-test policy` followed by
-  `bin/apg-test unit-integration --public-version 0.12.0` using the bootstrapped runtime. This explicit public mode uses the versioned release owner's six exact private-history deselections; public behavioral fixture companions run, and component/union thresholds remain unchanged
+  `bin/apg-test unit-integration --public-version 0.13.0` using the bootstrapped runtime. This explicit public mode uses the versioned release owner's six exact private-history deselections; public behavioral fixture companions run, and component/union thresholds remain unchanged
 - `closure`: both normal and `--require-zero` roadmap-closure modes
 - `go`: `go test ./...`, `go vet ./...`, `go test -race ./...`
-- `package`: all three Go targets, the maintained Python and npm builders,
-  `bin/apg-public-release manifest`, distribution-candidate build/check, and
-  repeated Python/npm builds for reproducibility
-- `sbom-and-vulnerability`: source and actual deliverable SBOMs, exact target records, and a
-  separate Grype scan of each SBOM with database freshness and finding checks
 - `codeql`: Advanced CodeQL matrix
+
+Native qualification owns packaging, Nix and release scans. Three native lanes
+retain compiler and installed runtime evidence and two identical Go builds.
+Assembly consumes those sealed inputs without Go compilation and emits exactly
+eleven distributables. Three further native consumer jobs smoke the packaged
+wheel/npm bytes, then recheck the bundle seal. The scanner job checks fourteen
+views, including a native hosted sdist-derived installation that never replaces
+release assets. `native-release-candidate-gate` requires every lane and receipt
+to succeed with one source commit/tree and exact artifact identities. No hosted
+success is claimed. The old `qualify_packages.sh` remains a developer path.
+
+Bundle downloads are verified against the immutable artifact ID, archive digest
+and expected internal seal before consumer or scanner execution. GitHub read
+tokens are scoped to this separate verification step. Scan input and receipt
+checks rebind the expected seal and source identity. The public source projection
+manifest accompanies the assembly receipt and is digest-bound by the native gate.
+The pinned download action preserves artifact-name directories for ID downloads,
+including a single ID; a pin upgrade must requalify this layout.
 
 Every completed member job attempts to emit an identity-bound receipt (`*-receipt.json`) with its actual
 success, failure, cancellation, or skip status. Each CodeQL language has a distinct
@@ -217,19 +246,38 @@ Operational settings state at APG144 candidate handoff:
 The later operator must configure and read back a `main` ruleset requiring a PR,
 at least one current approval with stale approvals dismissed, an up-to-date branch,
 and the following exact required checks from GitHub Actions: `guard`,
-`static-analysis`, `policy`, `unit-integration`, `closure`, `go`, `package`,
-`sbom-and-vulnerability`, `codeql (go)`, `codeql (python)`,
-`codeql (javascript-typescript)`, `codeql (actions)` and `public-pr-gate`.
+`static-analysis`, `policy`, `unit-integration`, `closure`, `go`,
+`codeql (go)`, `codeql (python)`, `codeql (javascript-typescript)`,
+`codeql (actions)`, `public-pr-gate`, and `native-release-candidate-gate`.
+The native aggregate enforces every platform, consumer, assembly and scan member.
+Before merge, an independently authorized attended administrator must remove the
+retired `package`, `sbom-and-vulnerability` and two `nix` contexts and require the
+native aggregate. Read back actual rules before and after that migration. Source
+staging authorization does not authorize the settings change; leaving retired
+contexts required blocks merge and omitting the native gate leaves it unprotected.
 Require CodeQL code-scanning merge protection at **High or higher** security
 severity and **Errors** alert severity. Permit squash promotion only, with subject
-`Release v0.12.0`; disallow force pushes and deletion of protected release history.
+`Release v0.13.0`; disallow force pushes and deletion of protected release history.
 Verify public `main` still equals the accepted public base immediately before
 merge. A moved base requires a newly bound candidate and qualification.
 
-These settings have not been changed or verified. If the future operator lacks
+APG167Q read-only preflight observes main as unprotected, with no required status
+contexts and no rulesets. The full protection endpoint is unavailable to the
+integration without administration access. Desired protection is therefore not
+deployed, and this source task changes no settings. Repeat the readback before
+staging and configure the complete desired policy before merge.
+
+If the future operator lacks
 ruleset or code-scanning permissions, the handoff is to an authorized repository
 administrator; requirements must not be disabled. Uploaded SARIF and successful
 workflow execution alone do not prove absence of CodeQL alerts.
+
+Native PR artifacts are retained for fourteen days. An expired gate artifact
+blocks release until hosted qualification is rerun. Exact merge-parent checks
+may fail when an event's base SHA is stale relative to the merge ref; refresh the
+run against the current PR/base rather than relaxing the checks. Publication
+must separately reconcile squash source-commit identity with tested source-tree
+identity, as described in [ADR 0078](adr/2026/10/0078-native-hosted-release-qualification.md).
 
 The initial suppression census is retained as review evidence, not an accepted
 waiver. Exact occurrences without an accepted reason, owner and unexpired review
@@ -247,7 +295,7 @@ bootstrap and helper boundary tests remain qualification concerns.
 
 The suppression inventory records observations, not approvals. Entries lacking
 an accepted, specific, owned and unexpired decision deliberately block the
-static lane. An observed baseline does not grandfather them. No second
+static lane. An observed suppression baseline does not grandfather them. No second
 baseline allowance overrides this decision check.
 
 The enforced SBOM coverage policy is `scan.coverage`: source Go/npm inventories,
@@ -265,12 +313,12 @@ Python-shebang entry scripts in bin. It records excluded artifact classes and
 refuses missing, unreadable or empty inputs. The public prospective capture
 tracks new candidate files before scanning; development HEAD alone is insufficient.
 
-Eighteen existing oversized READINESS2 files have individual content-bound entry
-allowances. Each remains visible retained debt; growth above its bound and new
-unlisted oversized files fail. Allowances cannot transfer on removal or increase
-automatically. Reviewed reductions may tighten bounds; retire an allowance once
-its file falls to the ordinary limit. This is a no-growth migration, with no
-promise or authorization of a later refactoring campaign.
+Forty-five existing oversized files have individual line-count no-growth entry
+allowances under schema `apg-file-length-policy-v2`. Each remains visible retained debt;
+growth above its line bound and new unlisted oversized files fail. Allowances cannot transfer
+on removal or increase automatically. Content changes and reviewed reductions below the bound
+pass cleanly; retire an allowance once its file falls to the ordinary limit. This is a no-growth
+migration, with no promise or authorization of a later refactoring campaign.
 
 Suppression result schema `apg-scanner-suppression-inventory-v3` uses Python
 comment tokens and a hash of the owning statement and enclosing scope names.
@@ -282,9 +330,11 @@ work-review verification under Manager Decision C; all 225 active directives hav
 owners, reasons, and expiry 2026-12-31. Other formats use bounded quote-aware line-comment
 recognition, not a general language parser.
 
-BetterLeaks observations retain the raw count. Three manager-reviewed nonsecret
-contexts are reconciled by exact path/rule/source-line/context hashes: two
-synthetic redaction inputs and one public integrity digest. The aggregate reports
+BetterLeaks observations retain the raw count. Eleven reviewed nonsecret
+contexts are reconciled by exact path/rule/source-line/context hashes: three
+synthetic redaction inputs, one public integrity digest, and seven SHA-256
+file-content digests in sealed evaluation records whose file names trigger the
+generic key rule. The aggregate reports
 `reviewed_nonsecret`, unresolved observations and unmatched dispositions separately.
 Changed or additional matches inherit no allowance. Full redaction remains enabled;
 source bytes are hashed in memory and scanner payloads are not retained in logs.
