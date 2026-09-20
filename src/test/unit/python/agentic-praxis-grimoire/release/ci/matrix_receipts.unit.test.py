@@ -136,7 +136,45 @@ def test_verify_matrix_requires_explicit_needs_success(tmp_path: Path) -> None:
         tmp_path, expected_sha=sha, expected_statuses=statuses
     )
     assert ok is False
-    assert any("codeql-actions needs result did not succeed" in err for err in doc["errors"])
+    assert doc["errors"] == [
+        "matrix codeql needs result did not succeed: status=skipped; no member receipt reports failure"
+    ]
+
+
+def test_shared_matrix_failure_names_only_failing_member_receipts(tmp_path: Path) -> None:
+    sha = "11223344556677889900aabbccddeeff11223344"
+    for job in DEFAULT_MEMBER_JOBS:
+        failed = job in {"codeql-python", "nix-x86_64-linux"}
+        _emit_complete_receipt(job, tmp_path, sha=sha, status="failure" if failed else "success")
+    statuses = {job: "success" for job in DEFAULT_MEMBER_JOBS}
+    for job in ("codeql-go", "codeql-python", "codeql-javascript-typescript", "codeql-actions",
+                "nix-x86_64-linux", "nix-aarch64-darwin"):
+        statuses[job] = "failure"
+    ok, _msg, doc = verify_matrix(tmp_path, expected_sha=sha, expected_statuses=statuses)
+    assert ok is False
+    assert sorted(doc["errors"]) == sorted([
+        "job codeql-python did not succeed: status=failure",
+        "job nix-x86_64-linux did not succeed: status=failure",
+        "matrix codeql needs result did not succeed: status=failure; failing member receipts: codeql-python",
+        "matrix nix needs result did not succeed: status=failure; failing member receipts: nix-x86_64-linux",
+    ])
+    assert doc["member_receipt_status"]["codeql-go"] == "success"
+    assert doc["member_receipt_status"]["nix-aarch64-darwin"] == "success"
+    assert doc["member_receipt_status"]["codeql-python"] == "failure"
+    assert not any("codeql-go" in err or "aarch64-darwin" in err for err in doc["errors"])
+
+
+def test_ungrouped_needs_failure_with_green_receipt_still_fails_closed(tmp_path: Path) -> None:
+    sha = "11223344556677889900aabbccddeeff11223344"
+    for job in DEFAULT_MEMBER_JOBS:
+        _emit_complete_receipt(job, tmp_path, sha=sha, status="success")
+    statuses = {job: "success" for job in DEFAULT_MEMBER_JOBS}
+    assert verify_matrix(tmp_path, expected_sha=sha, expected_statuses=statuses)[0] is True
+    statuses["static-analysis"] = "failure"
+    ok, _msg, doc = verify_matrix(tmp_path, expected_sha=sha, expected_statuses=statuses)
+    assert ok is False
+    assert doc["errors"] == ["job static-analysis needs result did not succeed: status=failure"]
+    assert set(doc["member_receipt_status"].values()) == {"success"}
 
 
 def test_downloaded_matrix_preserves_duplicate_detection(tmp_path: Path) -> None:
@@ -252,4 +290,35 @@ def test_verify_matrix_rejects_success_receipt_with_malformed_unavailable_artifa
     ok, _msg, doc = verify_matrix(tmp_path, expected_sha=sha)
     assert ok is False
     assert any("malformed unavailable_artifacts for job: guard" in err for err in doc["errors"])
+
+
+def test_emit_receipt_creates_valid_nix_receipts(tmp_path: Path) -> None:
+    p_linux = emit_receipt("nix-x86_64-linux", tmp_path, status="success", sha="a" * 40)
+    assert p_linux.is_file()
+    assert p_linux.name == "nix-x86_64-linux-receipt.json"
+
+    p_darwin = emit_receipt("nix-aarch64-darwin", tmp_path, status="success", sha="a" * 40)
+    assert p_darwin.is_file()
+    assert p_darwin.name == "nix-aarch64-darwin-receipt.json"
+
+
+def test_verify_matrix_rejects_missing_nix_member(tmp_path: Path) -> None:
+    sha = "11223344556677889900aabbccddeeff11223344"
+    for job in DEFAULT_MEMBER_JOBS - {"nix-x86_64-linux"}:
+        _emit_complete_receipt(job, tmp_path, sha=sha, status="success")
+
+    ok, _msg, doc = verify_matrix(tmp_path, expected_sha=sha)
+    assert ok is False
+    assert any("missing receipt for job: nix-x86_64-linux" in err for err in doc["errors"])
+
+
+def test_verify_matrix_rejects_failed_nix_member(tmp_path: Path) -> None:
+    sha = "11223344556677889900aabbccddeeff11223344"
+    for job in DEFAULT_MEMBER_JOBS:
+        status = "failure" if job == "nix-aarch64-darwin" else "success"
+        _emit_complete_receipt(job, tmp_path, sha=sha, status=status)
+
+    ok, _msg, doc = verify_matrix(tmp_path, expected_sha=sha)
+    assert ok is False
+    assert any("job nix-aarch64-darwin did not succeed: status=failure" in err for err in doc["errors"])
 

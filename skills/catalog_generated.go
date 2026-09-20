@@ -1,0 +1,154 @@
+package skills
+
+import (
+	"bytes"
+	_ "embed"
+	"encoding/json"
+	"fmt"
+	"io/fs"
+	"path"
+	"regexp"
+	"sort"
+	"strings"
+)
+
+//go:embed catalog_generated.json
+var generatedCatalog []byte
+
+type catalogGeneration struct {
+	SchemaVersion string                       `json:"schema_version"`
+	Authorities   []CatalogFile                `json:"authorities"`
+	Skills        []SkillDescriptor            `json:"skills"`
+	Support       map[string]map[string][]byte `json:"support"`
+}
+
+// GenerateCatalog is the experimental deterministic generation owner. root is
+// a read-only repository FS; output has no concrete host path or clock value.
+func GenerateCatalog(root fs.FS) ([]byte, error) {
+	authorityPaths := []string{"skills/README.md", "skills/rules.go", "docs/governance/skill-maturity-ledger.json", "docs/guides/skill-context-bundles.md", "docs/chatgpt-manager-skill-topology.md"}
+	gen := catalogGeneration{SchemaVersion: CatalogSchemaV1, Authorities: []CatalogFile{}, Skills: []SkillDescriptor{}, Support: map[string]map[string][]byte{}}
+	authorities := map[string][]byte{}
+	for _, name := range authorityPaths {
+		data, err := fs.ReadFile(root, name)
+		if err != nil {
+			return nil, err
+		}
+		authorities[name] = data
+		gen.Authorities = append(gen.Authorities, CatalogFile{Path: name, Bytes: int64(len(data)), SHA256: sha256Hex(data)})
+	}
+	refs := map[string]string{}
+	for _, label := range []string{"Common consumer limitations", "ChatGPT consumer limitations"} {
+		pattern := regexp.MustCompile(`\[` + regexp.QuoteMeta(label) + `\]\(([^)]+)\)`)
+		matches := pattern.FindAllSubmatch(authorities[authorityPaths[0]], -1)
+		if len(matches) != 1 {
+			return nil, fmt.Errorf("missing or duplicate consumer reference: %s", label)
+		}
+		ref := path.Clean(path.Join("skills", string(matches[0][1])))
+		if !fs.ValidPath(ref) || authorities[ref] == nil {
+			return nil, fmt.Errorf("unbound consumer reference: %s", label)
+		}
+		refs[label] = ref
+	}
+	var ledger struct {
+		Skills []struct {
+			ID       string `json:"skill_id"`
+			Maturity string `json:"current_maturity"`
+		} `json:"skills"`
+	}
+	if err := json.Unmarshal(authorities[authorityPaths[2]], &ledger); err != nil {
+		return nil, err
+	}
+	maturity := map[string]string{}
+	for _, row := range ledger.Skills {
+		if _, ok := maturity[row.ID]; ok {
+			return nil, fmt.Errorf("duplicate maturity ID")
+		}
+		maturity[row.ID] = row.Maturity
+	}
+	triggers := map[string]string{}
+	pattern := regexp.MustCompile("(?m)^\\| \\[\x60([^\x60]+)\x60\\]\\([^\\n]+?\\) \\| ([^|]+) \\|")
+	_, table, ok := strings.Cut(string(authorities[authorityPaths[0]]), "## Current development catalog\n")
+	if !ok {
+		return nil, fmt.Errorf("missing current catalog table")
+	}
+	table = strings.SplitN(table, "\n## ", 2)[0]
+	for _, m := range pattern.FindAllSubmatch([]byte(table), -1) {
+		if _, exists := triggers[string(m[1])]; exists {
+			return nil, fmt.Errorf("duplicate catalog trigger")
+		}
+		triggers[string(m[1])] = string(bytes.TrimSpace(m[2]))
+	}
+	corpus, err := fs.Sub(root, "skills")
+	if err != nil {
+		return nil, err
+	}
+	index, err := buildIndex(corpus)
+	if err != nil {
+		return nil, err
+	}
+	for _, metadata := range index.skills {
+		snapshot := SkillSnapshot{QualifiedID: "apgr:" + metadata.ID, Body: index.bodyByID[metadata.ID], Support: map[string][]byte{}}
+		fields, _, err := catalogMetadata(snapshot.Body)
+		if err != nil {
+			return nil, err
+		}
+		names, err := declaredList(fields, "support")
+		if err != nil {
+			return nil, err
+		}
+		for _, name := range names {
+			if !fs.ValidPath(name) {
+				return nil, fmt.Errorf("invalid support path")
+			}
+			prefix := metadata.CanonicalPath[:len(metadata.CanonicalPath)-len("SKILL.md")]
+			data, err := fs.ReadFile(corpus, prefix+name)
+			if err != nil {
+				return nil, err
+			}
+			snapshot.Support[name] = data
+		}
+		d, err := descriptor(snapshot)
+		if err != nil {
+			return nil, err
+		}
+		d.CanonicalPath = metadata.CanonicalPath
+		d.TriggerBoundary = triggers[metadata.ID]
+		d.Maturity = maturity[metadata.ID]
+		if d.TriggerBoundary == "" || d.Maturity == "" {
+			return nil, fmt.Errorf("missing catalog/maturity authority for %s", metadata.ID)
+		}
+		d.ConsumerLimitations = []string{refs["Common consumer limitations"]}
+		if bytes.HasPrefix([]byte(metadata.CanonicalPath), []byte("chatgpt/")) {
+			d.ConsumerLimitations = append(d.ConsumerLimitations, "chatgpt-only; "+refs["ChatGPT consumer limitations"])
+		}
+		for _, rule := range SelectionRules() {
+			if rule.SkillID == metadata.ID {
+				d.SelectionFacts = append(d.SelectionFacts, rule)
+			}
+		}
+		sealDescriptor(&d)
+		gen.Skills = append(gen.Skills, d)
+		if len(snapshot.Support) > 0 {
+			gen.Support[d.QualifiedID] = snapshot.Support
+		}
+	}
+	sort.Slice(gen.Authorities, func(i, j int) bool { return gen.Authorities[i].Path < gen.Authorities[j].Path })
+	data, err := json.MarshalIndent(gen, "", "  ")
+	return append(data, '\n'), err
+}
+
+// VerifyCatalogGeneration checks authoritative inputs as well as generated bytes.
+func VerifyCatalogGeneration(root fs.FS) error {
+	data, err := GenerateCatalog(root)
+	if err != nil {
+		return err
+	}
+	actual, err := fs.ReadFile(root, "skills/catalog_generated.json")
+	if err != nil {
+		return err
+	}
+	if !bytes.Equal(data, actual) || !bytes.Equal(data, generatedCatalog) {
+		return fmt.Errorf("generated skill catalog drift; regenerate skills/catalog_generated.json")
+	}
+	return nil
+}

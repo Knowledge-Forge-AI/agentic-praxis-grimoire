@@ -347,7 +347,7 @@ def discover_canonical_leaves(
         if entry.name == "README.md":
             continue
         if entry.name not in CANONICAL_NAMESPACES:
-            if ROOT_GO_SOURCE_NAME.fullmatch(entry.name) and _ordinary_file(entry):
+            if (ROOT_GO_SOURCE_NAME.fullmatch(entry.name) or entry.name == "catalog_generated.json") and _ordinary_file(entry):
                 continue
             if entry.is_dir():
                 leaves.append(entry)

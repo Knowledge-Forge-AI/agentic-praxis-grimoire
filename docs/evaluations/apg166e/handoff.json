@@ -1,0 +1,438 @@
+{
+  "checks": {
+    "record_identity": "pending-current-exact-source-command-receipt",
+    "roadmap_closure": "pending-current-exact-source-command-receipt",
+    "skill_library": "pending-current-exact-source-command-receipt",
+    "whitespace": "pending-current-exact-source-command-receipt"
+  },
+  "continuation": "V0130-H-D1-SEAM5-CORR2-RECOVERY3-SOURCE",
+  "correction": "APG166R1-R3",
+  "custody_threat_boundary": "Local custody consistency and tamper detection only; no hostile same-user cryptographic security claim.",
+  "d1_authorized": false,
+  "d1_invocations": 0,
+  "d1_seam_implemented_provider_free": true,
+  "default_context_mode": "static",
+  "deferred_limitations": [
+    "hostile in-process event forgery outside non-sandbox threat model",
+    "future class/parametrized hidden-overlay identity extraction",
+    "SQLite unittest hidden execution attestation",
+    "generalized attestation storage/readback beyond exact durable starting-subject need"
+  ],
+  "dispatcher_phase": "APG166R1R3",
+  "disposition": "produced-source-correction-pending-independent-source-review",
+  "dry_run": {
+    "evidence_owner": "run-owned qualification directory",
+    "status": "pending-manager-owned-fresh-final-B8-after-covering-host-qualification"
+  },
+  "dry_run_evidence_status": "Current qualification is represented only by run-owned exact-candidate receipts and final B8 seal; historical transactions do not qualify changed source.",
+  "exit": "00227",
+  "focused_qualification": {
+    "apg166r1r2_selected_reconciliation": {
+      "all_selected_passed": false,
+      "canonical_focused_case_count": 188,
+      "qualifies_current_candidate": false,
+      "required_suite_coverage": true,
+      "same_candidate": true
+    },
+    "authoritative_evidence": "manager-owned host covering reconciliation on the APG166R1-R3 candidate (pending)",
+    "canonical_unique_cases": "pending-host-covering-reconciliation",
+    "count_derivation": "not established; the APG166R1-R2 relation of 184 prior plus 4 new node IDs was asserted without a set comparison. A prior-to-current relation requires node_set_delta over the APG166R1-R1 prior and the new current reconciliation at the host gate.",
+    "count_method": "union of retained pytest node IDs",
+    "covering_rule": "success requires all_selected_passed, same_candidate and required_suite_coverage in one invocation (covering_qualification)",
+    "historical_188": "historical unreconciled aggregate; cause not proven",
+    "status": "pending-host-covering-reconciliation"
+  },
+  "h_main_gate": false,
+  "independent_source_accepted": false,
+  "independent_work_review": "APG166R1R2 review disposition amend (F1 blocking provider-stream receipt failure; F2 documentation truth). APG166R1R3 dispatcher-owned independent source review pending; source-accept means ready for host qualification only.",
+  "later_d1_phase": "APG166T",
+  "live_admission_available": false,
+  "live_evaluation_prerequisites_ready": false,
+  "live_holdout_authorized": false,
+  "manager_review_required": true,
+  "native_environment_digest": {
+    "authoritative_environment_custody": "outer launch-owner start-receipt environment_digest and allowlist_environment, independently derived for both authority branches",
+    "authority": "diagnostic-non-authoritative",
+    "field": "launch_facts.diagnostic_environment_digest",
+    "manager_option": "B",
+    "readback": "Refuses an authoritative-looking native environment_digest, a missing or non-diagnostic classification, and a malformed diagnostic digest; never uses it for custody.",
+    "reason": "The native Popen environment includes host launcher additions (shell PWD/SHLVL, toolchain-shim SDKROOT/CPATH/LIBRARY_PATH/MANPATH/LC_CTYPE, __CF_USER_TEXT_ENCODING) that readback cannot derive from source."
+  },
+  "native_launch_custody": {
+    "artifact": "d1.context-launcher-deliveries.json",
+    "binding": "exact bytes and SHA-256 in post_provider.native_launch_custody of the digest-bound d1-record.json",
+    "observation_scope": "native Popen success only; PID, process group and session are not re-observed after exit",
+    "readback": "Required regular non-symlink artifact read without following links; custody recomputed and compared before launch_facts are trusted; absent, symlinked, unreadable or mutated facts raise D1ReadbackError."
+  },
+  "per_skill_preregistration": {
+    "go-language-profile": "pending-independent-review",
+    "go-test-profile": "pending-independent-review",
+    "markdown-language-profile": "pending-independent-review",
+    "pytest-test-profile": "pending-independent-review",
+    "sqlite-database-profile": "pending-independent-review"
+  },
+  "phase": "APG166E",
+  "prior_apg166r": {
+    "disposition": "amend",
+    "dry_run": {
+      "aggregate_written": false,
+      "complete_records": 15,
+      "disposable_starting_subject_directories_removed": true,
+      "hidden_fixture_execution_attestations_recomputed": 18,
+      "initial_trees_equal": 15,
+      "integrity_readback": "valid",
+      "non_trigger_cases_structural_only": 10,
+      "oracle_fixture_pairs": 15,
+      "positive_hidden_execution_attestations_qualified": 9,
+      "positive_starting_subjects_rejected": 15,
+      "promotion_oracle_fixture_pairs": 25,
+      "provider_task_invocations": 0,
+      "records": 15,
+      "runtime_after": "valid",
+      "runtime_before": "valid",
+      "scenario12_13_15_provider_free_mechanics": "complete",
+      "sentinels_observed": 0,
+      "starting_pytest_attestations_recomputed": 3,
+      "starting_pytest_hidden_attestations_qualified": 3,
+      "subject_pairs_unchanged": 15
+    },
+    "finding_status": {
+      "R1": "partial",
+      "R2": "partial",
+      "R3": "partial",
+      "R4": "resolved"
+    },
+    "focused_qualification": {
+      "arm_evidence_qual6_tests": 20,
+      "canonical_unique_cases": 179,
+      "claude_reads_tests": 80,
+      "d1_seam_tests": 34,
+      "delivery_tests": 20,
+      "promotion_qual6_tests": 9,
+      "provider_free_guard_tests": 8,
+      "provider_free_readiness_tests": 8,
+      "sentinels_observed": 0,
+      "total_evaluation_suite_tests": 179
+    }
+  },
+  "prior_checkpoint": {
+    "dispatcher_phase": "APG166P",
+    "disposition": "amend",
+    "reason": "APG166P addressed D1 transport divergence and live/instrumented authority separation, but independent work review sustained 11 findings (Sec3/7/11/13/14/15/16/18) and returned disposition: amend with 15/15 transaction retained as diagnostic evidence."
+  },
+  "prior_corr2": {
+    "correction": "APG166E-CORR2",
+    "dispatcher_phase": "APG166G",
+    "disposition": "amend",
+    "finding_status": {
+      "F1": "partial",
+      "F2": "partial",
+      "F3": "resolved",
+      "F4": "preserved",
+      "F5": "resolved",
+      "F6": "preserved",
+      "F7": "preserved",
+      "F8": "preserved",
+      "F9": "preserved"
+    },
+    "mechanical_package": "reject",
+    "per_skill_preregistration": {
+      "go-language-profile": "accept",
+      "go-test-profile": "reject",
+      "markdown-language-profile": "accept",
+      "pytest-test-profile": "reject",
+      "sqlite-database-profile": "reject"
+    },
+    "producer_dry_run": {
+      "aggregate_written": false,
+      "complete_records": 15,
+      "initial_trees_equal": 15,
+      "integrity_readback": "valid",
+      "non_trigger_cases_structural_only": 10,
+      "oracle_fixture_pairs": 15,
+      "positive_starting_subjects_rejected": 15,
+      "promotion_oracle_fixture_pairs": 25,
+      "provider_task_invocations": 0,
+      "records": 15,
+      "runtime_after": "valid",
+      "runtime_before": "valid",
+      "scenario12_13_15_provider_free_mechanics": "complete",
+      "sentinels_observed": 0,
+      "subject_pairs_unchanged": 15
+    },
+    "producer_focused_qualification": {
+      "corrected-contracts-final": 98,
+      "full_project_suite_run": false,
+      "objective-final": 118,
+      "oracle-integration": 173,
+      "overlapping_slices": true,
+      "sentinels_observed": 0
+    },
+    "source_checkpoint_accepted": true
+  },
+  "prior_corr3": {
+    "advisory_status": {
+      "A1": "open",
+      "A2": "open",
+      "A3": "open",
+      "CopyFile": "resolved",
+      "Fetch": "resolved"
+    },
+    "correction": "APG166E-CORR3",
+    "dispatcher_phase": "APG166H",
+    "disposition": "amend",
+    "finding_status": {
+      "F1": "resolved",
+      "F2": "resolved",
+      "F3": "preserved",
+      "F4": "preserved",
+      "F5": "preserved",
+      "F6": "preserved",
+      "F7": "preserved",
+      "F8": "preserved",
+      "F9": "preserved",
+      "N1": "open"
+    },
+    "mechanical_package": "accept-for-manager-consideration",
+    "per_skill_preregistration": {
+      "go-language-profile": "accept",
+      "go-test-profile": "accept",
+      "markdown-language-profile": "accept",
+      "pytest-test-profile": "reject",
+      "sqlite-database-profile": "accept"
+    },
+    "producer_dry_run": {
+      "aggregate_written": false,
+      "complete_records": 15,
+      "initial_trees_equal": 15,
+      "integrity_readback": "valid",
+      "non_trigger_cases_structural_only": 10,
+      "oracle_fixture_pairs": 15,
+      "positive_starting_subjects_rejected": 15,
+      "promotion_oracle_fixture_pairs": 25,
+      "provider_task_invocations": 0,
+      "records": 15,
+      "runtime_after": "valid",
+      "runtime_before": "valid",
+      "scenario12_13_15_provider_free_mechanics": "complete",
+      "sentinels_observed": 0,
+      "subject_pairs_unchanged": 15
+    },
+    "producer_focused_qualification": {
+      "contracts-final": 95,
+      "full_project_suite_run": false,
+      "preserved-final": 155,
+      "records-corrected": 8,
+      "sentinels_observed": 0
+    },
+    "source_checkpoint_accepted": true
+  },
+  "prior_corr4": {
+    "correction": "APG166E-CORR4",
+    "dispatcher_phase": "APG166I",
+    "disposition": "amend",
+    "finding_status": {
+      "A1": "open",
+      "A2": "resolved",
+      "A3": "resolved",
+      "F1": "preserved",
+      "F2": "preserved",
+      "F3": "preserved",
+      "F4": "preserved",
+      "F5": "preserved",
+      "F6": "preserved",
+      "F7": "preserved",
+      "F8": "preserved",
+      "F9": "preserved",
+      "N1": "resolved",
+      "NF1": "open"
+    },
+    "mechanical_package": "accept-for-manager-consideration-with-NF1-caveat",
+    "per_skill_preregistration": {
+      "go-language-profile": "accept",
+      "go-test-profile": "accept",
+      "markdown-language-profile": "accept",
+      "pytest-test-profile": "reject",
+      "sqlite-database-profile": "accept"
+    },
+    "producer_dry_run": {
+      "aggregate_written": false,
+      "complete_records": 15,
+      "hidden_execution_attestations_recomputed": 18,
+      "initial_trees_equal": 15,
+      "integrity_readback": "valid",
+      "non_trigger_cases_structural_only": 10,
+      "oracle_fixture_pairs": 15,
+      "positive_hidden_execution_attestations_qualified": 9,
+      "positive_starting_subjects_rejected": 15,
+      "promotion_oracle_fixture_pairs": 25,
+      "provider_task_invocations": 0,
+      "records": 15,
+      "runtime_after": "valid",
+      "runtime_before": "valid",
+      "scenario12_13_15_provider_free_mechanics": "complete",
+      "sentinels_observed": 0,
+      "subject_pairs_unchanged": 15
+    },
+    "producer_focused_qualification": {
+      "attestation-corrected": 44,
+      "contracts-corrected": 81,
+      "full_project_suite_run": false,
+      "overlapping_slices": true,
+      "preserved-corrected": 174,
+      "records": 8,
+      "sentinels_observed": 0
+    },
+    "source_checkpoint_accepted": true
+  },
+  "prior_correction": {
+    "correction": "APG166E-CORR1",
+    "dispatcher_phase": "APG166F",
+    "disposition": "amend",
+    "finding_status": {
+      "F1": "partial",
+      "F2": "partial",
+      "F3": "partial",
+      "F4": "resolved",
+      "F5": "partial",
+      "F6": "resolved",
+      "F7": "resolved",
+      "F8": "resolved",
+      "F9": "resolved"
+    },
+    "mechanical_package": "reject",
+    "per_skill_preregistration": {
+      "go-language-profile": "accept",
+      "go-test-profile": "reject",
+      "markdown-language-profile": "accept",
+      "pytest-test-profile": "reject",
+      "sqlite-database-profile": "reject"
+    },
+    "producer_dry_run": {
+      "aggregate_written": false,
+      "complete_records": 15,
+      "initial_trees_equal": 15,
+      "integrity_readback": "valid",
+      "non_trigger_cases_structural_only": 10,
+      "oracle_fixture_pairs": 15,
+      "positive_starting_subjects_rejected": 15,
+      "promotion_oracle_fixture_pairs": 25,
+      "provider_task_invocations": 0,
+      "records": 15,
+      "runtime_after": "valid",
+      "runtime_before": "valid",
+      "sentinels_observed": 0,
+      "subject_pairs_unchanged": 15
+    },
+    "producer_focused_qualification": {
+      "arm_oracle": 131,
+      "bounded_go_version_cleanup_probes": 10,
+      "full_project_suite_run": false,
+      "overlapping_slices": true,
+      "promotion_runtime_readiness": 80,
+      "registry_readiness_final": 39,
+      "semantic_promotion_correction": 64,
+      "version_cleanup_runtime_readiness": 38
+    },
+    "qualification_attempts": {
+      "corrected": "complete after private telemetry-off configuration and fresh manifest capture",
+      "initial": "failed at version-probe temporary cleanup after scenario and fixture execution"
+    }
+  },
+  "prior_review": {
+    "blocking_findings": [
+      "R1",
+      "R2",
+      "R3",
+      "R4"
+    ],
+    "dispatcher_phase": "APG166QR1",
+    "disposition": "amend",
+    "manager_disposition": "MANAGER-DISPOSITION.md",
+    "review_source": "APG166QR1-INDEPENDENT-REVIEW.md"
+  },
+  "producer_advisory_status": {
+    "A1": "implemented-and-qualified-pending-independent-review",
+    "A2": "preserved-by-focused-verification",
+    "A3": "preserved-by-focused-verification",
+    "CopyFile": "preserved-by-focused-verification",
+    "Fetch": "preserved-by-focused-verification"
+  },
+  "producer_finding_status": {
+    "B1": "resolved-single-internal-attempt-engine-production-path-executed-under-fake-transport",
+    "B2": "resolved-native-read-and-oracle-recomputed-from-raw-evidence",
+    "B3": "resolved-external-live-provenance-derived-from-ledger-and-transport-receipt",
+    "B4": "resolved-canonical-authority-digest-and-global-custody-ledger-enforced",
+    "B5": "resolved-complete-launch-contract-captured-and-inspected",
+    "B6": "resolved-real-runtime-manifest-actual-settings-sources-executable-evidence-captured",
+    "B7": "resolved-complete-raw-artifact-inventory-and-observer-readback-recomputed",
+    "B8": "see-final-exact-source-B8-receipt",
+    "F1": "preserved-by-focused-verification-pending-independent-review",
+    "F2": "preserved-by-focused-verification-pending-independent-review",
+    "F3": "preserved-by-focused-verification-pending-independent-review",
+    "F4": "preserved-by-focused-verification-pending-independent-review",
+    "F5": "preserved-by-focused-verification-pending-independent-review",
+    "F6": "preserved-by-focused-verification-pending-independent-review",
+    "F7": "preserved-by-focused-verification-pending-independent-review",
+    "F8": "preserved-by-focused-verification-pending-independent-review",
+    "F9": "preserved-by-focused-verification-pending-independent-review",
+    "N1": "preserved-by-focused-verification",
+    "NF1": "implemented-and-qualified-pending-independent-review",
+    "R1": "candidate-correction-pending-independent-review",
+    "R2": "candidate-correction-pending-independent-review",
+    "R3": "candidate-correction-pending-independent-review",
+    "R4": "resolved-handoff-and-documentation-updated-with-current-state-truth-next-tranche-apg166s-and-live-d1-reserved-for-apg166t"
+  },
+  "promotion_preregistration_accepted": false,
+  "promotion_preregistration_disposition": "pending-independent-review",
+  "provider_free_mechanical_candidate": null,
+  "provider_free_package_ready": false,
+  "provider_stream_cleanup": {
+    "apg166r1r2_receipt": "failed: 48 collected, 39 passed, 9 failed, 0 errors, exit 1; process-group cleanup unproven where /bin/ps is denied",
+    "authoritative_rerun": "manager-owned on the outer host (pending)",
+    "cleanup_proof": "unchanged; an unknown or unproven process group is not accepted"
+  },
+  "pushed_or_published": false,
+  "qualification_attempts": {
+    "apg166k_carry_forward": "complete on exact new source; 15/15 records; valid runtime before/after; zero sentinels",
+    "apg166n_carry_forward": "complete fresh 15/15 transaction (2ff6b621442fb93b56ddbed5e7a71d9f6763bd22dada3678fb1fb0f7b2285c93); 15 initial trees equal; 15 subject pairs unchanged; 25 promotion fixture pairs; valid runtime before/after; zero sentinels; zero provider invocations (retained diagnostic)",
+    "apg166o_carry_forward": "complete fresh 15/15 transaction (8686441b3d57c6ebb079da7b2a295d0ba06dd87fe6963e08b0c07c4476632016); 15 initial trees equal; 15 subject pairs unchanged; 25 promotion fixture pairs; valid runtime before/after (5865d840...); zero sentinels; zero provider invocations",
+    "apg166qr1_carry_forward": "Historical B8: 15/15 complete; 15 equal initial trees; 15 unchanged subject pairs; 25 promotion fixture pairs; zero provider invocations and sentinels.",
+    "apg166r1_interrupted": "One partial source delta; provider transport failure; no completed qualification, independent review or verified checkpoint.",
+    "apg166r1r1": "Recovery in place produced 184 passing unique focused node IDs; outer semantic session hit a usage limit while final B8 ran; the partial B8 (9 complete scenarios) is aborted diagnostic evidence only and was not resumed.",
+    "apg166r1r2": "Native environment digest classified diagnostic (Option B); SQLite inventory isolation added; focused, separate, static and SQLite receipts rerun. The required provider stream/cleanup receipt failed 39/9 and the selected reconciliation had all_selected_passed=false with same_candidate and required_suite_coverage true. Its mechanically green final B8 does not qualify the candidate because the prerequisite ordering condition was false. Independent review: amend.",
+    "apg166r1r3": "Source correction only: native launch-facts custody, node-set delta helper, reasonless xfail classification, covering reconciliation exit semantics and host-path portability. All APG166R1-R2 receipts are historical for this candidate; no provider-stream rerun or B8 counted from the semantic sandbox.",
+    "apg166r_carry_forward": "complete fresh 15/15 transaction (dry-run digest 990201aae5b3d9cc0a866db16e57510b6981b9bab2c9833c359fc46299d3ab02); 15 initial trees equal; 15 subject pairs unchanged; 25 promotion fixture pairs; valid runtime before/after (5865d840...); zero sentinels; zero provider invocations",
+    "final_corr5": "complete after source/test stabilization; separate writable runtime storage; no mutable runtime drift or drift recapture",
+    "initial_corr5": "diagnostic only: source-drift guard rejected candidate changes to source-owner and cleanup regression assertions; no aggregate qualification written"
+  },
+  "qualified_promotions": 0,
+  "recovered_checkpoint": {
+    "commit": "bcb80f48af057a8cb973aae4edc8e1c26939bed7",
+    "parent": "8ccab92eb8c724dc256b01bfbc1a2a0d7e41fd90",
+    "status": "historical_diagnostic_evidence",
+    "tree": "1f420962dbb408d58729cc6cf2808dce98d51aee"
+  },
+  "revise_close_policy": "repository-read-only; amendments require a new correction",
+  "scenario15_live": "contingent/unavailable",
+  "schema": "apg.h-provider-free-produced-checkpoint/v1",
+  "source_committed": false,
+  "sqlite_fixture_isolation": "complete physical fixture inventory before and after each vector; causal proof requires no baseline residue, identical canonical starting state and no canonical residue",
+  "tranche_planning": {
+    "current_tranche": "APG166R1-R3 source correction; independent source review pending; host qualification and fresh B8 pending",
+    "live_d1_reservation": "APG166T (live D1 session qualification)",
+    "next_tranche": "APG166S (workers/config)"
+  },
+  "unresolved": [
+    "Dispatcher-owned independent source review of APG166R1-R3 pending",
+    "Manager-owned host qualification pending: all ten suites in one covering reconciliation, then static and SQLite receipts",
+    "Fresh final B8 pending after passing covering host qualification",
+    "Prior-to-current focused node-set relation pending node_set_delta at the host gate",
+    "All five promotion preregistrations pending fresh independent review",
+    "Next tranche APG166S (workers/config); live D1 reserved for APG166T; APG166S readiness not claimed",
+    "Scenario 15 live qualification contingent",
+    "Inherited repository-wide file-length and inventory findings remain outside correction scope",
+    "V0130-I unauthorized"
+  ],
+  "v0130_i_authorized": false
+}

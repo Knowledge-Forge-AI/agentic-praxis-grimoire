@@ -324,3 +324,42 @@ def test_static_presets_equivalence_all_ten_retained_modes() -> None:
             "codex_only",
             root=repo_root,
         )
+
+
+def test_static_presets_usable_without_dynamic_catalog(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    repo_root = Path(__file__).resolve().parents[3]
+    # Point load_capabilities to an empty root where capabilities.toml is missing
+    empty_root = tmp_path / "empty_repo"
+    empty_root.mkdir()
+    binding = ActorBinding.create("binding_work", (ROLE_PRODUCER,))
+    # Static mode must succeed even without capabilities.toml
+    route = resolve_static_preset_route(
+        binding,
+        "implementation_testing",
+        "normal",
+        root=repo_root,
+    )
+    assert route.endpoint_alias == "antigravity-gemini-high"
+    assert len(route.capabilities) > 0
+
+
+def test_dynamic_mode_fails_closed_when_catalog_missing(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    from agent_phase.request import PhaseRequestV2
+    from agent_phase.resolution_v2 import resolve_v2
+
+    repo_root = Path(__file__).resolve().parents[3]
+    empty_root = tmp_path / "empty_repo"
+    empty_root.mkdir()
+
+    req = PhaseRequestV2(
+        schema="agent-phase-request-v2",
+        phase_type="implementation_testing",
+        prompt="test prompt",
+    )
+    # When capabilities catalog is empty, dynamic resolution must fail closed
+    from agent_phase.roster import load_roster
+    from dataclasses import replace
+
+    with pytest.raises(RoutingResolutionError, match="capabilities are missing or empty"):
+        resolve_v2(req, empty_root, execution_mode="dynamic",
+                   roster=replace(load_roster(repo_root), capabilities_catalog={}))

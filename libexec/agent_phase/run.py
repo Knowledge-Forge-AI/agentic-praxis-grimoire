@@ -13,6 +13,7 @@ from typing import Any, Callable
 
 
 RUN_ROOT_ENVIRONMENT = "AGENT_PHASE_RUN_ROOT"
+APGR_RUN_ROOT_ENVIRONMENT = "APGR_RUN_ROOT"
 TELEMETRY_FILE = "malskanner-shadow.jsonl"
 LABEL_FILE = "malskanner-shadow.labels.jsonl"
 
@@ -39,12 +40,12 @@ class RunPathError(ValueError):
         self.code = code
 
 
-def default_root() -> Path:
-    override = os.environ.get(RUN_ROOT_ENVIRONMENT)
-    if override:
-        return Path(override)
-    home = Path(os.environ.get("HOME", "~")).expanduser()
-    return home / "Documents/agent/outbox"
+def default_root(
+    apgr_home: Path | str | None = None,
+    project_root: Path | str | None = None,
+) -> Path:
+    from .config_routing import resolve_outbox_root
+    return resolve_outbox_root(project_root=project_root, apgr_home=apgr_home)
 
 
 def v2_leaf(phase_id: str, timestamp: str) -> str:

@@ -59,8 +59,8 @@ const (
 	V010BrowserUIAdmittedSkillCount = 42
 	// V010ToolchainAdmittedSkillCount is the expected skill count under v0.10-toolchain (44 leaves).
 	V010ToolchainAdmittedSkillCount = 44
-	// V010BrowserRuntimeAdmittedSkillCount is the expected skill count under v0.10-browser-runtime (45 leaves).
-	V010BrowserRuntimeAdmittedSkillCount = 45
+	// V010BrowserRuntimeAdmittedSkillCount is the expected skill count under v0.10-browser-runtime (46 leaves).
+	V010BrowserRuntimeAdmittedSkillCount = 46
 
 	// FrozenSVGSkillDescription records the byte-identical description frozen for svg-language-profile under v0.10-browser-ui, v0.10-toolchain, and v0.10-browser-runtime.
 	FrozenSVGSkillDescription = "Use when SVG authoring depends on namespaces, viewBox, paths, transforms, paint, reuse, clipping, masking, text, naming, resources, or serialization; not for general CSS, JSX, React, browser runtime, accessibility audits, or test automation."
@@ -76,6 +76,9 @@ const (
 
 	// FrozenNPMSkillDescription records the byte-identical description frozen for npm-package-manager-profile under v0.10-browser-runtime.
 	FrozenNPMSkillDescription = "Use when package management decisions depend on npm CLI contracts, package.json and lockfile v3 integrity, install versus ci execution, peer dependencies and overrides, workspaces, script lifecycle and ignore-scripts, local pack tarballs, caching, or publication provenance; not for Node host runtime or bundler transforms."
+
+	// FrozenRTKCommandProxySkillDescription records the byte-identical description for rtk-command-proxy under v0.10-browser-runtime.
+	FrozenRTKCommandProxySkillDescription = "Use when Codex or Claude Code needs to run, choose, verify, troubleshoot, or explain shell commands through RTK, including ordinary command execution, raw-output fallbacks, RTK meta commands, installation checks, name collisions, or Claude PreToolUse rewrite behavior."
 )
 
 // V010EligibleCandidates lists all six candidate profiles eligible under the v0.10 discovery policy.
@@ -104,7 +107,7 @@ var V010ToolchainAdmittedCandidates = []string{
 	"npm-package-manager-profile",
 }
 
-// V010BrowserRuntimeAdmittedCandidates lists the six candidate profiles authorized for admission under v0.10-browser-runtime (45 leaves).
+// V010BrowserRuntimeAdmittedCandidates lists the seven candidate profiles authorized for admission under v0.10-browser-runtime (46 leaves).
 var V010BrowserRuntimeAdmittedCandidates = []string{
 	"svg-language-profile",
 	"playwright-test-profile",
@@ -112,6 +115,7 @@ var V010BrowserRuntimeAdmittedCandidates = []string{
 	"vite-build-profile",
 	"npm-package-manager-profile",
 	"browser-runtime-profile",
+	"rtk-command-proxy",
 }
 
 // Documented update requirement:
@@ -469,7 +473,7 @@ func ValidateDiscoveryPolicy(policyVersion string, skillList []SkillMetadata) er
 		return nil
 	}
 
-	// policyVersion == DiscoveryPolicyVersionV010BrowserRuntime (45 leaves)
+	// policyVersion == DiscoveryPolicyVersionV010BrowserRuntime (46 leaves)
 	requiredCandidates := map[string]bool{
 		"svg-language-profile":        true,
 		"playwright-test-profile":     true,
@@ -477,6 +481,7 @@ func ValidateDiscoveryPolicy(policyVersion string, skillList []SkillMetadata) er
 		"vite-build-profile":          true,
 		"npm-package-manager-profile": true,
 		"browser-runtime-profile":     true,
+		"rtk-command-proxy":           true,
 	}
 
 	for id := range byID {
@@ -520,6 +525,10 @@ func ValidateDiscoveryPolicy(policyVersion string, skillList []SkillMetadata) er
 			}
 		case "npm-package-manager-profile":
 			if cand.Description != FrozenNPMSkillDescription {
+				return fmt.Errorf("%w: candidate %q description mutated (reservation theft)", ErrCorpusMismatch, cand.ID)
+			}
+		case "rtk-command-proxy":
+			if cand.Description != FrozenRTKCommandProxySkillDescription {
 				return fmt.Errorf("%w: candidate %q description mutated (reservation theft)", ErrCorpusMismatch, cand.ID)
 			}
 		}

@@ -220,6 +220,7 @@ class APGRoadmapContractUnitTests(unittest.TestCase):
         self.assertEqual(
             maturity_props["disposition_status"]["enum"],
             [
+                "PROVISIONAL_ADMISSION",
                 "EXISTING_STABLE",
                 "PENDING_V0110_B",
                 "STABLE",

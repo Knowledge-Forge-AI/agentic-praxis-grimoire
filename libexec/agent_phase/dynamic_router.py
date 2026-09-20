@@ -9,7 +9,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 import time
-from typing import Any, Mapping, Sequence
+from typing import Any, Callable, Mapping, Sequence
 
 from .capabilities import EndpointCapabilities, load_capabilities
 from .roster import RosterSnapshot, load_roster
@@ -21,6 +21,7 @@ from .semantic_roles import (
     ROLE_REVISER,
     ROLE_WORK_REVIEWER,
 )
+from .worker_capability import MANDATORY_WORKER_MODES
 
 
 class RoutingResolutionError(RuntimeError):
@@ -156,31 +157,100 @@ def resolve_dynamic_route(
     operational_observations: Sequence[OperationalObservation] = (),
     prior_resolutions: Mapping[str, ResolvedActorRoute] | None = None,
     now: float | None = None,
+    worker_qualifier: Callable[..., Any] | None = None,
+    execution_mode: str = "normal",
+    root: Path | None = None,
+    bundle: Any = None,
+    snapshot: Any = None,
 ) -> ResolvedActorRoute:
-    """Resolve an actor binding turn dynamically with fail-closed capability checking."""
-    prior = prior_resolutions or {}
-    candidates: list[EndpointCapabilities] = list(capabilities_catalog.values())
+    effective_bundle = snapshot if snapshot is not None else bundle
+    from . import runtime_models
+    from contextlib import nullcontext
+    from .worker_capability import DYNAMIC_MODE, MANDATORY_WORKER_MODES
 
-    # 1. Capability Eligibility (Fails Closed)
-    capable: list[EndpointCapabilities] = []
-    rejections: dict[str, str] = {}
-    for ep in candidates:
-        if not ep.satisfies(
-            binding.required_capabilities,
-            requires_mutating=binding.is_mutating,
-        ):
-            rejections[ep.endpoint_alias] = (
-                f"missing required capabilities {sorted(binding.required_capabilities - ep.capabilities)} "
-                f"or posture conflict (ep: {ep.posture}, binding mutating: {binding.is_mutating})"
-            )
-            continue
-        capable.append(ep)
+    capture_ctx = runtime_models.captured(effective_bundle) if effective_bundle is not None else nullcontext()
+    with capture_ctx:
+        prior = prior_resolutions or {}
+        candidates: list[EndpointCapabilities] = list(capabilities_catalog.values())
 
-    if not capable:
-        raise NoRouteAvailableError(
-            f"no capability-eligible routes for binding {binding.binding_id!r} "
-            f"with required {sorted(binding.required_capabilities)}. Rejections: {rejections}"
+        workers_required_for_turn = (
+            execution_mode == DYNAMIC_MODE
+            or execution_mode in MANDATORY_WORKER_MODES
+            or "subagent_workers" in binding.required_capabilities
         )
+
+        # 1. Capability Eligibility (Fails Closed)
+        capable: list[EndpointCapabilities] = []
+        rejections: dict[str, str] = {}
+        for ep in candidates:
+            # Check base capabilities and posture
+            base_required = (
+                binding.required_capabilities - {"subagent_workers"}
+                if workers_required_for_turn
+                else binding.required_capabilities
+            )
+            if not ep.satisfies(
+                base_required,
+                requires_mutating=binding.is_mutating,
+            ):
+                rejections[ep.endpoint_alias] = (
+                    f"missing required capabilities {sorted(binding.required_capabilities - ep.capabilities)} "
+                    f"or posture conflict (ep: {ep.posture}, binding mutating: {binding.is_mutating})"
+                )
+                continue
+
+            if workers_required_for_turn:
+                if worker_qualifier is not None:
+                    try:
+                        qual_res = worker_qualifier(ep)
+                    except TypeError:
+                        qual_res = worker_qualifier(
+                            ep,
+                            root=root,
+                            execution_mode=execution_mode,
+                            bundle=effective_bundle,
+                            snapshot=effective_bundle,
+                        )
+                else:
+                    from .worker_capability import qualify_worker_eligibility
+                    qual_res = qualify_worker_eligibility(
+                        ep,
+                        root=root,
+                        execution_mode=execution_mode,
+                        bundle=effective_bundle,
+                        snapshot=effective_bundle,
+                    )
+
+                is_avail = False
+                reason = "worker_unavailable"
+                if hasattr(qual_res, "eligible"):
+                    is_avail = bool(qual_res.eligible)
+                    reason = qual_res.reason or "worker_unavailable"
+                elif isinstance(qual_res, tuple) and len(qual_res) >= 2:
+                    is_avail = bool(qual_res[0])
+                    reason = qual_res[1] or "worker_unavailable"
+                elif isinstance(qual_res, dict):
+                    is_avail = bool(qual_res.get("available") and qual_res.get("allowed"))
+                    reason = qual_res.get("reason") or "worker_unavailable"
+                elif isinstance(qual_res, bool):
+                    is_avail = qual_res
+                    reason = "worker_unavailable" if not is_avail else ""
+
+                if not is_avail:
+                    rejection_msg = (
+                        reason if reason.startswith("worker_unavailable")
+                        else f"worker_unavailable: {reason}"
+                    )
+                    rejections[ep.endpoint_alias] = rejection_msg
+                    continue
+
+            capable.append(ep)
+
+        if not capable:
+            raise NoRouteAvailableError(
+                f"no capability-eligible routes for binding {binding.binding_id!r} "
+                f"with required {sorted(binding.required_capabilities)}. Rejections: {rejections}"
+            )
 
     active_observations = [obs for obs in operational_observations if obs.is_active_at(now)]
     used_obs_ids: list[str] = []
@@ -322,12 +392,17 @@ def resolve_dynamic_route(
     winner = scored[0][4]
     rationale = f"selected with score {-scored[0][0]} for {binding.binding_id} ({phase_type})"
 
+    route_caps = (
+        frozenset(winner.capabilities | {"subagent_workers"})
+        if workers_required_for_turn
+        else winner.capabilities
+    )
     return ResolvedActorRoute(
         binding_id=binding.binding_id,
         provider=winner.provider,
         profile=winner.profile,
         endpoint_alias=winner.endpoint_alias,
-        capabilities=winner.capabilities,
+        capabilities=route_caps,
         selection_rationale=rationale,
         roles=tuple(binding.roles),
         observation_ids=tuple(sorted(set(used_obs_ids))),
@@ -342,10 +417,13 @@ def resolve_static_preset_route(
     execution_mode: str,
     roster: RosterSnapshot | None = None,
     root: Path | None = None,
+    *,
+    capabilities: Mapping[str, EndpointCapabilities] | None = None,
+    apgr_home: Path | str | None = None,
 ) -> ResolvedActorRoute:
     """Resolve a binding turn deterministically from the V1 static route tables."""
     repo_root = root or Path.cwd()
-    snap = roster or load_roster(repo_root)
+    snap = roster or load_roster(repo_root, apgr_home=apgr_home)
     # Map standard binding to V1 routing slot
     slot_map = {
         "binding_plan": "plan",
@@ -367,10 +445,15 @@ def resolve_static_preset_route(
     if not alias or alias not in snap.endpoints:
         raise RoutingResolutionError(f"no endpoint alias for slot {slot!r} in static mode {execution_mode!r}")
     endpoint = snap.endpoints[alias]
-    capabilities = load_capabilities(repo_root)
-    ep_caps = capabilities.get(alias)
+    caps_catalog = (
+        capabilities
+        if capabilities is not None
+        else load_capabilities(repo_root, apgr_home=apgr_home, roster=snap)
+    )
+    ep_caps = caps_catalog.get(alias)
     if ep_caps is None:
-        raise RoutingResolutionError(f"endpoint {alias!r} lacks capability declaration in capabilities catalog")
+        from .capabilities import _default_endpoint_capabilities
+        ep_caps = _default_endpoint_capabilities(alias, endpoint.provider, endpoint.profile)
     caps = ep_caps.capabilities
 
     return ResolvedActorRoute(

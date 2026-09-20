@@ -1,0 +1,103 @@
+{
+  "scenario_id": "scenario-11",
+  "name": "Withheld Skill Late Acquisition via Stdio MCP Adapter",
+  "subset": "acceptance",
+  "cohort": "savings_eligible_cohort",
+  "phase": "APG159A",
+  "task_input": {
+    "instruction": "Review Go client implementation in pkg/api/client.go and evaluate test readiness. Withheld skill apgr:go-test-profile must be acquired in-band via MCP tool call.",
+    "task_authority": "read_only",
+    "mutation_scope": []
+  },
+  "provider": "claude",
+  "role_binding": {
+    "binding_id": "binding-reviewer-03",
+    "roles": [
+      "Work Review"
+    ],
+    "allowed_tools": [
+      "view_file",
+      "skill_search",
+      "skill_acquire",
+      "context_explain"
+    ]
+  },
+  "repository_evidence": {
+    "files": [
+      "pkg/api/client.go"
+    ],
+    "primary_language": "go",
+    "dependency_facts": {}
+  },
+  "deliberately_withheld_skill": {
+    "id": "apgr:go-test-profile",
+    "canonical_path": "skills/go-test-profile/SKILL.md",
+    "whole_bytes": 17821,
+    "body_bytes": 17487,
+    "body_sha256": "b675e94daabf185896bba5cf740891215e74741b1088ba2fa74cb9d5576c6e61",
+    "source_kind": "canonical_measured"
+  },
+  "acquisition": {
+    "channel": "mcp",
+    "tool": "skill_acquire",
+    "arguments": {
+      "id": "apgr:go-test-profile"
+    }
+  },
+  "mandatory_instructions": {
+    "provider_file": "claude/CLAUDE.md",
+    "provider_instruction_bytes": 11071,
+    "mandatory_doctrine_bytes": 2500,
+    "mcp_protocol_version": "2025-11-25"
+  },
+  "budget": {
+    "scope": "apgr_controlled_initial_bytes",
+    "max_initial_controlled_bytes": 35000,
+    "allocated_skill_body_bytes": 20000
+  },
+  "expected_outcome": {
+    "acquisition_status": "success",
+    "body_returned_in_tool_result": true,
+    "body_sha256_matches_canonical": true,
+    "event_emitted": "<run_dir>/acquisitions/events-001.jsonl",
+    "worktree_drift_observed": false,
+    "index_drift_observed": false,
+    "head_drift_observed": false,
+    "quality_oracle": {
+      "assertions": "reviewer receives full body in MCP result payload without shell access; review findings reference test profile standards; zero git authority drift"
+    }
+  },
+  "status": "frozen_corrected",
+  "value_sources": {
+    "mandatory_instructions.provider_instruction_bytes": {
+      "source": "measured",
+      "basis": "wc -c claude/CLAUDE.md at the APG159A workspace tree"
+    },
+    "mandatory_instructions.mandatory_doctrine_bytes": {
+      "source": "estimate",
+      "basis": "Planning placeholder. The non-negotiable doctrine slice is not yet a separately measurable artifact; V0130-F must replace this with a measured value before any savings computation uses it."
+    },
+    "deliberately_withheld_skill.whole_bytes": {
+      "source": "measured",
+      "basis": "python3 measurement over skills/go-test-profile/SKILL.md"
+    },
+    "deliberately_withheld_skill.body_bytes": {
+      "source": "measured",
+      "basis": "python3 measurement over skills/go-test-profile/SKILL.md"
+    },
+    "budget.max_initial_controlled_bytes": {
+      "source": "declared",
+      "basis": "Frozen scenario budget parameter chosen by this correction revision."
+    },
+    "budget.allocated_skill_body_bytes": {
+      "source": "declared",
+      "basis": "Frozen scenario budget parameter chosen by this correction revision."
+    }
+  },
+  "value_source_vocabulary": "measured | synthetic | estimate | declared | unavailable (see context-eval-metrics-and-oracles.json)",
+  "correction_revision": {
+    "revision": "APG159A-CORR1",
+    "supersedes": "APG159 numerical freeze (retained in Git history at Exit 00205)",
+    "nature": "pre-implementation correction, not tuning against a held-out set"
+  }
+}

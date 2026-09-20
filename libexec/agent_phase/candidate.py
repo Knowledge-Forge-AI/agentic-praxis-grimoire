@@ -147,10 +147,17 @@ def tree_identity(cwd: Path) -> dict[str, object]:
             raise CandidateError(
                 "git index contains unmerged paths; candidate capture is unsafe"
             )
-        # Refresh tracked entries separately: explicit add -A pathspecs can
-        # reject tracked fixtures beneath ignored directories. Update only the
-        # throwaway index, including tracked edits, deletions, and mode changes.
-        _git(cwd, ["add", "-u", "--", ":/"], environment)
+        cached_raw = _git(
+            cwd,
+            ["ls-files", "--cached", "-z", "--", ":/"],
+            environment,
+            preserve_output=True,
+        )
+        if any(cached_raw.split("\0")):
+            # Refresh tracked entries separately: explicit add -A pathspecs can
+            # reject tracked fixtures beneath ignored directories. Update only the
+            # throwaway index, including tracked edits, deletions, and mode changes.
+            _git(cwd, ["add", "-u", "--", ":/"], environment)
         # Discover only untracked product without traversing built-in cache
         # roots. Never force-add or hash ignored/metadata files just to remove
         # them afterward; tracked metadata-looking paths were updated above.

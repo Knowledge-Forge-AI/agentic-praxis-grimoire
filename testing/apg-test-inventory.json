@@ -37,6 +37,33 @@
       ]
     },
     {
+      "path": "libexec/apg_nix_distribution.py",
+      "rationale": "maintained executable Python source",
+      "suites": [
+        "unit",
+        "integration",
+        "combined"
+      ]
+    },
+    {
+      "path": "libexec/apg_nix_qualification.py",
+      "rationale": "maintained executable Python source",
+      "suites": [
+        "unit",
+        "integration",
+        "combined"
+      ]
+    },
+    {
+      "path": "libexec/apg_nix_smoke.py",
+      "rationale": "maintained executable Python source",
+      "suites": [
+        "unit",
+        "integration",
+        "combined"
+      ]
+    },
+    {
       "path": "libexec/apg_npm_distribution.py",
       "rationale": "maintained executable Python source",
       "suites": [
@@ -83,6 +110,15 @@
     },
     {
       "path": "libexec/apg_public_release.py",
+      "rationale": "maintained executable Python source",
+      "suites": [
+        "unit",
+        "integration",
+        "combined"
+      ]
+    },
+    {
+      "path": "libexec/apg_public_release_v013.py",
       "rationale": "maintained executable Python source",
       "suites": [
         "unit",
@@ -403,6 +439,14 @@
       "rationale": "migrated single-phase dispatcher runtime"
     },
     {
+      "path": "libexec/agent_phase/acquisition_launch.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/acquisition_records.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
       "path": "libexec/agent_phase/adoption.py",
       "rationale": "migrated single-phase dispatcher runtime"
     },
@@ -435,6 +479,22 @@
       "rationale": "migrated single-phase dispatcher runtime"
     },
     {
+      "path": "libexec/agent_phase/bundle.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/bundle_cli.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/bundle_io.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/canary_budget.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
       "path": "libexec/agent_phase/candidate.py",
       "rationale": "migrated single-phase dispatcher runtime"
     },
@@ -451,11 +511,55 @@
       "rationale": "migrated single-phase dispatcher runtime"
     },
     {
+      "path": "libexec/agent_phase/claude_acquisition_argv.py",
+      "rationale": "internal acquisition admission grammar; dedicated dispatcher qualification"
+    },
+    {
+      "path": "libexec/agent_phase/claude_acquisition_custody.py",
+      "rationale": "internal acquisition before/after custody; dedicated dispatcher qualification"
+    },
+    {
+      "path": "libexec/agent_phase/claude_acquisition_handoff.py",
+      "rationale": "evaluation-only scoped Claude acquisition handoff; dedicated dispatcher qualification"
+    },
+    {
+      "path": "libexec/agent_phase/claude_context_acquisition.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/claude_instruction_handoff.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/claude_read_observer.py",
+      "rationale": "evaluation-only Claude native Read stream observation; dedicated dispatcher qualification"
+    },
+    {
+      "path": "libexec/agent_phase/claude_recovery_authority.py",
+      "rationale": "exact run-owned recovery directory authority; dedicated dispatcher qualification"
+    },
+    {
       "path": "libexec/agent_phase/cli.py",
       "rationale": "migrated single-phase dispatcher runtime"
     },
     {
       "path": "libexec/agent_phase/config_routing.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/context_adapter.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/context_config.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/context_inputs.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/context_route.py",
       "rationale": "migrated single-phase dispatcher runtime"
     },
     {
@@ -511,6 +615,14 @@
       "rationale": "migrated single-phase dispatcher runtime"
     },
     {
+      "path": "libexec/agent_phase/instruction_projection.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/interrupted_recovery.py",
+      "rationale": "interrupted-run resume recovery and ownership; dedicated dispatcher qualification"
+    },
+    {
       "path": "libexec/agent_phase/jsonc.py",
       "rationale": "migrated single-phase dispatcher runtime"
     },
@@ -536,6 +648,26 @@
     },
     {
       "path": "libexec/agent_phase/native_git_cli.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/observations.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/observations_cli.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/observations_discovery.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/observations_explain.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/observations_list.py",
       "rationale": "migrated single-phase dispatcher runtime"
     },
     {
@@ -583,6 +715,14 @@
       "rationale": "migrated single-phase dispatcher runtime"
     },
     {
+      "path": "libexec/agent_phase/provider_environment.py",
+      "rationale": "provider environment and activity descriptor ownership; dedicated dispatcher qualification"
+    },
+    {
+      "path": "libexec/agent_phase/provider_launch.py",
+      "rationale": "durable provider-launch evidence and pre-exec launch gate; dedicated dispatcher qualification"
+    },
+    {
       "path": "libexec/agent_phase/publication.py",
       "rationale": "migrated single-phase dispatcher runtime"
     },
@@ -627,7 +767,15 @@
       "rationale": "migrated single-phase dispatcher runtime"
     },
     {
+      "path": "libexec/agent_phase/retained_terminal_repair.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
       "path": "libexec/agent_phase/review_binding.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/review_drift.py",
       "rationale": "migrated single-phase dispatcher runtime"
     },
     {
@@ -659,7 +807,19 @@
       "rationale": "migrated single-phase dispatcher runtime"
     },
     {
+      "path": "libexec/agent_phase/runtime_identity.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/runtime_models.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
       "path": "libexec/agent_phase/scanner.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/schema_manifest.py",
       "rationale": "migrated single-phase dispatcher runtime"
     },
     {
@@ -669,6 +829,10 @@
     {
       "path": "libexec/agent_phase/stage_delta.py",
       "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/transmission.py",
+      "rationale": "controlled provider-launch observation owner"
     },
     {
       "path": "libexec/agent_phase/transport.py",
@@ -699,11 +863,23 @@
       "rationale": "migrated single-phase dispatcher runtime"
     },
     {
+      "path": "libexec/agent_phase/worker_canary.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
       "path": "libexec/agent_phase/worker_capability.py",
       "rationale": "migrated single-phase dispatcher runtime"
     },
     {
       "path": "libexec/agent_phase/worker_custody.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/worker_evidence.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/worker_launch.py",
       "rationale": "migrated single-phase dispatcher runtime"
     },
     {
@@ -721,6 +897,70 @@
     {
       "path": "libexec/antigravity_terminal_evidence.py",
       "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/apgr_workers/__init__.py",
+      "rationale": "migrated APGR worker facility runtime; dedicated dispatcher qualification"
+    },
+    {
+      "path": "libexec/apgr_workers/adapter.py",
+      "rationale": "migrated APGR worker facility runtime; dedicated dispatcher qualification"
+    },
+    {
+      "path": "libexec/apgr_workers/claude_parent.py",
+      "rationale": "migrated APGR worker facility runtime; dedicated dispatcher qualification"
+    },
+    {
+      "path": "libexec/apgr_workers/cli.py",
+      "rationale": "migrated APGR worker facility runtime; dedicated dispatcher qualification"
+    },
+    {
+      "path": "libexec/apgr_workers/codex_external.py",
+      "rationale": "migrated APGR worker facility runtime; dedicated dispatcher qualification"
+    },
+    {
+      "path": "libexec/apgr_workers/facade_context.py",
+      "rationale": "migrated APGR worker facility runtime; dedicated dispatcher qualification"
+    },
+    {
+      "path": "libexec/apgr_workers/gemini_parent.py",
+      "rationale": "migrated APGR worker facility runtime; dedicated dispatcher qualification"
+    },
+    {
+      "path": "libexec/apgr_workers/inspection.py",
+      "rationale": "migrated APGR worker facility runtime; dedicated dispatcher qualification"
+    },
+    {
+      "path": "libexec/apgr_workers/ledger.py",
+      "rationale": "migrated APGR worker facility runtime; dedicated dispatcher qualification"
+    },
+    {
+      "path": "libexec/apgr_workers/mcp.py",
+      "rationale": "migrated APGR worker facility runtime; dedicated dispatcher qualification"
+    },
+    {
+      "path": "libexec/apgr_workers/model_observation.py",
+      "rationale": "migrated APGR worker facility runtime; dedicated dispatcher qualification"
+    },
+    {
+      "path": "libexec/apgr_workers/native_launch.py",
+      "rationale": "migrated APGR worker facility runtime; dedicated dispatcher qualification"
+    },
+    {
+      "path": "libexec/apgr_workers/parent_custody.py",
+      "rationale": "migrated APGR worker facility runtime; dedicated dispatcher qualification"
+    },
+    {
+      "path": "libexec/apgr_workers/policy.py",
+      "rationale": "migrated APGR worker facility runtime; dedicated dispatcher qualification"
+    },
+    {
+      "path": "libexec/apgr_workers/settlement.py",
+      "rationale": "APGR worker settlement for interrupted-run recovery; dedicated dispatcher qualification"
+    },
+    {
+      "path": "libexec/apgr_workers/supervisor.py",
+      "rationale": "migrated APGR worker facility runtime; dedicated dispatcher qualification"
     },
     {
       "path": "libexec/claude_live_renderer.py",
@@ -757,6 +997,62 @@
     {
       "path": "libexec/controller_generation_store.py",
       "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "src/agentic_praxis_grimoire/acquisition.py",
+      "rationale": "v0.13 dispatcher-integrated package module; dedicated dispatcher qualification"
+    },
+    {
+      "path": "src/agentic_praxis_grimoire/home.py",
+      "rationale": "v0.13 dispatcher-integrated package module; dedicated dispatcher qualification"
+    },
+    {
+      "path": "src/agentic_praxis_grimoire/rtk.py",
+      "rationale": "v0.13 dispatcher-integrated package module; dedicated dispatcher qualification"
+    },
+    {
+      "path": "src/agentic_praxis_grimoire/skill_catalog.py",
+      "rationale": "v0.13 dispatcher-integrated package module; dedicated dispatcher qualification"
+    },
+    {
+      "path": "libexec/agent_phase/worker_policy_schema.py",
+      "rationale": "Dispatcher-owned roster, independent worker capacity, and native/foreign leaf transport contract."
+    },
+    {
+      "path": "libexec/apgr_workers/claude_native.py",
+      "rationale": "Dispatcher-owned roster, independent worker capacity, and native/foreign leaf transport contract."
+    },
+    {
+      "path": "libexec/apgr_workers/claude_external.py",
+      "rationale": "Dispatcher-owned roster, independent worker capacity, and native/foreign leaf transport contract."
+    },
+    {
+      "path": "libexec/apgr_workers/claude_events.py",
+      "rationale": "Dispatcher-owned roster, independent worker capacity, and native/foreign leaf transport contract."
+    },
+    {
+      "path": "libexec/apgr_workers/leaf_assignment.py",
+      "rationale": "Dispatcher-owned roster, independent worker capacity, and native/foreign leaf transport contract."
+    },
+    {
+      "path": "libexec/apgr_workers/native_capacity.py",
+      "rationale": "Dispatcher-owned roster, independent worker capacity, and native/foreign leaf transport contract."
+    },
+    {
+      "path": "libexec/agent_phase/canary_native_evidence.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/canary_qualification.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/rtk_fallback.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/stage_prompts.py",
+      "rationale": "migrated single-phase dispatcher runtime"
     }
   ],
   "excluded_python_launchers": [
@@ -767,6 +1063,14 @@
     {
       "path": "bin/agent-phase-archive",
       "reason": "single-phase run archive packaging entrypoint"
+    },
+    {
+      "path": "bin/agent-worker",
+      "reason": "APGR worker facility command entrypoint"
+    },
+    {
+      "path": "bin/agent-worker-mcp",
+      "reason": "APGR worker facility stdio MCP facade entrypoint"
     },
     {
       "path": "bin/antigravity-profile",
@@ -821,6 +1125,10 @@
       "reason": "thin import and exit adapter"
     },
     {
+      "path": "bin/apg-qualify-nix",
+      "reason": "thin import and exit adapter"
+    },
+    {
       "path": "bin/apg-test",
       "reason": "thin import and exit adapter"
     },
@@ -835,6 +1143,14 @@
     {
       "path": "bin/apgr",
       "reason": "thin import and exit adapter"
+    },
+    {
+      "path": "bin/apgr-dispatcher-bundle",
+      "reason": "dispatcher bundle projection entrypoint"
+    },
+    {
+      "path": "bin/apgr-worker-canary",
+      "reason": "APGR worker facility canary entrypoint"
     },
     {
       "path": "bin/append-operational-report",
@@ -1055,6 +1371,11 @@
       "suite": "integration"
     },
     {
+      "owner": "src/agentic_praxis_grimoire/skill_catalog.py",
+      "path": "src/test/int/python/agentic-praxis-grimoire/src/agentic_praxis_grimoire/skill_catalog.int.test.py",
+      "suite": "integration"
+    },
+    {
       "owner": "src/test/support/apg123_browser_ui.py",
       "path": "src/test/int/python/agentic-praxis-grimoire/src/test/support/apg123_browser_ui.int.test.py",
       "suite": "integration"
@@ -1105,6 +1426,11 @@
       "suite": "unit"
     },
     {
+      "owner": "flake.nix",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/flake.nix.unit.test.py",
+      "suite": "unit"
+    },
+    {
       "owner": "libexec/apg_distribution_candidate.py",
       "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_distribution_candidate.unit.test.py",
       "suite": "unit"
@@ -1112,6 +1438,36 @@
     {
       "owner": "libexec/apg_go_build.py",
       "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_go_build.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "libexec/apg_nix_distribution.py",
+      "path": "src/test/int/python/agentic-praxis-grimoire/libexec/apg_nix_distribution.int.test.py",
+      "suite": "integration"
+    },
+    {
+      "owner": "libexec/apg_nix_distribution.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_nix_distribution.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "libexec/apg_nix_qualification.py",
+      "path": "src/test/int/python/agentic-praxis-grimoire/libexec/apg_nix_qualification.int.test.py",
+      "suite": "integration"
+    },
+    {
+      "owner": "libexec/apg_nix_qualification.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_nix_qualification.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "libexec/apg_nix_smoke.py",
+      "path": "src/test/int/python/agentic-praxis-grimoire/libexec/apg_nix_smoke.int.test.py",
+      "suite": "integration"
+    },
+    {
+      "owner": "libexec/apg_nix_smoke.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_nix_smoke.unit.test.py",
       "suite": "unit"
     },
     {
@@ -1142,6 +1498,11 @@
     {
       "owner": "libexec/apg_public_release.py",
       "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_public_release.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "libexec/apg_public_release_v013.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_public_release_v013.unit.test.py",
       "suite": "unit"
     },
     {
@@ -1817,6 +2178,11 @@
     {
       "owner": "testing/release/check_release_matrix.py",
       "path": "src/test/unit/python/agentic-praxis-grimoire/testing/release/check_release_matrix.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "tools/ci/python_type_check.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/tools/ci/python_type_check.unit.test.py",
       "suite": "unit"
     }
   ]

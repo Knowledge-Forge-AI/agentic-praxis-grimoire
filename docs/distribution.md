@@ -1,10 +1,13 @@
 # APG Distribution
 
-This documentation covers the **unreleased v0.12.0 candidate**. Preceding releases
-(v0.11.0, v0.10.0, and earlier) remain frozen. Active planning and
-implementation are tracked in the [v0.12 roadmap](v0-12-roadmap.md).
+This documentation covers the **unreleased v0.13.0 candidate**. v0.12.0 is the
+latest published release; preceding releases (v0.12.0, v0.11.0, and earlier)
+remain frozen.
+Active planning and implementation are tracked in the [v0.13 roadmap](v0-13-roadmap.md).
+Multi-channel release outcomes and post-G1 development reconciliation are documented
+in the [v0.12 forward reconciliation record](architecture/v0-12-forward-reconciliation.md).
 The distribution architecture preserves the multi-registry packaging
-model and provides the 45-skill corpus. Local build and inspection do not publish
+model and provides the 46-skill corpus. Local build and inspection do not publish
 packages.
 
 APG has one editable release-version authority:
@@ -129,6 +132,43 @@ Intel macOS (`darwin/amd64`) is intentionally omitted and is not distributed or 
 The Homebrew formula installs the native portable `bin/apgr` executable into linked `bin/`, and its binary manifest (`apgr.binary-manifest.json`) and licensing documents into Homebrew prefix share storage (`pkgshare`). It requires no runtime Python, Node.js, or Go compilers. It does not install development test suites (`apgr test`).
 
 Homebrew installation coexistence alongside existing pip, npm, or Nix installations is designed to avoid overwriting, relinking, or force-replacing other package managers, with live verification recorded as pending until executed against the published tap.
+
+## First-party Nix flake (v0.13.0 onward)
+
+From v0.13.0, APGR is published as a first-party Nix flake from its own public
+repository and release tag ([ADR 0076](adr/2026/09/0076-first-party-nix-flake-publication-target.md)).
+This is not an upstream `NixOS/nixpkgs` package, and there is no Hydra job,
+binary cache or host-activation module. Earlier releases have no Nix artifact.
+The commands below work only after the `v0.13.0` tag is published:
+
+```sh
+nix build github:Knowledge-Forge-AI/agentic-praxis-grimoire/v0.13.0#agentic-praxis-grimoire
+nix run github:Knowledge-Forge-AI/agentic-praxis-grimoire/v0.13.0#apgr -- --version
+nix profile add github:Knowledge-Forge-AI/agentic-praxis-grimoire/v0.13.0#agentic-praxis-grimoire
+```
+
+Older Nix releases spell `nix profile add` as `nix profile install`; Nix
+2.31.5 still accepts `install` as a deprecated alias.
+Normal installs pin a release tag, never the mutable `main` branch.
+
+Outputs, the installed runtime, its prerequisites, the source boundary and
+the closure trade-offs are described in the [Nix flake guide](guides/nix-flake.md).
+
+### Platform status
+
+| System | Evidence before v0.13.0 publication |
+| --- | --- |
+| `aarch64-darwin` | Native build, flake checks and disposable-profile readback on the development host, unsandboxed (`sandbox = false`); host-tool independence is not proven. The hosted `nix (aarch64-darwin)` cell must also pass on public staging |
+| `x86_64-linux` | Evaluation and derivation instantiation locally; the hosted `nix (x86_64-linux)` cell gates the public PR but has not yet been observed |
+| `aarch64-linux` | Evaluation and derivation instantiation only; no native execution cell |
+
+The installed dispatcher runs only from a write-protected `/nix/store` object
+and verifies its recorded content digest when a `dispatch`, `finalize` or
+`ownership` run starts. This rejects copied or
+modified trees, but it is not tamper-proof against an account that can write
+the store. See the [Nix flake guide](guides/nix-flake.md#installed-dispatcher).
+
+`x86_64-darwin` is not supported.
 
 ## Candidate manifest and qualification
 

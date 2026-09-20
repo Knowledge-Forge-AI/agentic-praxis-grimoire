@@ -2,29 +2,30 @@ from __future__ import annotations
 
 import hashlib
 import json
-from pathlib import Path
 import re
 import subprocess
 import time
 import zipfile
+from pathlib import Path
+from typing import Any
 
 import pytest
-
 from agent_phase import capacity as capacity_module
-from agent_phase.dispatch import DispatchError, Dispatcher
+from agent_phase.dispatch import Dispatcher, DispatchError
 from agent_phase.lifecycle import get_lifecycle
 from agent_phase.provider import MAX_STAGE_OUTPUT_BYTES, Result
 from agent_phase.request import MAX_PROMPT_BYTES, PHASE_TYPES, PhaseRequest
 from agent_phase.routing import Endpoint, resolve, route
-from antigravity_profile import MAX_PROMPT_BYTES as ANTIGRAVITY_MAX_PROMPT_BYTES
-from agent_source_guidance import codex_guidance_overrides
-from antigravity_terminal_evidence import _closed_terminal_fields
+from agent_phase.runtime_models import selection
 from agent_phase_roster_fixtures import (
     SYNTHETIC_ENDPOINTS,
     build_synthetic_roster,
     write_roster_sources,
 )
-
+from agent_source_guidance import codex_guidance_overrides
+from antigravity_profile import MAX_PROMPT_BYTES as ANTIGRAVITY_MAX_PROMPT_BYTES
+from antigravity_terminal_evidence import _closed_terminal_fields
+from controller_generation import codex_profile_arguments
 
 ROOT = Path(__file__).resolve().parents[3]
 PHASE_ID = "TEST-ANTIGRAVITY-PROVIDER"
@@ -83,8 +84,8 @@ def strip_evidence(argv: list[str]) -> list[str]:
     return argv[:index]
 
 
-def expected_dispatch_argv(request: PhaseRequest) -> list[list[str]]:
-    resolved = resolve(request, ROOT)
+def expected_dispatch_argv(request: PhaseRequest, *, roster) -> list[list[str]]:
+    resolved = resolve(request, ROOT, roster=roster)
     expected: list[list[str]] = []
     for stage in get_lifecycle("standard").stages:
         endpoint = resolved["stages"][stage.name]
@@ -97,9 +98,16 @@ def expected_dispatch_argv(request: PhaseRequest) -> list[list[str]]:
                 argv.append("--read-only")
             argv.append("-p")
         elif provider == "codex":
-            argv = ["/fake/codex", "exec", "--profile", profile]
+            argv = ["/fake/codex", "exec", *codex_profile_arguments(ROOT, profile)]
             if read_only:
                 argv.extend(["-s", "read-only"])
+            selected = selection(ROOT, provider, profile, bundle=roster.bundle)
+            assert selected["model"] == endpoint["intelligence"]["model"]
+            assert selected["effort"] == endpoint["intelligence"]["effort"]
+            argv.extend([
+                "-c", "model=" + json.dumps(selected["model"]),
+                "-c", "model_reasoning_effort=" + json.dumps(selected["effort"]),
+            ])
             for override in codex_guidance_overrides(ROOT, workers=False):
                 argv.extend(["-c", override])
             argv.append("-")
@@ -236,7 +244,9 @@ def dispatcher(
     runner: FakeRunner,
     *,
     config_root: Path = ROOT,
+    **kwargs: Any,
 ) -> Dispatcher:
+    kwargs.setdefault("review_mutation_policy", "block")
     return Dispatcher(
         root=config_root,
         cwd=repository,
@@ -247,6 +257,7 @@ def dispatcher(
         scanner_executable=None,
         resolve_scanner=False,
         runner=runner,
+        **kwargs,
     )
 
 
@@ -259,12 +270,13 @@ def test_normal_uses_exact_five_stage_provider_argv(
     runner = FakeRunner()
     request = PhaseRequest(phase_type, "normal", "exact prompt fixture")
 
-    state = dispatcher(repository, tmp_path, runner).dispatch(
+    subject = dispatcher(repository, tmp_path, runner)
+    state = subject.dispatch(
         PHASE_ID,
         request,
     )
 
-    expected_argv = expected_dispatch_argv(request)
+    expected_argv = expected_dispatch_argv(request, roster=subject.roster)
     assert [strip_evidence(call["argv"]) for call in runner.calls] == expected_argv
     for call, expected in zip(runner.calls, expected_argv, strict=True):
         if expected[0] == "/fake/antigravity-profile":
@@ -310,14 +322,15 @@ def test_nonzero_exit_is_a_provider_transport_failure(
     runner = FakeRunner(first_exit_code=17)
     request = PhaseRequest("implementation_testing", "gemini_only", "task")
 
+    subject = dispatcher(repository, tmp_path, runner)
     with pytest.raises(DispatchError) as caught:
-        dispatcher(repository, tmp_path, runner).dispatch(
+        subject.dispatch(
             PHASE_ID,
             request,
         )
 
     assert caught.value.code == "PROVIDER_TRANSPORT_FAILED"
-    assert strip_evidence(runner.calls[0]["argv"]) == expected_dispatch_argv(request)[0]
+    assert strip_evidence(runner.calls[0]["argv"]) == expected_dispatch_argv(request, roster=subject.roster)[0]
 
 
 def test_missing_antigravity_evidence_blocks_with_stable_code(
@@ -658,12 +671,13 @@ def test_conserve_claude_uses_exact_five_stage_provider_argv(
         phase_type, "conserve_claude", "exact prompt fixture"
     )
 
-    state = dispatcher(repository, tmp_path, runner).dispatch(
+    subject = dispatcher(repository, tmp_path, runner)
+    state = subject.dispatch(
         PHASE_ID,
         request,
     )
 
-    expected_argv = expected_dispatch_argv(request)
+    expected_argv = expected_dispatch_argv(request, roster=subject.roster)
     assert [strip_evidence(call["argv"]) for call in runner.calls] == expected_argv
     assert len(runner.calls) == 5
     for index, prefix in enumerate(PREFIXES):

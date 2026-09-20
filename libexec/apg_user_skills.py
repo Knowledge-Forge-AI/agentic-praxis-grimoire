@@ -241,14 +241,14 @@ def verify_source(requested: str | Path) -> SourceIdentity:
     tree = text_git(root, ["rev-parse", "HEAD^{tree}"])
     try:
         release_repository = public_release.resolve_repository(root, "source")
-        lineage = public_release.verify_public_release_lineage(
-            release_repository,
-            accepted_commit=PUBLIC_V01_COMMIT,
-            accepted_tree=PUBLIC_V01_TREE,
-        )
+        lineage = public_release.verify_public_release_lineage(  # untagged commits may surround tags
+            release_repository, accepted_commit=PUBLIC_V01_COMMIT, accepted_tree=PUBLIC_V01_TREE,
+            allow_advanced_head=True, allow_interleaved_untagged=True)
     except public_release.ToolError as error:
         fail(f"source public release lineage is invalid: {error}")
     current_release = lineage[-1]
+    if commit != current_release.commit:
+        fail("source must be checked out at an exact public release tag")
     library_result = check_library(root)
     if not library_result.passed:
         diagnostic = library_result.diagnostics[0]

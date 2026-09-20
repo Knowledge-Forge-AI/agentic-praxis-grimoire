@@ -169,6 +169,7 @@
           "disposition_status": {
             "type": "string",
             "enum": [
+              "PROVISIONAL_ADMISSION",
               "EXISTING_STABLE",
               "PENDING_V0110_B",
               "STABLE",

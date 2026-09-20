@@ -38,7 +38,7 @@ def test_schema_migration_v2_creates_tables(tmp_path: Path) -> None:
     assert SCHEMA_VERSION >= 2
 
     cur = conn.execute("SELECT MAX(version) FROM schema_migrations;")
-    assert cur.fetchone()[0] == 2
+    assert cur.fetchone()[0] == SCHEMA_VERSION
 
     cur = conn.execute(
         "SELECT name FROM sqlite_master WHERE type='table' AND name='invocation_observation_relations';"

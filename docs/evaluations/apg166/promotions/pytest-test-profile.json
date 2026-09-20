@@ -1,0 +1,99 @@
+{
+  "active_debts": [],
+  "blocking_debts": [],
+  "body_only": {
+    "bytes": 17592,
+    "sha256": "b0b1f031282e6c2797c3e64858299dd77092c95280992c88368e4f9a00756fc5"
+  },
+  "dependency_closure": [],
+  "descriptor": {
+    "bytes": 3489,
+    "sha256": "b6cdfcbebbabe1d1a3412936dfd18e5f4ec130c787cda12355133551b88184bb"
+  },
+  "eligible_for_stable": false,
+  "entry_encoding": "UTF-8 json.dumps(sort_keys=True, indent=2) plus LF",
+  "evidence": {
+    "current_validation": {
+      "assessment": "LIMITED",
+      "observation": "Fresh structural, fact-selection, exact-source and acquisition checks are recorded by H qualification. They do not establish effective guidance use.",
+      "references": [
+        "skills/h_promotion_test.go",
+        "docs/evaluations/apg166-maturity-and-integrated-evaluation.md"
+      ]
+    },
+    "defect_debt_disposition": {
+      "assessment": "SUPPORTED",
+      "observation": "No active entry for this leaf in the maintained language-profile debt authority. This is not proof that all semantic defects are absent. Current independent semantic review remains pending. No debt is resolved by this inventory.",
+      "references": [
+        "docs/governance/language-profile-known-debt.json",
+        "skills/pytest-test-profile/SKILL.md",
+        "docs/evaluations/apg26-pytest-and-bash-to-python-capabilities.md",
+        "src/test/fixtures/apg26-scenario-families.json",
+        "docs/evaluations/apg41-v0-4-readiness-and-pre-release-smoke.md"
+      ]
+    },
+    "independent_review": {
+      "assessment": "PENDING",
+      "observation": "Dispatcher-owned APG166 work review pending. Explicit individual disposition of this exact body and evidence is required; historical APG139 acceptance is maintenance only.",
+      "references": []
+    },
+    "provenance": {
+      "assessment": "SUPPORTED",
+      "observation": "Retained canonical source/maintenance boundary and APG provenance record remain the source authority. Historical evaluations identify their original phase and scope; they are reused only for the observations stated here. No external source text is copied or new source refresh claimed.",
+      "references": [
+        "skills/pytest-test-profile/SKILL.md",
+        "docs/provenance.md",
+        "docs/evaluations/apg26-pytest-and-bash-to-python-capabilities.md",
+        "src/test/fixtures/apg26-scenario-families.json",
+        "docs/evaluations/apg41-v0-4-readiness-and-pre-release-smoke.md"
+      ]
+    },
+    "repeated_positive_use": {
+      "assessment": "LIMITED",
+      "observation": "APG26 provides 30 frozen families and fresh review; APG41 explicitly applies collection, fixture, parametrization, capture and xdist boundaries statically. APG repository pytest execution alone does not prove repeated guidance invocation or target/plugin compatibility. APG166 supplies no newly verified repeated guidance-use invocations. Planner and acquisition fixtures do not fill this gap.",
+      "references": [
+        "skills/pytest-test-profile/SKILL.md",
+        "docs/evaluations/apg26-pytest-and-bash-to-python-capabilities.md",
+        "src/test/fixtures/apg26-scenario-families.json",
+        "docs/evaluations/apg41-v0-4-readiness-and-pre-release-smoke.md"
+      ]
+    },
+    "representative_non_triggers": {
+      "assessment": "LIMITED",
+      "observation": "Positive material structured fact, two representative foreign-owner facts, and Producer/Work Review role variations exercise deterministic selection. This proves a fact boundary, not semantic guidance efficacy or live non-trigger judgment.",
+      "references": [
+        "skills/h_promotion_test.go",
+        "skills/pytest-test-profile/SKILL.md"
+      ]
+    },
+    "rollback": {
+      "assessment": "SUPPORTED",
+      "observation": "Use the canonical removal boundary and referenced integration history to reconcile the leaf, projection, catalog and focused fixtures while preserving historical decisions. Do not revert unrelated runner policy, target dependencies, generated mocks or target configuration.",
+      "references": [
+        "skills/pytest-test-profile/SKILL.md",
+        "docs/skill-authoring-and-maintenance.md",
+        "docs/evaluations/apg26-pytest-and-bash-to-python-capabilities.md",
+        "src/test/fixtures/apg26-scenario-families.json",
+        "docs/evaluations/apg41-v0-4-readiness-and-pre-release-smoke.md"
+      ]
+    }
+  },
+  "independent_review": null,
+  "late_acquisition": "Shared G engine exact-source contract; H qualification checks all five primary bodies. Live native recovery unavailable.",
+  "ledger_entry": {
+    "bytes": 2004,
+    "sha256": "cfd4484322fb7b00aae66c71de926249758d849e375c86f64a536f320aedb0a9"
+  },
+  "next_lifecycle_trigger": "Supply distinct actual pytest collection/fixture and isolation/xdist guidance-use decisions with versions, roots, workers and coverage context and meaningful observed outcomes; include ordinary-Python and policy-selection non-triggers, then independently adjudicate the individual inventory.",
+  "phase": "APG166",
+  "proposed_outcome": "RETAIN_PROVISIONAL_INSUFFICIENT_EVIDENCE",
+  "rollback": "Historical supported removal contract retained. H changes no body, ledger maturity or live projection; no new live de-projection is claimed.",
+  "schema_version": "apg.h-promotion-evidence/v1",
+  "skill_id": "pytest-test-profile",
+  "source_path": "skills/pytest-test-profile/SKILL.md",
+  "verified_new_positive_invocations": 0,
+  "whole_source": {
+    "bytes": 17844,
+    "sha256": "94e7bb6806165cb5afc14e3c20a264c62b25bbbc7a7124e2ff160b1c57ebfd15"
+  }
+}

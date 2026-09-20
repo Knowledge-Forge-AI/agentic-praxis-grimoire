@@ -1,0 +1,35 @@
+{
+  "schema_version": "apg.local-cli-compatibility/v1",
+  "source_phase": "APG162C-LOCAL-FINALIZE1",
+  "scope": "Accepted D entry canonical CLI outputs; E-CATALOG1 correction; not published-release evidence",
+  "cases": [
+    {
+      "arguments": [
+        "skills",
+        "list",
+        "--format",
+        "json"
+      ],
+      "stdout_sha256": "b50e0bfe05c27bf313e723be57a176f4bebff7446c60535f616b16e4933533af",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "arguments": [
+        "skills",
+        "context-report"
+      ],
+      "stdout_sha256": "5a0a9c1e569dce44424415edcbd56b3a9011d8328d598683aa8bde76110c38be",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "arguments": [
+        "skills",
+        "context-report",
+        "--format",
+        "text"
+      ],
+      "stdout_sha256": "7e561afb5ab7cefa0765742ff86dd6cb373dd6848fbb27ee1bc84e2f628e3531",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

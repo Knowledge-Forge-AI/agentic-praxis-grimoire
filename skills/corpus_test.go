@@ -136,13 +136,14 @@ func TestBuildIndexMissingSVGRejection(t *testing.T) {
 	delete(baseline, "vite-build-profile/SKILL.md")
 	delete(baseline, "npm-package-manager-profile/SKILL.md")
 	delete(baseline, "browser-runtime-profile/SKILL.md")
+	delete(baseline, "rtk-command-proxy/SKILL.md")
 	if _, err := buildIndexWithRequirement(baseline, false); err != nil {
 		t.Fatal(err)
 	}
 }
 
-func TestBuildIndex45SyntheticFS(t *testing.T) {
-	fs45 := fstest.MapFS{}
+func TestBuildIndex46SyntheticFS(t *testing.T) {
+	fs46 := fstest.MapFS{}
 	err := fs.WalkDir(Corpus(), ".", func(path string, entry fs.DirEntry, walkErr error) error {
 		if walkErr != nil {
 			return walkErr
@@ -152,7 +153,7 @@ func TestBuildIndex45SyntheticFS(t *testing.T) {
 			if readErr != nil {
 				return readErr
 			}
-			fs45[path] = &fstest.MapFile{Data: body}
+			fs46[path] = &fstest.MapFile{Data: body}
 		}
 		return nil
 	})
@@ -160,22 +161,21 @@ func TestBuildIndex45SyntheticFS(t *testing.T) {
 		t.Fatal(err)
 	}
 
-
-	index, err := buildIndexWithRequirement(fs45, true)
+	index, err := buildIndexWithRequirement(fs46, true)
 	if err != nil {
-		t.Fatalf("buildIndexWithRequirement failed on synthetic 45-skill corpus: %v", err)
+		t.Fatalf("buildIndexWithRequirement failed on synthetic 46-skill corpus: %v", err)
 	}
-	if len(index.skills) != 45 {
-		t.Fatalf("skills count = %d, want 45", len(index.skills))
+	if len(index.skills) != 46 {
+		t.Fatalf("skills count = %d, want 46", len(index.skills))
 	}
 	if index.fingerprint == "" {
 		t.Fatalf("fingerprint should not be empty")
 	}
 
-	// 44 skills (missing web-accessibility-profile) must fail
-	delete(fs45, "web-accessibility-profile/SKILL.md")
-	if _, err := buildIndexWithRequirement(fs45, true); !errors.Is(err, ErrCorpusMismatch) {
-		t.Fatalf("expected ErrCorpusMismatch on 44 skills, got %v", err)
+	// 45 skills (missing web-accessibility-profile) must fail
+	delete(fs46, "web-accessibility-profile/SKILL.md")
+	if _, err := buildIndexWithRequirement(fs46, true); !errors.Is(err, ErrCorpusMismatch) {
+		t.Fatalf("expected ErrCorpusMismatch on 45 skills, got %v", err)
 	}
 }
 

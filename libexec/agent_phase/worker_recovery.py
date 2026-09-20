@@ -7,7 +7,15 @@ from typing import Any
 from .run import worker_parent_prefix
 
 
-def verify_pending_cleanup(source: Path, state: dict[str, Any]) -> dict[str, Any] | None:
+def verify_pending_cleanup(
+    source: Path, state: dict[str, Any], *, settled_ok: bool = False
+) -> dict[str, Any] | None:
+    """Prove closed custody; ``settled_ok`` also admits a reconcilable parent.
+
+    A reconcilable parent is still ``active``/``draining`` only because its
+    process disappeared before closing, while every child is already terminal
+    with proven cleanup. Only interrupted-run recovery may request that view.
+    """
     pending = state.get("worker_cleanup_pending")
     if not pending:
         return None
@@ -27,7 +35,7 @@ def verify_pending_cleanup(source: Path, state: dict[str, Any]) -> dict[str, Any
         # Optional worker imports remain confined to runs that actually used
         # the facility. Read an atomic snapshot without starting a provider,
         # registering a parent, or rewriting the historical run.
-        from agent_workers.ledger import sanitize_parent_id
+        from apgr_workers.ledger import sanitize_parent_id
 
         ledger_path = source / "workers" / sanitize_parent_id(parent_id) / "ledger.json"
         workers_path = source / "workers"
@@ -50,7 +58,9 @@ def verify_pending_cleanup(source: Path, state: dict[str, Any]) -> dict[str, Any
                 or path.parent.name != sanitize_parent_id(ledger_parent)
             ):
                 raise ValueError("owned worker parent identity is invalid")
-            if ledger.get("status") != "closed":
+            if ledger.get("status") != "closed" and not (
+                settled_ok and ledger.get("status") in {"active", "draining"}
+            ):
                 raise ValueError("owned worker parent has not closed")
             jobs = ledger.get("gemini_jobs")
             natives = ledger.get("native_agents")
@@ -81,10 +91,52 @@ def verify_pending_cleanup(source: Path, state: dict[str, Any]) -> dict[str, Any
         raise ValueError(f"source run still has unresolved worker custody: {error}") from error
 
 
-def verify_retained_cleanup(source: Path, state: dict[str, Any]) -> None:
+def reconcile_settled_parents(
+    source: Path, state: dict[str, Any], reason: str
+) -> list[dict[str, Any]]:
+    """Close settled stale parents through the ledger owner, then re-prove.
+
+    Idempotent: closed parents are untouched. Any uncertain child refuses
+    before a write. Returns the persisted per-parent custody facts.
+    """
+    if not state.get("worker_cleanup_pending"):
+        return []
+    verify_pending_cleanup(source, state, settled_ok=True)
+    try:
+        from apgr_workers.ledger import LedgerError, ParentLedger
+        from apgr_workers.settlement import close_settled
+    except ImportError as error:
+        raise ValueError(f"worker ledger owner is unavailable: {error}") from error
+    try:
+        workers = source.resolve() / "workers"
+        for path in sorted(workers.glob("*/ledger.json")):
+            ledger = json.loads(path.read_text(encoding="utf-8"))
+            if ledger.get("status") != "closed":
+                close_settled(ParentLedger(ledger["parent_id"], state_dir=workers), reason)
+        verify_pending_cleanup(source, state)
+        facts = []
+        for path in sorted(workers.glob("*/ledger.json")):
+            ledger = json.loads(path.read_text(encoding="utf-8"))
+            facts.append({
+                "parent_id": ledger["parent_id"],
+                "status": ledger["status"],
+                "settled_reconciliation": ledger.get("settled_reconciliation"),
+                "gemini_jobs": {
+                    job_id: job.get("status")
+                    for job_id, job in sorted(ledger["gemini_jobs"].items())
+                },
+            })
+        return facts
+    except (OSError, ValueError, KeyError, TypeError, LedgerError) as error:
+        raise ValueError(f"settled worker custody cannot be reconciled: {error}") from error
+
+
+def verify_retained_cleanup(
+    source: Path, state: dict[str, Any], *, settled_ok: bool = False
+) -> None:
     """Validate recorded stage and auxiliary drains; no-worker history needs none."""
     # Keep the existing durable ledger reconciliation for a crashed parent.
-    reconciled = verify_pending_cleanup(source, state)
+    reconciled = verify_pending_cleanup(source, state, settled_ok=settled_ok)
     for receipt_path in source.glob("*.worker-drain.json"):
         try:
             receipt = json.loads(receipt_path.read_text(encoding="utf-8"))

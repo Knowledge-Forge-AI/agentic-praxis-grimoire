@@ -1,0 +1,38 @@
+schema = "agent-worker-policy-v2"
+generation = 9
+
+[limits]
+max_gemini_workers_per_parent = 4
+max_aggregate_workers_per_codex_parent = 12
+
+[gemini_worker]
+provider = "antigravity"
+profile = "gemini-3.8-flash-high"
+
+[policy]
+name = "triple_pool_4x4x4"
+borrowing = false
+leaf_only = true
+parent_authority = true
+mode_requirements = ["gemini_sub", "dynamic"]
+
+[selections.triple_pool_4x4x4]
+max_gemini = 4
+max_luna = 4
+max_sonnet = 4
+borrowing = false
+leaf_only = true
+parent_authority = true
+mode_requirements = ["gemini_sub", "dynamic"]
+
+[selections.triple_pool_4x4x4.gemini_worker]
+provider = "antigravity"
+profile = "gemini-3.8-flash-high"
+
+[selections.triple_pool_4x4x4.luna_worker]
+provider = "codex"
+profile = "luna-worker"
+
+[selections.triple_pool_4x4x4.sonnet_worker]
+provider = "claude"
+profile = "sonnet-worker"

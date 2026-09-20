@@ -779,3 +779,24 @@ def test_format_embedded_corpus_failure() -> None:
 if __name__ == "__main__":
     unittest.main()
 
+
+
+def test_generated_catalog_is_the_only_new_regular_root_owner(tmp_path):
+    import apg_skill_topology as topology
+    skills = tmp_path / "skills"
+    skills.mkdir()
+    generated = skills / "catalog_generated.json"
+    generated.write_text("{}\n")
+    issues = []
+    assert topology.discover_canonical_leaves(tmp_path, skills, lambda *args: issues.append(args)) == ()
+    assert not issues
+    unexpected = skills / "manual-catalog.json"
+    unexpected.write_text("{}\n")
+    topology.discover_canonical_leaves(tmp_path, skills, lambda *args: issues.append(args))
+    assert any(row[0] == "APG003" for row in issues)
+    unexpected.unlink()
+    generated.unlink()
+    generated.symlink_to(tmp_path / "missing.json")
+    issues.clear()
+    topology.discover_canonical_leaves(tmp_path, skills, lambda *args: issues.append(args))
+    assert any(row[0] == "APG003" for row in issues)

@@ -79,12 +79,12 @@ def test_python_skill_bridge_matches_oracle_and_routes_new_go_surfaces(
     assert built.returncode == 0, built.stderr
     monkeypatch.setenv("APGR_GO_BINARY", os.fspath(binary))
 
-    # Public predecessor evidence replaces the private Python oracle. The
-    # fixture binds the published archive, binary, and exact output digests.
+    # E-CATALOG1 uses measured accepted D entry output for the admitted corpus.
+    # The historical v0.10 public fixture remains unchanged and separate.
     fixture = json.loads(
-        (ROOT / "testing/fixtures/skill-cli-compatibility.json").read_text()
+        (ROOT / "testing/fixtures/skill-cli-v0130-compatibility.json").read_text()
     )
-    assert fixture["source_release"] == "v0.10.0"
+    assert fixture["source_phase"] == "APG162C-LOCAL-FINALIZE1"
     for case in fixture["cases"]:
         assert cli.main(case["arguments"]) == 0
         delegated = capfd.readouterr()

@@ -168,24 +168,24 @@ def test_private_current_machine_contract_remains_source_bound() -> None:
 def test_catalog_projection_maturity_routes_and_project_set_are_exact() -> None:
     rows = _catalog_rows()
     candidate_rows = [row for row in rows if f"[`{CANDIDATE}`]" in row]
-    assert len(rows) == 45
+    assert len(rows) == 46
     assert len(candidate_rows) == 1
     assert candidate_rows[0].endswith("| `provisional` |")
     assert sum(row.endswith("| `stable` |") for row in rows) == 14
-    assert sum(row.endswith("| `provisional` |") for row in rows) == 31
+    assert sum(row.endswith("| `provisional` |") for row in rows) == 32
     projection = ROOT / ".agents/skills" / CANDIDATE
     assert projection.is_symlink()
     assert os.readlink(projection) == "../../skills/css-language-profile"
     assert projection.resolve() == LEAF.parent.resolve()
     general, local = _routes(ROOT)
     entries = [entry for entry in general if entry["name"] == CANDIDATE]
-    assert len(general) == 43
+    assert len(general) == 44
     assert len(local) == 1
-    assert len(general) + len(local) == 44
+    assert len(general) + len(local) == 45
     assert len(entries) == 1
     assert "CSS-specific static semantics" in entries[0]["trigger"]
     assert CANDIDATE in project_skills.EXPECTED_SKILLS
-    assert len(project_skills.EXPECTED_SKILLS) == 45
+    assert len(project_skills.EXPECTED_SKILLS) == 46
 
 
 def test_release_inventory_and_historical_exclusions_are_exact() -> None:

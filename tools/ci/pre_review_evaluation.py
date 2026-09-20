@@ -11,6 +11,7 @@ from typing import Any, NamedTuple
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
+from tools.ci.betterleaks_dispositions import load_records, reconcile
 from tools.ci.pre_review_records import (
     CI_ROOT,
     FINDING_RETURN_CODES,
@@ -19,7 +20,37 @@ from tools.ci.pre_review_records import (
     POLICY_CHECKS,
     Check,
 )
-from tools.ci.betterleaks_dispositions import load_records, reconcile
+
+
+class RuffBaselineError(RuntimeError):
+    """Raised when the Ruff baseline file is missing, tampered, or violates policy."""
+
+
+
+
+def claim_historical_ruff_findings(root: Path, findings: list) -> tuple[int, set[int]]:
+    """Classify two immutable APG140 fixture observations, returning count and matched indices."""
+    relative = "src/test/support/apg_external_compatibility_fixture.py"
+    path = root / relative
+    expected = {(31, 8, "`stat` imported but unused"),
+                (32, 44, "`typing.Sequence` imported but unused")}
+    if not path.is_file() or path.is_symlink() or hashlib.sha256(path.read_bytes()).hexdigest() != (
+        "40b7e98fd862977d83a5e6a01113435bc1b6c47a710668c82faf5d45ff10369e"
+    ):
+        return 0, set()
+    accepted = 0
+    claimed: set[int] = set()
+    for idx, row in enumerate(findings):
+        location = row.get("location", {})
+        identity = (location.get("row"), location.get("column"), row.get("message"))
+        reported = Path(row["filename"])
+        if not reported.is_absolute():
+            reported = root / reported
+        if row.get("code") == "F401" and reported == path and identity in expected:
+            expected.remove(identity)
+            accepted += 1
+            claimed.add(idx)
+    return accepted, claimed
 
 
 def historical_ruff_findings(root: Path, findings: list) -> int:
@@ -29,25 +60,124 @@ def historical_ruff_findings(root: Path, findings: list) -> int:
     APG140 support binding owns this exact source; independent pre-final review
     must disposition this classification with the rest of the candidate.
     """
-    relative = "src/test/support/apg_external_compatibility_fixture.py"
-    path = root / relative
-    expected = {(31, 8, "`stat` imported but unused"),
-                (32, 44, "`typing.Sequence` imported but unused")}
-    if path.is_symlink() or hashlib.sha256(path.read_bytes()).hexdigest() != (
-        "40b7e98fd862977d83a5e6a01113435bc1b6c47a710668c82faf5d45ff10369e"
-    ):
-        return 0
-    accepted = 0
-    for row in findings:
-        location = row["location"]
-        identity = (location["row"], location["column"], row["message"])
-        reported = Path(row["filename"])
-        if not reported.is_absolute():
-            reported = root / reported
-        if row["code"] == "F401" and reported == path and identity in expected:
-            expected.remove(identity)
-            accepted += 1
-    return accepted
+    return claim_historical_ruff_findings(root, findings)[0]
+
+
+def load_ruff_baseline(
+    baseline_path: Path | None = None,
+    *,
+    expected_digest: str | None = None,
+) -> set[tuple[str, str, int, int, str, str]]:
+    """Load grandfathered Ruff baseline findings mapped as exact identities.
+
+    Returns a set of tuples: (path, code, row, col, context_hash, message).
+    Raises RuffBaselineError on any missing file, corrupted JSON, schema mismatch,
+    unexpected keys, provenance tampering, count mismatch, or digest mismatch.
+    """
+    libexec_dir = Path(__file__).resolve().parents[2] / "libexec"
+    if str(libexec_dir) not in sys.path:
+        sys.path.insert(0, str(libexec_dir))
+    from apg_public_release_v013 import (
+        V013_RUFF_BASELINE_COUNT,
+        V013_RUFF_BASELINE_DIGEST,
+        V013_RUFF_BASELINE_ORIGIN_COMMIT,
+        V013_RUFF_BASELINE_ORIGIN_TREE,
+        V013_RUFF_BASELINE_SCHEMA,
+    )
+
+    is_default_path = baseline_path is None
+    if baseline_path is None:
+        baseline_path = CI_ROOT / "ruff_baseline.json"
+        if expected_digest is None:
+            expected_digest = V013_RUFF_BASELINE_DIGEST
+
+    if not baseline_path.is_file():
+        raise RuffBaselineError(f"ruff baseline file does not exist: {baseline_path}")
+
+    raw_bytes = baseline_path.read_bytes()
+    computed_digest = hashlib.sha256(raw_bytes).hexdigest()
+    if expected_digest is not None and computed_digest != expected_digest:
+        raise RuffBaselineError(
+            f"ruff baseline digest mismatch: computed {computed_digest} != expected {expected_digest}"
+        )
+
+    try:
+        data = json.loads(raw_bytes.decode("utf-8"))
+    except Exception as error:
+        raise RuffBaselineError(f"ruff baseline JSON malformed: {error}") from error
+
+    if not isinstance(data, dict):
+        raise RuffBaselineError("ruff baseline must be a JSON object")
+
+    expected_keys = {
+        "schema",
+        "origin_commit",
+        "origin_tree",
+        "carry_forward_commit",
+        "carry_forward_tree",
+        "description",
+        "findings",
+    }
+    if set(data.keys()) != expected_keys:
+        raise RuffBaselineError(
+            f"ruff baseline keys differ from closed contract: {set(data.keys()) ^ expected_keys}"
+        )
+
+    if data.get("schema") != V013_RUFF_BASELINE_SCHEMA:
+        raise RuffBaselineError(f"unsupported ruff baseline schema: {data.get('schema')}")
+
+    if data.get("origin_commit") != V013_RUFF_BASELINE_ORIGIN_COMMIT:
+        raise RuffBaselineError(f"ruff baseline origin_commit mismatch: {data.get('origin_commit')}")
+
+    if data.get("origin_tree") != V013_RUFF_BASELINE_ORIGIN_TREE:
+        raise RuffBaselineError(f"ruff baseline origin_tree mismatch: {data.get('origin_tree')}")
+
+    findings = data.get("findings")
+    if not isinstance(findings, list):
+        raise RuffBaselineError("ruff baseline findings must be a list")
+
+    if is_default_path and expected_digest == V013_RUFF_BASELINE_DIGEST and len(findings) != V013_RUFF_BASELINE_COUNT:
+        raise RuffBaselineError(
+            f"ruff baseline finding count mismatch: {len(findings)} != {V013_RUFF_BASELINE_COUNT}"
+        )
+
+    finding_keys = {"path", "code", "message", "row", "col", "context_hash"}
+    identities: set[tuple[str, str, int, int, str, str]] = set()
+
+    for idx, item in enumerate(findings):
+        if not isinstance(item, dict) or set(item.keys()) != finding_keys:
+            raise RuffBaselineError(f"ruff baseline finding at index {idx} violates closed schema")
+        path = item["path"]
+        code = item["code"]
+        message = item["message"]
+        row = item["row"]
+        col = item["col"]
+        context_hash = item["context_hash"]
+
+        if not isinstance(path, str) or not path.strip():
+            raise RuffBaselineError(f"invalid path in baseline finding {idx}")
+        if not isinstance(code, str) or not code.strip():
+            raise RuffBaselineError(f"invalid code in baseline finding {idx}")
+        if not isinstance(message, str) or not message.strip():
+            raise RuffBaselineError(f"invalid message in baseline finding {idx}")
+        if not isinstance(row, int) or row <= 0:
+            raise RuffBaselineError(f"invalid row in baseline finding {idx}")
+        if not isinstance(col, int) or col <= 0:
+            raise RuffBaselineError(f"invalid col in baseline finding {idx}")
+        if (
+            not isinstance(context_hash, str)
+            or len(context_hash) != 64
+            or not all(c in "0123456789abcdef" for c in context_hash.lower())
+        ):
+            raise RuffBaselineError(f"invalid context_hash in baseline finding {idx}")
+
+        ident = (path, code, row, col, context_hash.lower(), message)
+        if ident in identities:
+            raise RuffBaselineError(f"duplicate finding identity in baseline: {ident}")
+        identities.add(ident)
+
+    return identities
+
 
 
 def baseline() -> dict:
@@ -214,19 +344,88 @@ def evaluate(
     if returncode != 0 and INTERNAL_FAILURE.search(failure_output):
         return "failed", "tool/internal failure: bounded diagnostic retained", "tool-failure"
 
-    if check.policy == "ruff":
+    if check.policy in {"ruff", "pyflakes"}:
         if returncode not in {0, 1}:
-            return "failed", "Ruff execution failed", "tool-failure"
+            return "failed", f"{check.name} execution failed", "tool-failure"
         try:
             findings = json.loads(stdout)
             if not isinstance(findings, list) or returncode != int(bool(findings)):
-                raise ValueError("Ruff result/exit disagreement")
-            historical = historical_ruff_findings(check.cwd, findings)
+                raise ValueError(f"{check.name} result/exit disagreement")
+            historical, claimed = (
+                claim_historical_ruff_findings(check.cwd, findings)
+                if check.policy == "ruff"
+                else (0, set())
+            )
         except (OSError, KeyError, TypeError, ValueError):
-            return "failed", "Ruff result or historical input invalid", "tool-failure"
-        unresolved = len(findings) - historical
-        detail = f"observations={len(findings)}; immutable_historical={historical}; unresolved={unresolved}"
+            return "failed", f"{check.name} result or historical input invalid", "tool-failure"
+
+        try:
+            baseline_identities = load_ruff_baseline()
+        except RuffBaselineError as error:
+            return "failed", f"ruff baseline verification failure: {error}", "tool-failure"
+        except Exception as error:
+            return "failed", f"ruff baseline load failure: {error}", "tool-failure"
+
+        file_lines_cache: dict[Path, list[str] | None] = {}
+
+        def get_line_context_hash(file_path: Path, row_num: int) -> str | None:
+            if file_path not in file_lines_cache:
+                try:
+                    file_lines_cache[file_path] = file_path.read_text(
+                        encoding="utf-8", errors="replace"
+                    ).splitlines()
+                except OSError:
+                    file_lines_cache[file_path] = None
+            lines = file_lines_cache[file_path]
+            if lines is None:
+                return None
+            if not isinstance(row_num, int) or not (1 <= row_num <= len(lines)):
+                return None
+            line_text = lines[row_num - 1]
+            return hashlib.sha256(line_text.strip().encode("utf-8")).hexdigest()
+
+        matched_identities: set[tuple[str, str, int, int, str, str]] = set()
+        unresolved = 0
+
+        for idx, row in enumerate(findings):
+            if idx in claimed:
+                continue
+            reported = Path(row.get("filename", ""))
+            if not reported.is_absolute():
+                reported = check.cwd / reported
+            try:
+                rel_path = reported.resolve().relative_to(check.cwd.resolve()).as_posix()
+            except ValueError:
+                rel_path = reported.as_posix()
+
+            location = row.get("location", {})
+            r_num = location.get("row", 0)
+            c_num = location.get("column", 0)
+
+            # Grandfathering identity strictly derives context_hash from source file
+            ctx_hash = get_line_context_hash(reported.resolve(), r_num)
+            if ctx_hash is None:
+                unresolved += 1
+                continue
+
+            ident = (
+                rel_path,
+                row.get("code", ""),
+                r_num,
+                c_num,
+                ctx_hash.lower(),
+                row.get("message", ""),
+            )
+
+            if ident in baseline_identities and ident not in matched_identities:
+                matched_identities.add(ident)
+            else:
+                unresolved += 1
+
+        grandfathered = len(matched_identities)
+        detail = f"observations={len(findings)}; historical={historical}; grandfathered={grandfathered}; unresolved={unresolved}"
         return ("failed", detail, "policy-finding") if unresolved else ("passed", detail, "passed")
+
 
     if check.policy == "file-length":
         if returncode not in {0, 1}:

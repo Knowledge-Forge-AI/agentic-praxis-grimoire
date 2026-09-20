@@ -1,0 +1,95 @@
+{
+  "active_debts": [],
+  "blocking_debts": [],
+  "body_only": {
+    "bytes": 11339,
+    "sha256": "7f7d818234777b030377c4a6c7496042a82a62514a346a0d0a1b4f5da42e8fb3"
+  },
+  "dependency_closure": [],
+  "descriptor": {
+    "bytes": 2995,
+    "sha256": "862762d75e9443bc2ed648fb80fb0ca821fdc301f04c5efdc5df37fa959675f5"
+  },
+  "eligible_for_stable": false,
+  "entry_encoding": "UTF-8 json.dumps(sort_keys=True, indent=2) plus LF",
+  "evidence": {
+    "current_validation": {
+      "assessment": "LIMITED",
+      "observation": "Fresh structural, fact-selection, exact-source and acquisition checks are recorded by H qualification. They do not establish effective guidance use.",
+      "references": [
+        "skills/h_promotion_test.go",
+        "docs/evaluations/apg166-maturity-and-integrated-evaluation.md"
+      ]
+    },
+    "defect_debt_disposition": {
+      "assessment": "SUPPORTED",
+      "observation": "No active entry for this leaf in the maintained language-profile debt authority. This is not proof that all semantic defects are absent. Current independent semantic review remains pending. No debt is resolved by this inventory.",
+      "references": [
+        "docs/governance/language-profile-known-debt.json",
+        "skills/markdown-language-profile/SKILL.md",
+        "docs/evaluations/apg66-markdown-language-profile-validation-and-integration.md",
+        "docs/evaluations/apg66a-markdown-replay-evidence-truth.md"
+      ]
+    },
+    "independent_review": {
+      "assessment": "PENDING",
+      "observation": "Dispatcher-owned APG166 work review pending. Explicit individual disposition of this exact body and evidence is required; historical APG139 acceptance is maintenance only.",
+      "references": []
+    },
+    "provenance": {
+      "assessment": "SUPPORTED",
+      "observation": "Retained canonical source/maintenance boundary and APG provenance record remain the source authority. Historical evaluations identify their original phase and scope; they are reused only for the observations stated here. No external source text is copied or new source refresh claimed.",
+      "references": [
+        "skills/markdown-language-profile/SKILL.md",
+        "docs/provenance.md",
+        "docs/evaluations/apg66-markdown-language-profile-validation-and-integration.md",
+        "docs/evaluations/apg66a-markdown-replay-evidence-truth.md"
+      ]
+    },
+    "repeated_positive_use": {
+      "assessment": "LIMITED",
+      "observation": "APG66 replays accepted semantic scenarios; APG66A-D correct evidence guards. Navigation coverage is not a semantic oracle, and target file inventories do not prove guidance invocation. APG166 supplies no newly verified repeated guidance-use invocations. Planner and acquisition fixtures do not fill this gap.",
+      "references": [
+        "skills/markdown-language-profile/SKILL.md",
+        "docs/evaluations/apg66-markdown-language-profile-validation-and-integration.md",
+        "docs/evaluations/apg66a-markdown-replay-evidence-truth.md"
+      ]
+    },
+    "representative_non_triggers": {
+      "assessment": "LIMITED",
+      "observation": "Positive material structured fact, two representative foreign-owner facts, and Producer/Work Review role variations exercise deterministic selection. This proves a fact boundary, not semantic guidance efficacy or live non-trigger judgment.",
+      "references": [
+        "skills/h_promotion_test.go",
+        "skills/markdown-language-profile/SKILL.md"
+      ]
+    },
+    "rollback": {
+      "assessment": "SUPPORTED",
+      "observation": "Preserve historical decisions; use the canonical leaf maintenance/removal boundary and the referenced integration evaluation to reconcile leaf, projection, catalog and focused tests if a separately authorized rollback is needed. APG139 changes no leaf content or deployment.",
+      "references": [
+        "skills/markdown-language-profile/SKILL.md",
+        "docs/skill-authoring-and-maintenance.md",
+        "docs/evaluations/apg66-markdown-language-profile-validation-and-integration.md",
+        "docs/evaluations/apg66a-markdown-replay-evidence-truth.md"
+      ]
+    }
+  },
+  "independent_review": null,
+  "late_acquisition": "Shared G engine exact-source contract; H qualification checks all five primary bodies. Live native recovery unavailable.",
+  "ledger_entry": {
+    "bytes": 2001,
+    "sha256": "23f6f223e3f00d966ea2bd3d2cd76e5af3b734e102c088bf820248fd441104cb"
+  },
+  "next_lifecycle_trigger": "Supply repeated actual Markdown parser/renderer-bound guidance decisions and representative dialect, raw-HTML and frontmatter non-trigger cases; bind parser settings and independently validate the current semantic outcome.",
+  "phase": "APG166",
+  "proposed_outcome": "RETAIN_PROVISIONAL_INSUFFICIENT_EVIDENCE",
+  "rollback": "Historical supported removal contract retained. H changes no body, ledger maturity or live projection; no new live de-projection is claimed.",
+  "schema_version": "apg.h-promotion-evidence/v1",
+  "skill_id": "markdown-language-profile",
+  "source_path": "skills/markdown-language-profile/SKILL.md",
+  "verified_new_positive_invocations": 0,
+  "whole_source": {
+    "bytes": 11566,
+    "sha256": "0102078f16b28b9054ec008218ab5877621540705297307482c7c58447a7013a"
+  }
+}

@@ -10,7 +10,7 @@ import re
 import stat
 import tomllib
 from types import MappingProxyType
-from typing import Callable, Mapping, NamedTuple
+from typing import Any, Callable, Mapping, NamedTuple
 
 from .request import EXECUTION_MODES, PHASE_TYPES
 
@@ -96,6 +96,11 @@ class RosterSnapshot:
     generation: int
     endpoints_source: RosterSource
     routes_source: RosterSource
+    capabilities_source: RosterSource | None = None
+    policy_source: RosterSource | None = None
+    capabilities_catalog: Mapping[str, Any] | None = None
+    policy: Mapping[str, Any] | None = None
+    bundle: Any = None
 
     def __post_init__(self) -> None:
         endpoints = MappingProxyType(dict(self.endpoints))
@@ -107,6 +112,18 @@ class RosterSnapshot:
         )
         object.__setattr__(self, "endpoints", endpoints)
         object.__setattr__(self, "routes", routes)
+        if self.capabilities_catalog is not None:
+            object.__setattr__(
+                self,
+                "capabilities_catalog",
+                MappingProxyType(dict(self.capabilities_catalog)),
+            )
+        if self.policy is not None:
+            object.__setattr__(
+                self,
+                "policy",
+                MappingProxyType(dict(self.policy)),
+            )
 
     def route_aliases(self, phase_type: str, execution_mode: str) -> dict[str, str]:
         key = (phase_type, execution_mode)
@@ -124,13 +141,22 @@ class RosterSnapshot:
         }
 
     def provenance(self) -> dict[str, object]:
+        sources: dict[str, Any] = {
+            "endpoints": self.endpoints_source.as_dict(),
+            "routes": self.routes_source.as_dict(),
+        }
+        if self.capabilities_source is not None:
+            sources["capabilities"] = self.capabilities_source.as_dict()
+        if self.policy_source is not None:
+            sources["policy"] = self.policy_source.as_dict()
+        if self.bundle is not None:
+            prefix = "common/dispatcher" if self.bundle.manifest.get("authority") == "source_default" else "dispatcher"
+            sources.update({name.removesuffix(".toml"): {"path": f"{prefix}/{name}", "sha256": member.sha256}
+                            for name, member in self.bundle.members.items()})
         return {
             "schema": PROVENANCE_SCHEMA,
             "generation": self.generation,
-            "sources": {
-                "endpoints": self.endpoints_source.as_dict(),
-                "routes": self.routes_source.as_dict(),
-            },
+            "sources": sources,
         }
 
 
@@ -143,7 +169,8 @@ def _display(relative: Path) -> str:
 
 
 def _path_error(relative: Path, detail: str) -> RosterError:
-    return RosterError(f"cannot read tracked roster {_display(relative)}: {detail}")
+    label = "operator" if relative.parts and relative.parts[0] == "dispatcher" else "tracked"
+    return RosterError(f"cannot read {label} roster {_display(relative)}: {detail}")
 
 
 def _validate_relative(relative: Path) -> None:
@@ -424,33 +451,40 @@ def _source(value: _CapturedSource) -> RosterSource:
     )
 
 
-def load_roster(root: Path) -> RosterSnapshot:
+def load_roster(root: Path, apgr_home: Path | str | None = None) -> RosterSnapshot:
     """Capture, revalidate, parse, and freeze one coherent roster generation."""
-    repository_root = Path(os.path.abspath(os.fspath(root)))
-    endpoints_source = _capture_source(repository_root, ENDPOINTS_SOURCE)
-    routes_source = _capture_source(repository_root, ROUTES_SOURCE)
-    _revalidate_source(repository_root, endpoints_source)
-    _revalidate_source(repository_root, routes_source)
-    endpoints_value = _parse_toml(endpoints_source)
-    routes_value = _parse_toml(routes_source)
-    endpoints_generation, endpoints = _parse_endpoints(endpoints_value)
-    routes_generation, routes = _parse_routes(routes_value, endpoints)
-    if endpoints_generation != routes_generation:
-        raise RosterError(
-            "endpoints and routes roster generation values must match exactly"
+    from .bundle import load_bundle, BundleError
+    from .config_routing import load_policy_file
+    from .capabilities import parse_capabilities
+    try:
+        bundle = load_bundle(apgr_home=apgr_home, repo_root=root)
+        members = bundle.members
+        generation, endpoints = _parse_endpoints(tomllib.loads(members["endpoints.toml"].raw.decode()))
+        route_generation, routes = _parse_routes(tomllib.loads(members["routes.toml"].raw.decode()), endpoints)
+        if generation != route_generation:
+            raise RosterError("roster generation mismatch")
+        def source(name):
+            member = members[name]
+            return RosterSource(member.path, member.sha256, member.raw,
+                                PhysicalIdentity.from_stat(member.path.stat()))
+        policy = load_policy_file(members["policy.toml"].path,
+                                  raw_bytes=members["policy.toml"].raw,
+                                  expected_generation=generation)
+        return RosterSnapshot(
+            endpoints=endpoints, routes=routes, generation=generation,
+            endpoints_source=source("endpoints.toml"), routes_source=source("routes.toml"),
+            capabilities_source=source("capabilities.toml"), policy_source=source("policy.toml"),
+            capabilities_catalog=parse_capabilities(tomllib.loads(members["capabilities.toml"].raw.decode())),
+            policy=policy, bundle=bundle,
         )
-    return RosterSnapshot(
-        endpoints=endpoints,
-        routes=routes,
-        generation=endpoints_generation,
-        endpoints_source=_source(endpoints_source),
-        routes_source=_source(routes_source),
-    )
+    except BundleError as error:
+        raise RosterError(str(error)) from error
 
 
 def validate_profiles(
     roster: RosterSnapshot, validator: Callable[[str, Endpoint], None]
 ) -> None:
     """Validate every tracked alias through provider-owned profile authority."""
-    for alias, endpoint in sorted(roster.endpoints.items()):
-        validator(alias, endpoint)
+    active = {alias for route in roster.routes.values() for alias in route.values()}
+    for alias in sorted(active):
+        validator(alias, roster.endpoints[alias])

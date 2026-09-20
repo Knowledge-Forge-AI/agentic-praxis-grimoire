@@ -1,0 +1,2433 @@
+{
+  "freeze_policy": "Any body/case/rubric change invalidates this preregistration before live use. No post-observation task change. Three planned positive tasks for each skill do not lower existing qualitative repeated-use criteria.",
+  "live_observations": 0,
+  "phase": "APG166E",
+  "reserve_substitution": false,
+  "schema": "apg.h-promotion-preregistration/v1",
+  "skills": [
+    {
+      "body_identity": {
+        "bytes": 16452,
+        "sha256": "a2a1090422ddd0aa38610f7beedad1d6af6d50f7c6c553fc6f1f5aabfb04935f"
+      },
+      "cases": [
+        {
+          "case_id": "go-language-profile/positive/cancellation",
+          "case_sha256": "e851257711a6061afbf418c16505ef867c8d05f7c9c91cc77ca0713790af7896",
+          "kind": "positive",
+          "oracle": {
+            "command": [
+              "go",
+              "test",
+              "-count=1",
+              "./..."
+            ],
+            "independent_rubric": "Source-owned fixture assertions enforce the case-specific source contract; model transcripts, prompt compliance, and command exit alone cannot satisfy this contract.",
+            "schema": "apg.h-promotion-oracle/v1",
+            "fixture_id": "go-language-profile/positive/cancellation",
+            "fixture_source": "testing/h_eval/promotion_oracles.py",
+            "fixture_kind": "command",
+            "expected_status": {
+              "good": "pass",
+              "bad": "fail"
+            },
+            "assertion_owner": "source-owned",
+            "test_ownership": "fixture-owned",
+            "decision_axis": "bounded result-channel capacity",
+            "runtime_requirements": [
+              "go"
+            ],
+            "hidden_fact_digests": [
+              "2aba1bba2c379ed653d5cea3288d9c99198a32337ed8b4e09e4c5667904086a4",
+              "065e22af1a9d24d0b05fa93d5868f673357f0777bf240f55b81358baecef5389",
+              "d163f8b12d465b8a47d17548f8e6dfe9a5e9a72fcbb76c88a621b45500279cb6"
+            ],
+            "fixture_contract": "command_exit_and_assertions",
+            "oracle_id": "go-language-profile/positive/cancellation::source-oracle-v2",
+            "hidden_oracle_sha256": "babf33d9e2ec6ec7d9b0a3d020cda936c4debe7f03adc39174adc465ed9ed24f",
+            "case_sha256": "e851257711a6061afbf418c16505ef867c8d05f7c9c91cc77ca0713790af7896"
+          },
+          "prompt": "Complete the missing Fetch behavior for this package. Callers need response bytes on success and a useful error when work is canceled or cannot complete; resource ownership must remain safe on every exit. Keep the exported API stable and the module self-contained. Cancellation errors must preserve errors.Is(err, context.Canceled) compatibility; expired deadlines must preserve errors.Is(err, context.DeadlineExceeded) compatibility. Explanatory wrapping may use %w.",
+          "attribution_rubric": {
+            "material_decision_required": true,
+            "decision_not_dictated_by": [
+              "prompt",
+              "oracle"
+            ],
+            "exact_guidance_link_required": true,
+            "resulting_work_link_required": true,
+            "insufficient_evidence": [
+              "skill delivery",
+              "native Read",
+              "skill acquisition",
+              "prompt compliance"
+            ],
+            "mode": "positive_use"
+          },
+          "relevance_category": "cancellation",
+          "required_evidence": [
+            "Exact runtime versions/settings and subject input/output hashes",
+            "Retained provider transcript and guidance invocation",
+            "Material decision not dictated by the prompt or oracle, linked to exact delivered guidance and the resulting work; skill delivery, native Read, skill acquisition or prompt compliance alone is insufficient",
+            "Independent substantive review with task-specific evidence and limitations"
+          ],
+          "route": {
+            "model": "gpt-6-astra",
+            "model_source": "codex/profiles/implementation-testing.config.toml",
+            "model_source_sha256": "8a786851da04d75b06f62781a418df6959d335d61a03e32613250bb33d588261",
+            "profile": "implementation-testing",
+            "provider": "codex",
+            "role": "Producer"
+          },
+          "subject_files": {
+            "fetch.go": "package fetch\nimport \"context\"\nfunc Fetch(ctx context.Context, url string) ([]byte, error) { panic(\"unimplemented\") }\n",
+            "go.mod": "module example.invalid/cancel\n\ngo 1.25\n",
+            "README.md": "This package is used by a caller that may stop work while a remote request is outstanding. Keep the exported API stable. Successful callers need response bytes and failed callers need an error that explains the failed operation. Transport, retry, and timeout choices are intentionally open.\nCancellation errors must preserve errors.Is(err, context.Canceled) compatibility; expired deadlines must preserve errors.Is(err, context.DeadlineExceeded) compatibility. Explanatory wrapping may use %w.\n"
+          }
+        },
+        {
+          "case_id": "go-language-profile/positive/concurrency",
+          "case_sha256": "164cbfe02d18a2241293344629d14655033ca366e2d810c9fcd8c0265b877b21",
+          "kind": "positive",
+          "oracle": {
+            "command": [
+              "go",
+              "test",
+              "-race",
+              "-count=1",
+              "./..."
+            ],
+            "independent_rubric": "Source-owned fixture assertions enforce the case-specific source contract; model transcripts, prompt compliance, and command exit alone cannot satisfy this contract.",
+            "schema": "apg.h-promotion-oracle/v1",
+            "fixture_id": "go-language-profile/positive/concurrency",
+            "fixture_source": "testing/h_eval/promotion_oracles.py",
+            "fixture_kind": "command",
+            "expected_status": {
+              "good": "pass",
+              "bad": "fail"
+            },
+            "assertion_owner": "source-owned",
+            "test_ownership": "fixture-owned",
+            "decision_axis": "worker error aggregation strategy",
+            "runtime_requirements": [
+              "go",
+              "cc"
+            ],
+            "hidden_fact_digests": [
+              "0c1112cebd1e292939050033ce5946e125d3e1520f9f8b6f9de058504f152e62",
+              "7565a6a13d57106514cf82052133f0a3d0104781c7dddc3ec0f3ff3cc1170108",
+              "a9593df2e719efcc5f442e38b30aed4db4ce41dce05b1d2bff445e87745c6dc3"
+            ],
+            "fixture_contract": "command_exit_and_assertions",
+            "oracle_id": "go-language-profile/positive/concurrency::source-oracle-v2",
+            "hidden_oracle_sha256": "55e934c0c6d51f189da30bcdc198b66f6963ce1170a1b7a91bdcef689825f973",
+            "case_sha256": "164cbfe02d18a2241293344629d14655033ca366e2d810c9fcd8c0265b877b21"
+          },
+          "prompt": "Complete the missing Map behavior for this package. Callers need bounded progress over the supplied values, results aligned with input order, useful error propagation, and prompt cancellation. Keep the exported API stable and avoid new dependencies.",
+          "attribution_rubric": {
+            "material_decision_required": true,
+            "decision_not_dictated_by": [
+              "prompt",
+              "oracle"
+            ],
+            "exact_guidance_link_required": true,
+            "resulting_work_link_required": true,
+            "insufficient_evidence": [
+              "skill delivery",
+              "native Read",
+              "skill acquisition",
+              "prompt compliance"
+            ],
+            "mode": "positive_use"
+          },
+          "relevance_category": "concurrency",
+          "required_evidence": [
+            "Exact runtime versions/settings and subject input/output hashes",
+            "Retained provider transcript and guidance invocation",
+            "Material decision not dictated by the prompt or oracle, linked to exact delivered guidance and the resulting work; skill delivery, native Read, skill acquisition or prompt compliance alone is insufficient",
+            "Independent substantive review with task-specific evidence and limitations"
+          ],
+          "route": {
+            "model": "gpt-6-astra",
+            "model_source": "codex/profiles/implementation-testing.config.toml",
+            "model_source_sha256": "8a786851da04d75b06f62781a418df6959d335d61a03e32613250bb33d588261",
+            "profile": "implementation-testing",
+            "provider": "codex",
+            "role": "Producer"
+          },
+          "subject_files": {
+            "go.mod": "module example.invalid/map\n\ngo 1.25\n",
+            "map.go": "package parallel\nimport \"context\"\nfunc Map(ctx context.Context, values []int, workers int, fn func(context.Context,int)(int,error)) ([]int,error) { panic(\"unimplemented\") }\n",
+            "README.md": "Callers consume results by the same positions they supplied. Work may be expensive and may stop partway through. Keep the exported function stable; choose the worker lifecycle and error policy that make cancellation and partial failure understandable without adding dependencies.\nThe workers parameter limits simultaneous callbacks. With sufficient input and workers > 1, callbacks must be able to make concurrent progress. Already-canceled and in-flight contexts must return their cancellation error, and callback errors must remain observable.\n"
+          }
+        },
+        {
+          "case_id": "go-language-profile/positive/api-resources",
+          "case_sha256": "0a02ff7e235ead391f7cfd08a88ccc842633b60d6e206fb231d330e48a117eb1",
+          "kind": "positive",
+          "oracle": {
+            "command": [
+              "go",
+              "test",
+              "-count=1",
+              "./..."
+            ],
+            "independent_rubric": "Source-owned fixture assertions enforce the case-specific source contract; model transcripts, prompt compliance, and command exit alone cannot satisfy this contract.",
+            "schema": "apg.h-promotion-oracle/v1",
+            "fixture_id": "go-language-profile/positive/api-resources",
+            "fixture_source": "testing/h_eval/promotion_oracles.py",
+            "fixture_kind": "command",
+            "expected_status": {
+              "good": "pass",
+              "bad": "fail"
+            },
+            "assertion_owner": "source-owned",
+            "test_ownership": "fixture-owned",
+            "decision_axis": "destination truncation policy",
+            "runtime_requirements": [
+              "go"
+            ],
+            "hidden_fact_digests": [
+              "bd91c5d95522254f2964187e878ca924032ea05d963160b2d30ce3230c587c98",
+              "7554af80050b83aec27f1148c5c54a22d3ad88f4ffd61bfb8cd9091d2a27ed83",
+              "d72248d07f7863ab22bb5185c3ddc0053be6c22db594db79a3ddd747f2f1624b"
+            ],
+            "fixture_contract": "command_exit_and_assertions",
+            "oracle_id": "go-language-profile/positive/api-resources::source-oracle-v2",
+            "hidden_oracle_sha256": "0b5a5b09290fb4cec1decfa0ab7a30c24b1658dfe3aac7eb9c1933a79d7152be",
+            "case_sha256": "0a02ff7e235ead391f7cfd08a88ccc842633b60d6e206fb231d330e48a117eb1"
+          },
+          "prompt": "Complete CopyFile for this package. Give callers predictable behavior for an existing destination and preserve failures from each stage of the copy operation. Keep the exported API stable, explain the chosen destination behavior, and avoid new dependencies.",
+          "attribution_rubric": {
+            "material_decision_required": true,
+            "decision_not_dictated_by": [
+              "prompt",
+              "oracle"
+            ],
+            "exact_guidance_link_required": true,
+            "resulting_work_link_required": true,
+            "insufficient_evidence": [
+              "skill delivery",
+              "native Read",
+              "skill acquisition",
+              "prompt compliance"
+            ],
+            "mode": "positive_use"
+          },
+          "relevance_category": "api-resources",
+          "required_evidence": [
+            "Exact runtime versions/settings and subject input/output hashes",
+            "Retained provider transcript and guidance invocation",
+            "Material decision not dictated by the prompt or oracle, linked to exact delivered guidance and the resulting work; skill delivery, native Read, skill acquisition or prompt compliance alone is insufficient",
+            "Independent substantive review with task-specific evidence and limitations"
+          ],
+          "route": {
+            "model": "gpt-6-astra",
+            "model_source": "codex/profiles/implementation-testing.config.toml",
+            "model_source_sha256": "8a786851da04d75b06f62781a418df6959d335d61a03e32613250bb33d588261",
+            "profile": "implementation-testing",
+            "provider": "codex",
+            "role": "Producer"
+          },
+          "subject_files": {
+            "copy.go": "package copyfile\nfunc CopyFile(src, dst string) error { panic(\"unimplemented\") }\n",
+            "go.mod": "module example.invalid/copy\n\ngo 1.25\n",
+            "README.md": "A local tool uses this helper for generated artifacts. Keep the exported API stable, make behavior at an existing destination explicit, and keep source and destination failures diagnosable. The repository leaves the copy strategy open.\nFor an existing destination, either replace its entire contents with the source bytes or report an error without changing its bytes. Both policies are supported; silent partial overwrite is unsafe.\n"
+          }
+        },
+        {
+          "case_id": "go-language-profile/non-trigger/go-test-only",
+          "case_sha256": "a165292e4210a97a44d445953f8d920d9b5fc8aff2ea6d4e0c726213973b4fe6",
+          "kind": "non-trigger",
+          "oracle": {
+            "command": null,
+            "independent_rubric": "Source-owned later-result grading checks the visible requested replacement and preservation of surrounding files and content, allowing only line-ending and trailing-whitespace normalization. Provider-free semantic non-use remains structure-only; later traces, actual task result and independent disposition are still required.",
+            "schema": "apg.h-promotion-oracle/v1",
+            "fixture_id": "go-language-profile/non-trigger/go-test-only",
+            "fixture_source": "testing/h_eval/promotion_oracles.py",
+            "fixture_kind": "source_fact",
+            "expected_status": {
+              "good": "pass",
+              "bad": "fail"
+            },
+            "assertion_owner": "source-owned",
+            "test_ownership": "fixture-owned",
+            "decision_axis": "scope exclusion rationale",
+            "runtime_requirements": [],
+            "hidden_fact_digests": [
+              "536e330601ece1df780dc97da356899a050337db058ee0c6288178b83d8ca9ab"
+            ],
+            "fixture_contract": "neighbor_go_test_only",
+            "oracle_id": "go-language-profile/non-trigger/go-test-only::source-oracle-v2",
+            "hidden_oracle_sha256": "823d445e64c62be3f12f0783d4daaac056ea51204e913772a83252208422c35a",
+            "case_sha256": "a165292e4210a97a44d445953f8d920d9b5fc8aff2ea6d4e0c726213973b4fe6"
+          },
+          "prompt": "Rename TestOne to TestExample in x_test.go. Change only that identifier; preserve the remaining content and runner.",
+          "attribution_rubric": {
+            "material_decision_required": true,
+            "decision_not_dictated_by": [
+              "prompt",
+              "oracle"
+            ],
+            "exact_guidance_link_required": false,
+            "resulting_work_link_required": true,
+            "insufficient_evidence": [
+              "skill delivery",
+              "native Read",
+              "skill acquisition",
+              "prompt compliance"
+            ],
+            "mode": "semantic_non_use",
+            "neighboring_domain_non_use_required": true,
+            "semantic_non_use_link_required": true
+          },
+          "relevance_category": "go-test-only",
+          "required_evidence": [
+            "Exact runtime versions/settings and subject input/output hashes",
+            "Retained provider transcript and guidance invocation",
+            "Semantic non-use decision with neighboring-domain rationale; resolver nonselection, skill delivery, native Read or prompt compliance alone is insufficient",
+            "Independent substantive review with task-specific evidence and limitations"
+          ],
+          "route": {
+            "model": "gpt-6-astra",
+            "model_source": "codex/profiles/implementation-testing.config.toml",
+            "model_source_sha256": "8a786851da04d75b06f62781a418df6959d335d61a03e32613250bb33d588261",
+            "profile": "implementation-testing",
+            "provider": "codex",
+            "role": "Producer"
+          },
+          "subject_files": {
+            "x_test.go": "package example\nimport \"testing\"\nfunc TestOne(t *testing.T) {}\n"
+          },
+          "non_trigger_contract": {
+            "target_skill": "go-language-profile",
+            "neighboring_domain": "go-test-only",
+            "external_correctness_oracle": {
+              "owner": "source-owned-later-result-and-independent-review",
+              "required": true,
+              "observable_facts": [
+                "requested_neighbor_edit_with_preserved_surroundings"
+              ],
+              "task_result_required": true,
+              "result_api": "testing.h_eval.promotion_oracles.evaluate_model_output",
+              "contract": "requested replacement; preserve other files and content; line endings and trailing whitespace immaterial"
+            },
+            "required_evidence": [
+              "selection/delivery/acquisition/read traces",
+              "actual task result",
+              "absence of material target-skill guidance use",
+              "reviewer disposition of semantic non-use"
+            ],
+            "provider_free_claim": "structure-only"
+          }
+        },
+        {
+          "case_id": "go-language-profile/non-trigger/non-go",
+          "case_sha256": "19ade2059a3a6a62e7fb430f501763d723854ac93a21ad83d8b762187ae579fa",
+          "kind": "non-trigger",
+          "oracle": {
+            "command": null,
+            "independent_rubric": "Source-owned later-result grading checks the visible requested replacement and preservation of surrounding files and content, allowing only line-ending and trailing-whitespace normalization. Provider-free semantic non-use remains structure-only; later traces, actual task result and independent disposition are still required.",
+            "schema": "apg.h-promotion-oracle/v1",
+            "fixture_id": "go-language-profile/non-trigger/non-go",
+            "fixture_source": "testing/h_eval/promotion_oracles.py",
+            "fixture_kind": "source_fact",
+            "expected_status": {
+              "good": "pass",
+              "bad": "fail"
+            },
+            "assertion_owner": "source-owned",
+            "test_ownership": "fixture-owned",
+            "decision_axis": "scope exclusion rationale",
+            "runtime_requirements": [],
+            "hidden_fact_digests": [
+              "536e330601ece1df780dc97da356899a050337db058ee0c6288178b83d8ca9ab"
+            ],
+            "fixture_contract": "neighbor_non_go",
+            "oracle_id": "go-language-profile/non-trigger/non-go::source-oracle-v2",
+            "hidden_oracle_sha256": "9565175fbd1a5a6df123eea3651f73a31ea5e033a31266ab84718f9112cc95a3",
+            "case_sha256": "19ade2059a3a6a62e7fb430f501763d723854ac93a21ad83d8b762187ae579fa"
+          },
+          "prompt": "Correct Exampel to Example in the Python docstring in x.py. Preserve all other content.",
+          "attribution_rubric": {
+            "material_decision_required": true,
+            "decision_not_dictated_by": [
+              "prompt",
+              "oracle"
+            ],
+            "exact_guidance_link_required": false,
+            "resulting_work_link_required": true,
+            "insufficient_evidence": [
+              "skill delivery",
+              "native Read",
+              "skill acquisition",
+              "prompt compliance"
+            ],
+            "mode": "semantic_non_use",
+            "neighboring_domain_non_use_required": true,
+            "semantic_non_use_link_required": true
+          },
+          "relevance_category": "non-go",
+          "required_evidence": [
+            "Exact runtime versions/settings and subject input/output hashes",
+            "Retained provider transcript and guidance invocation",
+            "Semantic non-use decision with neighboring-domain rationale; resolver nonselection, skill delivery, native Read or prompt compliance alone is insufficient",
+            "Independent substantive review with task-specific evidence and limitations"
+          ],
+          "route": {
+            "model": "gpt-6-astra",
+            "model_source": "codex/profiles/implementation-testing.config.toml",
+            "model_source_sha256": "8a786851da04d75b06f62781a418df6959d335d61a03e32613250bb33d588261",
+            "profile": "implementation-testing",
+            "provider": "codex",
+            "role": "Producer"
+          },
+          "subject_files": {
+            "x.py": "\"\"\"Exampel.\"\"\"\n"
+          },
+          "non_trigger_contract": {
+            "target_skill": "go-language-profile",
+            "neighboring_domain": "non-go",
+            "external_correctness_oracle": {
+              "owner": "source-owned-later-result-and-independent-review",
+              "required": true,
+              "observable_facts": [
+                "requested_neighbor_edit_with_preserved_surroundings"
+              ],
+              "task_result_required": true,
+              "result_api": "testing.h_eval.promotion_oracles.evaluate_model_output",
+              "contract": "requested replacement; preserve other files and content; line endings and trailing whitespace immaterial"
+            },
+            "required_evidence": [
+              "selection/delivery/acquisition/read traces",
+              "actual task result",
+              "absence of material target-skill guidance use",
+              "reviewer disposition of semantic non-use"
+            ],
+            "provider_free_claim": "structure-only"
+          }
+        }
+      ],
+      "count_is_not_redefinition_of_repeated": true,
+      "maturity_entry": {
+        "active_debts": [],
+        "blocking_debts": [],
+        "current_maturity": "provisional",
+        "debt_authority": "docs/governance/language-profile-known-debt.json",
+        "disposition_status": "PROVISIONAL_MAINTENANCE",
+        "evidence": {
+          "current_validation": [
+            "docs/governance/maturity/apg139/go-language-profile.json",
+            "docs/governance/maturity/apg139/qualification.md"
+          ],
+          "defect_debt_disposition": [
+            "docs/governance/maturity/apg139/go-language-profile.json"
+          ],
+          "independent_review": [
+            "docs/governance/maturity/apg139/independent-review.md"
+          ],
+          "provenance": [
+            "docs/governance/maturity/apg139/go-language-profile.json"
+          ],
+          "repeated_positive_use": [
+            "docs/governance/maturity/apg139/go-language-profile.json"
+          ],
+          "representative_non_triggers": [
+            "docs/governance/maturity/apg139/go-language-profile.json"
+          ],
+          "rollback": [
+            "docs/governance/maturity/apg139/go-language-profile.json"
+          ]
+        },
+        "independent_review": "docs/governance/maturity/apg139/independent-review.md",
+        "maintenance_ref": "MATURITY:go-language-profile",
+        "next_lifecycle_trigger": "Supply repeated actual Go guidance decisions involving errors, cancellation, concurrency, API or resource semantics with exact toolchain context and claim-appropriate validation; include mechanical-edit non-triggers and unsafe/cgo stops where applicable, then independent review.",
+        "path": "skills/go-language-profile/SKILL.md",
+        "required_evidence_categories": [
+          "repeated_positive_use",
+          "representative_non_triggers",
+          "defect_debt_disposition",
+          "rollback",
+          "provenance",
+          "independent_review",
+          "current_validation"
+        ],
+        "resolved_debts": [],
+        "skill_id": "go-language-profile",
+        "source_references": [
+          "skills/go-language-profile/SKILL.md",
+          "skills/README.md",
+          "docs/provenance.md",
+          "docs/skill-authoring-and-maintenance.md",
+          "docs/governance/maturity/apg139/go-language-profile.json"
+        ]
+      },
+      "planning_case_count": 3,
+      "prior_refusal_sha256": "f016bce91d637094579f488ceeccb09503f2f0b3f4bd4b513c969670efeb311a",
+      "repeated_requirement": "At least three non-trivial guidance invocations; cancellation/errors/concurrency/API/resource semantics",
+      "review_rubric": {
+        "must_verify": [
+          "All positive cases are distinct substantive decisions, not repeated delivery of one task",
+          "All semantic non-triggers retain actual guidance-use/non-use evidence",
+          "Exact skill body and maturity criteria remain unchanged",
+          "Current independent review cannot manufacture missing evidence",
+          "Historical evidence remains attributed; unresolved criterion means retain provisional"
+        ],
+        "promotion_authorized": false,
+        "required_categories": [
+          "repeated_positive_use",
+          "representative_non_triggers",
+          "defect_debt_disposition",
+          "rollback",
+          "provenance",
+          "independent_review",
+          "current_validation"
+        ]
+      },
+      "skill_id": "go-language-profile",
+      "source_path": "skills/go-language-profile/SKILL.md",
+      "whole_sha256": "1a87a3597ed8f3a2363dda4882d27bc59641ffe2053a87630b2dc289f084c110"
+    },
+    {
+      "body_identity": {
+        "bytes": 17487,
+        "sha256": "b675e94daabf185896bba5cf740891215e74741b1088ba2fa74cb9d5576c6e61"
+      },
+      "cases": [
+        {
+          "case_id": "go-test-profile/positive/lifecycle",
+          "case_sha256": "b84c865b945683979d65bf7a829d6b732a753f2a04112cf63ac2e7f02f0f093e",
+          "kind": "positive",
+          "oracle": {
+            "command": [
+              "go",
+              "test",
+              "-count=1",
+              "./..."
+            ],
+            "independent_rubric": "Source-owned fixture assertions enforce the case-specific source contract; model transcripts, prompt compliance, and command exit alone cannot satisfy this contract.",
+            "schema": "apg.h-promotion-oracle/v1",
+            "fixture_id": "go-test-profile/positive/lifecycle",
+            "fixture_source": "testing/h_eval/promotion_oracles.py",
+            "fixture_kind": "command",
+            "expected_status": {
+              "good": "pass",
+              "bad": "fail"
+            },
+            "assertion_owner": "source-owned",
+            "test_ownership": "fixture-owned",
+            "decision_axis": "table-driven malformed-input cases",
+            "runtime_requirements": [
+              "go"
+            ],
+            "hidden_fact_digests": [
+              "5a7cbdc7ae662c7f9f4237c27660cb80e2d23f6a01a34e67ff83e1a114dd627e",
+              "35767bf4f76f9dc8e85f02468f9d98188eb6dabd7b856c86da5b868528dfed41",
+              "0bff74a6a39ec6df1be43ed2f39f9d8255954bc2ac42bc7d68ff554730712bb2"
+            ],
+            "fixture_contract": "command_exit_and_assertions",
+            "oracle_id": "go-test-profile/positive/lifecycle::source-oracle-v2",
+            "hidden_oracle_sha256": "e563cab3db3fa1eb8feaeeb5fa8fb8c91fa5115d1f467930866241a3eeaf1666",
+            "case_sha256": "b84c865b945683979d65bf7a829d6b732a753f2a04112cf63ac2e7f02f0f093e"
+          },
+          "prompt": "Extend this package so malformed input is observable as a failure while the existing parser behavior stays intact. Keep the public function stable and make the package validation behavior easy for maintainers to assess.",
+          "attribution_rubric": {
+            "material_decision_required": true,
+            "decision_not_dictated_by": [
+              "prompt",
+              "oracle"
+            ],
+            "exact_guidance_link_required": true,
+            "resulting_work_link_required": true,
+            "insufficient_evidence": [
+              "skill delivery",
+              "native Read",
+              "skill acquisition",
+              "prompt compliance"
+            ],
+            "mode": "positive_use"
+          },
+          "relevance_category": "lifecycle",
+          "required_evidence": [
+            "Exact runtime versions/settings and subject input/output hashes",
+            "Retained provider transcript and guidance invocation",
+            "Material decision not dictated by the prompt or oracle, linked to exact delivered guidance and the resulting work; skill delivery, native Read, skill acquisition or prompt compliance alone is insufficient",
+            "Independent substantive review with task-specific evidence and limitations"
+          ],
+          "route": {
+            "model": "gpt-6-astra",
+            "model_source": "codex/profiles/implementation-testing.config.toml",
+            "model_source_sha256": "8a786851da04d75b06f62781a418df6959d335d61a03e32613250bb33d588261",
+            "profile": "implementation-testing",
+            "provider": "codex",
+            "role": "Producer"
+          },
+          "subject_files": {
+            "go.mod": "module example.invalid/parsing\n\ngo 1.25\n",
+            "parse.go": "package parsing\nimport \"strconv\"\nfunc Parse(s string)(int,error){ return strconv.Atoi(s) }\n",
+            "README.md": "The parser is used by callers that need a clear distinction between accepted integers and malformed input. Keep its public function stable and make this validation boundary easy to inspect. The package currently has no maintained checks for this boundary.\nAuthored-test qualification substitutes only parse.go with known-good and known-bad implementations. Your submitted module identity, collection configuration, tests and other support files remain unchanged in both runs.\n"
+          }
+        },
+        {
+          "case_id": "go-test-profile/positive/false-pass",
+          "case_sha256": "a23889532973adbf748bbeb0357ba17b82f9d1031bce149a1dc0cf6ae7d8422a",
+          "kind": "positive",
+          "oracle": {
+            "command": [
+              "go",
+              "test",
+              "-count=1",
+              "./..."
+            ],
+            "independent_rubric": "Source-owned fixture assertions enforce the case-specific source contract; model transcripts, prompt compliance, and command exit alone cannot satisfy this contract.",
+            "schema": "apg.h-promotion-oracle/v1",
+            "fixture_id": "go-test-profile/positive/false-pass",
+            "fixture_source": "testing/h_eval/promotion_oracles.py",
+            "fixture_kind": "command",
+            "expected_status": {
+              "good": "pass",
+              "bad": "fail"
+            },
+            "assertion_owner": "source-owned",
+            "test_ownership": "fixture-owned",
+            "decision_axis": "diagnostic wording for invalid results",
+            "runtime_requirements": [
+              "go"
+            ],
+            "hidden_fact_digests": [
+              "6c24f1be97bfd2c35b5c645054b7bc6483d9c782ea0f8d56e36f661dc4b6b7f8",
+              "293b2de7ebf40aed5495f8113b5f642ab8ac63bdd44b64ea1f753f263f1aa3d0",
+              "19408c310afd8e6c41d9b0cfd449a531dc2014e59ad88955cf61c6fa50422286"
+            ],
+            "fixture_contract": "command_exit_and_assertions",
+            "oracle_id": "go-test-profile/positive/false-pass::source-oracle-v2",
+            "hidden_oracle_sha256": "c6fd497ff3f7246b10a92dca4f7772a8982d946643c7a316cd7cbd06f7df1397",
+            "case_sha256": "a23889532973adbf748bbeb0357ba17b82f9d1031bce149a1dc0cf6ae7d8422a"
+          },
+          "prompt": "Make this package report a failed check truthfully while preserving its normal command-line entry point. A genuine failing case must not be reported as successful, and a passing regression must remain useful.",
+          "attribution_rubric": {
+            "material_decision_required": true,
+            "decision_not_dictated_by": [
+              "prompt",
+              "oracle"
+            ],
+            "exact_guidance_link_required": true,
+            "resulting_work_link_required": true,
+            "insufficient_evidence": [
+              "skill delivery",
+              "native Read",
+              "skill acquisition",
+              "prompt compliance"
+            ],
+            "mode": "positive_use"
+          },
+          "relevance_category": "false-pass",
+          "required_evidence": [
+            "Exact runtime versions/settings and subject input/output hashes",
+            "Retained provider transcript and guidance invocation",
+            "Material decision not dictated by the prompt or oracle, linked to exact delivered guidance and the resulting work; skill delivery, native Read, skill acquisition or prompt compliance alone is insufficient",
+            "Independent substantive review with task-specific evidence and limitations"
+          ],
+          "route": {
+            "model": "gpt-6-astra",
+            "model_source": "codex/profiles/implementation-testing.config.toml",
+            "model_source_sha256": "8a786851da04d75b06f62781a418df6959d335d61a03e32613250bb33d588261",
+            "profile": "implementation-testing",
+            "provider": "codex",
+            "role": "Producer"
+          },
+          "subject_files": {
+            "go.mod": "module example.invalid/harness\n\ngo 1.25\n",
+            "harness_test.go": "package harness\nimport (\"testing\"; \"os\")\nfunc TestMain(m *testing.M){m.Run();os.Exit(0)}\nfunc TestFailure(t *testing.T){t.Fatal(\"fixture failure\")}\n",
+            "harness.go": "package harness\nfunc Check(value int) bool { return value >= 0 }\n",
+            "README.md": "Check returns true for nonnegative integers and false for negatives. Repair the test harness so Go test reports failures truthfully. Maintain a regression that exercises accepted and rejected inputs.\nAuthored-test qualification substitutes only harness.go with known-good and known-bad implementations. Your submitted module identity, collection configuration, tests and other support files remain unchanged in both runs.\n"
+          }
+        },
+        {
+          "case_id": "go-test-profile/positive/parallel-isolation",
+          "case_sha256": "d3deaa13bf77838127b19ea84717f49528e8ea204afc92eaa2bfaa2e633364e5",
+          "kind": "positive",
+          "oracle": {
+            "command": [
+              "go",
+              "test",
+              "-race",
+              "-count=1",
+              "./..."
+            ],
+            "independent_rubric": "Source-owned fixture assertions enforce the case-specific source contract; model transcripts, prompt compliance, and command exit alone cannot satisfy this contract.",
+            "schema": "apg.h-promotion-oracle/v1",
+            "fixture_id": "go-test-profile/positive/parallel-isolation",
+            "fixture_source": "testing/h_eval/promotion_oracles.py",
+            "fixture_kind": "command",
+            "expected_status": {
+              "good": "pass",
+              "bad": "fail"
+            },
+            "assertion_owner": "source-owned",
+            "test_ownership": "fixture-owned",
+            "decision_axis": "temporary-directory fixture scope",
+            "runtime_requirements": [
+              "go",
+              "cc"
+            ],
+            "hidden_fact_digests": [
+              "d7ad74424326d27e2dd48f5f17a5d11eff218556c51730bc0189f0c4003751c6",
+              "db3d180ce3e176077281c5cef4792e21edb64753ce9ec332dd770175ad0fc606",
+              "203dd81e6b414569f7d4af7c66b3ceccdaac5ec7a97d092b4de96bf04cf1e2e7"
+            ],
+            "fixture_contract": "command_exit_and_assertions",
+            "oracle_id": "go-test-profile/positive/parallel-isolation::source-oracle-v2",
+            "hidden_oracle_sha256": "e133d202f7e5e7c13fc3df3836febe82744e7fc32d3e1790da55cde369b0af9e",
+            "case_sha256": "d3deaa13bf77838127b19ea84717f49528e8ea204afc92eaa2bfaa2e633364e5"
+          },
+          "prompt": "Make the package's concurrent file checks deterministic when they run together, with each check retaining its own result and no leftover shared state. Keep the existing check names and command entry point stable.",
+          "attribution_rubric": {
+            "material_decision_required": true,
+            "decision_not_dictated_by": [
+              "prompt",
+              "oracle"
+            ],
+            "exact_guidance_link_required": true,
+            "resulting_work_link_required": true,
+            "insufficient_evidence": [
+              "skill delivery",
+              "native Read",
+              "skill acquisition",
+              "prompt compliance"
+            ],
+            "mode": "positive_use"
+          },
+          "relevance_category": "parallel-isolation",
+          "required_evidence": [
+            "Exact runtime versions/settings and subject input/output hashes",
+            "Retained provider transcript and guidance invocation",
+            "Material decision not dictated by the prompt or oracle, linked to exact delivered guidance and the resulting work; skill delivery, native Read, skill acquisition or prompt compliance alone is insufficient",
+            "Independent substantive review with task-specific evidence and limitations"
+          ],
+          "route": {
+            "model": "gpt-6-astra",
+            "model_source": "codex/profiles/implementation-testing.config.toml",
+            "model_source_sha256": "8a786851da04d75b06f62781a418df6959d335d61a03e32613250bb33d588261",
+            "profile": "implementation-testing",
+            "provider": "codex",
+            "role": "Producer"
+          },
+          "subject_files": {
+            "files_test.go": "package files\nimport (\"os\"; \"testing\")\nfunc TestA(t *testing.T){t.Parallel();os.WriteFile(\"shared.txt\",[]byte(\"a\"),0600)}\nfunc TestB(t *testing.T){t.Parallel();os.WriteFile(\"shared.txt\",[]byte(\"b\"),0600)}\n",
+            "go.mod": "module example.invalid/isolation\n\ngo 1.25\n",
+            "isolation.go": "package files\nimport (\"os\"; \"path/filepath\")\nfunc WriteCheck(root, name, value string) error { return os.WriteFile(filepath.Join(root, name), []byte(value), 0600) }\n",
+            "README.md": "WriteCheck(root, name, value) writes value to the supplied root/name and reports write errors. Each concurrent check must verify its own resulting bytes in its own disposable directory.\nAuthored-test qualification substitutes only isolation.go with known-good and known-bad implementations. Your submitted module identity, collection configuration, tests and other support files remain unchanged in both runs.\n"
+          }
+        },
+        {
+          "case_id": "go-test-profile/non-trigger/production-go",
+          "case_sha256": "0959664002aaed99f7e2aa001d6764a1439109082c58b950bd195e4143e5db6f",
+          "kind": "non-trigger",
+          "oracle": {
+            "command": null,
+            "independent_rubric": "Source-owned later-result grading checks the visible requested replacement and preservation of surrounding files and content, allowing only line-ending and trailing-whitespace normalization. Provider-free semantic non-use remains structure-only; later traces, actual task result and independent disposition are still required.",
+            "schema": "apg.h-promotion-oracle/v1",
+            "fixture_id": "go-test-profile/non-trigger/production-go",
+            "fixture_source": "testing/h_eval/promotion_oracles.py",
+            "fixture_kind": "source_fact",
+            "expected_status": {
+              "good": "pass",
+              "bad": "fail"
+            },
+            "assertion_owner": "source-owned",
+            "test_ownership": "fixture-owned",
+            "decision_axis": "scope exclusion rationale",
+            "runtime_requirements": [],
+            "hidden_fact_digests": [
+              "536e330601ece1df780dc97da356899a050337db058ee0c6288178b83d8ca9ab"
+            ],
+            "fixture_contract": "neighbor_production_go",
+            "oracle_id": "go-test-profile/non-trigger/production-go::source-oracle-v2",
+            "hidden_oracle_sha256": "2132b11eeae2092e62c93acf7c0abf64dbd2ac7368e573e561ec562e39abb0a2",
+            "case_sha256": "0959664002aaed99f7e2aa001d6764a1439109082c58b950bd195e4143e5db6f"
+          },
+          "prompt": "Change the return string in Name from example to sample in x.go. Preserve the function signature and all other content; no test changes.",
+          "attribution_rubric": {
+            "material_decision_required": true,
+            "decision_not_dictated_by": [
+              "prompt",
+              "oracle"
+            ],
+            "exact_guidance_link_required": false,
+            "resulting_work_link_required": true,
+            "insufficient_evidence": [
+              "skill delivery",
+              "native Read",
+              "skill acquisition",
+              "prompt compliance"
+            ],
+            "mode": "semantic_non_use",
+            "neighboring_domain_non_use_required": true,
+            "semantic_non_use_link_required": true
+          },
+          "relevance_category": "production-go",
+          "required_evidence": [
+            "Exact runtime versions/settings and subject input/output hashes",
+            "Retained provider transcript and guidance invocation",
+            "Semantic non-use decision with neighboring-domain rationale; resolver nonselection, skill delivery, native Read or prompt compliance alone is insufficient",
+            "Independent substantive review with task-specific evidence and limitations"
+          ],
+          "route": {
+            "model": "gpt-6-astra",
+            "model_source": "codex/profiles/implementation-testing.config.toml",
+            "model_source_sha256": "8a786851da04d75b06f62781a418df6959d335d61a03e32613250bb33d588261",
+            "profile": "implementation-testing",
+            "provider": "codex",
+            "role": "Producer"
+          },
+          "subject_files": {
+            "x.go": "package example\nfunc Name() string { return \"example\" }\n"
+          },
+          "non_trigger_contract": {
+            "target_skill": "go-test-profile",
+            "neighboring_domain": "production-go",
+            "external_correctness_oracle": {
+              "owner": "source-owned-later-result-and-independent-review",
+              "required": true,
+              "observable_facts": [
+                "requested_neighbor_edit_with_preserved_surroundings"
+              ],
+              "task_result_required": true,
+              "result_api": "testing.h_eval.promotion_oracles.evaluate_model_output",
+              "contract": "requested replacement; preserve other files and content; line endings and trailing whitespace immaterial"
+            },
+            "required_evidence": [
+              "selection/delivery/acquisition/read traces",
+              "actual task result",
+              "absence of material target-skill guidance use",
+              "reviewer disposition of semantic non-use"
+            ],
+            "provider_free_claim": "structure-only"
+          }
+        },
+        {
+          "case_id": "go-test-profile/non-trigger/foreign-tests",
+          "case_sha256": "1183d2576997ee9cb15021f1ab455da3a288d844881bd9445337674cc669731e",
+          "kind": "non-trigger",
+          "oracle": {
+            "command": null,
+            "independent_rubric": "Source-owned later-result grading checks the visible requested replacement and preservation of surrounding files and content, allowing only line-ending and trailing-whitespace normalization. Provider-free semantic non-use remains structure-only; later traces, actual task result and independent disposition are still required.",
+            "schema": "apg.h-promotion-oracle/v1",
+            "fixture_id": "go-test-profile/non-trigger/foreign-tests",
+            "fixture_source": "testing/h_eval/promotion_oracles.py",
+            "fixture_kind": "source_fact",
+            "expected_status": {
+              "good": "pass",
+              "bad": "fail"
+            },
+            "assertion_owner": "source-owned",
+            "test_ownership": "fixture-owned",
+            "decision_axis": "scope exclusion rationale",
+            "runtime_requirements": [],
+            "hidden_fact_digests": [
+              "536e330601ece1df780dc97da356899a050337db058ee0c6288178b83d8ca9ab"
+            ],
+            "fixture_contract": "neighbor_foreign_runner",
+            "oracle_id": "go-test-profile/non-trigger/foreign-tests::source-oracle-v2",
+            "hidden_oracle_sha256": "e86562469557a49ce1046182c03dae1a6fffbed76d5e724a2e68d4fdb3a8a39b",
+            "case_sha256": "1183d2576997ee9cb15021f1ab455da3a288d844881bd9445337674cc669731e"
+          },
+          "prompt": "Correct the expected integer in the unittest assertion in test_x.py from 5 to 4, since 2 + 2 equals 4. Preserve all other content and the runner.",
+          "attribution_rubric": {
+            "material_decision_required": true,
+            "decision_not_dictated_by": [
+              "prompt",
+              "oracle"
+            ],
+            "exact_guidance_link_required": false,
+            "resulting_work_link_required": true,
+            "insufficient_evidence": [
+              "skill delivery",
+              "native Read",
+              "skill acquisition",
+              "prompt compliance"
+            ],
+            "mode": "semantic_non_use",
+            "neighboring_domain_non_use_required": true,
+            "semantic_non_use_link_required": true
+          },
+          "relevance_category": "foreign-tests",
+          "required_evidence": [
+            "Exact runtime versions/settings and subject input/output hashes",
+            "Retained provider transcript and guidance invocation",
+            "Semantic non-use decision with neighboring-domain rationale; resolver nonselection, skill delivery, native Read or prompt compliance alone is insufficient",
+            "Independent substantive review with task-specific evidence and limitations"
+          ],
+          "route": {
+            "model": "gpt-6-astra",
+            "model_source": "codex/profiles/implementation-testing.config.toml",
+            "model_source_sha256": "8a786851da04d75b06f62781a418df6959d335d61a03e32613250bb33d588261",
+            "profile": "implementation-testing",
+            "provider": "codex",
+            "role": "Producer"
+          },
+          "subject_files": {
+            "test_x.py": "import unittest\nclass T(unittest.TestCase):\n    def test_x(self): self.assertEqual(2 + 2, 5)\n"
+          },
+          "non_trigger_contract": {
+            "target_skill": "go-test-profile",
+            "neighboring_domain": "foreign-tests",
+            "external_correctness_oracle": {
+              "owner": "source-owned-later-result-and-independent-review",
+              "required": true,
+              "observable_facts": [
+                "requested_neighbor_edit_with_preserved_surroundings"
+              ],
+              "task_result_required": true,
+              "result_api": "testing.h_eval.promotion_oracles.evaluate_model_output",
+              "contract": "requested replacement; preserve other files and content; line endings and trailing whitespace immaterial"
+            },
+            "required_evidence": [
+              "selection/delivery/acquisition/read traces",
+              "actual task result",
+              "absence of material target-skill guidance use",
+              "reviewer disposition of semantic non-use"
+            ],
+            "provider_free_claim": "structure-only"
+          }
+        }
+      ],
+      "count_is_not_redefinition_of_repeated": true,
+      "maturity_entry": {
+        "active_debts": [],
+        "blocking_debts": [],
+        "current_maturity": "provisional",
+        "debt_authority": "docs/governance/language-profile-known-debt.json",
+        "disposition_status": "PROVISIONAL_MAINTENANCE",
+        "evidence": {
+          "current_validation": [
+            "docs/governance/maturity/apg139/go-test-profile.json",
+            "docs/governance/maturity/apg139/qualification.md"
+          ],
+          "defect_debt_disposition": [
+            "docs/governance/maturity/apg139/go-test-profile.json"
+          ],
+          "independent_review": [
+            "docs/governance/maturity/apg139/independent-review.md"
+          ],
+          "provenance": [
+            "docs/governance/maturity/apg139/go-test-profile.json"
+          ],
+          "repeated_positive_use": [
+            "docs/governance/maturity/apg139/go-test-profile.json"
+          ],
+          "representative_non_triggers": [
+            "docs/governance/maturity/apg139/go-test-profile.json"
+          ],
+          "rollback": [
+            "docs/governance/maturity/apg139/go-test-profile.json"
+          ]
+        },
+        "independent_review": "docs/governance/maturity/apg139/independent-review.md",
+        "maintenance_ref": "MATURITY:go-test-profile",
+        "next_lifecycle_trigger": "Supply distinct actual native testing lifecycle and false-pass guidance-use decisions with module/file/toolchain context and claim-appropriate observed results, plus ordinary-Go and comparison-library non-trigger handoffs; independently review the complete individual inventory.",
+        "path": "skills/go-test-profile/SKILL.md",
+        "required_evidence_categories": [
+          "repeated_positive_use",
+          "representative_non_triggers",
+          "defect_debt_disposition",
+          "rollback",
+          "provenance",
+          "independent_review",
+          "current_validation"
+        ],
+        "resolved_debts": [],
+        "skill_id": "go-test-profile",
+        "source_references": [
+          "skills/go-test-profile/SKILL.md",
+          "skills/README.md",
+          "docs/provenance.md",
+          "docs/skill-authoring-and-maintenance.md",
+          "docs/governance/maturity/apg139/go-test-profile.json"
+        ]
+      },
+      "planning_case_count": 3,
+      "prior_refusal_sha256": "3b2cb31aa8be03607bd8e9210f7edaa0a2a2333eb433cdd9261eea074177a85e",
+      "repeated_requirement": "Supply distinct actual native testing lifecycle and false-pass guidance-use decisions with module/file/toolchain context and claim-appropriate observed results, plus ordinary-Go and comparison-library non-trigger handoffs; independently review the complete individual inventory.",
+      "review_rubric": {
+        "must_verify": [
+          "All positive cases are distinct substantive decisions, not repeated delivery of one task",
+          "All semantic non-triggers retain actual guidance-use/non-use evidence",
+          "Exact skill body and maturity criteria remain unchanged",
+          "Current independent review cannot manufacture missing evidence",
+          "Historical evidence remains attributed; unresolved criterion means retain provisional"
+        ],
+        "promotion_authorized": false,
+        "required_categories": [
+          "repeated_positive_use",
+          "representative_non_triggers",
+          "defect_debt_disposition",
+          "rollback",
+          "provenance",
+          "independent_review",
+          "current_validation"
+        ]
+      },
+      "skill_id": "go-test-profile",
+      "source_path": "skills/go-test-profile/SKILL.md",
+      "whole_sha256": "725cb1b1842c8483f685a3885dc90ce6315f2c6d18b51a7c76b60b8629d6d93a"
+    },
+    {
+      "body_identity": {
+        "bytes": 17592,
+        "sha256": "b0b1f031282e6c2797c3e64858299dd77092c95280992c88368e4f9a00756fc5"
+      },
+      "cases": [
+        {
+          "case_id": "pytest-test-profile/positive/collection",
+          "case_sha256": "c6da602ec4b1b43f8181105485a3ee7311ca5da823abd43a42402aa0ae88d76e",
+          "kind": "positive",
+          "oracle": {
+            "command": [
+              "python3",
+              "-m",
+              "pytest",
+              "-q"
+            ],
+            "independent_rubric": "Source-owned fixture assertions enforce the case-specific source contract; model transcripts, prompt compliance, and command exit alone cannot satisfy this contract.",
+            "schema": "apg.h-promotion-oracle/v1",
+            "fixture_id": "pytest-test-profile/positive/collection",
+            "fixture_source": "testing/h_eval/promotion_oracles.py",
+            "fixture_kind": "command",
+            "expected_status": {
+              "good": "pass",
+              "bad": "fail"
+            },
+            "assertion_owner": "source-owned",
+            "test_ownership": "fixture-owned",
+            "decision_axis": "configuration precedence",
+            "runtime_requirements": [
+              "python3",
+              "pytest-module"
+            ],
+            "hidden_fact_digests": [
+              "4a5faa72213b0ee150779951755415c1cee9f2d7fbb7c15f1a257b4d1c28330f",
+              "4d2ab79b9bbb5274e47759aa9d8a490d1354df2841569164dbdc9f4fd88f6696",
+              "2d77a81c8c8321d1b265f069e59f95f710acb4f412fded5dae852fbb3062bca4"
+            ],
+            "fixture_contract": "command_exit_and_assertions",
+            "oracle_id": "pytest-test-profile/positive/collection::source-oracle-v2",
+            "hidden_oracle_sha256": "f524d4b8cba8670a023d45c59cff91ecf18489a87d16aeaa7681578d3178f09b",
+            "case_sha256": "c6da602ec4b1b43f8181105485a3ee7311ca5da823abd43a42402aa0ae88d76e"
+          },
+          "prompt": "Make the intended value check run under the repository's selected command and ensure a broken value check cannot disappear from the run. Keep the existing command selection and check name stable.",
+          "attribution_rubric": {
+            "material_decision_required": true,
+            "decision_not_dictated_by": [
+              "prompt",
+              "oracle"
+            ],
+            "exact_guidance_link_required": true,
+            "resulting_work_link_required": true,
+            "insufficient_evidence": [
+              "skill delivery",
+              "native Read",
+              "skill acquisition",
+              "prompt compliance"
+            ],
+            "mode": "positive_use"
+          },
+          "relevance_category": "collection",
+          "required_evidence": [
+            "Exact runtime versions/settings and subject input/output hashes",
+            "Retained provider transcript and guidance invocation",
+            "Material decision not dictated by the prompt or oracle, linked to exact delivered guidance and the resulting work; skill delivery, native Read, skill acquisition or prompt compliance alone is insufficient",
+            "Independent substantive review with task-specific evidence and limitations"
+          ],
+          "route": {
+            "model": "gpt-6-astra",
+            "model_source": "codex/profiles/implementation-testing.config.toml",
+            "model_source_sha256": "8a786851da04d75b06f62781a418df6959d335d61a03e32613250bb33d588261",
+            "profile": "implementation-testing",
+            "provider": "codex",
+            "role": "Producer"
+          },
+          "subject_files": {
+            "pytest.ini": "[pytest]\npython_files = check_*.py\n",
+            "test_values.py": "from values import normalize\n\ndef test_value_normalizes_mixed_input():\n    assert normalize([' Alpha ', 'BETA']) == ['alpha', 'beta']\n",
+            "README.md": "The repository's chosen command should exercise the value check in this directory. Keep the command selection intact and make a broken value check visible to the caller. The project does not prescribe a particular check-file naming convention.\nnormalize strips surrounding whitespace and lowercases each value; empty input returns an empty list. Preserve the existing check name.\nAuthored-test qualification substitutes only values.py with known-good and known-bad implementations. Your submitted module identity, collection configuration, tests and other support files remain unchanged in both runs.\n",
+            "values.py": "def normalize(values):\n    return [value.strip().lower() for value in values]\n"
+          }
+        },
+        {
+          "case_id": "pytest-test-profile/positive/fixture-lifecycle",
+          "case_sha256": "d55b034446abb28c84e8386967f4f45ce69b8f93d153fea293f1a105f066976f",
+          "kind": "positive",
+          "oracle": {
+            "command": [
+              "python3",
+              "-m",
+              "pytest",
+              "-q"
+            ],
+            "independent_rubric": "Source-owned fixture assertions enforce the case-specific source contract; model transcripts, prompt compliance, and command exit alone cannot satisfy this contract.",
+            "schema": "apg.h-promotion-oracle/v1",
+            "fixture_id": "pytest-test-profile/positive/fixture-lifecycle",
+            "fixture_source": "testing/h_eval/promotion_oracles.py",
+            "fixture_kind": "command",
+            "expected_status": {
+              "good": "pass",
+              "bad": "fail"
+            },
+            "assertion_owner": "source-owned",
+            "test_ownership": "fixture-owned",
+            "decision_axis": "failure-path observation and state-isolation test design",
+            "runtime_requirements": [
+              "python3",
+              "pytest-module"
+            ],
+            "hidden_fact_digests": [
+              "e7d7f1e07dcb7a7f2e58566c4fe0952ea65c11ce38e3aa19ec49e764b7ffd2d3",
+              "b537ccf4c8b9b0b9a27a523d181eeabce7f32d318290c7f139194605e89ecbc9",
+              "0b69959e3edd8ee23fef0fe660b70d3aaf78d8db4d8bcd1fbbab9b5e399174d3"
+            ],
+            "fixture_contract": "command_exit_and_assertions",
+            "oracle_id": "pytest-test-profile/positive/fixture-lifecycle::source-oracle-v2",
+            "hidden_oracle_sha256": "2a240c3bd8f76eb3532b39a9d554e93baab20587636da4bc45016aef7cf66c55",
+            "case_sha256": "d55b034446abb28c84e8386967f4f45ce69b8f93d153fea293f1a105f066976f"
+          },
+          "prompt": "Make each check's output independent and clean after completion, including when a check fails. Keep the public fixture name and observable assertions stable while preventing one check from influencing another.",
+          "attribution_rubric": {
+            "material_decision_required": true,
+            "decision_not_dictated_by": [
+              "prompt",
+              "oracle"
+            ],
+            "exact_guidance_link_required": true,
+            "resulting_work_link_required": true,
+            "insufficient_evidence": [
+              "skill delivery",
+              "native Read",
+              "skill acquisition",
+              "prompt compliance"
+            ],
+            "mode": "positive_use"
+          },
+          "relevance_category": "fixture-lifecycle",
+          "required_evidence": [
+            "Exact runtime versions/settings and subject input/output hashes",
+            "Retained provider transcript and guidance invocation",
+            "Material decision not dictated by the prompt or oracle, linked to exact delivered guidance and the resulting work; skill delivery, native Read, skill acquisition or prompt compliance alone is insufficient",
+            "Independent substantive review with task-specific evidence and limitations",
+            "Explain a material choice in how authored checks observe failure-path cleanup and state isolation, linked to exact guidance and resulting tests; generic testing boilerplate or copying source-owned hidden tests is insufficient. Multiple defensible test designs are eligible."
+          ],
+          "route": {
+            "model": "gpt-6-astra",
+            "model_source": "codex/profiles/implementation-testing.config.toml",
+            "model_source_sha256": "8a786851da04d75b06f62781a418df6959d335d61a03e32613250bb33d588261",
+            "profile": "implementation-testing",
+            "provider": "codex",
+            "role": "Producer"
+          },
+          "subject_files": {
+            "conftest.py": "from output_support import output, root\n",
+            "test_output.py": "def test_output_exists(output):\n    assert output is not None\n",
+            "README.md": "Each check writes a disposable output artifact and may fail after writing. Results from one check must not influence another, and cleanup should follow the owning check. Keep the public fixture name stable; the authored test design is open.\nThe visible output_support.py module supplies the output/root fixture implementation; conftest.py imports those fixtures. Add checks that expose failed cleanup as well as successful independent output. Candidate collection configuration and support are graded as submitted.\nAuthored-test qualification substitutes only output_support.py with known-good and known-bad implementations. Your submitted module identity, collection configuration, tests and other support files remain unchanged in both runs.\n",
+            "output_support.py": "import pytest\n\n@pytest.fixture(scope=\"session\")\ndef root(tmp_path_factory):\n    return tmp_path_factory.mktemp(\"outputs\")\n\n@pytest.fixture\ndef output(root):\n    path = root / \"output.txt\"\n    yield path\n    if path.exists():\n        path.unlink()\n"
+          }
+        },
+        {
+          "case_id": "pytest-test-profile/positive/worker-isolation",
+          "case_sha256": "1e586e2acc8ce9261ca5442b4af2ddeaa90d1b1d4993befc76d81d1ff8edcf38",
+          "kind": "positive",
+          "oracle": {
+            "command": [
+              "python3",
+              "-m",
+              "pytest",
+              "-q"
+            ],
+            "independent_rubric": "Source-owned fixture assertions enforce the case-specific source contract; model transcripts, prompt compliance, and command exit alone cannot satisfy this contract.",
+            "schema": "apg.h-promotion-oracle/v1",
+            "fixture_id": "pytest-test-profile/positive/worker-isolation",
+            "fixture_source": "testing/h_eval/promotion_oracles.py",
+            "fixture_kind": "command",
+            "expected_status": {
+              "good": "pass",
+              "bad": "fail"
+            },
+            "assertion_owner": "source-owned",
+            "test_ownership": "fixture-owned",
+            "decision_axis": "thread-pool namespace ownership",
+            "runtime_requirements": [
+              "python3",
+              "pytest-module"
+            ],
+            "hidden_fact_digests": [
+              "65051fe5f2d383265e84905f0bd947298558fcde8378bc5b56ea906a4f5d9d67",
+              "c993970ccbbd29aac533897fe0ce678273a4c8f5a72b206bf28561c8d1f6d919",
+              "d24e3a824d10e8125dc0e7289686f03cb2b37d5ed6750808a0883cddf7cc4e66"
+            ],
+            "fixture_contract": "command_exit_and_assertions",
+            "oracle_id": "pytest-test-profile/positive/worker-isolation::source-oracle-v2",
+            "hidden_oracle_sha256": "894a814976a8305bbe77bcd29f99d03f4eb539b85a62df66ef522a091f54c534",
+            "case_sha256": "1e586e2acc8ce9261ca5442b4af2ddeaa90d1b1d4993befc76d81d1ff8edcf38"
+          },
+          "prompt": "Make the two counter checks produce deterministic, isolated results while each check performs its own concurrent writes. Keep the selected command and check names stable, and report unavailable runtime evidence honestly if required tooling is absent.",
+          "attribution_rubric": {
+            "material_decision_required": true,
+            "decision_not_dictated_by": [
+              "prompt",
+              "oracle"
+            ],
+            "exact_guidance_link_required": true,
+            "resulting_work_link_required": true,
+            "insufficient_evidence": [
+              "skill delivery",
+              "native Read",
+              "skill acquisition",
+              "prompt compliance"
+            ],
+            "mode": "positive_use"
+          },
+          "relevance_category": "worker-isolation",
+          "required_evidence": [
+            "Exact runtime versions/settings and subject input/output hashes",
+            "Retained provider transcript and guidance invocation",
+            "Material decision not dictated by the prompt or oracle, linked to exact delivered guidance and the resulting work; skill delivery, native Read, skill acquisition or prompt compliance alone is insufficient",
+            "Independent substantive review with task-specific evidence and limitations"
+          ],
+          "route": {
+            "model": "gpt-6-astra",
+            "model_source": "codex/profiles/implementation-testing.config.toml",
+            "model_source_sha256": "8a786851da04d75b06f62781a418df6959d335d61a03e32613250bb33d588261",
+            "profile": "implementation-testing",
+            "provider": "codex",
+            "role": "Producer"
+          },
+          "subject_files": {
+            "pytest.ini": "[pytest]\naddopts = -q\n",
+            "test_counter.py": "from pathlib import Path\ndef test_one():\n    Path(\"counter\").write_text(\"one\")\n    assert Path(\"counter\").read_text() == \"one\"\ndef test_two():\n    Path(\"counter\").write_text(\"two\")\n    assert Path(\"counter\").read_text() == \"two\"\n",
+            "README.md": "The two checks may execute at the same time under the repository's configured command. They need independent output and truthful results. Keep the selected command and check names stable; the isolation mechanism is open.\nwrite_value(root, name, value) writes under root/name and returns the resulting text. The checks must use this supplied API and verify each concurrent result.\nAuthored-test qualification substitutes only isolation.py with known-good and known-bad implementations. Your submitted module identity, collection configuration, tests and other support files remain unchanged in both runs.\n",
+            "isolation.py": "from pathlib import Path\n\ndef write_value(root, name, value):\n    path = Path(root) / name\n    path.write_text(value)\n    return path.read_text()\n"
+          }
+        },
+        {
+          "case_id": "pytest-test-profile/non-trigger/bats",
+          "case_sha256": "ee6df7afe4966a126e7983b2f244fa9aed4dd43f436bc5ac0b21379a92b933a7",
+          "kind": "non-trigger",
+          "oracle": {
+            "command": null,
+            "independent_rubric": "Source-owned later-result grading checks the visible requested replacement and preservation of surrounding files and content, allowing only line-ending and trailing-whitespace normalization. Provider-free semantic non-use remains structure-only; later traces, actual task result and independent disposition are still required.",
+            "schema": "apg.h-promotion-oracle/v1",
+            "fixture_id": "pytest-test-profile/non-trigger/bats",
+            "fixture_source": "testing/h_eval/promotion_oracles.py",
+            "fixture_kind": "source_fact",
+            "expected_status": {
+              "good": "pass",
+              "bad": "fail"
+            },
+            "assertion_owner": "source-owned",
+            "test_ownership": "fixture-owned",
+            "decision_axis": "scope exclusion rationale",
+            "runtime_requirements": [],
+            "hidden_fact_digests": [
+              "536e330601ece1df780dc97da356899a050337db058ee0c6288178b83d8ca9ab"
+            ],
+            "fixture_contract": "neighbor_bats",
+            "oracle_id": "pytest-test-profile/non-trigger/bats::source-oracle-v2",
+            "hidden_oracle_sha256": "4a7cfc72afecd8f76068f27f9a3d70378b896363cfd3a256b5c24db6df8377ac",
+            "case_sha256": "ee6df7afe4966a126e7983b2f244fa9aed4dd43f436bc5ac0b21379a92b933a7"
+          },
+          "prompt": "Correct the expected status in x.bats from 0 to 1: the false command exits with status 1. Preserve all other content and the Bats runner.",
+          "attribution_rubric": {
+            "material_decision_required": true,
+            "decision_not_dictated_by": [
+              "prompt",
+              "oracle"
+            ],
+            "exact_guidance_link_required": false,
+            "resulting_work_link_required": true,
+            "insufficient_evidence": [
+              "skill delivery",
+              "native Read",
+              "skill acquisition",
+              "prompt compliance"
+            ],
+            "mode": "semantic_non_use",
+            "neighboring_domain_non_use_required": true,
+            "semantic_non_use_link_required": true
+          },
+          "relevance_category": "bats",
+          "required_evidence": [
+            "Exact runtime versions/settings and subject input/output hashes",
+            "Retained provider transcript and guidance invocation",
+            "Semantic non-use decision with neighboring-domain rationale; resolver nonselection, skill delivery, native Read or prompt compliance alone is insufficient",
+            "Independent substantive review with task-specific evidence and limitations"
+          ],
+          "route": {
+            "model": "gpt-6-astra",
+            "model_source": "codex/profiles/implementation-testing.config.toml",
+            "model_source_sha256": "8a786851da04d75b06f62781a418df6959d335d61a03e32613250bb33d588261",
+            "profile": "implementation-testing",
+            "provider": "codex",
+            "role": "Producer"
+          },
+          "subject_files": {
+            "x.bats": "@test \"false\" {\n  run false\n  [ \"$status\" -eq 0 ]\n}\n"
+          },
+          "non_trigger_contract": {
+            "target_skill": "pytest-test-profile",
+            "neighboring_domain": "bats",
+            "external_correctness_oracle": {
+              "owner": "source-owned-later-result-and-independent-review",
+              "required": true,
+              "observable_facts": [
+                "requested_neighbor_edit_with_preserved_surroundings"
+              ],
+              "task_result_required": true,
+              "result_api": "testing.h_eval.promotion_oracles.evaluate_model_output",
+              "contract": "requested replacement; preserve other files and content; line endings and trailing whitespace immaterial"
+            },
+            "required_evidence": [
+              "selection/delivery/acquisition/read traces",
+              "actual task result",
+              "absence of material target-skill guidance use",
+              "reviewer disposition of semantic non-use"
+            ],
+            "provider_free_claim": "structure-only"
+          }
+        },
+        {
+          "case_id": "pytest-test-profile/non-trigger/unittest",
+          "case_sha256": "d143810e451c95b901b016d7488a3f4e7cdf699dd55bcbf5b54ca995b971bf9d",
+          "kind": "non-trigger",
+          "oracle": {
+            "command": null,
+            "independent_rubric": "Source-owned later-result grading checks the visible requested replacement and preservation of surrounding files and content, allowing only line-ending and trailing-whitespace normalization. Provider-free semantic non-use remains structure-only; later traces, actual task result and independent disposition are still required.",
+            "schema": "apg.h-promotion-oracle/v1",
+            "fixture_id": "pytest-test-profile/non-trigger/unittest",
+            "fixture_source": "testing/h_eval/promotion_oracles.py",
+            "fixture_kind": "source_fact",
+            "expected_status": {
+              "good": "pass",
+              "bad": "fail"
+            },
+            "assertion_owner": "source-owned",
+            "test_ownership": "fixture-owned",
+            "decision_axis": "scope exclusion rationale",
+            "runtime_requirements": [],
+            "hidden_fact_digests": [
+              "536e330601ece1df780dc97da356899a050337db058ee0c6288178b83d8ca9ab"
+            ],
+            "fixture_contract": "neighbor_unittest",
+            "oracle_id": "pytest-test-profile/non-trigger/unittest::source-oracle-v2",
+            "hidden_oracle_sha256": "95b380ee5d2a510f0e97d17e5de7ce6cc264ad0390afc7e053fce95397ead0b5",
+            "case_sha256": "d143810e451c95b901b016d7488a3f4e7cdf699dd55bcbf5b54ca995b971bf9d"
+          },
+          "prompt": "Correct the expected integer in the unittest assertion in test_x.py from 5 to 4, since 2 + 2 equals 4. Preserve all other content and the runner.",
+          "attribution_rubric": {
+            "material_decision_required": true,
+            "decision_not_dictated_by": [
+              "prompt",
+              "oracle"
+            ],
+            "exact_guidance_link_required": false,
+            "resulting_work_link_required": true,
+            "insufficient_evidence": [
+              "skill delivery",
+              "native Read",
+              "skill acquisition",
+              "prompt compliance"
+            ],
+            "mode": "semantic_non_use",
+            "neighboring_domain_non_use_required": true,
+            "semantic_non_use_link_required": true
+          },
+          "relevance_category": "unittest",
+          "required_evidence": [
+            "Exact runtime versions/settings and subject input/output hashes",
+            "Retained provider transcript and guidance invocation",
+            "Semantic non-use decision with neighboring-domain rationale; resolver nonselection, skill delivery, native Read or prompt compliance alone is insufficient",
+            "Independent substantive review with task-specific evidence and limitations"
+          ],
+          "route": {
+            "model": "gpt-6-astra",
+            "model_source": "codex/profiles/implementation-testing.config.toml",
+            "model_source_sha256": "8a786851da04d75b06f62781a418df6959d335d61a03e32613250bb33d588261",
+            "profile": "implementation-testing",
+            "provider": "codex",
+            "role": "Producer"
+          },
+          "subject_files": {
+            "test_x.py": "import unittest\nclass T(unittest.TestCase):\n    def test_x(self): self.assertEqual(2 + 2, 5)\n"
+          },
+          "non_trigger_contract": {
+            "target_skill": "pytest-test-profile",
+            "neighboring_domain": "unittest",
+            "external_correctness_oracle": {
+              "owner": "source-owned-later-result-and-independent-review",
+              "required": true,
+              "observable_facts": [
+                "requested_neighbor_edit_with_preserved_surroundings"
+              ],
+              "task_result_required": true,
+              "result_api": "testing.h_eval.promotion_oracles.evaluate_model_output",
+              "contract": "requested replacement; preserve other files and content; line endings and trailing whitespace immaterial"
+            },
+            "required_evidence": [
+              "selection/delivery/acquisition/read traces",
+              "actual task result",
+              "absence of material target-skill guidance use",
+              "reviewer disposition of semantic non-use"
+            ],
+            "provider_free_claim": "structure-only"
+          }
+        }
+      ],
+      "count_is_not_redefinition_of_repeated": true,
+      "maturity_entry": {
+        "active_debts": [],
+        "blocking_debts": [],
+        "current_maturity": "provisional",
+        "debt_authority": "docs/governance/language-profile-known-debt.json",
+        "disposition_status": "PROVISIONAL_MAINTENANCE",
+        "evidence": {
+          "current_validation": [
+            "docs/governance/maturity/apg139/pytest-test-profile.json",
+            "docs/governance/maturity/apg139/qualification.md"
+          ],
+          "defect_debt_disposition": [
+            "docs/governance/maturity/apg139/pytest-test-profile.json"
+          ],
+          "independent_review": [
+            "docs/governance/maturity/apg139/independent-review.md"
+          ],
+          "provenance": [
+            "docs/governance/maturity/apg139/pytest-test-profile.json"
+          ],
+          "repeated_positive_use": [
+            "docs/governance/maturity/apg139/pytest-test-profile.json"
+          ],
+          "representative_non_triggers": [
+            "docs/governance/maturity/apg139/pytest-test-profile.json"
+          ],
+          "rollback": [
+            "docs/governance/maturity/apg139/pytest-test-profile.json"
+          ]
+        },
+        "independent_review": "docs/governance/maturity/apg139/independent-review.md",
+        "maintenance_ref": "MATURITY:pytest-test-profile",
+        "next_lifecycle_trigger": "Supply distinct actual pytest collection/fixture and isolation/xdist guidance-use decisions with versions, roots, workers and coverage context and meaningful observed outcomes; include ordinary-Python and policy-selection non-triggers, then independently adjudicate the individual inventory.",
+        "path": "skills/pytest-test-profile/SKILL.md",
+        "required_evidence_categories": [
+          "repeated_positive_use",
+          "representative_non_triggers",
+          "defect_debt_disposition",
+          "rollback",
+          "provenance",
+          "independent_review",
+          "current_validation"
+        ],
+        "resolved_debts": [],
+        "skill_id": "pytest-test-profile",
+        "source_references": [
+          "skills/pytest-test-profile/SKILL.md",
+          "skills/README.md",
+          "docs/provenance.md",
+          "docs/skill-authoring-and-maintenance.md",
+          "docs/governance/maturity/apg139/pytest-test-profile.json"
+        ]
+      },
+      "planning_case_count": 3,
+      "prior_refusal_sha256": "241c6bb15bf0472c66e2be99d4f1441709db9a08407f8d6f841e20aa32e7d15a",
+      "repeated_requirement": "Supply distinct actual pytest collection/fixture and isolation/xdist guidance-use decisions with versions, roots, workers and coverage context and meaningful observed outcomes; include ordinary-Python and policy-selection non-triggers, then independently adjudicate the individual inventory.",
+      "review_rubric": {
+        "must_verify": [
+          "All positive cases are distinct substantive decisions, not repeated delivery of one task",
+          "All semantic non-triggers retain actual guidance-use/non-use evidence",
+          "Exact skill body and maturity criteria remain unchanged",
+          "Current independent review cannot manufacture missing evidence",
+          "Historical evidence remains attributed; unresolved criterion means retain provisional"
+        ],
+        "promotion_authorized": false,
+        "required_categories": [
+          "repeated_positive_use",
+          "representative_non_triggers",
+          "defect_debt_disposition",
+          "rollback",
+          "provenance",
+          "independent_review",
+          "current_validation"
+        ]
+      },
+      "skill_id": "pytest-test-profile",
+      "source_path": "skills/pytest-test-profile/SKILL.md",
+      "whole_sha256": "94e7bb6806165cb5afc14e3c20a264c62b25bbbc7a7124e2ff160b1c57ebfd15"
+    },
+    {
+      "body_identity": {
+        "bytes": 11339,
+        "sha256": "7f7d818234777b030377c4a6c7496042a82a62514a346a0d0a1b4f5da42e8fb3"
+      },
+      "cases": [
+        {
+          "case_id": "markdown-language-profile/positive/nested-blocks",
+          "case_sha256": "859b5b8308f71c14b54c72f9ef0815148b1df8245c5fb923fc52a2ec00c519fd",
+          "kind": "positive",
+          "oracle": {
+            "command": null,
+            "independent_rubric": "Source-owned fixture assertions enforce the case-specific source contract; model transcripts, prompt compliance, and command exit alone cannot satisfy this contract.",
+            "schema": "apg.h-promotion-oracle/v1",
+            "fixture_id": "markdown-language-profile/positive/nested-blocks",
+            "fixture_source": "testing/h_eval/promotion_oracles.py",
+            "fixture_kind": "source_fact",
+            "expected_status": {
+              "good": "pass",
+              "bad": "fail"
+            },
+            "assertion_owner": "source-owned",
+            "test_ownership": "fixture-owned",
+            "decision_axis": "blank-line preservation",
+            "runtime_requirements": [],
+            "hidden_fact_digests": [
+              "feb66df1b9ba97e57fa8a3864c85ac6a327ce69d98b7f92c49c965801b780bba",
+              "d8c240678cfafe36519d4e20dee27a0bd9db5bf103f375ba827fcccfd2b96205"
+            ],
+            "fixture_contract": "markdown_nested_structure",
+            "oracle_id": "markdown-language-profile/positive/nested-blocks::source-oracle-v2",
+            "hidden_oracle_sha256": "34fb7e60b5b240c9a66220884f2b87829f7ff70a58ab0e358ba4fa9a1ad7a8cf",
+            "case_sha256": "859b5b8308f71c14b54c72f9ef0815148b1df8245c5fb923fc52a2ec00c519fd"
+          },
+          "prompt": "Repair the README so its setup steps and example are presented in the intended order and nesting. Preserve the wording unless a structural change is required for the reader-visible result.",
+          "attribution_rubric": {
+            "material_decision_required": true,
+            "decision_not_dictated_by": [
+              "prompt",
+              "oracle"
+            ],
+            "exact_guidance_link_required": true,
+            "resulting_work_link_required": true,
+            "insufficient_evidence": [
+              "skill delivery",
+              "native Read",
+              "skill acquisition",
+              "prompt compliance"
+            ],
+            "mode": "positive_use"
+          },
+          "relevance_category": "nested-blocks",
+          "required_evidence": [
+            "Exact runtime versions/settings and subject input/output hashes",
+            "Retained provider transcript and guidance invocation",
+            "Material decision not dictated by the prompt or oracle, linked to exact delivered guidance and the resulting work; skill delivery, native Read, skill acquisition or prompt compliance alone is insufficient",
+            "Independent substantive review with task-specific evidence and limitations"
+          ],
+          "route": {
+            "model": "gpt-6-astra",
+            "model_source": "codex/profiles/implementation-testing.config.toml",
+            "model_source_sha256": "8a786851da04d75b06f62781a418df6959d335d61a03e32613250bb33d588261",
+            "profile": "implementation-testing",
+            "provider": "codex",
+            "role": "Producer"
+          },
+          "subject_files": {
+            "README.md": "1. Prepare\n- first item\n- second item\n```sh\necho ready\n```\n2. Finish\n"
+          }
+        },
+        {
+          "case_id": "markdown-language-profile/positive/links",
+          "case_sha256": "644d7b49b37c458fb3f4cf808b4aa6f4dae6e87af3a52d535b7d05aa3faed6d7",
+          "kind": "positive",
+          "oracle": {
+            "command": null,
+            "independent_rubric": "Source-owned fixture assertions enforce the case-specific source contract; model transcripts, prompt compliance, and command exit alone cannot satisfy this contract.",
+            "schema": "apg.h-promotion-oracle/v1",
+            "fixture_id": "markdown-language-profile/positive/links",
+            "fixture_source": "testing/h_eval/promotion_oracles.py",
+            "fixture_kind": "source_fact",
+            "expected_status": {
+              "good": "pass",
+              "bad": "fail"
+            },
+            "assertion_owner": "source-owned",
+            "test_ownership": "fixture-owned",
+            "decision_axis": "percent-encoding normalization",
+            "runtime_requirements": [],
+            "hidden_fact_digests": [
+              "ce8447608892a5fc91ea9ffa502e51aae07915356d81509f431e711b2a917e70",
+              "9f3e045bc4329ad0b2a390a76c7b5e595eeae2601deafcb7faf0fac201330d18"
+            ],
+            "fixture_contract": "markdown_links",
+            "oracle_id": "markdown-language-profile/positive/links::source-oracle-v2",
+            "hidden_oracle_sha256": "7789b95ff000380ba3db873e45eef775e2a583ab9248d2915706e6710b1a10d4",
+            "case_sha256": "644d7b49b37c458fb3f4cf808b4aa6f4dae6e87af3a52d535b7d05aa3faed6d7"
+          },
+          "prompt": "Repair the guide's navigation so local destinations resolve and headings remain usable in the publishing context. Preserve the intended prose and make the reader-visible route behavior clear.",
+          "attribution_rubric": {
+            "material_decision_required": true,
+            "decision_not_dictated_by": [
+              "prompt",
+              "oracle"
+            ],
+            "exact_guidance_link_required": true,
+            "resulting_work_link_required": true,
+            "insufficient_evidence": [
+              "skill delivery",
+              "native Read",
+              "skill acquisition",
+              "prompt compliance"
+            ],
+            "mode": "positive_use"
+          },
+          "relevance_category": "links",
+          "required_evidence": [
+            "Exact runtime versions/settings and subject input/output hashes",
+            "Retained provider transcript and guidance invocation",
+            "Material decision not dictated by the prompt or oracle, linked to exact delivered guidance and the resulting work; skill delivery, native Read, skill acquisition or prompt compliance alone is insufficient",
+            "Independent substantive review with task-specific evidence and limitations"
+          ],
+          "route": {
+            "model": "gpt-6-astra",
+            "model_source": "codex/profiles/implementation-testing.config.toml",
+            "model_source_sha256": "8a786851da04d75b06f62781a418df6959d335d61a03e32613250bb33d588261",
+            "profile": "implementation-testing",
+            "provider": "codex",
+            "role": "Producer"
+          },
+          "subject_files": {
+            "README.md": "# Guide\n\n[Setup](setup.md#installation)\n[Next](missing.md)\n",
+            "setup.md": "# Setup\n\n## Install\n\nRun the documented command.\n"
+          }
+        },
+        {
+          "case_id": "markdown-language-profile/positive/code-literals",
+          "case_sha256": "3c39ae964e3f159c1b209097e67919acfe437a92e56baff4a68f9cdebd0f8902",
+          "kind": "positive",
+          "oracle": {
+            "command": null,
+            "independent_rubric": "Source-owned fixture assertions enforce the case-specific source contract; model transcripts, prompt compliance, and command exit alone cannot satisfy this contract.",
+            "schema": "apg.h-promotion-oracle/v1",
+            "fixture_id": "markdown-language-profile/positive/code-literals",
+            "fixture_source": "testing/h_eval/promotion_oracles.py",
+            "fixture_kind": "source_fact",
+            "expected_status": {
+              "good": "pass",
+              "bad": "fail"
+            },
+            "assertion_owner": "source-owned",
+            "test_ownership": "fixture-owned",
+            "decision_axis": "outer fence delimiter",
+            "runtime_requirements": [],
+            "hidden_fact_digests": [
+              "c5a8e2cc54a85d9126931d523fd1934fd69b62d1c8b429aef52dc6bfda85ab6c",
+              "c351ea682f5e43ac37eca6e91b4128f88086634afce7741baf93c0c9329497f6"
+            ],
+            "fixture_contract": "markdown_code_literals",
+            "oracle_id": "markdown-language-profile/positive/code-literals::source-oracle-v2",
+            "hidden_oracle_sha256": "f2d72493029a4b59f93d2b33a6c7a81eacb04a592611bf5c8c221e2f0bee19e4",
+            "case_sha256": "3c39ae964e3f159c1b209097e67919acfe437a92e56baff4a68f9cdebd0f8902"
+          },
+          "prompt": "Repair the examples page so the nested example is displayed as literal source while the surrounding document structure remains intact. Preserve the example text and make the reader-visible result unambiguous.",
+          "attribution_rubric": {
+            "material_decision_required": true,
+            "decision_not_dictated_by": [
+              "prompt",
+              "oracle"
+            ],
+            "exact_guidance_link_required": true,
+            "resulting_work_link_required": true,
+            "insufficient_evidence": [
+              "skill delivery",
+              "native Read",
+              "skill acquisition",
+              "prompt compliance"
+            ],
+            "mode": "positive_use"
+          },
+          "relevance_category": "code-literals",
+          "required_evidence": [
+            "Exact runtime versions/settings and subject input/output hashes",
+            "Retained provider transcript and guidance invocation",
+            "Material decision not dictated by the prompt or oracle, linked to exact delivered guidance and the resulting work; skill delivery, native Read, skill acquisition or prompt compliance alone is insufficient",
+            "Independent substantive review with task-specific evidence and limitations"
+          ],
+          "route": {
+            "model": "gpt-6-astra",
+            "model_source": "codex/profiles/implementation-testing.config.toml",
+            "model_source_sha256": "8a786851da04d75b06f62781a418df6959d335d61a03e32613250bb33d588261",
+            "profile": "implementation-testing",
+            "provider": "codex",
+            "role": "Producer"
+          },
+          "subject_files": {
+            "README.md": "# Examples\n\n```markdown\n```python\nprint(\"literal\")\n```\n```\n"
+          }
+        },
+        {
+          "case_id": "markdown-language-profile/non-trigger/mdx",
+          "case_sha256": "6d4f722a0bc1c70dff27519e7f04cc3f4b7473df3c9a1742105888f83739d3c1",
+          "kind": "non-trigger",
+          "oracle": {
+            "command": null,
+            "independent_rubric": "Source-owned later-result grading checks the visible requested replacement and preservation of surrounding files and content, allowing only line-ending and trailing-whitespace normalization. Provider-free semantic non-use remains structure-only; later traces, actual task result and independent disposition are still required.",
+            "schema": "apg.h-promotion-oracle/v1",
+            "fixture_id": "markdown-language-profile/non-trigger/mdx",
+            "fixture_source": "testing/h_eval/promotion_oracles.py",
+            "fixture_kind": "source_fact",
+            "expected_status": {
+              "good": "pass",
+              "bad": "fail"
+            },
+            "assertion_owner": "source-owned",
+            "test_ownership": "fixture-owned",
+            "decision_axis": "scope exclusion rationale",
+            "runtime_requirements": [],
+            "hidden_fact_digests": [
+              "536e330601ece1df780dc97da356899a050337db058ee0c6288178b83d8ca9ab"
+            ],
+            "fixture_contract": "neighbor_mdx",
+            "oracle_id": "markdown-language-profile/non-trigger/mdx::source-oracle-v2",
+            "hidden_oracle_sha256": "6224b3877d0151bd987ff3a17ab230c62034596af1a36c3a0b89d5a585789857",
+            "case_sha256": "6d4f722a0bc1c70dff27519e7f04cc3f4b7473df3c9a1742105888f83739d3c1"
+          },
+          "prompt": "Change the exported Count value in x.mdx from 2 to 3. Preserve the component expression and all other content.",
+          "attribution_rubric": {
+            "material_decision_required": true,
+            "decision_not_dictated_by": [
+              "prompt",
+              "oracle"
+            ],
+            "exact_guidance_link_required": false,
+            "resulting_work_link_required": true,
+            "insufficient_evidence": [
+              "skill delivery",
+              "native Read",
+              "skill acquisition",
+              "prompt compliance"
+            ],
+            "mode": "semantic_non_use",
+            "neighboring_domain_non_use_required": true,
+            "semantic_non_use_link_required": true
+          },
+          "relevance_category": "mdx",
+          "required_evidence": [
+            "Exact runtime versions/settings and subject input/output hashes",
+            "Retained provider transcript and guidance invocation",
+            "Semantic non-use decision with neighboring-domain rationale; resolver nonselection, skill delivery, native Read or prompt compliance alone is insufficient",
+            "Independent substantive review with task-specific evidence and limitations"
+          ],
+          "route": {
+            "model": "gpt-6-astra",
+            "model_source": "codex/profiles/implementation-testing.config.toml",
+            "model_source_sha256": "8a786851da04d75b06f62781a418df6959d335d61a03e32613250bb33d588261",
+            "profile": "implementation-testing",
+            "provider": "codex",
+            "role": "Producer"
+          },
+          "subject_files": {
+            "x.mdx": "export const Count = 2\n\n<Widget value={Count} />\n"
+          },
+          "non_trigger_contract": {
+            "target_skill": "markdown-language-profile",
+            "neighboring_domain": "mdx",
+            "external_correctness_oracle": {
+              "owner": "source-owned-later-result-and-independent-review",
+              "required": true,
+              "observable_facts": [
+                "requested_neighbor_edit_with_preserved_surroundings"
+              ],
+              "task_result_required": true,
+              "result_api": "testing.h_eval.promotion_oracles.evaluate_model_output",
+              "contract": "requested replacement; preserve other files and content; line endings and trailing whitespace immaterial"
+            },
+            "required_evidence": [
+              "selection/delivery/acquisition/read traces",
+              "actual task result",
+              "absence of material target-skill guidance use",
+              "reviewer disposition of semantic non-use"
+            ],
+            "provider_free_claim": "structure-only"
+          }
+        },
+        {
+          "case_id": "markdown-language-profile/non-trigger/frontmatter",
+          "case_sha256": "d9440815bf78ead6a72e90d6cb5a1143c1c9ce3b6b11ca6224eff08e5cb6dcdb",
+          "kind": "non-trigger",
+          "oracle": {
+            "command": null,
+            "independent_rubric": "Source-owned later-result grading checks the visible requested replacement and preservation of surrounding files and content, allowing only line-ending and trailing-whitespace normalization. Provider-free semantic non-use remains structure-only; later traces, actual task result and independent disposition are still required.",
+            "schema": "apg.h-promotion-oracle/v1",
+            "fixture_id": "markdown-language-profile/non-trigger/frontmatter",
+            "fixture_source": "testing/h_eval/promotion_oracles.py",
+            "fixture_kind": "source_fact",
+            "expected_status": {
+              "good": "pass",
+              "bad": "fail"
+            },
+            "assertion_owner": "source-owned",
+            "test_ownership": "fixture-owned",
+            "decision_axis": "scope exclusion rationale",
+            "runtime_requirements": [],
+            "hidden_fact_digests": [
+              "536e330601ece1df780dc97da356899a050337db058ee0c6288178b83d8ca9ab"
+            ],
+            "fixture_contract": "neighbor_frontmatter",
+            "oracle_id": "markdown-language-profile/non-trigger/frontmatter::source-oracle-v2",
+            "hidden_oracle_sha256": "1d96877a16c14bb2136bd5b6ad322d1e9b429360464ce1356aa77e0db0345f64",
+            "case_sha256": "d9440815bf78ead6a72e90d6cb5a1143c1c9ce3b6b11ca6224eff08e5cb6dcdb"
+          },
+          "prompt": "Append three to the tags list after two in BOTH x.md YAML frontmatter and json.md JSON frontmatter, using the existing inline list style. Preserve all other fields, prose and formatting.",
+          "attribution_rubric": {
+            "material_decision_required": true,
+            "decision_not_dictated_by": [
+              "prompt",
+              "oracle"
+            ],
+            "exact_guidance_link_required": false,
+            "resulting_work_link_required": true,
+            "insufficient_evidence": [
+              "skill delivery",
+              "native Read",
+              "skill acquisition",
+              "prompt compliance"
+            ],
+            "mode": "semantic_non_use",
+            "neighboring_domain_non_use_required": true,
+            "semantic_non_use_link_required": true
+          },
+          "relevance_category": "frontmatter",
+          "required_evidence": [
+            "Exact runtime versions/settings and subject input/output hashes",
+            "Retained provider transcript and guidance invocation",
+            "Semantic non-use decision with neighboring-domain rationale; resolver nonselection, skill delivery, native Read or prompt compliance alone is insufficient",
+            "Independent substantive review with task-specific evidence and limitations"
+          ],
+          "route": {
+            "model": "gpt-6-astra",
+            "model_source": "codex/profiles/implementation-testing.config.toml",
+            "model_source_sha256": "8a786851da04d75b06f62781a418df6959d335d61a03e32613250bb33d588261",
+            "profile": "implementation-testing",
+            "provider": "codex",
+            "role": "Producer"
+          },
+          "subject_files": {
+            "x.md": "---\ntitle: Example\ntags: [one, two]\n---\n\n# Example\n",
+            "json.md": "---\n{\"title\": \"Example\", \"tags\": [\"one\", \"two\"]}\n---\n\n# JSON Example\n"
+          },
+          "non_trigger_contract": {
+            "target_skill": "markdown-language-profile",
+            "neighboring_domain": "frontmatter",
+            "external_correctness_oracle": {
+              "owner": "source-owned-later-result-and-independent-review",
+              "required": true,
+              "observable_facts": [
+                "requested_neighbor_edit_with_preserved_surroundings"
+              ],
+              "task_result_required": true,
+              "result_api": "testing.h_eval.promotion_oracles.evaluate_model_output",
+              "contract": "requested replacement; preserve other files and content; line endings and trailing whitespace immaterial"
+            },
+            "required_evidence": [
+              "selection/delivery/acquisition/read traces",
+              "actual task result",
+              "absence of material target-skill guidance use",
+              "reviewer disposition of semantic non-use"
+            ],
+            "provider_free_claim": "structure-only"
+          }
+        }
+      ],
+      "count_is_not_redefinition_of_repeated": true,
+      "maturity_entry": {
+        "active_debts": [],
+        "blocking_debts": [],
+        "current_maturity": "provisional",
+        "debt_authority": "docs/governance/language-profile-known-debt.json",
+        "disposition_status": "PROVISIONAL_MAINTENANCE",
+        "evidence": {
+          "current_validation": [
+            "docs/governance/maturity/apg139/markdown-language-profile.json",
+            "docs/governance/maturity/apg139/qualification.md"
+          ],
+          "defect_debt_disposition": [
+            "docs/governance/maturity/apg139/markdown-language-profile.json"
+          ],
+          "independent_review": [
+            "docs/governance/maturity/apg139/independent-review.md"
+          ],
+          "provenance": [
+            "docs/governance/maturity/apg139/markdown-language-profile.json"
+          ],
+          "repeated_positive_use": [
+            "docs/governance/maturity/apg139/markdown-language-profile.json"
+          ],
+          "representative_non_triggers": [
+            "docs/governance/maturity/apg139/markdown-language-profile.json"
+          ],
+          "rollback": [
+            "docs/governance/maturity/apg139/markdown-language-profile.json"
+          ]
+        },
+        "independent_review": "docs/governance/maturity/apg139/independent-review.md",
+        "maintenance_ref": "MATURITY:markdown-language-profile",
+        "next_lifecycle_trigger": "Supply repeated actual Markdown parser/renderer-bound guidance decisions and representative dialect, raw-HTML and frontmatter non-trigger cases; bind parser settings and independently validate the current semantic outcome.",
+        "path": "skills/markdown-language-profile/SKILL.md",
+        "required_evidence_categories": [
+          "repeated_positive_use",
+          "representative_non_triggers",
+          "defect_debt_disposition",
+          "rollback",
+          "provenance",
+          "independent_review",
+          "current_validation"
+        ],
+        "resolved_debts": [],
+        "skill_id": "markdown-language-profile",
+        "source_references": [
+          "skills/markdown-language-profile/SKILL.md",
+          "skills/README.md",
+          "docs/provenance.md",
+          "docs/skill-authoring-and-maintenance.md",
+          "docs/governance/maturity/apg139/markdown-language-profile.json"
+        ]
+      },
+      "planning_case_count": 3,
+      "prior_refusal_sha256": "d969132063add451fb6061715a6d6996573b309155fda3a54f2e7fa7eab100ba",
+      "repeated_requirement": "Supply repeated actual Markdown parser/renderer-bound guidance decisions and representative dialect, raw-HTML and frontmatter non-trigger cases; bind parser settings and independently validate the current semantic outcome.",
+      "review_rubric": {
+        "must_verify": [
+          "All positive cases are distinct substantive decisions, not repeated delivery of one task",
+          "All semantic non-triggers retain actual guidance-use/non-use evidence",
+          "Exact skill body and maturity criteria remain unchanged",
+          "Current independent review cannot manufacture missing evidence",
+          "Historical evidence remains attributed; unresolved criterion means retain provisional"
+        ],
+        "promotion_authorized": false,
+        "required_categories": [
+          "repeated_positive_use",
+          "representative_non_triggers",
+          "defect_debt_disposition",
+          "rollback",
+          "provenance",
+          "independent_review",
+          "current_validation"
+        ]
+      },
+      "skill_id": "markdown-language-profile",
+      "source_path": "skills/markdown-language-profile/SKILL.md",
+      "whole_sha256": "0102078f16b28b9054ec008218ab5877621540705297307482c7c58447a7013a"
+    },
+    {
+      "body_identity": {
+        "bytes": 16929,
+        "sha256": "e87fd6b6058abfdefb2533edada2557397aab5c652ae2fd2f3af2cea7b6158df"
+      },
+      "cases": [
+        {
+          "case_id": "sqlite-database-profile/positive/transactions",
+          "case_sha256": "65c878e556b7880cee5ee6f35a7b702df6f16fa0f3c6370229ed392be26a7003",
+          "kind": "positive",
+          "oracle": {
+            "command": [
+              "python3",
+              "-m",
+              "unittest",
+              "discover",
+              "-q"
+            ],
+            "independent_rubric": "Source-owned fixture assertions enforce the case-specific source contract; model transcripts, prompt compliance, and command exit alone cannot satisfy this contract.",
+            "schema": "apg.h-promotion-oracle/v1",
+            "fixture_id": "sqlite-database-profile/positive/transactions",
+            "fixture_source": "testing/h_eval/promotion_oracles.py",
+            "fixture_kind": "command",
+            "expected_status": {
+              "good": "pass",
+              "bad": "fail"
+            },
+            "assertion_owner": "source-owned",
+            "test_ownership": "fixture-owned",
+            "decision_axis": "savepoint layering",
+            "runtime_requirements": [
+              "python3",
+              "sqlite3-module"
+            ],
+            "hidden_fact_digests": [
+              "3a4989be7179a48c176f0c65e40b0dfa02f8a484cf3bfadaf24414b8b301f0ff",
+              "d778b038f0a5c92ccfc58dcdf574fbf263c13a42c1fabcf7e74e048dca1eeb2b",
+              "053b0c9de23c93e351135879fb96d651ddcf91fb0d1a899dbbd319d8d1740d5e"
+            ],
+            "fixture_contract": "command_exit_and_assertions",
+            "oracle_id": "sqlite-database-profile/positive/transactions::source-oracle-v2",
+            "hidden_oracle_sha256": "5c8007c1c1a02adeb91d8af850a81bce1cf27376ed2c36f31cd795f80f0a8d78",
+            "case_sha256": "65c878e556b7880cee5ee6f35a7b702df6f16fa0f3c6370229ed392be26a7003"
+          },
+          "prompt": "Complete the account transfer behavior so successful moves preserve both balances and invalid requests leave stored state unchanged. Keep the public function shape and confine work to the supplied disposable data.",
+          "attribution_rubric": {
+            "material_decision_required": true,
+            "decision_not_dictated_by": [
+              "prompt",
+              "oracle"
+            ],
+            "exact_guidance_link_required": true,
+            "resulting_work_link_required": true,
+            "insufficient_evidence": [
+              "skill delivery",
+              "native Read",
+              "skill acquisition",
+              "prompt compliance"
+            ],
+            "mode": "positive_use"
+          },
+          "relevance_category": "transactions",
+          "required_evidence": [
+            "Exact runtime versions/settings and subject input/output hashes",
+            "Retained provider transcript and guidance invocation",
+            "Material decision not dictated by the prompt or oracle, linked to exact delivered guidance and the resulting work; skill delivery, native Read, skill acquisition or prompt compliance alone is insufficient",
+            "Independent substantive review with task-specific evidence and limitations"
+          ],
+          "route": {
+            "model": "gpt-6-astra",
+            "model_source": "codex/profiles/implementation-testing.config.toml",
+            "model_source_sha256": "8a786851da04d75b06f62781a418df6959d335d61a03e32613250bb33d588261",
+            "profile": "implementation-testing",
+            "provider": "codex",
+            "role": "Producer"
+          },
+          "subject_files": {
+            "schema.sql": "CREATE TABLE accounts(id INTEGER PRIMARY KEY, balance INTEGER NOT NULL CHECK(balance>=0));\nINSERT INTO accounts VALUES(1,100),(2,0);\n",
+            "transfer.py": "def transfer(connection, source, target, amount):\n    raise NotImplementedError\n",
+            "README.md": "A small account service uses this helper for transfers. Successful calls must leave both account balances consistent; callers rely on failures leaving stored state unchanged. Keep the function signature and schema inputs stable. The connection and transaction choices remain with the implementer.\nInvalid requests (negative amount, identical accounts, missing accounts, or insufficient funds) must raise an exception or return exactly False; successful calls may return None or True. No exception class is prescribed.\n"
+          }
+        },
+        {
+          "case_id": "sqlite-database-profile/positive/writer-wal",
+          "case_sha256": "6feef2399c531b38e785b6f6e836e4862a3b1d8a1df34dd49740657e711ca215",
+          "kind": "positive",
+          "oracle": {
+            "command": [
+              "python3",
+              "-m",
+              "unittest",
+              "discover",
+              "-q"
+            ],
+            "independent_rubric": "Source-owned fixture assertions enforce the case-specific source contract; model transcripts, prompt compliance, and command exit alone cannot satisfy this contract.",
+            "schema": "apg.h-promotion-oracle/v1",
+            "fixture_id": "sqlite-database-profile/positive/writer-wal",
+            "fixture_source": "testing/h_eval/promotion_oracles.py",
+            "fixture_kind": "command",
+            "expected_status": {
+              "good": "pass",
+              "bad": "fail"
+            },
+            "assertion_owner": "source-owned",
+            "test_ownership": "fixture-owned",
+            "decision_axis": "journal transition timing",
+            "runtime_requirements": [
+              "python3",
+              "sqlite3-module"
+            ],
+            "hidden_fact_digests": [
+              "c2f310ab99667ff3946131934f9fb842dab5bd865b75c624cf6297df3134efac",
+              "3a9eeda6dfa6351cc9c48c90d55c3c8ddb406c5c64c84280f3b8d0bddd152d80",
+              "60ecca9beab4e43e593ecc4a8ab5525ac93ef4bbd98b9ef6334e4c0a148beeb5"
+            ],
+            "fixture_contract": "command_exit_and_assertions",
+            "oracle_id": "sqlite-database-profile/positive/writer-wal::source-oracle-v2",
+            "hidden_oracle_sha256": "5834a6b359042c994b918915600abb71b0171539bdcf4e0096c3bc54e7e083b3",
+            "case_sha256": "6feef2399c531b38e785b6f6e836e4862a3b1d8a1df34dd49740657e711ca215"
+          },
+          "prompt": "Make the disposable event store behave predictably when a reader and multiple writers overlap, with a bounded response to contention and no host database access. Keep the supplied entry point stable and choose a defensible local policy.",
+          "attribution_rubric": {
+            "material_decision_required": true,
+            "decision_not_dictated_by": [
+              "prompt",
+              "oracle"
+            ],
+            "exact_guidance_link_required": true,
+            "resulting_work_link_required": true,
+            "insufficient_evidence": [
+              "skill delivery",
+              "native Read",
+              "skill acquisition",
+              "prompt compliance"
+            ],
+            "mode": "positive_use"
+          },
+          "relevance_category": "writer-wal",
+          "required_evidence": [
+            "Exact runtime versions/settings and subject input/output hashes",
+            "Retained provider transcript and guidance invocation",
+            "Material decision not dictated by the prompt or oracle, linked to exact delivered guidance and the resulting work; skill delivery, native Read, skill acquisition or prompt compliance alone is insufficient",
+            "Independent substantive review with task-specific evidence and limitations"
+          ],
+          "route": {
+            "model": "gpt-6-astra",
+            "model_source": "codex/profiles/implementation-testing.config.toml",
+            "model_source_sha256": "8a786851da04d75b06f62781a418df6959d335d61a03e32613250bb33d588261",
+            "profile": "implementation-testing",
+            "provider": "codex",
+            "role": "Producer"
+          },
+          "subject_files": {
+            "exercise.py": "import sqlite3\ndef open_database(path):\n    raise NotImplementedError(\"writer policy incomplete\")\n",
+            "schema.sql": "CREATE TABLE events(id INTEGER PRIMARY KEY, value TEXT NOT NULL);\n",
+            "README.md": "A local event store may have one reader and more than one writer at the same time. The command should remain bounded and explain unavailable or contended outcomes without touching host databases. Keep the supplied entry point stable; choose the connection and retry policy from the observed runtime.\nBoth connections must use the supplied file. While one holds a write transaction, a competing insert must report SQLite busy/locked unavailability within six seconds. After rollback, new writes must succeed. No journal mode or precise connection timeout is prescribed.\n"
+          }
+        },
+        {
+          "case_id": "sqlite-database-profile/positive/rebuild-integrity",
+          "case_sha256": "cacb9f8ecf1214a5666ceb650a99d413ef8f099d9340f9c021c39192ed377212",
+          "kind": "positive",
+          "oracle": {
+            "command": [
+              "python3",
+              "-m",
+              "unittest",
+              "discover",
+              "-q"
+            ],
+            "independent_rubric": "Source-owned fixture assertions enforce the case-specific source contract; model transcripts, prompt compliance, and command exit alone cannot satisfy this contract.",
+            "schema": "apg.h-promotion-oracle/v1",
+            "fixture_id": "sqlite-database-profile/positive/rebuild-integrity",
+            "fixture_source": "testing/h_eval/promotion_oracles.py",
+            "fixture_kind": "command",
+            "expected_status": {
+              "good": "pass",
+              "bad": "fail"
+            },
+            "assertion_owner": "source-owned",
+            "test_ownership": "fixture-owned",
+            "decision_axis": "preflight integrity query",
+            "runtime_requirements": [
+              "python3",
+              "sqlite3-module"
+            ],
+            "hidden_fact_digests": [
+              "b3d91ed641b26b88cffc26ba24f3943cddd36c5cdc0f83e54a18426a3b53fdb7",
+              "5b8b699112d57135732576eb557bcee494275b7713bdb6cadd92c6377d2874bf",
+              "110ca81a40cfdd37e8395ccc7c01913c163b9c06f1818384f3eca37daa83008b"
+            ],
+            "fixture_contract": "command_exit_and_assertions",
+            "oracle_id": "sqlite-database-profile/positive/rebuild-integrity::source-oracle-v2",
+            "hidden_oracle_sha256": "8ecd6ddc9fe50a4bf152067b4778f2c16818077fc8b891a295774ea7b8cad81d",
+            "case_sha256": "cacb9f8ecf1214a5666ceb650a99d413ef8f099d9340f9c021c39192ed377212"
+          },
+          "prompt": "Complete the requested parent-lookup index change described in the README, preserving existing rows and foreign keys and leaving failures recoverable. Keep the migration entry point stable and use only the supplied disposable data.",
+          "attribution_rubric": {
+            "material_decision_required": true,
+            "decision_not_dictated_by": [
+              "prompt",
+              "oracle"
+            ],
+            "exact_guidance_link_required": true,
+            "resulting_work_link_required": true,
+            "insufficient_evidence": [
+              "skill delivery",
+              "native Read",
+              "skill acquisition",
+              "prompt compliance"
+            ],
+            "mode": "positive_use"
+          },
+          "relevance_category": "rebuild-integrity",
+          "required_evidence": [
+            "Exact runtime versions/settings and subject input/output hashes",
+            "Retained provider transcript and guidance invocation",
+            "Material decision not dictated by the prompt or oracle, linked to exact delivered guidance and the resulting work; skill delivery, native Read, skill acquisition or prompt compliance alone is insufficient",
+            "Independent substantive review with task-specific evidence and limitations"
+          ],
+          "route": {
+            "model": "gpt-6-astra",
+            "model_source": "codex/profiles/implementation-testing.config.toml",
+            "model_source_sha256": "8a786851da04d75b06f62781a418df6959d335d61a03e32613250bb33d588261",
+            "profile": "implementation-testing",
+            "provider": "codex",
+            "role": "Producer"
+          },
+          "subject_files": {
+            "migrate.py": "def migrate(connection):\n    raise NotImplementedError\n",
+            "schema.sql": "PRAGMA foreign_keys=ON;\nCREATE TABLE parents(id INTEGER PRIMARY KEY);\nCREATE TABLE children(id INTEGER PRIMARY KEY, parent_id INTEGER REFERENCES parents(id));\nINSERT INTO parents VALUES(1);\nINSERT INTO children VALUES(1,1);\n",
+            "README.md": "Existing parent and child records are already in use. The schema change must preserve valid data and leave a failed change recoverable. Keep the migration entry point stable and confine all work to the supplied disposable data. The rebuild sequence and validation details are open.\nCreate the non-unique index children_parent_idx on children(parent_id), without adding columns or losing rows. Repeated migration must succeed. Foreign-key enforcement must remain enabled and failed writes must be recoverable by rollback.\n"
+          }
+        },
+        {
+          "case_id": "sqlite-database-profile/non-trigger/postgresql",
+          "case_sha256": "d82586ebf50cd186bf38c7a236717fc68625abaa2cd85cb84c6940a6e687604e",
+          "kind": "non-trigger",
+          "oracle": {
+            "command": null,
+            "independent_rubric": "Source-owned later-result grading checks the visible requested replacement and preservation of surrounding files and content, allowing only line-ending and trailing-whitespace normalization. Provider-free semantic non-use remains structure-only; later traces, actual task result and independent disposition are still required.",
+            "schema": "apg.h-promotion-oracle/v1",
+            "fixture_id": "sqlite-database-profile/non-trigger/postgresql",
+            "fixture_source": "testing/h_eval/promotion_oracles.py",
+            "fixture_kind": "source_fact",
+            "expected_status": {
+              "good": "pass",
+              "bad": "fail"
+            },
+            "assertion_owner": "source-owned",
+            "test_ownership": "fixture-owned",
+            "decision_axis": "scope exclusion rationale",
+            "runtime_requirements": [],
+            "hidden_fact_digests": [
+              "536e330601ece1df780dc97da356899a050337db058ee0c6288178b83d8ca9ab"
+            ],
+            "fixture_contract": "neighbor_postgresql",
+            "oracle_id": "sqlite-database-profile/non-trigger/postgresql::source-oracle-v2",
+            "hidden_oracle_sha256": "292cdb8e182710973492398b5418227d049f63da74915f183fc01441a90f5f5b",
+            "case_sha256": "d82586ebf50cd186bf38c7a236717fc68625abaa2cd85cb84c6940a6e687604e"
+          },
+          "prompt": "Change the advisory transaction lock key in query.sql from 42 to 43. Preserve the PostgreSQL function and all other content.",
+          "attribution_rubric": {
+            "material_decision_required": true,
+            "decision_not_dictated_by": [
+              "prompt",
+              "oracle"
+            ],
+            "exact_guidance_link_required": false,
+            "resulting_work_link_required": true,
+            "insufficient_evidence": [
+              "skill delivery",
+              "native Read",
+              "skill acquisition",
+              "prompt compliance"
+            ],
+            "mode": "semantic_non_use",
+            "neighboring_domain_non_use_required": true,
+            "semantic_non_use_link_required": true
+          },
+          "relevance_category": "postgresql",
+          "required_evidence": [
+            "Exact runtime versions/settings and subject input/output hashes",
+            "Retained provider transcript and guidance invocation",
+            "Semantic non-use decision with neighboring-domain rationale; resolver nonselection, skill delivery, native Read or prompt compliance alone is insufficient",
+            "Independent substantive review with task-specific evidence and limitations"
+          ],
+          "route": {
+            "model": "gpt-6-astra",
+            "model_source": "codex/profiles/implementation-testing.config.toml",
+            "model_source_sha256": "8a786851da04d75b06f62781a418df6959d335d61a03e32613250bb33d588261",
+            "profile": "implementation-testing",
+            "provider": "codex",
+            "role": "Producer"
+          },
+          "subject_files": {
+            "query.sql": "SELECT pg_advisory_xact_lock(42);\n"
+          },
+          "non_trigger_contract": {
+            "target_skill": "sqlite-database-profile",
+            "neighboring_domain": "postgresql",
+            "external_correctness_oracle": {
+              "owner": "source-owned-later-result-and-independent-review",
+              "required": true,
+              "observable_facts": [
+                "requested_neighbor_edit_with_preserved_surroundings"
+              ],
+              "task_result_required": true,
+              "result_api": "testing.h_eval.promotion_oracles.evaluate_model_output",
+              "contract": "requested replacement; preserve other files and content; line endings and trailing whitespace immaterial"
+            },
+            "required_evidence": [
+              "selection/delivery/acquisition/read traces",
+              "actual task result",
+              "absence of material target-skill guidance use",
+              "reviewer disposition of semantic non-use"
+            ],
+            "provider_free_claim": "structure-only"
+          }
+        },
+        {
+          "case_id": "sqlite-database-profile/non-trigger/generic-sql",
+          "case_sha256": "cc20b38c63d5fc679c0881cd3a676f30e052da6e9ae490c7fd24bcd99a29d2c9",
+          "kind": "non-trigger",
+          "oracle": {
+            "command": null,
+            "independent_rubric": "Source-owned later-result grading checks the visible requested replacement and preservation of surrounding files and content, allowing only line-ending and trailing-whitespace normalization. Provider-free semantic non-use remains structure-only; later traces, actual task result and independent disposition are still required.",
+            "schema": "apg.h-promotion-oracle/v1",
+            "fixture_id": "sqlite-database-profile/non-trigger/generic-sql",
+            "fixture_source": "testing/h_eval/promotion_oracles.py",
+            "fixture_kind": "source_fact",
+            "expected_status": {
+              "good": "pass",
+              "bad": "fail"
+            },
+            "assertion_owner": "source-owned",
+            "test_ownership": "fixture-owned",
+            "decision_axis": "scope exclusion rationale",
+            "runtime_requirements": [],
+            "hidden_fact_digests": [
+              "536e330601ece1df780dc97da356899a050337db058ee0c6288178b83d8ca9ab"
+            ],
+            "fixture_contract": "neighbor_generic_sql",
+            "oracle_id": "sqlite-database-profile/non-trigger/generic-sql::source-oracle-v2",
+            "hidden_oracle_sha256": "65b590295e6655e7b58d278acb0b7c552ade5c579c071536fd78ab6a17661597",
+            "case_sha256": "cc20b38c63d5fc679c0881cd3a676f30e052da6e9ae490c7fd24bcd99a29d2c9"
+          },
+          "prompt": "Change query.sql to select inactive people by replacing active = 1 with active = 0. Preserve all other content; no database engine selection.",
+          "attribution_rubric": {
+            "material_decision_required": true,
+            "decision_not_dictated_by": [
+              "prompt",
+              "oracle"
+            ],
+            "exact_guidance_link_required": false,
+            "resulting_work_link_required": true,
+            "insufficient_evidence": [
+              "skill delivery",
+              "native Read",
+              "skill acquisition",
+              "prompt compliance"
+            ],
+            "mode": "semantic_non_use",
+            "neighboring_domain_non_use_required": true,
+            "semantic_non_use_link_required": true
+          },
+          "relevance_category": "generic-sql",
+          "required_evidence": [
+            "Exact runtime versions/settings and subject input/output hashes",
+            "Retained provider transcript and guidance invocation",
+            "Semantic non-use decision with neighboring-domain rationale; resolver nonselection, skill delivery, native Read or prompt compliance alone is insufficient",
+            "Independent substantive review with task-specific evidence and limitations"
+          ],
+          "route": {
+            "model": "gpt-6-astra",
+            "model_source": "codex/profiles/implementation-testing.config.toml",
+            "model_source_sha256": "8a786851da04d75b06f62781a418df6959d335d61a03e32613250bb33d588261",
+            "profile": "implementation-testing",
+            "provider": "codex",
+            "role": "Producer"
+          },
+          "subject_files": {
+            "query.sql": "SELECT name FROM people WHERE active = 1;\n"
+          },
+          "non_trigger_contract": {
+            "target_skill": "sqlite-database-profile",
+            "neighboring_domain": "generic-sql",
+            "external_correctness_oracle": {
+              "owner": "source-owned-later-result-and-independent-review",
+              "required": true,
+              "observable_facts": [
+                "requested_neighbor_edit_with_preserved_surroundings"
+              ],
+              "task_result_required": true,
+              "result_api": "testing.h_eval.promotion_oracles.evaluate_model_output",
+              "contract": "requested replacement; preserve other files and content; line endings and trailing whitespace immaterial"
+            },
+            "required_evidence": [
+              "selection/delivery/acquisition/read traces",
+              "actual task result",
+              "absence of material target-skill guidance use",
+              "reviewer disposition of semantic non-use"
+            ],
+            "provider_free_claim": "structure-only"
+          }
+        }
+      ],
+      "count_is_not_redefinition_of_repeated": true,
+      "maturity_entry": {
+        "active_debts": [],
+        "blocking_debts": [],
+        "current_maturity": "provisional",
+        "debt_authority": "docs/governance/language-profile-known-debt.json",
+        "disposition_status": "PROVISIONAL_MAINTENANCE",
+        "evidence": {
+          "current_validation": [
+            "docs/governance/maturity/apg139/sqlite-database-profile.json",
+            "docs/governance/maturity/apg139/qualification.md"
+          ],
+          "defect_debt_disposition": [
+            "docs/governance/maturity/apg139/sqlite-database-profile.json"
+          ],
+          "independent_review": [
+            "docs/governance/maturity/apg139/independent-review.md"
+          ],
+          "provenance": [
+            "docs/governance/maturity/apg139/sqlite-database-profile.json"
+          ],
+          "repeated_positive_use": [
+            "docs/governance/maturity/apg139/sqlite-database-profile.json"
+          ],
+          "representative_non_triggers": [
+            "docs/governance/maturity/apg139/sqlite-database-profile.json"
+          ],
+          "rollback": [
+            "docs/governance/maturity/apg139/sqlite-database-profile.json"
+          ]
+        },
+        "independent_review": "docs/governance/maturity/apg139/independent-review.md",
+        "maintenance_ref": "MATURITY:sqlite-database-profile",
+        "next_lifecycle_trigger": "Supply repeated actual SQLite transaction/writer/WAL/rebuild/path/integrity guidance decisions bound to library, driver and filesystem facts, with ordinary-query non-triggers and authorized validation appropriate to recovery claims; obtain independent review.",
+        "path": "skills/sqlite-database-profile/SKILL.md",
+        "required_evidence_categories": [
+          "repeated_positive_use",
+          "representative_non_triggers",
+          "defect_debt_disposition",
+          "rollback",
+          "provenance",
+          "independent_review",
+          "current_validation"
+        ],
+        "resolved_debts": [],
+        "skill_id": "sqlite-database-profile",
+        "source_references": [
+          "skills/sqlite-database-profile/SKILL.md",
+          "skills/README.md",
+          "docs/provenance.md",
+          "docs/skill-authoring-and-maintenance.md",
+          "docs/governance/maturity/apg139/sqlite-database-profile.json"
+        ]
+      },
+      "planning_case_count": 3,
+      "prior_refusal_sha256": "569112cabbc02ea28c0325d5b0dd6062f11a000aa5369f03ec738f732753828a",
+      "repeated_requirement": "Supply repeated actual SQLite transaction/writer/WAL/rebuild/path/integrity guidance decisions bound to library, driver and filesystem facts, with ordinary-query non-triggers and authorized validation appropriate to recovery claims; obtain independent review.",
+      "review_rubric": {
+        "must_verify": [
+          "All positive cases are distinct substantive decisions, not repeated delivery of one task",
+          "All semantic non-triggers retain actual guidance-use/non-use evidence",
+          "Exact skill body and maturity criteria remain unchanged",
+          "Current independent review cannot manufacture missing evidence",
+          "Historical evidence remains attributed; unresolved criterion means retain provisional"
+        ],
+        "promotion_authorized": false,
+        "required_categories": [
+          "repeated_positive_use",
+          "representative_non_triggers",
+          "defect_debt_disposition",
+          "rollback",
+          "provenance",
+          "independent_review",
+          "current_validation"
+        ]
+      },
+      "skill_id": "sqlite-database-profile",
+      "source_path": "skills/sqlite-database-profile/SKILL.md",
+      "whole_sha256": "39bce0e13fe1009f859aff146885b24fd70e3fbe66bf7b064855810ed3568065"
+    }
+  ],
+  "oracle_source": {
+    "path": "testing/h_eval/promotion_oracles.py",
+    "paths": [
+      "testing/h_eval/promotion_oracles.py",
+      "testing/h_eval/promotion_fixture_specs.py",
+      "testing/h_eval/hidden_execution.py",
+      "testing/h_eval/lifecycle_hidden.py",
+      "testing/h_eval/authored_execution.py",
+      "testing/h_eval/starting_evidence.py"
+    ],
+    "schema": "apg.h-promotion-oracle/v1",
+    "sha256": "0b524c74b3bf6ca43777310ce30f09b4a5c6b423439942009ec507132885671f"
+  },
+  "independent_review": {
+    "status": "pending",
+    "source_disposition": "pending",
+    "provider_free_package_disposition": "pending",
+    "overall_inventory_disposition": "pending",
+    "per_skill_disposition": {
+      "go-language-profile": "pending",
+      "go-test-profile": "pending",
+      "pytest-test-profile": "pending",
+      "markdown-language-profile": "pending",
+      "sqlite-database-profile": "pending"
+    },
+    "acceptance_owner": "dispatcher_work_review",
+    "acceptance_required": true
+  }
+}

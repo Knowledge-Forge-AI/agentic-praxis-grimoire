@@ -1,0 +1,103 @@
+{
+  "schema": "apg.h-prerequisite-handoff/v1",
+  "phase": "APG166A",
+  "continuation": "V0130-H-QUAL2",
+  "exit": "00223",
+  "disposition": "blocked",
+  "review_state": "supplied independent work review dispositioned; amendments have no second independent review",
+  "checkpoint": null,
+  "h_main_gate": false,
+  "live_measured_pairs": 0,
+  "qualified_promotions": 0,
+  "scenario15": "contingent/unavailable",
+  "default_context_mode": "static",
+  "seal": {
+    "path": "docs/evaluations/apg166a/readiness-seal.json",
+    "sha256": "89887b79876e829fcafa15867cbabaf8120bb5415d53222c4a3d3055d0d97f01",
+    "purpose": "blocked pre-live infrastructure inventory; not readiness acceptance or holdout results"
+  },
+  "next_phase": "APG166B",
+  "next_phase_authorized": false,
+  "next_phase_prerequisites": [
+    "Close native recovery observation prerequisite and regenerate source inventory before opening live holdout",
+    "Manager acceptance and separate bounded authorization",
+    "Verify exact accepted source and readiness inventory before opening live holdout",
+    "Freeze explicit catalog capture and controlled runtime-input bytes/digests; public source inventory does not bind operator settings",
+    "Bind provider/model routes, clean subject fixtures, result importers and substantive task oracles",
+    "Invalidate complete live result set if sealed inputs change after observing live results"
+  ],
+  "retained_refusals": [
+    "go-language-profile",
+    "go-test-profile",
+    "pytest-test-profile",
+    "markdown-language-profile",
+    "sqlite-database-profile"
+  ],
+  "not_executed": [
+    "Real H provider pairs",
+    "Positive live guidance-use qualification or promotions",
+    "Scenario 15 live qualification",
+    "V0130-I, default flip, release, publication"
+  ],
+  "observation_limits": [
+    "Controlled process transport does not prove model observation",
+    "Native filesystem reads outside the instrumented recovery seam are unobserved",
+    "Instrumented providers establish runner mechanisms only"
+  ],
+  "required_test_skips": [],
+  "prerequisites_ready": false,
+  "blockers": [
+    "Complete provider-native recovery-read observation is unavailable; live arms exposing recovery snapshots fail coverage closed. Complete and reseal infrastructure before opening any live holdout."
+  ],
+  "review_dispositions": {
+    "1": "amended: native supervision requires evaluation/adaptive opt-in",
+    "2": "amended: binary bounded snapshots and terminal evidence after admission",
+    "3": "amended: instruction-settings classification and separate frozen runtime-input binding",
+    "4": "amended: native Antigravity prefix identity and retained component views",
+    "5": "accepted limitation: live native recovery coverage fails closed; prerequisite blocked",
+    "minor": "amended: KeyboardInterrupt preserved; explicit caller catalog capture for live evaluation"
+  },
+  "producer_qualification": {
+    "python_unique_cases": 276,
+    "python_runs": {
+      "sealed-qualification.xml": 264,
+      "terminal-final.xml": 40
+    },
+    "go_passing_test_and_subtest_records": 287,
+    "required_infrastructure_skips": 0,
+    "readiness_sha256": "d4d2a3789e2d63f2f53d3c4de76c62cc9fde75a439094d81826b694872f59b59",
+    "sealed_files": 343
+  },
+  "qualification": {
+    "python_unique_cases": 285,
+    "python_version": "3.13.12",
+    "pytest_version": "8.4.2",
+    "python_result": "285 passed, zero skips",
+    "go_packages": [
+      "./internal/acquisition",
+      "./internal/cli",
+      "./skills"
+    ],
+    "go_test": "pass with physical TMPDIR",
+    "go_vet": "pass",
+    "skill_library": "pass: 46 canonical skills",
+    "roadmap_closure": "pass: 55 terminal, zero open/invalid",
+    "record_identity": "pass: APG166A allocated to exit 00223; next exit 00224",
+    "whitespace": "pass",
+    "protected_files_unchanged": 72,
+    "aggregate_formulas_unchanged": true,
+    "required_infrastructure_skips": 0,
+    "readiness_sha256": "89887b79876e829fcafa15867cbabaf8120bb5415d53222c4a3d3055d0d97f01",
+    "sealed_files": 343,
+    "scope": "instrumented mechanism and source verification only; no live H data",
+    "failed_attempts": [
+      "Initial Python collection used the wrong import mode; corrected to importlib before the passing run.",
+      "Initial Go CLI test rejected platform temporary-path ancestry; all packages passed after physical TMPDIR routing."
+    ],
+    "not_run": [
+      "real H provider pairs",
+      "full project/release qualification",
+      "second independent review (not required by this stage)"
+    ]
+  }
+}

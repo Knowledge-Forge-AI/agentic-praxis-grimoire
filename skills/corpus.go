@@ -184,7 +184,14 @@ func parseSkill(relative string, body []byte) (SkillMetadata, error) {
 		}
 		values[key] = value
 	}
-	if len(values) != 2 || values["name"] == "" || values["description"] == "" || values["name"] != pathID {
+	for key := range values {
+		switch key {
+		case "name", "description", "requires", "support":
+		default:
+			return SkillMetadata{}, fmt.Errorf("%w: unsupported front matter", ErrCorpusMismatch)
+		}
+	}
+	if values["name"] == "" || values["description"] == "" || values["name"] != pathID {
 		return SkillMetadata{}, fmt.Errorf("%w: name/path/front matter mismatch", ErrCorpusMismatch)
 	}
 	lineCount := bytes.Count(body, []byte{'\n'})

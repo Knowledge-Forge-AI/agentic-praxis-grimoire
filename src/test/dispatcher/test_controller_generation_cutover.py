@@ -29,7 +29,7 @@ def test_dirty_development_preserves_worktree_execution(cutover_env):
     for name in ("helper.py", "late_import.py"):
         (layout["active"] / "libexec" / name).write_text(body)
     env = os.environ.copy()
-    env["AGENT_CENTRAL_ACTIVE_ROOT"] = str(layout["scratch_dir"] / "other-controller")
+    env["APGR_ACTIVE_ROOT"] = str(layout["scratch_dir"] / "other-controller")
     result = subprocess.run([sys.executable, "-B", str(layout["active"] / "libexec/agent_phase/cli.py"),
                              "dispatch"], env=env, capture_output=True, timeout=10)
     assert result.returncode == 0, result.stderr.decode()
@@ -48,7 +48,7 @@ def test_untracked_development_input_preserves_worktree_execution(cutover_env):
     git(layout["active"], "pull", "--ff-only")
     (layout["active"] / "libexec/local-development.txt").write_bytes(b'untracked-development')
     env = os.environ.copy()
-    env["AGENT_CENTRAL_ACTIVE_ROOT"] = str(layout["scratch_dir"] / "other-controller")
+    env["APGR_ACTIVE_ROOT"] = str(layout["scratch_dir"] / "other-controller")
     result = subprocess.run([sys.executable, "-B", str(layout["active"] / "libexec/agent_phase/cli.py"),
                              "dispatch"], env=env, capture_output=True, timeout=10)
     assert result.returncode == 0, result.stderr.decode()
@@ -566,3 +566,20 @@ def test_operator_root_and_codex_profile_arguments(tmp_path: Path, monkeypatch: 
     assert 'model.family="gpt-6"' in args
     assert "model.temperature=0" in args
     assert "model.enable_feature=true" in args
+
+
+def test_fixture_isolation_regression(cutover_env: dict[str, Any]) -> None:
+    """Regression test ensuring fixture selects APGR stores and launcher state is isolated."""
+    assert os.environ.get("APGR_GENERATION_STORE") == str(cutover_env["store"])
+    assert os.environ.get("APGR_ACTIVE_ROOT") == str(cutover_env["active"])
+    assert "AGENT_CENTRAL_GENERATION_STORE" not in os.environ
+    assert "AGENT_CENTRAL_ACTIVE_ROOT" not in os.environ
+    for prefix in ("AGENT_CENTRAL_", "AGENT_WORKER_"):
+        assert not any(k.startswith(prefix) for k in os.environ)
+    for exact_key in (
+        "AGENT_PHASE_RUN_ROOT",
+        "CODEX_THREAD_ID",
+        "CODEX_SESSION_ID",
+        "CODEX_CI",
+    ):
+        assert exact_key not in os.environ

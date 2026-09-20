@@ -34,6 +34,7 @@ from controller_generation_store import (
     canonical_root_sha256,
     coordinate,
     materialize,
+    resolve_controller_dir,
     validate_generation,
 )
 
@@ -148,12 +149,56 @@ def test_coordinate_creates_store_and_lock(scratch_dir: Path) -> None:
 def test_coordinate_env_base_override(monkeypatch: pytest.MonkeyPatch, scratch_dir: Path) -> None:
     repo = _init_git_repo(scratch_dir / "repo")
     store_base = scratch_dir / "env_store_base"
+    monkeypatch.delenv("APGR_GENERATION_STORE", raising=False)
     monkeypatch.setenv("AGENT_CENTRAL_GENERATION_STORE", str(store_base))
 
     with coordinate(repo) as cdir:
         expected_digest = canonical_root_sha256(repo)
         assert cdir == store_base / expected_digest
         assert cdir.is_dir()
+
+
+def test_coordinate_apgr_generation_store_override_wins(monkeypatch: pytest.MonkeyPatch, scratch_dir: Path) -> None:
+    repo = _init_git_repo(scratch_dir / "repo")
+    store_base = scratch_dir / "apgr_store_base"
+    legacy_base = scratch_dir / "legacy_store_base"
+    monkeypatch.setenv("AGENT_CENTRAL_GENERATION_STORE", str(legacy_base))
+    monkeypatch.setenv("APGR_GENERATION_STORE", str(store_base))
+
+    with coordinate(repo) as cdir:
+        expected_digest = canonical_root_sha256(repo)
+        assert cdir == store_base / expected_digest
+        assert cdir.is_dir()
+
+
+def test_resolve_controller_dir_legacy_readback_rule(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    repo = _init_git_repo(tmp_path / "repo")
+    digest = canonical_root_sha256(repo)
+
+    fake_home = tmp_path / "home"
+    fake_legacy_base = fake_home / ".local/state/agent-central/generations"
+    fake_legacy_dir = fake_legacy_base / digest
+    fake_legacy_dir.mkdir(parents=True, mode=0o700)
+
+    monkeypatch.delenv("APGR_GENERATION_STORE", raising=False)
+    monkeypatch.delenv("AGENT_CENTRAL_GENERATION_STORE", raising=False)
+    monkeypatch.delenv("APGR_HOME", raising=False)
+    monkeypatch.setenv("HOME", str(fake_home))
+
+    # With default home (~/.apgr), legacy dir exists and target (~/.apgr/generations/<digest>) does not
+    res = resolve_controller_dir(repo)
+    assert res == fake_legacy_dir
+
+    # When target exists, target wins
+    target_dir = fake_home / ".apgr/generations" / digest
+    target_dir.mkdir(parents=True, mode=0o700)
+    assert resolve_controller_dir(repo) == target_dir
+
+    # With explicitly relocated home (APGR_HOME), legacy is NEVER checked even if target does not exist
+    relocated_home = tmp_path / "relocated_home"
+    monkeypatch.setenv("APGR_HOME", str(relocated_home))
+    relocated_target = relocated_home / "generations" / digest
+    assert resolve_controller_dir(repo) == relocated_target
 
 
 def test_coordinate_rejects_symlink_dir(scratch_dir: Path) -> None:
@@ -250,6 +295,7 @@ def test_materialize_git_objects_allowlist_and_schema(scratch_dir: Path) -> None
     (repo / "claude").mkdir()
     (repo / "claude" / "CLAUDE.md").write_text("# Claude Guidance\n")
     (repo / "claude" / "model-catalog-v1.json").write_text('{"models": []}\n')
+    (repo / "claude" / "instruction-fragments-v1.json").write_text('{"fragments": []}\n')
 
     (repo / "antigravity" / "profiles").mkdir(parents=True)
     (repo / "antigravity" / "profiles" / "default.json").write_text('{"profile": "agy"}\n')
@@ -284,6 +330,7 @@ def test_materialize_git_objects_allowlist_and_schema(scratch_dir: Path) -> None
     assert (gen_root / "codex" / "AGENTS.md").is_file()
     assert (gen_root / "claude" / "CLAUDE.md").is_file()
     assert (gen_root / "claude" / "model-catalog-v1.json").is_file()
+    assert (gen_root / "claude" / "instruction-fragments-v1.json").is_file()
     assert (gen_root / "antigravity" / "profiles" / "default.json").is_file()
     assert (gen_root / "tools" / "add_dispatcher_roster_operator_directions.py").is_file()
 
@@ -577,3 +624,336 @@ def test_retirement_birth_order_is_conservative(monkeypatch, platform, previous,
     import controller_generation_process as processes
     monkeypatch.setattr(processes.sys, "platform", platform)
     assert processes.identity_supersedes(42, previous, observed) is expected
+
+
+def test_controller_generation_bootstrap_active_precedence(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    from controller_generation_bootstrap import _active
+
+    active_dir = tmp_path / "active"
+    active_dir.mkdir()
+    legacy_dir = tmp_path / "legacy"
+    legacy_dir.mkdir()
+
+    monkeypatch.setenv("AGENT_CENTRAL_ACTIVE_ROOT", str(legacy_dir))
+    monkeypatch.setenv("APGR_ACTIVE_ROOT", str(active_dir))
+
+    assert _active(active_dir) is True
+    assert _active(legacy_dir) is False
+
+    monkeypatch.delenv("APGR_ACTIVE_ROOT", raising=False)
+    assert _active(legacy_dir) is True
+
+
+def test_controller_generation_bootstrap_extract_apgr_home(tmp_path: Path) -> None:
+    from controller_generation_bootstrap import _extract_apgr_home
+
+    target = tmp_path / "valid_home"
+    assert _extract_apgr_home(["dispatch", "--apgr-home", str(target)]) == target
+    assert _extract_apgr_home(["dispatch", f"--apgr-home={target}"]) == target
+    assert _extract_apgr_home(["dispatch", "--other", "flag"]) is None
+
+    # Trailing flag fails closed
+    with pytest.raises(ValueError, match="requires an argument"):
+        _extract_apgr_home(["dispatch", "--apgr-home"])
+
+    # Relative path fails
+    with pytest.raises(ValueError, match="must be an absolute path"):
+        _extract_apgr_home(["dispatch", "--apgr-home", "relative/path"])
+
+    with pytest.raises(ValueError, match="must be an absolute path"):
+        _extract_apgr_home(["dispatch", "--apgr-home=relative/path"])
+
+    # Control characters fail
+    with pytest.raises(ValueError, match="invalid or control characters"):
+        _extract_apgr_home(["dispatch", "--apgr-home", "/path/with\ninvalid"])
+
+
+def test_validate_generation_does_not_create_missing_directories(scratch_dir: Path) -> None:
+    nonexistent = scratch_dir / "nonexistent_ctrl_dir"
+    fake_record = {
+        "schema": SCHEMA_GENERATION,
+        "safety_established": True,
+        "commit": "a" * 40,
+        "generation_root": str(nonexistent / "objects" / ("a" * 40)),
+        "controller_root": "/tmp/fake_root",
+        "controller_id": "b" * 64,
+        "tree": "c" * 40,
+        "manifest_sha256": "d" * 64,
+    }
+    with pytest.raises(GenerationValidationError, match="generation store directory missing"):
+        validate_generation(fake_record, nonexistent)
+    # The nonexistent directory was not created by validate_generation
+    assert not nonexistent.exists()
+
+
+def test_legacy_readback_survives_new_store_coordination_and_bootstrap(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    import hashlib
+    import json
+    import os
+    import sys
+    from controller_generation_bootstrap import _resume_commit, enter, LEASE_ENV
+    from controller_generation_store import coordinate, materialize, resolve_controller_dir
+
+    repo = _init_git_repo(tmp_path / "ctrl_repo")
+    (repo / "libexec").mkdir(parents=True, exist_ok=True)
+    (repo / "libexec/controller_generation_bootstrap.py").write_text("# bootstrap stub\n", encoding="utf-8")
+    (repo / "README.md").write_text("hello", encoding="utf-8")
+    commit = _git_commit_all(repo, "initial")
+    digest = canonical_root_sha256(repo)
+
+    fake_home = tmp_path / "home"
+    legacy_base = fake_home / ".local/state/agent-central/generations"
+    legacy_dir = legacy_base / digest
+    legacy_dir.mkdir(parents=True, mode=0o700)
+
+    monkeypatch.delenv("APGR_GENERATION_STORE", raising=False)
+    monkeypatch.delenv("AGENT_CENTRAL_GENERATION_STORE", raising=False)
+    monkeypatch.delenv("APGR_HOME", raising=False)
+    monkeypatch.setenv("HOME", str(fake_home))
+
+    # Materialize generation into the legacy store
+    legacy_record = materialize(repo, legacy_dir, commit=commit)
+    assert (legacy_dir / "objects" / commit).is_dir()
+
+    # Capture initial state of the legacy generation (files, digests, modes)
+    def snapshot_dir(base: Path) -> dict[str, tuple[str, int]]:
+        snap = {}
+        for p in sorted(base.rglob("*")):
+            rel = str(p.relative_to(base))
+            if p.is_file():
+                h = hashlib.sha256(p.read_bytes()).hexdigest()
+            else:
+                h = "DIR"
+            snap[rel] = (h, p.stat().st_mode)
+        return snap
+
+    legacy_snapshot_before = snapshot_dir(legacy_dir)
+
+    # Create a disposable prior run state.json referencing the legacy generation
+    run_dir = tmp_path / "prior_run"
+    run_dir.mkdir()
+    state_file = run_dir / "state.json"
+    state_file.write_text(json.dumps({
+        "schema": "agent-phase-state-v1",
+        "controller_generation": legacy_record,
+    }), encoding="utf-8")
+
+    # Before startup, new target store does not exist
+    target_dir = fake_home / ".apgr/generations" / digest
+    assert not target_dir.exists()
+    assert resolve_controller_dir(repo, lookup_only=True) == legacy_dir
+
+    # A newly created current-store directory (empty, before objects exist) must NOT mask legacy record
+    target_dir.mkdir(parents=True, mode=0o700)
+    assert target_dir.exists()
+    assert not (target_dir / "objects").exists()
+    assert resolve_controller_dir(repo, lookup_only=True) == legacy_dir
+    found_commit_early = _resume_commit(["--resume", str(run_dir)], repo)
+    assert found_commit_early == commit
+
+    # Intercept os.execve in enter()
+    execve_calls = []
+
+    def mock_execve(executable: str, args: list[str], env: dict[str, str]) -> None:
+        execve_calls.append((executable, args, env))
+
+    monkeypatch.setattr(os, "execve", mock_execve)
+    monkeypatch.setattr(sys, "argv", ["agent-phase-dispatch", "dispatch", "--resume", str(run_dir)])
+
+    # Run the native startup sequence through enter()
+    enter(repo)
+
+    # 1. Verify bootstrap succeeded and invoked execve
+    assert len(execve_calls) == 1
+    _exec, _args, _env = execve_calls[0]
+    lease_path = Path(_env[LEASE_ENV])
+    # Coordination lease MUST be in the new store, not legacy store
+    assert str(target_dir) in str(lease_path)
+    assert str(legacy_dir) not in str(lease_path)
+
+    # 2. Verify legacy bytes, modes, and directory membership are 100% unchanged
+    legacy_snapshot_after = snapshot_dir(legacy_dir)
+    assert legacy_snapshot_before == legacy_snapshot_after
+    assert not (legacy_dir / "leases").exists()
+    assert not (legacy_dir / ".lock").exists()
+
+    # 3. Verify new writable coordination stayed isolated in the new selected store
+    assert target_dir.is_dir()
+    assert (target_dir / "leases").is_dir()
+    assert (target_dir / "objects" / commit).is_dir()
+
+    # 4. Verify relocated home does not search default legacy state
+    relocated_home = tmp_path / "relocated_home"
+    relocated_target = relocated_home / "generations" / digest
+    monkeypatch.setenv("APGR_HOME", str(relocated_home))
+    assert resolve_controller_dir(repo, lookup_only=True) == relocated_target
+
+
+def test_generation_store_precedence_and_empty_suppression(
+    monkeypatch: pytest.MonkeyPatch, scratch_dir: Path, tmp_path: Path
+) -> None:
+    repo = _init_git_repo(scratch_dir / "repo")
+    digest = canonical_root_sha256(repo)
+
+    explicit_store = scratch_dir / "explicit_store"
+    apgr_base = scratch_dir / "apgr_base"
+    legacy_base = scratch_dir / "legacy_base"
+    fake_home = tmp_path / "fake_home"
+
+    monkeypatch.setenv("HOME", str(fake_home))
+    monkeypatch.delenv("APGR_HOME", raising=False)
+
+    # 1. Explicit store parameter wins over APGR_GENERATION_STORE and AGENT_CENTRAL_GENERATION_STORE
+    monkeypatch.setenv("APGR_GENERATION_STORE", str(apgr_base))
+    monkeypatch.setenv("AGENT_CENTRAL_GENERATION_STORE", str(legacy_base))
+    assert resolve_controller_dir(repo, store=explicit_store) == explicit_store
+
+    # 2. When store is None, APGR_GENERATION_STORE wins over AGENT_CENTRAL_GENERATION_STORE
+    assert resolve_controller_dir(repo) == apgr_base / digest
+
+    # 3. Present empty APGR_GENERATION_STORE suppresses legacy AGENT_CENTRAL_GENERATION_STORE and selects default
+    monkeypatch.setenv("APGR_GENERATION_STORE", "")
+    target_default = fake_home / ".apgr/generations" / digest
+    assert resolve_controller_dir(repo, lookup_only=False) == target_default
+
+    # Coordinate with present empty APGR_GENERATION_STORE writes to default store, not legacy
+    with coordinate(repo) as cdir:
+        assert cdir == target_default
+        assert cdir.is_dir()
+        assert not (legacy_base / digest).exists()
+
+    # 4. When APGR_GENERATION_STORE key is absent, AGENT_CENTRAL_GENERATION_STORE is selected
+    # and legacy alias writes are allowed via coordinate
+    monkeypatch.delenv("APGR_GENERATION_STORE", raising=False)
+    legacy_expected = legacy_base / digest
+    assert resolve_controller_dir(repo, lookup_only=False) == legacy_expected
+
+    with coordinate(repo) as cdir:
+        assert cdir == legacy_expected
+        assert cdir.is_dir()
+        assert (cdir / ".lock").is_file()
+
+
+def test_controller_generation_bootstrap_active_empty_suppresses_legacy(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    from controller_generation_bootstrap import _active
+
+    legacy_dir = tmp_path / "legacy_active"
+    legacy_dir.mkdir()
+
+    monkeypatch.setenv("AGENT_CENTRAL_ACTIVE_ROOT", str(legacy_dir))
+    monkeypatch.setenv("APGR_ACTIVE_ROOT", "")
+
+    # Present empty APGR_ACTIVE_ROOT suppresses AGENT_CENTRAL_ACTIVE_ROOT
+    assert _active(legacy_dir) is False
+
+    # Default active root is selected instead
+    default_root = Path.home() / ".local/nix-darwin/agentic-praxis-grimoire_dinas"
+    assert _active(default_root) is True
+
+
+def test_legacy_readback_existing_dir_precondition_and_lookup_only(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    repo = _init_git_repo(tmp_path / "repo")
+    digest = canonical_root_sha256(repo)
+
+    fake_home = tmp_path / "home"
+    legacy_dir = fake_home / ".local/state/agent-central/generations" / digest
+    target_dir = fake_home / ".apgr/generations" / digest
+
+    monkeypatch.delenv("APGR_GENERATION_STORE", raising=False)
+    monkeypatch.delenv("AGENT_CENTRAL_GENERATION_STORE", raising=False)
+    monkeypatch.delenv("APGR_HOME", raising=False)
+    monkeypatch.setenv("HOME", str(fake_home))
+
+    # Precondition: legacy directory does not exist, so default returns target even for lookup_only
+    assert not legacy_dir.exists()
+    assert resolve_controller_dir(repo, lookup_only=True) == target_dir
+
+    # When legacy directory exists, lookup_only selects legacy
+    legacy_dir.mkdir(parents=True, mode=0o700)
+    assert resolve_controller_dir(repo, lookup_only=True) == legacy_dir
+
+    # But lookup_only=False (e.g. for coordinate/write) selects target
+    assert resolve_controller_dir(repo, lookup_only=False) == target_dir
+
+    # Coordinate creates lock only in target, never in legacy
+    with coordinate(repo) as cdir:
+        assert cdir == target_dir
+        assert (target_dir / ".lock").is_file()
+        assert not (legacy_dir / ".lock").exists()
+
+
+def test_legacy_readback_commit_aware_and_no_merge_byte_mode_immutability(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    import hashlib
+
+    repo = _init_git_repo(tmp_path / "repo")
+    (repo / "libexec").mkdir(parents=True, exist_ok=True)
+    (repo / "libexec/controller_generation_bootstrap.py").write_text("# bootstrap\n", encoding="utf-8")
+    (repo / "README.md").write_text("v1", encoding="utf-8")
+    commit1 = _git_commit_all(repo, "commit1")
+    digest = canonical_root_sha256(repo)
+
+    fake_home = tmp_path / "home"
+    legacy_dir = fake_home / ".local/state/agent-central/generations" / digest
+    target_dir = fake_home / ".apgr/generations" / digest
+
+    monkeypatch.delenv("APGR_GENERATION_STORE", raising=False)
+    monkeypatch.delenv("AGENT_CENTRAL_GENERATION_STORE", raising=False)
+    monkeypatch.delenv("APGR_HOME", raising=False)
+    monkeypatch.setenv("HOME", str(fake_home))
+
+    # Materialize commit1 into legacy store
+    legacy_record1 = materialize(repo, legacy_dir, commit=commit1)
+    assert (legacy_dir / "objects" / commit1).is_dir()
+
+    # Capture initial snapshot of legacy directory (hashes and exact modes)
+    def snapshot(base: Path) -> dict[str, tuple[str, int]]:
+        result = {}
+        for p in sorted(base.rglob("*")):
+            rel = str(p.relative_to(base))
+            if p.is_file():
+                h = hashlib.sha256(p.read_bytes()).hexdigest()
+            else:
+                h = "DIR"
+            result[rel] = (h, p.stat().st_mode)
+        return result
+
+    snap_before = snapshot(legacy_dir)
+
+    # validate_generation succeeds via commit-aware resolution
+    assert validate_generation(legacy_record1, legacy_dir) is True
+
+    # Advance repository to commit2
+    (repo / "README.md").write_text("v2", encoding="utf-8")
+    commit2 = _git_commit_all(repo, "commit2")
+
+    # Materialize commit2 into target store
+    target_record2 = materialize(repo, target_dir, commit=commit2)
+    assert (target_dir / "objects" / commit2).is_dir()
+
+    # Verify commit-aware resolution:
+    # commit1 resolves to legacy_dir (present in legacy, absent in target)
+    assert resolve_controller_dir(repo, lookup_only=True, commit=commit1) == legacy_dir
+    # commit2 resolves to target_dir (present in target)
+    assert resolve_controller_dir(repo, lookup_only=True, commit=commit2) == target_dir
+
+    # Track validate_generation commit-aware path
+    assert validate_generation(legacy_record1, legacy_dir) is True
+    assert validate_generation(target_record2, target_dir) is True
+
+    # Verify NO merge occurred and legacy directory bytes and modes are 100% immutable
+    snap_after = snapshot(legacy_dir)
+    assert snap_before == snap_after
+
+    # Verify isolation: commit2 is not in legacy, commit1 is not in target
+    assert not (legacy_dir / "objects" / commit2).exists()
+    assert not (target_dir / "objects" / commit1).exists()
+    assert not (legacy_dir / ".lock").exists()
+    assert not (legacy_dir / "leases").exists()

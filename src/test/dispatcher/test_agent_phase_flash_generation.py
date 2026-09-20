@@ -11,7 +11,6 @@ import time
 import tomllib
 
 import pytest
-pytest.importorskip("agent_workers", reason="agent_workers subsystem retained in Agent-Central")
 
 from controller_generation_fixtures import GUARDED, git, make_process_reader
 from controller_generation_store import coordinate, materialize
@@ -23,10 +22,10 @@ FLASH_MODE = "gemini_flash_sub"
 PHASE_TYPES = ("implementation_testing", "architecture_docs", "sysadmin")
 STANDARD_SLOTS = ("plan", "plan_review", "work", "final_review", "closeout")
 PINNED_FILES = (
-    "libexec/agent_workers/gemini_parent.py",
-    "libexec/agent_workers/policy.py",
+    "libexec/apgr_workers/gemini_parent.py",
+    "libexec/apgr_workers/policy.py",
     "libexec/agent_phase/worker_capability.py",
-    "common/workers/policy.json",
+    "common/dispatcher/workers.toml",
     "common/skills/agent-worker/SKILL.md",
     "common/dispatcher/routes.toml",
     "common/dispatcher/endpoints.toml",
@@ -64,18 +63,10 @@ def _endpoints(root: Path) -> dict[str, dict[str, str]]:
     )["endpoints"]
 
 
-def _is_astra_medium(root: Path, endpoint: dict[str, str]) -> bool:
-    if endpoint["provider"] != "codex":
-        return False
-    profile = root / "codex/profiles" / f"{endpoint['profile']}.config.toml"
-    try:
-        value = tomllib.loads(profile.read_text(encoding="utf-8"))
-    except (OSError, UnicodeDecodeError, tomllib.TOMLDecodeError):
-        return False
-    return (
-        value.get("model") == "gpt-6-astra"
-        and value.get("model_reasoning_effort") == "medium"
-    )
+def _is_codex_parent(root: Path, endpoint: dict[str, str]) -> bool:
+    models = tomllib.loads((root / "common/dispatcher/models.toml").read_text())
+    return (endpoint["provider"] == "codex" and models["providers"]["codex"]
+            [endpoint["profile"]].get("role") == "parent")
 
 
 def _reentry_probe(
@@ -110,10 +101,10 @@ bootstrap.enter(root)
 raise AssertionError("bootstrap did not select a pinned executable")
 '''
     env = os.environ.copy()
-    env["AGENT_CENTRAL_GENERATION_STORE"] = str(store)
-    env["AGENT_CENTRAL_ACTIVE_ROOT"] = str(root)
+    env["APGR_GENERATION_STORE"] = str(store)
+    env["APGR_ACTIVE_ROOT"] = str(root)
     env["PYTHONDONTWRITEBYTECODE"] = "1"
-    env.pop("AGENT_CENTRAL_GENERATION_LEASE", None)
+    env.pop("APGR_GENERATION_LEASE", None)
     env.pop("PYTHONPATH", None)
     result = subprocess.run(
         [
@@ -201,8 +192,8 @@ output.write_text(json.dumps({
 }))
 '''
     env = os.environ.copy()
-    env["AGENT_CENTRAL_GENERATION_STORE"] = str(store)
-    env["AGENT_CENTRAL_ACTIVE_ROOT"] = str(active)
+    env["APGR_GENERATION_STORE"] = str(store)
+    env["APGR_ACTIVE_ROOT"] = str(active)
     env["PYTHONDONTWRITEBYTECODE"] = "1"
     env.pop("PYTHONPATH", None)
     expected_cli = Path(record["generation_root"]) / "libexec/agent_phase/cli.py"
@@ -263,7 +254,7 @@ def test_activeupdate1_pins_old_and_new_flash_generations(tmp_path, monkeypatch)
     git(active, "config", "user.name", "Generation Fixture")
 
     store_base = tmp_path / "generation-store"
-    monkeypatch.setenv("AGENT_CENTRAL_GENERATION_STORE", str(store_base))
+    monkeypatch.setenv("APGR_GENERATION_STORE", str(store_base))
     smoke_request = tmp_path / "flash-smoke.json"
     smoke_request.write_text(
         json.dumps(
@@ -320,10 +311,10 @@ def test_activeupdate1_pins_old_and_new_flash_generations(tmp_path, monkeypatch)
 
         # Resolve each phase from the materialized new generation and inspect the real parent identity.
         resolver_env = os.environ.copy()
-        resolver_env["AGENT_CENTRAL_GENERATION_STORE"] = str(store_base)
-        resolver_env["AGENT_CENTRAL_ACTIVE_ROOT"] = str(active)
+        resolver_env["APGR_GENERATION_STORE"] = str(store_base)
+        resolver_env["APGR_ACTIVE_ROOT"] = str(active)
         resolver_env["PYTHONDONTWRITEBYTECODE"] = "1"
-        resolver_env.pop("AGENT_CENTRAL_GENERATION_LEASE", None)
+        resolver_env.pop("APGR_GENERATION_LEASE", None)
         resolver_env.pop("PYTHONPATH", None)
         for phase_type in PHASE_TYPES:
             request = tmp_path / f"{phase_type}.json"
@@ -357,19 +348,11 @@ def test_activeupdate1_pins_old_and_new_flash_generations(tmp_path, monkeypatch)
             document = json.loads(resolved.stdout)
             assert document["execution_mode"] == FLASH_MODE
             for slot in STANDARD_SLOTS:
-                source_alias = new_routes[phase_type]["gemini_sub"][slot]
+                # Flash is an independently retained route; APG166S changes only
+                # gemini_sub, so do not derive Flash's historical roster from it.
                 target_alias = new_routes[phase_type][FLASH_MODE][slot]
-                source_endpoint = endpoints[source_alias]
                 target_endpoint = endpoints[target_alias]
-                if _is_astra_medium(new_root, source_endpoint):
-                    assert target_alias == "antigravity-gemini-high"
-                    assert target_endpoint == {
-                        "provider": "antigravity",
-                        "profile": "gemini-3.8-flash-high",
-                    }
-                else:
-                    assert target_alias == source_alias
-                    assert target_endpoint == source_endpoint
+                assert target_alias == _routes(ROOT)[phase_type][FLASH_MODE][slot]
                 stage = document["stages"][slot]
                 assert stage["endpoint_alias"] == target_alias
                 if target_endpoint == {
@@ -378,9 +361,11 @@ def test_activeupdate1_pins_old_and_new_flash_generations(tmp_path, monkeypatch)
                 }:
                     capability = stage["worker_capability"]
                     assert capability["parent_family"] == "gemini_flash"
-                    assert capability["policy_selection"] == "dual_pool_4x4"
+                    assert capability["policy_selection"] == "triple_pool_4x4x4"
                     assert capability["limits"]["max_gemini"] == capability["limits"]["max_luna"] == 4
-                    assert capability["limits"]["max_aggregate"] == 8
+                    assert capability["limits"]["max_aggregate"] == 12
+                    assert capability["limits"]["max_sonnet"] == 4
+                    assert capability["sonnet_worker"]["transport"] == "claude_external"
                     assert capability["borrowing"] is False
                     assert capability["luna_worker"]["transport"] == "codex_external"
                     assert capability["native_worker"] == {"enabled": False}
@@ -427,9 +412,11 @@ def test_activeupdate1_pins_old_and_new_flash_generations(tmp_path, monkeypatch)
                 }:
                     capability = stage["worker_capability"]
                     assert capability["parent_family"] == "gemini_flash"
-                    assert capability["policy_selection"] == "dual_pool_4x4"
+                    assert capability["policy_selection"] == "triple_pool_4x4x4"
                     assert capability["limits"]["max_gemini"] == capability["limits"]["max_luna"] == 4
-                    assert capability["limits"]["max_aggregate"] == 8
+                    assert capability["limits"]["max_aggregate"] == 12
+                    assert capability["limits"]["max_sonnet"] == 4
+                    assert capability["sonnet_worker"]["transport"] == "claude_external"
                     assert capability["borrowing"] is False
                     assert capability["luna_worker"]["transport"] == "codex_external"
                     assert capability["native_worker"] == {"enabled": False}
@@ -469,12 +456,12 @@ def test_activeupdate1_pins_old_and_new_flash_generations(tmp_path, monkeypatch)
             ),
             encoding="utf-8",
         )
-        (seed / "libexec/agent_workers/gemini_parent.py").write_bytes(
-            (seed / "libexec/agent_workers/gemini_parent.py").read_bytes()
+        (seed / "libexec/apgr_workers/gemini_parent.py").write_bytes(
+            (seed / "libexec/apgr_workers/gemini_parent.py").read_bytes()
             + b"\n# later generation helper\n"
         )
-        (seed / "common/workers/policy.json").write_bytes(
-            (seed / "common/workers/policy.json").read_bytes() + b"\n"
+        (seed / "common/dispatcher/workers.toml").write_bytes(
+            (seed / "common/dispatcher/workers.toml").read_bytes() + b"\n"
         )
         (seed / "common/skills/agent-worker/SKILL.md").write_bytes(
             (seed / "common/skills/agent-worker/SKILL.md").read_bytes()
@@ -496,8 +483,8 @@ def test_activeupdate1_pins_old_and_new_flash_generations(tmp_path, monkeypatch)
             (active / "common/dispatcher/routes.toml").read_bytes()
             != pinned_bytes["common/dispatcher/routes.toml"]
         )
-        assert (active / "libexec/agent_workers/gemini_parent.py").read_bytes() != pinned_bytes["libexec/agent_workers/gemini_parent.py"]
-        assert (active / "common/workers/policy.json").read_bytes() != pinned_bytes["common/workers/policy.json"]
+        assert (active / "libexec/apgr_workers/gemini_parent.py").read_bytes() != pinned_bytes["libexec/apgr_workers/gemini_parent.py"]
+        assert (active / "common/dispatcher/workers.toml").read_bytes() != pinned_bytes["common/dispatcher/workers.toml"]
         assert (active / "common/skills/agent-worker/SKILL.md").read_bytes() != pinned_bytes["common/skills/agent-worker/SKILL.md"]
         assert all(
             (new_root / relative).read_bytes() == data

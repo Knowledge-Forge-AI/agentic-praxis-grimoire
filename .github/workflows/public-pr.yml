@@ -243,7 +243,7 @@
         },
         {
           "name": "Run unit and integration suite",
-          "run": "set -euo pipefail\n\"${APGR_TEST_PYTHON}\" bin/apg-test policy \\\n  --summary-file \"${RUNNER_TEMP}/apgr-policy-summary.json\"\n\"${APGR_TEST_PYTHON}\" bin/apg-test unit-integration --public-version 0.12.0 \\\n  --summary-file \"${RUNNER_TEMP}/apgr-unit-integration-summary.json\"\n"
+          "run": "set -euo pipefail\n\"${APGR_TEST_PYTHON}\" bin/apg-test policy \\\n  --summary-file \"${RUNNER_TEMP}/apgr-policy-summary.json\"\n\"${APGR_TEST_PYTHON}\" bin/apg-test unit-integration --public-version 0.13.0 \\\n  --summary-file \"${RUNNER_TEMP}/apgr-unit-integration-summary.json\"\n"
         },
         {
           "name": "Emit unit-integration receipt",
@@ -664,6 +664,83 @@
         }
       ]
     },
+    "nix": {
+      "name": "nix (${{ matrix.system }})",
+      "if": "${{ needs.guard.result == 'success' && github.repository == 'Knowledge-Forge-AI/agentic-praxis-grimoire' && github.repository_id == 1306002537 && github.base_ref == 'main' && github.head_ref == 'staging' && github.event.pull_request.head.repo.full_name == github.repository }}",
+      "needs": [
+        "guard"
+      ],
+      "runs-on": "${{ matrix.os }}",
+      "timeout-minutes": 30,
+      "strategy": {
+        "fail-fast": false,
+        "matrix": {
+          "include": [
+            {
+              "os": "ubuntu-latest",
+              "system": "x86_64-linux"
+            },
+            {
+              "os": "macos-15",
+              "system": "aarch64-darwin"
+            }
+          ]
+        }
+      },
+      "steps": [
+        {
+          "name": "Check out repository",
+          "uses": "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "with": {
+            "persist-credentials": false,
+            "fetch-depth": 0
+          }
+        },
+        {
+          "name": "Set up Python",
+          "uses": "actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97",
+          "with": {
+            "python-version": "3.13"
+          }
+        },
+        {
+          "name": "Install pinned Nix on disposable hosted runner",
+          "uses": "cachix/install-nix-action@13d8dd58da0234aa297dedd986986ccb8e7f3e24",
+          "with": {
+            "install_url": "https://releases.nixos.org/nix/nix-2.35.2/install",
+            "extra_nix_config": "experimental-features = nix-command flakes",
+            "enable_kvm": false
+          }
+        },
+        {
+          "name": "Exercise first-party Nix flake and evaluate foreign systems",
+          "run": "set -euo pipefail\nnix flake check --no-update-lock-file --no-write-lock-file -L\nnix build --no-update-lock-file --no-write-lock-file -L --out-link \"${RUNNER_TEMP}/apgr-nix\" .#agentic-praxis-grimoire\n\"${RUNNER_TEMP}/apgr-nix/bin/apgr\" --version\npython3 bin/apg-qualify-nix eval-foreign --flake . --native \"$CI_SYSTEM\"\n",
+          "env": {
+            "CI_SYSTEM": "${{ matrix.system }}"
+          }
+        },
+        {
+          "name": "Emit nix receipt",
+          "if": "${{ always() }}",
+          "run": "mkdir -p \"${RUNNER_TEMP}/receipts\"\npython3 release/ci/matrix_receipts.py emit --job \"nix-$CI_SYSTEM\" --status \"$CI_JOB_STATUS\" --dir \"${RUNNER_TEMP}/receipts\" --sha \"${COMMIT_SHA:-$GITHUB_SHA}\"\n",
+          "env": {
+            "CI_JOB_STATUS": "${{ job.status }}",
+            "CI_SYSTEM": "${{ matrix.system }}"
+          }
+        },
+        {
+          "name": "Retain nix receipt",
+          "if": "${{ always() }}",
+          "uses": "actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f",
+          "with": {
+            "name": "nix-receipt-${{ matrix.system }}",
+            "path": "${{ runner.temp }}/receipts",
+            "retention-days": 7,
+            "if-no-files-found": "error"
+          }
+        }
+      ]
+    },
     "public-pr-gate": {
       "name": "public-pr-gate",
       "if": "${{ always() && github.repository == 'Knowledge-Forge-AI/agentic-praxis-grimoire' && github.repository_id == 1306002537 }}",
@@ -676,12 +753,13 @@
         "go",
         "package",
         "sbom-and-vulnerability",
-        "codeql"
+        "codeql",
+        "nix"
       ],
       "runs-on": "ubuntu-latest",
       "timeout-minutes": 10,
       "env": {
-        "MATRIX_NEEDS_RESULTS": "{\"guard\":\"${{ needs.guard.result }}\",\"static-analysis\":\"${{ needs.static-analysis.result }}\",\"policy\":\"${{ needs.policy.result }}\",\"unit-integration\":\"${{ needs.unit-integration.result }}\",\"closure\":\"${{ needs.closure.result }}\",\"go\":\"${{ needs.go.result }}\",\"package\":\"${{ needs.package.result }}\",\"sbom-and-vulnerability\":\"${{ needs.sbom-and-vulnerability.result }}\",\"codeql-go\":\"${{ needs.codeql.result }}\",\"codeql-python\":\"${{ needs.codeql.result }}\",\"codeql-javascript-typescript\":\"${{ needs.codeql.result }}\",\"codeql-actions\":\"${{ needs.codeql.result }}\"}"
+        "MATRIX_NEEDS_RESULTS": "{\"guard\":\"${{ needs.guard.result }}\",\"static-analysis\":\"${{ needs.static-analysis.result }}\",\"policy\":\"${{ needs.policy.result }}\",\"unit-integration\":\"${{ needs.unit-integration.result }}\",\"closure\":\"${{ needs.closure.result }}\",\"go\":\"${{ needs.go.result }}\",\"package\":\"${{ needs.package.result }}\",\"sbom-and-vulnerability\":\"${{ needs.sbom-and-vulnerability.result }}\",\"codeql-go\":\"${{ needs.codeql.result }}\",\"codeql-python\":\"${{ needs.codeql.result }}\",\"codeql-javascript-typescript\":\"${{ needs.codeql.result }}\",\"codeql-actions\":\"${{ needs.codeql.result }}\",\"nix-x86_64-linux\":\"${{ needs.nix.result }}\",\"nix-aarch64-darwin\":\"${{ needs.nix.result }}\"}"
       },
       "steps": [
         {

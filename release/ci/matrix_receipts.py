@@ -29,9 +29,19 @@ DEFAULT_MEMBER_JOBS = {
     "codeql-python",
     "codeql-javascript-typescript",
     "codeql-actions",
+    "nix-x86_64-linux",
+    "nix-aarch64-darwin",
 }
 
 VALID_STATUSES = {"success", "failure", "cancelled", "skipped"}
+
+# Strategy-matrix jobs expose one shared needs.<job>.result to every member.
+# A non-success group result is reported once, naming the members whose own
+# receipts did not succeed, so a green member is not relabelled as failed.
+MATRIX_GROUPS: dict[str, tuple[str, ...]] = {
+    "codeql": ("codeql-go", "codeql-python", "codeql-javascript-typescript", "codeql-actions"),
+    "nix": ("nix-x86_64-linux", "nix-aarch64-darwin"),
+}
 
 PRESCRIBED_JOB_ARTIFACTS: dict[str, tuple[str, ...]] = {
     "guard": (),
@@ -46,6 +56,8 @@ PRESCRIBED_JOB_ARTIFACTS: dict[str, tuple[str, ...]] = {
     "codeql-python": ("codeql-python.sarif",),
     "codeql-javascript-typescript": ("codeql-javascript-typescript.sarif",),
     "codeql-actions": ("codeql-actions.sarif",),
+    "nix-x86_64-linux": (),
+    "nix-aarch64-darwin": (),
 }
 
 
@@ -118,6 +130,9 @@ def verify_matrix(
 
     receipts: dict[str, Any] = {}
     errors: list[str] = []
+    receipt_statuses: dict[str, str] = {}
+    group_of = {member: group for group, members in MATRIX_GROUPS.items() for member in members}
+    failed_groups: dict[str, str] = {}
 
     # Preserve the artifact directory boundary. Flattening downloads before
     # this check could silently overwrite a duplicate matrix member.
@@ -160,6 +175,7 @@ def verify_matrix(
             continue
 
         status = doc.get("status")
+        receipt_statuses[job] = status if isinstance(status, str) else "malformed"
         if status != "success":
             errors.append(f"job {job} did not succeed: status={status}")
             continue
@@ -173,9 +189,12 @@ def verify_matrix(
 
         expected_status = expected_statuses.get(job)
         if needs_statuses_supplied and expected_status != "success":
-            errors.append(
-                f"job {job} needs result did not succeed: status={expected_status or 'missing'}"
-            )
+            if job in group_of:
+                failed_groups.setdefault(group_of[job], expected_status or "missing")
+            else:
+                errors.append(
+                    f"job {job} needs result did not succeed: status={expected_status or 'missing'}"
+                )
 
         sha = doc.get("sha")
         if expected_sha and sha != expected_sha:
@@ -218,6 +237,15 @@ def verify_matrix(
 
         receipts[job] = doc
 
+    for group, group_status in sorted(failed_groups.items()):
+        failing = [member for member in MATRIX_GROUPS[group]
+                   if member in targets and receipt_statuses.get(member) != "success"]
+        errors.append(
+            f"matrix {group} needs result did not succeed: status={group_status}; "
+            + (f"failing member receipts: {', '.join(failing)}" if failing
+               else "no member receipt reports failure")
+        )
+
     success = len(errors) == 0
     aggregate_doc = {
         "schema": "apg-matrix-aggregate-v1",
@@ -227,6 +255,7 @@ def verify_matrix(
         "verified_members_count": len(receipts),
         "errors": errors,
         "members": receipts,
+        "member_receipt_status": {job: receipt_statuses.get(job, "missing") for job in sorted(targets)},
     }
 
     detail = "matrix completeness verified" if success else f"matrix verification failed: {'; '.join(errors)}"

@@ -75,6 +75,7 @@ EXPECTED_SKILLS = (
     "python-language-profile",
     "react-component-profile",
     "reviewing-and-verifying-repository-work",
+    "rtk-command-proxy",
     "ruby-language-profile",
     "sqlite-database-profile",
     "svg-language-profile",
@@ -249,7 +250,8 @@ def _canonical_leaf_paths(skills_root: Path) -> tuple[Path, ...]:
             continue
         if entry.name not in CANONICAL_NAMESPACES:
             if (
-                ROOT_GO_SOURCE_NAME.fullmatch(entry.name)
+                (ROOT_GO_SOURCE_NAME.fullmatch(entry.name)
+                 or entry.name == "catalog_generated.json")
                 and not entry.is_symlink()
                 and stat.S_ISREG(entry.lstat().st_mode)
             ):

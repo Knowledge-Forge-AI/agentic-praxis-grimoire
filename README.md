@@ -11,18 +11,20 @@ task-scoped guidance, collecting immutable evidence, capturing curated
 environments, inspecting repository structures, and measuring context footprints
 without dictating an orchestration workflow.
 
-This documentation covers the **unreleased v0.12.0 candidate**. It retains 45
-canonical skills, transfers the single-phase execution runtime, achieves provider
-parity across Codex, Claude, and Antigravity, and hardens the attended multi-channel
-release operator. v0.11.0 remains the published release across GitHub Releases,
-Go, PyPI, npm, and Homebrew tap; earlier releases stay frozen. See the
-[candidate notes](release/v0.12.0-notes.md) and
-[v0.12 roadmap](docs/v0-12-roadmap.md). Candidate preparation does not
+This documentation covers the **unreleased v0.13.0 candidate**, an early pilot
+release. It carries 46 canonical skills, the independently usable single-phase
+dispatcher shipped with APGR, optional RTK integration, and a first-party Nix
+flake. Static context remains the shipped default; adaptive
+selected-skill and instruction projection are experimental and opt-in, and no
+token or context-window saving is claimed. v0.12.0 is the latest published
+release across GitHub Releases, Go, PyPI, npm, and Homebrew tap; earlier
+releases stay frozen. See the [candidate notes](release/v0.13.0-notes.md) and
+[v0.13 roadmap](docs/v0-13-roadmap.md). Candidate preparation does not
 establish hosted CI acceptance or publication.
 
 APGR includes:
 
-- **45 canonical agent skills** across 14 stable and 31 provisional leaves;
+- **46 canonical agent skills** across 14 stable and 32 provisional leaves;
 - **Context-footprint accounting** for measuring, comparing, and projecting
   context budgets across descriptions, bodies, and support material;
 - **Reusable Go packages** for schemas, canonical reports, skill bundles,
@@ -81,17 +83,17 @@ frameworks invoke APGR as an in-process library or CLI subprocess.
 
 ### Skill corpus and maturity
 
-APGR v0.12.0 retains 45 canonical leaves: 14 stable and 31 provisional. Canonical Markdown
+APGR v0.13.0 has 46 canonical leaves: 14 stable and 32 provisional. Canonical Markdown
 under `skills/` is the maintained body authority; embedded metadata and package
 resources are verified projections of it:
 
-- Corpus topology: **45 canonical / 45 catalog / 45 projections / 45
+- Corpus topology: **46 canonical / 46 catalog / 46 projections / 46
   discoverable**
-- Maturity: **14 stable / 31 provisional**
+- Maturity: **14 stable / 32 provisional**
 
 ## Quick start
 
-v0.11.0 packages are published and can be installed from the supported
+v0.12.0 packages are published and can be installed from the supported
 registries using the version-pinned commands in the
 [upgrade guidance](#upgrade-guidance-and-release-status).
 
@@ -436,26 +438,67 @@ can dispatch through that checkout; the native/npm binary cannot run `test`.
 
 ## Upgrade guidance and release status
 
-### Preparing v0.12.0
+### Preparing v0.13.0
 
-v0.12.0 is unreleased. Exercise candidate features from a source checkout or
+v0.13.0 is unreleased. Exercise candidate features from a source checkout or
 locally qualified wheel/npm artifacts; registry installation commands below
-refer to the published predecessor. The release route is public `staging` →
-pull request → squash merge to `main` → release. See the
-[release procedure](docs/public-release-process.md). Homebrew tap distribution
-(`brew install Knowledge-Forge-AI/tap/agentic-praxis-grimoire`) is supported
-alongside GitHub Release, PyPI, npm, and Go. See
-[distribution documentation](docs/distribution.md). Local preparation does not
+refer to the published v0.12.0 predecessor. The release route is public
+`staging` → pull request → squash merge to `main` → release; see the
+[release procedure](docs/public-release-process.md). Local preparation does not
 mean a public PR has run or that branch protection is configured.
 
-### Upgrading to v0.11.0
+Release status of v0.13.0 features:
+
+- **Supported**: the portable `apgr` CLI and Go packages, the skill corpus, and
+  the phase runtime on its V1 and V2 normal routes with static context.
+- **Experimental opt-in**: adaptive context (`mode = "adaptive"`), including
+  selected-skill delivery and stage-scoped instruction projection on the
+  ordinary Claude route. Other routes keep static transport. Static context is
+  the default.
+- **Not claimed**: measured token, provider-context, or context-window savings;
+  native `aarch64-linux` execution; skill promotions.
+
+#### First-party Nix
+
+From v0.13.0, APGR also publishes a first-party Nix flake from this repository
+([ADR 0076](docs/adr/2026/09/0076-first-party-nix-flake-publication-target.md)).
+The package contains the portable `apgr` and the installed phase runtime.
+These commands work only after the `v0.13.0` tag is published:
+
+```sh
+nix build github:Knowledge-Forge-AI/agentic-praxis-grimoire/v0.13.0#agentic-praxis-grimoire
+nix run github:Knowledge-Forge-AI/agentic-praxis-grimoire/v0.13.0#apgr -- --version
+nix profile add github:Knowledge-Forge-AI/agentic-praxis-grimoire/v0.13.0#agentic-praxis-grimoire
+```
+
+Pin the release tag, not `main`. This is not an upstream nixpkgs package. See
+[distribution](docs/distribution.md#first-party-nix-flake-v0130-onward) for
+platform status and installed-runtime prerequisites.
+
+### Upgrading to v0.12.0
+
+The published v0.12.0 release transfers the single-phase execution runtime into
+APGR and hardens the attended multi-channel release operator; see the
+[v0.12.0 release notes](release/v0.12.0-notes.md). v0.12.0 packages are
+published; install them with these commands:
+
+- **Go consumers**: Require `github.com/Knowledge-Forge-AI/agentic-praxis-grimoire v0.12.0`
+  or run `go get github.com/Knowledge-Forge-AI/agentic-praxis-grimoire@v0.12.0`.
+- **Python users**: `pip install agentic-praxis-grimoire==0.12.0`.
+- **npm users**: `npm install -g @knowledge-forge-ai/apgr@0.12.0`.
+- **Homebrew users**: `brew install Knowledge-Forge-AI/tap/agentic-praxis-grimoire`.
+
+Homebrew tap distribution is supported alongside GitHub Release, PyPI, npm, and
+Go. See [distribution documentation](docs/distribution.md).
+
+### Preserved predecessor: v0.11.0
 
 The published v0.11.0 release adds Homebrew tap distribution,
 pull-request release staging, and qualification maintenance; see the
 [v0.11.0 release notes](release/v0.11.0-notes.md). The CI-first qualification
 interface (`--summary-file`, `policy` role) and Go consumer interfaces remain.
 
-Install the published v0.11.0 packages with these commands:
+The published v0.11.0 packages remain installable with these commands:
 
 - **Go consumers**: Require `github.com/Knowledge-Forge-AI/agentic-praxis-grimoire v0.11.0`
   or run `go get github.com/Knowledge-Forge-AI/agentic-praxis-grimoire@v0.11.0`.

@@ -13,8 +13,7 @@ from agent_phase.dispatch import DispatchError, Dispatcher
 from agent_phase import gitstate
 from agent_phase.provider import Result
 from agent_phase.request import PhaseRequest
-pytest.importorskip("agent_workers", reason="agent_workers subsystem retained in Agent-Central")
-from agent_workers.ledger import ParentLedger
+from apgr_workers.ledger import ParentLedger
 from test_agent_phase_resume import ROOT, PHASE, git, repository as _repository, review, closeout
 
 repository = _repository

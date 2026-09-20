@@ -119,7 +119,7 @@ def test_2_dispatch_v2_works_with_injected_observations(tmp_path: Path) -> None:
     conn.close()
 
 
-def test_3_retry_snapshot_refresh_retains_injected_observations(tmp_path: Path) -> None:
+def test_3_retry_snapshot_refresh_retains_injected_observations(tmp_path: Path, monkeypatch) -> None:
     """3. Retry snapshot refresh retains the original injected observations."""
     apgr_home = tmp_path / "home"
     db_path = apgr_home / "state" / "dispatcher.sqlite3"
@@ -210,19 +210,27 @@ def test_3_retry_snapshot_refresh_retains_injected_observations(tmp_path: Path) 
                 status="pending",
             )
 
+    fake_bin = tmp_path / "fake-bin"
+    fake_bin.mkdir()
+    for executable in ("codex", "agy", "claude"):
+        path = fake_bin / executable
+        path.write_text('#!/bin/sh\nif [ "$1" = "--version" ]; then echo "fixture 1.2.11"; exit 0; fi\nexit 99\n')
+        path.chmod(0o755)
+    import os
+    monkeypatch.setenv("PATH", str(fake_bin) + os.pathsep + os.environ["PATH"])
     caps = {
-        "codex-primary": EndpointCapabilities(
-            endpoint_alias="codex-primary",
+        "codex-implementation-testing": EndpointCapabilities(
+            endpoint_alias="codex-implementation-testing",
             provider="codex",
-            profile="primary",
-            capabilities=frozenset(["code_generation", "read_only", "mutation", "read", "execution", "reasoning"]),
+            profile="implementation-testing",
+            capabilities=frozenset(["code_generation", "read_only", "mutation", "read", "execution", "reasoning", "subagent_workers"]),
             posture="full",
         ),
-        "agy-primary": EndpointCapabilities(
-            endpoint_alias="agy-primary",
-            provider="antigravity",
-            profile="primary",
-            capabilities=frozenset(["code_generation", "read_only", "mutation", "read", "execution", "reasoning"]),
+        "claude-opus-high-plan": EndpointCapabilities(
+            endpoint_alias="claude-opus-high-plan",
+            provider="claude",
+            profile="opus-high-plan",
+            capabilities=frozenset(["code_generation", "read_only", "mutation", "read", "execution", "reasoning", "subagent_workers"]),
             posture="full",
         ),
     }

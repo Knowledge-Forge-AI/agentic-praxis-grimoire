@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 from pathlib import Path
 import sys
 
@@ -52,11 +53,16 @@ from agent_phase.adoption import AdoptionError  # noqa: E402
 from agent_phase.finalization_proof import RecoveryError  # noqa: E402
 from agent_phase.native_git import NativeGitError  # noqa: E402
 from agent_phase.entry_adoption import EntryAdoptionError  # noqa: E402
+from agent_phase.roster import load_roster  # noqa: E402
 from agent_phase.config_routing import (  # noqa: E402
     ConfigError,
     ROUTING_MODES,
+    SUPPORTED_WORKTREE_POLICIES,
+    ReviewMutationPolicy,
     resolve_execution_mode,
+    resolve_review_mutation_policy,
 )
+
 
 
 ERRORS = (
@@ -80,8 +86,10 @@ def emit(payload: object) -> None:
 
 def resolve_main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="agent-phase-resolve", allow_abbrev=False)
-    parser.add_argument("request", type=Path)
+    parser.add_argument("request", type=Path, nargs="?")
+    parser.add_argument("--inspect-policy", action="store_true")
     parser.add_argument("--execution-mode", choices=ROUTING_MODES)
+    parser.add_argument("--review-mutation-worktree", choices=SUPPORTED_WORKTREE_POLICIES)
     parser.add_argument("--apgr-home", type=Path)
     parser.add_argument("--lifecycle", choices=LIFECYCLE_NAMES, default=LIFECYCLE_STANDARD)
     parser.add_argument(
@@ -89,6 +97,16 @@ def resolve_main(argv: list[str] | None = None) -> int:
     )
     parsed = parser.parse_args(argv)
     try:
+        policy_res = resolve_review_mutation_policy(
+            explicit=parsed.review_mutation_worktree,
+            apgr_home=parsed.apgr_home,
+            repository_root=repository_root(),
+        )
+        if parsed.inspect_policy:
+            emit(policy_res.as_dict())
+            return 0
+        if parsed.request is None:
+            parser.error("the following arguments are required: request")
         raw = parsed.request.read_bytes()
         try:
             peek = json.loads(raw.decode("utf-8", errors="replace"))
@@ -110,11 +128,16 @@ def resolve_main(argv: list[str] | None = None) -> int:
                 configuration_provenance=mode_res.winner.as_dict(),
                 lifecycle=parsed.lifecycle,
                 finalization_policy=parsed.finalization,
+                apgr_home=parsed.apgr_home,
             ))
         else:
             request = parse_request(raw)
             emit(resolve(
-                request, repository_root(), parsed.lifecycle, parsed.finalization
+                request,
+                repository_root(),
+                parsed.lifecycle,
+                parsed.finalization,
+                apgr_home=parsed.apgr_home,
             ))
     except ERRORS as error:
         parser.exit(2, f"agent-phase-resolve: {error}\n")
@@ -125,6 +148,7 @@ def dispatch_main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="agent-phase-dispatch", allow_abbrev=False)
     parser.add_argument("request", type=Path)
     parser.add_argument("--execution-mode", choices=ROUTING_MODES)
+    parser.add_argument("--review-mutation-worktree", choices=SUPPORTED_WORKTREE_POLICIES)
     parser.add_argument("--apgr-home", type=Path)
     parser.add_argument("--outbox-root", type=Path)
     parser.add_argument("--dry-run", action="store_true")
@@ -149,7 +173,28 @@ def dispatch_main(argv: list[str] | None = None) -> int:
         help="suppress the live progress display on stderr; artifacts and the "
              "machine-readable result on stdout are unaffected",
     )
+    parser.add_argument(
+        "--context-fact", action="append", default=[], metavar="KIND=VALUE",
+        help="adaptive context only: declare a structured task fact (repeatable; fresh dispatches)",
+    )
+    parser.add_argument(
+        "--context-skill", action="append", default=[], metavar="QUALIFIED_ID",
+        help="adaptive context only: request a qualified skill (repeatable; fresh dispatches)",
+    )
     parsed = parser.parse_args(argv)
+    from agent_phase import context_inputs as context_inputs_module
+    if (parsed.context_fact or parsed.context_skill) and parsed.resume is not None:
+        parser.error("--context-fact/--context-skill apply to fresh dispatches only; resume uses configuration")
+    try:
+        task_facts = [context_inputs_module.parse_task_fact(value) for value in parsed.context_fact]
+        task_scope = context_inputs_module.scoped_task_inputs(task_facts, parsed.context_skill)
+    except context_inputs_module.InputError as error:
+        parser.error(str(error))
+    with task_scope:
+        return _dispatch_parsed(parser, parsed)
+
+
+def _dispatch_parsed(parser: argparse.ArgumentParser, parsed: argparse.Namespace) -> int:
     if parsed.continue_from is not None and parsed.resume is not None:
         parser.error("--continue-from and --resume are distinct operations")
     if parsed.entry_adoption is not None and parsed.resume is not None:
@@ -183,7 +228,21 @@ def dispatch_main(argv: list[str] | None = None) -> int:
         )
     # Live human output goes to stderr so stdout stays a clean JSON channel.
     display = Display(sys.stderr, enabled=not parsed.quiet)
+    saved_apgr_home = os.environ.get("APGR_HOME")
     try:
+        if parsed.apgr_home is not None:
+            cand = Path(parsed.apgr_home).expanduser()
+            if not cand.is_absolute():
+                sys.stderr.write(f"apgr-agent-phase: error: --apgr-home must be an absolute path: {parsed.apgr_home}\n")
+                return 2
+            os.environ["APGR_HOME"] = str(cand.resolve())
+        repo_root = repository_root()
+        policy_res = resolve_review_mutation_policy(
+            explicit=parsed.review_mutation_worktree,
+            apgr_home=parsed.apgr_home,
+            repository_root=repo_root,
+        )
+        roster = policy_res.roster
         raw = parsed.request.read_bytes()
         try:
             peek = json.loads(raw.decode("utf-8", errors="replace"))
@@ -217,6 +276,9 @@ def dispatch_main(argv: list[str] | None = None) -> int:
                 execution_mode=mode_res.execution_mode,
                 provenance=mode_res.winner.as_dict(),
                 provenance_chain=[p.as_dict() for p in mode_res.provenance_chain],
+                review_mutation_policy=policy_res.policy,
+                review_mutation_provenance=policy_res.winner.as_dict(),
+                review_mutation_provenance_chain=[p.as_dict() for p in policy_res.provenance_chain],
                 apgr_home=parsed.apgr_home,
                 outbox_root=parsed.outbox_root,
                 lifecycle=parsed.lifecycle or LIFECYCLE_STANDARD,
@@ -229,6 +291,7 @@ def dispatch_main(argv: list[str] | None = None) -> int:
                 continue_from=parsed.continue_from,
                 entry_adoption=parsed.entry_adoption,
                 native_git_authority=parsed.native_git_authority,
+                roster=roster,
             )
             emit(result)
             return 0
@@ -241,7 +304,16 @@ def dispatch_main(argv: list[str] | None = None) -> int:
             else run_module.phase_id_from_request(parsed.request)
         )
         request = parse_request(raw)
-        dispatcher = Dispatcher(repository_root(), Path.cwd(), display=display)
+        dispatcher = Dispatcher(
+            repository_root(),
+            Path.cwd(),
+            display=display,
+            review_mutation_policy=policy_res.policy,
+            review_mutation_provenance=policy_res.winner.as_dict(),
+            review_mutation_provenance_chain=[p.as_dict() for p in policy_res.provenance_chain],
+            apgr_home=parsed.apgr_home,
+            roster=roster,
+        )
         if parsed.resume is not None:
             state = dispatcher.resume(
                 phase_id, request, parsed.resume, parsed.from_stage or "auto",
@@ -287,6 +359,10 @@ def dispatch_main(argv: list[str] | None = None) -> int:
     except KeyboardInterrupt:
         parser.exit(130, "agent-phase-dispatch: interrupted\n")
     finally:
+        if saved_apgr_home is None:
+            os.environ.pop("APGR_HOME", None)
+        else:
+            os.environ["APGR_HOME"] = saved_apgr_home
         display.close()
     return 0
 
@@ -344,6 +420,9 @@ def main() -> int:
     if len(sys.argv) > 1 and sys.argv[1] == "native-git":
         from agent_phase.native_git_cli import main as native_git_main
         return native_git_main(sys.argv[2:])
+    if len(sys.argv) > 1 and sys.argv[1] == "observations":
+        from agent_phase.observations_cli import main as observations_main
+        return observations_main(sys.argv[2:])
     if len(sys.argv) > 1 and sys.argv[1] == "finalize":
         from agent_phase.finalization_recovery import main as finalize_main
         return finalize_main(sys.argv[2:])

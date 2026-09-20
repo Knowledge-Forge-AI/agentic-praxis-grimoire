@@ -348,7 +348,7 @@ rollback tests cover both path classes without changing target state format.
 - Project projection success does not prove Codex invocation, automatic trigger
   selection, user-global integration, skill maturity, or production readiness.
 - The default managed set follows the verified source identity: nineteen
-  skills for public v0.3.0 and forty-five for current development. The command
+  skills for public v0.3.0 and forty-six for current development. The command
   is not a general skill installer or package manager.
 
 APG49 adds no projection. Its matryer/is candidate is terminally deferred

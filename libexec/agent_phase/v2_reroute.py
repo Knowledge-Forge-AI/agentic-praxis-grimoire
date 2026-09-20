@@ -378,6 +378,8 @@ def orchestrate_dynamic_retry(
     prior_resolutions: Mapping[str, ResolvedActorRoute],
     disposition: TurnFailureDisposition,
     now: float | None = None,
+    root: Path | None = None,
+    bundle: Any = None,
 ) -> tuple[bool, ResolvedActorRoute | None, int]:
     """Orchestrate dynamic retry turn following F2/F14/F15 rules."""
     ref_now = time.time() if now is None else float(now)
@@ -450,6 +452,9 @@ def orchestrate_dynamic_retry(
             operational_observations=fresh_observations,
             prior_resolutions=prior_resolutions,
             now=ref_now,
+            execution_mode=execution_mode,
+            root=root,
+            bundle=bundle,
         )
     except NoRouteAvailableError:
         for role in binding.roles:

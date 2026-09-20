@@ -39,6 +39,76 @@
       "owner": "APGR dispatcher tests",
       "review": "APG155 source inspection: synthetic redaction negative control",
       "disposition": "reviewed_nonsecret"
+    },
+    {
+      "path": "docs/evaluations/apg166b/readiness-seal.json",
+      "rule": "generic-api-key",
+      "match_sha256": "c9760ca5c16d6ce5297d37d140c14219ba448dc3fbf1775360d1fd605a45067e",
+      "context_sha256": "360a0356efbd6eebf3df41cfe4d9b8877ff8f2da9049036364abe3074baa71fb",
+      "reason": "SHA-256 content digest of tracked file internal/cli/project_key_test.go in a historical sealed file-digest map; the file-name substring \"key\" triggers the rule; not a credential.",
+      "owner": "docs/evaluations/apg166b/readiness-seal.json",
+      "review": "APG166ZM hosted public-pr run 36936252203 BetterLeaks 1.8.1 reproduction; digest verified equal to SHA-256 of the named tracked file",
+      "disposition": "reviewed_nonsecret"
+    },
+    {
+      "path": "docs/evaluations/apg166c/readiness-seal.json",
+      "rule": "generic-api-key",
+      "match_sha256": "c9760ca5c16d6ce5297d37d140c14219ba448dc3fbf1775360d1fd605a45067e",
+      "context_sha256": "360a0356efbd6eebf3df41cfe4d9b8877ff8f2da9049036364abe3074baa71fb",
+      "reason": "SHA-256 content digest of tracked file internal/cli/project_key_test.go in a historical sealed file-digest map; the file-name substring \"key\" triggers the rule; not a credential.",
+      "owner": "docs/evaluations/apg166c/readiness-seal.json",
+      "review": "APG166ZM hosted public-pr run 36936252203 BetterLeaks 1.8.1 reproduction; digest verified equal to SHA-256 of the named tracked file",
+      "disposition": "reviewed_nonsecret"
+    },
+    {
+      "path": "docs/evaluations/apg166d/readiness-seal.json",
+      "rule": "generic-api-key",
+      "match_sha256": "c9760ca5c16d6ce5297d37d140c14219ba448dc3fbf1775360d1fd605a45067e",
+      "context_sha256": "360a0356efbd6eebf3df41cfe4d9b8877ff8f2da9049036364abe3074baa71fb",
+      "reason": "SHA-256 content digest of tracked file internal/cli/project_key_test.go in a historical sealed file-digest map; the file-name substring \"key\" triggers the rule; not a credential.",
+      "owner": "docs/evaluations/apg166d/readiness-seal.json",
+      "review": "APG166ZM hosted public-pr run 36936252203 BetterLeaks 1.8.1 reproduction; digest verified equal to SHA-256 of the named tracked file",
+      "disposition": "reviewed_nonsecret"
+    },
+    {
+      "path": "docs/evaluations/apg166d/readiness-seal.json",
+      "rule": "generic-api-key",
+      "match_sha256": "a09ab9b95811f7c9252ff7ec7bce6e01dbf29258064f5b283fb8f9d04861b1f5",
+      "context_sha256": "686822db411e20f756dd300e3b3990a912ab5a38b82b0cbb8de7ea7c5ad7aaee",
+      "reason": "SHA-256 content digest of tracked file report/api_contract_test.go in a historical sealed file-digest map; the file-name substring \"api\" triggers the rule; not a credential.",
+      "owner": "docs/evaluations/apg166d/readiness-seal.json",
+      "review": "APG166ZM hosted public-pr run 36936252203 BetterLeaks 1.8.1 reproduction; digest verified equal to SHA-256 of the named tracked file",
+      "disposition": "reviewed_nonsecret"
+    },
+    {
+      "path": "docs/evaluations/apg166d/readiness-seal.json",
+      "rule": "generic-api-key",
+      "match_sha256": "0b36dcaf14c591fe96ebb7f2a611b78daf4e82844ffb7fa9c4bc1dd2833e324e",
+      "context_sha256": "1928701c7f62cecefe1c780439ea0397a1dfeaecab6d746077f61f478cfd4bd2",
+      "reason": "SHA-256 content digest of tracked fixture testing/fixtures/context-eval/subjects/scenario-13/pkg/auth/auth.go in a historical sealed file-digest map; the file-name substring \"auth\" triggers the rule; not a credential.",
+      "owner": "docs/evaluations/apg166d/readiness-seal.json",
+      "review": "APG166ZM hosted public-pr run 36936252203 BetterLeaks 1.8.1 reproduction; digest verified equal to SHA-256 of the named tracked file",
+      "disposition": "reviewed_nonsecret"
+    },
+    {
+      "path": "docs/evaluations/apg166a/readiness-seal.json",
+      "rule": "generic-api-key",
+      "match_sha256": "c9760ca5c16d6ce5297d37d140c14219ba448dc3fbf1775360d1fd605a45067e",
+      "context_sha256": "360a0356efbd6eebf3df41cfe4d9b8877ff8f2da9049036364abe3074baa71fb",
+      "reason": "SHA-256 content digest of tracked file internal/cli/project_key_test.go in a historical sealed file-digest map; the file-name substring \"key\" triggers the rule; not a credential.",
+      "owner": "docs/evaluations/apg166a/readiness-seal.json",
+      "review": "APG166ZM hosted public-pr run 36936252203 BetterLeaks 1.8.1 reproduction; digest verified equal to SHA-256 of the named tracked file",
+      "disposition": "reviewed_nonsecret"
+    },
+    {
+      "path": "docs/evaluations/apg166/seal.json",
+      "rule": "generic-api-key",
+      "match_sha256": "c9760ca5c16d6ce5297d37d140c14219ba448dc3fbf1775360d1fd605a45067e",
+      "context_sha256": "360a0356efbd6eebf3df41cfe4d9b8877ff8f2da9049036364abe3074baa71fb",
+      "reason": "SHA-256 content digest of tracked file internal/cli/project_key_test.go in a historical sealed file-digest map; the file-name substring \"key\" triggers the rule; not a credential.",
+      "owner": "docs/evaluations/apg166/seal.json",
+      "review": "APG166ZM hosted public-pr run 36936252203 BetterLeaks 1.8.1 reproduction; digest verified equal to SHA-256 of the named tracked file",
+      "disposition": "reviewed_nonsecret"
     }
   ],
   "schema": "apg-betterleaks-dispositions-v1"

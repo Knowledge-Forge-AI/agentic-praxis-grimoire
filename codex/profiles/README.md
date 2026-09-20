@@ -3,13 +3,13 @@
 These tracked profile files select only the model and reasoning effort for an
 explicitly chosen top-level Codex parent:
 
-Parent profiles at GPT-6 Astra medium reasoning drive phase work:
+Parent profiles at GPT-6.1 Sol xhigh reasoning drive phase work:
 
 - `implementation-testing` — implementation and testing work.
 - `architecture-docs-primary` — architecture and documentation work.
 - `sysadmin-primary` — host and system-administration work.
 
-Parent profiles at GPT-6 Astra medium reasoning drive adversarial review of a
+Parent profiles at GPT-6.1 Sol xhigh reasoning drive adversarial review of a
 bound candidate:
 
 - `implementation-testing-review` — implementation and testing candidates.
@@ -56,16 +56,16 @@ intelligence; they are not security or authority boundaries.
 
 Luna worker defaults and concurrency are separately owned by
 `config.d/170-subagents.toml`; named worker roles are owned by `agents/*.toml`.
-Neither is part of these Astra parent profiles. For `conserve_claude`, route
+Neither is part of these Codex parent profiles. For `conserve_claude`, route
 resolution reads that exact source and records its repository-relative path,
 SHA-256, enabled state, Luna model, Max effort, and concurrency in
 `resolved.json`; any semantic mismatch blocks before provider invocation.
 
 ## External Luna leaf profile
 
-`luna-worker.config.toml` is consumed directly by Agent-Central's external
+`luna-worker.config.toml` is consumed directly by APGR's external
 worker adapter. The adapter translates its model, Max effort and
 `agents.enabled=false` into explicit launch overrides. It does not require a
 live `$CODEX_HOME` profile link and does not alter the base compiler graph.
-Claude uses this external leaf only when the fixed dual-pool policy permits
-Luna. Astra uses its separate launch-bound native pool, never this route.
+Claude uses this external leaf only when the fixed triple-pool policy permits
+Luna. Codex uses its separate launch-bound native pool, never this route.

@@ -125,6 +125,12 @@ def retry_review(dispatcher, directory, state, stage, nonce, error):
     require_retry_boundary()
     # Publish completed-stage artifacts only after ordinary strict validation.
     for source in sorted(directory.path.glob(retry_prefix + ".*")):
+        # Context artifacts identify an actual attempt. Promoting retry output
+        # must not overwrite the original attempt's immutable plan/observation.
+        # Launch evidence is likewise per attempt and is recovery authority.
+        if (source.name.startswith(retry_prefix + ".context-")
+                or source.name == retry_prefix + ".provider-launch.json"):
+            continue
         name = stage.prefix + source.name[len(retry_prefix):]
         if source.name.endswith(".meta.json"):
             def canonical(value):

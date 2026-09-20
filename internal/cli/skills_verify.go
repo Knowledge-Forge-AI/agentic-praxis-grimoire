@@ -5,6 +5,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"errors"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"strings"
@@ -37,7 +38,7 @@ func runSkillsVerifyCorpus(arguments []string) error {
 			return errors.New("checkout skill body disagrees with the embedded canonical corpus")
 		}
 	}
-	return nil
+	return apgskills.VerifyCatalogGeneration(directCatalogFS{FS: os.DirFS(root), root: root})
 }
 
 func directCorpusRoot(value string) (string, error) {
@@ -83,4 +84,17 @@ func splitPath(value string) []string {
 		value = filepath.Clean(directory)
 	}
 	return parts
+}
+
+// Preserve the corpus reader's no-symlink policy for generated authority reads.
+type directCatalogFS struct {
+	fs.FS
+	root string
+}
+
+func (f directCatalogFS) ReadFile(name string) ([]byte, error) {
+	if !fs.ValidPath(name) {
+		return nil, errors.New("invalid catalog authority path")
+	}
+	return readDirectCorpusFile(f.root, filepath.Join(f.root, filepath.FromSlash(name)))
 }

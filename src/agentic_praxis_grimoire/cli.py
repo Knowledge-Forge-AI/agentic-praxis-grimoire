@@ -15,6 +15,7 @@ from .version import version
 
 COMMAND = "apgr"
 FAMILIES = (
+    "mcp",
     "build-info",
     "check",
     "skills",
@@ -22,6 +23,9 @@ FAMILIES = (
     "test",
     "env",
     "analyze",
+    "home",
+    "dispatcher",
+    "integrations",
     "report",
     "response",
     "release",
@@ -47,6 +51,8 @@ commands:
   test                   configured repository test runner
   env                    portable environment profile and snapshot commands
   analyze                read-only structural hotspot analysis
+  home                   canonical operator home layout and inspection
+  integrations           external tool integration management and inspection
   report                 terminal Git and operational report publication;
                          a new primary type supersedes the prior current primary
   response               immutable numbered response capture
@@ -136,6 +142,8 @@ def legacy_main(
             print(f"{command}: {error}", file=sys.stderr)
             return 1
     owners: dict[str, tuple[str, str]] = {
+        "apgr-dispatcher-bundle": ("agent_phase.bundle_cli", "main"),
+        "apgr-dispatcher-observations": ("agent_phase.observations_cli", "main"),
         "apg-check-change-size": ("change_size.cli", "run"),
         "apg-check-phase-commit-message": ("apg_phase_commit_message", "main"),
         "apg-check-record-identity": ("apg_record_identity", "main"),
@@ -309,11 +317,28 @@ def _dispatch(options: dict[str, str], arguments: list[str]) -> int:
             raise CliError("unknown check command")
         return _repository_route(owner, arguments, options)
 
+    if family == "mcp":
+        if not arguments or arguments.pop(0) != "serve":
+            raise CliError("mcp requires serve")
+        return _acquisition_route("mcp", "serve", arguments, options)
+
     if family == "skills":
         if not arguments:
             raise CliError("skills requires a command")
         action = arguments.pop(0)
-        if action in {"list", "context-report", "resolve", "materialize", "verify-corpus"}:
+        if action in {"search", "acquire"}:
+            return _acquisition_route("skills", action, arguments, options)
+        if action == "list" and "--all-sources" in arguments:
+            from .skill_catalog import list_catalog
+
+            from .config import ConfigError
+            from .paths import PathContractError
+
+            try:
+                return list_catalog(arguments, options)
+            except (ConfigError, PathContractError, OSError) as error:
+                raise CliError(str(error)) from error
+        if action in {"list", "context-report", "resolve", "materialize", "verify-corpus", "plan"}:
             from . import go_bridge
 
             return go_bridge.run(
@@ -345,6 +370,95 @@ def _dispatch(options: dict[str, str], arguments: list[str]) -> int:
         if not arguments or arguments.pop(0) != "public":
             raise CliError("release requires the public command")
         return _repository_route("apg-public-release", arguments, options)
+    if family == "dispatcher":
+        if arguments and arguments[0] == "observations":
+            arguments.pop(0)
+            if options.get("apgr_home") and arguments and arguments[0] in {"summarize", "index", "feedback", "explain", "list"}:
+                arguments += ["--apgr-home", options["apgr_home"]]
+            if options.get("outbox_root") and arguments and arguments[0] == "list" and "--outbox-root" not in arguments:
+                # Resolved before the repository route changes the working directory; ``list`` itself
+                # rejects an outbox root without a project scope rather than dropping it silently.
+                arguments += ["--outbox-root", str(Path(options["outbox_root"]).expanduser().resolve())]
+            return _repository_route("apgr-dispatcher-observations", arguments, options)
+        if not arguments or arguments.pop(0) != "bundle":
+            raise CliError("dispatcher requires bundle or observations")
+        if options.get("apgr_home"):
+            arguments += ["--apgr-home", options["apgr_home"]]
+        return _repository_route("apgr-dispatcher-bundle", arguments, options)
+
+    if family == "home":
+        if not arguments:
+            raise CliError("home requires a command (try: home show --json)")
+        action = arguments.pop(0)
+        if action != "show":
+            raise CliError(f"unknown home command: {action}")
+        json_output = False
+        while arguments:
+            arg = arguments.pop(0)
+            if arg == "--json":
+                json_output = True
+            else:
+                raise CliError(f"unknown option for home show: {arg}")
+        from .home import inspect_home
+        from .paths import PathContractError
+        from .config import ConfigError
+        import json
+
+        try:
+            result = inspect_home(
+                cli_home=options.get("apgr_home"),
+                outbox_root=options.get("outbox_root"),
+                project_root=options.get("project_root"),
+            )
+        except (PathContractError, ConfigError, ValueError) as err:
+            raise CliError(str(err)) from err
+        if json_output:
+            print(json.dumps(result, indent=2))
+        else:
+            print(f"layout_version: {result['layout_version']}")
+            print(f"precedence_source: {result['precedence_source']}")
+            print(f"effective_home: {result['effective_home']}")
+            print("paths:")
+            for k, v in sorted(result["paths"].items()):
+                print(f"  {k}: {v}")
+            if result["diagnostics"]:
+                print("diagnostics:")
+                for d in result["diagnostics"]:
+                    print(f"  - {d}")
+        return 0
+    if family == "integrations":
+        if not arguments:
+            raise CliError("integrations requires a command (try: integrations rtk doctor)")
+        target = arguments.pop(0)
+        if target != "rtk":
+            raise CliError(f"unknown integration: {target}")
+        if not arguments:
+            raise CliError("rtk requires a command (try: integrations rtk doctor)")
+        action = arguments.pop(0)
+        if action != "doctor":
+            raise CliError(f"unknown rtk command: {action}")
+        json_output = False
+        while arguments:
+            arg = arguments.pop(0)
+            if arg == "--json":
+                json_output = True
+            else:
+                raise CliError(f"unknown option for integrations rtk doctor: {arg}")
+        from .rtk import doctor_report, render_doctor_report
+        from .config import ConfigError
+        from .paths import PathContractError
+
+        try:
+            report = doctor_report(
+                project_root=options.get("project_root"),
+                apgr_home=options.get("apgr_home"),
+            )
+        except (PathContractError, ConfigError, ValueError) as err:
+            raise CliError(str(err)) from err
+
+        output = render_doctor_report(report, json_output=json_output)
+        sys.stdout.write(output)
+        return 0
     if family == "report":
         from . import reports
 
@@ -354,6 +468,17 @@ def _dispatch(options: dict[str, str], arguments: list[str]) -> int:
 
         return response.main(options, arguments, _repository_root(options))
     raise AssertionError(f"unhandled command family: {family}")
+
+
+def _acquisition_route(family, action, arguments, options):
+    from .acquisition import run_channel
+    from .config import ConfigError
+    from .paths import PathContractError
+    from .go_bridge import GoBridgeError
+    try:
+        return run_channel(family, action, arguments, options)
+    except (ConfigError, PathContractError, GoBridgeError, ValueError) as error:
+        raise CliError(str(error)) from error
 
 
 def main(arguments: Sequence[str] | None = None) -> int:

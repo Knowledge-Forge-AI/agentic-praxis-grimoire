@@ -1,5 +1,5 @@
 schema = "agent-phase-capabilities-v1"
-generation = 1
+generation = 9
 
 # Canonical capabilities: read, mutation, execution, reasoning, structured_output, subagent_workers
 # Default postures: mutating, read_only
@@ -25,101 +25,138 @@ posture = "read_only"
 [endpoints.claude-normal-plan-review]
 provider = "claude"
 profile = "normal-plan-review"
-capabilities = ["read", "reasoning"]
+capabilities = ["read", "reasoning", "subagent_workers"]
 posture = "read_only"
 
 [endpoints.claude-normal-final-review]
 provider = "claude"
 profile = "normal-final-review"
-capabilities = ["read", "reasoning"]
+capabilities = ["read", "reasoning", "subagent_workers"]
 posture = "read_only"
 
 [endpoints.claude-normal-sysadmin-plan-review]
 provider = "claude"
 profile = "normal-sysadmin-plan-review"
-capabilities = ["read", "reasoning"]
+capabilities = ["read", "reasoning", "subagent_workers"]
 posture = "read_only"
 
 [endpoints.claude-sysadmin-opus-review]
 provider = "claude"
 profile = "sysadmin-opus-review"
-capabilities = ["read", "reasoning"]
+capabilities = ["read", "reasoning", "subagent_workers"]
 posture = "read_only"
 
 [endpoints.claude-implementation-primary]
 provider = "claude"
 profile = "implementation-primary"
-capabilities = ["read", "mutation", "execution", "reasoning", "structured_output"]
+capabilities = ["read", "mutation", "execution", "reasoning", "structured_output", "subagent_workers"]
 posture = "mutating"
 
 [endpoints.claude-implementation-review]
 provider = "claude"
 profile = "implementation-review"
-capabilities = ["read", "reasoning", "structured_output"]
+capabilities = ["read", "reasoning", "structured_output", "subagent_workers"]
 posture = "read_only"
 
 [endpoints.claude-architecture-docs-primary]
 provider = "claude"
 profile = "architecture-docs-primary"
-capabilities = ["read", "mutation", "execution", "reasoning", "structured_output"]
+capabilities = ["read", "mutation", "execution", "reasoning", "structured_output", "subagent_workers"]
 posture = "mutating"
 
 [endpoints.fable-architecture-docs-primary]
 provider = "claude"
 profile = "fable-architecture-docs-primary"
-capabilities = ["read", "mutation", "execution", "reasoning", "structured_output"]
+capabilities = ["read", "mutation", "execution", "reasoning", "structured_output", "subagent_workers"]
 posture = "mutating"
 
 [endpoints.claude-architecture-docs-review]
 provider = "claude"
 profile = "architecture-docs-review"
-capabilities = ["read", "reasoning", "structured_output"]
+capabilities = ["read", "reasoning", "structured_output", "subagent_workers"]
 posture = "read_only"
 
 [endpoints.claude-sysadmin-primary]
 provider = "claude"
 profile = "sysadmin-primary"
-capabilities = ["read", "mutation", "execution", "reasoning", "structured_output"]
+capabilities = ["read", "mutation", "execution", "reasoning", "structured_output", "subagent_workers"]
 posture = "mutating"
 
 [endpoints.claude-sysadmin-review]
 provider = "claude"
 profile = "sysadmin-review"
-capabilities = ["read", "reasoning", "structured_output"]
+capabilities = ["read", "reasoning", "structured_output", "subagent_workers"]
 posture = "read_only"
 
 [endpoints.codex-implementation-testing]
 provider = "codex"
 profile = "implementation-testing"
-capabilities = ["read", "mutation", "execution", "reasoning", "structured_output"]
+capabilities = ["read", "mutation", "execution", "reasoning", "structured_output", "subagent_workers"]
 posture = "mutating"
 
 [endpoints.codex-implementation-testing-review]
 provider = "codex"
 profile = "implementation-testing-review"
-capabilities = ["read", "reasoning", "structured_output"]
+capabilities = ["read", "reasoning", "structured_output", "subagent_workers"]
 posture = "read_only"
 
 [endpoints.codex-architecture-docs-primary]
 provider = "codex"
 profile = "architecture-docs-primary"
-capabilities = ["read", "mutation", "execution", "reasoning", "structured_output"]
+capabilities = ["read", "mutation", "execution", "reasoning", "structured_output", "subagent_workers"]
 posture = "mutating"
 
 [endpoints.codex-architecture-docs-review]
 provider = "codex"
 profile = "architecture-docs-review"
-capabilities = ["read", "reasoning", "structured_output"]
+capabilities = ["read", "reasoning", "structured_output", "subagent_workers"]
 posture = "read_only"
 
 [endpoints.codex-sysadmin-primary]
 provider = "codex"
 profile = "sysadmin-primary"
-capabilities = ["read", "mutation", "execution", "reasoning", "structured_output"]
+capabilities = ["read", "mutation", "execution", "reasoning", "structured_output", "subagent_workers"]
 posture = "mutating"
 
 [endpoints.codex-sysadmin-review]
 provider = "codex"
 profile = "sysadmin-review"
-capabilities = ["read", "reasoning", "structured_output"]
+capabilities = ["read", "reasoning", "structured_output", "subagent_workers"]
 posture = "read_only"
+
+[endpoints.claude-opus-high-plan]
+provider = "claude"
+profile = "opus-high-plan"
+capabilities = ["read", "reasoning", "subagent_workers"]
+posture = "read_only"
+
+[endpoints.claude-opus-high-review]
+provider = "claude"
+profile = "opus-high-review"
+capabilities = ["read", "reasoning", "subagent_workers"]
+posture = "read_only"
+
+[endpoints.claude-opus-high-sysadmin-review]
+provider = "claude"
+profile = "opus-high-sysadmin-review"
+capabilities = ["read", "reasoning", "subagent_workers"]
+posture = "read_only"
+
+[endpoints.claude-only-implementation-primary]
+provider = "claude"
+profile = "claude-only-implementation-primary"
+capabilities = ["read", "mutation", "execution", "reasoning", "structured_output", "subagent_workers"]
+posture = "mutating"
+
+[endpoints.claude-only-architecture-docs-primary]
+provider = "claude"
+profile = "claude-only-architecture-docs-primary"
+capabilities = ["read", "mutation", "execution", "reasoning", "structured_output", "subagent_workers"]
+posture = "mutating"
+
+[endpoints.claude-only-sysadmin-primary]
+provider = "claude"
+profile = "claude-only-sysadmin-primary"
+capabilities = ["read", "mutation", "execution", "reasoning", "structured_output", "subagent_workers"]
+posture = "mutating"
+

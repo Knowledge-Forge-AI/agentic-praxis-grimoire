@@ -7,7 +7,7 @@ from typing import Any, NoReturn
 
 from . import candidate as candidate_module
 from . import checkpoint as checkpoint_module
-from .failure_boundary import record_manager_attention
+from .failure_boundary import interrupted_residue, record_manager_attention
 from . import gitstate as gitstate_module
 from . import stage_delta as stage_delta_module
 from . import path_disposition as ownership_module
@@ -137,8 +137,11 @@ def _phase_delta(
     # from that check.
     dirty_paths = {change.path for change in boundary_delta} & set(entry.dirty)
     dirty_paths -= adoption.paths(state)
+    # Interruption residue is governed only by its manager challenges.
+    residue = interrupted_residue(state)
     if state.get("resumed"):
         dirty_paths -= carried
+    dirty_paths -= residue
     overlap = sorted(dirty_paths)
     if overlap:
         # The terminal dispositioner owns this ambiguity. Preserve the complete
@@ -154,7 +157,7 @@ def _phase_delta(
             "candidate_tree": final_tree,
             "automatic_publication": "not_attempted",
         }
-    carried.update(change.path for change in boundary_delta)
+    carried.update(change.path for change in boundary_delta if change.path not in residue)
     adoption.guard_owned(state, carried)
     try:
         # The commit delta is relative to the current boundary's HEAD. This
@@ -391,7 +394,8 @@ def finalize_repository(
     try:
         legacy_exact_replay = finalize_replay and state.get('ownership_challenges') is None
         if not state.get('_ownership_recovery') and not legacy_exact_replay:
-            challenges.observe(entry.root, state, entry, final_tree, parsed.stage, 'post_terminal')
+            challenges.observe(entry.root, state, entry, final_tree, parsed.stage, 'post_terminal',
+                               path_dispositions=parsed.path_dispositions)
             # Exact resume reuses already validated provider events; it cannot
             # reinterpret the original response against a newly minted ID.
             if not finalize_replay:

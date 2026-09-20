@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, replace
 from copy import deepcopy
+from datetime import datetime, timezone
 import hashlib
 import json
 from pathlib import Path
@@ -11,28 +12,22 @@ from typing import Any
 
 from . import route_provenance
 
-from . import archive as archive_module
-from . import antigravity_output_recovery as output_recovery_module
-from . import candidate as candidate_module
-from . import capacity as capacity_module
-from . import envelope as envelope_module
-from . import finalization as finalization_module
-from . import failure_boundary as failure_boundary_module
-from . import gitstate as gitstate_module
-from . import lifecycle_dispatch as lifecycle_dispatch_module
-from . import prompt_policy as prompt_policy_module
-from . import provider as provider_module
-from . import result as result_module
-from . import result_artifacts as result_artifacts_module
-from . import result_repair as result_repair_module
-from . import review_result as review_result_module
-from . import resume as resume_module
-from .result_repair import qualify as qualify_result_repair
-from .result_repair import start as start_result_repair
-from . import run as run_module
+from . import (
+    antigravity_output_recovery as output_recovery_module, archive as archive_module,
+    candidate as candidate_module, capacity as capacity_module,
+    envelope as envelope_module, failure_boundary as failure_boundary_module,
+    finalization as finalization_module, gitstate as gitstate_module,
+    interrupted_recovery as interrupted_recovery_module,
+    lifecycle_dispatch as lifecycle_dispatch_module, prompt_policy as prompt_policy_module,
+    provider as provider_module, provider_launch as provider_launch_module,
+    result as result_module, result_artifacts as result_artifacts_module,
+    result_repair as result_repair_module, resume as resume_module,
+    review_result as review_result_module, run as run_module,
+    stage_delta as stage_delta_module,
+)
+from .result_repair import qualify as qualify_result_repair, start as start_result_repair
 from .publication import record as push_record
 from .routing import Endpoint, load_validated_roster, resolve, route
-from . import stage_delta as stage_delta_module
 from .transport import PromptLimitError
 
 def _inert_result_markers(text: str) -> str:
@@ -83,6 +78,8 @@ def _initial_state(dispatcher: Any, directory: Any, project: str, phase_id: str,
         "effective_checkpoints": inherited_checkpoints.copy(),
         "stage_accounting_schema": result_artifacts_module.STAGE_ACCOUNTING_SCHEMA,
         "stages_invoked": inherited_invoked.copy(),
+        "provider_launch_contract": provider_launch_module.SCHEMA,
+        "provider_launches": [],
         "stage_transports_completed": inherited_transports.copy(),
         "terminal_result_validated": terminal_validated,
         "stages_completed": inherited_stages.copy(),
@@ -138,7 +135,7 @@ def _initial_state(dispatcher: Any, directory: Any, project: str, phase_id: str,
         "candidate_manifest": plan.candidate_manifest,
         "path_ownership": plan.source_state.get("path_ownership"),
         "ownership_challenges": deepcopy(plan.source_state.get("ownership_challenges")),
-        "adoption": plan.source_state.get("adoption"),
+        "adoption": plan.source_state.get("adoption"), "entry_adoption": plan.source_state.get("entry_adoption"), "entry_dirt_identities": plan.source_state.get("entry_dirt_identities", plan.source_entry.dirty),
         "inherited_candidate_manifest": plan.candidate_manifest,
         "phase_owned_paths": sorted(plan.candidate_manifest["paths"]),
         "resume_boundary": plan.boundary_facts,
@@ -228,6 +225,32 @@ def _initial_state(dispatcher: Any, directory: Any, project: str, phase_id: str,
         }
     state["_previous_operational_metadata"] = stage_delta_module.scan_operational_metadata(dispatcher.cwd)
     state["index_normalizations"] = list(plan.source_state.get("index_normalizations", []))
+
+    source_policy = plan.source_state.get("review_mutation_policy")
+    if source_policy is None:
+        source_policy = {"worktree": "block", "index": "block", "head": "block", "generation": 7}
+    if plan.from_stage == "finalize":
+        current_policy = getattr(dispatcher, "_review_mutation_policy", None) or source_policy
+    else:
+        current_policy = getattr(dispatcher, "review_mutation_policy", None) or source_policy
+    policy_dict = current_policy.as_dict() if hasattr(current_policy, "as_dict") else dict(current_policy)
+    source_policy_dict = source_policy.as_dict() if hasattr(source_policy, "as_dict") else dict(source_policy)
+
+    state["review_mutation_policy"] = policy_dict
+    state["review_mutation_observations"] = deepcopy(plan.source_state.get("review_mutation_observations", {}))
+    state["review_window_mutation_paths"] = sorted(set(plan.source_state.get("review_window_mutation_paths", ())))
+    state["subject_drift_observed"] = bool(plan.source_state.get("subject_drift_observed", False))
+
+    if policy_dict != source_policy_dict:
+        transition = {
+            "source_policy": source_policy_dict,
+            "resumed_policy": policy_dict,
+            "active_policy": policy_dict,
+            "resumed_at": datetime.now(timezone.utc).isoformat(),
+        }
+        state["policy_transition"] = transition
+        state["review_mutation_policy_transition"] = transition
+
     if plan.output_recovery is not None:
         recovered_stage = plan.lifecycle.stage_names[0]
         state["stages_invoked"] = [recovered_stage]
@@ -308,6 +331,9 @@ def start(
     result_repair_commit_body_file: Path | None = None,
 ) -> dict[str, Any]:
     """Preflight, create, and finish one standalone resumed attempt."""
+    if (preview := interrupted_recovery_module.prepare(
+            source, phase_id, request, dry_run=dry_run, cwd=dispatcher.cwd)) is not None:
+        return preview
     authority_requested = (
         result_repair_commit_subject is not None
         or result_repair_commit_body_file is not None
@@ -374,8 +400,20 @@ def start(
     roster = (
         None
         if plan.from_stage == "finalize"
-        else load_validated_roster(dispatcher.root)
+        else (
+            getattr(dispatcher, "_roster", None)
+            or (
+                load_validated_roster(dispatcher.root, apgr_home=dispatcher.apgr_home)
+                if dispatcher.apgr_home is not None
+                else load_validated_roster(dispatcher.root)
+            )
+        )
     )
+    if roster is not None:
+        dispatcher.roster = roster
+    res_kwargs = {}
+    if dispatcher.apgr_home is not None:
+        res_kwargs["apgr_home"] = dispatcher.apgr_home
     current_resolved = (
         None
         if roster is None
@@ -385,6 +423,7 @@ def start(
             plan.lifecycle.name,
             target_policy,
             roster=roster,
+            **res_kwargs,
         )
     )
     if current_resolved is not None and plan.output_recovery is not None:
@@ -881,6 +920,7 @@ def _closeout_result(
             begin,
             end,
             stage_delta_summary=prior_stage_deltas,
+            review_window_mutations=context.state.get("review_window_mutation_paths"),
         ),
         forwarded_work,
         source_stage=envelope_module.STAGE_WORK,
@@ -938,10 +978,20 @@ def _closeout_result(
         stage,
         envelope_module.STAGE_FINAL_REVIEW,
     )
-    context.state["final_candidate_reviewed"] = (
-        (not adversary_mutated)
-        and (not closer_mutated)
-        and (closeout_candidate["tree"] == pre_final["tree"])
+    from . import review_drift
+    has_final_receipt = (
+        envelope_module.STAGE_FINAL_REVIEW in context.state.get("review_outcomes", {})
+        or any(
+            isinstance(item, dict) and item.get("stage") == envelope_module.STAGE_FINAL_REVIEW
+            for item in context.state.get("review_artifacts", [])
+        )
+    )
+    context.state["final_candidate_reviewed"] = review_drift.derive_final_candidate_freshness(
+        work_review_observation=context.state.get("review_mutation_observations", {}).get(envelope_module.STAGE_FINAL_REVIEW),
+        work_review_candidate_tree=str(pre_final["tree"]),
+        terminal_candidate_tree=str(closeout_candidate["tree"]),
+        has_verified_receipt=has_final_receipt,
+        closer_mutated=closer_mutated,
     )
     try:
         verified = result_repair_module._candidate_boundary(
@@ -1407,10 +1457,20 @@ def _resume_work_reviewed(
         terminal,
         review_stage.name,
     )
-    context.state["final_candidate_reviewed"] = (
-        (not adversary_mutated)
-        and (not closer_mutated)
-        and (candidate["tree"] == produced["tree"])
+    from . import review_drift
+    has_review_receipt = (
+        review_stage.name in context.state.get("review_outcomes", {})
+        or any(
+            isinstance(item, dict) and item.get("stage") == review_stage.name
+            for item in context.state.get("review_artifacts", [])
+        )
+    )
+    context.state["final_candidate_reviewed"] = review_drift.derive_final_candidate_freshness(
+        work_review_observation=context.state.get("review_mutation_observations", {}).get(review_stage.name),
+        work_review_candidate_tree=str(produced["tree"]),
+        terminal_candidate_tree=str(candidate["tree"]),
+        has_verified_receipt=has_review_receipt,
+        closer_mutated=closer_mutated,
     )
     return terminal_result, nonce, terminal
 

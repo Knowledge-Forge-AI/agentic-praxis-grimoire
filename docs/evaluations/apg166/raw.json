@@ -1,0 +1,3861 @@
+{
+  "boundary": "apgr-controlled-channel-write/v1",
+  "rows": [
+    {
+      "arms": {
+        "adaptive": {
+          "authority": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "coverage": {
+            "reason": "no live channel trace",
+            "source": "unavailable",
+            "value": null
+          },
+          "cumulative": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "deliveries": [],
+          "exact_recovery": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "initial": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "late_acquisitions": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "missing_guidance_findings": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "producer_revisions": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "provider_native_bytes": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "quality_oracle": {
+            "assertions": "health check endpoint returns 200 and passes test assertions; zero unexpected repo mutations",
+            "command": "go test ./pkg/handler/...",
+            "expected_exit_code": 0
+          },
+          "restart_required_incidents": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "retries": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "route": {
+            "binding": {
+              "allowed_tools": [
+                "view_file",
+                "replace_file_content",
+                "write_to_file",
+                "run_command"
+              ],
+              "binding_id": "binding-producer-01",
+              "roles": [
+                "Producer"
+              ]
+            },
+            "execution": "not_invoked",
+            "model_route": {
+              "reason": "no qualified live paired harness",
+              "source": "unavailable",
+              "value": null
+            },
+            "provider": "codex",
+            "provider_binding": {
+              "reason": "native selective projection unqualified",
+              "source": "unavailable",
+              "value": null
+            },
+            "requested_context_mode": "adaptive"
+          },
+          "task_outcome": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "tokens": {
+            "reason": "no direct provider token counter",
+            "source": "unavailable",
+            "value": null
+          }
+        },
+        "static": {
+          "authority": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "coverage": {
+            "reason": "no live channel trace",
+            "source": "unavailable",
+            "value": null
+          },
+          "cumulative": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "deliveries": [],
+          "exact_recovery": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "initial": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "late_acquisitions": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "missing_guidance_findings": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "producer_revisions": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "provider_native_bytes": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "quality_oracle": {
+            "assertions": "health check endpoint returns 200 and passes test assertions; zero unexpected repo mutations",
+            "command": "go test ./pkg/handler/...",
+            "expected_exit_code": 0
+          },
+          "restart_required_incidents": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "retries": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "route": {
+            "binding": {
+              "allowed_tools": [
+                "view_file",
+                "replace_file_content",
+                "write_to_file",
+                "run_command"
+              ],
+              "binding_id": "binding-producer-01",
+              "roles": [
+                "Producer"
+              ]
+            },
+            "execution": "not_invoked",
+            "model_route": {
+              "reason": "no qualified live paired harness",
+              "source": "unavailable",
+              "value": null
+            },
+            "provider": "codex",
+            "provider_binding": {
+              "reason": "native selective projection unqualified",
+              "source": "unavailable",
+              "value": null
+            },
+            "requested_context_mode": "static"
+          },
+          "task_outcome": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "tokens": {
+            "reason": "no direct provider token counter",
+            "source": "unavailable",
+            "value": null
+          }
+        }
+      },
+      "mechanism": {
+        "components": [
+          {
+            "bytes": 7698,
+            "id": "standing",
+            "sha256": "b7eb1ceb0d45e813cd1054f7a591630bae5041fd11a1d03342af71e5732f70bd",
+            "source": "measured"
+          },
+          {
+            "bytes": 312,
+            "id": "task",
+            "sha256": "e1f2119a1c6e41abb88b3f20934696d8a6a724d823b4185dfade546f339e40fc",
+            "source": "synthetic"
+          },
+          {
+            "bytes": 183,
+            "id": "roles",
+            "sha256": "fdec5560a53f27462cab3167a5c0a13cefa70b8c7d63fa5528a243c65d5253c5",
+            "source": "synthetic"
+          }
+        ],
+        "content_identity": "10e467950aaf4f0734816941f9a61bc0613fbdbcef46ea963a4e00ae29dc5dd5",
+        "effective_mode": "static",
+        "facts": [
+          {
+            "kind": "language",
+            "value": "go"
+          }
+        ],
+        "mandatory_cost": {
+          "bytes": 8193,
+          "characters": 8193,
+          "sha256": "416db7c1dbedd03deefcfee10a783bd8d038c5a8cc68ad0693cd4453729083b4"
+        },
+        "payload_cost": {
+          "bytes": 25465,
+          "characters": 25413,
+          "sha256": "0eeb29f7c6b9393133cb9740a4127eaef55140ade547ff7ba4a38c221c381d86"
+        },
+        "reasons": [
+          "selective_projection_unqualified",
+          "independent_recovery_unqualified"
+        ],
+        "reproducible": true,
+        "request_sha256": "1d6d07565e2e51344e0ced859917ea7febd146640862dc9e9f8c871f2eb40c39",
+        "rule_version": "apg.context-packing/v1",
+        "scope": "prospective planner only; synthetic task/role envelope",
+        "selected": [
+          "apgr:go-language-profile"
+        ],
+        "source": "measured"
+      },
+      "scenario_id": "scenario-01",
+      "subset": "calibration",
+      "synthetic_inputs": false,
+      "synthetic_materialization": null
+    },
+    {
+      "arms": {
+        "adaptive": {
+          "authority": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "coverage": {
+            "reason": "no live channel trace",
+            "source": "unavailable",
+            "value": null
+          },
+          "cumulative": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "deliveries": [],
+          "exact_recovery": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "initial": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "late_acquisitions": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "missing_guidance_findings": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "producer_revisions": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "provider_native_bytes": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "quality_oracle": {
+            "assertions": "plan review disposition is recorded and pytest suite passes cleanly",
+            "command": "pytest tests/",
+            "expected_exit_code": 0
+          },
+          "restart_required_incidents": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "retries": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "route": {
+            "binding": {
+              "allowed_tools": [
+                "view_file",
+                "replace_file_content",
+                "write_to_file",
+                "run_command"
+              ],
+              "binding_id": "binding-merged-01",
+              "roles": [
+                "Plan Review Disposition",
+                "Producer"
+              ]
+            },
+            "execution": "not_invoked",
+            "model_route": {
+              "reason": "no qualified live paired harness",
+              "source": "unavailable",
+              "value": null
+            },
+            "provider": "codex",
+            "provider_binding": {
+              "reason": "native selective projection unqualified",
+              "source": "unavailable",
+              "value": null
+            },
+            "requested_context_mode": "adaptive"
+          },
+          "task_outcome": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "tokens": {
+            "reason": "no direct provider token counter",
+            "source": "unavailable",
+            "value": null
+          }
+        },
+        "static": {
+          "authority": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "coverage": {
+            "reason": "no live channel trace",
+            "source": "unavailable",
+            "value": null
+          },
+          "cumulative": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "deliveries": [],
+          "exact_recovery": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "initial": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "late_acquisitions": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "missing_guidance_findings": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "producer_revisions": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "provider_native_bytes": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "quality_oracle": {
+            "assertions": "plan review disposition is recorded and pytest suite passes cleanly",
+            "command": "pytest tests/",
+            "expected_exit_code": 0
+          },
+          "restart_required_incidents": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "retries": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "route": {
+            "binding": {
+              "allowed_tools": [
+                "view_file",
+                "replace_file_content",
+                "write_to_file",
+                "run_command"
+              ],
+              "binding_id": "binding-merged-01",
+              "roles": [
+                "Plan Review Disposition",
+                "Producer"
+              ]
+            },
+            "execution": "not_invoked",
+            "model_route": {
+              "reason": "no qualified live paired harness",
+              "source": "unavailable",
+              "value": null
+            },
+            "provider": "codex",
+            "provider_binding": {
+              "reason": "native selective projection unqualified",
+              "source": "unavailable",
+              "value": null
+            },
+            "requested_context_mode": "static"
+          },
+          "task_outcome": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "tokens": {
+            "reason": "no direct provider token counter",
+            "source": "unavailable",
+            "value": null
+          }
+        }
+      },
+      "mechanism": {
+        "components": [
+          {
+            "bytes": 7698,
+            "id": "standing",
+            "sha256": "b7eb1ceb0d45e813cd1054f7a591630bae5041fd11a1d03342af71e5732f70bd",
+            "source": "measured"
+          },
+          {
+            "bytes": 265,
+            "id": "task",
+            "sha256": "94a6d6142811c0143485898c4fedcd0dc26b356ca015babc24e9a354cabc418c",
+            "source": "synthetic"
+          },
+          {
+            "bytes": 208,
+            "id": "roles",
+            "sha256": "ba0dfce1071665a5246f29093ee9c43d0e18a647efc5818bdf36b61ff16a97ab",
+            "source": "synthetic"
+          }
+        ],
+        "content_identity": "76e1f28f4c20a433fa996eec684700e6c761c1c86a88e88fe0b94a1334576095",
+        "effective_mode": "static",
+        "facts": [
+          {
+            "kind": "language",
+            "value": "python"
+          }
+        ],
+        "mandatory_cost": {
+          "bytes": 8171,
+          "characters": 8171,
+          "sha256": "092086f997cd7b2f2f0371cfa376060cf1d7a20c37e9ced99309bb1b439536c6"
+        },
+        "payload_cost": {
+          "bytes": 24186,
+          "characters": 24142,
+          "sha256": "a795d06095bb085ef45487ca3e6f548a09e9aaed3c7d9fd3d6ae7b2763890139"
+        },
+        "reasons": [
+          "selective_projection_unqualified",
+          "independent_recovery_unqualified"
+        ],
+        "reproducible": true,
+        "request_sha256": "313e772957cfc44e01400b6f91f15b01435178591a105064c5a77e7644b70d22",
+        "rule_version": "apg.context-packing/v1",
+        "scope": "prospective planner only; synthetic task/role envelope",
+        "selected": [
+          "apgr:python-language-profile"
+        ],
+        "source": "measured"
+      },
+      "scenario_id": "scenario-02",
+      "subset": "calibration",
+      "synthetic_inputs": false,
+      "synthetic_materialization": null
+    },
+    {
+      "arms": {
+        "adaptive": {
+          "authority": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "coverage": {
+            "reason": "no live channel trace",
+            "source": "unavailable",
+            "value": null
+          },
+          "cumulative": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "deliveries": [],
+          "exact_recovery": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "initial": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "late_acquisitions": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "missing_guidance_findings": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "producer_revisions": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "provider_native_bytes": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "quality_oracle": {
+            "assertions": "zero inapplicable language/database skills selected; reviewer produces structured critique; zero worktree/index/HEAD drift"
+          },
+          "restart_required_incidents": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "retries": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "route": {
+            "binding": {
+              "allowed_tools": [
+                "view_file"
+              ],
+              "binding_id": "binding-reviewer-01",
+              "roles": [
+                "Work Review"
+              ]
+            },
+            "execution": "not_invoked",
+            "model_route": {
+              "reason": "no qualified live paired harness",
+              "source": "unavailable",
+              "value": null
+            },
+            "provider": "claude",
+            "provider_binding": {
+              "reason": "native selective projection unqualified",
+              "source": "unavailable",
+              "value": null
+            },
+            "requested_context_mode": "adaptive"
+          },
+          "task_outcome": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "tokens": {
+            "reason": "no direct provider token counter",
+            "source": "unavailable",
+            "value": null
+          }
+        },
+        "static": {
+          "authority": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "coverage": {
+            "reason": "no live channel trace",
+            "source": "unavailable",
+            "value": null
+          },
+          "cumulative": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "deliveries": [],
+          "exact_recovery": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "initial": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "late_acquisitions": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "missing_guidance_findings": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "producer_revisions": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "provider_native_bytes": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "quality_oracle": {
+            "assertions": "zero inapplicable language/database skills selected; reviewer produces structured critique; zero worktree/index/HEAD drift"
+          },
+          "restart_required_incidents": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "retries": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "route": {
+            "binding": {
+              "allowed_tools": [
+                "view_file"
+              ],
+              "binding_id": "binding-reviewer-01",
+              "roles": [
+                "Work Review"
+              ]
+            },
+            "execution": "not_invoked",
+            "model_route": {
+              "reason": "no qualified live paired harness",
+              "source": "unavailable",
+              "value": null
+            },
+            "provider": "claude",
+            "provider_binding": {
+              "reason": "native selective projection unqualified",
+              "source": "unavailable",
+              "value": null
+            },
+            "requested_context_mode": "static"
+          },
+          "task_outcome": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "tokens": {
+            "reason": "no direct provider token counter",
+            "source": "unavailable",
+            "value": null
+          }
+        }
+      },
+      "mechanism": {
+        "components": [
+          {
+            "bytes": 11071,
+            "id": "standing",
+            "sha256": "b8f7adaa54096479d561255ce02409af0710d55c9d964a4bea71b07344feea87",
+            "source": "measured"
+          },
+          {
+            "bytes": 199,
+            "id": "task",
+            "sha256": "f3320c22755c7c6eb491205fd5ca6e5670abbbad42e722bd99caeca088cdca9b",
+            "source": "synthetic"
+          },
+          {
+            "bytes": 130,
+            "id": "roles",
+            "sha256": "95355a50bb2c608f14b32a3d2dab2078216e34c76440ddc83a7ef83da417ce63",
+            "source": "synthetic"
+          }
+        ],
+        "content_identity": "c4d2297d56bdf046ec3566d572b3445b7e0024b5e61afbd706eae789d03da149",
+        "effective_mode": "static",
+        "facts": [
+          {
+            "kind": "language",
+            "value": "markdown"
+          }
+        ],
+        "mandatory_cost": {
+          "bytes": 11400,
+          "characters": 11386,
+          "sha256": "a65669cb577d75e52a326ef0553bde615389e6e8a40f49910cced887722b842f"
+        },
+        "payload_cost": {
+          "bytes": 23400,
+          "characters": 23342,
+          "sha256": "45beda19d341cdbb29bcafef5181194cc0e1fd0d231894cd8d84a95c36ba2170"
+        },
+        "reasons": [
+          "selective_projection_unqualified",
+          "independent_recovery_unqualified"
+        ],
+        "reproducible": true,
+        "request_sha256": "5b864bb342be56a554fc77bac4d47d734ca1f0885a09ff5dff05909fb0f9db3b",
+        "rule_version": "apg.context-packing/v1",
+        "scope": "prospective planner only; synthetic task/role envelope",
+        "selected": [
+          "apgr:markdown-language-profile"
+        ],
+        "source": "measured"
+      },
+      "scenario_id": "scenario-03",
+      "subset": "calibration",
+      "synthetic_inputs": false,
+      "synthetic_materialization": null
+    },
+    {
+      "arms": {
+        "adaptive": {
+          "authority": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "coverage": {
+            "reason": "no live channel trace",
+            "source": "unavailable",
+            "value": null
+          },
+          "cumulative": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "deliveries": [],
+          "exact_recovery": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "initial": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "late_acquisitions": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "missing_guidance_findings": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "producer_revisions": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "provider_native_bytes": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "quality_oracle": {
+            "assertions": "RTK instructions slice delivered in prompt; bash syntax passes; zero git authority drift",
+            "command": "bash -n scripts/build.sh",
+            "expected_exit_code": 0
+          },
+          "restart_required_incidents": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "retries": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "route": {
+            "binding": {
+              "allowed_tools": [
+                "view_file",
+                "replace_file_content",
+                "write_to_file",
+                "run_command"
+              ],
+              "binding_id": "binding-producer-02",
+              "roles": [
+                "Producer"
+              ]
+            },
+            "execution": "not_invoked",
+            "model_route": {
+              "reason": "no qualified live paired harness",
+              "source": "unavailable",
+              "value": null
+            },
+            "provider": "codex",
+            "provider_binding": {
+              "reason": "native selective projection unqualified",
+              "source": "unavailable",
+              "value": null
+            },
+            "requested_context_mode": "adaptive"
+          },
+          "task_outcome": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "tokens": {
+            "reason": "no direct provider token counter",
+            "source": "unavailable",
+            "value": null
+          }
+        },
+        "static": {
+          "authority": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "coverage": {
+            "reason": "no live channel trace",
+            "source": "unavailable",
+            "value": null
+          },
+          "cumulative": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "deliveries": [],
+          "exact_recovery": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "initial": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "late_acquisitions": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "missing_guidance_findings": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "producer_revisions": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "provider_native_bytes": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "quality_oracle": {
+            "assertions": "RTK instructions slice delivered in prompt; bash syntax passes; zero git authority drift",
+            "command": "bash -n scripts/build.sh",
+            "expected_exit_code": 0
+          },
+          "restart_required_incidents": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "retries": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "route": {
+            "binding": {
+              "allowed_tools": [
+                "view_file",
+                "replace_file_content",
+                "write_to_file",
+                "run_command"
+              ],
+              "binding_id": "binding-producer-02",
+              "roles": [
+                "Producer"
+              ]
+            },
+            "execution": "not_invoked",
+            "model_route": {
+              "reason": "no qualified live paired harness",
+              "source": "unavailable",
+              "value": null
+            },
+            "provider": "codex",
+            "provider_binding": {
+              "reason": "native selective projection unqualified",
+              "source": "unavailable",
+              "value": null
+            },
+            "requested_context_mode": "static"
+          },
+          "task_outcome": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "tokens": {
+            "reason": "no direct provider token counter",
+            "source": "unavailable",
+            "value": null
+          }
+        }
+      },
+      "mechanism": {
+        "components": [
+          {
+            "bytes": 7698,
+            "id": "standing",
+            "sha256": "b7eb1ceb0d45e813cd1054f7a591630bae5041fd11a1d03342af71e5732f70bd",
+            "source": "measured"
+          },
+          {
+            "bytes": 206,
+            "id": "task",
+            "sha256": "3f3f469f1f3ff13bfc37ec8acd981f03786dc77c0c0e24ec67735d2a0bd14265",
+            "source": "synthetic"
+          },
+          {
+            "bytes": 183,
+            "id": "roles",
+            "sha256": "b40b0c55cbbeadd19399361e06c4f2724fab6c96b09ba40b528bc591aaeb54ad",
+            "source": "synthetic"
+          }
+        ],
+        "content_identity": "59aa0d22aff7d0ae2aef2095b93f5bb0239a1c48a200c97a34acfd5fed508c16",
+        "effective_mode": "static",
+        "facts": [
+          {
+            "kind": "language",
+            "value": "bash"
+          }
+        ],
+        "mandatory_cost": {
+          "bytes": 8087,
+          "characters": 8087,
+          "sha256": "1d26940d544fe84a38daf3d9d52a7f0b661932e8fca541afebc2244039fe249a"
+        },
+        "payload_cost": {
+          "bytes": 21221,
+          "characters": 21177,
+          "sha256": "e7c00707908aa8fe2e4c51ef148344ce13314b441e3b6bc8b8a2871802749cb5"
+        },
+        "reasons": [
+          "selective_projection_unqualified",
+          "independent_recovery_unqualified"
+        ],
+        "reproducible": true,
+        "request_sha256": "725b3a87f0772ff1497944ce2650488388c891f94e5c51e28884b8e94871d9a1",
+        "rule_version": "apg.context-packing/v1",
+        "scope": "prospective planner only; synthetic task/role envelope",
+        "selected": [
+          "apgr:bash-language-profile"
+        ],
+        "source": "measured"
+      },
+      "scenario_id": "scenario-04",
+      "subset": "calibration",
+      "synthetic_inputs": false,
+      "synthetic_materialization": null
+    },
+    {
+      "arms": {
+        "adaptive": {
+          "authority": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "coverage": {
+            "reason": "no live channel trace",
+            "source": "unavailable",
+            "value": null
+          },
+          "cumulative": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "deliveries": [],
+          "exact_recovery": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "initial": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "late_acquisitions": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "missing_guidance_findings": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "producer_revisions": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "provider_native_bytes": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "quality_oracle": {
+            "assertions": "static dispatch succeeds cleanly; all canonical skills loaded via global root; no attempted destructive per-run projection"
+          },
+          "restart_required_incidents": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "retries": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "route": {
+            "binding": {
+              "allowed_tools": [
+                "view_file",
+                "replace_file_content",
+                "write_to_file",
+                "run_command"
+              ],
+              "binding_id": "binding-producer-03",
+              "roles": [
+                "Producer"
+              ]
+            },
+            "execution": "not_invoked",
+            "model_route": {
+              "reason": "no qualified live paired harness",
+              "source": "unavailable",
+              "value": null
+            },
+            "provider": "antigravity",
+            "provider_binding": {
+              "reason": "native selective projection unqualified",
+              "source": "unavailable",
+              "value": null
+            },
+            "requested_context_mode": "adaptive"
+          },
+          "task_outcome": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "tokens": {
+            "reason": "no direct provider token counter",
+            "source": "unavailable",
+            "value": null
+          }
+        },
+        "static": {
+          "authority": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "coverage": {
+            "reason": "no live channel trace",
+            "source": "unavailable",
+            "value": null
+          },
+          "cumulative": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "deliveries": [],
+          "exact_recovery": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "initial": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "late_acquisitions": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "missing_guidance_findings": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "producer_revisions": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "provider_native_bytes": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "quality_oracle": {
+            "assertions": "static dispatch succeeds cleanly; all canonical skills loaded via global root; no attempted destructive per-run projection"
+          },
+          "restart_required_incidents": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "retries": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "route": {
+            "binding": {
+              "allowed_tools": [
+                "view_file",
+                "replace_file_content",
+                "write_to_file",
+                "run_command"
+              ],
+              "binding_id": "binding-producer-03",
+              "roles": [
+                "Producer"
+              ]
+            },
+            "execution": "not_invoked",
+            "model_route": {
+              "reason": "no qualified live paired harness",
+              "source": "unavailable",
+              "value": null
+            },
+            "provider": "antigravity",
+            "provider_binding": {
+              "reason": "native selective projection unqualified",
+              "source": "unavailable",
+              "value": null
+            },
+            "requested_context_mode": "static"
+          },
+          "task_outcome": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "tokens": {
+            "reason": "no direct provider token counter",
+            "source": "unavailable",
+            "value": null
+          }
+        }
+      },
+      "mechanism": {
+        "components": [
+          {
+            "bytes": 3196,
+            "id": "standing",
+            "sha256": "f1270b1818cc157546f64e39f29c2e5c62133864efc393be9fdfcae34692e97e",
+            "source": "measured"
+          },
+          {
+            "bytes": 210,
+            "id": "task",
+            "sha256": "c6da048a1efea4df1ea793210e3cc1a9a53f8449eb6160e1661efb78a31980cc",
+            "source": "synthetic"
+          },
+          {
+            "bytes": 183,
+            "id": "roles",
+            "sha256": "fa00493e84e1378f82a243365d369975697787cd0a4936485bdd08fbc2009914",
+            "source": "synthetic"
+          }
+        ],
+        "content_identity": "87281aa5e84c5ea97555a475cc8f818660b85b4fbfe9d2dd97f9456c2607e72e",
+        "effective_mode": "static",
+        "facts": [
+          {
+            "kind": "language",
+            "value": "go"
+          }
+        ],
+        "mandatory_cost": {
+          "bytes": 3589,
+          "characters": 3589,
+          "sha256": "43f065b9e0f7ec8385458457920996de0982bd459160e9f7c061d1de89cb15ec"
+        },
+        "payload_cost": {
+          "bytes": 20861,
+          "characters": 20809,
+          "sha256": "253466c26444862a0b85716a9b4ff19f73126fb58384c86d97f8e3861d3debaf"
+        },
+        "reasons": [
+          "selective_projection_unqualified",
+          "independent_recovery_unqualified"
+        ],
+        "reproducible": true,
+        "request_sha256": "7792532f3dcbd2ee78d0f3927cebc1f1f94acaf1ad6c9553ec37c25a2f188440",
+        "rule_version": "apg.context-packing/v1",
+        "scope": "prospective planner only; synthetic task/role envelope",
+        "selected": [
+          "apgr:go-language-profile"
+        ],
+        "source": "measured"
+      },
+      "scenario_id": "scenario-05",
+      "subset": "calibration",
+      "synthetic_inputs": false,
+      "synthetic_materialization": null
+    },
+    {
+      "arms": {
+        "adaptive": {
+          "authority": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "coverage": {
+            "reason": "no live channel trace",
+            "source": "unavailable",
+            "value": null
+          },
+          "cumulative": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "deliveries": [],
+          "exact_recovery": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "initial": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "late_acquisitions": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "missing_guidance_findings": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "producer_revisions": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "provider_native_bytes": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "quality_oracle": {
+            "assertions": "server SQLite query handler passes integration tests cleanly",
+            "command": "go test ./cmd/server/...",
+            "expected_exit_code": 0
+          },
+          "restart_required_incidents": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "retries": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "route": {
+            "binding": {
+              "allowed_tools": [
+                "view_file",
+                "replace_file_content",
+                "write_to_file",
+                "run_command"
+              ],
+              "binding_id": "binding-producer-04",
+              "roles": [
+                "Producer"
+              ]
+            },
+            "execution": "not_invoked",
+            "model_route": {
+              "reason": "no qualified live paired harness",
+              "source": "unavailable",
+              "value": null
+            },
+            "provider": "codex",
+            "provider_binding": {
+              "reason": "native selective projection unqualified",
+              "source": "unavailable",
+              "value": null
+            },
+            "requested_context_mode": "adaptive"
+          },
+          "task_outcome": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "tokens": {
+            "reason": "no direct provider token counter",
+            "source": "unavailable",
+            "value": null
+          }
+        },
+        "static": {
+          "authority": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "coverage": {
+            "reason": "no live channel trace",
+            "source": "unavailable",
+            "value": null
+          },
+          "cumulative": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "deliveries": [],
+          "exact_recovery": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "initial": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "late_acquisitions": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "missing_guidance_findings": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "producer_revisions": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "provider_native_bytes": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "quality_oracle": {
+            "assertions": "server SQLite query handler passes integration tests cleanly",
+            "command": "go test ./cmd/server/...",
+            "expected_exit_code": 0
+          },
+          "restart_required_incidents": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "retries": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "route": {
+            "binding": {
+              "allowed_tools": [
+                "view_file",
+                "replace_file_content",
+                "write_to_file",
+                "run_command"
+              ],
+              "binding_id": "binding-producer-04",
+              "roles": [
+                "Producer"
+              ]
+            },
+            "execution": "not_invoked",
+            "model_route": {
+              "reason": "no qualified live paired harness",
+              "source": "unavailable",
+              "value": null
+            },
+            "provider": "codex",
+            "provider_binding": {
+              "reason": "native selective projection unqualified",
+              "source": "unavailable",
+              "value": null
+            },
+            "requested_context_mode": "static"
+          },
+          "task_outcome": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "tokens": {
+            "reason": "no direct provider token counter",
+            "source": "unavailable",
+            "value": null
+          }
+        }
+      },
+      "mechanism": {
+        "components": [
+          {
+            "bytes": 7698,
+            "id": "standing",
+            "sha256": "b7eb1ceb0d45e813cd1054f7a591630bae5041fd11a1d03342af71e5732f70bd",
+            "source": "measured"
+          },
+          {
+            "bytes": 264,
+            "id": "task",
+            "sha256": "5c75eb26bea78efc48a7836c23a27dde06ef8166c819b7a0d3bf27a31369e136",
+            "source": "synthetic"
+          },
+          {
+            "bytes": 183,
+            "id": "roles",
+            "sha256": "8e4e0ad7b392480291282fcf4b5be6d1b2ce180a89e5100d42c90b9e99b752c5",
+            "source": "synthetic"
+          }
+        ],
+        "content_identity": "46c45d3539f4c1adff0d17064020d83b7c3c20afeb9bd73e1eca1d945e26ce26",
+        "effective_mode": "static",
+        "facts": [
+          {
+            "kind": "language",
+            "value": "go"
+          }
+        ],
+        "mandatory_cost": {
+          "bytes": 8145,
+          "characters": 8145,
+          "sha256": "58306eea4b320253a90ba9288a2ae58d48bfd275b6402d9e281772dd291bcb2d"
+        },
+        "payload_cost": {
+          "bytes": 25417,
+          "characters": 25365,
+          "sha256": "b6a9bc067450b19faecb0cb6a06cd767b053b693ba51daf64e9f42a95b5362ed"
+        },
+        "reasons": [
+          "selective_projection_unqualified",
+          "independent_recovery_unqualified"
+        ],
+        "reproducible": true,
+        "request_sha256": "19020173869e7b1c5fdb2fddf0c7feb8f55715566d99be04c416d4e29ba0abfd",
+        "rule_version": "apg.context-packing/v1",
+        "scope": "prospective planner only; synthetic task/role envelope",
+        "selected": [
+          "apgr:go-language-profile"
+        ],
+        "source": "measured"
+      },
+      "scenario_id": "scenario-06",
+      "subset": "acceptance",
+      "synthetic_inputs": false,
+      "synthetic_materialization": null
+    },
+    {
+      "arms": {
+        "adaptive": {
+          "authority": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "coverage": {
+            "reason": "no live channel trace",
+            "source": "unavailable",
+            "value": null
+          },
+          "cumulative": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "deliveries": [],
+          "exact_recovery": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "initial": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "late_acquisitions": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "missing_guidance_findings": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "producer_revisions": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "provider_native_bytes": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "quality_oracle": {
+            "assertions": "planner rejects adaptive context plan due to mandatory doctrine overflow and falls back to qualified static transport with doctrine intact; zero silent doctrine truncation; no pre-launch dispatch abort"
+          },
+          "restart_required_incidents": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "retries": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "route": {
+            "binding": {
+              "allowed_tools": [
+                "view_file"
+              ],
+              "binding_id": "binding-reviewer-02",
+              "roles": [
+                "Work Review"
+              ]
+            },
+            "execution": "not_invoked",
+            "model_route": {
+              "reason": "no qualified live paired harness",
+              "source": "unavailable",
+              "value": null
+            },
+            "provider": "claude",
+            "provider_binding": {
+              "reason": "native selective projection unqualified",
+              "source": "unavailable",
+              "value": null
+            },
+            "requested_context_mode": "adaptive"
+          },
+          "task_outcome": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "tokens": {
+            "reason": "no direct provider token counter",
+            "source": "unavailable",
+            "value": null
+          }
+        },
+        "static": {
+          "authority": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "coverage": {
+            "reason": "no live channel trace",
+            "source": "unavailable",
+            "value": null
+          },
+          "cumulative": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "deliveries": [],
+          "exact_recovery": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "initial": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "late_acquisitions": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "missing_guidance_findings": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "producer_revisions": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "provider_native_bytes": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "quality_oracle": {
+            "assertions": "planner rejects adaptive context plan due to mandatory doctrine overflow and falls back to qualified static transport with doctrine intact; zero silent doctrine truncation; no pre-launch dispatch abort"
+          },
+          "restart_required_incidents": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "retries": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "route": {
+            "binding": {
+              "allowed_tools": [
+                "view_file"
+              ],
+              "binding_id": "binding-reviewer-02",
+              "roles": [
+                "Work Review"
+              ]
+            },
+            "execution": "not_invoked",
+            "model_route": {
+              "reason": "no qualified live paired harness",
+              "source": "unavailable",
+              "value": null
+            },
+            "provider": "claude",
+            "provider_binding": {
+              "reason": "native selective projection unqualified",
+              "source": "unavailable",
+              "value": null
+            },
+            "requested_context_mode": "static"
+          },
+          "task_outcome": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "tokens": {
+            "reason": "no direct provider token counter",
+            "source": "unavailable",
+            "value": null
+          }
+        }
+      },
+      "mechanism": {
+        "components": [
+          {
+            "bytes": 11071,
+            "id": "standing",
+            "sha256": "b8f7adaa54096479d561255ce02409af0710d55c9d964a4bea71b07344feea87",
+            "source": "measured"
+          },
+          {
+            "bytes": 168,
+            "id": "task",
+            "sha256": "7bebd530eed1909c8ddab94ca99f2663cebcb989d5a61dbc9eaf1f84320662c6",
+            "source": "synthetic"
+          },
+          {
+            "bytes": 130,
+            "id": "roles",
+            "sha256": "7d9a8eebe58eeb92eb05116b073788e5cc7b2d06fab774a465afddf7203313c7",
+            "source": "synthetic"
+          }
+        ],
+        "content_identity": "1a00a573d08eaa0c22019ffbe9a68198fdb5d001d264f5f2cea2425ff8c503c5",
+        "effective_mode": "static",
+        "facts": [
+          {
+            "kind": "language",
+            "value": "rust"
+          }
+        ],
+        "mandatory_cost": {
+          "bytes": 11369,
+          "characters": 11355,
+          "sha256": "30f8252846eb1f51e6439cb281791c58e6e780b163dd40f47072d39cc98f20c7"
+        },
+        "payload_cost": {
+          "bytes": 11369,
+          "characters": 11355,
+          "sha256": "30f8252846eb1f51e6439cb281791c58e6e780b163dd40f47072d39cc98f20c7"
+        },
+        "reasons": [
+          "mandatory_overflow",
+          "selective_projection_unqualified",
+          "independent_recovery_unqualified"
+        ],
+        "reproducible": true,
+        "request_sha256": "406715a4a63507797f6eca5dd2427eaddae8d3818ad7360dbdaa431155e34d57",
+        "rule_version": "apg.context-packing/v1",
+        "scope": "prospective planner only; synthetic task/role envelope",
+        "selected": [],
+        "source": "measured"
+      },
+      "scenario_id": "scenario-07",
+      "subset": "acceptance",
+      "synthetic_inputs": false,
+      "synthetic_materialization": null
+    },
+    {
+      "arms": {
+        "adaptive": {
+          "authority": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "coverage": {
+            "reason": "no live channel trace",
+            "source": "unavailable",
+            "value": null
+          },
+          "cumulative": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "deliveries": [],
+          "exact_recovery": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "initial": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "late_acquisitions": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "missing_guidance_findings": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "producer_revisions": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "provider_native_bytes": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "quality_oracle": {
+            "assertions": "both project: and apgr: skills are retained under explicit namespaces; zero silent shadowing; project skill ranked ahead of canonical"
+          },
+          "restart_required_incidents": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "retries": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "route": {
+            "binding": {
+              "allowed_tools": [
+                "view_file",
+                "replace_file_content",
+                "write_to_file",
+                "run_command"
+              ],
+              "binding_id": "binding-producer-05",
+              "roles": [
+                "Producer"
+              ]
+            },
+            "execution": "not_invoked",
+            "model_route": {
+              "reason": "no qualified live paired harness",
+              "source": "unavailable",
+              "value": null
+            },
+            "provider": "codex",
+            "provider_binding": {
+              "reason": "native selective projection unqualified",
+              "source": "unavailable",
+              "value": null
+            },
+            "requested_context_mode": "adaptive"
+          },
+          "task_outcome": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "tokens": {
+            "reason": "no direct provider token counter",
+            "source": "unavailable",
+            "value": null
+          }
+        },
+        "static": {
+          "authority": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "coverage": {
+            "reason": "no live channel trace",
+            "source": "unavailable",
+            "value": null
+          },
+          "cumulative": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "deliveries": [],
+          "exact_recovery": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "initial": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "late_acquisitions": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "missing_guidance_findings": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "producer_revisions": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "provider_native_bytes": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "quality_oracle": {
+            "assertions": "both project: and apgr: skills are retained under explicit namespaces; zero silent shadowing; project skill ranked ahead of canonical"
+          },
+          "restart_required_incidents": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "retries": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "route": {
+            "binding": {
+              "allowed_tools": [
+                "view_file",
+                "replace_file_content",
+                "write_to_file",
+                "run_command"
+              ],
+              "binding_id": "binding-producer-05",
+              "roles": [
+                "Producer"
+              ]
+            },
+            "execution": "not_invoked",
+            "model_route": {
+              "reason": "no qualified live paired harness",
+              "source": "unavailable",
+              "value": null
+            },
+            "provider": "codex",
+            "provider_binding": {
+              "reason": "native selective projection unqualified",
+              "source": "unavailable",
+              "value": null
+            },
+            "requested_context_mode": "static"
+          },
+          "task_outcome": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "tokens": {
+            "reason": "no direct provider token counter",
+            "source": "unavailable",
+            "value": null
+          }
+        }
+      },
+      "mechanism": {
+        "components": [
+          {
+            "bytes": 7698,
+            "id": "standing",
+            "sha256": "b7eb1ceb0d45e813cd1054f7a591630bae5041fd11a1d03342af71e5732f70bd",
+            "source": "measured"
+          },
+          {
+            "bytes": 246,
+            "id": "task",
+            "sha256": "3c56b08ea70e81780631960a2f8a6bd8809c504403e846871ef1fd0b4671b11d",
+            "source": "synthetic"
+          },
+          {
+            "bytes": 183,
+            "id": "roles",
+            "sha256": "47887540e9bf694cea5720d0375e73daa74d7bcd077ae17019bc78ea3aec899c",
+            "source": "synthetic"
+          }
+        ],
+        "content_identity": "0610053bc6521fca06cd78b263d51c2dd04291a8f18a4942cef1c7b5d249f394",
+        "effective_mode": "static",
+        "facts": [
+          {
+            "kind": "language",
+            "value": "go"
+          }
+        ],
+        "mandatory_cost": {
+          "bytes": 8127,
+          "characters": 8127,
+          "sha256": "c49c61173b3b43175256e63492443c9ebf1f75c2d9e9730ac15d1677b6197db0"
+        },
+        "payload_cost": {
+          "bytes": 25399,
+          "characters": 25347,
+          "sha256": "e0987a39f171977c315c9ea5f6d7ce81246f3df66f8afc58f958bdc368564556"
+        },
+        "reasons": [
+          "selective_projection_unqualified",
+          "independent_recovery_unqualified"
+        ],
+        "reproducible": true,
+        "request_sha256": "741c960768aead1cf7e9ebf7fb3b18f2df68d44e80820680ae5bf9797e0f7c52",
+        "rule_version": "apg.context-packing/v1",
+        "scope": "prospective planner only; synthetic task/role envelope",
+        "selected": [
+          "apgr:go-language-profile"
+        ],
+        "source": "measured"
+      },
+      "scenario_id": "scenario-08",
+      "subset": "acceptance",
+      "synthetic_inputs": true,
+      "synthetic_materialization": {
+        "body_bytes": 525,
+        "body_sha256": "4607e41ed55c9851f54b6e4ffa59f39f0cf1da2f7ff26380f1200db7b9433b5d",
+        "source": "synthetic",
+        "whole_bytes": 690,
+        "whole_sha256": "76192c9275bc2c26d4702bfcfbc3022cc13bd0806b1703f34024eba2ab9440b8"
+      }
+    },
+    {
+      "arms": {
+        "adaptive": {
+          "authority": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "coverage": {
+            "reason": "no live channel trace",
+            "source": "unavailable",
+            "value": null
+          },
+          "cumulative": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "deliveries": [],
+          "exact_recovery": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "initial": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "late_acquisitions": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "missing_guidance_findings": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "producer_revisions": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "provider_native_bytes": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "quality_oracle": {
+            "assertions": "canonical apgr: skill is suppressed; project: skill is delivered; replacement provenance is explicitly recorded in plan"
+          },
+          "restart_required_incidents": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "retries": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "route": {
+            "binding": {
+              "allowed_tools": [
+                "view_file",
+                "replace_file_content",
+                "write_to_file",
+                "run_command"
+              ],
+              "binding_id": "binding-producer-06",
+              "roles": [
+                "Producer"
+              ]
+            },
+            "execution": "not_invoked",
+            "model_route": {
+              "reason": "no qualified live paired harness",
+              "source": "unavailable",
+              "value": null
+            },
+            "provider": "codex",
+            "provider_binding": {
+              "reason": "native selective projection unqualified",
+              "source": "unavailable",
+              "value": null
+            },
+            "requested_context_mode": "adaptive"
+          },
+          "task_outcome": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "tokens": {
+            "reason": "no direct provider token counter",
+            "source": "unavailable",
+            "value": null
+          }
+        },
+        "static": {
+          "authority": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "coverage": {
+            "reason": "no live channel trace",
+            "source": "unavailable",
+            "value": null
+          },
+          "cumulative": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "deliveries": [],
+          "exact_recovery": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "initial": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "late_acquisitions": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "missing_guidance_findings": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "producer_revisions": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "provider_native_bytes": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "quality_oracle": {
+            "assertions": "canonical apgr: skill is suppressed; project: skill is delivered; replacement provenance is explicitly recorded in plan"
+          },
+          "restart_required_incidents": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "retries": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "route": {
+            "binding": {
+              "allowed_tools": [
+                "view_file",
+                "replace_file_content",
+                "write_to_file",
+                "run_command"
+              ],
+              "binding_id": "binding-producer-06",
+              "roles": [
+                "Producer"
+              ]
+            },
+            "execution": "not_invoked",
+            "model_route": {
+              "reason": "no qualified live paired harness",
+              "source": "unavailable",
+              "value": null
+            },
+            "provider": "codex",
+            "provider_binding": {
+              "reason": "native selective projection unqualified",
+              "source": "unavailable",
+              "value": null
+            },
+            "requested_context_mode": "static"
+          },
+          "task_outcome": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "tokens": {
+            "reason": "no direct provider token counter",
+            "source": "unavailable",
+            "value": null
+          }
+        }
+      },
+      "mechanism": {
+        "components": [
+          {
+            "bytes": 7698,
+            "id": "standing",
+            "sha256": "b7eb1ceb0d45e813cd1054f7a591630bae5041fd11a1d03342af71e5732f70bd",
+            "source": "measured"
+          },
+          {
+            "bytes": 293,
+            "id": "task",
+            "sha256": "518741b4f6c948876aefa35ff79cd2a99c886acf9748a723786c442362b7cdf5",
+            "source": "synthetic"
+          },
+          {
+            "bytes": 183,
+            "id": "roles",
+            "sha256": "dad63671b1cb2f06c6ff464b1a860a74371845a85a4b65c236f0bd3e1c842eff",
+            "source": "synthetic"
+          }
+        ],
+        "content_identity": "a2d70bc9b709b3957f404b3467315226fc62401cc619e3a42a73f48ff29320b9",
+        "effective_mode": "static",
+        "facts": [
+          {
+            "kind": "language",
+            "value": "go"
+          }
+        ],
+        "mandatory_cost": {
+          "bytes": 8174,
+          "characters": 8174,
+          "sha256": "b92f7b454f84325c57fb25a68c0301f5d41a05ca72cb9657300f6892bbdb7095"
+        },
+        "payload_cost": {
+          "bytes": 9056,
+          "characters": 9056,
+          "sha256": "d7812bef8f88e2d8c99bc0843b19b01dc0306b64eb8461aa04b2951f8504d761"
+        },
+        "reasons": [
+          "selective_projection_unqualified",
+          "independent_recovery_unqualified"
+        ],
+        "reproducible": true,
+        "request_sha256": "b0dc976f2cf4dc3678dec32aea29fc8016a3dd700c04671944a169e30082b51c",
+        "rule_version": "apg.context-packing/v1",
+        "scope": "prospective planner only; synthetic task/role envelope",
+        "selected": [
+          "project:go-language-profile"
+        ],
+        "source": "measured"
+      },
+      "scenario_id": "scenario-09",
+      "subset": "acceptance",
+      "synthetic_inputs": true,
+      "synthetic_materialization": {
+        "body_bytes": 525,
+        "body_sha256": "4607e41ed55c9851f54b6e4ffa59f39f0cf1da2f7ff26380f1200db7b9433b5d",
+        "source": "synthetic",
+        "whole_bytes": 690,
+        "whole_sha256": "76192c9275bc2c26d4702bfcfbc3022cc13bd0806b1703f34024eba2ab9440b8"
+      }
+    },
+    {
+      "arms": {
+        "adaptive": {
+          "authority": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "coverage": {
+            "reason": "no live channel trace",
+            "source": "unavailable",
+            "value": null
+          },
+          "cumulative": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "deliveries": [],
+          "exact_recovery": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "initial": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "late_acquisitions": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "missing_guidance_findings": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "producer_revisions": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "provider_native_bytes": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "quality_oracle": {
+            "assertions": "go-cmp integration test compiles and passes; acquired body SHA-256 matches canonical exactly; zero repo mutations outside tests/",
+            "command": "go test ./tests/...",
+            "expected_exit_code": 0
+          },
+          "restart_required_incidents": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "retries": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "route": {
+            "binding": {
+              "allowed_tools": [
+                "view_file",
+                "replace_file_content",
+                "write_to_file",
+                "run_command"
+              ],
+              "binding_id": "binding-producer-07",
+              "roles": [
+                "Producer"
+              ]
+            },
+            "execution": "not_invoked",
+            "model_route": {
+              "reason": "no qualified live paired harness",
+              "source": "unavailable",
+              "value": null
+            },
+            "provider": "codex",
+            "provider_binding": {
+              "reason": "native selective projection unqualified",
+              "source": "unavailable",
+              "value": null
+            },
+            "requested_context_mode": "adaptive"
+          },
+          "task_outcome": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "tokens": {
+            "reason": "no direct provider token counter",
+            "source": "unavailable",
+            "value": null
+          }
+        },
+        "static": {
+          "authority": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "coverage": {
+            "reason": "no live channel trace",
+            "source": "unavailable",
+            "value": null
+          },
+          "cumulative": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "deliveries": [],
+          "exact_recovery": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "initial": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "late_acquisitions": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "missing_guidance_findings": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "producer_revisions": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "provider_native_bytes": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "quality_oracle": {
+            "assertions": "go-cmp integration test compiles and passes; acquired body SHA-256 matches canonical exactly; zero repo mutations outside tests/",
+            "command": "go test ./tests/...",
+            "expected_exit_code": 0
+          },
+          "restart_required_incidents": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "retries": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "route": {
+            "binding": {
+              "allowed_tools": [
+                "view_file",
+                "replace_file_content",
+                "write_to_file",
+                "run_command"
+              ],
+              "binding_id": "binding-producer-07",
+              "roles": [
+                "Producer"
+              ]
+            },
+            "execution": "not_invoked",
+            "model_route": {
+              "reason": "no qualified live paired harness",
+              "source": "unavailable",
+              "value": null
+            },
+            "provider": "codex",
+            "provider_binding": {
+              "reason": "native selective projection unqualified",
+              "source": "unavailable",
+              "value": null
+            },
+            "requested_context_mode": "static"
+          },
+          "task_outcome": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "tokens": {
+            "reason": "no direct provider token counter",
+            "source": "unavailable",
+            "value": null
+          }
+        }
+      },
+      "mechanism": {
+        "components": [
+          {
+            "bytes": 7698,
+            "id": "standing",
+            "sha256": "b7eb1ceb0d45e813cd1054f7a591630bae5041fd11a1d03342af71e5732f70bd",
+            "source": "measured"
+          },
+          {
+            "bytes": 291,
+            "id": "task",
+            "sha256": "f00a2b8809598e106572b2b2156d8b73762e32fa3f762887117b8c07c08c1590",
+            "source": "synthetic"
+          },
+          {
+            "bytes": 183,
+            "id": "roles",
+            "sha256": "1c42a628faaf5efcaf7f0041f2e31509df2fe5b9ecf24e59eb81657ef729c925",
+            "source": "synthetic"
+          }
+        ],
+        "content_identity": "62ace759e0094172a64517f5ca8bade9168b252766d6bb78aa4318b592554859",
+        "effective_mode": "static",
+        "facts": [
+          {
+            "kind": "language",
+            "value": "go"
+          }
+        ],
+        "mandatory_cost": {
+          "bytes": 8172,
+          "characters": 8172,
+          "sha256": "2d9b049f1b4e31c3f2e47ecfe9d8d23823ddb6b57b6fe1630931185139ef09f6"
+        },
+        "payload_cost": {
+          "bytes": 25444,
+          "characters": 25392,
+          "sha256": "923d4fb393a558003dd8dcf2ec35f0409291e9e2d6802e76ac0cbd0f737d2560"
+        },
+        "reasons": [
+          "selective_projection_unqualified",
+          "independent_recovery_unqualified"
+        ],
+        "reproducible": true,
+        "request_sha256": "f59351eec5131c8a55a97bc6bc205f2f39103c2210a67e3aa4a5aae2cec2e106",
+        "rule_version": "apg.context-packing/v1",
+        "scope": "prospective planner only; synthetic task/role envelope",
+        "selected": [
+          "apgr:go-language-profile"
+        ],
+        "source": "measured"
+      },
+      "scenario_id": "scenario-10",
+      "subset": "acceptance",
+      "synthetic_inputs": false,
+      "synthetic_materialization": null
+    },
+    {
+      "arms": {
+        "adaptive": {
+          "authority": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "coverage": {
+            "reason": "no live channel trace",
+            "source": "unavailable",
+            "value": null
+          },
+          "cumulative": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "deliveries": [],
+          "exact_recovery": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "initial": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "late_acquisitions": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "missing_guidance_findings": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "producer_revisions": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "provider_native_bytes": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "quality_oracle": {
+            "assertions": "reviewer receives full body in MCP result payload without shell access; review findings reference test profile standards; zero git authority drift"
+          },
+          "restart_required_incidents": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "retries": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "route": {
+            "binding": {
+              "allowed_tools": [
+                "view_file",
+                "skill_search",
+                "skill_acquire",
+                "context_explain"
+              ],
+              "binding_id": "binding-reviewer-03",
+              "roles": [
+                "Work Review"
+              ]
+            },
+            "execution": "not_invoked",
+            "model_route": {
+              "reason": "no qualified live paired harness",
+              "source": "unavailable",
+              "value": null
+            },
+            "provider": "claude",
+            "provider_binding": {
+              "reason": "native selective projection unqualified",
+              "source": "unavailable",
+              "value": null
+            },
+            "requested_context_mode": "adaptive"
+          },
+          "task_outcome": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "tokens": {
+            "reason": "no direct provider token counter",
+            "source": "unavailable",
+            "value": null
+          }
+        },
+        "static": {
+          "authority": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "coverage": {
+            "reason": "no live channel trace",
+            "source": "unavailable",
+            "value": null
+          },
+          "cumulative": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "deliveries": [],
+          "exact_recovery": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "initial": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "late_acquisitions": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "missing_guidance_findings": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "producer_revisions": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "provider_native_bytes": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "quality_oracle": {
+            "assertions": "reviewer receives full body in MCP result payload without shell access; review findings reference test profile standards; zero git authority drift"
+          },
+          "restart_required_incidents": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "retries": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "route": {
+            "binding": {
+              "allowed_tools": [
+                "view_file",
+                "skill_search",
+                "skill_acquire",
+                "context_explain"
+              ],
+              "binding_id": "binding-reviewer-03",
+              "roles": [
+                "Work Review"
+              ]
+            },
+            "execution": "not_invoked",
+            "model_route": {
+              "reason": "no qualified live paired harness",
+              "source": "unavailable",
+              "value": null
+            },
+            "provider": "claude",
+            "provider_binding": {
+              "reason": "native selective projection unqualified",
+              "source": "unavailable",
+              "value": null
+            },
+            "requested_context_mode": "static"
+          },
+          "task_outcome": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "tokens": {
+            "reason": "no direct provider token counter",
+            "source": "unavailable",
+            "value": null
+          }
+        }
+      },
+      "mechanism": {
+        "components": [
+          {
+            "bytes": 11071,
+            "id": "standing",
+            "sha256": "b8f7adaa54096479d561255ce02409af0710d55c9d964a4bea71b07344feea87",
+            "source": "measured"
+          },
+          {
+            "bytes": 266,
+            "id": "task",
+            "sha256": "70b8bcb19bd50d06b02a26c979896fafb6525a11d0bb2f21e34939cfa3a8b197",
+            "source": "synthetic"
+          },
+          {
+            "bytes": 182,
+            "id": "roles",
+            "sha256": "56d58d6e0d6551918b193dbdbc60709b1229b41321225d946d8512cf8aa97c37",
+            "source": "synthetic"
+          }
+        ],
+        "content_identity": "7e37496ce58c3f33c6789aff61c2902b143ecccccdc13916e5438eacc0b8d5fd",
+        "effective_mode": "static",
+        "facts": [
+          {
+            "kind": "language",
+            "value": "go"
+          }
+        ],
+        "mandatory_cost": {
+          "bytes": 11519,
+          "characters": 11505,
+          "sha256": "9bb1632ab366e8369de63f71c024ddf7bd6871be150af1c0181cd3ce8411d47b"
+        },
+        "payload_cost": {
+          "bytes": 28791,
+          "characters": 28725,
+          "sha256": "faccddd6158882594527b4480b66c17dd83d06e06f11da468fd7cbd69d7c3f30"
+        },
+        "reasons": [
+          "selective_projection_unqualified",
+          "independent_recovery_unqualified"
+        ],
+        "reproducible": true,
+        "request_sha256": "2e21c041a85297ad453333568b601d580ae8978daad935189653f99ef200f0b9",
+        "rule_version": "apg.context-packing/v1",
+        "scope": "prospective planner only; synthetic task/role envelope",
+        "selected": [
+          "apgr:go-language-profile"
+        ],
+        "source": "measured"
+      },
+      "scenario_id": "scenario-11",
+      "subset": "acceptance",
+      "synthetic_inputs": false,
+      "synthetic_materialization": null
+    },
+    {
+      "arms": {
+        "adaptive": {
+          "authority": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "coverage": {
+            "reason": "no live channel trace",
+            "source": "unavailable",
+            "value": null
+          },
+          "cumulative": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "deliveries": [],
+          "exact_recovery": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "initial": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "late_acquisitions": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "missing_guidance_findings": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "producer_revisions": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "provider_native_bytes": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "quality_oracle": {
+            "assertions": "reviewer recovers skill body from pre-materialized snapshot using view_file without shell access; critique is delivered; zero git authority drift"
+          },
+          "restart_required_incidents": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "retries": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "route": {
+            "binding": {
+              "allowed_tools": [
+                "view_file"
+              ],
+              "binding_id": "binding-reviewer-04",
+              "roles": [
+                "Work Review"
+              ]
+            },
+            "execution": "not_invoked",
+            "model_route": {
+              "reason": "no qualified live paired harness",
+              "source": "unavailable",
+              "value": null
+            },
+            "provider": "claude",
+            "provider_binding": {
+              "reason": "native selective projection unqualified",
+              "source": "unavailable",
+              "value": null
+            },
+            "requested_context_mode": "adaptive"
+          },
+          "task_outcome": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "tokens": {
+            "reason": "no direct provider token counter",
+            "source": "unavailable",
+            "value": null
+          }
+        },
+        "static": {
+          "authority": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "coverage": {
+            "reason": "no live channel trace",
+            "source": "unavailable",
+            "value": null
+          },
+          "cumulative": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "deliveries": [],
+          "exact_recovery": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "initial": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "late_acquisitions": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "missing_guidance_findings": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "producer_revisions": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "provider_native_bytes": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "quality_oracle": {
+            "assertions": "reviewer recovers skill body from pre-materialized snapshot using view_file without shell access; critique is delivered; zero git authority drift"
+          },
+          "restart_required_incidents": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "retries": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "route": {
+            "binding": {
+              "allowed_tools": [
+                "view_file"
+              ],
+              "binding_id": "binding-reviewer-04",
+              "roles": [
+                "Work Review"
+              ]
+            },
+            "execution": "not_invoked",
+            "model_route": {
+              "reason": "no qualified live paired harness",
+              "source": "unavailable",
+              "value": null
+            },
+            "provider": "claude",
+            "provider_binding": {
+              "reason": "native selective projection unqualified",
+              "source": "unavailable",
+              "value": null
+            },
+            "requested_context_mode": "static"
+          },
+          "task_outcome": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "tokens": {
+            "reason": "no direct provider token counter",
+            "source": "unavailable",
+            "value": null
+          }
+        }
+      },
+      "mechanism": {
+        "components": [
+          {
+            "bytes": 11071,
+            "id": "standing",
+            "sha256": "b8f7adaa54096479d561255ce02409af0710d55c9d964a4bea71b07344feea87",
+            "source": "measured"
+          },
+          {
+            "bytes": 264,
+            "id": "task",
+            "sha256": "47c1639c432379f2084ef60b2ebd297e4a31f87716e46f8dcb604af672033807",
+            "source": "synthetic"
+          },
+          {
+            "bytes": 130,
+            "id": "roles",
+            "sha256": "920f442d2bea948aeaf167803ae5e85a781ad27b4e1a9b7f7b36e16a93c98119",
+            "source": "synthetic"
+          }
+        ],
+        "content_identity": "4efb3d31bb79a402f5282b17571fb57a74b3f70146d77b2c6b2be6a33951b3b2",
+        "effective_mode": "static",
+        "facts": [
+          {
+            "kind": "language",
+            "value": "go"
+          }
+        ],
+        "mandatory_cost": {
+          "bytes": 11465,
+          "characters": 11451,
+          "sha256": "88979191522c228c153c4dd79ef4ff2532d8e581f7a280bbc0cfe4c0ed0b0a60"
+        },
+        "payload_cost": {
+          "bytes": 28737,
+          "characters": 28671,
+          "sha256": "32b455a586c0f383e1734fe77bf86824f993277c1bc657e9a8d42878a68eecf3"
+        },
+        "reasons": [
+          "selective_projection_unqualified",
+          "independent_recovery_unqualified"
+        ],
+        "reproducible": true,
+        "request_sha256": "b2c2b48e1465b27b52e1cddd05b983256913ebcffd5618b75982ad72bbe1bf65",
+        "rule_version": "apg.context-packing/v1",
+        "scope": "prospective planner only; synthetic task/role envelope",
+        "selected": [
+          "apgr:go-language-profile"
+        ],
+        "source": "measured"
+      },
+      "scenario_id": "scenario-12",
+      "subset": "acceptance",
+      "synthetic_inputs": false,
+      "synthetic_materialization": null
+    },
+    {
+      "arms": {
+        "adaptive": {
+          "authority": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "coverage": {
+            "reason": "no live channel trace",
+            "source": "unavailable",
+            "value": null
+          },
+          "cumulative": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "deliveries": [],
+          "exact_recovery": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "initial": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "late_acquisitions": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "missing_guidance_findings": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "producer_revisions": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "provider_native_bytes": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "quality_oracle": {
+            "assertions": "dispatcher detects disabled/unavailable MCP before launch; cleanly chooses static context mode; zero attempted broken JSON-RPC connections"
+          },
+          "restart_required_incidents": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "retries": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "route": {
+            "binding": {
+              "allowed_tools": [
+                "view_file"
+              ],
+              "binding_id": "binding-reviewer-05",
+              "roles": [
+                "Work Review"
+              ]
+            },
+            "execution": "not_invoked",
+            "model_route": {
+              "reason": "no qualified live paired harness",
+              "source": "unavailable",
+              "value": null
+            },
+            "provider": "claude",
+            "provider_binding": {
+              "reason": "native selective projection unqualified",
+              "source": "unavailable",
+              "value": null
+            },
+            "requested_context_mode": "adaptive"
+          },
+          "task_outcome": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "tokens": {
+            "reason": "no direct provider token counter",
+            "source": "unavailable",
+            "value": null
+          }
+        },
+        "static": {
+          "authority": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "coverage": {
+            "reason": "no live channel trace",
+            "source": "unavailable",
+            "value": null
+          },
+          "cumulative": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "deliveries": [],
+          "exact_recovery": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "initial": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "late_acquisitions": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "missing_guidance_findings": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "producer_revisions": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "provider_native_bytes": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "quality_oracle": {
+            "assertions": "dispatcher detects disabled/unavailable MCP before launch; cleanly chooses static context mode; zero attempted broken JSON-RPC connections"
+          },
+          "restart_required_incidents": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "retries": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "route": {
+            "binding": {
+              "allowed_tools": [
+                "view_file"
+              ],
+              "binding_id": "binding-reviewer-05",
+              "roles": [
+                "Work Review"
+              ]
+            },
+            "execution": "not_invoked",
+            "model_route": {
+              "reason": "no qualified live paired harness",
+              "source": "unavailable",
+              "value": null
+            },
+            "provider": "claude",
+            "provider_binding": {
+              "reason": "native selective projection unqualified",
+              "source": "unavailable",
+              "value": null
+            },
+            "requested_context_mode": "static"
+          },
+          "task_outcome": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "tokens": {
+            "reason": "no direct provider token counter",
+            "source": "unavailable",
+            "value": null
+          }
+        }
+      },
+      "mechanism": {
+        "components": [
+          {
+            "bytes": 11071,
+            "id": "standing",
+            "sha256": "b8f7adaa54096479d561255ce02409af0710d55c9d964a4bea71b07344feea87",
+            "source": "measured"
+          },
+          {
+            "bytes": 204,
+            "id": "task",
+            "sha256": "aeb8e6c59677802a96de3b19a79ba6cbb4d84c815df075ecf282064243dd0e9f",
+            "source": "synthetic"
+          },
+          {
+            "bytes": 130,
+            "id": "roles",
+            "sha256": "69b35d78dbf4aeb21f801a432cd2fb4f5326a3a74f15d1aec7340a53c0f3dc70",
+            "source": "synthetic"
+          }
+        ],
+        "content_identity": "3079ec46b12975046a6c637de171a15245b790e77f293327c77c8713d505e2f3",
+        "effective_mode": "static",
+        "facts": [
+          {
+            "kind": "language",
+            "value": "go"
+          }
+        ],
+        "mandatory_cost": {
+          "bytes": 11405,
+          "characters": 11391,
+          "sha256": "852bf3ba2552f77a206e58462d5040d7a930a54cabc3f0f136d19a6a1001d5af"
+        },
+        "payload_cost": {
+          "bytes": 28677,
+          "characters": 28611,
+          "sha256": "0a2cefa98e49854b3dedc009e569e9f952b7e69ba20da6f6ab39c6c10d417808"
+        },
+        "reasons": [
+          "selective_projection_unqualified",
+          "independent_recovery_unqualified"
+        ],
+        "reproducible": true,
+        "request_sha256": "901e373dd5ae1df5a62531e43873905e18666db47956d7d37abb72237ba6f823",
+        "rule_version": "apg.context-packing/v1",
+        "scope": "prospective planner only; synthetic task/role envelope",
+        "selected": [
+          "apgr:go-language-profile"
+        ],
+        "source": "measured"
+      },
+      "scenario_id": "scenario-13",
+      "subset": "acceptance",
+      "synthetic_inputs": false,
+      "synthetic_materialization": null
+    },
+    {
+      "arms": {
+        "adaptive": {
+          "authority": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "coverage": {
+            "reason": "no live channel trace",
+            "source": "unavailable",
+            "value": null
+          },
+          "cumulative": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "deliveries": [],
+          "exact_recovery": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "initial": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "late_acquisitions": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "missing_guidance_findings": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "producer_revisions": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "provider_native_bytes": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "quality_oracle": {
+            "assertions": "in-band MCP acquisition delivers skill body to reviewer without repository writes; worktree, index, and HEAD remain strictly unchanged"
+          },
+          "restart_required_incidents": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "retries": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "route": {
+            "binding": {
+              "allowed_tools": [
+                "view_file",
+                "skill_search",
+                "skill_acquire",
+                "context_explain"
+              ],
+              "binding_id": "binding-reviewer-06",
+              "roles": [
+                "Work Review"
+              ]
+            },
+            "execution": "not_invoked",
+            "model_route": {
+              "reason": "no qualified live paired harness",
+              "source": "unavailable",
+              "value": null
+            },
+            "provider": "claude",
+            "provider_binding": {
+              "reason": "native selective projection unqualified",
+              "source": "unavailable",
+              "value": null
+            },
+            "requested_context_mode": "adaptive"
+          },
+          "task_outcome": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "tokens": {
+            "reason": "no direct provider token counter",
+            "source": "unavailable",
+            "value": null
+          }
+        },
+        "static": {
+          "authority": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "coverage": {
+            "reason": "no live channel trace",
+            "source": "unavailable",
+            "value": null
+          },
+          "cumulative": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "deliveries": [],
+          "exact_recovery": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "initial": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "late_acquisitions": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "missing_guidance_findings": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "producer_revisions": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "provider_native_bytes": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "quality_oracle": {
+            "assertions": "in-band MCP acquisition delivers skill body to reviewer without repository writes; worktree, index, and HEAD remain strictly unchanged"
+          },
+          "restart_required_incidents": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "retries": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "route": {
+            "binding": {
+              "allowed_tools": [
+                "view_file",
+                "skill_search",
+                "skill_acquire",
+                "context_explain"
+              ],
+              "binding_id": "binding-reviewer-06",
+              "roles": [
+                "Work Review"
+              ]
+            },
+            "execution": "not_invoked",
+            "model_route": {
+              "reason": "no qualified live paired harness",
+              "source": "unavailable",
+              "value": null
+            },
+            "provider": "claude",
+            "provider_binding": {
+              "reason": "native selective projection unqualified",
+              "source": "unavailable",
+              "value": null
+            },
+            "requested_context_mode": "static"
+          },
+          "task_outcome": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "tokens": {
+            "reason": "no direct provider token counter",
+            "source": "unavailable",
+            "value": null
+          }
+        }
+      },
+      "mechanism": {
+        "components": [
+          {
+            "bytes": 11071,
+            "id": "standing",
+            "sha256": "b8f7adaa54096479d561255ce02409af0710d55c9d964a4bea71b07344feea87",
+            "source": "measured"
+          },
+          {
+            "bytes": 228,
+            "id": "task",
+            "sha256": "fdeadf4de7f48e08e1e7056b76cc02c44c2a57fbae0e643fcbd4c9a304c8f959",
+            "source": "synthetic"
+          },
+          {
+            "bytes": 182,
+            "id": "roles",
+            "sha256": "cafa607d357844598a289d39d30fe677d53780f17af9b343d45e91dd8d4350b9",
+            "source": "synthetic"
+          }
+        ],
+        "content_identity": "35e1253d87d1e20f9f34a45143b2bcaf240faa97cb24716b4c6e3cf7505a6945",
+        "effective_mode": "static",
+        "facts": [
+          {
+            "kind": "language",
+            "value": "go"
+          }
+        ],
+        "mandatory_cost": {
+          "bytes": 11481,
+          "characters": 11467,
+          "sha256": "f35de24f463c92bad032cdad5dede9f72741e1028503af96368849fc6af8528a"
+        },
+        "payload_cost": {
+          "bytes": 28753,
+          "characters": 28687,
+          "sha256": "c5d8df53b49fcc56057785c505853f355ca8763b87712352164849a2f7eb6e0f"
+        },
+        "reasons": [
+          "selective_projection_unqualified",
+          "independent_recovery_unqualified"
+        ],
+        "reproducible": true,
+        "request_sha256": "2d8be1f681d81588c7d2922ab2a2e50157e9870e1e350fd58380fb03ff1a7782",
+        "rule_version": "apg.context-packing/v1",
+        "scope": "prospective planner only; synthetic task/role envelope",
+        "selected": [
+          "apgr:go-language-profile"
+        ],
+        "source": "measured"
+      },
+      "scenario_id": "scenario-14",
+      "subset": "acceptance",
+      "synthetic_inputs": false,
+      "synthetic_materialization": null
+    },
+    {
+      "arms": {
+        "adaptive": {
+          "authority": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "coverage": {
+            "reason": "no live channel trace",
+            "source": "unavailable",
+            "value": null
+          },
+          "cumulative": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "deliveries": [],
+          "exact_recovery": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "initial": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "late_acquisitions": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "missing_guidance_findings": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "producer_revisions": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "provider_native_bytes": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "quality_oracle": {
+            "assertions": "component builds cleanly; operator claude settings remain unmutated; zero global discovery pollution",
+            "command": "npm run build --prefix frontend",
+            "expected_exit_code": 0
+          },
+          "restart_required_incidents": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "retries": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "route": {
+            "binding": {
+              "allowed_tools": [
+                "view_file",
+                "replace_file_content",
+                "write_to_file",
+                "run_command"
+              ],
+              "binding_id": "binding-producer-08",
+              "roles": [
+                "Producer"
+              ]
+            },
+            "execution": "not_invoked",
+            "model_route": {
+              "reason": "no qualified live paired harness",
+              "source": "unavailable",
+              "value": null
+            },
+            "provider": "claude",
+            "provider_binding": {
+              "reason": "native selective projection unqualified",
+              "source": "unavailable",
+              "value": null
+            },
+            "requested_context_mode": "adaptive"
+          },
+          "task_outcome": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "tokens": {
+            "reason": "no direct provider token counter",
+            "source": "unavailable",
+            "value": null
+          }
+        },
+        "static": {
+          "authority": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "coverage": {
+            "reason": "no live channel trace",
+            "source": "unavailable",
+            "value": null
+          },
+          "cumulative": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "deliveries": [],
+          "exact_recovery": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "initial": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "late_acquisitions": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "missing_guidance_findings": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "producer_revisions": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "provider_native_bytes": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "quality_oracle": {
+            "assertions": "component builds cleanly; operator claude settings remain unmutated; zero global discovery pollution",
+            "command": "npm run build --prefix frontend",
+            "expected_exit_code": 0
+          },
+          "restart_required_incidents": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "retries": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "route": {
+            "binding": {
+              "allowed_tools": [
+                "view_file",
+                "replace_file_content",
+                "write_to_file",
+                "run_command"
+              ],
+              "binding_id": "binding-producer-08",
+              "roles": [
+                "Producer"
+              ]
+            },
+            "execution": "not_invoked",
+            "model_route": {
+              "reason": "no qualified live paired harness",
+              "source": "unavailable",
+              "value": null
+            },
+            "provider": "claude",
+            "provider_binding": {
+              "reason": "native selective projection unqualified",
+              "source": "unavailable",
+              "value": null
+            },
+            "requested_context_mode": "static"
+          },
+          "task_outcome": {
+            "reason": "No repository-owned qualified live paired provider harness; subject task output unavailable",
+            "source": "unavailable",
+            "value": null
+          },
+          "tokens": {
+            "reason": "no direct provider token counter",
+            "source": "unavailable",
+            "value": null
+          }
+        }
+      },
+      "mechanism": {
+        "components": [
+          {
+            "bytes": 11071,
+            "id": "standing",
+            "sha256": "b8f7adaa54096479d561255ce02409af0710d55c9d964a4bea71b07344feea87",
+            "source": "measured"
+          },
+          {
+            "bytes": 276,
+            "id": "task",
+            "sha256": "94b65e2735704952110fb5724ef7e5854b2555497fc135ea61a7bd8552a86f0e",
+            "source": "synthetic"
+          },
+          {
+            "bytes": 183,
+            "id": "roles",
+            "sha256": "8dd300837b1dff6cdcd57875b22dd3565d30d1d3158f3f8f4ea73713a0e8d2f8",
+            "source": "synthetic"
+          }
+        ],
+        "content_identity": "d9c6bf39bc714841fda374d2fd4d7c8a44919567d1b2f77ef1b7c4b9e5843261",
+        "effective_mode": "static",
+        "facts": [
+          {
+            "kind": "language",
+            "value": "typescript"
+          }
+        ],
+        "mandatory_cost": {
+          "bytes": 11530,
+          "characters": 11516,
+          "sha256": "48a84bcd77142ec1d16fdf5115188b460c0a9f20eff2023e38cb7f5d515f474b"
+        },
+        "payload_cost": {
+          "bytes": 23133,
+          "characters": 23101,
+          "sha256": "e2640b61f8ca80a82d93054abf25b19e644f0a8ad1baac6af9296fa1039b78d8"
+        },
+        "reasons": [
+          "selective_projection_unqualified",
+          "independent_recovery_unqualified"
+        ],
+        "reproducible": true,
+        "request_sha256": "650edbc31b43c13e42a44c2478727e456592465f5a4e85a1d1f28c1ea496899b",
+        "rule_version": "apg.context-packing/v1",
+        "scope": "prospective planner only; synthetic task/role envelope",
+        "selected": [
+          "apgr:typescript-language-profile"
+        ],
+        "source": "measured"
+      },
+      "scenario_id": "scenario-15",
+      "subset": "acceptance",
+      "synthetic_inputs": false,
+      "synthetic_materialization": null
+    }
+  ],
+  "scenario15": "contingent/unavailable",
+  "schema_version": "apg.h-evaluation/v1",
+  "seal_sha256": "46c500f6e785bccdd7c3477033754a0eab450002153ed01a5fcd7747abcfc2eb"
+}

@@ -485,3 +485,419 @@ def test_govulncheck_mixed_repeated_osvs() -> None:
     assert "module-package=2" in detail
     assert "module_package_osv=1" in detail
 
+
+def _make_sample_baseline(
+    tmp_path: Path,
+    findings: list[dict] | None = None,
+    *,
+    schema: str = "apg-ruff-baseline-v2",
+    origin_commit: str = "129a29590b0ab73f3d5a72afff8cbd406accce63",
+    origin_tree: str = "0f5381be0a7bab42da533861c0657cbf593538d9",
+    carry_forward_commit: str = "a7159723478b1f8029d938212b83ce0a6bd6ea25",
+    carry_forward_tree: str = "d5f8b7cfe98ff1ca074c248e5121810ef9be3f39",
+    description: str = "sample baseline description",
+) -> tuple[Path, str]:
+    import hashlib
+
+    if findings is None:
+        findings = [
+            {
+                "path": "sample.py",
+                "code": "F401",
+                "message": "`os` imported but unused",
+                "row": 10,
+                "col": 1,
+                "context_hash": hashlib.sha256(b"import os").hexdigest(),
+            }
+        ]
+    data = {
+        "schema": schema,
+        "origin_commit": origin_commit,
+        "origin_tree": origin_tree,
+        "carry_forward_commit": carry_forward_commit,
+        "carry_forward_tree": carry_forward_tree,
+        "description": description,
+        "findings": findings,
+    }
+    raw = json.dumps(data, indent=2, sort_keys=True) + "\n"
+    digest = hashlib.sha256(raw.encode("utf-8")).hexdigest()
+    path = tmp_path / "ruff_baseline.json"
+    path.write_text(raw, encoding="utf-8")
+    return path, digest
+
+
+def _make_test_source_file(tmp_path: Path, filename: str = "sample.py", line_10: str = "import os") -> Path:
+    lines = [f"# line {i}" for i in range(1, 31)]
+    lines[9] = line_10
+    lines[14] = "x = 1"
+    lines[19] = "print(x)"
+    lines[24] = "import sys"
+    path = tmp_path / filename
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    return path
+
+
+def test_ruff_baseline_ratchet_v2_exact_and_negative_controls(tmp_path, monkeypatch) -> None:
+    import hashlib
+    from tools.ci import pre_review_evaluation as eval_mod
+
+    findings_baseline = [
+        {
+            "path": "sample.py",
+            "code": "F401",
+            "message": "`os` imported but unused",
+            "row": 10,
+            "col": 1,
+            "context_hash": hashlib.sha256(b"import os").hexdigest(),
+        },
+        {
+            # Sharp discriminating control for missing file:
+            # Baseline entry has context_hash sha256(b"") at missing.py:10.
+            # Old code would hash "" on missing file and grandfather this entry.
+            # New code returns None on unreadable/missing file and must fail closed.
+            "path": "missing.py",
+            "code": "F401",
+            "message": "`os` imported but unused",
+            "row": 10,
+            "col": 1,
+            "context_hash": hashlib.sha256(b"").hexdigest(),
+        },
+        {
+            # Sharp discriminating control for out-of-range row:
+            # Baseline entry has context_hash sha256(b"") at sample.py:999.
+            # Old code would hash "" on out-of-range row and grandfather this entry.
+            # New code returns None on invalid/out-of-range row and must fail closed.
+            "path": "sample.py",
+            "code": "F401",
+            "message": "`os` imported but unused",
+            "row": 999,
+            "col": 1,
+            "context_hash": hashlib.sha256(b"").hexdigest(),
+        },
+    ]
+    path, digest = _make_sample_baseline(tmp_path, findings=findings_baseline)
+    monkeypatch.setattr(eval_mod, "CI_ROOT", tmp_path)
+
+    import apg_public_release_v013 as v013
+    monkeypatch.setattr(v013, "V013_RUFF_BASELINE_DIGEST", digest)
+    monkeypatch.setattr(v013, "V013_RUFF_BASELINE_COUNT", 3)
+
+    src_file = _make_test_source_file(tmp_path, "sample.py", "import os")
+    check = Check("ruff", ("ruff",), cwd=tmp_path, policy="ruff")
+
+    # 1. Exact approved finding passes (real file on disk; no injected context_hash)
+    findings_exact = [
+        {
+            "filename": str(src_file),
+            "code": "F401",
+            "message": "`os` imported but unused",
+            "location": {"row": 10, "column": 1},
+        }
+    ]
+    status, detail, classification = eval_mod.evaluate(check, 1, json.dumps(findings_exact))
+    assert (status, classification) == ("passed", "passed")
+    assert "grandfathered=1" in detail
+    assert "unresolved=0" in detail
+
+    # 2. Current finding reduction passes without editing the baseline
+    status, detail, classification = eval_mod.evaluate(check, 0, "[]")
+    assert (status, classification) == ("passed", "passed")
+    assert "unresolved=0" in detail
+
+    # 3. Same path/code/message at a different location (row 25) fails as policy-finding
+    findings_moved_row = [
+        {
+            "filename": str(src_file),
+            "code": "F401",
+            "message": "`os` imported but unused",
+            "location": {"row": 25, "column": 1},
+        }
+    ]
+    status, detail, classification = eval_mod.evaluate(check, 1, json.dumps(findings_moved_row))
+    assert (status, classification) == ("failed", "policy-finding")
+    assert "unresolved=1" in detail
+
+    # 4. Exact row but source line content changed on disk fails as policy-finding
+    _make_test_source_file(tmp_path, "sample.py", "import math")
+    status, detail, classification = eval_mod.evaluate(check, 1, json.dumps(findings_exact))
+    assert (status, classification) == ("failed", "policy-finding")
+    assert "unresolved=1" in detail
+    _make_test_source_file(tmp_path, "sample.py", "import os")  # restore
+
+    # 5. Extra duplicate at a new location fails as policy-finding
+    findings_dup = findings_exact + findings_moved_row
+    status, detail, classification = eval_mod.evaluate(check, 1, json.dumps(findings_dup))
+    assert (status, classification) == ("failed", "policy-finding")
+    assert "grandfathered=1" in detail
+    assert "unresolved=1" in detail
+
+    # 6. Scanner-supplied fake context_hash cannot override APGR-derived hash:
+    # 6a. Source line changed on disk (import math), but scanner row injects baseline hash -> fails
+    _make_test_source_file(tmp_path, "sample.py", "import math")
+    findings_fake_override = [
+        {
+            "filename": str(src_file),
+            "code": "F401",
+            "message": "`os` imported but unused",
+            "location": {"row": 10, "column": 1},
+            "context_hash": hashlib.sha256(b"import os").hexdigest(),
+        }
+    ]
+    status, detail, classification = eval_mod.evaluate(check, 1, json.dumps(findings_fake_override))
+    assert (status, classification) == ("failed", "policy-finding")
+    assert "unresolved=1" in detail
+    _make_test_source_file(tmp_path, "sample.py", "import os")  # restore
+
+    # 6b. Source line on disk matches, but scanner row injects bogus hash ("0"*64) -> ignored, passes
+    findings_bogus_ignored = [
+        {
+            "filename": str(src_file),
+            "code": "F401",
+            "message": "`os` imported but unused",
+            "location": {"row": 10, "column": 1},
+            "context_hash": "0" * 64,
+        }
+    ]
+    status, detail, classification = eval_mod.evaluate(check, 1, json.dumps(findings_bogus_ignored))
+    assert (status, classification) == ("passed", "passed")
+    assert "grandfathered=1" in detail
+    assert "unresolved=0" in detail
+
+    # 7. Missing source file fails closed:
+    # Even though baseline contains (missing.py, F401, 10, 1, sha256(b""), msg),
+    # missing file returns None and fails closed instead of hashing ""
+    findings_missing_file = [
+        {
+            "filename": str(tmp_path / "missing.py"),
+            "code": "F401",
+            "message": "`os` imported but unused",
+            "location": {"row": 10, "column": 1},
+        }
+    ]
+    status, detail, classification = eval_mod.evaluate(check, 1, json.dumps(findings_missing_file))
+    assert (status, classification) == ("failed", "policy-finding")
+    assert "unresolved=1" in detail
+
+    # 8. Out-of-range row fails closed:
+    # 8a. Row 999 beyond file length 30:
+    # Even though baseline contains (sample.py, F401, 999, 1, sha256(b""), msg),
+    # out-of-range row returns None and fails closed instead of hashing ""
+    findings_out_of_range = [
+        {
+            "filename": str(src_file),
+            "code": "F401",
+            "message": "`os` imported but unused",
+            "location": {"row": 999, "column": 1},
+        }
+    ]
+    status, detail, classification = eval_mod.evaluate(check, 1, json.dumps(findings_out_of_range))
+    assert (status, classification) == ("failed", "policy-finding")
+    assert "unresolved=1" in detail
+
+    # 8b. Row 0 invalid (1-indexed)
+    findings_row_zero = [
+        {
+            "filename": str(src_file),
+            "code": "F401",
+            "message": "`os` imported but unused",
+            "location": {"row": 0, "column": 1},
+        }
+    ]
+    status, detail, classification = eval_mod.evaluate(check, 1, json.dumps(findings_row_zero))
+    assert (status, classification) == ("failed", "policy-finding")
+    assert "unresolved=1" in detail
+
+    # 9. New unbaselined rule at valid row (row 15, x = 1) fails as policy-finding
+    findings_new = [
+        {
+            "filename": str(src_file),
+            "code": "F841",
+            "message": "unused variable",
+            "location": {"row": 15, "column": 5},
+        }
+    ]
+    status, detail, classification = eval_mod.evaluate(check, 1, json.dumps(findings_new))
+    assert (status, classification) == ("failed", "policy-finding")
+    assert "unresolved=1" in detail
+
+
+def test_ruff_baseline_tampering_fails_closed_even_with_zero_findings(tmp_path, monkeypatch) -> None:
+    import hashlib
+    from tools.ci import pre_review_evaluation as eval_mod
+
+    path, digest = _make_sample_baseline(tmp_path)
+    monkeypatch.setattr(eval_mod, "CI_ROOT", tmp_path)
+
+    import apg_public_release_v013 as v013
+    monkeypatch.setattr(v013, "V013_RUFF_BASELINE_DIGEST", digest)
+    monkeypatch.setattr(v013, "V013_RUFF_BASELINE_COUNT", 1)
+
+    check = Check("ruff", ("ruff",), cwd=tmp_path, policy="ruff")
+
+    # Control: baseline passes with zero findings
+    status, _, classification = eval_mod.evaluate(check, 0, "[]")
+    assert (status, classification) == ("passed", "passed")
+
+    # Negative control 1: mutate one baseline entry without changing digest authority -> fails tool-failure
+    mutated_doc = json.loads(path.read_text(encoding="utf-8"))
+    mutated_doc["findings"][0]["code"] = "F841"
+    path.write_text(json.dumps(mutated_doc, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    status, detail, classification = eval_mod.evaluate(check, 0, "[]")
+    assert (status, classification) == ("failed", "tool-failure")
+    assert "digest mismatch" in detail
+
+    # Negative control 2: append one baseline entry -> fails tool-failure
+    _make_sample_baseline(tmp_path)
+    appended_doc = json.loads(path.read_text(encoding="utf-8"))
+    appended_doc["findings"].append({
+        "path": "other.py",
+        "code": "E731",
+        "message": "lambda",
+        "row": 1,
+        "col": 1,
+        "context_hash": hashlib.sha256(b"f = lambda: None").hexdigest(),
+    })
+    path.write_text(json.dumps(appended_doc, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    status, detail, classification = eval_mod.evaluate(check, 0, "[]")
+    assert (status, classification) == ("failed", "tool-failure")
+    assert "digest mismatch" in detail
+
+    # Negative control 3: change provenance commit/tree -> fails tool-failure
+    _make_sample_baseline(tmp_path)
+    tampered_doc = json.loads(path.read_text(encoding="utf-8"))
+    tampered_doc["origin_commit"] = "0" * 40
+    path.write_text(json.dumps(tampered_doc, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    status, detail, classification = eval_mod.evaluate(check, 0, "[]")
+    assert (status, classification) == ("failed", "tool-failure")
+    assert "digest mismatch" in detail
+
+    # Negative control 4: missing baseline file -> fails tool-failure
+    path.unlink()
+    status, detail, classification = eval_mod.evaluate(check, 0, "[]")
+    assert (status, classification) == ("failed", "tool-failure")
+    assert "does not exist" in detail
+
+
+def test_pyflakes_evaluates_against_v2_baseline(tmp_path, monkeypatch) -> None:
+    import hashlib
+    from tools.ci import pre_review_evaluation as eval_mod
+
+    findings_baseline = [
+        {
+            "path": "sample.py",
+            "code": "F401",
+            "message": "`os` imported but unused",
+            "row": 10,
+            "col": 1,
+            "context_hash": hashlib.sha256(b"import os").hexdigest(),
+        },
+        {
+            "path": "missing.py",
+            "code": "F401",
+            "message": "`os` imported but unused",
+            "row": 10,
+            "col": 1,
+            "context_hash": hashlib.sha256(b"").hexdigest(),
+        },
+        {
+            "path": "sample.py",
+            "code": "F401",
+            "message": "`os` imported but unused",
+            "row": 999,
+            "col": 1,
+            "context_hash": hashlib.sha256(b"").hexdigest(),
+        },
+    ]
+    path, digest = _make_sample_baseline(tmp_path, findings=findings_baseline)
+    monkeypatch.setattr(eval_mod, "CI_ROOT", tmp_path)
+
+    import apg_public_release_v013 as v013
+    monkeypatch.setattr(v013, "V013_RUFF_BASELINE_DIGEST", digest)
+    monkeypatch.setattr(v013, "V013_RUFF_BASELINE_COUNT", 3)
+
+    src_file = _make_test_source_file(tmp_path, "sample.py", "import os")
+    check = Check("pyflakes", ("ruff",), cwd=tmp_path, policy="pyflakes")
+
+    # 1. Exact finding passes without injected context_hash
+    findings = [
+        {
+            "filename": str(src_file),
+            "code": "F401",
+            "message": "`os` imported but unused",
+            "location": {"row": 10, "column": 1},
+        }
+    ]
+    status, detail, classification = eval_mod.evaluate(check, 1, json.dumps(findings))
+    assert (status, classification) == ("passed", "passed")
+    assert "grandfathered=1" in detail
+    assert "unresolved=0" in detail
+
+    # 2. Injected bogus context_hash is ignored, derived from disk, passes
+    findings_bogus = [
+        {
+            "filename": str(src_file),
+            "code": "F401",
+            "message": "`os` imported but unused",
+            "location": {"row": 10, "column": 1},
+            "context_hash": "0" * 64,
+        }
+    ]
+    status, detail, classification = eval_mod.evaluate(check, 1, json.dumps(findings_bogus))
+    assert (status, classification) == ("passed", "passed")
+    assert "grandfathered=1" in detail
+
+    # 3. Changed source line fails even if scanner supplies baseline hash
+    _make_test_source_file(tmp_path, "sample.py", "import math")
+    findings_injected = [
+        {
+            "filename": str(src_file),
+            "code": "F401",
+            "message": "`os` imported but unused",
+            "location": {"row": 10, "column": 1},
+            "context_hash": hashlib.sha256(b"import os").hexdigest(),
+        }
+    ]
+    status, detail, classification = eval_mod.evaluate(check, 1, json.dumps(findings_injected))
+    assert (status, classification) == ("failed", "policy-finding")
+    assert "unresolved=1" in detail
+    _make_test_source_file(tmp_path, "sample.py", "import os")
+
+    # 4. Missing file fails closed (even with sha256(b"") baseline entry)
+    findings_missing = [
+        {
+            "filename": str(tmp_path / "missing.py"),
+            "code": "F401",
+            "message": "`os` imported but unused",
+            "location": {"row": 10, "column": 1},
+        }
+    ]
+    status, detail, classification = eval_mod.evaluate(check, 1, json.dumps(findings_missing))
+    assert (status, classification) == ("failed", "policy-finding")
+    assert "unresolved=1" in detail
+
+    # 5. Out of range row fails closed (even with sha256(b"") baseline entry)
+    findings_oor = [
+        {
+            "filename": str(src_file),
+            "code": "F401",
+            "message": "`os` imported but unused",
+            "location": {"row": 999, "column": 1},
+        }
+    ]
+    status, detail, classification = eval_mod.evaluate(check, 1, json.dumps(findings_oor))
+    assert (status, classification) == ("failed", "policy-finding")
+    assert "unresolved=1" in detail
+
+    # 6. Unbaselined rule at row 20 fails as policy-finding
+    findings_unbaselined = [
+        {
+            "filename": str(src_file),
+            "code": "F821",
+            "message": "undefined name `x`",
+            "location": {"row": 20, "column": 5},
+        }
+    ]
+    status, detail, classification = eval_mod.evaluate(check, 1, json.dumps(findings_unbaselined))
+    assert (status, classification) == ("failed", "policy-finding")
+    assert "unresolved=1" in detail
+

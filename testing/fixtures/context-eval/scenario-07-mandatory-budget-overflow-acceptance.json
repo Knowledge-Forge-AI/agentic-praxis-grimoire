@@ -1,0 +1,81 @@
+{
+  "scenario_id": "scenario-07",
+  "name": "Mandatory Budget Overflow Rejection",
+  "subset": "acceptance",
+  "cohort": "correctness_failure_only_cohort",
+  "phase": "APG159A",
+  "task_input": {
+    "instruction": "Review Rust source file under an artificially tiny byte budget.",
+    "task_authority": "read_only",
+    "mutation_scope": []
+  },
+  "provider": "claude",
+  "role_binding": {
+    "binding_id": "binding-reviewer-02",
+    "roles": [
+      "Work Review"
+    ],
+    "allowed_tools": [
+      "view_file"
+    ]
+  },
+  "repository_evidence": {
+    "files": [
+      "src/main.rs"
+    ],
+    "primary_language": "rust",
+    "dependency_facts": {}
+  },
+  "mandatory_instructions": {
+    "provider_file": "claude/CLAUDE.md",
+    "provider_instruction_bytes": 11071,
+    "mandatory_doctrine_bytes": 2500,
+    "total_mandatory_context_bytes": 13571
+  },
+  "budget": {
+    "scope": "apgr_controlled_initial_bytes",
+    "max_initial_controlled_bytes": 1000
+  },
+  "expected_outcome": {
+    "mode": "adaptive",
+    "resolve_status": "fallback_to_static",
+    "rejection_reason": "BUDGET_EXCEEDED_BY_MANDATORY_DOCTRINE",
+    "effective_transport": "static",
+    "mandatory_doctrine_preserved": true,
+    "silent_truncation_permitted": false,
+    "quality_oracle": {
+      "assertions": "planner rejects adaptive context plan due to mandatory doctrine overflow and falls back to qualified static transport with doctrine intact; zero silent doctrine truncation; no pre-launch dispatch abort"
+    }
+  },
+  "status": "frozen_corrected",
+  "value_sources": {
+    "mandatory_instructions.provider_instruction_bytes": {
+      "source": "measured",
+      "basis": "wc -c claude/CLAUDE.md at the APG159A workspace tree"
+    },
+    "mandatory_instructions.mandatory_doctrine_bytes": {
+      "source": "estimate",
+      "basis": "Planning placeholder. The non-negotiable doctrine slice is not yet a separately measurable artifact; V0130-F must replace this with a measured value before any savings computation uses it."
+    },
+    "mandatory_instructions.total_mandatory_context_bytes": {
+      "source": "estimate",
+      "basis": "Sum of measured provider_instruction_bytes and estimated mandatory_doctrine_bytes."
+    },
+    "budget.max_initial_controlled_bytes": {
+      "source": "declared",
+      "basis": "Frozen scenario budget parameter chosen by this correction revision."
+    }
+  },
+  "value_source_vocabulary": "measured | synthetic | estimate | declared | unavailable (see context-eval-metrics-and-oracles.json)",
+  "correction_revision": {
+    "revision": "APG160-CORR2",
+    "supersedes": "APG159A pre-launch abort expectation (M2 manager authority)",
+    "nature": "pre-implementation correction aligning static fallback with doctrine intact"
+  },
+  "f_accounting_correction": {
+    "revision": "F-CONTEXT1",
+    "owner": "f-context1-accounting.json",
+    "historical_fields": "mandatory_instructions and value_sources retain the earlier freeze; their estimates are superseded for F packing by measured mandatory_cost in the correction owner",
+    "qualification": "prospective fixture only; normal effective transport remains static; no H benefit claim"
+  }
+}
