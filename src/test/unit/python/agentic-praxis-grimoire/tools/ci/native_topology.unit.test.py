@@ -149,6 +149,14 @@ def _native_doc() -> Doc:
     }
 
 
+def test_diagnostics_output_must_stay_under_runner_temp() -> None:
+    doc = _native_doc()
+    qualify = next(step for step in doc["jobs"][LANES[0]]["steps"] if step.get("id") == "qualify")
+    qualify["run"] += 'python3 tools/ci/native_lane.py qualify --diagnostics "/tmp/escape"\n'
+    errors = validate_native_qualification(doc, PATH)
+    assert any("output path must be under RUNNER_TEMP" in error for error in errors), errors
+
+
 def _step(doc: Doc, job: str, needle: str) -> Doc:
     return next(s for s in doc["jobs"][job]["steps"]
                 if needle in s.get("run", "") or str(s.get("uses", "")).startswith(needle) or s.get("id") == needle)

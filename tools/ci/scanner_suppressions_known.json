@@ -674,18 +674,6 @@
       "rule": "E402"
     },
     {
-      "context": "sha256:178cbe9f4efec9ed489dafb128707631d0b2cb4e331ef8bf406e8bd6dbf4a8fd",
-      "disposition": "accepted",
-      "expiry": "2026-12-31",
-      "kind": "noqa",
-      "line": 413,
-      "owner": "APGR static analysis",
-      "path": "src/test/dispatcher/test_agent_phase_instruction_route.py",
-      "reason": "Grandfathered pre-existing suppression from v0.13.0 base commit",
-      "review": "APGR-V0130-STAGING-BLOCKERS1 pre_final review; Decision Finding B4",
-      "rule": "E402, F401"
-    },
-    {
       "context": "sha256:ad70f557cdeb2c912e344c51bda00f7cbfebeb1a1e8b7dd369663a205a665db1",
       "disposition": "accepted",
       "expiry": "2026-12-31",
@@ -1761,18 +1749,6 @@
       "line": 20,
       "owner": "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_project_skills_core.unit.test.py",
       "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_project_skills_core.unit.test.py",
-      "reason": "Import follows repository-local module-path initialization; moving it before bootstrap changes isolated execution/discovery.",
-      "review": "APGR-V0110-READINESS4 pre_final review; Decision C",
-      "rule": "E402"
-    },
-    {
-      "context": "sha256:93ed309dca3d794c36fe0bf01e86d24eb5e48e1dcd3da40151b518cb1615e596",
-      "disposition": "accepted",
-      "expiry": "2026-12-31",
-      "kind": "noqa",
-      "line": 23,
-      "owner": "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_public_release.unit.test.py",
-      "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_public_release.unit.test.py",
       "reason": "Import follows repository-local module-path initialization; moving it before bootstrap changes isolated execution/discovery.",
       "review": "APGR-V0110-READINESS4 pre_final review; Decision C",
       "rule": "E402"

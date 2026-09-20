@@ -8,19 +8,20 @@ import os
 import platform
 import re
 import shutil
+import signal
 import subprocess
 import sys
 import tempfile
 from pathlib import Path
 from typing import Any
 
-ROOT = Path(__file__).resolve().parents[2]
-sys.path[:0] = [str(ROOT), str(ROOT / "libexec")]
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "libexec"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from tools.ci.native_diagnostics import bounded, command_diagnostics, command_message, failure_record, sanitize
 from tools.ci.native_seal import (
     CANONICAL_TARGETS,
     IDENTITY_SCHEMA,
     REQUIRED_LANES,
-    SealError,
     build_consumer_receipt,
     build_lane_seal,
     canonical_json,
@@ -29,21 +30,48 @@ from tools.ci.native_seal import (
     write_github_output,
 )
 
+ROOT = Path(__file__).resolve().parents[2]
 EXPECTED_REPO = "Knowledge-Forge-AI/agentic-praxis-grimoire"
 EXPECTED_REPO_ID = "1306002537"
 RELEASE_GO_VERSION = "go1.26.9"
+COMMAND_TIMEOUT_SECONDS = 45 * 60
 
 
 class LaneError(ValueError):
     """A native precondition, child process or smoke check failed."""
 
 
+class LaneCommandError(LaneError):
+    """A child failure with sanitized, bounded stdout and stderr evidence."""
+
+    def __init__(self, diagnostics: dict[str, Any]) -> None:
+        self.diagnostics = diagnostics
+        super().__init__(command_message(diagnostics))
+
+
 def _run(args: list[str], *, cwd: Path = ROOT, allow_failure: bool = False) -> subprocess.CompletedProcess[str]:
     environment = dict(os.environ, GOTOOLCHAIN="local", PYTHONDONTWRITEBYTECODE="1")
-    result = subprocess.run(args, cwd=cwd, env=environment, capture_output=True,
-                            text=True, timeout=7200, check=False)
+    with subprocess.Popen(args, cwd=cwd, env=environment, stdout=subprocess.PIPE,
+                          stderr=subprocess.PIPE, text=True, start_new_session=True) as child:
+        try:
+            stdout, stderr = child.communicate(timeout=COMMAND_TIMEOUT_SECONDS)
+        except subprocess.TimeoutExpired as error:
+            # Go test binaries share this new process group, so kill them too.
+            try:
+                os.killpg(child.pid, signal.SIGKILL)
+            except ProcessLookupError:
+                pass  # The whole group has already exited.
+            partial_stdout: str | bytes | None
+            partial_stderr: str | bytes | None
+            try:
+                partial_stdout, partial_stderr = child.communicate(timeout=5)
+            except subprocess.TimeoutExpired as drain_error:
+                # A descendant that escaped the group may still hold a pipe.
+                partial_stdout, partial_stderr = drain_error.stdout, drain_error.stderr
+            raise LaneCommandError(command_diagnostics(args, None, partial_stdout, partial_stderr, environment)) from error
+        result = subprocess.CompletedProcess(args, child.returncode, stdout, stderr)
     if result.returncode and not allow_failure:
-        raise LaneError(f"{Path(args[0]).name} {args[1:3]} failed ({result.returncode}): {result.stderr[-2000:]}")
+        raise LaneCommandError(command_diagnostics(args, result.returncode, result.stdout, result.stderr, environment))
     return result
 
 
@@ -99,7 +127,7 @@ def _verify_native_host(spec: dict[str, str]) -> dict[str, str]:
     actual_os, actual_arch = platform.system().lower(), aliases.get(platform.machine().lower())
     runner_os = _required("RUNNER_OS").lower().replace("macos", "darwin")
     runner_arch = aliases.get(_required("RUNNER_ARCH").lower())
-    if (actual_os, actual_arch) != (spec["system"], spec["arch"]) or (runner_os, runner_arch) != (actual_os, actual_arch):
+    if actual_arch is None or (actual_os, actual_arch) != (spec["system"], spec["arch"]) or (runner_os, runner_arch) != (actual_os, actual_arch):
         raise LaneError("host system/architecture mismatch")
     if any(name in os.environ for name in ("GOOS", "GOARCH")):
         raise LaneError("GOOS/GOARCH override forbidden")
@@ -222,6 +250,32 @@ def run_consumer(lane: str, bundle_dir: Path, output_path: Path) -> dict[str, An
                                   "npm_install_smoke", "bundle_seal_verified"), "passed"), output_path)
 
 
+def _diagnostics_directory(path: Path, output: Path) -> Path:
+    check_containment(path, "diagnostics")
+    resolved, lane_output = path.resolve(), output.resolve()
+    if resolved.is_relative_to(lane_output) or lane_output.is_relative_to(resolved):
+        raise LaneError("diagnostics and qualification output directories must be disjoint")
+    return path
+
+
+def _report_failure(error: Exception, args: argparse.Namespace, diagnostics: Path | None) -> None:
+    message = str(error) if isinstance(error, LaneCommandError) else bounded(sanitize(str(error)))[0]
+    print(f"native lane failed: {message}", file=sys.stderr)
+    if diagnostics is not None:
+        try:
+            # Revalidate at the write boundary as well as before qualification.
+            _diagnostics_directory(diagnostics, args.output)
+            diagnostics.mkdir(parents=True, exist_ok=True)
+            destination = diagnostics / f"{args.lane}-failure.json"
+            check_containment(destination, "diagnostics file")
+            if destination.is_symlink():
+                raise LaneError("diagnostics file must not be a symlink")
+            details = error.diagnostics if isinstance(error, LaneCommandError) else None
+            destination.write_bytes(canonical_json(failure_record(error, args.lane, details)))
+        except Exception as write_error:
+            print(f"native lane diagnostics write failed: {bounded(sanitize(str(write_error)))[0]}", file=sys.stderr)
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="command", required=True)
@@ -232,16 +286,23 @@ def main(argv: list[str] | None = None) -> int:
             command.add_argument("--lane", required=True, choices=REQUIRED_LANES)
         if name == "consumer":
             command.add_argument("--bundle", required=True, type=Path)
+        if name == "qualify":
+            command.add_argument("--diagnostics", type=Path)
     args = parser.parse_args(argv)
+    diagnostics = None
     try:
         if args.command == "guard":
             run_guard(args.output)
         elif args.command == "qualify":
+            if args.diagnostics is not None:
+                diagnostics = _diagnostics_directory(args.diagnostics, args.output)
             run_qualify(args.lane, args.output)
         else:
             run_consumer(args.lane, args.bundle, args.output)
-    except (LaneError, SealError, OSError, ValueError, subprocess.SubprocessError) as error:
-        print(f"native lane failed: {error}", file=sys.stderr)
+    except Exception as error:
+        # This CLI boundary records unexpected adapter errors and remains nonzero.
+        # KeyboardInterrupt/SystemExit and runner cancellation still propagate.
+        _report_failure(error, args, diagnostics)
         return 1
     return 0
 

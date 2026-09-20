@@ -253,8 +253,13 @@ def test_gate_archive_checks_connect_all_fourteen_downloads(tmp_path, gh, monkey
         (evidence / REQUIRED_LANES[0] / "proof.txt").write_bytes(b"changed")
     elif mutation == "extra-download":
         (evidence / "duplicate-lane").mkdir()
-    call = lambda: VERIFY_INPUTS(evidence, na.context_from_env(),
-                                {lane: bindings[lane] for lane in REQUIRED_LANES}, bindings[assembly.BUNDLE_ARTIFACT_NAME])
+    def call() -> None:
+        VERIFY_INPUTS(
+            evidence,
+            na.context_from_env(),
+            {lane: bindings[lane] for lane in REQUIRED_LANES},
+            bindings[assembly.BUNDLE_ARTIFACT_NAME],
+        )
     if mutation:
         with pytest.raises((gate.GateError, na.ArtifactError)):
             call()

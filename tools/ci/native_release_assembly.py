@@ -21,10 +21,10 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
 
-ROOT = Path(__file__).resolve().parents[2]
-for _path in (ROOT, ROOT / "libexec"):
-    if str(_path) not in sys.path:
-        sys.path.insert(0, str(_path))
+if str(Path(__file__).resolve().parents[2]) not in sys.path:
+    sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+if str(Path(__file__).resolve().parents[2] / "libexec") not in sys.path:
+    sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "libexec"))
 
 import apg_distribution_candidate as candidate
 import apg_go_buildinfo as buildinfo
@@ -47,6 +47,8 @@ from tools.ci.native_seal import (
     verify_lane_seal,
     write_github_output,
 )
+
+ROOT = Path(__file__).resolve().parents[2]
 
 SBOM_POLICY = ROOT / "release/ci/sbom_policy.json"
 SCAN_SCHEMA = "apg-sbom-scan-v1"

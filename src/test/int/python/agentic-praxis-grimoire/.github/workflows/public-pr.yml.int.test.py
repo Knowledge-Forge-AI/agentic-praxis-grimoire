@@ -100,7 +100,7 @@ def test_all_shipped_workflows_structural_assertion() -> None:
 
     # 2. release.yml structural assertion
     doc_rel = parse_yaml_or_json(RELEASE_WORKFLOW_PATH.read_text(encoding="utf-8"))
-    assert doc_rel["name"] == "Publish Python distribution"
+    assert doc_rel["name"] == "Publish Python distribution (v0.13 provenance blocked)"
     assert isinstance(doc_rel.get("jobs"), dict)
     assert doc_rel.get("permissions") == {}
     assert "release" in doc_rel.get("on", {})
@@ -108,6 +108,40 @@ def test_all_shipped_workflows_structural_assertion() -> None:
 
     # 3. Structural and topology validation via existing ci_topology tool
     assert validate_all_workflows() == []
+
+
+def test_release_publication_keeps_unsatisfiable_provenance_guard() -> None:
+    doc = parse_yaml_or_json(RELEASE_WORKFLOW_PATH.read_text())
+    steps = doc["jobs"]["publish"]["steps"]
+    assert [step["name"] for step in steps] == [
+        "Download and verify exact GitHub Release assets",
+        "Verify merged source, PR approval, and workflow checks",
+        "Publish verified distributions to PyPI",
+    ]
+    verification = steps[1]
+    assert "if" not in verification and not verification.get("continue-on-error", False)
+    lines = verification["run"].splitlines()
+    assert "# v0.13 publication is knowingly unsatisfiable for PR-native bundles:" in lines
+    assert '[[ "$manifest_source_commit" == "$merged_commit" ]] || exit 1' in lines
+    assert '[[ "$manifest_source_tree" == "$merged_tree" ]] || exit 1' in lines
+    assert steps[-1]["uses"].startswith("pypa/gh-action-pypi-publish@")
+
+
+def test_native_failure_diagnostics_upload_is_bound_to_failed_qualify() -> None:
+    doc = parse_yaml_or_json((ROOT / ".github/workflows/native-qualification.yml").read_text())
+    for lane in ("native-darwin-arm64", "native-linux-x64", "native-linux-arm64"):
+        steps = doc["jobs"][lane]["steps"]
+        qualify = next(step for step in steps if step.get("id") == "qualify")
+        assert '--diagnostics "$RUNNER_TEMP/lane-diagnostics"' in qualify["run"]
+        uploads = [step for step in steps if step.get("with", {}).get("name") == f"{lane}-failure-diagnostics"]
+        assert len(uploads) == 1
+        upload = uploads[0]
+        assert steps.index(upload) == steps.index(qualify) + 1
+        assert upload["if"] == "${{ failure() && steps.qualify.outcome == 'failure' }}"
+        assert upload["uses"] == "actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f"
+        assert upload["with"] == {"name": f"{lane}-failure-diagnostics",
+                                  "path": "${{ runner.temp }}/lane-diagnostics",
+                                  "retention-days": 14, "if-no-files-found": "error"}
 
 
 def test_native_jobs_own_nix_qualification() -> None:

@@ -3,18 +3,18 @@
 from __future__ import annotations
 
 import subprocess
+import sys
 from pathlib import Path
 
 import pytest
 
 from src.test.apg_test_support import repository_root
 
-REPOSITORY_ROOT = repository_root(__file__)
-import sys
-
-sys.path.insert(0, str(REPOSITORY_ROOT / "libexec"))
+sys.path.insert(0, str(repository_root(__file__) / "libexec"))
 
 import apg_go_buildinfo as buildinfo
+
+REPOSITORY_ROOT = repository_root(__file__)
 
 
 def test_validate_synthetic_elf_and_macho_targets(tmp_path: Path) -> None:
