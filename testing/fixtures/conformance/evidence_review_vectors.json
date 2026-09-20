@@ -1,0 +1,56 @@
+{
+  "categories": [
+    "correctness",
+    "contract_violation",
+    "security",
+    "scope",
+    "evidence",
+    "clarity"
+  ],
+  "disposition_actions": [
+    "accept",
+    "amend",
+    "reject",
+    "defer"
+  ],
+  "disposition_bases": [
+    "accepted_authority",
+    "canonical_evidence",
+    "scope_owner",
+    "none"
+  ],
+  "review_outcomes": [
+    "reviewed_with_no_findings",
+    "reviewed_with_findings",
+    "unreviewable"
+  ],
+  "sample_disposition": {
+    "action": "amend",
+    "basis": "accepted_authority",
+    "finding_id": "F-001",
+    "rationale": "Corrected per ADR 0066 specification"
+  },
+  "sample_finding": {
+    "category": "contract_violation",
+    "file_path": "phase/request.go",
+    "finding_id": "F-001",
+    "line_end": 45,
+    "line_start": 42,
+    "severity": "blocking",
+    "summary": "Request V2 must reject execution_mode"
+  },
+  "sample_receipt": {
+    "archive_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "completed_at": "2026-09-17T00:00:00Z",
+    "phase_id": "APG150",
+    "receipt_id": "rcpt-run-001",
+    "run_id": "run-20260917-001",
+    "terminal_status": "completed"
+  },
+  "schema": "apgr-conformance-evidence-review-v1",
+  "severities": [
+    "blocking",
+    "substantive",
+    "advisory"
+  ]
+}

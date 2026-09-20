@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+import hashlib
 import sys
 
 import pytest
@@ -147,3 +148,126 @@ def test_start_discovers_project_configuration(tmp_path: Path) -> None:
     assert config.resolve_outbox_root(
         start=nested, apgr_home=tmp_path / "missing-home"
     ) == selected
+
+
+@pytest.mark.parametrize("body, diagnostic", (
+    ('dispatcher = "command"', "dispatcher configuration must be a TOML table"),
+    ('[dispatcher]\ncommand = "run"', "unsupported dispatcher configuration key"),
+    ('[dispatcher]\nrouting = []', "dispatcher.routing configuration must be a TOML table"),
+    ('[dispatcher.routing]\nprovider = "custom"', "unsupported routing configuration key"),
+    ('[dispatcher.routing]\nexecution_mode = 7', "execution_mode must be a non-empty string"),
+    ('[dispatcher.routing]\nexecution_mode = ""', "execution_mode must be a non-empty string"),
+    ('[dispatcher.routing]\nexecution_mode = "unknown"', "unsupported execution_mode"),
+))
+def test_routing_schema_refuses_invalid_values(tmp_path, body, diagnostic):
+    path = tmp_path / "config.toml"
+    path.write_text(body, encoding="utf-8")
+    with pytest.raises(config.ConfigError, match=diagnostic):
+        config.load_config(path)
+
+
+@pytest.mark.parametrize("body", ("", "[dispatcher]", "[dispatcher.routing]"))
+def test_empty_optional_routing_tables_fall_through(tmp_path, body):
+    project = tmp_path / "project"
+    project_config = project / ".apgr/config.toml"
+    project_config.parent.mkdir(parents=True)
+    project_config.write_text(body, encoding="utf-8")
+    global_home = tmp_path / "global"
+    global_home.mkdir()
+    global_config = global_home / "config.toml"
+    global_config.write_text(body, encoding="utf-8")
+
+    result = config.resolve_execution_mode(project_root=project, apgr_home=global_home)
+    assert result.execution_mode == "dynamic"
+    assert result.winner.source_type == "default"
+    assert [item.source_type for item in result.provenance_chain] == [
+        "project_config", "global_config", "default"
+    ]
+    assert [item.is_winner for item in result.provenance_chain] == [False, False, True]
+    assert [item.precedence_rank for item in result.provenance_chain] == [2, 3, 4]
+    for item, path in zip(result.provenance_chain, (project_config, global_config)):
+        assert item.resolved_mode == ""
+        assert item.source_path == str(path)
+        assert item.content_digest == hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+@pytest.mark.parametrize("mode", config.ROUTING_MODES)
+def test_supported_modes_have_explicit_and_file_provenance(tmp_path, mode):
+    project = tmp_path / "project"
+    path = project / ".apgr/config.toml"
+    path.parent.mkdir(parents=True)
+    path.write_text(f'[dispatcher.routing]\nexecution_mode = "{mode}"\n', encoding="utf-8")
+    assert config.load_config(path) == {"dispatcher": {"routing": {"execution_mode": mode}}}
+    # A project winner prevents a malformed lower-precedence config from being read.
+    global_home = tmp_path / "global"
+    global_home.mkdir()
+    (global_home / "config.toml").write_text("malformed = [", encoding="utf-8")
+    result = config.resolve_execution_mode(project_root=project, apgr_home=global_home)
+    assert result.execution_mode == mode
+    assert result.provenance_chain == (result.winner,)
+    assert result.winner.as_dict() == {
+        "source_type": "project_config", "source_path": str(path),
+        "content_digest": hashlib.sha256(path.read_bytes()).hexdigest(),
+        "resolved_mode": mode, "is_winner": True, "precedence_rank": 2,
+    }
+    path.write_text("also malformed = [", encoding="utf-8")
+    explicit = config.resolve_execution_mode(mode, project_root=project, apgr_home=global_home)
+    assert explicit.execution_mode == mode
+    assert explicit.provenance_chain == (explicit.winner,)
+    assert explicit.winner.as_dict() == {
+        "source_type": "cli", "source_path": None, "content_digest": None,
+        "resolved_mode": mode, "is_winner": True, "precedence_rank": 1,
+    }
+
+
+def test_routing_global_winner_discovery_and_home_aliases(tmp_path):
+    project = tmp_path / "project"
+    nested = project / "nested"
+    nested.mkdir(parents=True)
+    (project / ".git").mkdir()
+    path = project / ".apgr/config.toml"
+    path.parent.mkdir()
+    path.write_text("[dispatcher.routing]\n", encoding="utf-8")
+    global_home = tmp_path / "global"
+    global_home.mkdir()
+    global_config = global_home / "config.toml"
+    global_config.write_text('[dispatcher.routing]\nexecution_mode = "codex_only"\n', encoding="utf-8")
+    for alias in ("cli_home", "apgr_home", "global_home"):
+        result = config.resolve_execution_mode(start=nested, **{alias: global_home})
+        assert result.execution_mode == "codex_only"
+        assert [item.is_winner for item in result.provenance_chain] == [False, True]
+        assert result.winner.as_dict() == {
+            "source_type": "global_config", "source_path": str(global_config),
+            "content_digest": hashlib.sha256(global_config.read_bytes()).hexdigest(),
+            "resolved_mode": "codex_only", "is_winner": True, "precedence_rank": 3,
+        }
+    path.unlink()
+    assert config.resolve_execution_mode(project_root=project, cli_home=global_home,
+        apgr_home=tmp_path / "ignored", global_home=tmp_path / "also-ignored").execution_mode == "codex_only"
+    global_config.unlink()
+    result = config.resolve_execution_mode(project_root=project, apgr_home=global_home)
+    assert result.provenance_chain == (result.winner,)
+    assert result.winner.source_type == "default"
+
+
+def test_invalid_explicit_mode_and_malformed_project_do_not_fall_back(tmp_path):
+    with pytest.raises(config.ConfigError, match="unsupported execution_mode"):
+        config.resolve_execution_mode("unknown")
+    path = tmp_path / ".apgr/config.toml"
+    path.parent.mkdir()
+    path.write_text('[dispatcher.routing]\nexecution_mode = "unknown"\n', encoding="utf-8")
+    with pytest.raises(config.ConfigError, match="unsupported execution_mode"):
+        config.resolve_execution_mode(project_root=tmp_path, apgr_home=tmp_path / "global")
+
+
+def test_empty_project_config_preserves_global_outbox_and_binary_path_is_refused(tmp_path):
+    project = tmp_path / "project"
+    path = project / ".apgr/config.toml"
+    path.parent.mkdir(parents=True)
+    path.write_text("[dispatcher]\n", encoding="utf-8")
+    global_home = tmp_path / "global"
+    value = tmp_path / "outbox"
+    write_config(global_home / "config.toml", value)
+    assert config.resolve_outbox_root(project_root=project, global_home=global_home) == value
+    with pytest.raises(config.ConfigError, match="not a valid path"):
+        config.load_config(b"/binary-path")

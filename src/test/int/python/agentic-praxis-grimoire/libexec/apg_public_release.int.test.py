@@ -11,6 +11,7 @@ import shutil
 import sys
 import tempfile
 import unittest
+from src.test.apg_public_release_cases import HistoricalValidationCaseMixin
 
 
 FIXTURE_PATH = Path(__file__).parent.parent / "bin" / "apg-public-release.int.test.py"
@@ -972,6 +973,11 @@ class APGPublicReleaseV03PolicyTests(unittest.TestCase):
         )[1]
         self.assertEqual(result.returncode, 1)
         self.assertIn("bin/git-diff-report", result.stderr)
+
+
+
+class HistoricalValidationTests(HistoricalValidationCaseMixin, unittest.TestCase):
+    """Real Git history and validation-copy boundaries."""
 
 
 if __name__ == "__main__":

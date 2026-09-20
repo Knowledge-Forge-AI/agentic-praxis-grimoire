@@ -1,0 +1,158 @@
+{
+  "invalid_vectors": [
+    {
+      "expected_error": "request schema must be agent-phase-request-v2",
+      "id": "invalid_wrong_schema",
+      "payload": {
+        "phase_type": "implementation_testing",
+        "prompt": "Test prompt",
+        "schema": "agent-phase-request-v1"
+      }
+    },
+    {
+      "expected_error": "request schema must be agent-phase-request-v2",
+      "id": "invalid_unknown_schema",
+      "payload": {
+        "phase_type": "implementation_testing",
+        "prompt": "Test prompt",
+        "schema": "unknown-schema-v2"
+      }
+    },
+    {
+      "expected_error": "unsupported phase_type: invalid_phase",
+      "id": "invalid_wrong_phase_type",
+      "payload": {
+        "phase_type": "invalid_phase",
+        "prompt": "Test prompt",
+        "schema": "agent-phase-request-v2"
+      }
+    },
+    {
+      "expected_error": "prompt must be non-empty",
+      "id": "invalid_empty_prompt",
+      "payload": {
+        "phase_type": "implementation_testing",
+        "prompt": "",
+        "schema": "agent-phase-request-v2"
+      }
+    },
+    {
+      "expected_error": "prompt must be non-empty",
+      "id": "invalid_whitespace_prompt",
+      "payload": {
+        "phase_type": "implementation_testing",
+        "prompt": "   \n\t  ",
+        "schema": "agent-phase-request-v2"
+      }
+    },
+    {
+      "expected_error": "unsupported request key for agent-phase-request-v2: execution_mode",
+      "id": "invalid_extra_execution_mode",
+      "payload": {
+        "execution_mode": "normal",
+        "phase_type": "implementation_testing",
+        "prompt": "Test prompt",
+        "schema": "agent-phase-request-v2"
+      }
+    },
+    {
+      "expected_error": "unsupported request key for agent-phase-request-v2: constraints",
+      "id": "invalid_extra_constraints",
+      "payload": {
+        "constraints": [
+          "no_network"
+        ],
+        "phase_type": "implementation_testing",
+        "prompt": "Test prompt",
+        "schema": "agent-phase-request-v2"
+      }
+    },
+    {
+      "expected_error": "unsupported request key for agent-phase-request-v2: provider",
+      "id": "invalid_extra_provider",
+      "payload": {
+        "phase_type": "implementation_testing",
+        "prompt": "Test prompt",
+        "provider": "codex",
+        "schema": "agent-phase-request-v2"
+      }
+    },
+    {
+      "expected_error": "unsupported request key for agent-phase-request-v2: extra_key",
+      "id": "invalid_extra_unknown_key",
+      "payload": {
+        "extra_key": "unexpected",
+        "phase_type": "implementation_testing",
+        "prompt": "Test prompt",
+        "schema": "agent-phase-request-v2"
+      }
+    },
+    {
+      "expected_error": "request keys must be exactly ['phase_type', 'prompt', 'schema']",
+      "id": "invalid_missing_prompt",
+      "payload": {
+        "phase_type": "implementation_testing",
+        "schema": "agent-phase-request-v2"
+      }
+    },
+    {
+      "expected_error": "request keys must be exactly ['phase_type', 'prompt', 'schema']",
+      "id": "invalid_missing_phase_type",
+      "payload": {
+        "prompt": "Test prompt",
+        "schema": "agent-phase-request-v2"
+      }
+    },
+    {
+      "expected_error": "request keys must be exactly ['phase_type', 'prompt', 'schema']",
+      "id": "invalid_missing_schema",
+      "payload": {
+        "phase_type": "implementation_testing",
+        "prompt": "Test prompt"
+      }
+    }
+  ],
+  "schema": "apgr-conformance-request-v2-v1",
+  "valid_vectors": [
+    {
+      "id": "valid_minimal",
+      "payload": {
+        "phase_type": "implementation_testing",
+        "prompt": "Implement public Go packages",
+        "schema": "agent-phase-request-v2"
+      }
+    },
+    {
+      "id": "valid_architecture_docs",
+      "payload": {
+        "phase_type": "architecture_docs",
+        "prompt": "Write ADR 0066 specification",
+        "schema": "agent-phase-request-v2"
+      }
+    },
+    {
+      "id": "valid_sysadmin",
+      "payload": {
+        "phase_type": "sysadmin",
+        "prompt": "Provision development environment",
+        "schema": "agent-phase-request-v2"
+      }
+    },
+    {
+      "id": "valid_multiline_prompt",
+      "payload": {
+        "phase_type": "implementation_testing",
+        "prompt": "Line 1\nLine 2\n\nLine 4 with special chars: <>&'\"`",
+        "schema": "agent-phase-request-v2"
+      }
+    },
+    {
+      "id": "valid_unicode_prompt",
+      "payload": {
+        "phase_type": "implementation_testing",
+        "prompt": "Unicode test: \u9b54\u6cd5 \ud83e\uddd9\u200d\u2642\ufe0f \u2728 \ud83d\ude80 \u2014 invariant check",
+        "schema": "agent-phase-request-v2"
+      }
+    }
+  ]
+}

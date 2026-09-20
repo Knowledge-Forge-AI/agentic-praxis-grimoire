@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
+import hashlib
 import os
 from pathlib import Path
 import stat
-from typing import Any
+from typing import Any, NamedTuple
 
 try:  # pragma: no cover - the branch depends on the supported interpreter.
     import tomllib
@@ -27,7 +28,52 @@ class ConfigError(ValueError):
 
 
 DEFAULT_OUTBOX_RELATIVE = Path("Documents") / "agent" / "outbox"
-SUPPORTED_KEYS = frozenset({"outbox_root"})
+DEFAULT_EXECUTION_MODE = "dynamic"
+
+SUPPORTED_TOP_LEVEL_KEYS = frozenset({"outbox_root", "dispatcher"})
+SUPPORTED_DISPATCHER_KEYS = frozenset({"routing"})
+SUPPORTED_ROUTING_KEYS = frozenset({"execution_mode"})
+
+RETAINED_STATIC_MODES = (
+    "normal",
+    "gemini_sub",
+    "gemini_flash_sub",
+    "gemini_flash_opus_sub",
+    "conserve_claude",
+    "claude_only",
+    "codex_only",
+    "gemini_only",
+    "gemini_opus",
+    "gemini_fable",
+)
+ROUTING_MODES = (DEFAULT_EXECUTION_MODE, *RETAINED_STATIC_MODES)
+SUPPORTED_EXECUTION_MODES = frozenset(ROUTING_MODES)
+SUPPORTED_KEYS = SUPPORTED_TOP_LEVEL_KEYS
+
+
+class ConfigurationProvenance(NamedTuple):
+    source_type: str
+    source_path: str | None
+    content_digest: str | None
+    resolved_mode: str
+    is_winner: bool = False
+    precedence_rank: int = 0
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "source_type": self.source_type,
+            "source_path": self.source_path,
+            "content_digest": self.content_digest,
+            "resolved_mode": self.resolved_mode,
+            "is_winner": self.is_winner,
+            "precedence_rank": self.precedence_rank,
+        }
+
+
+class ExecutionModeResolution(NamedTuple):
+    execution_mode: str
+    winner: ConfigurationProvenance
+    provenance_chain: tuple[ConfigurationProvenance, ...]
 
 
 def _absolute(value: str | os.PathLike[str], label: str) -> Path:
@@ -47,8 +93,8 @@ def _absolute(value: str | os.PathLike[str], label: str) -> Path:
     return path
 
 
-def load_config(path: str | os.PathLike[str]) -> dict[str, Path]:
-    """Read one APGR TOML file with a deliberately scalar schema."""
+def load_config(path: str | os.PathLike[str]) -> dict[str, Any]:
+    """Read one APGR TOML file with a closed, declarative schema."""
 
     config_path = _absolute(path, "configuration path")
     try:
@@ -65,15 +111,37 @@ def load_config(path: str | os.PathLike[str]) -> dict[str, Path]:
         raise ConfigError(f"could not read configuration: {config_path}") from error
     if not isinstance(values, dict):
         raise ConfigError("configuration must be a TOML table")
-    unknown = sorted(set(values) - SUPPORTED_KEYS)
+    unknown = sorted(set(values) - SUPPORTED_TOP_LEVEL_KEYS)
     if unknown:
         raise ConfigError(f"unsupported configuration key: {unknown[0]}")
-    if "outbox_root" not in values:
-        return {}
-    value = values["outbox_root"]
-    if not isinstance(value, str) or not value:
-        raise ConfigError("outbox_root must be a non-empty string")
-    return {"outbox_root": _absolute(value, "outbox_root")}
+    result: dict[str, Any] = {}
+    if "outbox_root" in values:
+        value = values["outbox_root"]
+        if not isinstance(value, str) or not value:
+            raise ConfigError("outbox_root must be a non-empty string")
+        result["outbox_root"] = _absolute(value, "outbox_root")
+    if "dispatcher" in values:
+        dispatcher_table = values["dispatcher"]
+        if not isinstance(dispatcher_table, dict):
+            raise ConfigError("dispatcher configuration must be a TOML table")
+        unknown_dispatcher = sorted(set(dispatcher_table) - SUPPORTED_DISPATCHER_KEYS)
+        if unknown_dispatcher:
+            raise ConfigError(f"unsupported dispatcher configuration key: {unknown_dispatcher[0]}")
+        if "routing" in dispatcher_table:
+            routing_table = dispatcher_table["routing"]
+            if not isinstance(routing_table, dict):
+                raise ConfigError("dispatcher.routing configuration must be a TOML table")
+            unknown_routing = sorted(set(routing_table) - SUPPORTED_ROUTING_KEYS)
+            if unknown_routing:
+                raise ConfigError(f"unsupported routing configuration key: {unknown_routing[0]}")
+            if "execution_mode" in routing_table:
+                mode = routing_table["execution_mode"]
+                if not isinstance(mode, str) or not mode:
+                    raise ConfigError("execution_mode must be a non-empty string")
+                if mode not in SUPPORTED_EXECUTION_MODES:
+                    raise ConfigError(f"unsupported execution_mode: {mode}")
+                result.setdefault("dispatcher", {})["routing"] = {"execution_mode": mode}
+    return result
 
 
 def default_outbox_root(
@@ -157,14 +225,153 @@ def resolved_configuration(
     }
 
 
+def resolve_execution_mode(
+    explicit: str | None = None,
+    *,
+    project_root: str | os.PathLike[str] | None = None,
+    apgr_home: str | os.PathLike[str] | None = None,
+    cli_home: str | os.PathLike[str] | None = None,
+    global_home: str | os.PathLike[str] | None = None,
+    environment: Mapping[str, str] | None = None,
+    home: str | os.PathLike[str] | None = None,
+    start: str | os.PathLike[str] | None = None,
+) -> ExecutionModeResolution:
+    """Resolve execution_mode in explicit CLI / project / global / default order."""
+
+    if explicit is not None:
+        if explicit not in SUPPORTED_EXECUTION_MODES:
+            raise ConfigError(f"unsupported execution_mode: {explicit}")
+        prov = ConfigurationProvenance(
+            source_type="cli",
+            source_path=None,
+            content_digest=None,
+            resolved_mode=explicit,
+            is_winner=True,
+            precedence_rank=1,
+        )
+        return ExecutionModeResolution(
+            execution_mode=explicit,
+            winner=prov,
+            provenance_chain=(prov,),
+        )
+
+    chain: list[ConfigurationProvenance] = []
+    selected_cli_home = (
+        cli_home
+        if cli_home is not None
+        else apgr_home
+        if apgr_home is not None
+        else global_home
+    )
+    selected_home = resolve_global_home(
+        selected_cli_home,
+        environment=environment,
+        home=home,
+    )
+    project = project_root
+    if project is None and start is not None:
+        project = discover_project_root(start)
+    if project is not None:
+        project_path = Path(project).expanduser()
+        cfg_path = project_config_path(project_path)
+        if cfg_path.is_file():
+            raw_bytes = cfg_path.read_bytes()
+            digest = hashlib.sha256(raw_bytes).hexdigest()
+            values = load_config(cfg_path)
+            disp = values.get("dispatcher")
+            routing = disp.get("routing") if isinstance(disp, dict) else None
+            if isinstance(routing, dict) and "execution_mode" in routing:
+                mode = routing["execution_mode"]
+                winner = ConfigurationProvenance(
+                    source_type="project_config",
+                    source_path=str(cfg_path),
+                    content_digest=digest,
+                    resolved_mode=mode,
+                    is_winner=True,
+                    precedence_rank=2,
+                )
+                chain.append(winner)
+                return ExecutionModeResolution(
+                    execution_mode=mode,
+                    winner=winner,
+                    provenance_chain=tuple(chain),
+                )
+            chain.append(
+                ConfigurationProvenance(
+                    source_type="project_config",
+                    source_path=str(cfg_path),
+                    content_digest=digest,
+                    resolved_mode="",
+                    is_winner=False,
+                    precedence_rank=2,
+                )
+            )
+
+    global_cfg = global_config_path(selected_home)
+    if global_cfg.is_file():
+        raw_bytes = global_cfg.read_bytes()
+        digest = hashlib.sha256(raw_bytes).hexdigest()
+        values = load_config(global_cfg)
+        disp = values.get("dispatcher")
+        routing = disp.get("routing") if isinstance(disp, dict) else None
+        if isinstance(routing, dict) and "execution_mode" in routing:
+            mode = routing["execution_mode"]
+            winner = ConfigurationProvenance(
+                source_type="global_config",
+                source_path=str(global_cfg),
+                content_digest=digest,
+                resolved_mode=mode,
+                is_winner=True,
+                precedence_rank=3,
+            )
+            chain.append(winner)
+            return ExecutionModeResolution(
+                execution_mode=mode,
+                winner=winner,
+                provenance_chain=tuple(chain),
+            )
+        chain.append(
+            ConfigurationProvenance(
+                source_type="global_config",
+                source_path=str(global_cfg),
+                content_digest=digest,
+                resolved_mode="",
+                is_winner=False,
+                precedence_rank=3,
+            )
+        )
+
+    default_prov = ConfigurationProvenance(
+        source_type="default",
+        source_path=None,
+        content_digest=None,
+        resolved_mode=DEFAULT_EXECUTION_MODE,
+        is_winner=True,
+        precedence_rank=4,
+    )
+    chain.append(default_prov)
+    return ExecutionModeResolution(
+        execution_mode=DEFAULT_EXECUTION_MODE,
+        winner=default_prov,
+        provenance_chain=tuple(chain),
+    )
+
+
 __all__ = [
     "ConfigError",
+    "ConfigurationProvenance",
+    "DEFAULT_EXECUTION_MODE",
     "DEFAULT_OUTBOX_RELATIVE",
+    "ExecutionModeResolution",
+    "RETAINED_STATIC_MODES",
+    "ROUTING_MODES",
+    "SUPPORTED_EXECUTION_MODES",
     "default_outbox_root",
     "discover_project_root",
     "global_config_path",
     "load_config",
     "project_config_path",
+    "resolve_execution_mode",
     "resolve_outbox_root",
     "resolved_configuration",
 ]

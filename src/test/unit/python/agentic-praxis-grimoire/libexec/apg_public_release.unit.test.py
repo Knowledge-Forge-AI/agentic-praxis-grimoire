@@ -5,7 +5,6 @@ from __future__ import annotations
 
 import json
 from contextlib import ExitStack
-import os
 from pathlib import Path
 import subprocess
 import sys
@@ -17,11 +16,14 @@ from src.test.apg_test_support import repository_root
 from src.test.apg_public_release_cases import APGPublicReleaseCaseMixin
 
 
+sys.path.insert(0, str(repository_root(__file__) / "libexec"))
+
+import apg_public_release as release
+from src.test.apg_public_release_boundary_cases import ReleaseBoundaryCases
+from src.test.apg_public_release_confidentiality_cases import ReleaseConfidentialityCases
+
+
 REPOSITORY_ROOT = repository_root(__file__)
-sys.path.insert(0, str(REPOSITORY_ROOT / "libexec"))
-
-import apg_public_release as release  # noqa: E402
-
 
 EXPECTED_V03_SKILLS = tuple(
     f"skills/{name}/SKILL.md"
@@ -60,7 +62,12 @@ HISTORICAL_V02_SKILLS = tuple(
 )
 
 
-class APGPublicReleaseUnitTests(APGPublicReleaseCaseMixin, unittest.TestCase):
+class APGPublicReleaseUnitTests(
+    ReleaseBoundaryCases,
+    ReleaseConfidentialityCases,
+    APGPublicReleaseCaseMixin,
+    unittest.TestCase,
+):
     def test_development_manifest_refuses_historical_v07_publication(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             source = Path(temporary) / "source"
@@ -92,7 +99,7 @@ class APGPublicReleaseUnitTests(APGPublicReleaseCaseMixin, unittest.TestCase):
         expected = {
             "README.md": (
                 "45 canonical agent skills",
-                "APGR v0.11.0 retains 45 canonical leaves: 14 stable and 31 provisional",
+                "APGR v0.12.0 retains 45 canonical leaves: 14 stable and 31 provisional",
                 "45 canonical / 45 catalog / 45 projections / 45\n  discoverable",
             ),
             "skills/README.md": (
@@ -125,7 +132,7 @@ class APGPublicReleaseUnitTests(APGPublicReleaseCaseMixin, unittest.TestCase):
             "0.5.1",
             "0.6.1",
             "0.10.1",
-            "0.12.0",
+            "0.13.0",
             "1.0.0",
             "invalid",
         ):
@@ -306,14 +313,16 @@ class APGPublicReleaseUnitTests(APGPublicReleaseCaseMixin, unittest.TestCase):
         ):
             self.assertIn(path, v010["critical_files"])
 
-        # The flat current policy is the v0.11 surface; v0.10 remains the
-        # frozen in-code historical surface used by versioned source policies.
+        # The flat current policy is the v0.12 surface; v0.10 and v0.11 remain
+        # frozen in-code historical surfaces used by versioned source policies.
+        v012 = release.audited_policy_surfaces("0.12.0")[0]
+        self.assertTrue(set(v011["critical_files"]).issubset(v012["critical_files"]))
         policy = json.loads(
             (REPOSITORY_ROOT / "release" / "public-surface.json").read_text(
                 encoding="utf-8"
             )
         )
-        for key, expected in v011.items():
+        for key, expected in v012.items():
             self.assertEqual(policy[key], list(expected), key)
 
         # Candidate path filtering behavior
@@ -672,31 +681,6 @@ class APGPublicReleaseUnitTests(APGPublicReleaseCaseMixin, unittest.TestCase):
         self.assertTrue(any("pytest" in values for values in rendered_commands))
         self.assertTrue(any(values[:2] == ["bash", "-n"] for values in rendered_commands))
 
-    def test_isolated_environment_and_checked_command_failures_are_bounded(self) -> None:
-        candidate = release.Repository(Path("candidate"), "a" * 40, "b" * 40)
-        base = release.Repository(Path("base"), "c" * 40, "d" * 40)
-        with tempfile.TemporaryDirectory() as temporary:
-            environment = release.isolated_validation_environment(Path(temporary), candidate, base)
-            self.assertEqual(environment["PWD"], "candidate")
-            self.assertEqual(environment["APG12_PUBLIC_V01_ROOT"], "base")
-            self.assertTrue(
-                environment["PYTHONPATH"].startswith(
-                    os.pathsep.join(("candidate/src", "candidate"))
-                )
-            )
-            pytest_root = Path(environment["PYTEST_DEBUG_TEMPROOT"])
-            worker_root = Path(environment["TMPDIR"])
-            self.assertTrue(pytest_root.is_dir())
-            self.assertEqual(pytest_root.parent, worker_root.parent)
-            self.assertNotEqual(pytest_root, worker_root)
-            self.assertNotIn("OLDPWD", environment)
-        with mock.patch.object(
-            release.subprocess,
-            "run",
-            return_value=mock.Mock(returncode=1, stderr=b"failed", stdout=b""),
-        ):
-            with self.assertRaisesRegex(release.ToolError, "configured validation failed"):
-                release.run_checked_command(["tool"], Path("."))
 
     def test_main_routes_manifest_build_check_and_errors(self) -> None:
         repository = release.Repository(Path("repo"), "a" * 40, "b" * 40)
@@ -922,7 +906,7 @@ class APGPublicReleaseUnitTests(APGPublicReleaseCaseMixin, unittest.TestCase):
             result = release.build_candidate(
                 source,
                 base,
-                Path("candidate"),
+                Path("candidate_test_output"),
                 "0.6.0",
                 "2026-07-20T12:00:00-04:00",
                 "Release Author",
@@ -1268,4 +1252,3 @@ class APGPublicReleaseUnitTests(APGPublicReleaseCaseMixin, unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

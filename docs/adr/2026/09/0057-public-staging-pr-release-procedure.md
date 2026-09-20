@@ -68,7 +68,11 @@ deferred to live-host execution:
 - **Staging correction commit discipline**: When hosted CI or review detects defects on the public
   staging PR prior to merge, corrections are prepared as ordinary, linear fast-forward commits
   on top of the existing staging branch head. Force-pushing (`+`), history rewriting, branch deletion,
-  and new PR creation are strictly forbidden. The stage operator operates in `--update` mode,
+  and new PR creation are strictly forbidden for intra-cycle PR corrections. Conversely, inter-cycle
+  staging replacement (when initializing a new release cycle on `staging` based on advanced `main` after
+  prior releases have merged and when no open PR exists) requires `--force-with-lease` explicitly bound
+  to the observed stale remote staging SHA (e.g. `staging:a0e76457ca84d56099c9c42cfd32297809680339`).
+  For intra-cycle corrections once a PR is open, the stage operator operates in `--update` mode,
   verifying that the public base commit is in candidate ancestry, the immediate parent matches
   the expected prior staging tip, the open PR is preserved and reused, and post-push readbacks
   confirm exact remote commit and tree identity.

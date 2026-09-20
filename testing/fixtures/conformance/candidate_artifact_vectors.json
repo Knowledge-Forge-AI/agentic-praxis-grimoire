@@ -1,0 +1,29 @@
+{
+  "invalid_relative_paths": [
+    "../outside.txt",
+    "/absolute/path.txt",
+    "foo/../../escape.txt",
+    "",
+    "."
+  ],
+  "sample_artifact": {
+    "artifact_id": "art-plan-001",
+    "byte_size": 2048,
+    "media_type": "text/markdown; charset=utf-8",
+    "phase_id": "APG150",
+    "relative_path": "docs/architecture/plan.md",
+    "run_id": "run-001",
+    "sha256": "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824"
+  },
+  "sample_candidate": {
+    "candidate_id": "cand-001-generation-1",
+    "commit": "4885f5f290fe6adc0d763cc8a284ac1179be5c90",
+    "expected_base": "388f53e1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7",
+    "generation": 1,
+    "predecessor_id": null,
+    "producer_attempt_id": "att-001",
+    "producer_role": "Producer",
+    "tree_digest": "0ec1c98f51e3b6419e4ab0f3d25fa120aaffb1f8"
+  },
+  "schema": "apgr-conformance-candidate-artifact-v1"
+}

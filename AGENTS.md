@@ -107,10 +107,13 @@ prerequisite, never a fabricated fact.
 
 ## Current development authority
 
-Public v0.10.0 is released across GitHub, Go, PyPI and npm. The
-[v0.11 roadmap](docs/v0-11-roadmap.md) and
-[closure governance](docs/governance/v0-11-closure-governance.md) own inherited
-scheduling. At the historical foundation entry, APG138 implemented V0110-A only:
+Public v0.11.0 is released across GitHub, Go, PyPI, npm, and Homebrew tap. APGR
+v0.11.0 publication is terminal. The [v0.11 roadmap](docs/v0-11-roadmap.md) and
+[closure governance](docs/governance/v0-11-closure-governance.md) represent a
+completed, immutable historical closure program with a closed 55/55/0/0 ledger.
+The [v0.12 architecture transfer roadmap](docs/v0-12-roadmap.md) is the current
+authorized development line, initiated by APG146 (stage V0120-A).
+At the historical foundation entry, APG138 implemented V0110-A only:
 55 inherited closure rows, separate maintenance and compatibility records,
 a 45-leaf maturity ledger and measured
 capacity governance. All 31 provisional leaves retain maturity. ADR 0055
@@ -183,6 +186,14 @@ inventory retains 45 canonical leaves (14 stable / 31 provisional), six active C
 and 11,142 description bytes under the 11,507-byte ceiling. This dispatch performs no
 Git publication or remote mutations; the dispatcher owns private Git publication.
 
+APG146 initiates the approved v0.12 program as the terminal v0.11 reconciliation and
+architecture transfer slice under V0120-A, allocating exit 00191. The phase reconciles
+v0.11.0 terminal publication status across documentation, establishes the v0.12 roadmap,
+authors foundational ADRs 0058–0062, formalizes the Agent-Central dispatcher migration inventory
+and transition schedule, delivers the JACA §18.13 ownership alignment handoff, and codifies
+v0.11 publication repair cases as regression inputs for v0.12 stage V0120-F. This dispatch
+performs no code or remote mutations; the dispatcher owns private Git publication.
+
 ## Project map
 
 - [Project model](docs/project-model.md): artifact ownership and practice
@@ -234,6 +245,13 @@ Git publication or remote mutations; the dispatcher owns private Git publication
   and JACA consumer-handoff boundaries without implementation authority.
 - [v0.8 roadmap](docs/v0-8-roadmap.md): CAP0 and CXT0 architecture entries and
   dependency-ordered additive successors without automatic start authority.
+- [v0.10 roadmap](docs/v0-10-roadmap.md): historical v0.10 release roadmap and deliverables.
+- [v0.11 roadmap](docs/v0-11-roadmap.md): historical v0.11 closure program with 55/55/0/0 closed ledger.
+- [v0.12 roadmap](docs/v0-12-roadmap.md): authorized architecture transfer, dispatcher runtime parity, dynamic routing, provider matrix, and Go library integration.
+- [v0.12 Agent-Central migration inventory](docs/architecture/v0-12-agent-central-migration-inventory.md): dispatcher runtime migration and component dispositions.
+- [v0.12 JACA disposition handoff](docs/architecture/v0-12-jaca-disposition-handoff.md): §18.13 ownership alignment and exported Go interfaces.
+- [v0.12 Agent-Central ownership transition](docs/architecture/v0-12-agent-central-ownership-transition.md): staged transfer coordination and compatibility wrappers.
+- [v0.12 v0.11 publication regression inputs](docs/architecture/v0-12-v011-publication-regression-inputs.md): codified v0.11 repair cases as regression test specifications.
 - [APG85 architecture evaluation](docs/evaluations/apg85-v0-6-architecture-discoverability-and-context-budget.md):
   budget derivation from measured evidence, enforcement ownership, and the
   stated-but-unenforced limitation boundary.

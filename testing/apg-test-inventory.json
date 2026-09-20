@@ -397,17 +397,391 @@
       ]
     }
   ],
+  "dispatcher_sources": [
+    {
+      "path": "libexec/agent_phase/__init__.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/adoption.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/adoption_cli.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/antigravity_evidence.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/antigravity_output_recovery.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/archive.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/archive_recovery.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/archive_snapshot.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/archive_verify.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/candidate.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/capabilities.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/capacity.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/checkpoint.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/cli.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/config_routing.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/dispatch.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/display.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/dry_run.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/dynamic_router.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/entry_adoption.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/entry_adoption_cli.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/envelope.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/failure_boundary.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/failure_classifier.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/finalization.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/finalization_proof.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/finalization_recovery.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/gitstate.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/jsonc.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/lifecycle.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/lifecycle_dispatch.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/metadata_noop.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/metadata_policy.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/native_git.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/native_git_cli.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/outbox_projection.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/outcomes.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/ownership_challenge.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/ownership_cli.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/path_disposition.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/persistence.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/persistence_feedback.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/plan_material.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/probes.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/prompt_policy.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/provider.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/publication.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/publication_summary.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/request.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/resolution_v2.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/result.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/result_artifacts.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/result_repair.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/result_repair_authority.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/resume.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/resume_dispatch.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/resume_validation.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/review_binding.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/review_recovery.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/review_result.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/roster.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/route_provenance.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/routing.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/run.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/runtime_exclusion.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/scanner.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/semantic_roles.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/stage_delta.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/transport.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/v2_dispatch.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/v2_prompts.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/v2_records.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/v2_repair.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/v2_reroute.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/v2_turns.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/worker_capability.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/worker_custody.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_phase/worker_recovery.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/agent_source_guidance.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/antigravity_profile.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/antigravity_terminal_evidence.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/claude_live_renderer.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/claude_model_catalog.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/claude_profile_directories.py",
+      "rationale": "Claude dispatcher profile directory resolution; dedicated dispatcher qualification"
+    },
+    {
+      "path": "libexec/claude_vc_profile.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/controller_generation.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/controller_generation_admin.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/controller_generation_bootstrap.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/controller_generation_process.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    },
+    {
+      "path": "libexec/controller_generation_store.py",
+      "rationale": "migrated single-phase dispatcher runtime"
+    }
+  ],
   "excluded_python_launchers": [
     {
-      "path": "bin/apgr",
-      "reason": "thin import and exit adapter"
+      "path": "bin/agent-controller-generation",
+      "reason": "controller generation administrative entrypoint"
+    },
+    {
+      "path": "bin/agent-phase-archive",
+      "reason": "single-phase run archive packaging entrypoint"
+    },
+    {
+      "path": "bin/antigravity-profile",
+      "reason": "dispatcher provider profile launcher"
     },
     {
       "path": "bin/apg-build-go-cli",
       "reason": "thin import and exit adapter"
     },
     {
-      "path": "bin/apg-check-phase-commit-message",
+      "path": "bin/apg-build-python-release-bundle",
+      "reason": "thin import and exit adapter"
+    },
+    {
+      "path": "bin/apg-capture-source",
       "reason": "thin import and exit adapter"
     },
     {
@@ -415,7 +789,19 @@
       "reason": "thin import and exit adapter"
     },
     {
+      "path": "bin/apg-check-phase-commit-message",
+      "reason": "thin import and exit adapter"
+    },
+    {
       "path": "bin/apg-check-record-identity",
+      "reason": "thin import and exit adapter"
+    },
+    {
+      "path": "bin/apg-check-release-matrix",
+      "reason": "release readiness regression matrix checker launcher"
+    },
+    {
+      "path": "bin/apg-check-roadmap-closure",
       "reason": "thin import and exit adapter"
     },
     {
@@ -423,7 +809,7 @@
       "reason": "thin import and exit adapter"
     },
     {
-      "path": "bin/apg-build-python-release-bundle",
+      "path": "bin/apg-normalize-python-sdist",
       "reason": "thin import and exit adapter"
     },
     {
@@ -435,19 +821,27 @@
       "reason": "thin import and exit adapter"
     },
     {
-      "path": "bin/apg-normalize-python-sdist",
+      "path": "bin/apg-test",
       "reason": "thin import and exit adapter"
     },
     {
-      "path": "bin/apg-test",
-      "reason": "thin import and exit adapter"
+      "path": "bin/apg-test-dispatcher",
+      "reason": "dedicated dispatcher qualification runner for migrated single-phase test suites"
     },
     {
       "path": "bin/apg-user-skills",
       "reason": "thin import and exit adapter"
     },
     {
+      "path": "bin/apgr",
+      "reason": "thin import and exit adapter"
+    },
+    {
       "path": "bin/append-operational-report",
+      "reason": "thin import and exit adapter"
+    },
+    {
+      "path": "bin/flatten-skill-symlinks",
       "reason": "thin import and exit adapter"
     },
     {
@@ -459,19 +853,7 @@
       "reason": "thin import and exit adapter"
     },
     {
-      "path": "bin/flatten-skill-symlinks",
-      "reason": "thin import and exit adapter"
-    },
-    {
       "path": "bin/install-global-skills",
-      "reason": "thin import and exit adapter"
-    },
-    {
-      "path": "bin/apg-check-roadmap-closure",
-      "reason": "thin import and exit adapter"
-    },
-    {
-      "path": "bin/apg-capture-source",
       "reason": "thin import and exit adapter"
     }
   ],
@@ -505,6 +887,11 @@
     {
       "owner": "bin/apg-check-record-identity",
       "path": "src/test/int/python/agentic-praxis-grimoire/bin/apg-check-record-identity.int.test.py",
+      "suite": "integration"
+    },
+    {
+      "owner": "bin/apg-check-release-matrix",
+      "path": "src/test/int/python/agentic-praxis-grimoire/bin/apg-check-release-matrix.int.test.py",
       "suite": "integration"
     },
     {
@@ -1421,6 +1808,16 @@
       "owner": "bin/apg-capture-source",
       "path": "src/test/int/python/agentic-praxis-grimoire/bin/apg-capture-source.int.test.py",
       "suite": "integration"
+    },
+    {
+      "owner": "testing/release/check_release_matrix.py",
+      "path": "src/test/int/python/agentic-praxis-grimoire/testing/release/check_release_matrix.int.test.py",
+      "suite": "integration"
+    },
+    {
+      "owner": "testing/release/check_release_matrix.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/testing/release/check_release_matrix.unit.test.py",
+      "suite": "unit"
     }
   ]
 }

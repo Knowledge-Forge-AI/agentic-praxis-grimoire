@@ -28,8 +28,8 @@ import apg_python_distribution as distribution  # noqa: E402
 import apg_python_publication as publication  # noqa: E402
 
 
-CURRENT_VERSION = "0.11.0"
-HISTORICAL_VERSION = "0.10.0"
+CURRENT_VERSION = "0.12.0"
+HISTORICAL_VERSION = "0.11.0"
 
 
 def _identity(
@@ -673,8 +673,8 @@ def test_package_links_refuse_repository_escape(target: str) -> None:
         backend._package_readme(f"[license]({target})", "0.8.1")
 
 
-def test_publication_epoch_alias_tracks_v0110_candidate() -> None:
-    assert publication.EPOCH == distribution.V011_RELEASE_EPOCH
+def test_publication_epoch_alias_tracks_v0120_candidate() -> None:
+    assert publication.EPOCH == distribution.V012_RELEASE_EPOCH
     assert publication.EPOCH == distribution.release_epoch(publication.VERSION)
 
 
@@ -705,11 +705,12 @@ OLDER_FORBIDDEN_WORDING = (
 
 def _assert_current_release_wording(text: str) -> None:
     normalized = " ".join(text.lower().split())
-    # Current candidate surfaces announce v0.11.0; retained v0.10.0
+    # Current candidate surfaces announce v0.12.0; retained v0.11.0 and v0.10.0
     # references remain valid for historical documentation and release pins.
     assert (
         f"this documentation covers the **unreleased v{CURRENT_VERSION} candidate**" in normalized
         or f"this documentation covers v{HISTORICAL_VERSION}." in normalized
+        or "this documentation covers v0.10.0." in normalized
     )
     for stale in (*OLDER_FORBIDDEN_WORDING,
         "development readiness", "development interface", "development candidate",

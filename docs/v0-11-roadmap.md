@@ -2,13 +2,14 @@
 
 ## Direction and scheduling authority
 
-The operator-approved release goal is v0.11.0: finish or permanently disposition
-the inherited roadmap. Public v0.10.0 is released across GitHub, Go, PyPI and
-npm and remains immutable. [APG138 reconciliation](evaluations/apg138-v0-11-foundation-closure.md)
-records the publication authority and the foundation qualification boundary.
+The operator-approved v0.11 closure program is complete and **v0.11.0 is publicly released**
+across GitHub Release, Go, PyPI, npm, and Homebrew tap. APGR v0.11.0 publication is terminal.
+Earlier releases (v0.10.0 and preceding) remain frozen.
 
 This roadmap and its [closure ledger](governance/v0-11-closure-ledger.json)
-own current inherited scheduling. The [v0.10 roadmap](v0-10-roadmap.md),
+remain an immutable historical record with a closed 55/55/0/0 ledger.
+Current development planning is owned by the [v0.12 roadmap](v0-12-roadmap.md).
+The [v0.10 roadmap](v0-10-roadmap.md),
 [backlog consolidation](v0-10-backlog-consolidation.md),
 [v0.9 roadmap](v0-9-roadmap.md), and
 [Repo Map support roadmap](repo-map-support-roadmap.md) remain historical
@@ -51,20 +52,21 @@ permits open rows; integrated readiness requires valid zero-open accounting.
 ## Semantic sequence
 
 At the historical APG138 entry, only V0110-A was implemented. APG139 through
-APG142 subsequently closed V0110-B through V0110-E. Current inherited
-accounting is 55 terminal / zero OPEN / zero invalid. APG143 begins V0110-F
-but its closeout remains blocked with incomplete readiness gates.
-V0110-G requires separate bounded dispatch.
+APG142 subsequently closed V0110-B through V0110-E. APG143 completed local technical
+readiness under V0110-F. APG144 (STAGING-PREP4) and APG145 completed staging candidate
+preparation, hosted CI repair, and operator handoffs under V0110-G. Operator
+execution `publication1` achieved terminal publication of v0.11.0. The terminal
+accounting is 55 terminal / zero OPEN / zero invalid.
 
 | Stage | Owned work | Required exit |
 | --- | --- | --- |
-| V0110-A | Publication reconciliation, frozen inheritance, capacity decision and governance tools | Valid complete foundation; open rows allowed |
-| V0110-B | Individual maturity campaign for all 31 inherited provisional leaves | Every leaf has an individual terminal lifecycle decision |
-| V0110-C | Repo Map, JACA and external-consumer closure | Source-bound compatibility and consumer ownership dispositions |
-| V0110-D | Optional reporting, hotspot and context decisions | Each optional item delivered or explicitly rejected |
-| V0110-E | Exact-trigger debt and maintenance closure | No condition-triggered row remains release work |
+| V0110-A | Publication reconciliation, frozen inheritance, capacity decision and governance tools | Valid complete foundation; open rows allowed (APG138) |
+| V0110-B | Individual maturity campaign for all 31 inherited provisional leaves | Every leaf has an individual terminal lifecycle decision (APG139) |
+| V0110-C | Repo Map, JACA and external-consumer closure | Source-bound compatibility and consumer ownership dispositions (APG140) |
+| V0110-D | Optional reporting, hotspot and context decisions | Each optional item delivered or explicitly rejected (APG141) |
+| V0110-E | Exact-trigger debt and maintenance closure | No condition-triggered row remains release work (APG142) |
 | V0110-F | Integrated readiness and zero-backlog proof | Local technical readiness and public CI preparation qualified (APG143) |
-| V0110-G | Deterministic v0.11.0 release | Public staging candidate prepared (APG144); deterministic publication |
+| V0110-G | Deterministic v0.11.0 release | Public staging candidate, hosted CI repairs, and deterministic publication qualified (APG144, APG145, publication1) |
 
 ## V0110-B — Individual maturity
 

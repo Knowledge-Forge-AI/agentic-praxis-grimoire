@@ -1,0 +1,1069 @@
+{
+  "schema": "agent-phase-parity-golden-corpus-v1",
+  "request_schema": "agent-phase-request-v1",
+  "baseline_commit": "56e9bb039536dfc8893e61a431681d6a32167b6f",
+  "baseline_provenance": "Agent-Central immutable baseline 56e9bb039536dfc8893e61a431681d6a32167b6f",
+  "route_count": 30,
+  "routes": [
+    {
+      "phase_type": "architecture_docs",
+      "execution_mode": "claude_only",
+      "stages": {
+        "plan": {
+          "alias": "claude-architecture-docs-primary",
+          "provider": "claude",
+          "profile": "architecture-docs-primary"
+        },
+        "plan_review": {
+          "alias": "claude-architecture-docs-review",
+          "provider": "claude",
+          "profile": "architecture-docs-review"
+        },
+        "work": {
+          "alias": "claude-architecture-docs-primary",
+          "provider": "claude",
+          "profile": "architecture-docs-primary"
+        },
+        "final_review": {
+          "alias": "claude-architecture-docs-review",
+          "provider": "claude",
+          "profile": "architecture-docs-review"
+        },
+        "closeout": {
+          "alias": "claude-architecture-docs-primary",
+          "provider": "claude",
+          "profile": "architecture-docs-primary"
+        }
+      }
+    },
+    {
+      "phase_type": "architecture_docs",
+      "execution_mode": "codex_only",
+      "stages": {
+        "plan": {
+          "alias": "codex-architecture-docs-primary",
+          "provider": "codex",
+          "profile": "architecture-docs-primary"
+        },
+        "plan_review": {
+          "alias": "codex-architecture-docs-review",
+          "provider": "codex",
+          "profile": "architecture-docs-review"
+        },
+        "work": {
+          "alias": "codex-architecture-docs-primary",
+          "provider": "codex",
+          "profile": "architecture-docs-primary"
+        },
+        "final_review": {
+          "alias": "codex-architecture-docs-review",
+          "provider": "codex",
+          "profile": "architecture-docs-review"
+        },
+        "closeout": {
+          "alias": "codex-architecture-docs-primary",
+          "provider": "codex",
+          "profile": "architecture-docs-primary"
+        }
+      }
+    },
+    {
+      "phase_type": "architecture_docs",
+      "execution_mode": "conserve_claude",
+      "stages": {
+        "plan": {
+          "alias": "codex-architecture-docs-primary",
+          "provider": "codex",
+          "profile": "architecture-docs-primary"
+        },
+        "plan_review": {
+          "alias": "claude-normal-final-review",
+          "provider": "claude",
+          "profile": "normal-final-review"
+        },
+        "work": {
+          "alias": "antigravity-gemini-high",
+          "provider": "antigravity",
+          "profile": "gemini-3.8-flash-high"
+        },
+        "final_review": {
+          "alias": "claude-normal-final-review",
+          "provider": "claude",
+          "profile": "normal-final-review"
+        },
+        "closeout": {
+          "alias": "codex-architecture-docs-primary",
+          "provider": "codex",
+          "profile": "architecture-docs-primary"
+        }
+      }
+    },
+    {
+      "phase_type": "architecture_docs",
+      "execution_mode": "gemini_fable",
+      "stages": {
+        "plan": {
+          "alias": "antigravity-gemini-high",
+          "provider": "antigravity",
+          "profile": "gemini-3.8-flash-high"
+        },
+        "plan_review": {
+          "alias": "claude-normal-plan-review",
+          "provider": "claude",
+          "profile": "normal-plan-review"
+        },
+        "work": {
+          "alias": "antigravity-gemini-high",
+          "provider": "antigravity",
+          "profile": "gemini-3.8-flash-high"
+        },
+        "final_review": {
+          "alias": "claude-normal-final-review",
+          "provider": "claude",
+          "profile": "normal-final-review"
+        },
+        "closeout": {
+          "alias": "antigravity-gemini-high",
+          "provider": "antigravity",
+          "profile": "gemini-3.8-flash-high"
+        }
+      }
+    },
+    {
+      "phase_type": "architecture_docs",
+      "execution_mode": "gemini_flash_opus_sub",
+      "stages": {
+        "plan": {
+          "alias": "antigravity-gemini-high",
+          "provider": "antigravity",
+          "profile": "gemini-3.8-flash-high"
+        },
+        "plan_review": {
+          "alias": "claude-normal-final-review",
+          "provider": "claude",
+          "profile": "normal-final-review"
+        },
+        "work": {
+          "alias": "antigravity-gemini-high",
+          "provider": "antigravity",
+          "profile": "gemini-3.8-flash-high"
+        },
+        "final_review": {
+          "alias": "claude-normal-final-review",
+          "provider": "claude",
+          "profile": "normal-final-review"
+        },
+        "closeout": {
+          "alias": "claude-architecture-docs-primary",
+          "provider": "claude",
+          "profile": "architecture-docs-primary"
+        }
+      }
+    },
+    {
+      "phase_type": "architecture_docs",
+      "execution_mode": "gemini_flash_sub",
+      "stages": {
+        "plan": {
+          "alias": "antigravity-gemini-high",
+          "provider": "antigravity",
+          "profile": "gemini-3.8-flash-high"
+        },
+        "plan_review": {
+          "alias": "claude-normal-plan-review",
+          "provider": "claude",
+          "profile": "normal-plan-review"
+        },
+        "work": {
+          "alias": "antigravity-gemini-high",
+          "provider": "antigravity",
+          "profile": "gemini-3.8-flash-high"
+        },
+        "final_review": {
+          "alias": "claude-normal-final-review",
+          "provider": "claude",
+          "profile": "normal-final-review"
+        },
+        "closeout": {
+          "alias": "fable-architecture-docs-primary",
+          "provider": "claude",
+          "profile": "fable-architecture-docs-primary"
+        }
+      }
+    },
+    {
+      "phase_type": "architecture_docs",
+      "execution_mode": "gemini_only",
+      "stages": {
+        "plan": {
+          "alias": "antigravity-gemini-high",
+          "provider": "antigravity",
+          "profile": "gemini-3.8-flash-high"
+        },
+        "plan_review": {
+          "alias": "antigravity-gemini-high",
+          "provider": "antigravity",
+          "profile": "gemini-3.8-flash-high"
+        },
+        "work": {
+          "alias": "antigravity-gemini-high",
+          "provider": "antigravity",
+          "profile": "gemini-3.8-flash-high"
+        },
+        "final_review": {
+          "alias": "antigravity-gemini-high",
+          "provider": "antigravity",
+          "profile": "gemini-3.8-flash-high"
+        },
+        "closeout": {
+          "alias": "antigravity-gemini-high",
+          "provider": "antigravity",
+          "profile": "gemini-3.8-flash-high"
+        }
+      }
+    },
+    {
+      "phase_type": "architecture_docs",
+      "execution_mode": "gemini_opus",
+      "stages": {
+        "plan": {
+          "alias": "antigravity-gemini-high",
+          "provider": "antigravity",
+          "profile": "gemini-3.8-flash-high"
+        },
+        "plan_review": {
+          "alias": "claude-normal-final-review",
+          "provider": "claude",
+          "profile": "normal-final-review"
+        },
+        "work": {
+          "alias": "antigravity-gemini-high",
+          "provider": "antigravity",
+          "profile": "gemini-3.8-flash-high"
+        },
+        "final_review": {
+          "alias": "claude-normal-final-review",
+          "provider": "claude",
+          "profile": "normal-final-review"
+        },
+        "closeout": {
+          "alias": "antigravity-gemini-high",
+          "provider": "antigravity",
+          "profile": "gemini-3.8-flash-high"
+        }
+      }
+    },
+    {
+      "phase_type": "architecture_docs",
+      "execution_mode": "gemini_sub",
+      "stages": {
+        "plan": {
+          "alias": "codex-architecture-docs-primary",
+          "provider": "codex",
+          "profile": "architecture-docs-primary"
+        },
+        "plan_review": {
+          "alias": "claude-normal-plan-review",
+          "provider": "claude",
+          "profile": "normal-plan-review"
+        },
+        "work": {
+          "alias": "codex-architecture-docs-primary",
+          "provider": "codex",
+          "profile": "architecture-docs-primary"
+        },
+        "final_review": {
+          "alias": "claude-normal-final-review",
+          "provider": "claude",
+          "profile": "normal-final-review"
+        },
+        "closeout": {
+          "alias": "fable-architecture-docs-primary",
+          "provider": "claude",
+          "profile": "fable-architecture-docs-primary"
+        }
+      }
+    },
+    {
+      "phase_type": "architecture_docs",
+      "execution_mode": "normal",
+      "stages": {
+        "plan": {
+          "alias": "codex-architecture-docs-primary",
+          "provider": "codex",
+          "profile": "architecture-docs-primary"
+        },
+        "plan_review": {
+          "alias": "claude-normal-plan-review",
+          "provider": "claude",
+          "profile": "normal-plan-review"
+        },
+        "work": {
+          "alias": "antigravity-gemini-high",
+          "provider": "antigravity",
+          "profile": "gemini-3.8-flash-high"
+        },
+        "final_review": {
+          "alias": "codex-architecture-docs-primary",
+          "provider": "codex",
+          "profile": "architecture-docs-primary"
+        },
+        "closeout": {
+          "alias": "fable-architecture-docs-primary",
+          "provider": "claude",
+          "profile": "fable-architecture-docs-primary"
+        }
+      }
+    },
+    {
+      "phase_type": "implementation_testing",
+      "execution_mode": "claude_only",
+      "stages": {
+        "plan": {
+          "alias": "claude-implementation-primary",
+          "provider": "claude",
+          "profile": "implementation-primary"
+        },
+        "plan_review": {
+          "alias": "claude-implementation-review",
+          "provider": "claude",
+          "profile": "implementation-review"
+        },
+        "work": {
+          "alias": "claude-implementation-primary",
+          "provider": "claude",
+          "profile": "implementation-primary"
+        },
+        "final_review": {
+          "alias": "claude-implementation-review",
+          "provider": "claude",
+          "profile": "implementation-review"
+        },
+        "closeout": {
+          "alias": "claude-implementation-primary",
+          "provider": "claude",
+          "profile": "implementation-primary"
+        }
+      }
+    },
+    {
+      "phase_type": "implementation_testing",
+      "execution_mode": "codex_only",
+      "stages": {
+        "plan": {
+          "alias": "codex-implementation-testing",
+          "provider": "codex",
+          "profile": "implementation-testing"
+        },
+        "plan_review": {
+          "alias": "codex-implementation-testing-review",
+          "provider": "codex",
+          "profile": "implementation-testing-review"
+        },
+        "work": {
+          "alias": "codex-implementation-testing",
+          "provider": "codex",
+          "profile": "implementation-testing"
+        },
+        "final_review": {
+          "alias": "codex-implementation-testing-review",
+          "provider": "codex",
+          "profile": "implementation-testing-review"
+        },
+        "closeout": {
+          "alias": "codex-implementation-testing",
+          "provider": "codex",
+          "profile": "implementation-testing"
+        }
+      }
+    },
+    {
+      "phase_type": "implementation_testing",
+      "execution_mode": "conserve_claude",
+      "stages": {
+        "plan": {
+          "alias": "codex-architecture-docs-primary",
+          "provider": "codex",
+          "profile": "architecture-docs-primary"
+        },
+        "plan_review": {
+          "alias": "claude-normal-final-review",
+          "provider": "claude",
+          "profile": "normal-final-review"
+        },
+        "work": {
+          "alias": "antigravity-gemini-high",
+          "provider": "antigravity",
+          "profile": "gemini-3.8-flash-high"
+        },
+        "final_review": {
+          "alias": "codex-implementation-testing-review",
+          "provider": "codex",
+          "profile": "implementation-testing-review"
+        },
+        "closeout": {
+          "alias": "antigravity-gemini-high",
+          "provider": "antigravity",
+          "profile": "gemini-3.8-flash-high"
+        }
+      }
+    },
+    {
+      "phase_type": "implementation_testing",
+      "execution_mode": "gemini_fable",
+      "stages": {
+        "plan": {
+          "alias": "antigravity-gemini-high",
+          "provider": "antigravity",
+          "profile": "gemini-3.8-flash-high"
+        },
+        "plan_review": {
+          "alias": "claude-normal-plan-review",
+          "provider": "claude",
+          "profile": "normal-plan-review"
+        },
+        "work": {
+          "alias": "antigravity-gemini-high",
+          "provider": "antigravity",
+          "profile": "gemini-3.8-flash-high"
+        },
+        "final_review": {
+          "alias": "claude-normal-final-review",
+          "provider": "claude",
+          "profile": "normal-final-review"
+        },
+        "closeout": {
+          "alias": "antigravity-gemini-high",
+          "provider": "antigravity",
+          "profile": "gemini-3.8-flash-high"
+        }
+      }
+    },
+    {
+      "phase_type": "implementation_testing",
+      "execution_mode": "gemini_flash_opus_sub",
+      "stages": {
+        "plan": {
+          "alias": "antigravity-gemini-high",
+          "provider": "antigravity",
+          "profile": "gemini-3.8-flash-high"
+        },
+        "plan_review": {
+          "alias": "claude-normal-final-review",
+          "provider": "claude",
+          "profile": "normal-final-review"
+        },
+        "work": {
+          "alias": "antigravity-gemini-high",
+          "provider": "antigravity",
+          "profile": "gemini-3.8-flash-high"
+        },
+        "final_review": {
+          "alias": "claude-normal-final-review",
+          "provider": "claude",
+          "profile": "normal-final-review"
+        },
+        "closeout": {
+          "alias": "antigravity-gemini-high",
+          "provider": "antigravity",
+          "profile": "gemini-3.8-flash-high"
+        }
+      }
+    },
+    {
+      "phase_type": "implementation_testing",
+      "execution_mode": "gemini_flash_sub",
+      "stages": {
+        "plan": {
+          "alias": "antigravity-gemini-high",
+          "provider": "antigravity",
+          "profile": "gemini-3.8-flash-high"
+        },
+        "plan_review": {
+          "alias": "claude-normal-plan-review",
+          "provider": "claude",
+          "profile": "normal-plan-review"
+        },
+        "work": {
+          "alias": "antigravity-gemini-high",
+          "provider": "antigravity",
+          "profile": "gemini-3.8-flash-high"
+        },
+        "final_review": {
+          "alias": "claude-normal-final-review",
+          "provider": "claude",
+          "profile": "normal-final-review"
+        },
+        "closeout": {
+          "alias": "antigravity-gemini-high",
+          "provider": "antigravity",
+          "profile": "gemini-3.8-flash-high"
+        }
+      }
+    },
+    {
+      "phase_type": "implementation_testing",
+      "execution_mode": "gemini_only",
+      "stages": {
+        "plan": {
+          "alias": "antigravity-gemini-high",
+          "provider": "antigravity",
+          "profile": "gemini-3.8-flash-high"
+        },
+        "plan_review": {
+          "alias": "antigravity-gemini-high",
+          "provider": "antigravity",
+          "profile": "gemini-3.8-flash-high"
+        },
+        "work": {
+          "alias": "antigravity-gemini-high",
+          "provider": "antigravity",
+          "profile": "gemini-3.8-flash-high"
+        },
+        "final_review": {
+          "alias": "antigravity-gemini-high",
+          "provider": "antigravity",
+          "profile": "gemini-3.8-flash-high"
+        },
+        "closeout": {
+          "alias": "antigravity-gemini-high",
+          "provider": "antigravity",
+          "profile": "gemini-3.8-flash-high"
+        }
+      }
+    },
+    {
+      "phase_type": "implementation_testing",
+      "execution_mode": "gemini_opus",
+      "stages": {
+        "plan": {
+          "alias": "antigravity-gemini-high",
+          "provider": "antigravity",
+          "profile": "gemini-3.8-flash-high"
+        },
+        "plan_review": {
+          "alias": "claude-normal-final-review",
+          "provider": "claude",
+          "profile": "normal-final-review"
+        },
+        "work": {
+          "alias": "antigravity-gemini-high",
+          "provider": "antigravity",
+          "profile": "gemini-3.8-flash-high"
+        },
+        "final_review": {
+          "alias": "claude-normal-final-review",
+          "provider": "claude",
+          "profile": "normal-final-review"
+        },
+        "closeout": {
+          "alias": "antigravity-gemini-high",
+          "provider": "antigravity",
+          "profile": "gemini-3.8-flash-high"
+        }
+      }
+    },
+    {
+      "phase_type": "implementation_testing",
+      "execution_mode": "gemini_sub",
+      "stages": {
+        "plan": {
+          "alias": "codex-architecture-docs-primary",
+          "provider": "codex",
+          "profile": "architecture-docs-primary"
+        },
+        "plan_review": {
+          "alias": "claude-normal-plan-review",
+          "provider": "claude",
+          "profile": "normal-plan-review"
+        },
+        "work": {
+          "alias": "codex-implementation-testing",
+          "provider": "codex",
+          "profile": "implementation-testing"
+        },
+        "final_review": {
+          "alias": "claude-normal-final-review",
+          "provider": "claude",
+          "profile": "normal-final-review"
+        },
+        "closeout": {
+          "alias": "codex-implementation-testing",
+          "provider": "codex",
+          "profile": "implementation-testing"
+        }
+      }
+    },
+    {
+      "phase_type": "implementation_testing",
+      "execution_mode": "normal",
+      "stages": {
+        "plan": {
+          "alias": "codex-architecture-docs-primary",
+          "provider": "codex",
+          "profile": "architecture-docs-primary"
+        },
+        "plan_review": {
+          "alias": "claude-normal-plan-review",
+          "provider": "claude",
+          "profile": "normal-plan-review"
+        },
+        "work": {
+          "alias": "antigravity-gemini-high",
+          "provider": "antigravity",
+          "profile": "gemini-3.8-flash-high"
+        },
+        "final_review": {
+          "alias": "claude-normal-final-review",
+          "provider": "claude",
+          "profile": "normal-final-review"
+        },
+        "closeout": {
+          "alias": "codex-implementation-testing",
+          "provider": "codex",
+          "profile": "implementation-testing"
+        }
+      }
+    },
+    {
+      "phase_type": "sysadmin",
+      "execution_mode": "claude_only",
+      "stages": {
+        "plan": {
+          "alias": "claude-sysadmin-primary",
+          "provider": "claude",
+          "profile": "sysadmin-primary"
+        },
+        "plan_review": {
+          "alias": "claude-sysadmin-review",
+          "provider": "claude",
+          "profile": "sysadmin-review"
+        },
+        "work": {
+          "alias": "claude-sysadmin-primary",
+          "provider": "claude",
+          "profile": "sysadmin-primary"
+        },
+        "final_review": {
+          "alias": "claude-sysadmin-review",
+          "provider": "claude",
+          "profile": "sysadmin-review"
+        },
+        "closeout": {
+          "alias": "claude-sysadmin-primary",
+          "provider": "claude",
+          "profile": "sysadmin-primary"
+        }
+      }
+    },
+    {
+      "phase_type": "sysadmin",
+      "execution_mode": "codex_only",
+      "stages": {
+        "plan": {
+          "alias": "codex-sysadmin-primary",
+          "provider": "codex",
+          "profile": "sysadmin-primary"
+        },
+        "plan_review": {
+          "alias": "codex-sysadmin-review",
+          "provider": "codex",
+          "profile": "sysadmin-review"
+        },
+        "work": {
+          "alias": "codex-sysadmin-primary",
+          "provider": "codex",
+          "profile": "sysadmin-primary"
+        },
+        "final_review": {
+          "alias": "codex-sysadmin-review",
+          "provider": "codex",
+          "profile": "sysadmin-review"
+        },
+        "closeout": {
+          "alias": "codex-sysadmin-primary",
+          "provider": "codex",
+          "profile": "sysadmin-primary"
+        }
+      }
+    },
+    {
+      "phase_type": "sysadmin",
+      "execution_mode": "conserve_claude",
+      "stages": {
+        "plan": {
+          "alias": "codex-sysadmin-primary",
+          "provider": "codex",
+          "profile": "sysadmin-primary"
+        },
+        "plan_review": {
+          "alias": "claude-sysadmin-opus-review",
+          "provider": "claude",
+          "profile": "sysadmin-opus-review"
+        },
+        "work": {
+          "alias": "antigravity-gemini-high",
+          "provider": "antigravity",
+          "profile": "gemini-3.8-flash-high"
+        },
+        "final_review": {
+          "alias": "claude-sysadmin-opus-review",
+          "provider": "claude",
+          "profile": "sysadmin-opus-review"
+        },
+        "closeout": {
+          "alias": "codex-sysadmin-primary",
+          "provider": "codex",
+          "profile": "sysadmin-primary"
+        }
+      }
+    },
+    {
+      "phase_type": "sysadmin",
+      "execution_mode": "gemini_fable",
+      "stages": {
+        "plan": {
+          "alias": "antigravity-gemini-high",
+          "provider": "antigravity",
+          "profile": "gemini-3.8-flash-high"
+        },
+        "plan_review": {
+          "alias": "claude-normal-sysadmin-plan-review",
+          "provider": "claude",
+          "profile": "normal-sysadmin-plan-review"
+        },
+        "work": {
+          "alias": "antigravity-gemini-high",
+          "provider": "antigravity",
+          "profile": "gemini-3.8-flash-high"
+        },
+        "final_review": {
+          "alias": "claude-sysadmin-opus-review",
+          "provider": "claude",
+          "profile": "sysadmin-opus-review"
+        },
+        "closeout": {
+          "alias": "antigravity-gemini-high",
+          "provider": "antigravity",
+          "profile": "gemini-3.8-flash-high"
+        }
+      }
+    },
+    {
+      "phase_type": "sysadmin",
+      "execution_mode": "gemini_flash_opus_sub",
+      "stages": {
+        "plan": {
+          "alias": "antigravity-gemini-high",
+          "provider": "antigravity",
+          "profile": "gemini-3.8-flash-high"
+        },
+        "plan_review": {
+          "alias": "claude-sysadmin-opus-review",
+          "provider": "claude",
+          "profile": "sysadmin-opus-review"
+        },
+        "work": {
+          "alias": "antigravity-gemini-high",
+          "provider": "antigravity",
+          "profile": "gemini-3.8-flash-high"
+        },
+        "final_review": {
+          "alias": "claude-sysadmin-opus-review",
+          "provider": "claude",
+          "profile": "sysadmin-opus-review"
+        },
+        "closeout": {
+          "alias": "antigravity-gemini-high",
+          "provider": "antigravity",
+          "profile": "gemini-3.8-flash-high"
+        }
+      }
+    },
+    {
+      "phase_type": "sysadmin",
+      "execution_mode": "gemini_flash_sub",
+      "stages": {
+        "plan": {
+          "alias": "antigravity-gemini-high",
+          "provider": "antigravity",
+          "profile": "gemini-3.8-flash-high"
+        },
+        "plan_review": {
+          "alias": "claude-sysadmin-opus-review",
+          "provider": "claude",
+          "profile": "sysadmin-opus-review"
+        },
+        "work": {
+          "alias": "antigravity-gemini-high",
+          "provider": "antigravity",
+          "profile": "gemini-3.8-flash-high"
+        },
+        "final_review": {
+          "alias": "claude-sysadmin-opus-review",
+          "provider": "claude",
+          "profile": "sysadmin-opus-review"
+        },
+        "closeout": {
+          "alias": "antigravity-gemini-high",
+          "provider": "antigravity",
+          "profile": "gemini-3.8-flash-high"
+        }
+      }
+    },
+    {
+      "phase_type": "sysadmin",
+      "execution_mode": "gemini_only",
+      "stages": {
+        "plan": {
+          "alias": "antigravity-gemini-high",
+          "provider": "antigravity",
+          "profile": "gemini-3.8-flash-high"
+        },
+        "plan_review": {
+          "alias": "antigravity-gemini-high",
+          "provider": "antigravity",
+          "profile": "gemini-3.8-flash-high"
+        },
+        "work": {
+          "alias": "antigravity-gemini-high",
+          "provider": "antigravity",
+          "profile": "gemini-3.8-flash-high"
+        },
+        "final_review": {
+          "alias": "antigravity-gemini-high",
+          "provider": "antigravity",
+          "profile": "gemini-3.8-flash-high"
+        },
+        "closeout": {
+          "alias": "antigravity-gemini-high",
+          "provider": "antigravity",
+          "profile": "gemini-3.8-flash-high"
+        }
+      }
+    },
+    {
+      "phase_type": "sysadmin",
+      "execution_mode": "gemini_opus",
+      "stages": {
+        "plan": {
+          "alias": "antigravity-gemini-high",
+          "provider": "antigravity",
+          "profile": "gemini-3.8-flash-high"
+        },
+        "plan_review": {
+          "alias": "claude-sysadmin-opus-review",
+          "provider": "claude",
+          "profile": "sysadmin-opus-review"
+        },
+        "work": {
+          "alias": "antigravity-gemini-high",
+          "provider": "antigravity",
+          "profile": "gemini-3.8-flash-high"
+        },
+        "final_review": {
+          "alias": "claude-sysadmin-opus-review",
+          "provider": "claude",
+          "profile": "sysadmin-opus-review"
+        },
+        "closeout": {
+          "alias": "antigravity-gemini-high",
+          "provider": "antigravity",
+          "profile": "gemini-3.8-flash-high"
+        }
+      }
+    },
+    {
+      "phase_type": "sysadmin",
+      "execution_mode": "gemini_sub",
+      "stages": {
+        "plan": {
+          "alias": "codex-architecture-docs-primary",
+          "provider": "codex",
+          "profile": "architecture-docs-primary"
+        },
+        "plan_review": {
+          "alias": "claude-sysadmin-opus-review",
+          "provider": "claude",
+          "profile": "sysadmin-opus-review"
+        },
+        "work": {
+          "alias": "codex-sysadmin-primary",
+          "provider": "codex",
+          "profile": "sysadmin-primary"
+        },
+        "final_review": {
+          "alias": "claude-sysadmin-opus-review",
+          "provider": "claude",
+          "profile": "sysadmin-opus-review"
+        },
+        "closeout": {
+          "alias": "codex-implementation-testing",
+          "provider": "codex",
+          "profile": "implementation-testing"
+        }
+      }
+    },
+    {
+      "phase_type": "sysadmin",
+      "execution_mode": "normal",
+      "stages": {
+        "plan": {
+          "alias": "codex-architecture-docs-primary",
+          "provider": "codex",
+          "profile": "architecture-docs-primary"
+        },
+        "plan_review": {
+          "alias": "claude-normal-sysadmin-plan-review",
+          "provider": "claude",
+          "profile": "normal-sysadmin-plan-review"
+        },
+        "work": {
+          "alias": "antigravity-gemini-high",
+          "provider": "antigravity",
+          "profile": "gemini-3.8-flash-high"
+        },
+        "final_review": {
+          "alias": "claude-sysadmin-opus-review",
+          "provider": "claude",
+          "profile": "sysadmin-opus-review"
+        },
+        "closeout": {
+          "alias": "codex-implementation-testing",
+          "provider": "codex",
+          "profile": "implementation-testing"
+        }
+      }
+    }
+  ],
+  "lifecycle_stages": [
+    {
+      "name": "plan",
+      "role": "primary",
+      "routing_slot": "plan",
+      "prefix": "01-plan",
+      "candidate_key": null,
+      "checkpoint": null,
+      "is_mutating": false,
+      "process_read_only": true
+    },
+    {
+      "name": "plan_review",
+      "role": "reviewer",
+      "routing_slot": "plan_review",
+      "prefix": "02-plan-review",
+      "candidate_key": null,
+      "checkpoint": "post_planning",
+      "is_mutating": false,
+      "process_read_only": true
+    },
+    {
+      "name": "work",
+      "role": "primary",
+      "routing_slot": "work",
+      "prefix": "03-work",
+      "candidate_key": "pre_final_candidate",
+      "checkpoint": null,
+      "is_mutating": true,
+      "process_read_only": false
+    },
+    {
+      "name": "final_review",
+      "role": "reviewer",
+      "routing_slot": "final_review",
+      "prefix": "04-final-review",
+      "candidate_key": null,
+      "checkpoint": "pre_final",
+      "is_mutating": false,
+      "process_read_only": true
+    },
+    {
+      "name": "closeout",
+      "role": "primary",
+      "routing_slot": "closeout",
+      "prefix": "05-closeout",
+      "candidate_key": "closeout_candidate",
+      "checkpoint": null,
+      "is_mutating": true,
+      "process_read_only": false
+    }
+  ],
+  "valid_request_samples": [
+    {
+      "schema": "agent-phase-request-v1",
+      "phase_type": "implementation_testing",
+      "execution_mode": "normal",
+      "prompt": "Perform implementation task"
+    },
+    {
+      "schema": "agent-phase-request-v1",
+      "phase_type": "architecture_docs",
+      "execution_mode": "gemini_flash_sub",
+      "prompt": "Perform architecture documentation"
+    },
+    {
+      "schema": "agent-phase-request-v1",
+      "phase_type": "sysadmin",
+      "execution_mode": "claude_only",
+      "prompt": "Perform sysadmin maintenance"
+    }
+  ],
+  "invalid_request_samples": [
+    {
+      "input": {
+        "schema": "agent-phase-request-v1",
+        "phase_type": "invalid_type",
+        "execution_mode": "normal",
+        "prompt": "prompt"
+      },
+      "expected_error": "unsupported phase_type"
+    },
+    {
+      "input": {
+        "schema": "agent-phase-request-v1",
+        "phase_type": "implementation_testing",
+        "execution_mode": "invalid_mode",
+        "prompt": "prompt"
+      },
+      "expected_error": "unsupported execution_mode"
+    },
+    {
+      "input": {
+        "schema": "agent-phase-request-v1",
+        "phase_type": "implementation_testing",
+        "execution_mode": "normal",
+        "prompt": ""
+      },
+      "expected_error": "prompt must be non-empty"
+    },
+    {
+      "input": {
+        "schema": "wrong-schema",
+        "phase_type": "implementation_testing",
+        "execution_mode": "normal",
+        "prompt": "prompt"
+      },
+      "expected_error": "request schema must be"
+    },
+    {
+      "input": {
+        "schema": "agent-phase-request-v1",
+        "phase_type": "implementation_testing",
+        "execution_mode": "normal",
+        "prompt": "prompt",
+        "extra_key": "unsupported"
+      },
+      "expected_error": "request keys must be exactly"
+    }
+  ],
+  "error_classifications": [
+    "RequestError",
+    "RosterError",
+    "RoutingError",
+    "LifecycleError",
+    "CandidateError",
+    "ArchiveError",
+    "AdoptionError",
+    "FinalizationError"
+  ]
+}

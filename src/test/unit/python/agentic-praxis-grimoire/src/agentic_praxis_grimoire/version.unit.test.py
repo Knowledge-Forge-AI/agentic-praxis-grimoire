@@ -18,7 +18,7 @@ from agentic_praxis_grimoire import VERSION, __version__  # noqa: E402
 from agentic_praxis_grimoire.version import version  # noqa: E402
 
 
-CURRENT_VERSION = "0.11.0"
+CURRENT_VERSION = "0.12.0"
 
 
 def test_version_is_read_from_the_single_package_resource() -> None:

@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+from dataclasses import replace
 import os
 import subprocess
 import sys
@@ -146,6 +147,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--evidence-dir", required=True, type=Path)
     parser.add_argument("--tool-root", type=Path, default=None)
     parser.add_argument("--check", type=str, default=None, help="Run only a specific named check")
+    parser.add_argument("--public-projection", action="store_true",
+                        help="Explicitly validate publication-excluded matrix rows through public traceability")
     args = parser.parse_args(argv)
 
     if args.tool_root:
@@ -154,6 +157,11 @@ def main(argv: list[str] | None = None) -> int:
     with tempfile.TemporaryDirectory(prefix="apgr-pre-review-scratch-") as raw:
         scratch_dir = Path(raw)
         all_checks = checks(scratch_dir, args.tool_root)
+        if args.public_projection:
+            all_checks = tuple(
+                replace(check, command=(*check.command, "--mode", "public"))
+                if check.name == "release-matrix" else check for check in all_checks
+            )
         if args.check:
             selected = tuple(c for c in all_checks if c.name == args.check)
             if not selected:

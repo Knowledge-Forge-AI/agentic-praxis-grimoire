@@ -270,7 +270,10 @@ def test_load_shipped_policy() -> None:
     assert shipped_policy.is_file()
     policy = load_policy(shipped_policy)
     assert policy.schema == "apg-file-length-policy-v1"
-    assert len(policy.allowances) == 18
+    declared = json.loads(shipped_policy.read_text(encoding="utf-8"))["allowances"]
+    assert policy.allowances
+    assert set(policy.allowances) == {entry["path"] for entry in declared}
+    assert len(policy.allowances) == len(declared)
     for allowance in policy.allowances.values():
         assert allowance.count > 1000
         assert len(allowance.sha256) == 64

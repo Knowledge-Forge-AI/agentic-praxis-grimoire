@@ -1,0 +1,9 @@
+{
+  "modelRole": "primary",
+  "effort": "high",
+  "permissionMode": "acceptEdits",
+  "additionalDirectories": [
+    "user-home",
+    "scratch"
+  ]
+}

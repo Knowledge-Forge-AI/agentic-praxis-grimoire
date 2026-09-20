@@ -21,7 +21,7 @@ from agentic_praxis_grimoire import go_bridge  # noqa: E402
 from agentic_praxis_grimoire import __main__ as module_main  # noqa: E402
 
 
-CURRENT_VERSION = "0.11.0"
+CURRENT_VERSION = "0.12.0"
 
 
 def test_help_and_version_are_checkout_independent(capsys: pytest.CaptureFixture[str]) -> None:

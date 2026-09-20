@@ -1,0 +1,3 @@
+# Astra parent for adversarial review of host and system-administration candidates.
+model = "gpt-6-astra"
+model_reasoning_effort = "medium"

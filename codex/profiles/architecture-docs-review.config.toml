@@ -1,0 +1,3 @@
+# Astra parent for adversarial review of Claude-authored architecture and docs.
+model = "gpt-6-astra"
+model_reasoning_effort = "medium"
