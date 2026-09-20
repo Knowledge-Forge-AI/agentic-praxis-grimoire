@@ -65,14 +65,7 @@ func TestVerifyCorpusRejectsLinkedAuthority(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	candidate := t.TempDir()
-	if err := os.MkdirAll(filepath.Join(candidate, "src/agentic_praxis_grimoire/resources"), 0700); err != nil {
-		t.Fatal(err)
-	}
-	copyCorpusFixture(t, root, candidate)
-	for _, name := range []string{"skills/README.md", "skills/rules.go", "skills/catalog_generated.json", "docs/governance/skill-maturity-ledger.json", "docs/guides/skill-context-bundles.md", "docs/chatgpt-manager-skill-topology.md"} {
-		copySkillFile(t, root, candidate, name)
-	}
+	candidate := newDirectCorpusFixture(t)
 	if exit, _, stderr := runTest(t, context.Background(), "skills", "verify-corpus", "--repository", candidate); exit != 0 {
 		t.Fatal(stderr)
 	}
@@ -83,7 +76,7 @@ func TestVerifyCorpusRejectsLinkedAuthority(t *testing.T) {
 	if err := os.Symlink(filepath.Join(root, "docs/governance/skill-maturity-ledger.json"), authority); err != nil {
 		t.Fatal(err)
 	}
-	if exit, _, _ := runTest(t, context.Background(), "skills", "verify-corpus", "--repository", candidate); exit != 1 {
-		t.Fatal("linked authority accepted", exit)
+	if exit, _, stderr := runTest(t, context.Background(), "skills", "verify-corpus", "--repository", candidate); exit != 1 || !strings.Contains(stderr, "skill corpus path is unsafe") || strings.Contains(stderr, "repository root is unsafe") {
+		t.Fatal("linked authority rejection", exit, stderr)
 	}
 }
