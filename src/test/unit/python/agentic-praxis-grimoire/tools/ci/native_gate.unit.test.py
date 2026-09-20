@@ -6,11 +6,12 @@ import copy
 import hashlib
 import io
 import json
-from pathlib import Path
-from types import SimpleNamespace
-from typing import Any, Callable
 import urllib.error
 import zipfile
+from collections.abc import Callable
+from pathlib import Path
+from types import SimpleNamespace
+from typing import Any
 
 import pytest
 
@@ -158,6 +159,17 @@ def build_evidence(tmp_path: Path, gh: FakeGitHub, monkeypatch: pytest.MonkeyPat
         path.write_bytes((json.dumps(doc, indent=2, sort_keys=True) + "\n").encode() if pretty else canonical_json(doc))
         paths[key], docs[key] = path, doc
 
+    # 1. Native guard receipt
+    guard_dir = evidence / "native-guard-receipt"
+    guard_dir.mkdir(parents=True, exist_ok=True)
+    guard_doc = {"schema_version": "apgr.native-identity/v1", "source_commit": COMMIT, "source_tree": TREE,
+                 "repository": na.EXPECTED_REPO, "repository_id": na.EXPECTED_REPO_ID,
+                 "pr_head_sha": HEAD, "pr_base_sha": BASE, "status": "passed"}
+    emit("guard", "native-guard-receipt/identity.json", guard_doc, None)
+    (guard_dir / "native-guard-receipt.json").write_text(
+        json.dumps({"schema": "apg-matrix-receipt-v1", "job": "native-guard", "status": "success"}) + "\n")
+
+    # 2. Lane seals, receipts and lane download artifacts with wrapper
     lane_ids: dict[str, str] = {}
     for lane in REQUIRED_LANES:
         spec = CANONICAL_TARGETS[lane]
@@ -165,7 +177,17 @@ def build_evidence(tmp_path: Path, gh: FakeGitHub, monkeypatch: pytest.MonkeyPat
                "source_tree": TREE, "files": {n: {"sha256": hex_of(n), "size_bytes": 1} for n in sorted(assembly.LANE_FILES)}}
         emit(f"lane:{lane}", f"{lane}-receipt/lane-seal.json", doc, "seal_sha256")
         lane_ids[lane] = sealed[f"lane:{lane}"]
+        (evidence / f"{lane}-receipt" / f"{lane}-receipt.json").write_text(
+            json.dumps({"schema": "apg-matrix-receipt-v1", "job": lane, "status": "success"}) + "\n")
 
+        # Real lane artifact download directory with wrapper slug
+        lane_out = evidence / lane / spec["slug"]
+        lane_out.mkdir(parents=True, exist_ok=True)
+        (lane_out / "lane-seal.json").write_bytes(paths[f"lane:{lane}"].read_bytes())
+        for name in assembly.LANE_FILES:
+            (lane_out / name).write_bytes(f"fixture {lane} {name}\n".encode())
+
+    # 3. Bundle seal, assemble receipt and bundle download artifact
     assets = {spec["go_binary"]: {"sha256": hex_of(spec["go_binary"]), "size_bytes": 5} for spec in CANONICAL_TARGETS.values()}
     assets.update({f"python/{n}": {"sha256": hex_of(n), "size_bytes": 5} for n in (*WHEELS, "pkg-0.13.0.tar.gz")})
     assets.update({f"npm/{n}": {"sha256": hex_of(n), "size_bytes": 5} for n in NPMS})
@@ -178,18 +200,50 @@ def build_evidence(tmp_path: Path, gh: FakeGitHub, monkeypatch: pytest.MonkeyPat
          {"schema_version": 1, "canonical_public_identity": na.EXPECTED_REPO, "excluded_prefix": "private/",
           "entries": [{"path": ".github/workflows/native-qualification.yml", "mode": "100644", "type": "file",
                        "sha256": WORKFLOW_SHA}]}, None)
+    (evidence / "native-assemble-receipt" / "native-assemble-receipt.json").write_text(
+        json.dumps({"schema": "apg-matrix-receipt-v1", "job": "native-assemble", "status": "success"}) + "\n")
 
+    bundle_dir = evidence / assembly.BUNDLE_ARTIFACT_NAME
+    bundle_dir.mkdir(parents=True, exist_ok=True)
+    (bundle_dir / "release-bundle-seal.json").write_bytes(paths["bundle"].read_bytes())
+    for asset_name in bundle["assets"]:
+        asset_path = bundle_dir / asset_name
+        asset_path.parent.mkdir(parents=True, exist_ok=True)
+        asset_path.write_bytes(f"asset {asset_name}\n".encode())
     for lane in REQUIRED_LANES:
+        manifest_path = bundle_dir / f"go/{assembly._go_slug(lane)}/apgr.binary-manifest.json"
+        manifest_path.parent.mkdir(parents=True, exist_ok=True)
+        manifest_path.write_bytes(b"{}\n")
+    (bundle_dir / "apg-distribution-manifest.json").write_bytes(b"manifest\n")
+    (bundle_dir / "SHA256SUMS").write_bytes(b"sums\n")
+
+    # 4. Consumer receipts
+    for lane in REQUIRED_LANES:
+        job = CONSUMER_JOBS[lane]
         doc = {"schema_version": CONSUMER_RECEIPT_SCHEMA, "lane": lane, "target": CANONICAL_TARGETS[lane]["target"], "bundle_seal_sha256": bundle_seal,
                "source_commit": COMMIT, "source_tree": TREE, "status": "passed",
                "checks": {"wheel_install_smoke": "passed", "foreign_wheel_rejected": "passed", "npm_install_smoke": "passed", "bundle_seal_verified": "passed"}}
-        emit(f"consumer:{lane}", f"{CONSUMER_JOBS[lane]}-receipt/consumer-receipt.json", doc, "receipt_sha256")
+        emit(f"consumer:{lane}", f"{job}-receipt/consumer-receipt.json", doc, "receipt_sha256")
+        (evidence / f"{job}-receipt" / f"{job}-receipt.json").write_text(
+            json.dumps({"schema": "apg-matrix-receipt-v1", "job": job, "status": "success"}) + "\n")
 
+    # 5. Scan results, scan receipt and scan evidence download artifact
     emit("scan-results", "native-release-scans-receipt/scan-results.json", scan_doc(baseline_assets), None, pretty=True)
     receipt = {"schema_version": SCAN_RECEIPT_SCHEMA, "bundle_seal_sha256": bundle_seal, "asset_count": 11, "scan_count": 14, "status": "passed",
                "grype_policy": "passed", "scans_digest": hashlib.sha256(paths["scan-results"].read_bytes()).hexdigest()}
     emit("scan-receipt", "native-release-scans-receipt/scan-receipt.json", receipt, "receipt_sha256")
+    (evidence / "native-release-scans-receipt" / "native-release-scans-receipt.json").write_text(
+        json.dumps({"schema": "apg-matrix-receipt-v1", "job": "native-release-scans", "status": "success"}) + "\n")
 
+    scan_dir = evidence / "native-scan-evidence"
+    scan_dir.mkdir(parents=True, exist_ok=True)
+    (scan_dir / "scan-results.json").write_bytes(paths["scan-results"].read_bytes())
+    # Exact duplicate fixture hotspot/testdata/classification/sample.json under scan extracted sdist
+    sample_path = scan_dir / "extracted" / "python-sdist" / "agentic_praxis_grimoire-0.13.0" / "hotspot" / "testdata" / "classification" / "sample.json"
+    sample_path.parent.mkdir(parents=True, exist_ok=True)
+    sample_path.write_bytes((Path(__file__).resolve().parents[7] / 'hotspot/testdata/classification/sample.json').read_bytes())
+
+    # 6. Matrix aggregate
     def digest(key: str) -> str:
         return hashlib.sha256(paths[key].read_bytes()).hexdigest()
 
@@ -197,15 +251,25 @@ def build_evidence(tmp_path: Path, gh: FakeGitHub, monkeypatch: pytest.MonkeyPat
     bound["native-assemble"] = {"release-bundle-seal.json": digest("bundle"),
                                 "public-projection-manifest.json": digest("public-projection")}
     bound.update({CONSUMER_JOBS[lane]: {"consumer-receipt.json": digest(f"consumer:{lane}")} for lane in REQUIRED_LANES})
-    bound["native-release-scans"] = {"scan-results.json": digest("scan-results")}
+    bound["native-release-scans"] = {"scan-results.json": digest("scan-results"),
+                                    "scan-receipt.json": digest("scan-receipt")}
+    bound["native-guard"] = {"identity.json": digest("guard")}
     members = {job: {"schema": "apg-matrix-receipt-v1", "job": job, "workflow": "native-qualification", "status": "success", "sha": COMMIT,
                      "pr_head_sha": HEAD, "pr_base_sha": BASE, "workflow_sha256": WORKFLOW_SHA, "artifacts": bound.get(job, {})}
                for job in sorted(gate.MATRIX_JOBS)}
     aggregate = {"schema": gate.AGGREGATE_SCHEMA, "success": True, "required_members_count": 9, "verified_members_count": 9, "errors": [],
                  "members": members, "member_receipt_status": {job: "success" for job in sorted(members)}}
     emit("matrix", "matrix-aggregate.json", aggregate, None, pretty=True)
+
     for key in skip:
         paths[key].unlink()
+        if key.startswith("lane:"):
+            lane = key.removeprefix("lane:")
+            (evidence / lane / CANONICAL_TARGETS[lane]["slug"] / "lane-seal.json").unlink(missing_ok=True)
+        elif key == "bundle":
+            (evidence / assembly.BUNDLE_ARTIFACT_NAME / "release-bundle-seal.json").unlink(missing_ok=True)
+        elif key == "scan-results":
+            (evidence / "native-scan-evidence" / "scan-results.json").unlink(missing_ok=True)
 
     inputs = {lane: {"seal_sha256": lane_ids[lane], "artifact_id": LANE_IDS[lane], "artifact_digest": "sha256:" + hex_of(lane)} for lane in REQUIRED_LANES}
     bundle_ref = {"artifact_id": BUNDLE_ID, "artifact_digest": "sha256:" + hex_of(assembly.BUNDLE_ARTIFACT_NAME), "seal_sha256": bundle_seal}
@@ -485,20 +549,33 @@ def test_duplicate_evidence_fails(tmp_path: Path, gh: FakeGitHub, monkeypatch: p
 
 def test_evidence_directory_hygiene(tmp_path: Path, gh: FakeGitHub, monkeypatch: pytest.MonkeyPatch) -> None:
     world = build_evidence(tmp_path, gh, monkeypatch)
-    stray = world.evidence / "notes.txt"
+    extracted_dir = world.evidence / "native-scan-evidence" / "extracted" / "python-sdist" / "agentic_praxis_grimoire-0.13.0"
+    stray = extracted_dir / "notes.txt"
     stray.write_text("not json is ignored", encoding="utf-8")
-    other = world.evidence / "unrelated.json"
+    other = extracted_dir / "unrelated.json"
     other.write_text('{"schema": "something-else"}', encoding="utf-8")
     gate.run_gate(world.evidence, world.out)
 
     (world.out / "native-rc-index.json").unlink()
-    other.write_text("{broken", encoding="utf-8")
-    fails(world, "failed to read JSON", SealError)
-    other.write_text("[1]", encoding="utf-8")
-    fails(world, "expected JSON object", SealError)
-    other.write_text('{"a": 1, "a": 2}', encoding="utf-8")
-    fails(world, "duplicate key", SealError)
-    other.unlink()
+    bundle_path = world.paths["bundle"]
+    bundle_proof = world.evidence / assembly.BUNDLE_ARTIFACT_NAME / "release-bundle-seal.json"
+    bundle_orig = bundle_path.read_bytes()
+    bundle_orig_proof = bundle_proof.read_bytes()
+    for bad_content, err_msg in (
+        ("{broken", "failed to read JSON"),
+        ("[1]", "expected JSON object"),
+        ('{"a": 1, "a": 2}', "duplicate key"),
+    ):
+        bundle_path.write_text(bad_content, encoding="utf-8")
+        bundle_proof.write_text(bad_content, encoding="utf-8")
+        fails(world, err_msg, SealError)
+    bundle_path.write_bytes(bundle_orig)
+    bundle_proof.write_bytes(bundle_orig_proof)
+
+    root_stray = world.evidence / "notes.txt"
+    root_stray.write_text("not allowed at root", encoding="utf-8")
+    fails(world, "wrong-root")
+    root_stray.unlink()
 
     link = world.evidence / "link.json"
     link.symlink_to(world.paths["bundle"])
@@ -742,6 +819,8 @@ def test_matrix_aggregate_semantics(tmp_path: Path, gh: FakeGitHub, monkeypatch:
 @pytest.mark.parametrize(
     ("job", "artifacts", "message"),
     [
+        ("native-guard", {"identity.json": "0" * 64}, "does not bind identity.json"),
+        ("native-guard", {}, "does not bind identity.json"),
         ("native-darwin-arm64", {"lane-seal.json": "0" * 64}, "does not bind lane-seal.json"),
         ("native-darwin-arm64", {}, "does not bind lane-seal.json"),
         ("native-darwin-arm64", "not-a-mapping", "does not bind lane-seal.json"),
@@ -754,6 +833,24 @@ def test_matrix_aggregate_semantics(tmp_path: Path, gh: FakeGitHub, monkeypatch:
 def test_matrix_receipts_must_bind_the_exact_evidence_files(tmp_path: Path, gh: FakeGitHub, monkeypatch: pytest.MonkeyPatch, job: str, artifacts: Any, message: str) -> None:
     world = build_evidence(tmp_path, gh, monkeypatch, edits={"matrix": _member(job, artifacts=artifacts)})
     fails(world, message)
+
+
+@pytest.mark.parametrize("key", ["source_commit", "source_tree", "pr_head_sha", "pr_base_sha"])
+def test_guard_must_match_source_identity(tmp_path: Path, gh: FakeGitHub, monkeypatch: pytest.MonkeyPatch, key: str) -> None:
+    world = build_evidence(tmp_path, gh, monkeypatch, edits={"guard": lambda doc: doc.update({key: "0" * 40})})
+    fails(world, "guard identity differs from source identity")
+
+
+@pytest.mark.parametrize("digest", [None, "0" * 64])
+def test_matrix_binds_scan_receipt(tmp_path: Path, gh: FakeGitHub, monkeypatch: pytest.MonkeyPatch, digest: str | None) -> None:
+    def edit(doc):
+        refs = doc["members"]["native-release-scans"]["artifacts"]
+        if digest is None:
+            del refs["scan-receipt.json"]
+        else:
+            refs["scan-receipt.json"] = digest
+    world = build_evidence(tmp_path, gh, monkeypatch, edits={"matrix": edit})
+    fails(world, "does not bind scan-receipt.json")
 
 
 def test_substituted_evidence_breaks_matrix_binding(tmp_path: Path, gh: FakeGitHub, monkeypatch: pytest.MonkeyPatch) -> None:

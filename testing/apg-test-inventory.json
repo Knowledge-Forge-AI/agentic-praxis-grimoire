@@ -1494,6 +1494,11 @@
       "suite": "integration"
     },
     {
+      "owner": "tools/ci/release_boundary.py",
+      "path": "src/test/int/python/agentic-praxis-grimoire/tools/ci/release_boundary.int.test.py",
+      "suite": "integration"
+    },
+    {
       "owner": "tools/ci/run_pre_review.py",
       "path": "src/test/int/python/agentic-praxis-grimoire/tools/ci/run_pre_review.int.test.py",
       "suite": "integration"
@@ -2194,6 +2199,11 @@
       "suite": "unit"
     },
     {
+      "owner": "tools/ci/native_gate_discovery.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/tools/ci/native_gate_discovery.unit.test.py",
+      "suite": "unit"
+    },
+    {
       "owner": "tools/ci/native_lane.py",
       "path": "src/test/unit/python/agentic-praxis-grimoire/tools/ci/native_lane.unit.test.py",
       "suite": "unit"
@@ -2241,6 +2251,11 @@
     {
       "owner": "tools/ci/python_type_check.py",
       "path": "src/test/unit/python/agentic-praxis-grimoire/tools/ci/python_type_check.unit.test.py",
+      "suite": "unit"
+    },
+    {
+      "owner": "tools/ci/release_boundary.py",
+      "path": "src/test/unit/python/agentic-praxis-grimoire/tools/ci/release_boundary.unit.test.py",
       "suite": "unit"
     },
     {

@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import json
-from pathlib import Path
 import sys
+from pathlib import Path
 
 if str(Path(__file__).resolve().parents[7]) not in sys.path:
     sys.path.insert(0, str(Path(__file__).resolve().parents[7]))
@@ -40,7 +40,7 @@ def test_private_mode_enforces_repository_surface() -> None:
     assert res["summary"]["reg_r_count"] == 13
     assert res["summary"]["reg_p_count"] == 13
     assert res["summary"]["f_count"] == 12
-    assert res["summary"]["private_only_count"] == 26
+    assert res["summary"]["private_only_count"] == 25
     assert res["summary"]["mode"] == "private"
 
 
@@ -48,7 +48,7 @@ def test_public_mode_passes_on_repository_matrix() -> None:
     res = checker.validate_matrix(checker.MATRIX_PATH, REPO_ROOT, mode="public")
     assert res["status"] == "passed", f"Validation errors: {res.get('errors')}"
     assert res["summary"]["total_rules"] == 38
-    assert res["summary"]["private_only_count"] == 26
+    assert res["summary"]["private_only_count"] == 25
     assert res["summary"]["mode"] == "public"
 
 

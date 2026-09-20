@@ -22,21 +22,21 @@ if str(Path(__file__).resolve().parents[2]) not in sys.path:
 
 from tools.ci import native_artifacts as artifacts
 from tools.ci import native_release_assembly as assembly
+from tools.ci.native_gate_discovery import (
+    GateError,
+    _discover,
+    _env_json,
+    _require,
+    _self_hashed,
+)
 from tools.ci.native_seal import (
     CANONICAL_TARGETS,
-    CONSUMER_RECEIPT_SCHEMA,
-    LANE_SEAL_SCHEMA,
     RC_INDEX_SCHEMA,
-    RELEASE_BUNDLE_SEAL_SCHEMA,
     REQUIRED_LANES,
-    SCAN_RECEIPT_SCHEMA,
     SealError,
-    assert_direct_dir,
     canonical_json,
     check_containment,
-    load_canonical_json,
     sha256_bytes,
-    sha256_file,
 )
 from tools.ci.native_topology import REQUIRED_NATIVE_JOBS
 
@@ -47,76 +47,6 @@ MATRIX_JOBS = frozenset(REQUIRED_NATIVE_JOBS - {"native-release-candidate-gate"}
 INDEX_NAME = "native-rc-index.json"
 HEX_RE = assembly.HEX_RE
 
-
-class GateError(ValueError):
-    """Release candidate gate verification failure."""
-
-
-def _require(condition: bool, message: str) -> None:
-    if not condition:
-        raise GateError(message)
-
-
-def _env_json(name: str) -> Any:
-    raw = os.environ.get(name)
-    _require(bool(raw), f"missing {name} environment variable")
-    try:
-        return assembly.strict_json(raw or "", name)
-    except assembly.AssemblyError as error:
-        raise GateError(str(error)) from error
-
-
-def _self_hashed(doc: Mapping[str, Any], key: str, label: str) -> str:
-    recorded = doc.get(key)
-    _require(isinstance(recorded, str) and bool(HEX_RE.match(recorded)), f"{label} lacks a valid {key}")
-    body = {k: v for k, v in doc.items() if k != key}
-    _require(sha256_bytes(canonical_json(body)) == recorded, f"{label} {key} is tampered")
-    return recorded
-
-
-def _discover(evidence_dir: Path) -> dict[str, tuple[dict[str, Any], str]]:
-    """Locate each evidence document by schema; links, duplicates and strays are fatal."""
-    assert_direct_dir(evidence_dir, "evidence directory")
-    found: dict[str, tuple[dict[str, Any], str]] = {}
-    origins: dict[str, Path] = {}
-    for root, dirs, files in os.walk(evidence_dir):
-        for entry in [*dirs, *files]:
-            _require(not (Path(root) / entry).is_symlink(), f"symlink forbidden in evidence: {Path(root) / entry}")
-        for name in sorted(files):
-            if not name.endswith(".json"):
-                continue
-            path = Path(root) / name
-            doc = load_canonical_json(path)
-            version, schema = doc.get("schema_version"), doc.get("schema")
-            if version in (LANE_SEAL_SCHEMA, CONSUMER_RECEIPT_SCHEMA):
-                lane = doc.get("lane")
-                _require(lane in CANONICAL_TARGETS, f"{path.name} names an unknown lane: {lane!r}")
-                key = f"{'lane' if version == LANE_SEAL_SCHEMA else 'consumer'}:{lane}"
-            elif version == RELEASE_BUNDLE_SEAL_SCHEMA:
-                key = "bundle"
-            elif version == SCAN_RECEIPT_SCHEMA:
-                key = "scan-receipt"
-            elif schema == assembly.SCAN_SCHEMA:
-                key = "scan-results"
-            elif schema == AGGREGATE_SCHEMA:
-                key = "matrix"
-            elif name == "public-projection-manifest.json":
-                key = "public-projection"
-            else:
-                continue
-            roots: set[str] = set()
-            if key.startswith("lane:"):
-                roots = {str(doc["lane"]), f"{doc['lane']}-receipt"}
-            elif key == "bundle":
-                roots = {assembly.BUNDLE_ARTIFACT_NAME, "native-assemble-receipt"}
-            elif key == "scan-results":
-                roots = {"native-scan-evidence", "native-release-scans-receipt"}
-            if key in found and {path.relative_to(evidence_dir).parts[0], origins[key].relative_to(evidence_dir).parts[0]} <= roots and found[key][1] == sha256_file(path):
-                continue  # The matrix artifact contains a hash-bound copy.
-            _require(key not in found, f"duplicate evidence for {key}: {path}")
-            found[key] = (doc, sha256_file(path))
-            origins[key] = path
-    return found
 
 
 def _bound(members: Mapping[str, Any], job: str, filename: str, digest: str) -> None:
@@ -235,11 +165,14 @@ def run_gate(evidence_dir: Path, output_path: Path) -> dict[str, Any]:
         artifacts.verify_artifact_metadata(ctx, artifact_id, digest, name)
     _verify_inputs(evidence_dir, ctx, inputs, bundle_ref)
 
-    found = _discover(evidence_dir)
-    expected = {"matrix", "bundle", "scan-results", "scan-receipt", "public-projection",
+    found = _discover(evidence_dir, bundle_ref)
+    expected = {"matrix", "guard", "bundle", "scan-results", "scan-receipt", "public-projection",
                 *(f"lane:{lane}" for lane in REQUIRED_LANES), *(f"consumer:{lane}" for lane in REQUIRED_LANES)}
     _require(set(found) == expected, f"evidence set is incomplete: missing={sorted(expected - set(found))}")
     members = _check_matrix(found, identity)
+    guard, guard_sha = found["guard"]
+    _require(all(guard.get(key) == value for key, value in identity.items()), "guard identity differs from source identity")
+    _bound(members, "native-guard", "identity.json", guard_sha)
 
     lane_hashes: dict[str, str] = {}
     for lane in REQUIRED_LANES:
@@ -271,6 +204,7 @@ def run_gate(evidence_dir: Path, output_path: Path) -> dict[str, Any]:
     scan_receipt, scan_receipt_sha = found["scan-receipt"]
     scan_digest = _check_scans(scan_results, scan_receipt, results_sha, bundle)
     _bound(members, "native-release-scans", "scan-results.json", results_sha)
+    _bound(members, "native-release-scans", "scan-receipt.json", scan_receipt_sha)
 
     aggregate_sha = found["matrix"][1]
     index: dict[str, Any] = {

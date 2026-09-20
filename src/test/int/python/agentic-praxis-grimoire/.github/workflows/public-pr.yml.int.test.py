@@ -100,31 +100,33 @@ def test_all_shipped_workflows_structural_assertion() -> None:
 
     # 2. release.yml structural assertion
     doc_rel = parse_yaml_or_json(RELEASE_WORKFLOW_PATH.read_text(encoding="utf-8"))
-    assert doc_rel["name"] == "Publish Python distribution (v0.13 provenance blocked)"
+    assert doc_rel["name"] == "Verify published release boundary"
     assert isinstance(doc_rel.get("jobs"), dict)
     assert doc_rel.get("permissions") == {}
     assert "release" in doc_rel.get("on", {})
-    assert "publish" in doc_rel["jobs"]
+    assert "verify" in doc_rel["jobs"]
 
     # 3. Structural and topology validation via existing ci_topology tool
     assert validate_all_workflows() == []
 
 
-def test_release_publication_keeps_unsatisfiable_provenance_guard() -> None:
+def test_release_workflow_is_read_only_and_cannot_publish_packages() -> None:
     doc = parse_yaml_or_json(RELEASE_WORKFLOW_PATH.read_text())
-    steps = doc["jobs"]["publish"]["steps"]
+    steps = doc["jobs"]["verify"]["steps"]
     assert [step["name"] for step in steps] == [
-        "Download and verify exact GitHub Release assets",
-        "Verify merged source, PR approval, and workflow checks",
-        "Publish verified distributions to PyPI",
+        "Check out trusted repository",
+        "Verify published release boundary",
     ]
-    verification = steps[1]
-    assert "if" not in verification and not verification.get("continue-on-error", False)
-    lines = verification["run"].splitlines()
-    assert "# v0.13 publication is knowingly unsatisfiable for PR-native bundles:" in lines
-    assert '[[ "$manifest_source_commit" == "$merged_commit" ]] || exit 1' in lines
-    assert '[[ "$manifest_source_tree" == "$merged_tree" ]] || exit 1' in lines
-    assert steps[-1]["uses"].startswith("pypa/gh-action-pypi-publish@")
+    checkout_step = steps[0]
+    assert checkout_step["uses"] == "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1"
+    assert checkout_step["with"]["persist-credentials"] is False
+
+    verify_step = steps[1]
+    assert "tools/ci/release_boundary.py verify-published" in verify_step["run"]
+    assert verify_step["env"] == {"GH_TOKEN": "${{ github.token }}"}
+    assert "uses" not in verify_step
+    assert "environment" not in doc["jobs"]["verify"]
+    assert "id-token" not in doc["jobs"]["verify"]["permissions"]
 
 
 def test_native_failure_diagnostics_upload_is_bound_to_failed_qualify() -> None:
@@ -155,8 +157,8 @@ def test_native_jobs_own_nix_qualification() -> None:
 
 def test_failure_upload_matches_only_sanitized_browser_writer(tmp_path):
     """Exercise the maintained writer and the workflow's exact upload glob."""
-    import sys
     import json
+    import sys
     sys.path.insert(0, str(ROOT / "src/test/support"))
     from apg123_browser_ui import BrowserHarnessConfig, retain_failure_evidence
 
@@ -205,7 +207,7 @@ def test_package_export_copies_only_distribution_artifacts(tmp_path):
         path.write_bytes(content)
     environment = dict(os.environ, RUNNER_TEMP=str(tmp_path), pkg_root=str(packages))
     result = subprocess.run(["bash", "-euc", script[start:end]], env=environment,
-                            capture_output=True, text=True)
+                            capture_output=True, text=True, check=False)
     assert result.returncode == 0, result.stderr
     exported = tmp_path / "deliverables"
     assert {p.relative_to(exported).as_posix() for p in exported.rglob("*") if p.is_file()} == {

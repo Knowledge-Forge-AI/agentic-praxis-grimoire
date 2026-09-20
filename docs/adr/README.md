@@ -740,3 +740,5 @@ V0110-G.
 
 - [`0077 — Codex parent roster and independent Sonnet pool`](2026/10/0077-codex-parent-roster-and-independent-sonnet-pool.md) — Proposed (APG166ZO candidate)
 - [`0078 — Native Hosted Release Qualification`](2026/10/0078-native-hosted-release-qualification.md) — Proposed (APG167Q candidate)
+
+- [`0079 — GitHub-only Release and Tree-bound Native Attestation`](2026/10/0079-github-release-only-boundary-and-tree-bound-attestation.md) — Proposed (APG167U candidate)

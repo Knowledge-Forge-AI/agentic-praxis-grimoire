@@ -6,7 +6,6 @@ from __future__ import annotations
 import argparse
 import json
 import re
-import shlex
 import sys
 from pathlib import Path
 from typing import Any
@@ -17,8 +16,6 @@ if str(Path(__file__).resolve().parents[2]) not in sys.path:
 from tools.ci.native_topology import (
     EXPECTED_REPO,
     EXPECTED_REPO_ID,
-    GATE as NATIVE_GATE,
-    MEMBER_JOBS as NATIVE_MEMBER_JOBS,
     SHA_PATTERN,
     check_go_setups,
     check_pull_request_workflow,
@@ -54,26 +51,54 @@ EXPECTED_CODEQL_LANGUAGES = {
 NATIVE_WORKFLOW_PATH = ".github/workflows/native-qualification.yml"
 NATIVE_INDEX_SCHEMA = "apgr.native-rc-index/v1"
 NATIVE_GATE_ARTIFACT = "native-release-candidate-gate-result"
-RELEASE_PUBLISH_ACTION = "pypa/gh-action-pypi-publish"
-RELEASE_PUBLISH_PIN = "dc37677b2e1c63e2034f94d8a5b11f265b73ba33"
+RELEASE_CHECKOUT_ACTION = "actions/checkout"
+RELEASE_CHECKOUT_PIN = "3d3c42e5aac5ba805825da76410c181273ba90b1"
 RELEASE_STEP_NAMES = [
-    "Download and verify exact GitHub Release assets",
-    "Verify merged source, PR approval, and workflow checks",
-    "Publish verified distributions to PyPI",
+    "Check out trusted repository",
+    "Verify published release boundary",
 ]
-RELEASE_JOB_KEYS = {"runs-on", "environment", "permissions", "steps"}
+RELEASE_VERIFY_COMMAND = (
+    'python3 tools/ci/release_boundary.py verify-published '
+    '--event "$GITHUB_EVENT_PATH" --output "$RUNNER_TEMP/release-boundary"'
+)
+RELEASE_JOB_KEYS = {"runs-on", "permissions", "steps"}
+EXPECTED_VERIFY_PERMISSIONS = {
+    "actions": "read",
+    "checks": "read",
+    "contents": "read",
+    "pull-requests": "read",
+}
 RELEASE_FORBIDDEN_TOKENS = (
     "continue-on-error", "go build", "go test", "nix build", "nix develop", "npm ci",
     "npm run", "pip install", "-m build", "gh workflow run", "gh run rerun",
 )
-RELEASE_VERIFY_FRAGMENTS = (
-    f"native_workflow_path={NATIVE_WORKFLOW_PATH}",
-    NATIVE_GATE_ARTIFACT,
-    NATIVE_INDEX_SCHEMA,
-    '.status == "passed"',
-    "unzip -Z1",
-    'actual_native_digest="sha256:',
-    '[[ "$actual_native_digest" == "$native_artifact_digest" ]]',
+GLOBAL_FORBIDDEN_PUBLICATION_MARKERS = (
+    "gh-action-pypi-publish",
+    "twine",
+    "npm publish",
+    "pnpm publish",
+    "yarn publish",
+    "uv publish",
+    "poetry publish",
+    "flit publish",
+    "hatch publish",
+    "cargo publish",
+    "gem push",
+    "goreleaser",
+    "docker push",
+    "brew",
+    "homebrew",
+    "pypi_",
+    "npm_token",
+    "node_auth_token",
+    "registry-url",
+    "id-token",
+    "secrets.",
+    "gh release",
+    "action-gh-release",
+)
+PUBLISH_COMMAND_PATTERN = re.compile(
+    r"\b(npm|pnpm|yarn|uv|poetry|flit|hatch|cargo)\s+publish\b", re.IGNORECASE
 )
 
 
@@ -197,34 +222,50 @@ def _check_codeql_matrix(errors: list[str], path: Path, job_doc: dict[str, Any])
         errors.append(f"{path.name}:codeql: language matrix contains duplicate members")
 
 
-def _script_array(script: str, name: str) -> list[str] | None:
-    match = re.search(rf"^{name}=\((.*)\)$", script, re.MULTILINE)
-    return shlex.split(match.group(1)) if match else None
+def check_global_publication_markers(raw_text: str, path: Path) -> list[str]:
+    errors = []
+    lower = raw_text.lower()
+    for marker in GLOBAL_FORBIDDEN_PUBLICATION_MARKERS:
+        if marker in lower:
+            errors.append(f"{path.name}: forbidden publication marker {marker!r}")
+    match = PUBLISH_COMMAND_PATTERN.search(raw_text)
+    if match:
+        matched_cmd = match.group(0).lower()
+        if not any(marker == matched_cmd for marker in GLOBAL_FORBIDDEN_PUBLICATION_MARKERS):
+            errors.append(f"{path.name}: forbidden publication marker {match.group(0)!r}")
+    return errors
 
 
-def _check_release_verification(errors: list[str], path: Path, script: str) -> None:
-    from release.ci.matrix_receipts import PUBLIC_PR_MEMBER_JOBS
+def check_workflow_permissions(doc: dict[str, Any], path: Path) -> list[str]:
+    errors = []
+    top_perms = doc.get("permissions")
+    if isinstance(top_perms, dict):
+        for perm, val in top_perms.items():
+            if val == "write":
+                errors.append(
+                    f"{path.name}: top-level write permission {perm!r} is forbidden"
+                )
+    elif top_perms == "write-all":
+        errors.append(f"{path.name}: top-level write-all permission is forbidden")
 
-    label = f"{path.name}:publish"
-    public_checks = sorted((REQUIRED_PR_JOBS - {"codeql"})
-                           | {f"codeql ({language})" for language in EXPECTED_CODEQL_LANGUAGES})
-    for name, expected in (
-        ("required_checks", public_checks),
-        ("native_required_checks", sorted([*NATIVE_MEMBER_JOBS, NATIVE_GATE])),
-    ):
-        actual = _script_array(script, name)
-        if actual is None or sorted(actual) != expected:
-            errors.append(f"{label}: {name} must be exactly {expected}, got {actual}")
-    receipts = re.search(r"^required_receipts='(.*)'$", script, re.MULTILINE)
-    try:
-        listed = sorted(json.loads(receipts.group(1))) if receipts else None
-    except ValueError:
-        listed = None
-    if listed != sorted(PUBLIC_PR_MEMBER_JOBS):
-        errors.append(f"{label}: required_receipts must be exactly {sorted(PUBLIC_PR_MEMBER_JOBS)}")
-    for fragment in RELEASE_VERIFY_FRAGMENTS:
-        if fragment not in script:
-            errors.append(f"{label}: release verification must contain {fragment!r}")
+    jobs = doc.get("jobs", {})
+    if isinstance(jobs, dict):
+        for job_name, job_doc in jobs.items():
+            if not isinstance(job_doc, dict):
+                continue
+            job_perms = job_doc.get("permissions")
+            if isinstance(job_perms, dict):
+                for perm, val in job_perms.items():
+                    if val == "write" and not (
+                        path.stem == "public-pr" and job_name == "codeql" and perm == "security-events"
+                    ):
+                        errors.append(f"{path.name}:{job_name}: write permission {perm!r} is forbidden "
+                                      "(only public-pr:codeql may write security-events)")
+            elif job_perms == "write-all":
+                errors.append(
+                    f"{path.name}:{job_name}: write-all permission is forbidden"
+                )
+    return errors
 
 
 def validate_release_yml(doc: dict[str, Any], path: Path) -> list[str]:
@@ -236,7 +277,7 @@ def validate_release_yml(doc: dict[str, Any], path: Path) -> list[str]:
     on = doc.get("on")
     if not isinstance(on, dict) or set(on) != {"release"}:
         errors.append(f"{path.name}: only release execution is permitted")
-    elif not isinstance(on.get("release"), dict) or on["release"].get("types") != ["published"]:
+    elif on != {"release": {"types": ["published"]}}:
         errors.append(f"{path.name}: release trigger must specify types: ['published']")
 
     # 2. Top-level permissions
@@ -248,71 +289,81 @@ def validate_release_yml(doc: dict[str, Any], path: Path) -> list[str]:
 
     # 3. Jobs inspection
     jobs = doc.get("jobs", {})
-    if not isinstance(jobs, dict) or "publish" not in jobs:
-        errors.append(f"{path.name}: missing required 'publish' job")
+    if not isinstance(jobs, dict) or "verify" not in jobs:
+        errors.append(f"{path.name}: missing required 'verify' job")
         return errors
-    if set(jobs) != {"publish"}:
-        errors.append(f"{path.name}: unexpected jobs in release: {sorted(set(jobs) - {'publish'})}")
+    if set(jobs) != {"verify"}:
+        errors.append(f"{path.name}: unexpected jobs in release: {sorted(set(jobs) - {'verify'})}")
 
-    publish = jobs["publish"]
-    if not isinstance(publish, dict):
-        errors.append(f"{path.name}:publish: job must be an object")
+    verify = jobs["verify"]
+    if not isinstance(verify, dict):
+        errors.append(f"{path.name}:verify: job must be an object")
         return errors
-    for key in sorted(set(publish) - RELEASE_JOB_KEYS):
-        errors.append(f"{path.name}:publish: unsupported job key {key!r}")
+    for key in sorted(set(verify) - RELEASE_JOB_KEYS):
+        errors.append(f"{path.name}:verify: unsupported job key {key!r}")
 
-    runs_on = publish.get("runs-on")
+    if "environment" in verify:
+        errors.append(f"{path.name}:verify: environment is forbidden")
+
+    runs_on = verify.get("runs-on")
     if runs_on != "ubuntu-latest":
-        errors.append(f"{path.name}:publish: runs-on must be ubuntu-latest, got {runs_on!r}")
+        errors.append(f"{path.name}:verify: runs-on must be ubuntu-latest, got {runs_on!r}")
 
-    environment = publish.get("environment")
-    if environment != "pypi":
-        errors.append(f"{path.name}:publish: environment must be 'pypi', got {environment!r}")
-
-    # Publication permissions check (distinct from PR)
-    expected_publish_perms = {
-        "actions": "read",
-        "checks": "read",
-        "contents": "read",
-        "id-token": "write",
-        "pull-requests": "read",
-    }
-    job_perms = publish.get("permissions")
-    if job_perms != expected_publish_perms:
+    job_perms = verify.get("permissions")
+    if job_perms != EXPECTED_VERIFY_PERMISSIONS:
         errors.append(
-            f"{path.name}:publish: permissions must be {expected_publish_perms}, got {job_perms}"
+            f"{path.name}:verify: permissions must be {EXPECTED_VERIFY_PERMISSIONS}, got {job_perms}"
         )
 
-    # Step inspection
-    steps = publish.get("steps", [])
-    if not isinstance(steps, list) or not steps:
-        errors.append(f"{path.name}:publish: job must contain non-empty steps")
+    steps = verify.get("steps", [])
+    if not isinstance(steps, list) or len(steps) != 2:
+        errors.append(f"{path.name}:verify: steps must contain exactly 2 steps, got {len(steps) if isinstance(steps, list) else type(steps)}")
         return errors
-    if [step.get("name") if isinstance(step, dict) else None for step in steps] != RELEASE_STEP_NAMES:
-        errors.append(f"{path.name}:publish: steps must be exactly {RELEASE_STEP_NAMES}")
 
-    for step in steps:
-        if not isinstance(step, dict):
-            errors.append(f"{path.name}:publish: step must be an object")
-            continue
-        uses = step.get("uses")
-        if uses:
-            action, _, ref = str(uses).partition("@")
-            if not SHA_PATTERN.match(ref.strip()):
-                errors.append(f"{path.name}:publish: action {uses} not pinned to 40-char SHA")
-            elif (action, ref) != (RELEASE_PUBLISH_ACTION, RELEASE_PUBLISH_PIN):
-                errors.append(f"{path.name}:publish: action {uses} is not the approved publisher pin")
-        for token in RELEASE_FORBIDDEN_TOKENS:
-            if token in str(step.get("run", "")) or token in step:
-                errors.append(f"{path.name}:publish: forbidden release step token {token!r}")
-        if "checkout" in str(uses).lower() and step.get("with", {}).get("persist-credentials") is not False:
-            errors.append(f"{path.name}:publish: checkout step must set persist-credentials: false")
-    if [s for s in steps if isinstance(s, dict) and "uses" in s] != [steps[-1]]:
-        errors.append(f"{path.name}:publish: only the final step may use an action")
-    verify = next((s for s in steps if isinstance(s, dict)
-                   and s.get("name") == RELEASE_STEP_NAMES[1]), None)
-    if verify is not None:
-        _check_release_verification(errors, path, str(verify.get("run", "")))
+    step_names = [step.get("name") if isinstance(step, dict) else None for step in steps]
+    if step_names != RELEASE_STEP_NAMES:
+        errors.append(f"{path.name}:verify: steps must be exactly {RELEASE_STEP_NAMES}")
+
+    step0, step1 = steps[0], steps[1]
+    if not isinstance(step0, dict) or not isinstance(step1, dict):
+        errors.append(f"{path.name}:verify: steps must be objects")
+        return errors
+
+    if set(step0) != {"name", "uses", "with"} or step0.get("with") != {"persist-credentials": False}:
+        errors.append(f"{path.name}:verify: checkout step keys/options must be exact")
+    if set(step1) != {"name", "env", "run"}:
+        errors.append(f"{path.name}:verify: verifier step keys must be exact")
+    uses0 = step0.get("uses")
+    if not uses0:
+        errors.append(f"{path.name}:verify: step 0 must use checkout action")
+    else:
+        action, _, ref = str(uses0).partition("@")
+        if not SHA_PATTERN.match(ref.strip()):
+            errors.append(f"{path.name}:verify: action {uses0} not pinned to 40-char SHA")
+        elif (action, ref) != (RELEASE_CHECKOUT_ACTION, RELEASE_CHECKOUT_PIN):
+            errors.append(
+                f"{path.name}:verify: action {uses0} is not the approved checkout pin"
+            )
+    if step0.get("with", {}).get("persist-credentials") is not False:
+        errors.append(f"{path.name}:verify: checkout step must set persist-credentials: false")
+
+    if "uses" in step1:
+        errors.append(f"{path.name}:verify: step 1 must not use an action")
+
+    run_cmd = str(step1.get("run", "")).strip()
+    if run_cmd != RELEASE_VERIFY_COMMAND:
+        errors.append(
+            f"{path.name}:verify: step 1 run command must be {RELEASE_VERIFY_COMMAND!r}, got {run_cmd!r}"
+        )
+
+    env1 = step1.get("env")
+    expected_env = {"GH_TOKEN": "${{ github.token }}"}
+    if env1 != expected_env:
+        errors.append(f"{path.name}:verify: step 1 env must be {expected_env}, got {env1}")
+
+    for token in RELEASE_FORBIDDEN_TOKENS:
+        if token in run_cmd or token in step1:
+            errors.append(f"{path.name}:verify: forbidden release step token {token!r}")
 
     return errors
 
@@ -334,11 +385,14 @@ def validate_all_workflows() -> list[str]:
             errors.append(f"{wf.name}: unknown workflow")
             continue
         seen.add(wf.stem)
+        raw_text = wf.read_text(encoding="utf-8")
+        errors.extend(check_global_publication_markers(raw_text, wf))
         try:
             doc = load_workflow_doc(wf)
         except (OSError, RuntimeError, TypeError, ValueError) as error:
             errors.append(f"{wf.name}: parse error: {error}")
             continue
+        errors.extend(check_workflow_permissions(doc, wf))
         errors.extend(validator(doc, wf))
     if not set(validators) <= seen:
         errors.append(f"missing required workflows: {sorted(set(validators) - seen)}")

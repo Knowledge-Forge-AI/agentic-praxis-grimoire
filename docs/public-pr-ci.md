@@ -76,9 +76,15 @@ fabricated:
 The canonical runtime job uses `cachix/install-nix-action` v31.11.1 at
 `13d8dd58da0234aa297dedd986986ccb8e7f3e24`, selecting Nix 2.35.2.
 
-The release publisher separately pins `pypa/gh-action-pypi-publish` to
-`dc37677b2e1c63e2034f94d8a5b11f265b73ba33`; the retained Low advisory remains
-visible pending a verified update.
+APG167U replaces the release publisher with a constrained read-only audit.
+The release workflow has no publication action, registry credentials, OIDC
+grant or write permission. The attended draft verifier owns the prepublication
+stop; the release event audit runs after publication. See
+[ADR 0079](adr/2026/10/0079-github-release-only-boundary-and-tree-bound-attestation.md).
+The public aggregate is retained seven days, constraining the attended release
+window even though native artifacts have fourteen-day retention. Postmerge
+audits use premerge PR/source bindings and recheck durable run identity and
+pinned artifacts rather than mutable workflow-run PR associations.
 
 The upload v6 / download v4 pairing uses the v4 artifact backend. Upload v6
 changes the action runtime to Node 24; download v4 supports `pattern` and

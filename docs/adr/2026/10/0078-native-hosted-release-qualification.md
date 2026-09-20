@@ -4,6 +4,8 @@ Date: 2026-10-11
 
 Status: Proposed
 
+Publication boundary amended by [ADR 0079](0079-github-release-only-boundary-and-tree-bound-attestation.md) (APG167U candidate).
+
 Phase: APG167Q
 
 ## Context

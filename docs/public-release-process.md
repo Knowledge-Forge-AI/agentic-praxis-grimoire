@@ -469,7 +469,7 @@ manifest. The trusted local input is the exact reviewed release reconstruction;
 the operator binds its public Git identity and artifact metadata before upload.
 GitHub Release upload consumes only that directory.
 
-The v0.6 PyPI workflow runs only for a published GitHub Release and downloads
+The historical v0.6 PyPI workflow ran only for a published GitHub Release and downloads
 the triggering release's exact three asset IDs. It rejects any tag, filename,
 asset count, or checksum mismatch before supplying only the verified wheel and
 sdist directory to PyPA Trusted Publishing. The checked-in action identity is
@@ -535,7 +535,7 @@ machine-readable inventory of the ten GitHub Release assets and their roles (one
 manifest, one checksum file, three platform Python wheels, one Python sdist,
 three npm platform packages, and one npm launcher package).
 
-The v0.7 PyPI release workflow (`.github/workflows/release.yml`) runs on
+The historical v0.7 PyPI release workflow ran on
 published GitHub Releases, enforces OIDC Trusted Publishing (`id-token: write`,
 environment `pypi`), verifies repository and `v0.7.0` tag identity, and
 safely distinguishes the four Python distribution artifacts from all other release
@@ -672,7 +672,7 @@ release commits to public `main` is retired in favor of PR-governed integration.
   The latter requires the observed merged commit, the accepted pre-merge `main` identity,
   a caller-supplied approved-PR receipt, and an explicit success receipt for every required
   check. These local arguments are attestations; the command does not contact GitHub or
-  establish that a review was actually approved. The release publisher performs that host
+  establish that a review was actually approved. The historical release publisher performed that host
   readback, requiring a current approval bound to the PR head and successful `public-pr`
   GitHub Actions check-runs. It also requires the v0.11 distribution manifest's
   `source_commit` and `source_tree` to equal the observed merged commit and tree. The
@@ -798,3 +798,45 @@ back. Resume re-verifies every recorded receipt digest, skips verified channels
 and retries only the Nix readback with a fresh scratch directory.
 `x86_64-linux` evidence for the tag rests on the hosted PR cell plus the
 release workflow's tested-tree equals merged-tree check, not on a tag readback.
+
+
+## v0.13 GitHub-only boundary (APG167U candidate)
+
+The current source candidate retires automatic package publication on GitHub
+Release events. The release workflow performs a read-only postpublication
+audit. No workflow can mint an OIDC publication token or run a package-manager
+publisher. The attended operation must verify the draft before publishing;
+the hosted audit does not provide that prepublication stop.
+
+The no-rebuild boundary binds successful public and native workflows to the
+same PR head/base, synthetic merge parents and exact tested source tree. The
+actual squash merge must preserve that tree, have the frozen base as sole
+parent, the exact release subject and PR association. Manifests keep their
+tested merge-ref source commit; no post-CI rebuild or manifest rewrite is
+permitted. An annotated tag binds the actual merged public commit.
+
+Capture the run-to-PR associations and tested merge parents/tree before merge.
+Postmerge checks compare durable run metadata and pinned artifact bytes to
+that candidate instead of fetching a removed synthetic commit or relying on
+mutable run PR associations. Retain the operator-accepted candidate digest.
+
+Eleven distributables and three binary manifests are retained unchanged,
+alongside the distribution manifest and checksum authority: sixteen release
+files. Attestation maps every logical checksum path to its flat release
+filename. Exact names, sizes and SHA-256 must pass draft and published download
+readback. Exact CI run IDs and canonical attestations accompany the notes.
+
+Active strict checks from the expected GitHub Actions source, no bypass actors
+and current eligible approval or an explicitly reviewed waiver are mandatory.
+Administrative setup, source staging, merge, tagging and release publication
+remain separate attended operations. Fresh native aggregate success is still
+pending. Historical producer success is not RC qualification. Actions artifact
+expiry fails closed and can prevent late audit reruns.
+The public aggregate's seven-day retention bounds the operation even though
+native evidence is retained fourteen days; use the earliest actual expiry.
+
+After verified GitHub publication, Release Starport 9 receives URLs, tagged
+source identity, asset hashes and provenance. PyPI, npm, Homebrew and all
+package-manager publication are excluded from this phase. The legacy private
+multichannel operator is not usable for this boundary. See
+[ADR 0079](adr/2026/10/0079-github-release-only-boundary-and-tree-bound-attestation.md).

@@ -7,7 +7,6 @@ historical v0.12.0-and-earlier surfaces cannot change through this file.
 
 from __future__ import annotations
 
-
 # First-party Nix publication owners. They mirror the
 # ``publication.critical_files`` declared by ``nix/distribution.json``; a
 # focused test keeps the two lists equal.
@@ -34,6 +33,11 @@ V013_WRAPPER_ADDITIONS = (
 )
 
 V013_HELPER_ADDITIONS = (
+    "tools/ci/native_gate_discovery.py",
+    "tools/ci/release_boundary.py",
+    "tools/ci/release_boundary_bundle.py",
+    "tools/ci/release_boundary_github.py",
+
     "libexec/apg_go_buildinfo.py",
     "libexec/apg_nix_distribution.py",
     "libexec/apg_nix_qualification.py",
@@ -55,6 +59,10 @@ V013_HELPER_ADDITIONS = (
 # Only mirrored ``/agentic-praxis-grimoire/`` pytest files may enter the
 # audited selection; dedicated dispatcher suites are qualified separately.
 V013_TEST_ADDITIONS = (
+    "src/test/unit/python/agentic-praxis-grimoire/tools/ci/native_gate_discovery.unit.test.py",
+    "src/test/unit/python/agentic-praxis-grimoire/tools/ci/release_boundary.unit.test.py",
+    "src/test/int/python/agentic-praxis-grimoire/tools/ci/release_boundary.int.test.py",
+
     "src/test/int/python/agentic-praxis-grimoire/libexec/apg_go_buildinfo.int.test.py",
     "src/test/int/python/agentic-praxis-grimoire/libexec/apg_python_prebuilt_publication.int.test.py",
     "src/test/int/python/agentic-praxis-grimoire/libexec/apg_nix_distribution.int.test.py",
@@ -101,6 +109,11 @@ V013_RUNTIME_AUTHORITY_FILES = (
 )
 
 V013_CRITICAL_ADDITIONS = (
+    "src/test/support/release_boundary_fixtures.py",
+    "docs/adr/2026/10/0079-github-release-only-boundary-and-tree-bound-attestation.md",
+    "docs/evaluations/apg167u-github-release-only-boundary.md",
+    "docs/status/2026/10/13/00229-apg167u-github-release-only-boundary-exit.md",
+
     *V013_NIX_CRITICAL_FILES,
     *V013_RUNTIME_AUTHORITY_FILES,
     ".github/workflows/native-qualification.yml",
