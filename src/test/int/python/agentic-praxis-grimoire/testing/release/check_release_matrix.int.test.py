@@ -3,10 +3,10 @@
 from __future__ import annotations
 
 import json
-from pathlib import Path
 import shutil
 import subprocess
 import sys
+from pathlib import Path
 
 if str(Path(__file__).resolve().parents[7]) not in sys.path:
     sys.path.insert(0, str(Path(__file__).resolve().parents[7]))
@@ -62,7 +62,7 @@ def test_public_mode_command_passes_on_repository() -> None:
     assert proc.returncode == 0, f"STDOUT: {proc.stdout}\nSTDERR: {proc.stderr}"
     assert "PASS: Release readiness matrix valid (public projection mode: 38 rows checked)" in proc.stdout
     assert "REG-R: 13/13 (13 private-only disposition)" in proc.stdout
-    assert "REG-P: 13/13 (13 private-only disposition)" in proc.stdout
+    assert "REG-P: 13/13 (12 private-only disposition)" in proc.stdout
     assert "F-Traceability: 12/12" in proc.stdout
 
 
@@ -84,6 +84,7 @@ def _build_disposable_public_checkout(target_root: Path) -> Path:
         "libexec/apg_test.py",
         "tools/ci/pre_review_evaluation.py",
         ".github/workflows/release.yml",
+        "src/test/unit/python/agentic-praxis-grimoire/.github/workflows/release.yml.unit.test.py",
         "libexec/apg_python_distribution.py",
         "libexec/apg_public_release.py",
     ]
@@ -122,7 +123,7 @@ def test_disposable_public_checkout_contract_passes(tmp_path: Path) -> None:
     assert proc.returncode == 0, f"STDOUT: {proc.stdout}\nSTDERR: {proc.stderr}"
     assert "PASS: Release readiness matrix valid (public projection mode: 38 rows checked)" in proc.stdout
     assert "REG-R: 13/13 (13 private-only disposition)" in proc.stdout
-    assert "REG-P: 13/13 (13 private-only disposition)" in proc.stdout
+    assert "REG-P: 13/13 (12 private-only disposition)" in proc.stdout
     assert "F-Traceability: 12/12" in proc.stdout
 
 

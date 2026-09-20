@@ -491,12 +491,9 @@ def test_sdist_structure_and_comparison_refusals_are_explicit(tmp_path: Path) ->
 
 
 def test_release_workflow_targets_current_version_and_tag() -> None:
-    workflow = json.loads(
-        (REPOSITORY_ROOT / ".github/workflows/release.yml").read_text(encoding="utf-8")
-    )
-    command = workflow["jobs"]["publish"]["steps"][0]["run"]
-    assert f"expected_tag=v{CURRENT_VERSION}" in command
-    assert f"expected_version={CURRENT_VERSION}" in command
+    from tools.ci.release_boundary import EXPECTED_TAG, EXPECTED_VERSION
+    assert EXPECTED_TAG == f"v{CURRENT_VERSION}"
+    assert EXPECTED_VERSION == CURRENT_VERSION
 
 
 def test_backend_manifest_and_configuration_refusals_are_complete(tmp_path: Path) -> None:

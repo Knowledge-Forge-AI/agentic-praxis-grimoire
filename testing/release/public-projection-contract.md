@@ -130,11 +130,15 @@ Owner: publication-excluded attended release operation.
 
 ## REG-P3
 
-PyPI OIDC Trusted Publishing Alignment
+GitHub-only Release Nonpublication Boundary
 
-Disposition: private qualification test; public traceability retained.
+Disposition: public workflow qualification; the historical PyPI OIDC requirement
+is retired for the GitHub-only release. Package-manager writes remain outside
+this boundary.
 
 Public owner: [`.github/workflows/release.yml`](../../.github/workflows/release.yml).
+The workflow tests and topology validator require an exactly constrained
+read-only audit and reject publication actions, credentials and permissions.
 
 ## REG-P4
 

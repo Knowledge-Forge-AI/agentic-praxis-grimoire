@@ -3,8 +3,6 @@
 from __future__ import annotations
 
 import json
-import re
-import shlex
 from pathlib import Path
 
 import pytest
@@ -17,14 +15,22 @@ from release.ci.matrix_receipts import (
 )
 from tools.ci.ci_topology import (
     EXPECTED_CODEQL_LANGUAGES,
-    NATIVE_GATE_ARTIFACT,
-    NATIVE_INDEX_SCHEMA,
+    EXPECTED_VERIFY_PERMISSIONS,
+    RELEASE_CHECKOUT_ACTION,
+    RELEASE_CHECKOUT_PIN,
+    RELEASE_STEP_NAMES,
+    RELEASE_VERIFY_COMMAND,
     REQUIRED_PR_JOBS,
     load_workflow_doc,
     main,
     validate_all_workflows,
 )
-from tools.ci.native_topology import GATE, MEMBER_JOBS, NATIVE_DOWNLOAD_PIN, REQUIRED_NATIVE_JOBS
+from tools.ci.native_topology import (
+    GATE,
+    MEMBER_JOBS,
+    NATIVE_DOWNLOAD_PIN,
+    REQUIRED_NATIVE_JOBS,
+)
 
 ROOT = Path(__file__).resolve().parents[7]
 WORKFLOWS = ROOT / ".github/workflows"
@@ -32,20 +38,6 @@ PUBLIC_PR_WORKFLOW = WORKFLOWS / "public-pr.yml"
 NATIVE_WORKFLOW = WORKFLOWS / "native-qualification.yml"
 RELEASE_WORKFLOW = WORKFLOWS / "release.yml"
 
-
-def _release_script() -> str:
-    doc = load_workflow_doc(RELEASE_WORKFLOW)
-    return next(
-        step["run"]
-        for step in doc["jobs"]["publish"]["steps"]
-        if step.get("name") == "Verify merged source, PR approval, and workflow checks"
-    )
-
-
-def _array(script: str, name: str) -> list[str]:
-    match = re.search(rf"^{name}=\((.*)\)$", script, re.MULTILINE)
-    assert match is not None, f"release.yml missing {name} array"
-    return shlex.split(match.group(1))
 
 
 def test_shipped_workflow_directory_is_exactly_the_two_pr_workflows_plus_release() -> None:
@@ -103,46 +95,20 @@ def test_every_native_member_emits_its_own_prescribed_artifacts_with_actual_stat
             assert f"/{artifact}" in emits[0]["run"]
 
 
-def test_release_checks_cross_bind_both_pr_workflows() -> None:
-    script = _release_script()
-    pr_jobs = load_workflow_doc(PUBLIC_PR_WORKFLOW)["jobs"]
-    native_jobs = load_workflow_doc(NATIVE_WORKFLOW)["jobs"]
-
-    expected_public_checks = (REQUIRED_PR_JOBS - {"codeql"}) | {
-        f"codeql ({language})" for language in EXPECTED_CODEQL_LANGUAGES
-    }
-    public_checks = _array(script, "required_checks")
-    assert set(public_checks) == expected_public_checks
-    assert len(public_checks) == len(expected_public_checks), "duplicate checks in release.yml"
-    rendered_names = {
-        job["name"].replace("${{ matrix.language }}", language)
-        for job_id, job in pr_jobs.items()
-        for language in (EXPECTED_CODEQL_LANGUAGES if job_id == "codeql" else {""})
-    }
-    assert rendered_names == expected_public_checks
-
-    native_checks = _array(script, "native_required_checks")
-    assert set(native_checks) == REQUIRED_NATIVE_JOBS and len(native_checks) == 10
-    assert {job["name"] for job in native_jobs.values()} == set(native_checks)
-
-    receipts = re.search(r"^required_receipts='(.*)'$", script, re.MULTILINE)
-    assert receipts is not None, "release.yml missing required_receipts JSON"
-    assert set(json.loads(receipts.group(1))) == DEFAULT_MEMBER_JOBS
-
-
-def test_release_native_evidence_is_the_native_gate_artifact_with_a_digest() -> None:
-    script = _release_script()
-    native_jobs = load_workflow_doc(NATIVE_WORKFLOW)["jobs"]
-    uploads = [
-        step["with"]["name"]
-        for step in native_jobs[GATE]["steps"]
-        if str(step.get("uses", "")).startswith("actions/upload-artifact@")
-    ]
-    assert NATIVE_GATE_ARTIFACT in uploads
-    assert f".github/workflows/{NATIVE_WORKFLOW.name}" in script
-    assert NATIVE_INDEX_SCHEMA in script
-    assert 'native_artifact_digest" =~ ^sha256:[0-9a-f]{64}$' in script
-    assert '"$actual_native_digest" == "$native_artifact_digest"' in script
+def test_release_workflow_has_exact_verify_topology() -> None:
+    doc = load_workflow_doc(RELEASE_WORKFLOW)
+    assert set(doc["jobs"]) == {"verify"}
+    job = doc["jobs"]["verify"]
+    assert job["runs-on"] == "ubuntu-latest"
+    assert "environment" not in job
+    assert job["permissions"] == EXPECTED_VERIFY_PERMISSIONS
+    assert [step["name"] for step in job["steps"]] == RELEASE_STEP_NAMES
+    checkout_step, verify_step = job["steps"]
+    assert checkout_step["uses"] == f"{RELEASE_CHECKOUT_ACTION}@{RELEASE_CHECKOUT_PIN}"
+    assert checkout_step["with"]["persist-credentials"] is False
+    assert verify_step["run"] == RELEASE_VERIFY_COMMAND
+    assert verify_step["env"] == {"GH_TOKEN": "${{ github.token }}"}
+    assert "uses" not in verify_step
 
 
 def test_native_post_lane_jobs_use_the_artifact_id_capable_download_pin_only() -> None:

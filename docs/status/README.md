@@ -323,3 +323,5 @@ Exit 00182 remains privately reserved for APG137; APG138 uses corrected exit 001
 
 The retained APG166S record includes the
 [APG166S-R2 work checkpoint](2026/09/26/00228-apg166s-worker-configuration-checkpoint-exit.md#apg166s-r2-work-checkpoint).
+
+- [`00229 — APG167U GitHub-only Release Boundary Candidate Exit`](2026/10/13/00229-apg167u-github-release-only-boundary-exit.md)

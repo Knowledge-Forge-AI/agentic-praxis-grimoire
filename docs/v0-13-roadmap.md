@@ -1238,3 +1238,25 @@ before ZE. Clearing them needs a remediation campaign or a recorded policy
 decision; neither is part of this slice. No H benefit, context-savings, skill
 promotion or native `aarch64-linux` runtime claim follows. Static context
 remains the default.
+
+
+## APG167U addendum: GitHub-only release boundary candidate
+
+APG167T is preserved. APG167U repairs authority discovery of native evidence
+and retires automatic package publication on release events. The candidate
+provides a no-rebuild attestation linking public/native CI, the synthetic merge
+and actual squash merge through an identical source tree. Eleven distributables
+and five provenance/checksum files form sixteen unchanged GitHub assets.
+
+The attended draft readback owns the prepublication stop; the hosted workflow
+is a read-only postpublication audit. Fresh hosted RC success, enforced strict
+required checks and eligible approval or an explicitly reviewed waiver remain
+release blockers. Historical producer successes are not RC qualification.
+The supplied work review is dispositioned as amend: premerge run/PR and tested
+merge bindings survive PR closure, retention is bounded by the seven-day public
+aggregate, and guard/scan receipts bind their matrix digests. Terminal focused
+Python verification passes; dispatcher finalization remains separate. No staging push, settings
+mutation, merge, tag, GitHub Release or package publication happens in this
+source phase. Release Starport 9 owns the later package-manager handoff. See
+[the APG167U evaluation](evaluations/apg167u-github-release-only-boundary.md)
+and [exit 00229](status/2026/10/13/00229-apg167u-github-release-only-boundary-exit.md).

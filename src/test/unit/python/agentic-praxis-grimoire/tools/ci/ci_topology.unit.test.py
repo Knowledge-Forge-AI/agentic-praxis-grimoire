@@ -9,6 +9,9 @@ import pytest
 
 from tools.ci import ci_topology
 from tools.ci.ci_topology import (
+    GLOBAL_FORBIDDEN_PUBLICATION_MARKERS,
+    check_global_publication_markers,
+    check_workflow_permissions,
     load_workflow_doc,
     validate_all_workflows,
     validate_public_pr,
@@ -260,10 +263,10 @@ def test_reject_release_non_empty_top_level_permissions(valid_release_doc: dict)
     assert any("top-level permissions must be empty mapping" in e for e in validate_release_yml(doc, RELEASE))
 
 
-def test_reject_release_missing_publish_job(valid_release_doc: dict) -> None:
+def test_reject_release_missing_verify_job(valid_release_doc: dict) -> None:
     doc = copy.deepcopy(valid_release_doc)
-    del doc["jobs"]["publish"]
-    assert any("missing required 'publish' job" in e for e in validate_release_yml(doc, RELEASE))
+    del doc["jobs"]["verify"]
+    assert any("missing required 'verify' job" in e for e in validate_release_yml(doc, RELEASE))
 
 
 def test_reject_release_extra_job(valid_release_doc: dict) -> None:
@@ -274,64 +277,117 @@ def test_reject_release_extra_job(valid_release_doc: dict) -> None:
 
 def test_reject_release_wrong_runner(valid_release_doc: dict) -> None:
     doc = copy.deepcopy(valid_release_doc)
-    doc["jobs"]["publish"]["runs-on"] = "macos-15"
+    doc["jobs"]["verify"]["runs-on"] = "macos-15"
     assert any("runs-on must be ubuntu-latest" in e for e in validate_release_yml(doc, RELEASE))
 
 
-def test_reject_release_wrong_environment(valid_release_doc: dict) -> None:
+def test_reject_release_environment_forbidden(valid_release_doc: dict) -> None:
     doc = copy.deepcopy(valid_release_doc)
-    doc["jobs"]["publish"]["environment"] = "staging"
-    assert any("environment must be 'pypi'" in e for e in validate_release_yml(doc, RELEASE))
+    doc["jobs"]["verify"]["environment"] = "pypi"
+    assert any("environment is forbidden" in e for e in validate_release_yml(doc, RELEASE))
 
 
-def test_reject_release_missing_id_token_permission(valid_release_doc: dict) -> None:
+def test_reject_release_id_token_forbidden(valid_release_doc: dict) -> None:
     doc = copy.deepcopy(valid_release_doc)
-    # Publication requires id-token: write (distinct from PR which forbids it)
-    doc["jobs"]["publish"]["permissions"] = {"contents": "read"}
+    doc["jobs"]["verify"]["permissions"]["id-token"] = "write"
     assert any("permissions must be" in e for e in validate_release_yml(doc, RELEASE))
 
 
-def test_reject_release_unpinned_action(valid_release_doc: dict) -> None:
+def test_reject_release_unpinned_checkout(valid_release_doc: dict) -> None:
     doc = copy.deepcopy(valid_release_doc)
-    doc["jobs"]["publish"]["steps"][-1]["uses"] = "pypa/gh-action-pypi-publish@v1"
+    doc["jobs"]["verify"]["steps"][0]["uses"] = "actions/checkout@v4"
     assert any("not pinned to 40-char SHA" in e for e in validate_release_yml(doc, RELEASE))
 
 
-def test_reject_release_unapproved_publisher_pin_and_extra_action(valid_release_doc: dict) -> None:
+def test_reject_release_unapproved_checkout_pin(valid_release_doc: dict) -> None:
     doc = copy.deepcopy(valid_release_doc)
-    doc["jobs"]["publish"]["steps"][-1]["uses"] = "pypa/gh-action-pypi-publish@" + "b" * 40
-    assert any("not the approved publisher pin" in e for e in validate_release_yml(doc, RELEASE))
+    doc["jobs"]["verify"]["steps"][0]["uses"] = "actions/checkout@" + "b" * 40
+    assert any("is not the approved checkout pin" in e for e in validate_release_yml(doc, RELEASE))
+
+
+def test_reject_release_checkout_credentials_leak(valid_release_doc: dict) -> None:
     doc = copy.deepcopy(valid_release_doc)
-    doc["jobs"]["publish"]["steps"].insert(0, {"name": "x", "uses": "actions/checkout@" + "a" * 40})
-    errors = validate_release_yml(doc, RELEASE)
-    assert any("only the final step may use an action" in e for e in errors)
-    assert any("steps must be exactly" in e for e in errors)
+    doc["jobs"]["verify"]["steps"][0]["with"]["persist-credentials"] = True
+    assert any("persist-credentials: false" in e for e in validate_release_yml(doc, RELEASE))
+
+
+def test_reject_release_step1_extra_action(valid_release_doc: dict) -> None:
+    doc = copy.deepcopy(valid_release_doc)
+    doc["jobs"]["verify"]["steps"][1]["uses"] = "actions/checkout@" + "3d3c42e5aac5ba805825da76410c181273ba90b1"
+    assert any("step 1 must not use an action" in e for e in validate_release_yml(doc, RELEASE))
+
+
+def test_reject_release_step1_wrong_command(valid_release_doc: dict) -> None:
+    doc = copy.deepcopy(valid_release_doc)
+    doc["jobs"]["verify"]["steps"][1]["run"] = "echo forbidden"
+    assert any("step 1 run command must be" in e for e in validate_release_yml(doc, RELEASE))
+
+
+def test_reject_release_step1_wrong_env(valid_release_doc: dict) -> None:
+    doc = copy.deepcopy(valid_release_doc)
+    doc["jobs"]["verify"]["steps"][1]["env"] = {}
+    assert any("step 1 env must be" in e for e in validate_release_yml(doc, RELEASE))
+
+
+def test_reject_release_wrong_step_count(valid_release_doc: dict) -> None:
+    doc = copy.deepcopy(valid_release_doc)
+    doc["jobs"]["verify"]["steps"].append({"name": "extra", "run": "true"})
+    assert any("steps must contain exactly 2 steps" in e for e in validate_release_yml(doc, RELEASE))
 
 
 @pytest.mark.parametrize("token", ["go build ./...", "nix build .#x", "python3 -m build", "pip install x"])
 def test_reject_release_local_build_fallback(valid_release_doc: dict, token: str) -> None:
     doc = copy.deepcopy(valid_release_doc)
-    doc["jobs"]["publish"]["steps"][0]["run"] += f"\n{token}\n"
-    assert any("forbidden release step token" in e for e in validate_release_yml(doc, RELEASE))
+    doc["jobs"]["verify"]["steps"][1]["run"] += f"\n{token}\n"
+    assert any("step 1 run command must be" in e for e in validate_release_yml(doc, RELEASE))
 
 
-def _release_script(doc: dict) -> dict:
-    return doc["jobs"]["publish"]["steps"][1]
+@pytest.mark.parametrize("marker", GLOBAL_FORBIDDEN_PUBLICATION_MARKERS)
+def test_reject_global_publication_markers(marker: str) -> None:
+    errors = check_global_publication_markers(f"# some comment with {marker} token", Path("test.yml"))
+    assert any("forbidden publication marker" in e for e in errors), f"marker {marker!r} not detected"
 
 
-@pytest.mark.parametrize("old, new, expected", [
-    ("native-release-candidate-gate-result", "other-artifact", "release verification must contain"),
-    ("apgr.native-rc-index/v1", "apgr.other/v1", "release verification must contain"),
-    ('.status == "passed"', ".status != null", "release verification must contain"),
-    ("unzip -Z1", "unzip -l", "release verification must contain"),
-    ("native-release-scans native-release-candidate-gate", "native-release-scans", "native_required_checks must be"),
-    ("public-pr-gate)", "public-pr-gate nix)", "required_checks must be exactly"),
-    ('"codeql-actions"]', '"codeql-actions","package"]', "required_receipts must be exactly"),
+@pytest.mark.parametrize(
+    ("job", "perm"),
+    [
+        ("guard", "contents"),
+        ("policy", "packages"),
+        ("unit-integration", "id-token"),
+        ("closure", "security-events"),
+        ("go", "actions"),
+    ],
+)
+def test_check_workflow_permissions_rejects_forbidden_writes(
+    valid_public_pr_doc: dict, job: str, perm: str
+) -> None:
+    doc = copy.deepcopy(valid_public_pr_doc)
+    doc["jobs"][job]["permissions"] = {perm: "write"}
+    errors = check_workflow_permissions(doc, PUBLIC)
+    assert any(f"write permission {perm!r} is forbidden" in e for e in errors)
+
+
+def test_check_workflow_permissions_allows_public_pr_codeql_security_events(
+    valid_public_pr_doc: dict,
+) -> None:
+    errors = check_workflow_permissions(valid_public_pr_doc, PUBLIC)
+    assert errors == []
+
+
+@pytest.mark.parametrize("mutation", [
+    "checkout-run", "checkout-repository", "verifier-shell", "verifier-if", "trigger-filter",
 ])
-def test_reject_release_verification_weakening(valid_release_doc: dict, old: str, new: str, expected: str) -> None:
-    doc = copy.deepcopy(valid_release_doc)
-    step = _release_script(doc)
-    candidate = step["run"].replace(old, new)
-    assert candidate != step["run"], old
-    step["run"] = candidate
-    assert any(expected in e for e in validate_release_yml(doc, RELEASE)), expected
+def test_release_step_and_trigger_authority_keys_are_closed(mutation):
+    doc = load_workflow_doc(ROOT / ".github/workflows/release.yml")
+    first, second = doc["jobs"]["verify"]["steps"]
+    if mutation == "checkout-run":
+        first["run"] = "arbitrary-command"
+    elif mutation == "checkout-repository":
+        first["with"]["repository"] = "other/repository"
+    elif mutation == "verifier-shell":
+        second["shell"] = "arbitrary-executable {0}"
+    elif mutation == "verifier-if":
+        second["if"] = "false"
+    else:
+        doc["on"]["release"]["branches"] = ["other"]
+    assert validate_release_yml(doc, Path("release.yml"))

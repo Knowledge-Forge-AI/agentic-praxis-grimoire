@@ -152,15 +152,15 @@
     },
     {
       "classification": "durable",
-      "disposition": "private_only",
-      "fixture": "test_workflow_pypi_oidc_validation",
+      "disposition": "public",
+      "fixture": "test_release_workflow_has_no_publication_markers_or_secrets",
       "historical_source": "ADR 0062 / F12",
       "owning_code": ".github/workflows/release.yml",
       "regression_id": "REG-P3",
-      "requirement": "PyPI OIDC Trusted Publishing Alignment",
+      "requirement": "GitHub-only Release Nonpublication Boundary",
       "status": "verified_repo_side",
-      "test_command": "PYTHONPATH=private/releases/v0.12.0 python3 private/releases/v0.12.0/test_release_operator_dry_runs.py",
-      "test_path": "private/releases/v0.12.0/test_release_operator_dry_runs.py",
+      "test_command": "python3 -m pytest src/test/unit/python/agentic-praxis-grimoire/.github/workflows/release.yml.unit.test.py",
+      "test_path": "src/test/unit/python/agentic-praxis-grimoire/.github/workflows/release.yml.unit.test.py",
       "public_evidence": "testing/release/public-projection-contract.md#reg-p3"
     },
     {
