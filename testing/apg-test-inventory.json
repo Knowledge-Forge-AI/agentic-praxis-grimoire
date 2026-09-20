@@ -1289,6 +1289,11 @@
       "suite": "integration"
     },
     {
+      "owner": "libexec/apg_go_buildinfo.py",
+      "path": "src/test/int/python/agentic-praxis-grimoire/libexec/apg_go_buildinfo.int.test.py",
+      "suite": "integration"
+    },
+    {
       "owner": "libexec/apg_nix_distribution.py",
       "path": "src/test/int/python/agentic-praxis-grimoire/libexec/apg_nix_distribution.int.test.py",
       "suite": "integration"
@@ -1326,6 +1331,11 @@
     {
       "owner": "libexec/apg_python_distribution.py",
       "path": "src/test/int/python/agentic-praxis-grimoire/libexec/apg_python_distribution.int.test.py",
+      "suite": "integration"
+    },
+    {
+      "owner": "libexec/apg_python_prebuilt_publication.py",
+      "path": "src/test/int/python/agentic-praxis-grimoire/libexec/apg_python_prebuilt_publication.int.test.py",
       "suite": "integration"
     },
     {

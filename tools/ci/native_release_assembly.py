@@ -321,20 +321,53 @@ def export_scan_input(bundle_dir: Path, output_path: Path) -> list[str]:
 
 
 def _scan_policy() -> dict[str, Any]:
-    scan = load_canonical_json(SBOM_POLICY)["scan"]["scanner"]
-    return {"syft": scan["syft"]["version"], "grype": scan["grype"]["version"],
-            "max_age": scan["database"]["max_age_hours"], "fail_on": scan["grype"]["fail_on"]}
+    policy_doc = load_canonical_json(SBOM_POLICY)
+    scan = policy_doc["scan"]
+    scanner = scan["scanner"]
+    requirements = scan.get("artifact_requirements")
+    sdist = requirements.get("python-sdist") if isinstance(requirements, dict) else None
+    sdist_req = sdist.get("required_types") if isinstance(sdist, dict) else None
+    _require(isinstance(sdist_req, list) and all(isinstance(t, str) and t for t in sdist_req)
+             and sdist_req == sorted(set(sdist_req)) and "python" in sdist_req, "sdist coverage policy is malformed")
+    return {"syft": scanner["syft"]["version"], "grype": scanner["grype"]["version"],
+            "max_age": scanner["database"]["max_age_hours"], "fail_on": scanner["grype"]["fail_on"],
+            "sdist_required_types": sdist_req}
 
 
-def _evidence(record: Any, label: str, sink: list[tuple[str, str]], *, derived: bool = False) -> None:
+def _sdist_coverage(sbom: Mapping[str, Any], label: str, required: list[str], *, raw: bool) -> None:
+    types = sbom.get("types")
+    _require(isinstance(types, dict), f"{label} SBOM types inventory is missing or malformed")
+    _require(all(isinstance(k, str) and k for k in types), f"{label} SBOM type key is malformed")
+    _require(all(type(v) is int and v > 0 for v in types.values()), f"{label} SBOM type count must be positive integer")
+    _require(sum(types.values()) == sbom["package_count"], f"{label} SBOM package_count inconsistent with types count")
+    _require(sbom.get("required_types") == required, f"{label} SBOM required_types differs from policy")
+    missing = sorted(set(required) - set(types))
+    if raw:
+        _require(sbom.get("missing_types") == missing, f"{label} SBOM missing_types is inconsistent with types")
+        _require(sbom.get("coverage_status") == ("coverage-gap" if missing else "passed"),
+                 f"{label} SBOM coverage_status is inconsistent")
+    else:
+        _require(sbom.get("coverage_status") == "passed", f"{label} SBOM coverage did not pass")
+        _require(missing == [] and sbom.get("missing_types") == [], f"{label} SBOM has coverage gap")
+
+
+def _evidence(record: Any, label: str, sink: list[tuple[str, str]], *, derived: bool = False,
+              raw_sdist: bool = False, sdist_required: list[str] | None = None) -> None:
     _require(isinstance(record, dict), f"{label} is not an object")
     sbom, grype = record.get("sbom"), record.get("grype")
     _require(isinstance(sbom, dict) and isinstance(grype, dict), f"{label} lacks SBOM or Grype evidence")
-    _require(sbom.get("coverage_status") == "passed" and sbom.get("missing_types") == [], f"{label} SBOM coverage is incomplete")
-    _require(sbom.get("syft_returncode") == 0, f"{label} Syft did not exit cleanly")
-    _require(isinstance(sbom.get("package_count"), int) and sbom["package_count"] > 0, f"{label} SBOM is empty")
-    _require(grype.get("status") == "passed" and grype.get("returncode") == 0 and grype.get("blocking_severities") == [],
-             f"{label} Grype policy did not pass")
+    _require(sbom.get("syft_returncode") == 0 and type(sbom.get("syft_returncode")) is int, f"{label} Syft did not exit cleanly")
+    pkg_count = sbom.get("package_count")
+    _require(isinstance(pkg_count, int) and not isinstance(pkg_count, bool) and pkg_count > 0, f"{label} SBOM is empty")
+
+    if raw_sdist or derived:
+        _require(sdist_required is not None, "internal error: missing sdist_required policy")
+        _sdist_coverage(sbom, label, sdist_required, raw=raw_sdist)
+    else:
+        _require(sbom.get("coverage_status") == "passed" and sbom.get("missing_types") == [], f"{label} SBOM coverage is incomplete")
+
+    _require(grype.get("status") == "passed" and grype.get("returncode") == 0 and type(grype.get("returncode")) is int
+             and grype.get("blocking_severities") == [], f"{label} Grype policy did not pass")
     _require(grype.get("input_sbom_sha256") == sbom.get("sha256"), f"{label} Grype input is not its SBOM")
     for part in (sbom, grype):
         _require(isinstance(part.get("path"), str) and HEX_RE.match(str(part.get("sha256"))), f"{label} evidence path/digest is malformed")
@@ -345,31 +378,56 @@ def _evidence(record: Any, label: str, sink: list[tuple[str, str]], *, derived: 
 
 
 def _check_artifact(rec: Any, target: str, asset: Mapping[str, Any], assets: Mapping[str, Any],
-                    sink: list[tuple[str, str]]) -> str:
+                    sink: list[tuple[str, str]], policy: Mapping[str, Any]) -> str:
     _require(isinstance(rec, dict), f"scan record for {target} is not an object")
     kind = rec.get("kind")
-    expected = {"go": ("go-binary",), "python": ("python-wheel", "python-sdist"), "npm": ("npm-launcher", "npm-platform")}[target.split("/")[0]]
+    expected = {"go": ("go-binary",), "python": ("python-wheel", "python-sdist"),
+                "npm": ("npm-launcher", "npm-platform")}.get(target.split("/")[0], ())
     _require(kind in expected, f"scan record for {target} has unexpected kind {kind!r}")
-    _require(rec.get("status") == "passed", f"scan record for {target} did not pass: {rec.get('status')!r}")
+    if kind in ("python-sdist", "python-wheel"):
+        suffix = ".tar.gz" if kind == "python-sdist" else ".whl"
+        _require(target.endswith(suffix), f"scan record for {target} has unexpected kind {kind!r}")
+    rec_status = rec.get("status")
+    _require(rec_status == "passed", f"scan record for {target} did not pass: {rec_status!r}")
     _require(rec.get("target_sha256") == asset["sha256"], f"scan record for {target} is not bound to the sealed asset digest")
-    _evidence(rec, target, sink)
     if kind in ("python-wheel", "npm-platform"):
+        _evidence(rec, target, sink)
         platform = rec.get("target_platform")
         binary = assets.get(f"go/{str(platform).replace('/', '-')}/apgr")
         embedded = rec.get("embedded_binary")
         _require(binary is not None and isinstance(embedded, dict) and embedded.get("matches") is True
                  and embedded.get("sha256") == binary["sha256"], f"{target} does not embed the sealed {platform} binary")
-    if kind == "python-sdist":
+    elif kind == "python-sdist":
+        sdist_required = policy["sdist_required_types"]
+        _evidence(rec, target, sink, raw_sdist=True, sdist_required=sdist_required)
         derived = rec.get("derived_install")
         _require(isinstance(derived, dict), "sdist lacks its derived-install scan view")
-        installer = derived.get("installation", {}).get("installer", {}) if isinstance(derived.get("installation"), dict) else {}
-        _require(installer.get("status") == "passed" and installer.get("returncode") == 0, "sdist derived installation did not pass")
         _require(derived.get("source_archive_sha256") == asset["sha256"], "derived install is not bound to the sealed sdist")
-        _evidence(derived, "sdist derived install", sink, derived=True)
+        installation = derived.get("installation")
+        _require(isinstance(installation, dict), "derived installation is malformed")
+        _require(installation.get("archive_sha256") == asset["sha256"], "installation archive_sha256 is not bound to the sealed sdist")
+        installer = installation.get("installer")
+        _require(isinstance(installer, dict), "derived installer is malformed")
+        _require(installer.get("status") == "passed" and installer.get("returncode") == 0 and type(installer.get("returncode")) is int,
+                 "sdist derived installation did not pass")
+        _evidence(derived, "sdist derived install", sink, derived=True, sdist_required=sdist_required)
         for part in ("sbom", "grype"):
-            _require(derived[part]["source_archive_sha256"] == asset["sha256"], f"derived {part} is not bound to the sealed sdist")
+            _require(derived[part].get("source_archive_sha256") == asset["sha256"], f"derived {part} is not bound to the sealed sdist")
+        derived_sbom = derived["sbom"]
+        _require("python" in derived_sbom.get("types", {}), "sdist derived install lacks python coverage")
         union = rec.get("coverage_union")
-        _require(isinstance(union, dict) and union.get("status") == "passed" and union.get("missing_types") == [], "sdist coverage union is incomplete")
+        _require(isinstance(union, dict) and union.get("status") == "passed", "sdist coverage union is incomplete")
+        raw_types = set(rec["sbom"].get("types", {}).keys())
+        derived_types = set(derived_sbom.get("types", {}).keys())
+        recomputed_covered = sorted(raw_types | derived_types)
+        recomputed_missing = sorted(set(sdist_required) - set(recomputed_covered))
+        _require(recomputed_missing == [], "sdist coverage union has missing types")
+        _require(union.get("missing_types") == [], "sdist coverage union missing_types must be empty")
+        _require(union.get("required_types") == list(sdist_required), "sdist coverage union required_types mismatch")
+        _require(union.get("covered_types") == recomputed_covered, "sdist coverage union covered_types mismatch")
+        _require("python" in recomputed_covered, "sdist coverage union lacks python coverage")
+    else:
+        _evidence(rec, target, sink)
     return kind
 
 
@@ -420,7 +478,7 @@ def validate_scan_document(doc: Mapping[str, Any], assets: Mapping[str, Any]) ->
     _require(set(by_target) == set(assets), f"scan targets differ from sealed assets: {sorted(set(by_target) ^ set(assets))}")
     kinds: dict[str, int] = {}
     for target in sorted(by_target):
-        kind = _check_artifact(by_target[target], target, assets[target], assets, sink)
+        kind = _check_artifact(by_target[target], target, assets[target], assets, sink, policy)
         kinds[kind] = kinds.get(kind, 0) + 1
     _require(kinds == KIND_COUNTS, f"scan artifact kinds differ from the canonical eleven: {kinds}")
     conditional = doc.get("conditional_dependency")
@@ -435,6 +493,7 @@ def validate_scan_document(doc: Mapping[str, Any], assets: Mapping[str, Any]) ->
              and view.get("download", {}).get("status") == "passed" and view.get("installation", {}).get("status") == "passed",
              "conditional dependency view did not pass")
     _require(len(sink) == 2 * SBOM_COUNT + 1, f"scan evidence inventory has {len(sink)} entries, expected {2 * SBOM_COUNT + 1}")
+    _require(len({path for path, _ in sink}) == len(sink), "scan evidence paths must be distinct")
     return sink
 
 
