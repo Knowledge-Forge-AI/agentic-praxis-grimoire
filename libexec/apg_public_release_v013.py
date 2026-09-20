@@ -55,6 +55,8 @@ V013_HELPER_ADDITIONS = (
 # Only mirrored ``/agentic-praxis-grimoire/`` pytest files may enter the
 # audited selection; dedicated dispatcher suites are qualified separately.
 V013_TEST_ADDITIONS = (
+    "src/test/int/python/agentic-praxis-grimoire/libexec/apg_go_buildinfo.int.test.py",
+    "src/test/int/python/agentic-praxis-grimoire/libexec/apg_python_prebuilt_publication.int.test.py",
     "src/test/int/python/agentic-praxis-grimoire/libexec/apg_nix_distribution.int.test.py",
     "src/test/int/python/agentic-praxis-grimoire/libexec/apg_nix_qualification.int.test.py",
     "src/test/int/python/agentic-praxis-grimoire/libexec/apg_nix_smoke.int.test.py",

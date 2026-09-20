@@ -604,11 +604,16 @@ def build_scan(scans: Path, assets: dict[str, Any]) -> dict[str, Any]:
         if kind in ("python-wheel", "npm-platform"):
             record["embedded_binary"] = {"path": "bin/apgr", "sha256": go_sha[f"go/{platform.replace('/', '-')}/apgr"], "matches": True}
         if kind == "python-sdist":
+            record["sbom"].update({"package_count": 1, "types": {"go-module": 1}, "required_types": ["python"],
+                                   "missing_types": ["python"], "coverage_status": "coverage-gap"})
             record["derived_install"] = {
-                "installation": {"installer": {"status": "passed", "returncode": 0}}, "source_archive_sha256": spec["sha256"],
+                "installation": {"installer": {"status": "passed", "returncode": 0}, "archive_sha256": spec["sha256"]},
+                "source_archive_sha256": spec["sha256"],
                 **evidence(scans, f"artifacts/{rid}/derived-install", name + " derived", source_archive_sha256=spec["sha256"]),
             }
-            record["coverage_union"] = {"status": "passed", "missing_types": [], "covered_types": ["python"], "required_types": ["python"]}
+            record["derived_install"]["sbom"].update({"package_count": 3, "types": {"go-module": 2, "python": 1},
+                                                      "required_types": ["python"], "missing_types": [], "coverage_status": "passed"})
+            record["coverage_union"] = {"status": "passed", "missing_types": [], "covered_types": ["go-module", "python"], "required_types": ["python"]}
         records.append(record)
     (scans / "conditional-runtime").mkdir()
     (scans / "conditional-runtime" / "receipt.json").write_bytes(b"{}")
@@ -672,7 +677,13 @@ def test_export_detects_bundle_tampering(assembled: SimpleNamespace, victim: str
     assert not (assembled.tmp / "scan-input").exists()
 
 
-def test_check_scan_accepts_the_complete_strict_document(scans_world: SimpleNamespace) -> None:
+@pytest.mark.parametrize("raw_gap", [True, False], ids=["hosted-raw-gap", "raw-complete"])
+def test_check_scan_accepts_the_complete_strict_document(scans_world: SimpleNamespace, raw_gap: bool) -> None:
+    sdist = rec(scans_world.doc, ".tar.gz")
+    if not raw_gap:
+        sdist["sbom"].update({"types": {"go-module": 1, "python": 1}, "package_count": 2,
+                              "missing_types": [], "coverage_status": "passed"})
+    assert len(assembly.validate_scan_document(scans_world.doc, scans_world.seal["assets"])) == 29
     write_scan(scans_world.scans, scans_world.doc)
     receipt = assembly.run_check_scan(scans_world.out, scans_world.scans, scans_world.scan_out)
     assert receipt["asset_count"] == 11 and receipt["scan_count"] == 14 and receipt["status"] == "passed"
@@ -682,6 +693,15 @@ def test_check_scan_accepts_the_complete_strict_document(scans_world: SimpleName
     assert (scans_world.scan_out / "scan-results.json").read_bytes() == (scans_world.scans / "scan-results.json").read_bytes()
     with pytest.raises(assembly.AssemblyError, match="already exists"):
         assembly.run_check_scan(scans_world.out, scans_world.scans, scans_world.scan_out)
+
+
+@pytest.mark.parametrize("required", [None, [], "python", ["other"], ["python", "python"], [True]])
+def test_sdist_policy_cannot_fall_back_to_assumed_requirements(monkeypatch: pytest.MonkeyPatch, required: Any) -> None:
+    policy = json.loads(assembly.SBOM_POLICY.read_text())
+    policy["scan"]["artifact_requirements"]["python-sdist"]["required_types"] = required
+    monkeypatch.setattr(assembly, "load_canonical_json", lambda path: policy)
+    with pytest.raises(assembly.AssemblyError, match="sdist coverage policy is malformed"):
+        assembly._scan_policy()
 
 
 def _set(path: tuple[str, ...], value: Any) -> Callable[[dict[str, Any]], None]:
@@ -736,6 +756,8 @@ SCAN_NEGATIVES = [
     ("unbound-digest", _in_record("linux-amd64/apgr", "target_sha256", value="0" * 64), "not bound to the sealed asset digest"),
     ("record-failed", _in_record(".tar.gz", "status", value="policy-finding"), "did not pass"),
     ("wrong-kind", _in_record(".whl", "kind", value="npm-launcher"), "unexpected kind"),
+    ("wheel-as-sdist", _in_record(".whl", "kind", value="python-sdist"), "unexpected kind"),
+    ("wheel-gap", _in_record(".whl", "sbom", "coverage_status", value="coverage-gap"), "SBOM coverage is incomplete"),
     ("sbom-gap", _in_record("darwin-arm64/apgr", "sbom", "coverage_status", value="coverage-gap"), "SBOM coverage is incomplete"),
     ("sbom-missing-types", _in_record("darwin-arm64/apgr", "sbom", "missing_types", value=["go-module"]), "SBOM coverage is incomplete"),
     ("syft-failed", _in_record("darwin-arm64/apgr", "sbom", "syft_returncode", value=1), "Syft did not exit cleanly"),
@@ -747,10 +769,42 @@ SCAN_NEGATIVES = [
     ("embedded-flag", _in_record(".whl", "embedded_binary", "matches", value=False), "does not embed the sealed"),
     ("embedded-missing", _in_record(".whl", "embedded_binary", delete=True), "does not embed the sealed"),
     ("no-derived", _in_record(".tar.gz", "derived_install", delete=True), "lacks its derived-install"),
+    ("derived-invalid", _in_record(".tar.gz", "derived_install", value="bad"), "lacks its derived-install"),
+    ("derived-inst-malformed", _in_record(".tar.gz", "derived_install", "installation", value="bad"), "derived installation is malformed"),
+    ("derived-installer-malformed", _in_record(".tar.gz", "derived_install", "installation", "installer", value="bad"), "derived installer is malformed"),
     ("derived-failed", _in_record(".tar.gz", "derived_install", "installation", "installer", "status", value="failed"), "derived installation did not pass"),
+    ("derived-installer-rc", _in_record(".tar.gz", "derived_install", "installation", "installer", "returncode", value=1), "derived installation did not pass"),
+    ("derived-inst-unbound", _in_record(".tar.gz", "derived_install", "installation", "archive_sha256", value="0" * 64), "installation archive_sha256 is not bound"),
     ("derived-unbound", _in_record(".tar.gz", "derived_install", "source_archive_sha256", value="0" * 64), "not bound to the sealed sdist"),
     ("derived-sbom-unbound", _in_record(".tar.gz", "derived_install", "sbom", "source_archive_sha256", value="0" * 64), "derived sbom is not bound"),
+    ("derived-grype-unbound", _in_record(".tar.gz", "derived_install", "grype", "source_archive_sha256", value="0" * 64), "derived grype is not bound"),
+    ("duplicate-sbom-view", lambda doc: rec(doc, ".tar.gz")["derived_install"]["sbom"].update({"path": rec(doc, ".tar.gz")["sbom"]["path"]}), "paths must be distinct"),
+    ("duplicate-grype-view", lambda doc: rec(doc, ".tar.gz")["derived_install"]["grype"].update({"path": rec(doc, ".tar.gz")["grype"]["path"]}), "paths must be distinct"),
+    ("derived-no-python", _in_record(".tar.gz", "derived_install", "sbom", "types", value={"go-module": 3}), "has coverage gap"),
+    ("derived-syft-failed", _in_record(".tar.gz", "derived_install", "sbom", "syft_returncode", value=1), "Syft did not exit cleanly"),
+    ("derived-empty", _in_record(".tar.gz", "derived_install", "sbom", "package_count", value=0), "SBOM is empty"),
+    ("raw-sdist-empty", _in_record(".tar.gz", "sbom", "package_count", value=0), "SBOM is empty"),
+    ("raw-sdist-count-bool", _in_record(".tar.gz", "sbom", "package_count", value=True), "SBOM is empty"),
+    ("raw-sdist-status", _in_record(".tar.gz", "sbom", "coverage_status", value="passed"), "coverage_status is inconsistent"),
+    ("raw-sdist-missing", _in_record(".tar.gz", "sbom", "missing_types", value=["other"]), "missing_types is inconsistent"),
+    ("raw-sdist-required", _in_record(".tar.gz", "sbom", "required_types", value=[]), "required_types differs from policy"),
+    ("raw-sdist-grype", _in_record(".tar.gz", "grype", "status", value="failed"), "Grype policy did not pass"),
+    ("raw-sdist-syft", _in_record(".tar.gz", "sbom", "syft_returncode", value=1), "Syft did not exit cleanly"),
+    ("derived-types-invalid", _in_record(".tar.gz", "derived_install", "sbom", "types", value=None), "types inventory is missing or malformed"),
+    ("sdist-types-malformed", _in_record(".tar.gz", "sbom", "types", value="bad"), "types inventory is missing or malformed"),
+    ("sdist-types-bool", _in_record(".tar.gz", "sbom", "types", value={"go-module": True, "python": 1}), "must be positive integer"),
+    ("sdist-types-sum", _in_record(".tar.gz", "sbom", "types", value={"go-module": 2}), "inconsistent with types count"),
+    ("derived-grype-failed", _in_record(".tar.gz", "derived_install", "grype", "status", value="failed"), "Grype policy did not pass"),
+    ("derived-grype-input", _in_record(".tar.gz", "derived_install", "grype", "input_sbom_sha256", value="0" * 64), "Grype input is not its SBOM"),
+    ("derived-grype-blocking", _in_record(".tar.gz", "derived_install", "grype", "blocking_severities", value=["high"]), "Grype policy did not pass"),
     ("union-gap", _in_record(".tar.gz", "coverage_union", "status", value="coverage-gap"), "coverage union is incomplete"),
+    ("union-missing", _in_record(".tar.gz", "coverage_union", "missing_types", value=["python"]), "missing_types must be empty"),
+    ("union-covered", _in_record(".tar.gz", "coverage_union", "covered_types", value=["go-module"]), "covered_types mismatch"),
+    ("union-required", _in_record(".tar.gz", "coverage_union", "required_types", value=["other"]), "required_types mismatch"),
+    ("raw-complete-derived-gap", lambda doc: (
+        rec(doc, ".tar.gz")["sbom"].update({"types": {"go-module": 1, "python": 1}, "package_count": 2, "missing_types": [], "coverage_status": "passed"}),
+        rec(doc, ".tar.gz")["derived_install"]["sbom"].update({"types": {"go-module": 3}, "package_count": 3, "coverage_status": "coverage-gap", "missing_types": ["python"]}),
+    ), "coverage did not pass"),
     ("conditional-failed", _set(("conditional_dependency", "status"), "tool-failure"), "conditional dependency scan did not pass"),
     ("conditional-view", _set(("conditional_dependency", "view", "target_python"), "3.11"), "conditional dependency view did not pass"),
     ("conditional-receipt", _set(("conditional_dependency", "receipt"), None), "receipt is missing"),
@@ -781,7 +835,7 @@ def test_check_scan_negative_fixture_table_has_no_vacuous_entry(scans_world: Sim
     for name, mutate, _ in SCAN_NEGATIVES:
         doc = copy.deepcopy(scans_world.doc)
         mutate(doc)
-        assert doc != scans_world.doc, name
+        assert json.dumps(doc, sort_keys=True) != json.dumps(scans_world.doc, sort_keys=True), name
 
 
 def test_check_scan_requires_every_evidence_file_by_digest(scans_world: SimpleNamespace) -> None:

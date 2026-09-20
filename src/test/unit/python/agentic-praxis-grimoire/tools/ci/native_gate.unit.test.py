@@ -95,20 +95,32 @@ def scan_doc(assets: dict[str, Any]) -> dict[str, Any]:
             match = [s["target"] for s in specs if s["npm_slug"] in name]
             kind, platform = ("npm-platform", match[0]) if match else ("npm-launcher", None)
         record: dict[str, Any] = {"kind": kind, "target": name, "target_sha256": asset["sha256"], "target_platform": platform, "status": "passed", **copy.deepcopy(parts)}
+        for key in ("sbom", "grype"):
+            record[key]["path"] = f"artifacts/{name}/{key}.json"
         if kind in ("python-wheel", "npm-platform"):
             record["embedded_binary"] = {"sha256": assets[f"go/{platform.replace('/', '-')}/apgr"]["sha256"], "matches": True}
         if kind == "python-sdist":
+            record["sbom"].update({"package_count": 1, "types": {"go-module": 1}, "required_types": ["python"],
+                                   "missing_types": ["python"], "coverage_status": "coverage-gap"})
             derived = copy.deepcopy(parts)
             for part in derived.values():
                 part["source_archive_sha256"] = asset["sha256"]
-            record["derived_install"] = {"installation": {"installer": {"status": "passed", "returncode": 0}}, "source_archive_sha256": asset["sha256"], **derived}
-            record["coverage_union"] = {"status": "passed", "missing_types": []}
+                path = Path(part["path"])
+                part["path"] = str(Path("artifacts/python-sdist/derived-install") / path.name)
+            derived["sbom"].update({"package_count": 3, "types": {"go-module": 2, "python": 1}, "required_types": ["python"],
+                                    "missing_types": [], "coverage_status": "passed"})
+            record["derived_install"] = {"installation": {"installer": {"status": "passed", "returncode": 0}, "archive_sha256": asset["sha256"]},
+                                         "source_archive_sha256": asset["sha256"], **derived}
+            record["coverage_union"] = {"status": "passed", "missing_types": [], "covered_types": ["go-module", "python"], "required_types": ["python"]}
         records.append(record)
+    conditional = copy.deepcopy(parts)
+    for key, part in conditional.items():
+        part["path"] = f"conditional-runtime/{key}.json"
     return {
         "schema": "apg-sbom-scan-v1", "status": "passed",
         "source": {"target": ".", "status": "passed", **copy.deepcopy(parts)},
         "artifacts": records,
-        "conditional_dependency": {"kind": "conditional-dependency", "status": "passed", **copy.deepcopy(parts),
+        "conditional_dependency": {"kind": "conditional-dependency", "status": "passed", **conditional,
                                    "view": {"target_python": "3.10", "download": {"status": "passed"}, "installation": {"status": "passed"}},
                                    "receipt": {"path": "r", "sha256": hex_of("receipt")}},
         "scanner": {"syft": {"version": policy["syft"], "binary_sha256": hex_of("s")}, "grype": {"version": policy["grype"], "binary_sha256": hex_of("g")}},
