@@ -17,9 +17,8 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
 
-ROOT = Path(__file__).resolve().parents[2]
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
+if str(Path(__file__).resolve().parents[2]) not in sys.path:
+    sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from tools.ci import native_artifacts as artifacts
 from tools.ci import native_release_assembly as assembly
@@ -40,6 +39,8 @@ from tools.ci.native_seal import (
     sha256_file,
 )
 from tools.ci.native_topology import REQUIRED_NATIVE_JOBS
+
+ROOT = Path(__file__).resolve().parents[2]
 
 AGGREGATE_SCHEMA = "apg-matrix-aggregate-v1"
 MATRIX_JOBS = frozenset(REQUIRED_NATIVE_JOBS - {"native-release-candidate-gate"})

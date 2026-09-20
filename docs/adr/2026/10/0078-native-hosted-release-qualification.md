@@ -74,6 +74,27 @@ Rollback restores the earlier source workflow only through a reviewed change;
 it cannot relabel cross compilation as native qualification. Required-check
 migration must be coordinated with whichever source topology is active.
 
+### APG167R failure observability
+
+Failed qualification commands retain sanitized stdout and stderr tails and an
+early Go failure extract (including compile and vet errors), each bounded to
+16 KiB. Qualification exceptions are
+recorded as `apgr.native-lane-failure/v1` JSON outside the sealed lane output.
+If diagnostics cannot be written, the sanitized original error remains in the
+job log and the lane remains failed.
+Each native lane uploads these diagnostics for fourteen days only when its
+qualification step fails. The command and lane remain failed; diagnostics do
+not satisfy a qualification gate. Each command has a forty-five-minute timeout;
+on timeout the adapter kills its POSIX process group before recording partial
+output. This leaves time for diagnostics when an early command stalls. A late
+command or runner cancellation can still reach the overall job deadline first
+and prevent retention.
+
+The first Darwin Go-test cause remains
+`MACOS_NATIVE_TEST_ROOT_CAUSE_PENDING_HOSTED_REEXECUTION`. Source fixtures prove
+observability and failure behavior; the next native hosted run must establish
+the actual cause and qualification outcome.
+
 ## Provenance
 
 This design is independently written from APGR's existing packaging and CI

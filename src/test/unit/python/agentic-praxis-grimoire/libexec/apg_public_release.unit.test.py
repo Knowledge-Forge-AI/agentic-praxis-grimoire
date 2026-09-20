@@ -323,6 +323,9 @@ class APGPublicReleaseUnitTests(
         )
         for key, expected in v013.items():
             self.assertEqual(policy[key], list(expected), key)
+        for key in ("critical_files", "required_helpers"):
+            self.assertIn("tools/ci/native_diagnostics.py", v013[key])
+            self.assertNotIn("tools/ci/native_diagnostics.py", v012[key])
 
         # Candidate path filtering behavior
         self.assertFalse(release.is_v010_candidate_path("private/secret.txt"))

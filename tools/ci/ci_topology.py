@@ -11,12 +11,10 @@ import sys
 from pathlib import Path
 from typing import Any
 
-ROOT = Path(__file__).resolve().parents[2]
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
-WORKFLOWS_DIR = ROOT / ".github/workflows"
+if str(Path(__file__).resolve().parents[2]) not in sys.path:
+    sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-from tools.ci.native_topology import (  # noqa: E402
+from tools.ci.native_topology import (
     EXPECTED_REPO,
     EXPECTED_REPO_ID,
     GATE as NATIVE_GATE,
@@ -29,6 +27,9 @@ from tools.ci.native_topology import (  # noqa: E402
     guard_clauses,
     validate_native_qualification,
 )
+
+ROOT = Path(__file__).resolve().parents[2]
+WORKFLOWS_DIR = ROOT / ".github/workflows"
 
 REQUIRED_PR_JOBS = {
     "guard",

@@ -21,8 +21,13 @@ from types import SimpleNamespace
 from typing import Any, Callable
 import urllib.error
 import zipfile
+import sys
 
 import pytest
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[7] / "libexec"))
+import apg_go_build as go_build
+import apg_go_buildinfo as buildinfo
 
 from tools.ci import native_artifacts as na
 from tools.ci import native_release_assembly as assembly
@@ -36,9 +41,6 @@ from tools.ci.native_seal import (
     verify_bundle_seal,
     verify_scan_receipt,
 )
-
-import apg_go_build as go_build  # noqa: E402
-import apg_go_buildinfo as buildinfo  # noqa: E402
 
 COMMIT, TREE, HEAD, BASE = "a" * 40, "b" * 40, "c" * 40, "d" * 40
 RUN_ID = "777"

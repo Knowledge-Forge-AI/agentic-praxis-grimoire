@@ -44,6 +44,7 @@ V013_HELPER_ADDITIONS = (
     "libexec/controller_generation_bootstrap.py",
     "tools/ci/mypy_identity.py",
     "tools/ci/native_artifacts.py",
+    "tools/ci/native_diagnostics.py",
     "tools/ci/native_gate.py",
     "tools/ci/native_lane.py",
     "tools/ci/native_release_assembly.py",

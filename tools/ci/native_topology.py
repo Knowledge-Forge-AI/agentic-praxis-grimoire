@@ -42,7 +42,7 @@ DOWNLOAD_WITH_KEYS = {"name", "pattern", "path", "merge-multiple", "artifact-ids
 FORBIDDEN_RUN_TOKENS = ("|| true", "|| :", "set +e", "exit 0", "continue-on-error")
 FORBIDDEN_DOC_TOKENS = ("secrets.", "pull_request_target", "workflow_dispatch", "workflow_run")
 SCRIPT_REF = re.compile(r"(?<![\w./-])((?:release|tools|libexec|bin)/[\w./-]*\.py)\b")
-OUTPUT_FLAG = re.compile(r"--(?:output|dir|bundle|lanes|scans|evidence|artifact)\s+(\S+)")
+OUTPUT_FLAG = re.compile(r"--(?:output|dir|bundle|lanes|scans|evidence|artifact|diagnostics)\s+(\S+)")
 OUTPUT_VALUE = re.compile(r"^(?:sha256:)?\$\{\{ steps\.([A-Za-z0-9_-]+)\.outputs\.[A-Za-z0-9_-]+ \}\}$")
 NEEDS_REF = re.compile(r"needs\.([A-Za-z0-9_-]+)\.(result|outputs\.([A-Za-z0-9_-]+))")
 

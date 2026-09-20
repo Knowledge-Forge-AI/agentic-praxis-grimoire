@@ -135,8 +135,19 @@
         },
         {
           "name": "Native Go and installed Nix qualification",
-          "run": "set -euo pipefail\npython3 tools/ci/native_lane.py qualify --lane native-darwin-arm64 --output \"$RUNNER_TEMP/lane-out\"\n",
+          "run": "set -euo pipefail\npython3 tools/ci/native_lane.py qualify --lane native-darwin-arm64 --output \"$RUNNER_TEMP/lane-out\" --diagnostics \"$RUNNER_TEMP/lane-diagnostics\"\n",
           "id": "qualify"
+        },
+        {
+          "name": "Retain native-darwin-arm64 failure diagnostics",
+          "if": "${{ failure() && steps.qualify.outcome == 'failure' }}",
+          "uses": "actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f",
+          "with": {
+            "name": "native-darwin-arm64-failure-diagnostics",
+            "path": "${{ runner.temp }}/lane-diagnostics",
+            "retention-days": 14,
+            "if-no-files-found": "error"
+          }
         },
         {
           "name": "Retain native-darwin-arm64",
@@ -226,8 +237,19 @@
         },
         {
           "name": "Native Go and installed Nix qualification",
-          "run": "set -euo pipefail\npython3 tools/ci/native_lane.py qualify --lane native-linux-x64 --output \"$RUNNER_TEMP/lane-out\"\n",
+          "run": "set -euo pipefail\npython3 tools/ci/native_lane.py qualify --lane native-linux-x64 --output \"$RUNNER_TEMP/lane-out\" --diagnostics \"$RUNNER_TEMP/lane-diagnostics\"\n",
           "id": "qualify"
+        },
+        {
+          "name": "Retain native-linux-x64 failure diagnostics",
+          "if": "${{ failure() && steps.qualify.outcome == 'failure' }}",
+          "uses": "actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f",
+          "with": {
+            "name": "native-linux-x64-failure-diagnostics",
+            "path": "${{ runner.temp }}/lane-diagnostics",
+            "retention-days": 14,
+            "if-no-files-found": "error"
+          }
         },
         {
           "name": "Retain native-linux-x64",
@@ -317,8 +339,19 @@
         },
         {
           "name": "Native Go and installed Nix qualification",
-          "run": "set -euo pipefail\npython3 tools/ci/native_lane.py qualify --lane native-linux-arm64 --output \"$RUNNER_TEMP/lane-out\"\n",
+          "run": "set -euo pipefail\npython3 tools/ci/native_lane.py qualify --lane native-linux-arm64 --output \"$RUNNER_TEMP/lane-out\" --diagnostics \"$RUNNER_TEMP/lane-diagnostics\"\n",
           "id": "qualify"
+        },
+        {
+          "name": "Retain native-linux-arm64 failure diagnostics",
+          "if": "${{ failure() && steps.qualify.outcome == 'failure' }}",
+          "uses": "actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f",
+          "with": {
+            "name": "native-linux-arm64-failure-diagnostics",
+            "path": "${{ runner.temp }}/lane-diagnostics",
+            "retention-days": 14,
+            "if-no-files-found": "error"
+          }
         },
         {
           "name": "Retain native-linux-arm64",

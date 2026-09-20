@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import subprocess
+import sys
 import zipfile
 from pathlib import Path
 
@@ -10,16 +11,15 @@ import pytest
 
 from src.test.apg_test_support import repository_root
 
-REPOSITORY_ROOT = repository_root(__file__)
-import sys
-
-sys.path.insert(0, str(REPOSITORY_ROOT / "libexec"))
+sys.path.insert(0, str(repository_root(__file__) / "libexec"))
 
 import apg_go_build as go_build
 import apg_go_buildinfo as buildinfo
 import apg_python_build_backend as backend
 import apg_python_prebuilt_publication as prebuilt_pub
 import apg_python_publication as publication
+
+REPOSITORY_ROOT = repository_root(__file__)
 
 
 def _make_artifacts(
