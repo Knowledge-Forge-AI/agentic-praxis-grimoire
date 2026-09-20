@@ -1,10 +1,13 @@
 # APG Distribution
 
-This documentation covers the **unreleased v0.12.0 candidate**. Preceding releases
-(v0.11.0, v0.10.0, and earlier) remain frozen. Active planning and
-implementation are tracked in the [v0.12 roadmap](v0-12-roadmap.md).
+This documentation covers the **unreleased v0.13.0 candidate**. v0.12.0 is the
+latest published release; preceding releases (v0.12.0, v0.11.0, and earlier)
+remain frozen.
+Active planning and implementation are tracked in the [v0.13 roadmap](v0-13-roadmap.md).
+Multi-channel release outcomes and post-G1 development reconciliation are documented
+in the [v0.12 forward reconciliation record](architecture/v0-12-forward-reconciliation.md).
 The distribution architecture preserves the multi-registry packaging
-model and provides the 45-skill corpus. Local build and inspection do not publish
+model and provides the 46-skill corpus. Local build and inspection do not publish
 packages.
 
 APG has one editable release-version authority:
@@ -25,7 +28,8 @@ and the legacy project-local symlink projection.
 
 Importantly, `apgr test` (including `--summary-file` and the `policy` mechanical role)
 is a repository maintenance workflow requiring an APGR Git source checkout and
-the developer toolchain (Python 3.11+, pytest stack, Git 2.40+, Go 1.25+). The
+the developer toolchain (Python 3.11+, pytest stack, Git 2.40+, Go 1.25+).
+Release builds and builder tests require exactly Go 1.26.9. The
 prebuilt native Go binary (`bin/apgr`), bare wheels, and npm platform packages do
 **not** carry the test runner or test suites (`libexec/apg_test.py` and `src/test/`
 are intentionally excluded from binary distribution packages).
@@ -62,7 +66,7 @@ the `policy` suite is pending runner qualification, and `unit`/`integration`/`co
 suites are blocked by whole-inventory preflight binding Darwin arm64 Nix store digests.
 macOS Apple Silicon (`darwin/arm64`) is fully qualified (APG114 / Exit `00159`).
 
-Builds use Go 1.25, `CGO_ENABLED=0`, trimmed source paths, disabled VCS
+Release builds use exactly Go 1.26.9, `CGO_ENABLED=0`, trimmed source paths, disabled VCS
 stamping, and an empty controlled Go build ID. The distribution pipeline builds
 each target twice in disjoint scratch roots and requires byte equality. It then
 reuses those exact bytes in Python and npm artifacts rather than recompiling
@@ -81,7 +85,7 @@ The source distribution contains Go source, the canonical skills, the
 thin Python source, the dependency-free build backend, packaging helpers,
 the footprint subsystem, metadata, and licenses. Source distributions contain no
 prebuilt executable. Building a wheel from an extracted source distribution
-requires a supported host and a local Go 1.25 toolchain; the resulting
+requires a supported host and exactly the local Go 1.26.9 toolchain; the resulting
 installed wheel does not require Go.
 Unsupported build targets fail explicitly.
 
@@ -130,6 +134,43 @@ The Homebrew formula installs the native portable `bin/apgr` executable into lin
 
 Homebrew installation coexistence alongside existing pip, npm, or Nix installations is designed to avoid overwriting, relinking, or force-replacing other package managers, with live verification recorded as pending until executed against the published tap.
 
+## First-party Nix flake (v0.13.0 onward)
+
+From v0.13.0, APGR is published as a first-party Nix flake from its own public
+repository and release tag ([ADR 0076](adr/2026/09/0076-first-party-nix-flake-publication-target.md)).
+This is not an upstream `NixOS/nixpkgs` package, and there is no Hydra job,
+binary cache or host-activation module. Earlier releases have no Nix artifact.
+The commands below work only after the `v0.13.0` tag is published:
+
+```sh
+nix build github:Knowledge-Forge-AI/agentic-praxis-grimoire/v0.13.0#agentic-praxis-grimoire
+nix run github:Knowledge-Forge-AI/agentic-praxis-grimoire/v0.13.0#apgr -- --version
+nix profile add github:Knowledge-Forge-AI/agentic-praxis-grimoire/v0.13.0#agentic-praxis-grimoire
+```
+
+Older Nix releases spell `nix profile add` as `nix profile install`; Nix
+2.31.5 still accepts `install` as a deprecated alias.
+Normal installs pin a release tag, never the mutable `main` branch.
+
+Outputs, the installed runtime, its prerequisites, the source boundary and
+the closure trade-offs are described in the [Nix flake guide](guides/nix-flake.md).
+
+### Platform status
+
+| System | Evidence before v0.13.0 publication |
+| --- | --- |
+| `aarch64-darwin` | Native build, flake checks and disposable-profile readback on the development host, unsandboxed (`sandbox = false`); host-tool independence is not proven. The hosted `nix (aarch64-darwin)` cell must also pass on public staging |
+| `x86_64-linux` | Evaluation and derivation instantiation locally; the hosted `nix (x86_64-linux)` cell gates the public PR but has not yet been observed |
+| `aarch64-linux` | Evaluation and derivation instantiation only; no native execution cell |
+
+The installed dispatcher runs only from a write-protected `/nix/store` object
+and verifies its recorded content digest when a `dispatch`, `finalize` or
+`ownership` run starts. This rejects copied or
+modified trees, but it is not tamper-proof against an account that can write
+the store. See the [Nix flake guide](guides/nix-flake.md#installed-dispatcher).
+
+`x86_64-darwin` is not supported.
+
 ## Candidate manifest and qualification
 
 `apg.distribution-manifest/v1` is the release-candidate checksum authority. It
@@ -163,3 +204,19 @@ v0.11.0 is publicly released across GitHub, Go, PyPI, npm, and Homebrew tap. Ins
 `npm install -g @knowledge-forge-ai/apgr@0.11.0`, Homebrew with
 `brew install Knowledge-Forge-AI/tap/agentic-praxis-grimoire`, or the Go module with
 `go get github.com/Knowledge-Forge-AI/agentic-praxis-grimoire@v0.11.0`.
+
+Release-builder tests fail if the selected compiler is not exactly Go 1.26.9;
+they do not skip a compiler mismatch. Source-distribution wheel builds use the
+same compiler so their deterministic rebuilds can match release outputs. Select
+an isolated compiler with `GOTOOLCHAIN=local`; installed wheel, npm and Nix
+runtimes use the bundled binary and do not require a Go compiler.
+
+Hosted native qualification builds each binary on its actual target runner.
+Release assembly uses the Python `build-prebuilt` path and existing npm
+packager to consume those sealed binaries without compilation. It checks binary
+build information against retained native `go version -m` evidence, creates the
+canonical three wheels and one sdist, and independently validates the archives.
+The resulting eleven distributables are sealed before native consumer smoke;
+their bytes remain unchanged through scans and any later attended promotion.
+Developer compile paths remain for compatibility and are excluded from hosted
+release assembly. Local binary qualification is stopped for this release line.

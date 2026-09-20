@@ -68,8 +68,12 @@ def test_substantive_banner_differentiation() -> None:
     assert is_substantive_failure(tree_clean, tree_dirty, CAPTURED_CODEX_BANNER) is True
 
 
-def test_quota_failure_dynamic_reroute(tmp_path: Path) -> None:
+def test_quota_failure_dynamic_reroute(tmp_path: Path, monkeypatch) -> None:
     """Turn failure with quota exhaustion persists failure artifact and reroutes to fallback."""
+    # This unit owns retry accounting with synthetic endpoints. Real captured
+    # worker qualification is covered by the selected-home dispatch tests.
+    monkeypatch.setattr("agent_phase.worker_capability.qualify_worker_eligibility",
+                        lambda *args, **kwargs: True)
     db_path = tmp_path / "test.db"
     conn = open_dispatcher_db(db_path)
     run_id = "run-reroute-1"
@@ -598,4 +602,3 @@ def test_substantive_stdout_with_quota_text_does_not_persist_or_reroute(tmp_path
     assert fail_data["retryable"] is False
     assert fail_data["observation_ids"] == []
     assert fail_data["observation_digests"] == {}
-

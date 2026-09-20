@@ -32,9 +32,9 @@ DISPATCHER_END = "<!-- END MANAGED DISPATCHER ROSTER OPERATIONS -->"
 ROOT_BODY = """## Dispatcher roster quick start
 
 Edit `common/dispatcher/endpoints.toml` for provider/profile aliases and
-`common/dispatcher/routes.toml` for stage-slot assignments. Advance their shared
-positive `generation` together. Provider profiles own model, effort, and runtime
-semantics; roster files do not own security-sensitive launch controls.
+`common/dispatcher/routes.toml` for stage-slot assignments. Advance the six-member bundle
+generation together. Captured `models.toml` owns model and effort; provider profiles
+own launch posture; roster files do not own security-sensitive launch controls.
 Select `execution_mode` from the current operator instruction, not a durable
 default. Follow the self-contained
 [operator roster workflow](common/dispatcher/README.md#operator-roster-workflow)
@@ -45,11 +45,11 @@ JACA nor Agent-Security is a mandatory local prototype runtime dependency."""
 DISPATCHER_BODY = """Edit `endpoints.toml` when adding or renaming a stable endpoint alias. Each
 alias contains only `provider` and `profile`. Edit `routes.toml` when changing a
 stage roster; every supported phase/mode table must contain exactly the five
-standard slots. Provider profiles own model, effort, and runtime semantics;
+standard slots. The bundle owns model and effort; provider profiles own launch posture;
 endpoints alias provider plus profile; routes alias phase, mode, and stage.
 Do not copy model or reasoning-effort values into either roster file.
 
-Both files carry one positive `generation`. Advance it in both files as one
+All six bundle members carry one positive `generation`. Advance them as one
 operator edit; a mismatch is unusable roster state and dispatch fails closed.
 Select `execution_mode` from the explicit current operator instruction for each
 run. These directions define no active default and do not change routing policy.
@@ -78,10 +78,10 @@ bin/agent-phase-resolve path/to/request.json
 bin/agent-phase-dispatch --help
 ```
 
-The first command closed-validates both canonical TOML files and checks these
+The first command validates the canonical bundle and checks these
 managed directions. The tests cover completeness, referential integrity,
 provider-profile validation, and behavioral routing. Resolution is provider-free
-and exposes selected aliases, profile-derived intelligence, the shared
+and exposes selected aliases, captured-bundle intelligence, the shared
 generation, repository-relative source paths, and SHA-256 source digests.
 Inspect that evidence before using a changed roster. A passing local check does
 not authorize dispatch, publication, or workstation installation.

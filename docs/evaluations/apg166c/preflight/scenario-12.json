@@ -1,0 +1,77 @@
+{
+  "arms": {
+    "adaptive": {
+      "route": {
+        "identity_sources": [
+          "common/dispatcher/routes.toml",
+          "common/dispatcher/endpoints.toml",
+          "claude/profiles/normal-final-review.json",
+          "claude/model-catalog-v1.json"
+        ],
+        "model": "claude-opus-5",
+        "profile": "normal-final-review",
+        "provider": "claude",
+        "requested_mode": "adaptive",
+        "role_binding": {
+          "allowed_tools": [
+            "view_file"
+          ],
+          "binding_id": "binding-reviewer-04",
+          "roles": [
+            "Work Review"
+          ]
+        },
+        "source_sha256": {
+          "claude/model-catalog-v1.json": "24461d64200f30cec950190856d88b7ce1513c8c9f429a319c15c1357bbcae09",
+          "claude/profiles/normal-final-review.json": "8d868e7ad5105ac364dae89d47b7391f9e920539a30b8a900f9d14087858172a",
+          "common/dispatcher/endpoints.toml": "a3ae4c8654cf16a314d277877c99f98bffefdea2ae593d1475df3a6c1fc8a4b9",
+          "common/dispatcher/routes.toml": "c194887b362159141db6e345951cae20c229f05c1f5cf72eeb8305e5e8135673"
+        }
+      },
+      "status": "unavailable"
+    },
+    "static": {
+      "route": {
+        "identity_sources": [
+          "common/dispatcher/routes.toml",
+          "common/dispatcher/endpoints.toml",
+          "claude/profiles/normal-final-review.json",
+          "claude/model-catalog-v1.json"
+        ],
+        "model": "claude-opus-5",
+        "profile": "normal-final-review",
+        "provider": "claude",
+        "requested_mode": "static",
+        "role_binding": {
+          "allowed_tools": [
+            "view_file"
+          ],
+          "binding_id": "binding-reviewer-04",
+          "roles": [
+            "Work Review"
+          ]
+        },
+        "source_sha256": {
+          "claude/model-catalog-v1.json": "24461d64200f30cec950190856d88b7ce1513c8c9f429a319c15c1357bbcae09",
+          "claude/profiles/normal-final-review.json": "8d868e7ad5105ac364dae89d47b7391f9e920539a30b8a900f9d14087858172a",
+          "common/dispatcher/endpoints.toml": "a3ae4c8654cf16a314d277877c99f98bffefdea2ae593d1475df3a6c1fc8a4b9",
+          "common/dispatcher/routes.toml": "c194887b362159141db6e345951cae20c229f05c1f5cf72eeb8305e5e8135673"
+        }
+      },
+      "status": "unavailable"
+    }
+  },
+  "blockers": [
+    "Concrete clean subject factory not frozen",
+    "Provider result importer not frozen",
+    "Substantive external oracle implementation not frozen",
+    "Live projection/runtime authority not frozen"
+  ],
+  "oracle_executed": false,
+  "phase": "APG166C",
+  "provider_invocations": 0,
+  "scenario_id": "scenario-12",
+  "scenario_sha256": "09a3ea566f882ae0c780586aca228a0e7a264d749ec54d8c3b944f68fb83c805",
+  "status": "unavailable",
+  "subject_materialized": false
+}

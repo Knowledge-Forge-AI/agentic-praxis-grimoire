@@ -30,6 +30,7 @@ from apg_skill_library_check import (  # noqa: E402
     REQUIRED_H2S,
     FROZEN_VITE_SKILL_DESCRIPTION,
     FROZEN_NPM_SKILL_DESCRIPTION,
+    FROZEN_RTK_COMMAND_PROXY_SKILL_DESCRIPTION,
     DISCOVERY_POLICY_VERSION_V010_BROWSER_RUNTIME,
     V010_BROWSER_RUNTIME_ADMITTED_CANDIDATES,
 )
@@ -607,6 +608,7 @@ def _apg125_build_synthetic_45_library(
     browser_runtime_desc: str | None = None,
     vite_desc: str | None = None,
     npm_desc: str | None = None,
+    rtk_desc: str | None = None,
     candidate_names: tuple[str, ...] = tuple(sorted(V010_BROWSER_RUNTIME_ADMITTED_CANDIDATES)),
     omit_skills: tuple[str, ...] = (),
 ) -> None:
@@ -649,6 +651,11 @@ def _apg125_build_synthetic_45_library(
             if browser_runtime_desc is not None
             else "Use when web decisions depend on browser host behavior — Window, Document, DOM mutation, event phases, tasks, microtasks, timers, rAF, MutationObserver, URL, History, Fetch, CORS, cookies, WebStorage, IndexedDB, custom elements, Shadow DOM, geometry, workers, or object URLs — for an established browser execution role.",
             extra_browser_runtime_body,
+        )
+    if "rtk-command-proxy" in candidate_names and "rtk-command-proxy" not in omit_skills:
+        all_skills["rtk-command-proxy"] = (
+            rtk_desc if rtk_desc is not None else FROZEN_RTK_COMMAND_PROXY_SKILL_DESCRIPTION,
+            "",
         )
 
     for cname in candidate_names:
@@ -801,6 +808,7 @@ class SyntheticV010BrowserRuntimeIntegrationTests(unittest.TestCase):
                     "web-accessibility-profile",
                     "vite-build-profile",
                     "npm-package-manager-profile",
+                    "rtk-command-proxy",
                     "unauthorized-runtime-profile",
                 ),
             )
@@ -821,6 +829,7 @@ class SyntheticV010BrowserRuntimeIntegrationTests(unittest.TestCase):
                     "vite-build-profile",
                     "npm-package-manager-profile",
                     "browser-runtime-profile",
+                    "rtk-command-proxy",
                     "extra-candidate-profile",
                 ),
             )

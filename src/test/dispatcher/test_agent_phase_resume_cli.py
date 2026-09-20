@@ -114,16 +114,70 @@ def test_retained_request_json_supplies_source_phase_identity(
     assert run_module.phase_id_from_request(Path("request.json")) == "request"
 
 
-def test_resume_rejects_semantically_equal_but_byte_different_request(
-    tmp_path: Path,
+@pytest.mark.parametrize(
+    "encode",
+    [
+        lambda value: json.dumps(value),
+        lambda value: json.dumps(value, ensure_ascii=False, indent=4),
+        lambda value: json.dumps(dict(reversed(list(value.items())))),
+    ],
+    ids=["ascii-escapes", "utf8-indented", "key-order"],
+)
+def test_resume_accepts_semantically_equal_but_byte_different_request(
+    tmp_path: Path, encode
 ) -> None:
     source = source_run(tmp_path)
+    retained = json.loads((source / "request.json").read_text())
+    retained["prompt"] = "Do the retained work — exactly."
+    (source / "request.json").write_text(
+        json.dumps(retained, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
+    )
     supplied = tmp_path / "copy.json"
-    supplied.write_text(json.dumps(json.loads((source / "request.json").read_text())))
+    supplied.write_text(encode(retained), encoding="utf-8")
+    assert supplied.read_bytes() != (source / "request.json").read_bytes()
+
+    assert resume_validation_module.phase_id_for_resume(source, supplied) == "SOURCE-PHASE"
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("prompt", "Do different work."),
+        ("prompt", "Do the retained work. "),
+        ("phase_type", "architecture_docs"),
+        ("execution_mode", "claude_only"),
+    ],
+)
+def test_resume_rejects_different_request_semantics(
+    tmp_path: Path, field: str, value: str
+) -> None:
+    source = source_run(tmp_path)
+    supplied_value = json.loads((source / "request.json").read_text())
+    supplied_value[field] = value
+    supplied = tmp_path / "different.json"
+    supplied.write_text(json.dumps(supplied_value))
     with pytest.raises(
         resume_validation_module.ResumeError, match="RESUME_REQUEST_MISMATCH"
     ):
         resume_validation_module.phase_id_for_resume(source, supplied)
+
+
+def test_resume_rejects_invalid_supplied_or_retained_request(tmp_path: Path) -> None:
+    source = source_run(tmp_path)
+    extra = json.loads((source / "request.json").read_text())
+    extra["model"] = "substituted"
+    supplied = tmp_path / "extra.json"
+    supplied.write_text(json.dumps(extra))
+    with pytest.raises(resume_validation_module.ResumeError) as caught:
+        resume_validation_module.phase_id_for_resume(source, supplied)
+    assert caught.value.code == "RESUME_REQUEST_MISMATCH"
+
+    valid = tmp_path / "valid.json"
+    valid.write_bytes((source / "request.json").read_bytes())
+    (source / "request.json").write_text(json.dumps(extra))
+    with pytest.raises(resume_validation_module.ResumeError) as caught:
+        resume_validation_module.phase_id_for_resume(source, valid)
+    assert caught.value.code == "RESUME_SOURCE_INVALID"
 
 
 @pytest.mark.parametrize(

@@ -46,7 +46,7 @@ def make_policy_file(root: Path, allowances: list[dict] | None = None) -> Path:
     policy_file = root / "tools/ci/file_length_policy.json"
     policy_file.parent.mkdir(parents=True, exist_ok=True)
     doc = {
-        "schema": "apg-file-length-policy-v1",
+        "schema": "apg-file-length-policy-v2",
         "warning_limit": 400,
         "failure_limit": 1000,
         "allowances": allowances or [],
@@ -128,7 +128,6 @@ def test_retained_oversized_file_with_allowance_passes_as_warning(tmp_path: Path
                 "path": "libexec/oversized.py",
                 "role": "maintained-source",
                 "owner": "test-owner",
-                "sha256": "e" * 64,
                 "count": 1050,
                 "rationale": "Historical oversized",
                 "maintenance": "Refactor",
@@ -173,7 +172,6 @@ def test_retained_growth_beyond_allowance_fails(tmp_path: Path) -> None:
                 "path": "libexec/growing.py",
                 "role": "maintained-source",
                 "owner": "test-owner",
-                "sha256": "f" * 64,
                 "count": 1050,
                 "rationale": "Historical oversized",
                 "maintenance": "Refactor",
@@ -201,7 +199,6 @@ def test_allowance_is_nontransferable_on_removal(tmp_path: Path) -> None:
                 "path": "libexec/old_allowed.py",
                 "role": "maintained-source",
                 "owner": "test-owner",
-                "sha256": "a" * 64,
                 "count": 1200,
                 "rationale": "test",
                 "maintenance": "test",
@@ -235,7 +232,6 @@ def test_no_aggregate_failure_count_allowance(tmp_path: Path) -> None:
                 "path": "libexec/allowed.py",
                 "role": "maintained-source",
                 "owner": "test-owner",
-                "sha256": "b" * 64,
                 "count": 1200,
                 "rationale": "test",
                 "maintenance": "test",
@@ -295,7 +291,6 @@ def test_duplicate_policy_fails_with_exit_2(tmp_path: Path) -> None:
         "path": "libexec/dup.py",
         "role": "maintained-source",
         "owner": "test",
-        "sha256": "c" * 64,
         "count": 1200,
         "rationale": "test",
         "maintenance": "test",
@@ -375,3 +370,44 @@ def test_git_environment_isolation(tmp_path: Path) -> None:
     proc = run_cli(root, env_override={"GIT_INDEX_FILE": str(fake_index)})
     assert proc.returncode == 0
     assert "scanned: 1 Python files" in proc.stdout
+
+
+def test_content_modification_below_allowance_passes_cleanly(tmp_path: Path) -> None:
+    root = tmp_path / "repo"
+    init_disposable_repo(root)
+    f = root / "libexec/oversized.py"
+    write_lines(f, 1100)
+    git_add(root, "libexec/oversized.py")
+
+    make_policy_file(
+        root,
+        [
+            {
+                "path": "libexec/oversized.py",
+                "role": "maintained-source",
+                "owner": "test-owner",
+                "count": 1200,
+                "rationale": "Historical oversized",
+                "maintenance": "Refactor",
+            }
+        ],
+    )
+
+    # Initial state passes within allowance (1100 <= 1200)
+    proc = run_cli(root)
+    assert proc.returncode == 0
+
+    # Mutate content completely (different lines/content) but still <= 1200 lines
+    f.write_text("\n".join(f"# mutated line {i}" for i in range(1050)) + "\n", encoding="utf-8")
+    git_add(root, "libexec/oversized.py")
+
+    # Content change passes cleanly without false hash integrity errors
+    proc_mutated = run_cli(root)
+    assert proc_mutated.returncode == 0
+    assert "file-length: passed with warnings\n" in proc_mutated.stdout
+
+    # Reduction below failure limit (e.g. 500 lines) also passes cleanly
+    f.write_text("\n".join(f"# reduced line {i}" for i in range(500)) + "\n", encoding="utf-8")
+    git_add(root, "libexec/oversized.py")
+    proc_reduced = run_cli(root)
+    assert proc_reduced.returncode == 0

@@ -251,9 +251,10 @@ def worker_envelope(capability: dict, command: str = "agent-worker") -> str:
     """Describe only this stage's resolved, provider-owned worker capability."""
     if not capability.get("allowed"):
         return (
-            "Optional worker facility unavailable for this stage: "
+            "Worker facility unavailable for this stage: "
             + str(capability.get("reason", "runtime qualification incomplete"))
-            + ". Continue the parent task without external workers.\n"
+            + (". Required worker launch is blocked.\n" if capability.get("requirement") == "required"
+               else ". Optional delegation disposition: unavailable.\n")
         )
     limits = capability["limits"]
     interface = (
@@ -266,21 +267,26 @@ def worker_envelope(capability: dict, command: str = "agent-worker") -> str:
         else (
             f"Optional shared local workers: use {command} job launch/status/wait/cancel/abandon.\n"
             "Use the inherited parent ID and worker state; do not initialize a new parent. "
-            "Launch with --worker-kind gemini or luna only when listed below, --key, "
+            "Launch with --worker-kind gemini, luna or sonnet only when listed below, --key, "
             "--task-file, --task-authority, and --acceptance-criteria. "
             "Writing jobs also require --mutation-scope with explicit relative paths. "
             "Wait calls are bounded; still-running is not failure.\n"
         )
     )
     pools = (
-        f"Fixed independent pools: Gemini {limits['max_gemini']}, Luna {limits['max_luna']}; "
-        "no borrowing; parent excluded. "
+        f"Fixed independent pools: Gemini {limits['max_gemini']}, Luna {limits['max_luna']}, "
+        f"Sonnet {limits['max_sonnet']}; no borrowing; parent excluded. "
         f"External kinds allowed: {', '.join(capability['allowed_worker_kinds'])}. "
         f"Luna transport: {capability['luna_worker']['transport']}. "
-        + ("Astra native occupancy is owned by Codex open-thread accounting, not this ledger.\n"
-           if capability.get("parent_family") == "codex_astra"
-           else "Both pools use external leaf processes; native Codex agents are disabled for Luna.\n")
-        if capability.get("policy_selection") == "dual_pool_4x4"
+        f"Sonnet transport: {capability['sonnet_worker']['transport']}; "
+        "model claude-sonnet-5-5/high. "
+        + ("Codex native Luna occupancy is owned by Codex open-thread accounting.\n"
+           if capability.get("parent_family") == "codex_parent"
+           else "Native Claude Sonnet uses the launcher-bound apgr-sonnet-leaf Agent type "
+                "and atomic ledger admission; all other external workers are leaves.\n"
+           if capability['sonnet_worker']['transport'] == "claude_native"
+           else "All three pools use external leaf processes.\n")
+        if capability.get("policy_selection") == "triple_pool_4x4x4"
         else f"Maximum aggregate workers per parent: {limits['max_aggregate']}.\n"
     )
     return (

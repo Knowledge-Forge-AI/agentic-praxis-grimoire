@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 import tomllib
 
+from agent_phase.bundle import BUNDLE_GENERATION, BUNDLE_MEMBERS
 from agent_phase.provider import (
     DEFAULT_ADVISORY_INTERVAL_SECONDS,
     DEFAULT_ADVISORY_SILENCE_SECONDS,
@@ -86,7 +87,11 @@ def test_antigravity_reviewer_endpoint_registration() -> None:
     with open(capabilities_path, "rb") as f:
         capabilities_data = tomllib.load(f)
 
-    assert endpoints_data.get("generation") == 7
+    assert endpoints_data.get("generation") == BUNDLE_GENERATION
+    assert capabilities_data.get("generation") == BUNDLE_GENERATION
+    for member in BUNDLE_MEMBERS:
+        with open(repo_root / "common" / "dispatcher" / member, "rb") as stream:
+            assert tomllib.load(stream)["generation"] == BUNDLE_GENERATION, member
     ep_entry = endpoints_data.get("endpoints", {}).get("antigravity-claude-opus-review")
     assert ep_entry is not None, "antigravity-claude-opus-review missing from endpoints.toml"
     assert ep_entry.get("provider") == "antigravity"

@@ -10,29 +10,29 @@
       "execution_mode": "claude_only",
       "stages": {
         "plan": {
-          "alias": "claude-architecture-docs-primary",
+          "alias": "claude-opus-high-plan",
           "provider": "claude",
-          "profile": "architecture-docs-primary"
+          "profile": "opus-high-plan"
         },
         "plan_review": {
-          "alias": "claude-architecture-docs-review",
+          "alias": "claude-opus-high-review",
           "provider": "claude",
-          "profile": "architecture-docs-review"
+          "profile": "opus-high-review"
         },
         "work": {
-          "alias": "claude-architecture-docs-primary",
+          "alias": "claude-only-architecture-docs-primary",
           "provider": "claude",
-          "profile": "architecture-docs-primary"
+          "profile": "claude-only-architecture-docs-primary"
         },
         "final_review": {
-          "alias": "claude-architecture-docs-review",
+          "alias": "claude-opus-high-review",
           "provider": "claude",
-          "profile": "architecture-docs-review"
+          "profile": "opus-high-review"
         },
         "closeout": {
-          "alias": "claude-architecture-docs-primary",
+          "alias": "claude-only-architecture-docs-primary",
           "provider": "claude",
-          "profile": "architecture-docs-primary"
+          "profile": "claude-only-architecture-docs-primary"
         }
       }
     },
@@ -320,29 +320,29 @@
       "execution_mode": "claude_only",
       "stages": {
         "plan": {
-          "alias": "claude-implementation-primary",
+          "alias": "claude-opus-high-plan",
           "provider": "claude",
-          "profile": "implementation-primary"
+          "profile": "opus-high-plan"
         },
         "plan_review": {
-          "alias": "claude-implementation-review",
+          "alias": "claude-opus-high-review",
           "provider": "claude",
-          "profile": "implementation-review"
+          "profile": "opus-high-review"
         },
         "work": {
-          "alias": "claude-implementation-primary",
+          "alias": "claude-only-implementation-primary",
           "provider": "claude",
-          "profile": "implementation-primary"
+          "profile": "claude-only-implementation-primary"
         },
         "final_review": {
-          "alias": "claude-implementation-review",
+          "alias": "claude-opus-high-review",
           "provider": "claude",
-          "profile": "implementation-review"
+          "profile": "opus-high-review"
         },
         "closeout": {
-          "alias": "claude-implementation-primary",
+          "alias": "claude-only-implementation-primary",
           "provider": "claude",
-          "profile": "implementation-primary"
+          "profile": "claude-only-implementation-primary"
         }
       }
     },
@@ -630,29 +630,29 @@
       "execution_mode": "claude_only",
       "stages": {
         "plan": {
-          "alias": "claude-sysadmin-primary",
+          "alias": "claude-opus-high-sysadmin-review",
           "provider": "claude",
-          "profile": "sysadmin-primary"
+          "profile": "opus-high-sysadmin-review"
         },
         "plan_review": {
-          "alias": "claude-sysadmin-review",
+          "alias": "claude-opus-high-sysadmin-review",
           "provider": "claude",
-          "profile": "sysadmin-review"
+          "profile": "opus-high-sysadmin-review"
         },
         "work": {
-          "alias": "claude-sysadmin-primary",
+          "alias": "claude-only-sysadmin-primary",
           "provider": "claude",
-          "profile": "sysadmin-primary"
+          "profile": "claude-only-sysadmin-primary"
         },
         "final_review": {
-          "alias": "claude-sysadmin-review",
+          "alias": "claude-opus-high-sysadmin-review",
           "provider": "claude",
-          "profile": "sysadmin-review"
+          "profile": "opus-high-sysadmin-review"
         },
         "closeout": {
-          "alias": "claude-sysadmin-primary",
+          "alias": "claude-only-sysadmin-primary",
           "provider": "claude",
-          "profile": "sysadmin-primary"
+          "profile": "claude-only-sysadmin-primary"
         }
       }
     },
@@ -1065,5 +1065,91 @@
     "ArchiveError",
     "AdoptionError",
     "FinalizationError"
-  ]
+  ],
+  "current_roster_overrides": {
+    "semantic_phase": "APG166ZO-V0130-LATE-MODEL-ROSTER1",
+    "gemini_sub": {
+      "implementation_testing": {
+        "plan": {
+          "alias": "claude-opus-high-plan",
+          "provider": "claude",
+          "profile": "opus-high-plan"
+        },
+        "plan_review": {
+          "alias": "claude-opus-high-review",
+          "provider": "claude",
+          "profile": "opus-high-review"
+        },
+        "work": {
+          "alias": "codex-implementation-testing",
+          "provider": "codex",
+          "profile": "implementation-testing"
+        },
+        "final_review": {
+          "alias": "claude-opus-high-review",
+          "provider": "claude",
+          "profile": "opus-high-review"
+        },
+        "closeout": {
+          "alias": "codex-implementation-testing",
+          "provider": "codex",
+          "profile": "implementation-testing"
+        }
+      },
+      "architecture_docs": {
+        "plan": {
+          "alias": "claude-opus-high-plan",
+          "provider": "claude",
+          "profile": "opus-high-plan"
+        },
+        "plan_review": {
+          "alias": "claude-opus-high-review",
+          "provider": "claude",
+          "profile": "opus-high-review"
+        },
+        "work": {
+          "alias": "codex-architecture-docs-primary",
+          "provider": "codex",
+          "profile": "architecture-docs-primary"
+        },
+        "final_review": {
+          "alias": "claude-opus-high-review",
+          "provider": "claude",
+          "profile": "opus-high-review"
+        },
+        "closeout": {
+          "alias": "codex-architecture-docs-primary",
+          "provider": "codex",
+          "profile": "architecture-docs-primary"
+        }
+      },
+      "sysadmin": {
+        "plan": {
+          "alias": "claude-opus-high-plan",
+          "provider": "claude",
+          "profile": "opus-high-plan"
+        },
+        "plan_review": {
+          "alias": "claude-opus-high-sysadmin-review",
+          "provider": "claude",
+          "profile": "opus-high-sysadmin-review"
+        },
+        "work": {
+          "alias": "codex-sysadmin-primary",
+          "provider": "codex",
+          "profile": "sysadmin-primary"
+        },
+        "final_review": {
+          "alias": "claude-opus-high-sysadmin-review",
+          "provider": "claude",
+          "profile": "opus-high-sysadmin-review"
+        },
+        "closeout": {
+          "alias": "codex-sysadmin-primary",
+          "provider": "codex",
+          "profile": "sysadmin-primary"
+        }
+      }
+    }
+  }
 }

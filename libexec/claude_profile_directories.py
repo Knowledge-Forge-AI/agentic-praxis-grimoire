@@ -195,6 +195,7 @@ def resolve_scratch(
     *,
     environment: Mapping[str, str] | None = None,
     home: Path | str | None = None,
+    create: bool = True,
 ) -> Path:
     """Resolve and validate scratch directory with override support."""
     env = os.environ if environment is None else environment
@@ -209,6 +210,8 @@ def resolve_scratch(
             raise ProfileDirectoryError(
                 f"{APGR_SCRATCH_OVERRIDE_ENVIRONMENT} must be an absolute path: {override}"
             )
+        if not create:
+            return scratch_path
         if not scratch_path.exists():
             raise ProfileDirectoryError(
                 f"scratch override directory does not exist: {scratch_path}"
@@ -219,6 +222,8 @@ def resolve_scratch(
 
     apgr_home = resolve_apgr_home(environment=env, home=home)
     scratch_path = apgr_home / "scratch"
+    if not create:
+        return scratch_path
     if not apgr_home.exists() and APGR_HOME_ENVIRONMENT not in env:
         _create_owned_child(apgr_home.parent, ".apgr")
     validate_directory_security(apgr_home, label="APGR home")
@@ -234,12 +239,13 @@ def resolve_directory_token(
     *,
     environment: Mapping[str, str] | None = None,
     home: Path | str | None = None,
+    create: bool = True,
 ) -> Path:
     """Resolve a single closed token to a validated direct filesystem path."""
     if token == TOKEN_USER_HOME:
         return resolve_user_home(environment=environment, home=home)
     if token == TOKEN_SCRATCH:
-        return resolve_scratch(environment=environment, home=home)
+        return resolve_scratch(environment=environment, home=home, create=create)
     raise ProfileDirectoryError(f"unsupported directory token: {token!r}")
 
 
@@ -248,10 +254,11 @@ def resolve_profile_directories(
     *,
     environment: Mapping[str, str] | None = None,
     home: Path | str | None = None,
+    create: bool = True,
 ) -> list[Path]:
     """Validate closed tokens and resolve each to a secure filesystem path."""
     validate_directory_tokens(tokens)
     return [
-        resolve_directory_token(token, environment=environment, home=home)
+        resolve_directory_token(token, environment=environment, home=home, create=create)
         for token in tokens
     ]

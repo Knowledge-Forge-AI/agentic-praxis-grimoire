@@ -126,12 +126,6 @@ authority and safety rules. Use the projected installed-canon
 and MCP procedure. The installed canon is official; development checkouts are
 contribution worktrees, not private operational or runtime authority.
 
-## RTK
-
-For every shell-tool command, follow `$rtk-command-proxy`. In Codex, prefix the
-command with `rtk`; invoke RTK-native commands only once. Use the skill for
-client-specific verification, passthrough, hook, and troubleshooting rules.
-
 ## Curated Shell Environment
 
 When a command needs the user's real PATH, locale, or tool roots that a
@@ -147,9 +141,9 @@ For persistent task scratch, manifests, relocated temporary state, retained
 evidence, and exact resource cleanup, follow `$agent-scratch-workflow`. Use the
 configured APGR or dispatcher scratch root; do not create client-specific roots.
 
-## Enabled Agent-Central workers
+## Enabled APGR workers
 
-When this session's launch context exposes Agent-Central workers, use
+When this session's launch context exposes APGR workers, use
 `$agent-worker` at your discretion for separable work that improves correctness,
 parallel progress or parent-context efficiency. The user need not request
 subagents or approve each ordinary handoff within the authorized task. Keep
@@ -193,3 +187,17 @@ Common `[agents]` desired state is compiled into base configuration. Until
 separately requalified, launch Luna-dependent swarms through the qualified
 Homebrew/system Codex CLI; do not assume the macOS app or VS Code/IDE runtime
 can spawn Luna merely because it loads the same base configuration.
+
+## APGR worker runtime authority
+
+For APGR dispatcher launches, the captured APGR-home bundle owns model and
+worker policy. Use only the absolute candidate-root worker entrypoints supplied
+by the launch context and its APGR-owned skill copy. Do not resolve a same-named
+worker command from PATH or import the emergency dispatcher's configuration.
+The standard `gemini_sub` and worker-required dynamic routes refuse unavailable
+worker bindings before launch. Report `used`, `declined` with reason, or
+`unavailable` with a technical diagnostic. A configured model is not an observed
+worker invocation. Luna uses GPT-6 Luna/max, with a ceiling of four; Gemini has
+its own ceiling of four. Sonnet 5.5/high has a third independent ceiling
+of four through external Claude transport. Native Codex accounting owns Luna
+only; capacity cannot be borrowed.

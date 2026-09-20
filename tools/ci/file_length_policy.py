@@ -32,7 +32,7 @@ PROFILE_NAME = "file-length"
 PROTOCOL_VERSION = 1
 DEFAULT_WARNING_LIMIT = 400
 DEFAULT_FAILURE_LIMIT = 1000
-EXPECTED_SCHEMA = "apg-file-length-policy-v1"
+EXPECTED_SCHEMA = "apg-file-length-policy-v2"
 
 Severity = Literal["warning", "failure"]
 Status = Literal["passed", "passed_with_warnings", "failed"]
@@ -49,7 +49,6 @@ class Allowance:
     path: str
     role: str
     owner: str
-    sha256: str
     count: int
     rationale: str
     maintenance: str
@@ -59,7 +58,6 @@ class Allowance:
             "path": self.path,
             "role": self.role,
             "owner": self.owner,
-            "sha256": self.sha256,
             "count": self.count,
             "rationale": self.rationale,
             "maintenance": self.maintenance,
@@ -242,13 +240,12 @@ def load_policy(policy_path: Path) -> Policy:
             raise FileLengthOperationalError(
                 f"allowance entry at index {idx} is not a JSON object"
             )
-        if set(raw) != {"path", "role", "owner", "sha256", "count", "rationale", "maintenance"}:
+        if set(raw) != {"path", "role", "owner", "count", "rationale", "maintenance"}:
             raise FileLengthOperationalError("allowance fields differ from the closed contract")
         for req_field in (
             "path",
             "role",
             "owner",
-            "sha256",
             "count",
             "rationale",
             "maintenance",
@@ -285,16 +282,6 @@ def load_policy(policy_path: Path) -> Policy:
                 f"allowance count for {rel_path} must be an integer > failure_limit ({failure_limit}), got: {count!r}"
             )
 
-        sha256 = raw["sha256"]
-        if (
-            not isinstance(sha256, str)
-            or len(sha256) != 64
-            or not all(c in "0123456789abcdef" for c in sha256.lower())
-        ):
-            raise FileLengthOperationalError(
-                f"allowance sha256 for {rel_path} must be a 64-char hex string, got: {sha256!r}"
-            )
-
         role = raw["role"]
         owner = raw["owner"]
         rationale = raw["rationale"]
@@ -311,7 +298,6 @@ def load_policy(policy_path: Path) -> Policy:
             path=rel_path,
             role=role,
             owner=owner,
-            sha256=sha256.lower(),
             count=count,
             rationale=rationale,
             maintenance=maintenance,

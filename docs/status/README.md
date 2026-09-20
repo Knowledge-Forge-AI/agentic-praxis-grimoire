@@ -295,3 +295,31 @@ Exit 00182 remains privately reserved for APG137; APG138 uses corrected exit 001
 
 - [`00204 — APG152C v0.12 Release Authority Evidence and Crash-Resume Closure Exit`](2026/09/18/00204-apg152c-v0120-g1-repair3-release-authority-evidence-and-crash-resume-closure-exit.md)
 
+- [`00205 — APG159 v0.13.0 Foundation Architecture and Evaluation Data Exit`](2026/09/20/00205-apg159-v0130-a-foundation-architecture-and-evaluation-data-exit.md)
+- [`00206 — APG159A v0.13.0 Foundation Correction Exit`](2026/09/20/00206-apg159a-v0130-a-corr1-foundation-correction-exit.md)
+- [`00207 — APG160 v0.13.0 Review-Stage Mutation Policy Qualification Exit`](2026/09/20/00207-apg160-v0130-b-review-mutation-policy-exit.md)
+- [`00208 — APG160A v0.13.0 Review-Policy Persistence Upgrade Repair 1 Exit`](2026/09/21/00208-apg160a-v0130-b-repair1-exit.md)
+- [`00209 — APG160B v0.13.0 Review-Policy Persistence Upgrade Repair 2 Exit`](2026/09/21/00209-apg160b-v0130-b-repair2-exit.md)
+- [`00210 — APG160C v0.13.0 Review-Policy Persistence Upgrade Repair 3 Exit`](2026/09/21/00210-apg160c-v0130-b-repair3-exit.md)
+- [`00211 — APG160D v0.13.0 Review-Policy Boundary Repair 1 Exit`](2026/09/21/00211-apg160d-v0130-b-boundary-repair1-exit.md)
+- [`00212 — APG161 v0.13.0 Operator Home, Closed Config, and State Seams Exit`](2026/09/21/00212-apg161-v0130-c-operator-home-and-hosting-seams-exit.md)
+- [`00213 — APG161A v0.13.0 Integrated Home/Configuration Correction Exit`](2026/09/21/00213-apg161a-v0130-c-repair1-exit.md)
+- [`00214 — APG161B v0.13.0 Native Home and Bundle Integration Repair Exit`](2026/09/21/00214-apg161b-v0130-c-repair2-exit.md)
+- [`00215 — APG162 v0.13.0 Optional RTK Integration and Conditional Instruction Slices Exit`](2026/09/22/00215-apg162-v0130-d-optional-rtk-integration-exit.md)
+- [`00216 — APG162A v0.13.0 RTK Integration Correction and Qualification Exit`](2026/09/22/00216-apg162a-v0130-d-integration1-correction-exit.md)
+- [`00217 — APG162B v0.13.0 RTK Boundary and Authority Correction Exit`](2026/09/22/00217-apg162b-v0130-d-boundary2-exit.md)
+- [`00218 — APG162C v0.13.0 RTK Caller Integration Correction Exit`](2026/09/22/00218-apg162c-v0130-d-callpath1-exit.md)
+- [`00219 — APG163 v0.13.0 Unified Skill Catalog Candidate Exit`](2026/09/23/00219-apg163-v0130-e-catalog1-exit.md)
+- [`00220 — APG164 Context Planning, Budgets and Static Fallback Candidate Exit`](2026/09/23/00220-apg164-v0130-f-context1-exit.md)
+- [`00221 — APG165 Late Acquisition Channels Candidate Exit`](2026/09/23/00221-apg165-v0130-g-acquire1-exit.md)
+- [`00222 — APG166 Maturity Tranche and Integrated Evaluation Candidate Exit`](2026/09/23/00222-apg166-v0130-h-eval1-exit.md)
+- [`00223 — APG166A H Measurement and Launcher Prerequisite Candidate Exit`](2026/09/23/00223-apg166a-v0130-h-qual2-exit.md)
+
+- [`00224 — APG166B Claude Native Read Prerequisite Qualification Blocked Exit`](2026/09/23/00224-apg166b-v0130-h-qual3-exit.md)
+- [`00225 — APG166C Final Pre-Live H Qualification Blocked Exit`](2026/09/23/00225-apg166c-v0130-h-qual4-exit.md)
+- [`00226 — APG166D Pre-Live Execution Prerequisite Repair Checkpoint`](2026/09/23/00226-apg166d-v0130-h-qual5-exit.md)
+- [`00227 — APG166E Provider-Free Execution Package Checkpoint`](2026/09/23/00227-apg166e-v0130-h-qual6-exit.md)
+- [`00228 — APG166S Worker and Configuration Checkpoint (accepted)`](2026/09/26/00228-apg166s-worker-configuration-checkpoint-exit.md)
+
+The retained APG166S record includes the
+[APG166S-R2 work checkpoint](2026/09/26/00228-apg166s-worker-configuration-checkpoint-exit.md#apg166s-r2-work-checkpoint).

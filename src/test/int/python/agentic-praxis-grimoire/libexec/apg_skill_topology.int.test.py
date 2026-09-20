@@ -443,6 +443,10 @@ class APGSkillTopologyIntegrationTests(unittest.TestCase):
                 ),
             )
             expected.pop("nodejs-runtime-profile")
+        # D admitted RTK to development; the retained release policy remains
+        # historical until separately authorized publication (not catalog E).
+        if "rtk-command-proxy" not in paths:
+            expected.pop("rtk-command-proxy", None)
         self.assertEqual(tuple(paths), tuple(expected))
         current = {name: repository / path for name, path in canonical.items()}
         issues: list[str] = []

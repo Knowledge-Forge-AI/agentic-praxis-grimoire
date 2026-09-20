@@ -8,11 +8,11 @@ still requires human review.
 
 ## Roadmap policy
 
-**v0.11.0 is publicly released** across GitHub Release, Go, PyPI, npm, and Homebrew tap.
-APGR v0.11.0 publication is terminal. The [v0.11 closure roadmap](v0-11-roadmap.md)
-remains an immutable historical record with a closed 55/55/0/0 ledger.
-The [v0.12 architecture and runtime transfer roadmap](v0-12-roadmap.md) is the current authorized
-development line, initiated by APG146 (stage V0120-A). Earlier release
+**v0.12.0 is publicly released** across GitHub Release (Release ID `392534425`), Go, PyPI, npm, and Homebrew tap.
+The [v0.12 forward reconciliation record](architecture/v0-12-forward-reconciliation.md) reconciles v0.12.0 distribution and development accounting.
+The [v0.13 roadmap](v0-13-roadmap.md) is the current authorized development line, initiated by APG159 (stage V0130-A).
+Its §1a pilot release direction (APG166X) is operative: v0.13.0 is an early dispatcher and context-management pilot, and the H benefit gate and skill promotions are not publication prerequisites.
+The [v0.12 architecture and runtime transfer roadmap](v0-12-roadmap.md) and [v0.11 closure roadmap](v0-11-roadmap.md) remain historical release records. Earlier release
 preparation, qualification, blocked and recovery records remain historical.
 
 Historical APG139, APG140, APG141, and APG142 exits closed stages V0110-B through V0110-E.

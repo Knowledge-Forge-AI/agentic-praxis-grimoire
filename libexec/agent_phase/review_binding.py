@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
+
 from . import candidate, gitstate, lifecycle
 
 
@@ -10,19 +12,51 @@ def is_review(state, stage):
     return stage in spec.stage_names and spec.stage(stage).checkpoint is not None
 
 
-def bind(root, state, stage, subject):
+def bind(root, state, stage, subject, *, attempt_id=None, binding_id=None, attempt_number=None):
     """Keep immutable plan/subject identity separate from repository identity."""
+    spec = None
+    try:
+        spec = lifecycle.get_lifecycle(state.get("lifecycle", "standard")).stage(stage)
+    except Exception:
+        pass
+    role = None
+    subject_kind = None
+    if spec:
+        if spec.checkpoint in ("pre_final", "post_work"):
+            role = "work_reviewer"
+            subject_kind = "work"
+        elif spec.checkpoint == "post_planning":
+            role = "plan_reviewer"
+            subject_kind = "plan"
+        else:
+            role = spec.role
+            subject_kind = subject.get("kind") if isinstance(subject, Mapping) else None
+
+    if attempt_id is None:
+        run_id = state.get("run_id") or state.get("active_run_id") or state.get("route_selecting_run_id") or "run"
+        att_num = attempt_number or state.get("attempt_number") or 1
+        attempt_id = f"att-{run_id}-{stage}-{att_num}"
+    if binding_id is None:
+        binding_id = stage
+    if attempt_number is None:
+        attempt_number = 1
+
     record = {
         "subject": subject,
         "repository": candidate.tree_identity(root),
         "index": gitstate.index_identity(root),
+        "role": role,
+        "subject_kind": subject_kind,
+        "attempt_id": attempt_id,
+        "binding_id": binding_id,
+        "attempt_number": attempt_number,
     }
     state.setdefault("immutable_review_bindings", {})[stage] = record
     # Resume validates scoped candidate ownership and may allow unrelated HEAD
     # or dirt changes. Its review prompt carries that separate current boundary.
     if not state.get("resumed") and subject and subject.get("kind") == "git_tree":
         record["repository"] = {key: subject[key] for key in ("kind", "head", "tree")}
-        verify(root, state, stage)
+        verify(root, state, stage, attempt_id=attempt_id, binding_id=binding_id, attempt_number=attempt_number)
     return record
 
 
@@ -86,41 +120,94 @@ def _enrich_evidence(root, state, evidence):
     evidence["index_normalization_reason"] = latest.get("reason")
 
 
-def verify(root, state, stage, after=None, observed_index=None, transport=None):
-    """Invalidate before parsing or accepting review bytes; never restore product."""
-    from .dispatch import DispatchError
-    from .failure_boundary import record_manager_attention
+def verify(
+    root,
+    state,
+    stage,
+    after=None,
+    observed_index=None,
+    transport=None,
+    policy=None,
+    attempt_id=None,
+    binding_id=None,
+    attempt_number=None,
+):
+    """Observe review drift and evaluate review mutation policy."""
+    from . import review_drift
 
     binding = state.get("immutable_review_bindings", {}).get(stage)
     if binding is None:
-        return
-    after = after if after is not None else _observe_candidate(root)
-    observed_index = observed_index if observed_index is not None else gitstate.index_identity(root)
-    before = binding["repository"]
-    if after == before and observed_index == binding["index"]:
-        return
-    index_changed = observed_index != binding["index"]
-    code = "READ_ONLY_STAGE_MUTATED_INDEX" if index_changed else "READ_ONLY_STAGE_MUTATED_CANDIDATE"
-    detail = f"mutation observed during read-only stage {stage}; review binding invalidated"
-    evidence = {
-        "stage": stage, "candidate_binding": binding["subject"],
-        "subject_binding": binding["subject"],
-        "expected_head": before.get("head"), "observed_head": after.get("head"),
-        "expected_tree": before["tree"], "observed_tree": after.get("tree"),
-        "paths": [], "index_paths": [], "paths_complete": False,
-        "candidate_observation_unavailable": bool(after.get("observation_unavailable") or not after.get("tree")),
-        "observation_limitations": [],
-        "expected_index": binding["index"], "observed_index": observed_index,
-        "transport": transport or state.get("stage_transport_outcomes", {}).get(stage),
-        "code": code, "detail": detail,
-    }
-    state[f"{stage}_mutation"] = evidence
-    state.setdefault("review_binding_invalidations", {})[stage] = evidence
-    state["blocking_reason"] = {"code": code, "detail": detail}
-    state["outcome"] = "blocked"
-    _enrich_evidence(root, state, evidence)
-    record_manager_attention(
-        state, reason="review_binding_invalidated", detail=detail + "; repository/candidate resolution and fresh review required",
-        paths=sorted(set(evidence["paths"] + evidence["index_paths"])), candidate_tree=after.get("tree"),
+        return None
+
+    if policy is None:
+        policy = state.get("review_mutation_policy", "block")
+
+    eff_attempt_id = attempt_id if attempt_id is not None else binding.get("attempt_id")
+    if eff_attempt_id is None:
+        run_id = state.get("run_id") or state.get("active_run_id") or state.get("route_selecting_run_id") or "run"
+        eff_attempt_id = f"att-{run_id}-{stage}-1"
+    eff_binding_id = binding_id if binding_id is not None else (binding.get("binding_id") or stage)
+    eff_attempt_num = attempt_number if attempt_number is not None else (binding.get("attempt_number") or 1)
+
+    obs = review_drift.observe_review_drift(
+        root,
+        stage=stage,
+        before=binding,
+        after=after,
+        expected_index=binding.get("index"),
+        observed_index=observed_index,
+        transport=transport,
+        policy=policy,
+        state=state,
+        role=binding.get("role"),
+        subject_kind=binding.get("subject_kind"),
+        attempt_id=eff_attempt_id,
+        binding_id=eff_binding_id,
+        attempt_number=eff_attempt_num,
     )
-    raise DispatchError(detail, code)
+
+    evaluated = review_drift.apply_review_mutation_policy(
+        obs,
+        policy=policy,
+        state=state,
+        raise_on_block=False,
+    )
+
+    if not obs.subject_drift_observed and evaluated.action_taken != "blocked":
+        return evaluated
+
+    evidence = obs.as_dict()
+    evidence["candidate_binding"] = binding.get("subject")
+    evidence["subject_binding"] = binding.get("subject")
+    evidence["paths"] = obs.worktree_paths
+    evidence["code"] = obs.diagnostic_code
+    if "transport" not in evidence or evidence["transport"] is None:
+        evidence["transport"] = transport or (state.get("stage_transport_outcomes", {}).get(stage) if state else None)
+
+    normalizations = state.get("index_normalizations", [])
+    latest = next((item for item in reversed(normalizations)
+                   if item.get("stage") == stage), {})
+    if latest.get("reason"):
+        evidence["index_normalization_reason"] = latest.get("reason")
+
+    state[f"{stage}_mutation"] = evidence
+
+    if evaluated.action_taken == "blocked":
+        state.setdefault("review_binding_invalidations", {})[stage] = evidence
+        from .dispatch import DispatchError
+        from .failure_boundary import record_manager_attention
+        detail = evaluated.detail or f"mutation observed during read-only stage {stage}; review binding invalidated"
+        state["blocking_reason"] = {"code": evaluated.diagnostic_code, "detail": detail}
+        state["outcome"] = "blocked"
+        _enrich_evidence(root, state, evidence)
+        record_manager_attention(
+            state,
+            reason="review_binding_invalidated",
+            detail=detail + "; repository/candidate resolution and fresh review required",
+            paths=sorted(set(evidence["paths"] + evidence["index_paths"])),
+            candidate_tree=evidence.get("observed_tree"),
+        )
+        raise DispatchError(detail, evaluated.diagnostic_code)
+
+    return evaluated
+

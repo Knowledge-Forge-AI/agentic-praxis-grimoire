@@ -8,10 +8,15 @@ from agent_phase.dispatch import DispatchError
 from agent_phase.lifecycle import LIFECYCLES
 from test_agent_phase_dispatch import git, repository as _repository
 from test_agent_phase_lifecycle_dispatch import (
-    LifecycleRunner, REQUEST, dispatcher, only_run,
+    LifecycleRunner, REQUEST, dispatcher as _dispatcher, only_run,
 )
 
 repository = _repository
+
+
+def dispatcher(repository, tmp_path, runner, **kwargs):
+    kwargs.setdefault("review_mutation_policy", "block")
+    return _dispatcher(repository, tmp_path, runner, **kwargs)
 
 
 def evidence(tmp_path):
@@ -259,7 +264,7 @@ def test_head_only_drift_is_self_describing(repository, tmp_path):
     with pytest.raises(DispatchError) as caught:
         dispatcher(repository, tmp_path, LifecycleRunner(mutate)).dispatch(
             "IMMUT", REQUEST, "work-reviewed", "checkpoint")
-    assert caught.value.code == "READ_ONLY_STAGE_MUTATED_CANDIDATE"
+    assert caught.value.code == "READ_ONLY_STAGE_MUTATED_HEAD"
     _, state = evidence(tmp_path)
     record = state["review_binding_invalidations"]["work_review"]
     assert record["expected_head"] != record["observed_head"]

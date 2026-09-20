@@ -21,7 +21,9 @@ from agent_phase.provider import Result, build_argv
 from agent_phase.request import EXECUTION_MODES, PhaseRequest
 from agent_phase.roster import load_roster
 from agent_phase.routing import Endpoint, resolve
+from agent_phase.runtime_models import selection
 from agent_phase_roster_fixtures import replace_once
+from controller_generation import codex_profile_arguments
 
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -666,12 +668,20 @@ def test_claude_argv_never_overrides_profile_owned_flags() -> None:
 
 
 def test_codex_primary_inherits_base_sandbox_policy() -> None:
+    endpoint = Endpoint("codex", "sysadmin-primary")
     argv = build_argv(
-        Endpoint("codex", "sysadmin-primary"), "primary", ROOT,
+        endpoint, "primary", ROOT,
         codex_executable="/fake/codex",
     )
-    assert argv == ["/fake/codex", "exec", "--profile", "sysadmin-primary", "-"]
+    selected = selection(ROOT, endpoint.provider, endpoint.profile)
+    assert argv == [
+        "/fake/codex", "exec", *codex_profile_arguments(ROOT, endpoint.profile),
+        "-c", "model=" + json.dumps(selected["model"]),
+        "-c", "model_reasoning_effort=" + json.dumps(selected["effort"]),
+        "-",
+    ]
     assert "-s" not in argv
+    assert not any("sandbox" in argument for argument in argv)
 
 
 def test_reviewer_prompt_marks_primary_output_as_untrusted(
@@ -834,7 +844,7 @@ def test_stage_meta_records_argv_exit_and_digests(
     assert meta["argv"] == runner.calls[0]["argv"]
     assert meta["exit_code"] == 0
     assert meta["provider"] == "claude"
-    assert meta["profile"] == "sysadmin-primary"
+    assert meta["profile"] == "opus-high-sysadmin-review"
     assert len(meta["prompt_sha256"]) == 64
     assert len(meta["stdout_sha256"]) == 64
     assert "timed_out" not in meta
@@ -1420,27 +1430,29 @@ def test_resolve_codex_executable_missing_raises_provider_error(
         provider_module.resolve_codex_executable()
 
 
+def _codex_test_path(monkeypatch: pytest.MonkeyPatch, bin_dir: Path) -> None:
+    git_bin = shutil.which("git")
+    assert git_bin is not None
+    monkeypatch.setenv("PATH", f"{bin_dir}:{Path(git_bin).parent}")
+
+
+def _lazy_codex_dispatcher(repository: Path, run_root: Path, runner: FakeRunner) -> Dispatcher:
+    return Dispatcher(
+        root=ROOT, cwd=repository, run_root=run_root, codex_executable=None,
+        claude_launcher="/fake/claude-profile", scanner_executable=None,
+        resolve_scanner=False, runner=runner,
+    )
+
+
 def test_dispatcher_missing_codex_closes_stage_boundary_and_records_transport(
     repository: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     empty_dir = tmp_path / "empty"
     empty_dir.mkdir(parents=True, exist_ok=True)
-    git_bin = shutil.which("git")
-    assert git_bin is not None
-    git_dir = str(Path(git_bin).parent)
-    monkeypatch.setenv("PATH", f"{empty_dir}:{git_dir}")
+    _codex_test_path(monkeypatch, empty_dir)
 
     runner = FakeRunner()
-    dispatcher = Dispatcher(
-        root=ROOT,
-        cwd=repository,
-        run_root=tmp_path / "runs-missing-codex",
-        codex_executable=None,
-        claude_launcher="/fake/claude-profile",
-        scanner_executable=None,
-        resolve_scanner=False,
-        runner=runner,
-    )
+    dispatcher = _lazy_codex_dispatcher(repository, tmp_path / "runs-missing-codex", runner)
     with pytest.raises(
         provider_module.ProviderError, match="Codex executable not found on PATH: codex"
     ):
@@ -1463,22 +1475,10 @@ def test_dispatcher_gemini_opus_succeeds_without_codex_on_path(
     # Set PATH with NO codex binary, but preserve git
     empty_dir = tmp_path / "empty"
     empty_dir.mkdir(parents=True, exist_ok=True)
-    git_bin = shutil.which("git")
-    assert git_bin is not None
-    git_dir = str(Path(git_bin).parent)
-    monkeypatch.setenv("PATH", f"{empty_dir}:{git_dir}")
+    _codex_test_path(monkeypatch, empty_dir)
 
     runner = FakeRunner()
-    dispatcher = Dispatcher(
-        root=ROOT,
-        cwd=repository,
-        run_root=tmp_path / "runs-gemini-opus",
-        codex_executable=None,
-        claude_launcher="/fake/claude-profile",
-        scanner_executable=None,
-        resolve_scanner=False,
-        runner=runner,
-    )
+    dispatcher = _lazy_codex_dispatcher(repository, tmp_path / "runs-gemini-opus", runner)
     assert dispatcher.codex_executable is None
 
     state = dispatcher.dispatch(
@@ -1499,22 +1499,10 @@ def test_dispatcher_lazily_resolves_codex_on_first_codex_stage(
     fake_codex = bin_dir / "codex"
     fake_codex.write_text("#!/bin/sh\nexit 0\n")
     fake_codex.chmod(0o755)
-    git_bin = shutil.which("git")
-    assert git_bin is not None
-    git_dir = str(Path(git_bin).parent)
-    monkeypatch.setenv("PATH", f"{bin_dir}:{git_dir}")
+    _codex_test_path(monkeypatch, bin_dir)
 
     runner = FakeRunner()
-    dispatcher = Dispatcher(
-        root=ROOT,
-        cwd=repository,
-        run_root=tmp_path / "runs-lazy-codex",
-        codex_executable=None,
-        claude_launcher="/fake/claude-profile",
-        scanner_executable=None,
-        resolve_scanner=False,
-        runner=runner,
-    )
+    dispatcher = _lazy_codex_dispatcher(repository, tmp_path / "runs-lazy-codex", runner)
     assert dispatcher.codex_executable is None
 
     state = dispatcher.dispatch(

@@ -165,6 +165,32 @@ def test_source_checkout_builds_release_like_binary_and_cleans_up(
     assert not binary.parent.exists()
 
 
+def test_source_runtime_accepts_a_synthetic_old_go_builder(tmp_path: Path, monkeypatch) -> None:
+    """The release pin must not become an ordinary source-dispatch gate."""
+    import sys
+    source = tmp_path / "source"
+    package = source / "src/agentic_praxis_grimoire"
+    (package / "resources").mkdir(parents=True)
+    version, _corpus = bridge._package_identities()
+    (package / "VERSION").write_text(version)
+    actual_package = Path(bridge.__file__).resolve().parent
+    (package / "resources/skill-metadata.json").write_bytes(
+        (actual_package / "resources/skill-metadata.json").read_bytes())
+    binary = _fake_binary(tmp_path)
+    go = tmp_path / "go"
+    go.write_text(f"#!{sys.executable}\n" +
+                  "import pathlib, shutil, sys\n"
+                  "if sys.argv[1:3] == ['env', 'GOVERSION'] or sys.argv[1:] == ['version']:\n"
+                  "    print('go1.25.14'); sys.exit(0)\n"
+                  "assert sys.argv[1] == 'build'\n" +
+                  f"shutil.copyfile({str(binary)!r}, sys.argv[sys.argv.index('-o') + 1])\n" +
+                  "pathlib.Path(sys.argv[sys.argv.index('-o') + 1]).chmod(0o700)\n")
+    go.chmod(0o700)
+    monkeypatch.setattr(bridge, "locate", lambda _environment=None:
+                        bridge.Invocation((str(go),), source, source, "source"))
+    assert bridge.run(["build-info"], repository_root=tmp_path) == 0
+
+
 def test_bundled_manifest_is_canonical_and_binds_hash_target_and_identity(
     tmp_path: Path,
 ) -> None:

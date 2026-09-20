@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import os
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -75,7 +76,8 @@ def test_build_refuses_inputs_toolchain_and_failed_child(
     monkeypatch.setattr(
         builder.subprocess,
         "run",
-        lambda *_args, **_kwargs: SimpleNamespace(returncode=1),
+        lambda args, **_kwargs: (SimpleNamespace(returncode=0, stdout=b"go1.26.9\n")
+                                if args[1:3] == ["env", "GOVERSION"] else SimpleNamespace(returncode=1)),
     )
     with pytest.raises(builder.BuildError, match="build failed"):
         builder.build(root, "darwin/arm64", output)
@@ -93,16 +95,19 @@ def test_build_success_and_main_rendering(
     observed: dict[str, object] = {}
 
     def successful_run(arguments: list[str], **kwargs: object) -> SimpleNamespace:
-        observed.update(kwargs)
+        if arguments[1:3] == ["env", "GOVERSION"]:
+            assert kwargs["env"]["GOTOOLCHAIN"] == "local"
+            return SimpleNamespace(returncode=0, stdout=b"go1.26.9\n")
         if "-o" in arguments:
+            observed.update(kwargs)
             output = Path(arguments[arguments.index("-o") + 1])
             output.write_bytes(b"binary")
             return SimpleNamespace(returncode=0, stdout=b"", stderr=b"")
         return SimpleNamespace(
             returncode=0,
             stdout=(
-                b"/tmp/apgr: go1.25.10\n"
-                b" mod github.com/Knowledge-Forge-AI/agentic-praxis-grimoire (devel)\n"
+                f"{arguments[-1]}: go1.26.9\n".encode()
+                + b" mod github.com/Knowledge-Forge-AI/agentic-praxis-grimoire (devel)\n"
                 b" build CGO_ENABLED=0\n"
                 b" build GOOS=linux\n"
                 b" build GOARCH=arm64\n"
@@ -212,6 +217,10 @@ def test_host_build_info_is_checked_against_manifest(
     monkeypatch.setattr(builder, "_host_target", lambda: "linux/arm64")
 
     def successful_run(arguments: list[str], **kwargs: object) -> SimpleNamespace:
+        if arguments[1:3] == ["env", "GOVERSION"]:
+            return SimpleNamespace(returncode=0, stdout=b"go1.26.9\n")
+        if arguments[1:3] == ["version", "-m"]:
+            return SimpleNamespace(returncode=0, stdout=f"{arguments[-1]}: go1.26.9\n".encode())
         if "-o" in arguments:
             Path(arguments[arguments.index("-o") + 1]).write_bytes(b"binary")
             return SimpleNamespace(returncode=0, stdout=b"", stderr=b"")
@@ -235,3 +244,74 @@ def test_host_build_info_is_checked_against_manifest(
     result = builder.build(root, "linux/arm64", tmp_path / "renamed-output")
     assert result["version"] == "0.7.0"
     assert result["binary_name"] == "apgr"
+
+
+def test_old_release_compiler_is_refused_before_build(tmp_path: Path, monkeypatch) -> None:
+    root = authority_root(tmp_path)
+    go = tmp_path / "go"
+    go.write_bytes(b"stand-in")
+    go.chmod(0o700)
+    monkeypatch.setattr(builder.shutil, "which", lambda _: str(go))
+    calls = []
+    def run(argv, **kwargs):
+        calls.append(argv)
+        assert kwargs["env"]["GOTOOLCHAIN"] == "local"
+        return SimpleNamespace(returncode=0, stdout=b"go1.25.14\n")
+    monkeypatch.setattr(builder.subprocess, "run", run)
+    with pytest.raises(builder.BuildError, match="exactly go1.26.9"):
+        builder.build(root, "linux/arm64", tmp_path / "out")
+    assert len(calls) == 1 and calls[0][1:] == ["env", "GOVERSION"]
+    assert not (tmp_path / "out").exists()
+
+
+@pytest.mark.parametrize("version", ["go1.25.14", "go1.26.90", "go1.26.9 X:experiment", "devel go1.26.9"])
+def test_wrong_actual_compiler_removes_host_and_foreign_output(tmp_path: Path, monkeypatch, version: str) -> None:
+    root = authority_root(tmp_path)
+    go = tmp_path / "go"
+    go.write_bytes(b"stand-in")
+    go.chmod(0o700)
+    monkeypatch.setattr(builder.shutil, "which", lambda _: str(go))
+    for host in ("linux/arm64", "darwin/arm64"):
+        monkeypatch.setattr(builder, "_host_target", lambda: host)
+        output = tmp_path / "out"
+        def run(argv, **kwargs):
+            if argv[1] == "env":
+                return SimpleNamespace(returncode=0, stdout=b"go1.26.9\n")
+            if argv[1] == "build":
+                output.write_bytes(b"binary")
+                return SimpleNamespace(returncode=0)
+            return SimpleNamespace(returncode=0, stdout=f"{output}: {version}\n".encode())
+        monkeypatch.setattr(builder.subprocess, "run", run)
+        with pytest.raises(builder.BuildError, match="compiled with go1.26.9"):
+            builder.build(root, "linux/arm64", output)
+        assert not output.exists()
+        assert not output.with_name("out.binary-manifest.json").exists()
+
+
+def test_build_require_native_rejects_foreign_and_cli_flag(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    root = authority_root(tmp_path)
+    monkeypatch.setattr(builder, "_host_target", lambda: "darwin/arm64")
+    output = tmp_path / "out"
+
+    # API: require_native=True rejects foreign target
+    with pytest.raises(builder.BuildError, match="native target required: linux/amd64 != darwin/arm64"):
+        builder.build(root, "linux/amd64", output, require_native=True)
+
+    # API: require_native=False allows foreign target past target check (fails later on toolchain in this test)
+    monkeypatch.setattr(builder.shutil, "which", lambda _name: None)
+    with pytest.raises(builder.BuildError, match="Go toolchain is unavailable"):
+        builder.build(root, "linux/amd64", output, require_native=False)
+
+    # CLI: --require-native rejects foreign target
+    code = builder.main(["--target", "linux/amd64", "--output", os.fspath(output), "--require-native"])
+    assert code == 1
+    assert "native target required: linux/amd64 != darwin/arm64" in capsys.readouterr().err
+
+    # CLI: --require-native accepts native target
+    expected = {"path": os.fspath(output), "target": "darwin/arm64"}
+    monkeypatch.setattr(builder, "build", lambda *_args, **_kwargs: expected)
+    code = builder.main(["--target", "darwin/arm64", "--output", os.fspath(output), "--require-native"])
+    assert code == 0
+    assert json.loads(capsys.readouterr().out) == expected

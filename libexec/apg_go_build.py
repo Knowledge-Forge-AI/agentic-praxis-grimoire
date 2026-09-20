@@ -21,6 +21,8 @@ BUILD_INFO_SCHEMA = "apg.build-info/v1"
 MODULE = "github.com/Knowledge-Forge-AI/agentic-praxis-grimoire"
 BINARY_NAME = "apgr"
 BUILD_FLAGS = ("CGO_ENABLED=0", "-trimpath", "-buildvcs=false", "-buildid=")
+RELEASE_GO_VERSION = "go1.26.9"
+RELEASE_GO_SOURCE_SHA256 = "9735d7dcdb65b35d3fa577f04064737c03b89cf1a2b71e6e69fe2f3c6f9fd4ca"
 
 # These are distribution identities, not version authorities.  The editable
 # version remains the VERSION resource read by ``identities`` below.
@@ -235,6 +237,7 @@ def _validate_binary_metadata(
 ) -> None:
     """Validate host runtime metadata or foreign Go object metadata."""
 
+    metadata = release_binary_metadata(output, go, root)
     if target == _host_target():
         completed = subprocess.run(
             [os.fspath(output), "build-info"],
@@ -263,20 +266,6 @@ def _validate_binary_metadata(
             raise BuildError("host binary build-info disagrees with manifest")
         return
 
-    completed = subprocess.run(
-        [os.fspath(go), "version", "-m", os.fspath(output)],
-        cwd=root,
-        check=False,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        shell=False,
-    )
-    if completed.returncode != 0:
-        raise BuildError("foreign binary metadata inspection failed")
-    try:
-        metadata = completed.stdout.decode("utf-8")
-    except (AttributeError, UnicodeDecodeError) as error:
-        raise BuildError("foreign binary metadata is malformed") from error
     goos, goarch = target.split("/", 1)
     normalized_metadata = {" ".join(line.strip().split()) for line in metadata.splitlines()}
     required = {
@@ -290,15 +279,48 @@ def _validate_binary_metadata(
         raise BuildError("foreign binary metadata disagrees with manifest")
 
 
+def release_binary_metadata(output: Path, go: Path, root: Path) -> str:
+    """Inspect the actual object, including host objects, before release use."""
+
+    completed = subprocess.run(
+        [os.fspath(go), "version", "-m", os.fspath(output)],
+        cwd=root, env={**os.environ, "GOTOOLCHAIN": "local"}, check=False,
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=False,
+    )
+    if completed.returncode != 0:
+        raise BuildError("release binary metadata inspection failed")
+    try:
+        metadata = completed.stdout.decode("utf-8")
+    except (AttributeError, UnicodeDecodeError) as error:
+        raise BuildError("release binary metadata is malformed") from error
+    if metadata.splitlines()[:1] != [f"{output}: {RELEASE_GO_VERSION}"]:
+        raise BuildError(f"release binary must be compiled with {RELEASE_GO_VERSION}")
+    return metadata
+
+
+def _require_release_compiler(go: Path, root: Path, environment: Mapping[str, str]) -> None:
+    completed = subprocess.run(
+        [os.fspath(go), "env", "GOVERSION"], cwd=root, env=dict(environment),
+        check=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=False,
+    )
+    if completed.returncode != 0 or completed.stdout.strip() != RELEASE_GO_VERSION.encode():
+        raise BuildError(f"release builds require exactly {RELEASE_GO_VERSION} (GOTOOLCHAIN=local)")
+
+
 def build(
     root: Path,
     target: str,
     output: Path,
     manifest_output: Path | None = None,
+    require_native: bool = False,
 ) -> dict[str, object]:
     """Build one static target, validate it, and write its canonical manifest."""
 
     target_mapping(target)
+    if require_native and target != _host_target():
+        raise BuildError(
+            f"native target required: {target} != {_host_target() or 'unknown'}"
+        )
     output = _prepare_output(output, "binary output")
     if manifest_output is None:
         manifest_output = output.with_name(f"{output.name}.binary-manifest.json")
@@ -335,6 +357,7 @@ def build(
         environment["GOAMD64"] = "v1"
     elif goarch == "arm64":
         environment["GOARM64"] = "v8.0"
+    _require_release_compiler(go, root, environment)
     completed = subprocess.run(
         [
             os.fspath(go),
@@ -396,10 +419,17 @@ def main(arguments: list[str] | None = None) -> int:
     parser.add_argument("--target", required=True, choices=SUPPORTED_TARGETS)
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--manifest", type=Path)
+    parser.add_argument("--require-native", action="store_true", default=False)
     parsed = parser.parse_args(arguments)
     root = Path(__file__).resolve().parent.parent
     try:
-        result = build(root, parsed.target, parsed.output, parsed.manifest)
+        result = build(
+            root,
+            parsed.target,
+            parsed.output,
+            parsed.manifest,
+            parsed.require_native,
+        )
     except BuildError as error:
         print(f"apg-build-go-cli: {error}", file=sys.stderr)
         return 1

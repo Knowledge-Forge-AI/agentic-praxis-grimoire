@@ -1,13 +1,12 @@
 {
   "allowances": [
     {
-      "count": 2132,
+      "count": 2511,
       "maintenance": "No growth beyond the entry bound. Review reductions; retire when at or below 1000 lines. No transfer or automatic increase.",
       "owner": "dispatcher",
       "path": "libexec/agent_phase/dispatch.py",
       "rationale": "Migrated Agent-Central single-phase dispatcher module exceeding failure limit",
-      "role": "maintained-source",
-      "sha256": "ee3936385780cda571c6e28d7b3857c0b86dda80701701a881895d674c38efb9"
+      "role": "maintained-source"
     },
     {
       "count": 1101,
@@ -15,62 +14,71 @@
       "owner": "dispatcher",
       "path": "libexec/agent_phase/gitstate.py",
       "rationale": "Migrated Agent-Central single-phase dispatcher module exceeding failure limit",
-      "role": "maintained-source",
-      "sha256": "81ff7a16e9ac45cae92b5ed166e25ba66a0acf00085165d2d6d61010d281f0fe"
+      "role": "maintained-source"
     },
     {
-      "count": 1421,
+      "count": 2028,
+      "maintenance": "No growth beyond the entry bound. Review reductions; retire when at or below 1000 lines. No transfer or automatic increase.",
+      "owner": "dispatcher",
+      "path": "libexec/agent_phase/persistence.py",
+      "rationale": "Pre-existing oversized file at v0.13.0 base commit grandfathered under Finding B1",
+      "role": "maintained-source"
+    },
+    {
+      "count": 1433,
       "maintenance": "No growth beyond the entry bound. Review reductions; retire when at or below 1000 lines. No transfer or automatic increase.",
       "owner": "dispatcher",
       "path": "libexec/agent_phase/provider.py",
       "rationale": "Migrated Agent-Central single-phase dispatcher module exceeding failure limit",
-      "role": "maintained-source",
-      "sha256": "0aa8b8a2d2ffb8fc525a7b7aa360e686cb12ecf8b6cbac23cd6e88e86b8eb29a"
+      "role": "maintained-source"
     },
     {
-      "count": 1844,
+      "count": 1858,
       "maintenance": "No growth beyond the entry bound. Review reductions; retire when at or below 1000 lines. No transfer or automatic increase.",
       "owner": "dispatcher",
       "path": "libexec/agent_phase/result_artifacts.py",
       "rationale": "Migrated Agent-Central single-phase dispatcher module exceeding failure limit",
-      "role": "maintained-source",
-      "sha256": "847afeb5a55fe3e2fd0c5f26a2dcc15532248c3ebe341e8c28243c71018e3700"
+      "role": "maintained-source"
     },
     {
-      "count": 1864,
+      "count": 1875,
       "maintenance": "No growth beyond the entry bound. Review reductions; retire when at or below 1000 lines. No transfer or automatic increase.",
       "owner": "dispatcher",
       "path": "libexec/agent_phase/result_repair.py",
       "rationale": "Migrated Agent-Central single-phase dispatcher module exceeding failure limit",
-      "role": "maintained-source",
-      "sha256": "9544f4f58006395532d2ca33a92b9a36879d1f5cb79800822b0ff39123680ad0"
+      "role": "maintained-source"
     },
     {
-      "count": 1637,
+      "count": 1698,
       "maintenance": "No growth beyond the entry bound. Review reductions; retire when at or below 1000 lines. No transfer or automatic increase.",
       "owner": "dispatcher",
       "path": "libexec/agent_phase/resume_dispatch.py",
       "rationale": "Migrated Agent-Central single-phase dispatcher module exceeding failure limit",
-      "role": "maintained-source",
-      "sha256": "b5217ecdaebfcb817f14ca4006ba19a2dc9b6685a41b51c2ed05bdd3f561fa35"
+      "role": "maintained-source"
     },
     {
-      "count": 2001,
+      "count": 2004,
       "maintenance": "No growth beyond the entry bound. Review reductions; retire when at or below 1000 lines. No transfer or automatic increase.",
       "owner": "dispatcher",
       "path": "libexec/agent_phase/stage_delta.py",
       "rationale": "Migrated Agent-Central single-phase dispatcher module exceeding failure limit",
-      "role": "maintained-source",
-      "sha256": "d8eab2a345583a25604ae5ca51eba32c918d9737b3d2613a2bfe52a0d374e3b7"
+      "role": "maintained-source"
     },
     {
-      "count": 1780,
+      "count": 1238,
+      "maintenance": "No growth beyond the entry bound. Review reductions; retire when at or below 1000 lines. No transfer or automatic increase.",
+      "owner": "dispatcher",
+      "path": "libexec/agent_phase/v2_turns.py",
+      "rationale": "Pre-existing oversized file at v0.13.0 base commit grandfathered under Finding B1",
+      "role": "maintained-source"
+    },
+    {
+      "count": 1785,
       "maintenance": "No growth beyond the entry bound. Review reductions; retire when at or below 1000 lines. No transfer or automatic increase.",
       "owner": "dispatcher",
       "path": "libexec/antigravity_profile.py",
       "rationale": "Migrated Agent-Central single-phase dispatcher module exceeding failure limit",
-      "role": "maintained-source",
-      "sha256": "7c4c00475ba034482eea7b6d94710352e5d737f4cef28b26f4d2337a28de0a8d"
+      "role": "maintained-source"
     },
     {
       "count": 1017,
@@ -78,8 +86,7 @@
       "owner": "npm-distribution",
       "path": "libexec/apg_npm_distribution.py",
       "rationale": "Pre-existing npm packaging and distribution orchestrator exceeding failure limit",
-      "role": "maintained-source",
-      "sha256": "33f3e26218c6be7b302ceccfc606b43f245b9f2e731152ecca9ccd04576c4a6b"
+      "role": "maintained-source"
     },
     {
       "count": 4584,
@@ -87,17 +94,15 @@
       "owner": "public-release",
       "path": "libexec/apg_public_release.py",
       "rationale": "Pre-existing public release lifecycle orchestrator exceeding failure limit",
-      "role": "maintained-source",
-      "sha256": "971381ec69ec37b920fc2992f43d0557896a2b6b768f55a616257e943eef877c"
+      "role": "maintained-source"
     },
     {
-      "count": 2330,
+      "count": 2356,
       "maintenance": "No growth beyond the entry bound. Review reductions; retire when at or below 1000 lines. No transfer or automatic increase.",
       "owner": "skill-library-check",
       "path": "libexec/apg_skill_library_check.py",
       "rationale": "Pre-existing skill verification and catalog topology enforcement exceeding failure limit",
-      "role": "maintained-source",
-      "sha256": "f0de9865db8b80cf20120ec0885ae0946adcd9c1e350e8b41587b8501753a583"
+      "role": "maintained-source"
     },
     {
       "count": 3034,
@@ -105,8 +110,7 @@
       "owner": "test-runner",
       "path": "libexec/apg_test.py",
       "rationale": "Pre-existing test execution runner and exact coverage orchestrator exceeding failure limit",
-      "role": "maintained-source",
-      "sha256": "a3db96a84e4092843e781f1fb00e3454c18ba74a14807ed6c0d218f8b540c482"
+      "role": "maintained-source"
     },
     {
       "count": 1026,
@@ -114,17 +118,39 @@
       "owner": "user-skills",
       "path": "libexec/apg_user_skills.py",
       "rationale": "Pre-existing user skills management CLI and execution adapter exceeding failure limit",
-      "role": "maintained-source",
-      "sha256": "9a6d213b80944021f22b97c9063f82c6bf0a46a543ddddd05de83154947fd1b9"
+      "role": "maintained-source"
     },
     {
-      "count": 1240,
+      "count": 2253,
+      "maintenance": "No growth beyond the entry bound. Review reductions; retire when at or below 1000 lines. No transfer or automatic increase.",
+      "owner": "apgr-workers",
+      "path": "libexec/apgr_workers/ledger.py",
+      "rationale": "Pre-existing oversized file at v0.13.0 base commit grandfathered under Finding B1",
+      "role": "maintained-source"
+    },
+    {
+      "count": 1249,
+      "maintenance": "No growth beyond the entry bound. Review reductions; retire when at or below 1000 lines. No transfer or automatic increase.",
+      "owner": "apgr-workers",
+      "path": "libexec/apgr_workers/supervisor.py",
+      "rationale": "Pre-existing oversized file at v0.13.0 base commit grandfathered under Finding B1",
+      "role": "maintained-source"
+    },
+    {
+      "count": 1657,
       "maintenance": "No growth beyond the entry bound. Review reductions; retire when at or below 1000 lines. No transfer or automatic increase.",
       "owner": "dispatcher",
       "path": "libexec/claude_vc_profile.py",
       "rationale": "Migrated Agent-Central single-phase dispatcher module exceeding failure limit",
-      "role": "maintained-source",
-      "sha256": "b05d907b5de045ec350293b22c7f6e8947d04d5b0265e9176d558ca16532630b"
+      "role": "maintained-source"
+    },
+    {
+      "count": 1320,
+      "maintenance": "No growth beyond the entry bound. Review reductions; retire when at or below 1000 lines. No transfer or automatic increase.",
+      "owner": "runtime",
+      "path": "src/agentic_praxis_grimoire/rtk.py",
+      "rationale": "Pre-existing oversized file at v0.13.0 base commit grandfathered under Finding B1",
+      "role": "maintained-source"
     },
     {
       "count": 1173,
@@ -132,17 +158,15 @@
       "owner": "dispatcher",
       "path": "src/test/dispatcher/test_agent_phase_closeout.py",
       "rationale": "Migrated Agent-Central single-phase dispatcher test suite exceeding failure limit",
-      "role": "fixture-or-test",
-      "sha256": "f050dc4dd976ef152230cc4f407d72922d1a00d342af1b3e114dc0645855573a"
+      "role": "fixture-or-test"
     },
     {
-      "count": 1526,
+      "count": 1514,
       "maintenance": "No growth beyond the entry bound. Review reductions; retire when at or below 1000 lines. No transfer or automatic increase.",
       "owner": "dispatcher",
       "path": "src/test/dispatcher/test_agent_phase_dispatch.py",
       "rationale": "Migrated Agent-Central single-phase dispatcher test suite exceeding failure limit",
-      "role": "fixture-or-test",
-      "sha256": "9411742050ea01773e5d4f0ad03c38427bb97aeaf2663669fc1a2a3936abf9dd"
+      "role": "fixture-or-test"
     },
     {
       "count": 1030,
@@ -150,8 +174,7 @@
       "owner": "dispatcher",
       "path": "src/test/dispatcher/test_agent_phase_disposition_flow.py",
       "rationale": "Migrated Agent-Central single-phase dispatcher test suite exceeding failure limit",
-      "role": "fixture-or-test",
-      "sha256": "d82152f57864a9156f12dab4a18f8d3a5a8762d7f5ec0f4ab14617b91378fbbb"
+      "role": "fixture-or-test"
     },
     {
       "count": 1112,
@@ -159,26 +182,23 @@
       "owner": "dispatcher",
       "path": "src/test/dispatcher/test_agent_phase_entry_adoption_boundary.py",
       "rationale": "Migrated Agent-Central single-phase dispatcher test suite exceeding failure limit",
-      "role": "fixture-or-test",
-      "sha256": "12d63881cd3424dbef7f7bb3f814951025c6ef42e98d9cd97657976b73836990"
+      "role": "fixture-or-test"
     },
     {
-      "count": 1098,
+      "count": 1100,
       "maintenance": "No growth beyond the entry bound. Review reductions; retire when at or below 1000 lines. No transfer or automatic increase.",
       "owner": "dispatcher",
       "path": "src/test/dispatcher/test_agent_phase_lifecycle_dispatch.py",
       "rationale": "Migrated Agent-Central single-phase dispatcher test suite exceeding failure limit",
-      "role": "fixture-or-test",
-      "sha256": "de2464b289baf29a378cde6df4992f743ddb3a489f88df99299bf7af6d1e298c"
+      "role": "fixture-or-test"
     },
     {
-      "count": 1410,
+      "count": 1441,
       "maintenance": "No growth beyond the entry bound. Review reductions; retire when at or below 1000 lines. No transfer or automatic increase.",
       "owner": "dispatcher",
       "path": "src/test/dispatcher/test_agent_phase_provider_stream.py",
       "rationale": "Migrated Agent-Central single-phase dispatcher test suite exceeding failure limit",
-      "role": "fixture-or-test",
-      "sha256": "1bd97e8b41d172a69cc746666deafdf1d9f85da7da8a3f58bc1170a761e27353"
+      "role": "fixture-or-test"
     },
     {
       "count": 1046,
@@ -186,8 +206,7 @@
       "owner": "dispatcher",
       "path": "src/test/dispatcher/test_agent_phase_result.py",
       "rationale": "Migrated Agent-Central single-phase dispatcher test suite exceeding failure limit",
-      "role": "fixture-or-test",
-      "sha256": "b2ad081290040a6cdcfa24e095a99e281f91fafd4ec8353e9c79f7c5e5f8b5f1"
+      "role": "fixture-or-test"
     },
     {
       "count": 1469,
@@ -195,8 +214,39 @@
       "owner": "dispatcher",
       "path": "src/test/dispatcher/test_agent_phase_result_repair.py",
       "rationale": "Migrated Agent-Central single-phase dispatcher test suite exceeding failure limit",
-      "role": "fixture-or-test",
-      "sha256": "428b505323445db54b2a2bb92ed9dbff4e36f65e8dd64d63de7fe99439531dca"
+      "role": "fixture-or-test"
+    },
+    {
+      "count": 2094,
+      "maintenance": "No growth beyond the entry bound. Review reductions; retire when at or below 1000 lines. No transfer or automatic increase.",
+      "owner": "dispatcher",
+      "path": "src/test/dispatcher/test_agent_phase_review_mutation_repair.py",
+      "rationale": "Pre-existing oversized file at v0.13.0 base commit grandfathered under Finding B1",
+      "role": "fixture-or-test"
+    },
+    {
+      "count": 1677,
+      "maintenance": "No growth beyond the entry bound. Review reductions; retire when at or below 1000 lines. No transfer or automatic increase.",
+      "owner": "dispatcher",
+      "path": "src/test/dispatcher/test_agent_phase_rtk.py",
+      "rationale": "Pre-existing oversized file at v0.13.0 base commit grandfathered under Finding B1",
+      "role": "fixture-or-test"
+    },
+    {
+      "count": 1012,
+      "maintenance": "No growth beyond the entry bound. Review reductions; retire when at or below 1000 lines. No transfer or automatic increase.",
+      "owner": "dispatcher",
+      "path": "src/test/dispatcher/test_agent_phase_run_layout.py",
+      "rationale": "Pre-existing oversized file at v0.13.0 base commit grandfathered under Finding B1",
+      "role": "fixture-or-test"
+    },
+    {
+      "count": 1064,
+      "maintenance": "No growth beyond the entry bound. Review reductions; retire when at or below 1000 lines. No transfer or automatic increase.",
+      "owner": "dispatcher",
+      "path": "src/test/dispatcher/test_h_d1_seam.py",
+      "rationale": "Pre-existing oversized file at v0.13.0 base commit grandfathered under Finding B1",
+      "role": "fixture-or-test"
     },
     {
       "count": 1026,
@@ -204,8 +254,7 @@
       "owner": "skill-library-check",
       "path": "src/test/int/python/agentic-praxis-grimoire/bin/apg-check-skill-library.int.test.py",
       "rationale": "Comprehensive skill library verification integration scenarios exceeding failure limit",
-      "role": "fixture-or-test",
-      "sha256": "54e4ed6b37f3408c27d962fd82eb20624e5377e7943ca1248afe2cbe9da48b9d"
+      "role": "fixture-or-test"
     },
     {
       "count": 1139,
@@ -213,8 +262,7 @@
       "owner": "public-release",
       "path": "src/test/int/python/agentic-praxis-grimoire/bin/apg-public-release.int.test.py",
       "rationale": "Comprehensive public release integration lifecycle scenarios exceeding failure limit",
-      "role": "fixture-or-test",
-      "sha256": "e505ced999e741016ec08b8b953c6fabe57731b4f3bc6aedaaa4388adc03c005"
+      "role": "fixture-or-test"
     },
     {
       "count": 1363,
@@ -222,17 +270,23 @@
       "owner": "test-runner",
       "path": "src/test/int/python/agentic-praxis-grimoire/bin/apg-test.int.test.py",
       "rationale": "Comprehensive test runner and coverage gate integration scenarios exceeding failure limit",
-      "role": "fixture-or-test",
-      "sha256": "61a46e97e63d4d14aed0ee43f43eb2bad68a0cfacd13aeeb6f35ab2f44535677"
+      "role": "fixture-or-test"
     },
     {
-      "count": 1119,
+      "count": 1123,
       "maintenance": "No growth beyond the entry bound. Review reductions; retire when at or below 1000 lines. No transfer or automatic increase.",
       "owner": "roadmap-closure",
       "path": "src/test/int/python/agentic-praxis-grimoire/libexec/apg_roadmap_closure.int.test.py",
       "rationale": "Comprehensive roadmap closure and ledger validation integration scenarios exceeding failure limit",
-      "role": "fixture-or-test",
-      "sha256": "8404746e33e1c77d1c03ad0859649ce5cd4193953fdde6816405b71baf0d82fd"
+      "role": "fixture-or-test"
+    },
+    {
+      "count": 1087,
+      "maintenance": "No growth beyond the entry bound. Review reductions; retire when at or below 1000 lines. No transfer or automatic increase.",
+      "owner": "apgr-workers",
+      "path": "src/test/python/test_apgr_workers.py",
+      "rationale": "Pre-existing oversized file at v0.13.0 base commit grandfathered under Finding B1",
+      "role": "fixture-or-test"
     },
     {
       "count": 1245,
@@ -240,8 +294,7 @@
       "owner": "test-support",
       "path": "src/test/support/apg122_svg_contract.py",
       "rationale": "SVG language profile test contract and fixture verification exceeding failure limit",
-      "role": "fixture-or-test",
-      "sha256": "11e527918ecfb3570b75bc8538db9fb330860020c3f7fb731a7bc42265b25e97"
+      "role": "fixture-or-test"
     },
     {
       "count": 1269,
@@ -249,8 +302,7 @@
       "owner": "test-support",
       "path": "src/test/support/apg123_browser_ui.py",
       "rationale": "Browser UI runtime interaction and headless verification contract exceeding failure limit",
-      "role": "fixture-or-test",
-      "sha256": "a5d667db8996fd2db57710a1fa039404cc27ac969cf3d7c829ca83e90a98bd6a"
+      "role": "fixture-or-test"
     },
     {
       "count": 1421,
@@ -258,8 +310,7 @@
       "owner": "test-support",
       "path": "src/test/support/apg_css_evidence_retention_contract.py",
       "rationale": "CSS candidate evidence retention contract and oracle verification exceeding failure limit",
-      "role": "fixture-or-test",
-      "sha256": "22133ea2b2ef25e5e32f1cf8415d2bbe97c0c9d437db893a4180ca3dbd1b3495"
+      "role": "fixture-or-test"
     },
     {
       "count": 1066,
@@ -267,8 +318,7 @@
       "owner": "distribution-candidate",
       "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_distribution_candidate.unit.test.py",
       "rationale": "Distribution candidate unit verification suite exceeding failure limit",
-      "role": "fixture-or-test",
-      "sha256": "5681c4e1406337e22fc442027bbeb96e8f2e580967966132e04f074250fc269a"
+      "role": "fixture-or-test"
     },
     {
       "count": 1282,
@@ -276,17 +326,15 @@
       "owner": "public-release",
       "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_public_release.unit.test.py",
       "rationale": "Public release unit test suite covering release lifecycle states exceeding failure limit",
-      "role": "fixture-or-test",
-      "sha256": "4f77c96fe790769725c1af84bc0ebc00dd87fe818749c7271c40dcc7ce81e11a"
+      "role": "fixture-or-test"
     },
     {
-      "count": 3104,
+      "count": 3134,
       "maintenance": "No growth beyond the entry bound. Review reductions; retire when at or below 1000 lines. No transfer or automatic increase.",
       "owner": "skill-library-check",
       "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_skill_library_check.unit.test.py",
       "rationale": "Skill library check unit verification suite exceeding failure limit",
-      "role": "fixture-or-test",
-      "sha256": "f5fa925e9ddb72bf054b5c7cd2329728ad9485a5198087c63f8f7a841fb36bfa"
+      "role": "fixture-or-test"
     },
     {
       "count": 3423,
@@ -294,8 +342,7 @@
       "owner": "test-runner",
       "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_test.unit.test.py",
       "rationale": "Test runner and coverage policy unit test suite exceeding failure limit",
-      "role": "fixture-or-test",
-      "sha256": "b41db535fb15584e850326fd5797d735a4d55f7f5ae5e719c2475ac7340a5817"
+      "role": "fixture-or-test"
     },
     {
       "count": 1710,
@@ -303,8 +350,7 @@
       "owner": "test-support",
       "path": "src/test/unit/python/agentic-praxis-grimoire/src/test/support/apg123_browser_ui.unit.test.py",
       "rationale": "Browser UI contract unit verification suite exceeding failure limit",
-      "role": "fixture-or-test",
-      "sha256": "55f422567906b28a953cea2d7ed8d57a594d36e682eb674b34180ab1f901a513"
+      "role": "fixture-or-test"
     },
     {
       "count": 2352,
@@ -312,11 +358,10 @@
       "owner": "ci-tooling",
       "path": "tools/ci/sbom_records.py",
       "rationale": "Pre-existing SBOM record generator and validator exceeding failure limit",
-      "role": "maintained-source",
-      "sha256": "1cb15b557fa82323a32375429a060327ab0f2c3e5afc6d0a7ee917b0d3b11483"
+      "role": "maintained-source"
     }
   ],
   "failure_limit": 1000,
-  "schema": "apg-file-length-policy-v1",
+  "schema": "apg-file-length-policy-v2",
   "warning_limit": 400
 }

@@ -1,0 +1,380 @@
+{
+  "scenarios": {
+    "scenario-01": {
+      "files": [
+        {
+          "bytes": 36,
+          "mode": 420,
+          "path": "go.mod",
+          "sha256": "52888bf98ffc8791334913b45f6edee1e989783caf736bc2c68327e45836fda4"
+        },
+        {
+          "bytes": 178,
+          "mode": 420,
+          "path": "main.go",
+          "sha256": "3f744f7ff0e3cbe7f581f5c9b8554edcd3a8474a920c1e8e1af30d97157162b8"
+        },
+        {
+          "bytes": 81,
+          "mode": 420,
+          "path": "pkg/handler/handler_test.go",
+          "sha256": "194333d289fbd17952578f7b75a632a71a3d1f8580ab299c402c1714cf3272f1"
+        },
+        {
+          "bytes": 229,
+          "mode": 420,
+          "path": "pkg/handler/health.go",
+          "sha256": "02fff061164bb31bf03baf044467edef465b3e65273424f9a07950ce5d09c926"
+        },
+        {
+          "bytes": 132,
+          "mode": 420,
+          "path": "pkg/handler/health_test.go",
+          "sha256": "678cbd65d53903dd44e4eda4473dc1145121c90c1262d43e344366d23498998e"
+        }
+      ],
+      "scenario_sha256": "ac77494048f93f3c859210f821b2a75532e4182c4061f5378ac7f53b7748b68e",
+      "total_bytes": 656,
+      "tree_sha256": "bdb55f78ce893824223e8c0534d1371ed34207a19ece7bcd3df94cbef7c1bc31"
+    },
+    "scenario-02": {
+      "files": [
+        {
+          "bytes": 166,
+          "mode": 420,
+          "path": "docs/plan.md",
+          "sha256": "1028885b78993e71090804753206d1ba59b23572c073dd83f93840f42e02a225"
+        },
+        {
+          "bytes": 100,
+          "mode": 420,
+          "path": "pyproject.toml",
+          "sha256": "548265905986dacd898fa810916c7868dad408c4dcbfa065aeae511e6d70bd48"
+        },
+        {
+          "bytes": 64,
+          "mode": 420,
+          "path": "src/__init__.py",
+          "sha256": "f9eaf4c1eb351e3e9440a3dcd1609eea4f72bcc97d87ead9195533923b17447a"
+        },
+        {
+          "bytes": 112,
+          "mode": 420,
+          "path": "src/app.py",
+          "sha256": "277f93f574044d804808d51fac481972d2c7c131f7c94cbfea6f72b8b22b2335"
+        },
+        {
+          "bytes": 212,
+          "mode": 420,
+          "path": "tests/test_app.py",
+          "sha256": "04c7f8f02028660cc875f1d08a316cf64fec9afc0cdef3f5832fd300b865725e"
+        }
+      ],
+      "scenario_sha256": "02037a53f1c56851e8d13356d55db59c0068ac5b1f25bc22236654545c64c60e",
+      "total_bytes": 654,
+      "tree_sha256": "3c3bd6f51433d85ad424d31145387f81347fe37209d4887616a2d6865432a914"
+    },
+    "scenario-03": {
+      "files": [
+        {
+          "bytes": 66,
+          "mode": 420,
+          "path": "README.md",
+          "sha256": "2bc6b57582e159a6a901c2c7390d15c07231cd7b20f41e908cafc8d074e43e52"
+        },
+        {
+          "bytes": 115,
+          "mode": 420,
+          "path": "docs/architecture.md",
+          "sha256": "401cc4767fda004e7b9dd655a654fef987502b851c31cfa9f0e4297a01526b46"
+        }
+      ],
+      "scenario_sha256": "201059ef94922e5ed468bdbd4ad19c55ed94732142681c03983d2ac047c8b0f6",
+      "total_bytes": 181,
+      "tree_sha256": "0436851e0effcbce50760868a46ad1dd9baf5e32d65a9ca70fbf373f688752fc"
+    },
+    "scenario-04": {
+      "files": [
+        {
+          "bytes": 27,
+          "mode": 420,
+          "path": "Makefile",
+          "sha256": "1f10aea420918604dc226e4839bebe8778df09468477eea75c2381e24ebf7f80"
+        },
+        {
+          "bytes": 83,
+          "mode": 493,
+          "path": "scripts/build.sh",
+          "sha256": "239691f1d9aae1b87f1c054b874ee58832549939fac970f66efea4f13c10008f"
+        },
+        {
+          "bytes": 29,
+          "mode": 420,
+          "path": "src/main.c",
+          "sha256": "2ad75d95660563887d8d3f1d0ae1dcf18c2379cbd83a5c72f5ab276351ee6949"
+        }
+      ],
+      "scenario_sha256": "48250559edd8cc8066366c6dd85086156a5d9c8e77f49a10de1a2ba371b353e1",
+      "total_bytes": 139,
+      "tree_sha256": "ee83982c323e9eabd490188867be0bd38c538be03a831e6c7c1f145406d9ef0b"
+    },
+    "scenario-05": {
+      "files": [
+        {
+          "bytes": 35,
+          "mode": 420,
+          "path": "go.mod",
+          "sha256": "acc1ce9ffb6dad17238ad582e58fe11c5f497dee88d2b6c021ae5e24285d1cc8"
+        },
+        {
+          "bytes": 29,
+          "mode": 420,
+          "path": "main.go",
+          "sha256": "55a60bb97151b2b4b680462447ce60ec34511b14fa10d77440c97b9777101566"
+        },
+        {
+          "bytes": 238,
+          "mode": 420,
+          "path": "pkg/util/strings.go",
+          "sha256": "7b0d329674f88fafd8f857289192de6c9de4d47dc9a7882b7d448e649e2a271b"
+        }
+      ],
+      "scenario_sha256": "83f4129fb82738ac4ee3fbc8ef7a0d99899c7f71d88a7e0a5b5a8010440f9131",
+      "total_bytes": 302,
+      "tree_sha256": "34e927fbd588a6dd07c4931d74d83e2a40edf9516b23a3e6e4115b04c1d6ff8d"
+    },
+    "scenario-06": {
+      "files": [
+        {
+          "bytes": 622,
+          "mode": 420,
+          "path": "cmd/server/main.go",
+          "sha256": "a054a9de06cf6f7370cea85f447be82fe845c048a15cdd4e7419b9100f9987c9"
+        },
+        {
+          "bytes": 144,
+          "mode": 420,
+          "path": "cmd/server/main_test.go",
+          "sha256": "2d1bca44ebbec6758575ac960c517f4dd9e1ec864b8c4d1fbabb06b57a60d896"
+        },
+        {
+          "bytes": 95,
+          "mode": 420,
+          "path": "docs/index.md",
+          "sha256": "cdbdf589028728a43e5eb644b423f440d66353a3af53efd84147be3ca3138810"
+        },
+        {
+          "bytes": 35,
+          "mode": 420,
+          "path": "go.mod",
+          "sha256": "8b62773f5cdf3cb0b58e3d3876646dcb92928914908a52caebc7c28d8c3db593"
+        },
+        {
+          "bytes": 1024,
+          "mode": 420,
+          "path": "schema/db.sqlite",
+          "sha256": "4942f911ad5506d0c4ed0f9137ddb20b7d1050090f349f1daf63e4a23a8cfc85"
+        },
+        {
+          "bytes": 65,
+          "mode": 420,
+          "path": "schema/schema.sql",
+          "sha256": "f202577af96fe5ff413f6456e176f80eb994ac7d349d89f8707fa32f79cef931"
+        },
+        {
+          "bytes": 140,
+          "mode": 420,
+          "path": "tools/generator.py",
+          "sha256": "c71d110a1f098b617a2d02c64f4a1b4f27726329f8748905b8a0e63b507db7b4"
+        },
+        {
+          "bytes": 358,
+          "mode": 420,
+          "path": "tools/query_sqlite.py",
+          "sha256": "9994e192476d40b881d7debb0478fb1a831472c88a1606cebb00bdf62afb9a11"
+        }
+      ],
+      "scenario_sha256": "435e8de99dd2ce4d96dbf039e1bca66e24287bcd3774d842435e0d1a71efbb99",
+      "total_bytes": 2483,
+      "tree_sha256": "52dbc78747f0f4cfe9401a467948d83d981a679006561662d791e8ee59e2619f"
+    },
+    "scenario-07": {
+      "files": [
+        {
+          "bytes": 174,
+          "mode": 420,
+          "path": "README.md",
+          "sha256": "05358a52161211952f82f0f0dd80dd37edb3008272d31a6f1ab1c36fff2e2025"
+        },
+        {
+          "bytes": 83,
+          "mode": 420,
+          "path": "src/main.rs",
+          "sha256": "3fa0e8e0d690aa5a1d6564be1f910ae9e7d3748b8a91bb5f89382fa556eb5676"
+        }
+      ],
+      "scenario_sha256": "b1d47e3676ee01c39c86d6878b19852bc02a931c9ed4eb28bf8f7cc20ceee4d0",
+      "total_bytes": 257,
+      "tree_sha256": "5e60b6ab6c7d13c1c7a49879a950d7b316fc4ebec3297149e30eb36424d812c2"
+    },
+    "scenario-08": {
+      "files": [
+        {
+          "bytes": 690,
+          "mode": 420,
+          "path": ".apgr/skills/go-language-profile/SKILL.md",
+          "sha256": "76192c9275bc2c26d4702bfcfbc3022cc13bd0806b1703f34024eba2ab9440b8"
+        },
+        {
+          "bytes": 29,
+          "mode": 420,
+          "path": "main.go",
+          "sha256": "55a60bb97151b2b4b680462447ce60ec34511b14fa10d77440c97b9777101566"
+        }
+      ],
+      "scenario_sha256": "c54b22384f167c189b2c4a4cc8274e02b8c5099b349422e7712e5d06bb666d08",
+      "total_bytes": 719,
+      "tree_sha256": "9cb4b00fc99665fb08303f752fe360c79c078b98f723e41dd9f511cf7dbfc9ca"
+    },
+    "scenario-09": {
+      "files": [
+        {
+          "bytes": 78,
+          "mode": 420,
+          "path": ".apgr/config.toml",
+          "sha256": "a1d483030b3b1010594a679e316f0945f80e0aa5873a14d7168d0278859b0450"
+        },
+        {
+          "bytes": 690,
+          "mode": 420,
+          "path": ".apgr/skills/go-language-profile/SKILL.md",
+          "sha256": "76192c9275bc2c26d4702bfcfbc3022cc13bd0806b1703f34024eba2ab9440b8"
+        },
+        {
+          "bytes": 29,
+          "mode": 420,
+          "path": "main.go",
+          "sha256": "55a60bb97151b2b4b680462447ce60ec34511b14fa10d77440c97b9777101566"
+        }
+      ],
+      "scenario_sha256": "dd9d856e496caf5ced79c5c20156dbf3e45b6d2d2d4d268b3be8bcf605211cc3",
+      "total_bytes": 797,
+      "tree_sha256": "629ac9cc7f5e00729ff479647165aa25786ec5d5384bded4fb63896825a04342"
+    },
+    "scenario-10": {
+      "files": [
+        {
+          "bytes": 73,
+          "mode": 420,
+          "path": "go.mod",
+          "sha256": "e09e2f8312526dfc76e7fae4b09e8790d923cf7ff669b7ad311cc0208767dc82"
+        },
+        {
+          "bytes": 167,
+          "mode": 420,
+          "path": "go.sum",
+          "sha256": "914c00c3fe0abb847abcdc66929e93e4cc62abccc7fb381563cc4c70dc9dafec"
+        },
+        {
+          "bytes": 29,
+          "mode": 420,
+          "path": "main.go",
+          "sha256": "55a60bb97151b2b4b680462447ce60ec34511b14fa10d77440c97b9777101566"
+        },
+        {
+          "bytes": 147,
+          "mode": 420,
+          "path": "tests/integration_test.go",
+          "sha256": "dfc471caf50a67ff37615fb25046fac7386b5d95defaaaf7d08bdc19b3bddf25"
+        }
+      ],
+      "scenario_sha256": "f465b9085440f21897a7c7768476a2b1712d0ff8ac5a669efae2e6461b2d6c84",
+      "total_bytes": 416,
+      "tree_sha256": "9262119226dddcfa03dc12ea093a9673cd248ad23530675bdbb74911cba66fca"
+    },
+    "scenario-11": {
+      "files": [
+        {
+          "bytes": 171,
+          "mode": 420,
+          "path": "pkg/api/client.go",
+          "sha256": "aca30ecba8a170e079060ec9c50b959353f964c302748b2c0a9181b1d620c401"
+        }
+      ],
+      "scenario_sha256": "84afd5268ea75b9c59f5ef592d3c8544c02f37a852c7e042ca1c904cc207d059",
+      "total_bytes": 171,
+      "tree_sha256": "1e6b31cc6823b82780db00a06196babbe0f663c45bfc53cc20d6001c53fe2cd6"
+    },
+    "scenario-12": {
+      "files": [
+        {
+          "bytes": 158,
+          "mode": 420,
+          "path": "pkg/service/service.go",
+          "sha256": "1828dbf48b77ea6371c240b34654bd8eca55086c66baeedc676d6c9621149ff3"
+        }
+      ],
+      "scenario_sha256": "09a3ea566f882ae0c780586aca228a0e7a264d749ec54d8c3b944f68fb83c805",
+      "total_bytes": 158,
+      "tree_sha256": "b0b604336df91672bdedd722ea72bf760fab0a393ae6820e44c6c2837fbb49f1"
+    },
+    "scenario-13": {
+      "files": [
+        {
+          "bytes": 147,
+          "mode": 420,
+          "path": "pkg/auth/auth.go",
+          "sha256": "f8b48c7c6ee5f41f178936a413cbfdc95ae9179f526e5592263d6e84d8657918"
+        }
+      ],
+      "scenario_sha256": "0488881524f6521bb39bd7c359859fb730b140e131827357331a4d70b96ff1d5",
+      "total_bytes": 147,
+      "tree_sha256": "2e3453dc6fdd6608439d6e06191c8a7447e9cdf48eab3847fe8ca8fca5800c12"
+    },
+    "scenario-14": {
+      "files": [
+        {
+          "bytes": 120,
+          "mode": 420,
+          "path": "pkg/data/models.go",
+          "sha256": "f9c8a161f371696454d0af91f2eb77591de3020c89d9308e2e24fd3680f0a1c2"
+        }
+      ],
+      "scenario_sha256": "1180bd94f7da395dfa02ded05dcc40e69150fa225cb4d42208ed488103563ac4",
+      "total_bytes": 120,
+      "tree_sha256": "002bc4ed34f6d285ad9fe23b6d7bdbd5d7a1479ad71d32af41f1451ed6ba98f6"
+    },
+    "scenario-15": {
+      "files": [
+        {
+          "bytes": 530,
+          "mode": 420,
+          "path": "frontend/README.md",
+          "sha256": "82fcf816834b1672f3a033d42015e741d1df3f32383040f9b99100784d7b73f3"
+        },
+        {
+          "bytes": 156,
+          "mode": 420,
+          "path": "frontend/package.json",
+          "sha256": "99cdf9d90f323412442b52b6881f4da1b16c0ef3b99cc6c0634fc1fdb83d6581"
+        },
+        {
+          "bytes": 205,
+          "mode": 420,
+          "path": "frontend/src/App.tsx",
+          "sha256": "460483f79b7f2431d91a6fa35a09c0d5b14e251527fdb74beb46b87cf0dcc599"
+        },
+        {
+          "bytes": 181,
+          "mode": 420,
+          "path": "frontend/tsconfig.json",
+          "sha256": "fe6c8d134f9354d4164e651a8865277b30caa392084dd640eed3edd8e1ef64e1"
+        }
+      ],
+      "scenario_sha256": "7d92ea27859484372783ab5d27e5827ca1de1de016f5e002eb320af6963bf257",
+      "total_bytes": 1072,
+      "tree_sha256": "3eafae8f3da9aed017bf6411e96dc1c8804735e222a55c6480b8a985d3787e8f"
+    }
+  },
+  "schema": "apg.h-subject-manifest/v1"
+}

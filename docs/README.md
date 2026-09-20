@@ -17,10 +17,11 @@ start with the [root README](../README.md).
 - [Release notes (v0.9.0)](../release/v0.9.0-notes.md) — preceding release
   highlights and publication reconciliation.
 
-This documentation covers v0.11.0. The retained CI-first interfaces are preserved.
-v0.11.0 is publicly released across GitHub, Go, PyPI, npm, and Homebrew tap. Preceding releases remain frozen.
-The [v0.12 architecture transfer roadmap](v0-12-roadmap.md) owns current development planning.
-The [v0.11 closure roadmap](v0-11-roadmap.md) and [v0.10 roadmap](v0-10-roadmap.md) are historical release records.
+This documentation covers the **unreleased v0.13.0 candidate**.
+v0.12.0 is publicly released across GitHub, Go, PyPI, npm, and Homebrew tap. Preceding releases remain frozen.
+The [v0.13 roadmap](v0-13-roadmap.md) owns current development planning, initiated by APG159 (stage V0130-A).
+The [v0.12 forward reconciliation record](architecture/v0-12-forward-reconciliation.md) reconciles v0.12.0 publication and development lineage.
+The [v0.12 architecture transfer roadmap](v0-12-roadmap.md), [v0.11 closure roadmap](v0-11-roadmap.md), and [v0.10 roadmap](v0-10-roadmap.md) are historical release records.
 
 ## Use the CLI
 
@@ -47,8 +48,12 @@ The [v0.11 closure roadmap](v0-11-roadmap.md) and [v0.10 roadmap](v0-10-roadmap.
   details Agent-Central runtime migration and component dispositions.
 - [v0.12 JACA disposition handoff](architecture/v0-12-jaca-disposition-handoff.md)
   defines §18.13 ownership alignment and exported Go interfaces.
+- [v0.13 JACA disposition handoff](architecture/v0-13-jaca-disposition-handoff.md)
+  defines v0.13 hosting seams, state independence, and DTO contracts.
 - [v0.12 Agent-Central ownership transition](architecture/v0-12-agent-central-ownership-transition.md)
   coordinates staged transfer and compatibility wrappers.
+- [v0.13 Agent-Central ownership transition](architecture/v0-13-agent-central-ownership-transition.md)
+  defines reversible owner-executed dispatcher adoption and standalone boundaries.
 - [v0.12 v0.11 publication regression inputs](architecture/v0-12-v011-publication-regression-inputs.md)
   codifies v0.11 repair and publication findings as regression specifications.
 
@@ -56,6 +61,11 @@ The [v0.11 closure roadmap](v0-11-roadmap.md) and [v0.10 roadmap](v0-10-roadmap.
 
 - [Skill context bundles](guides/skill-context-bundles.md) documents the
   structured resolver, budgets, fingerprints, and isolated materialization.
+- [Context planning](guides/context-planning.md) documents per-attempt plans,
+  static fallback, and the experimental adaptive opt-in.
+- [Operational observations](guides/operational-observations.md) documents the
+  v0.13 pilot's per-attempt dispatch observations, opt-out, and provider-free
+  summary.
 - [Skill catalog](../skills/README.md) lists the 45 development canonical leaves and their
   maturity.
 - [Skill authoring and maintenance](skill-authoring-and-maintenance.md)
@@ -89,6 +99,8 @@ Growth and churn analysis is not part of the v0.8 footprint capability.
 ## Understand distribution and installation
 
 - [APG distribution](distribution.md) is the primary package and target owner.
+- [Nix flake guide](guides/nix-flake.md) documents the first-party flake
+  outputs, installed runtime, source boundary, and qualification from v0.13.0.
 - [Public release process](public-release-process.md) defines candidate,
   validation, and publication boundaries.
 - [User-scoped skill integration](user-scoped-skill-integration.md) covers

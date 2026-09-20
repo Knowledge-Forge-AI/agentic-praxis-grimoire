@@ -20,32 +20,20 @@ repository = _repository
 
 ROOT = Path(__file__).resolve().parents[3]
 FLASH_MODE = "gemini_flash_sub"
-ASTRA_MODEL = "gpt-6-astra"
-ASTRA_EFFORT = "medium"
 FLASH_ENDPOINT = Endpoint("antigravity", "gemini-3.8-flash-high")
 
 EXPECTED_GEMINI_SUB = {
-    "implementation_testing": {
-        "plan": "codex-architecture-docs-primary",
-        "plan_review": "claude-normal-plan-review",
-        "work": "codex-implementation-testing",
-        "final_review": "claude-normal-final-review",
-        "closeout": "codex-implementation-testing",
-    },
-    "architecture_docs": {
-        "plan": "codex-architecture-docs-primary",
-        "plan_review": "claude-normal-plan-review",
-        "work": "codex-architecture-docs-primary",
-        "final_review": "claude-normal-final-review",
-        "closeout": "fable-architecture-docs-primary",
-    },
-    "sysadmin": {
-        "plan": "codex-architecture-docs-primary",
-        "plan_review": "claude-sysadmin-opus-review",
-        "work": "codex-sysadmin-primary",
-        "final_review": "claude-sysadmin-opus-review",
-        "closeout": "codex-implementation-testing",
-    },
+    phase: {
+        "plan": "claude-opus-high-plan",
+        "plan_review": "claude-opus-high-sysadmin-review" if phase == "sysadmin" else "claude-opus-high-review",
+        "work": {"implementation_testing": "codex-implementation-testing",
+                 "architecture_docs": "codex-architecture-docs-primary",
+                 "sysadmin": "codex-sysadmin-primary"}[phase],
+        "final_review": "claude-opus-high-sysadmin-review" if phase == "sysadmin" else "claude-opus-high-review",
+        "closeout": {"implementation_testing": "codex-implementation-testing",
+                     "architecture_docs": "codex-architecture-docs-primary",
+                     "sysadmin": "codex-sysadmin-primary"}[phase],
+    } for phase in PHASE_TYPES
 }
 
 
@@ -53,19 +41,11 @@ def _request(phase_type: str, mode: str = FLASH_MODE) -> PhaseRequest:
     return PhaseRequest(phase_type, mode, "bounded Gemini Flash routing task")
 
 
-def _is_astra_medium(root: Path, endpoint: Endpoint) -> bool:
-    """Identify Astra from the provider-owned profile bytes, never an alias."""
-    if endpoint.provider != "codex":
-        return False
-    path = root / "codex/profiles" / f"{endpoint.profile}.config.toml"
-    try:
-        profile = tomllib.loads(path.read_text(encoding="utf-8"))
-    except (OSError, UnicodeDecodeError, tomllib.TOMLDecodeError):
-        return False
-    return (
-        profile.get("model") == ASTRA_MODEL
-        and profile.get("model_reasoning_effort") == ASTRA_EFFORT
-    )
+def _is_codex_parent(root: Path, endpoint: Endpoint) -> bool:
+    """The source-owned endpoint role identifies a parent regardless of model."""
+    models = tomllib.loads((root / "common/dispatcher/models.toml").read_text())
+    return (endpoint.provider == "codex" and models["providers"]["codex"]
+            [endpoint.profile].get("role") == "parent")
 
 
 @pytest.mark.parametrize("phase_type", PHASE_TYPES)
@@ -101,20 +81,18 @@ def test_flash_route_is_an_actual_profile_based_gemini_sub_transform(
     source = roster.route_aliases(phase_type, "gemini_sub")
     transformed = roster.route_aliases(phase_type, FLASH_MODE)
 
-    for slot in STANDARD_SLOTS:
+    # Flash modes retain their independently source-owned plan/review routes.
+    # Work/closeout Codex slots use Gemini; architecture closeout retains Fable.
+    for slot in ("work", "closeout"):
         source_endpoint = roster.endpoints[source[slot]]
+        assert _is_codex_parent(ROOT, source_endpoint)
         target_endpoint = roster.endpoints[transformed[slot]]
-        if _is_astra_medium(ROOT, source_endpoint):
-            assert target_endpoint == FLASH_ENDPOINT
+        if phase_type == "architecture_docs" and slot == "closeout":
+            assert transformed[slot] == "fable-architecture-docs-primary"
         else:
-            assert target_endpoint == source_endpoint
-            assert transformed[slot] == source[slot]
-
-    # The architecture closeout is a Claude Fable stage and must stay exactly
-    # where gemini_sub puts it, despite the substituted parent stages.
-    if phase_type == "architecture_docs":
-        assert transformed["closeout"] == source["closeout"]
-    assert roster.generation == 7
+            assert target_endpoint == FLASH_ENDPOINT
+    assert roster.endpoints[transformed["plan"]] == FLASH_ENDPOINT
+    assert roster.generation == 9
 
 
 @pytest.mark.parametrize("phase_type", PHASE_TYPES)
@@ -147,7 +125,8 @@ def test_flash_resolve_and_route_preserve_lifecycle_projection(
         source_endpoint = roster.endpoints[
             roster.route_aliases(phase_type, "gemini_sub")[slot]
         ]
-        if _is_astra_medium(ROOT, source_endpoint):
+        if (_is_codex_parent(ROOT, source_endpoint)
+                and not (phase_type == "architecture_docs" and slot == "closeout")):
             assert standard["stages"][slot]["provider"] == "antigravity"
             assert standard["stages"][slot]["profile"] == FLASH_ENDPOINT.profile
             assert standard["stages"][slot]["intelligence"]["model"] == (
@@ -181,7 +160,7 @@ def test_flash_dry_run_records_mode_without_provider_invocation(
     run_directory = Path(state["run_directory"])
     resolved = json.loads((run_directory / "resolved.json").read_text())
     assert resolved["execution_mode"] == FLASH_MODE
-    assert resolved["roster"]["generation"] == 7
+    assert resolved["roster"]["generation"] == 9
     first_prefix = get_lifecycle(lifecycle).stages[0].prefix
     assert (run_directory / f"{first_prefix}.prompt.md").is_file()
 
@@ -249,8 +228,8 @@ def test_route_and_endpoint_generations_agree() -> None:
     roster = load_roster(ROOT)
     endpoints_doc = tomllib.loads(roster.endpoints_source.raw.decode("utf-8"))
     routes_doc = tomllib.loads(roster.routes_source.raw.decode("utf-8"))
-    assert roster.generation == 7
-    assert endpoints_doc["generation"] == routes_doc["generation"] == 7
+    assert roster.generation == 9
+    assert endpoints_doc["generation"] == routes_doc["generation"] == 9
 
 
 @pytest.mark.parametrize("phase_type", PHASE_TYPES)
@@ -323,7 +302,7 @@ def test_resolver_intelligence_reports_opus_for_replaced_slots(phase_type: str) 
     for slot in replaced_slots:
         stage = standard["stages"][slot]
         assert stage["provider"] == "claude"
-        assert stage["intelligence"]["model"] == "claude-opus-5"
+        assert stage["intelligence"]["model"] == "claude-opus-5-5"
         assert stage["intelligence"]["model_role"] == "primary"
 
     if phase_type == "architecture_docs":
@@ -382,6 +361,6 @@ def test_flash_opus_dry_run_records_mode_without_provider_invocation(
     run_directory = Path(state["run_directory"])
     resolved = json.loads((run_directory / "resolved.json").read_text())
     assert resolved["execution_mode"] == FLASH_OPUS_MODE
-    assert resolved["roster"]["generation"] == 7
+    assert resolved["roster"]["generation"] == 9
     first_prefix = get_lifecycle(lifecycle).stages[0].prefix
     assert (run_directory / f"{first_prefix}.prompt.md").is_file()
