@@ -23,7 +23,14 @@ import sys
 from typing import Any, Dict, FrozenSet, List, Optional, Set, Tuple
 import uuid
 
-from apg123_browser_process import communicate_owned, progress_tail
+from apg123_browser_process import (
+    BrowserSlot,
+    BrowserSlotError,
+    append_progress_marker,
+    communicate_owned,
+    harness_timeout_seconds,
+    progress_tail,
+)
 
 # Explicit Disclaimers
 BROWSER_CORROBORATION_DISCLAIMER: str = (
@@ -127,6 +134,7 @@ class BrowserHarnessReceipt:
     scenarios: List[Dict[str, Any]] = field(default_factory=list)
     artifacts: List[str] = field(default_factory=list)
     retained_on_disk: bool = False
+    scheduling: Dict[str, Any] = field(default_factory=dict)
 
     @property
     def total_count(self) -> int:
@@ -911,6 +919,7 @@ def retain_failure_evidence(
     error_msg: str,
     cleanup: Optional[Dict[str, Any]] = None,
     process_error: Optional[Dict[str, str]] = None,
+    scheduling: Optional[Dict[str, Any]] = None,
 ) -> Tuple[Dict[str, Any], Path]:
     """Retain sanitized failure evidence in external scratch before run directory cleanup."""
     scratch_real = config.scratch_root.resolve(strict=True)
@@ -978,6 +987,7 @@ def retain_failure_evidence(
         "progress_tail": sanitize_evidence_structure(progress_tail(receipt_file.parent / "progress.jsonl")),
         "cleanup": sanitize_evidence_structure(cleanup),
         "process_error": sanitize_evidence_structure(process_error),
+        "scheduling": sanitize_evidence_structure(scheduling),
     }
     # Configured scratch is private even when the caller did not export its env.
     evidence = json.loads(json.dumps(evidence).replace(os.fspath(config.scratch_root), "<SCRATCH_ROOT>"))
@@ -1058,6 +1068,14 @@ def execute_browser_harness(
     # Resolve authority ONCE BEFORE execution
     resolve_scenario_family_authority(family_table, target_scenarios)
 
+    case_count = len(target_scenarios) * len(browsers)
+    try:
+        budget = harness_timeout_seconds(case_count, len(browsers) if "PW10" in target_scenarios else 0)
+    except ValueError as err:
+        raise BrowserHarnessExecutionError(f"Harness case budget refused: {err}") from err
+    scheduling: Dict[str, Any] = {"wait_seconds": None, "budget_seconds": budget,
+                                  "selected_cases": case_count, "terminated_by_harness_deadline": False}
+
     run_id = f"run-{uuid.uuid4().hex[:10]}"
     run_dir = config.scratch_root / run_id
     run_dir.mkdir(parents=True, exist_ok=True, mode=0o700)
@@ -1075,7 +1093,7 @@ def execute_browser_harness(
         try:
             evidence, retained_file = retain_failure_evidence(
                 config, run_id, receipt_file, returncode, stdout, stderr, message,
-                cleanup=cleanup, process_error=process_error)
+                cleanup=cleanup, process_error=process_error, scheduling=scheduling)
         except Exception:
             pass
         reported_class = process_error["class"] if process_error else diagnostic[0] or original_class
@@ -1124,33 +1142,48 @@ def execute_browser_harness(
         env["APG_REPOSITORY_ROOT"] = os.fspath(config.repo_root)
         env["NO_COLOR"] = "1"
 
-        # Manage child in isolated process group: bounded TERM then KILL cleanup on failure
-        proc = subprocess.Popen(
-            cmd,
-            cwd=run_dir,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
-            env=env,
-            start_new_session=True,
-        )
+        # Real browser suites share one slot: concurrent heavy runs starve each other's deadlines.
+        slot = BrowserSlot(config.scratch_root)
+        try:
+            scheduling["wait_seconds"] = slot.acquire()
+        except BrowserSlotError as err:
+            scheduling["wait_seconds"] = err.wait_seconds
+            raise failure(str(err), original_class=type(err).__name__,
+                          process_error={"class": type(err).__name__, "message": str(err)}) from err
+
+        def mark_deadline():
+            scheduling["terminated_by_harness_deadline"] = True
+            # Append order alone places this between Node's entries; no clocks are compared.
+            append_progress_marker(run_dir / "progress.jsonl", {
+                "source": "harness", "phase": "harness deadline", "engine": None,
+                "scenario": None, "boundary": "signal"})
 
         try:
-            stdout, stderr = communicate_owned(proc)
-            cleanup = {"child_reaped": proc.returncode is not None, "detached_descendants": "not_verified"}
-        except BaseException as err:
-            stdout, stderr = getattr(err, "output", ""), getattr(err, "stderr", "")
-            cleanup = getattr(err, "cleanup", None)
-            timed_out = isinstance(err, subprocess.TimeoutExpired)
-            message = (f"Harness execution timed out after 180s:\n{stdout}\n{stderr}" if timed_out
-                       else f"Harness process execution failed: {err}")
-            retained_error = failure(message, returncode=proc.returncode,
-                                     original_class=type(err).__name__,
-                                     process_error={"class": type(err).__name__, "message":
-                                                    "Harness execution timed out after 180s" if timed_out else str(err)})
-            if not isinstance(err, Exception):
-                raise
-            raise retained_error from err
+            # Manage child in isolated process group: bounded TERM then KILL cleanup on failure
+            proc = None
+            try:
+                proc = subprocess.Popen(
+                    cmd, cwd=run_dir, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                    text=True, env=env, start_new_session=True,
+                )
+                stdout, stderr = communicate_owned(proc, timeout=budget, on_deadline=mark_deadline)
+                cleanup = {"child_reaped": proc.returncode is not None, "detached_descendants": "not_verified"}
+            except BaseException as err:
+                stdout, stderr = getattr(err, "output", ""), getattr(err, "stderr", "")
+                cleanup = getattr(err, "cleanup", None)
+                timed_out = isinstance(err, subprocess.TimeoutExpired)
+                timeout_message = f"Harness execution timed out after {budget}s"
+                message = (f"{timeout_message}:\n{stdout}\n{stderr}" if timed_out
+                           else f"Harness process execution failed: {err}")
+                retained_error = failure(message, returncode=proc.returncode if proc else -1,
+                                         original_class=type(err).__name__,
+                                         process_error={"class": type(err).__name__,
+                                                        "message": timeout_message if timed_out else str(err)})
+                if not isinstance(err, Exception):
+                    raise
+                raise retained_error from err
+        finally:
+            slot.release()
 
         if proc.returncode != 0:
             raise failure(
@@ -1178,7 +1211,9 @@ def execute_browser_harness(
                 )
 
         try:
-            return validate_receipt(receipt_data, browsers, target_scenarios, retained_on_disk=keep_scratch, fixtures_dir=fixtures_dir)
+            receipt = validate_receipt(receipt_data, browsers, target_scenarios, retained_on_disk=keep_scratch, fixtures_dir=fixtures_dir)
+            receipt.scheduling = dict(scheduling)
+            return receipt
         except BrowserHarnessValidationError as val_err:
             try:
                 evidence, retained_file = retain_failure_evidence(
@@ -1190,6 +1225,7 @@ def execute_browser_harness(
                     stderr=stderr,
                     error_msg=str(val_err),
                     cleanup=cleanup,
+                    scheduling=scheduling,
                 )
                 val_err.failure_evidence = evidence
                 val_err.retained_path = retained_file
