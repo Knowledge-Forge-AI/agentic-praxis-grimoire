@@ -1,0 +1,83 @@
+{
+  "arms": {
+    "adaptive": {
+      "route": {
+        "identity_sources": [
+          "common/dispatcher/routes.toml",
+          "common/dispatcher/endpoints.toml",
+          "claude/profiles/implementation-primary.json",
+          "claude/model-catalog-v1.json"
+        ],
+        "model": "claude-opus-5",
+        "profile": "implementation-primary",
+        "provider": "claude",
+        "requested_mode": "adaptive",
+        "role_binding": {
+          "allowed_tools": [
+            "view_file",
+            "replace_file_content",
+            "write_to_file",
+            "run_command"
+          ],
+          "binding_id": "binding-producer-08",
+          "roles": [
+            "Producer"
+          ]
+        },
+        "source_sha256": {
+          "claude/model-catalog-v1.json": "24461d64200f30cec950190856d88b7ce1513c8c9f429a319c15c1357bbcae09",
+          "claude/profiles/implementation-primary.json": "8e890679280a69ef797c37578ec5bd409c86b60f89a9de6fb364f6ec63b10e18",
+          "common/dispatcher/endpoints.toml": "a3ae4c8654cf16a314d277877c99f98bffefdea2ae593d1475df3a6c1fc8a4b9",
+          "common/dispatcher/routes.toml": "c194887b362159141db6e345951cae20c229f05c1f5cf72eeb8305e5e8135673"
+        }
+      },
+      "status": "unavailable"
+    },
+    "static": {
+      "route": {
+        "identity_sources": [
+          "common/dispatcher/routes.toml",
+          "common/dispatcher/endpoints.toml",
+          "claude/profiles/implementation-primary.json",
+          "claude/model-catalog-v1.json"
+        ],
+        "model": "claude-opus-5",
+        "profile": "implementation-primary",
+        "provider": "claude",
+        "requested_mode": "static",
+        "role_binding": {
+          "allowed_tools": [
+            "view_file",
+            "replace_file_content",
+            "write_to_file",
+            "run_command"
+          ],
+          "binding_id": "binding-producer-08",
+          "roles": [
+            "Producer"
+          ]
+        },
+        "source_sha256": {
+          "claude/model-catalog-v1.json": "24461d64200f30cec950190856d88b7ce1513c8c9f429a319c15c1357bbcae09",
+          "claude/profiles/implementation-primary.json": "8e890679280a69ef797c37578ec5bd409c86b60f89a9de6fb364f6ec63b10e18",
+          "common/dispatcher/endpoints.toml": "a3ae4c8654cf16a314d277877c99f98bffefdea2ae593d1475df3a6c1fc8a4b9",
+          "common/dispatcher/routes.toml": "c194887b362159141db6e345951cae20c229f05c1f5cf72eeb8305e5e8135673"
+        }
+      },
+      "status": "unavailable"
+    }
+  },
+  "blockers": [
+    "Concrete clean subject factory not frozen",
+    "Provider result importer not frozen",
+    "Substantive external oracle implementation not frozen",
+    "Live projection/runtime authority not frozen"
+  ],
+  "oracle_executed": false,
+  "phase": "APG166C",
+  "provider_invocations": 0,
+  "scenario_id": "scenario-15",
+  "scenario_sha256": "7d92ea27859484372783ab5d27e5827ca1de1de016f5e002eb320af6963bf257",
+  "status": "unavailable",
+  "subject_materialized": false
+}

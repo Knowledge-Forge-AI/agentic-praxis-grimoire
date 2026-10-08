@@ -1,0 +1,9 @@
+{
+  "modelRole": "opus",
+  "effort": "high",
+  "permissionMode": "acceptEdits",
+  "additionalDirectories": [
+    "user-home",
+    "scratch"
+  ]
+}

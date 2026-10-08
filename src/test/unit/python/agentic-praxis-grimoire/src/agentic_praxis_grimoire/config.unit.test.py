@@ -271,3 +271,166 @@ def test_empty_project_config_preserves_global_outbox_and_binary_path_is_refused
     assert config.resolve_outbox_root(project_root=project, global_home=global_home) == value
     with pytest.raises(config.ConfigError, match="not a valid path"):
         config.load_config(b"/binary-path")
+
+
+def test_skill_overrides_closed_table(tmp_path):
+    path = tmp_path / "config.toml"
+    path.write_text('[skills.overrides]\n"apgr:go-language-profile" = "project:go-language-profile"\n')
+    assert config.load_config(path)["skills"]["overrides"] == {
+        "apgr:go-language-profile": "project:go-language-profile"
+    }
+    for text in ('[skills]\ncontext = true\n', '[skills]\noverrides = 1\n', '[skills.overrides]\nx = 1\n'):
+        path.write_text(text)
+        with pytest.raises(config.ConfigError):
+            config.load_config(path)
+
+
+def _loaded(tmp_path, body):
+    path = tmp_path / "config.toml"
+    path.write_text(body, encoding="utf-8")
+    return config.load_config(path)
+
+
+def test_dispatcher_tables_round_trip_only_their_declared_values(tmp_path):
+    body = """
+[dispatcher.bundle]
+required = true
+[dispatcher.observations]
+enabled = false
+[dispatcher.review_mutation]
+worktree = "warn"
+index = "block"
+head = "block"
+[dispatcher.context]
+mode = "adaptive"
+instructions = "projected"
+manifest_facts = true
+max_initial_context_bytes = 0
+max_initial_context_characters = 4096
+skills = ["apgr:go-language-profile", {id = "project:local-skill", required = true, stages = ["plan", "work"]}]
+[dispatcher.context.facts]
+language = ["go", "python"]
+test_framework = ["pytest"]
+"""
+    dispatcher = _loaded(tmp_path, body)["dispatcher"]
+    assert dispatcher["bundle"] == {"required": True}
+    assert dispatcher["observations"] == {"enabled": False}
+    assert dispatcher["review_mutation"] == {"worktree": "warn", "index": "block", "head": "block"}
+    assert dispatcher["context"]["skills"][1] == {"id": "project:local-skill", "required": True,
+                                                  "stages": ["plan", "work"]}
+    assert dispatcher["context"]["facts"] == {"language": ["go", "python"], "test_framework": ["pytest"]}
+    assert _loaded(tmp_path, "[dispatcher.review_mutation]\n") == {"dispatcher": {"review_mutation": {}}}
+
+
+@pytest.mark.parametrize("body, diagnostic", (
+    ("[dispatcher]\nbundle = 1", "supports only required"),
+    ("[dispatcher.bundle]\nrequired = 1", "bundle.required must be a boolean"),
+    ("[dispatcher.bundle]\nother = true", "supports only required"),
+    ("[dispatcher]\nobservations = 1", "supports only enabled"),
+    ("[dispatcher.observations]\nenabled = \"yes\"", "observations.enabled must be a boolean"),
+    ("[dispatcher]\ncontext = 1", "dispatcher.context must be a table"),
+    ("[dispatcher.context]\nunknown = 1", "unsupported dispatcher.context key"),
+    ("[dispatcher.context]\nmode = \"dynamic\"", "must be static or adaptive"),
+    ("[dispatcher.context]\nmax_initial_context_bytes = -1", "non-negative integers"),
+    ("[dispatcher.context]\nmax_initial_context_characters = true", "non-negative integers"),
+    ("[dispatcher.context]\nmanifest_facts = 1", "manifest_facts must be a boolean"),
+    ("[dispatcher.context]\ninstructions = \"inline\"", "projected or static"),
+    ("[dispatcher.context]\nskills = \"apgr:x\"", "at most 64 entries"),
+    ("[dispatcher.context]\nskills = [" + ", ".join(f'"apgr:s{i}"' for i in range(65)) + "]", "at most 64 entries"),
+    ("[dispatcher.context]\nskills = [1]", "an ID or a table"),
+    ("[dispatcher.context]\nskills = [{required = true}]", "an ID or a table"),
+    ("[dispatcher.context]\nskills = [{id = \"apgr:x\", why = 1}]", "an ID or a table"),
+    ("[dispatcher.context]\nskills = [{id = 7}]", "invalid qualified skill ID"),
+    ("[dispatcher.context]\nskills = [\"vendor:x\"]", "invalid qualified skill ID"),
+    ("[dispatcher.context]\nskills = [{id = \"apgr:x\", required = 1}]", "required must be a boolean"),
+    ("[dispatcher.context]\nskills = [{id = \"apgr:x\", stages = []}]", "non-empty subset"),
+    ("[dispatcher.context]\nskills = [{id = \"apgr:x\", stages = \"plan\"}]", "non-empty subset"),
+    ("[dispatcher.context]\nskills = [{id = \"apgr:x\", stages = [\"plan\", \"plan\"]}]", "non-empty subset"),
+    ("[dispatcher.context]\nskills = [{id = \"apgr:x\", stages = [\"deploy\"]}]", "non-empty subset"),
+    ("[dispatcher.context]\nskills = [\"apgr:x\", {id = \"apgr:x\"}]", "duplicate dispatcher.context.skills"),
+    ("[dispatcher.context]\nfacts = []", "facts must be a table"),
+    ("[dispatcher.context.facts]\nwork_class = [\"x\"]", "dispatcher-owned"),
+    ("[dispatcher.context.facts]\nmood = [\"x\"]", "unsupported dispatcher.context.facts kind"),
+    ("[dispatcher.context.facts]\nlanguage = \"go\"", "distinct lowercase fact values"),
+    ("[dispatcher.context.facts]\nlanguage = [\"Go\"]", "distinct lowercase fact values"),
+    ("[dispatcher.context.facts]\nlanguage = [1]", "distinct lowercase fact values"),
+    ("[dispatcher.context.facts]\nlanguage = [\"go\", \"go\"]", "distinct lowercase fact values"),
+    ("[dispatcher.context.facts]\nlanguage = [" + ", ".join(f'"l{i}"' for i in range(33)) + "]",
+     "distinct lowercase fact values"),
+    ("[dispatcher]\nreview_mutation = 1", "review_mutation configuration must be a TOML table"),
+    ("[dispatcher.review_mutation]\nstage = \"block\"", "unsupported review_mutation configuration key"),
+    ("[dispatcher.review_mutation]\nworktree = \"ignore\"", "unsupported worktree review mutation policy"),
+    ("[dispatcher.review_mutation]\nworktree = 1", "unsupported worktree review mutation policy"),
+    ("[dispatcher.review_mutation]\nindex = \"warn\"", "index review mutation policy must be 'block'"),
+    ("[dispatcher.review_mutation]\nindex = 1", "index review mutation policy must be 'block'"),
+    ("[dispatcher.review_mutation]\nhead = \"allow\"", "head review mutation policy must be 'block'"),
+    ("[dispatcher.review_mutation]\nhead = false", "head review mutation policy must be 'block'"),
+))
+def test_dispatcher_tables_refuse_unsupported_values(tmp_path, body, diagnostic):
+    with pytest.raises(config.ConfigError, match=diagnostic):
+        _loaded(tmp_path, body)
+
+
+def test_rtk_integration_round_trips_the_declared_optional_contract(tmp_path):
+    body = """
+[integrations.rtk]
+enabled = true
+executable = "/opt/rtk/bin/rtk"
+required = false
+minimum_version = " 0.9.0 "
+[integrations.rtk.providers]
+claude = "hook"
+codex = "instructions"
+antigravity = "off"
+"""
+    assert _loaded(tmp_path, body) == {"integrations": {"rtk": {
+        "enabled": True, "executable": Path("/opt/rtk/bin/rtk"), "required": False,
+        "minimum_version": "0.9.0",
+        "providers": {"claude": "hook", "codex": "instructions", "antigravity": "off"},
+    }}}
+    assert _loaded(tmp_path, "[integrations.rtk]\n") == {"integrations": {"rtk": {}}}
+    assert _loaded(tmp_path, "[integrations]\n") == {}
+
+
+@pytest.mark.parametrize("body, diagnostic", (
+    ("integrations = 1", "integrations configuration must be a TOML table"),
+    ("[integrations.other]\nx = 1", "unsupported integrations configuration key"),
+    ("[integrations]\nrtk = 1", "integrations.rtk configuration must be a TOML table"),
+    ("[integrations.rtk]\nmode = 1", "unsupported integrations.rtk configuration key"),
+    ("[integrations.rtk]\nenabled = \"yes\"", "enabled must be a boolean"),
+    ("[integrations.rtk]\nexecutable = \" \"", "executable must be a non-empty string"),
+    ("[integrations.rtk]\nexecutable = 1", "executable must be a non-empty string"),
+    ("[integrations.rtk]\nexecutable = \"~/bin/rtk\"", "cannot use ~ interpolation"),
+    ("[integrations.rtk]\nexecutable = \"$HOME/bin/rtk\"", "cannot use variable interpolation"),
+    ("[integrations.rtk]\nexecutable = \"/bin/rtk\\u0007\"", "contains a control character"),
+    ("[integrations.rtk]\nexecutable = \"bin/rtk\"", "must be an absolute path"),
+    ("[integrations.rtk]\nrequired = 1", "required must be a boolean"),
+    ("[integrations.rtk]\nrequired = true", "required=true is deferred"),
+    ("[integrations.rtk]\nminimum_version = \"\"", "minimum_version must be a non-empty string"),
+    ("[integrations.rtk]\nminimum_version = 1", "minimum_version must be a non-empty string"),
+    ("[integrations.rtk]\nproviders = 1", "providers configuration must be a TOML table"),
+    ("[integrations.rtk.providers]\ngemini = \"hook\"", "unsupported integrations.rtk.providers key"),
+    ("[integrations.rtk.providers]\nclaude = \"always\"", "providers.claude mode"),
+    ("[integrations.rtk.providers]\ncodex = 1", "providers.codex mode"),
+    ("[integrations.rtk.providers]\nantigravity = \"proxy\"", "providers.antigravity mode"),
+))
+def test_rtk_integration_refuses_unsupported_values(tmp_path, body, diagnostic):
+    with pytest.raises(config.ConfigError, match=diagnostic):
+        _loaded(tmp_path, body)
+
+
+def test_load_config_decodes_supplied_bytes_and_reports_unreadable_paths(tmp_path, monkeypatch):
+    path = tmp_path / "config.toml"
+    path.write_text('outbox_root = "/ignored"\n', encoding="utf-8")
+    assert config.load_config(path, raw_bytes=b'outbox_root = "/supplied"\n') == {"outbox_root": Path("/supplied")}
+    with pytest.raises(config.ConfigError, match="could not read"):
+        config.load_config(path, raw_bytes=b"\xff")
+    with pytest.raises(config.ConfigError, match="not an ordinary file"):
+        config.load_config(tmp_path)
+
+    def refused(self):
+        raise PermissionError(self)
+
+    monkeypatch.setattr(Path, "lstat", refused)
+    with pytest.raises(config.ConfigError, match="could not inspect configuration"):
+        config.load_config(path)

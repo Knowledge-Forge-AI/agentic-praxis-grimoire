@@ -184,7 +184,9 @@ def make_dispatcher(
     repository: Path,
     tmp_path: Path,
     runner: Any,
+    **kwargs: Any,
 ) -> Dispatcher:
+    kwargs.setdefault("review_mutation_policy", "block")
     return Dispatcher(
         root=ROOT,
         cwd=repository,
@@ -194,6 +196,7 @@ def make_dispatcher(
         scanner_executable=None,
         resolve_scanner=False,
         runner=runner,
+        **kwargs,
     )
 
 

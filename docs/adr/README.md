@@ -722,5 +722,20 @@ V0110-G.
 
 - [`0068 — Release Authority Reconciliation with Advanced Public Main and Hardened Attended Release Operator`](2026/09/0068-release-authority-reconciliation-with-advanced-public-main.md) — Accepted
 
+- [`0069 — v0.13 Program Scope and Forward Dispatcher Reference Doctrine`](2026/09/0069-v0-13-program-scope-and-dispatcher-reference-doctrine.md) — Accepted
 
+- [`0070 — Configurable Review-Stage Mutation Policy`](2026/09/0070-configurable-review-stage-mutation-policy.md) — Accepted (Amended under APG159A / V0130-A-CORR1)
 
+- [`0071 — APGR Home Layout, Relocatable Configuration and State, and Portable Hosting Seams`](2026/09/0071-apgr-home-layout-and-portable-hosting-seams.md) — Accepted (Amended under APG159A / V0130-A-CORR1)
+
+- [`0072 — Optional RTK Integration as Declared Metadata and Conditional Instruction Slices`](2026/09/0072-optional-rtk-integration-and-conditional-slices.md) — Accepted
+
+- [`0073 — Unified Skill Catalog, Sources, Namespaces, and Deterministic Resolution`](2026/09/0073-unified-skill-catalog-and-deterministic-resolution.md) — Accepted
+
+- [`0074 — Context Plan, Byte Budgets, Late Acquisition, and Bounded APGR MCP Adapter`](2026/09/0074-context-plan-byte-budgets-and-bounded-mcp-adapter.md) — Accepted with Amendment to APGR-D8 (Amended under APG159A / V0130-A-CORR1)
+
+- [`0075 — APGR Worker and Model Configuration Authority`](2026/09/0075-apgr-worker-and-model-configuration-authority.md) — Accepted (APG166S)
+
+- [`0076 — First-Party Nix Flake Publication Target`](2026/09/0076-first-party-nix-flake-publication-target.md) — Accepted with amendment (APG166ZC-NIX-DISTRIBUTION1; amended APG166ZD / V0130-I)
+
+- [`0077 — Codex parent roster and independent Sonnet pool`](2026/10/0077-codex-parent-roster-and-independent-sonnet-pool.md) — Proposed (APG166ZO candidate)

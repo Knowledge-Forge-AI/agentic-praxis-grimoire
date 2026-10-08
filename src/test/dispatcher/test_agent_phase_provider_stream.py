@@ -1408,3 +1408,34 @@ def test_an_explicitly_injected_finite_hard_bound_still_expires(
     # Advisory evidence is preserved alongside the typed expiry.
     assert expired.cleanup["stall_warnings"]["count"] >= 1
     assert expired.activity_counts["non_progress"]["unknown"] == 0
+
+
+@pytest.mark.parametrize('code', [0, 7])
+def test_default_process_hook_inert_with_normal_exit_and_failure(tmp_path, code):
+    assert provider_module.PROCESS_CREATION_HOOK.get() is None
+    argv = script(f'import sys\nsys.stdout.buffer.write(sys.stdin.buffer.read())\nsys.stderr.write("diagnostic")\nsys.exit({code})\n', tmp_path)
+    result = provider_module.run(argv, b'payload', tmp_path)
+    assert result.exit_code == code
+    assert result.stdout == b'payload'
+    assert result.stderr == b'diagnostic'
+    assert result.cleanup['wrapper_reaped'] is True
+    assert result.cleanup['readers_joined'] is True
+    assert provider_module.PROCESS_CREATION_HOOK.get() is None
+
+
+def test_process_hook_exception_reaps_created_child(tmp_path):
+    observed = []
+    def fail(process, argv, cwd, env):
+        observed.append(process)
+        assert argv == process.args
+        raise RuntimeError('hook failed')
+    token = provider_module.PROCESS_CREATION_HOOK.set(fail)
+    try:
+        with pytest.raises(RuntimeError, match='hook failed'):
+            provider_module.run(script('import time\ntime.sleep(60)\n', tmp_path), b'', tmp_path)
+    finally:
+        provider_module.PROCESS_CREATION_HOOK.reset(token)
+    assert len(observed) == 1
+    assert observed[0].poll() is not None
+    with pytest.raises(ProcessLookupError):
+        os.kill(observed[0].pid, 0)

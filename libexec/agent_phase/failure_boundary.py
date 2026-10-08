@@ -33,6 +33,14 @@ def _publication_boundary(state: dict[str, Any], entry: Any, raw: str, carried: 
     return publication, sorted(carried - excluded - set(ambiguous))
 
 
+def interrupted_residue(state: dict[str, Any]) -> set[str]:
+    """Paths a killed stage may have written; only manager challenges own them."""
+    if not state.get("resumed"):
+        return set()
+    boundary = (state.get("resume") or {}).get("resume_boundary") or {}
+    return set(boundary.get("interrupted_residue_paths", ()))
+
+
 class FailureBoundaryError(RuntimeError):
     def __init__(self, code: str, detail: str) -> None:
         super().__init__(f"{code}: {detail}")
@@ -90,6 +98,15 @@ def record_manager_attention(
             disp["paths"] = list(paths)
 
 
+def manifest_base(state: dict[str, Any], entry: Any) -> str:
+    """Use the same cumulative base as publication ownership."""
+    if state.get("path_ownership"):
+        return state["path_ownership"]["entry_tree"]
+    if state.get("entry_adoption"):
+        return state["entry_adoption"]["base_tree"]
+    return (state.get("resume") or {}).get("source_entry_tree", entry.tree)
+
+
 def record_mutating_failure(
     state: dict[str, Any],
     entry: Any,
@@ -108,7 +125,8 @@ def record_mutating_failure(
         if isinstance(manifest, dict):
             gitstate_module.validate_candidate_manifest(manifest)
             carried.update(manifest["paths"])
-        overlap = ({change.path for change in boundary_delta} & set(entry.dirty)) - adoption.paths(state)
+        residue = interrupted_residue(state)
+        overlap = ({change.path for change in boundary_delta} & set(entry.dirty)) - adoption.paths(state) - residue
         if state.get("resumed"):
             overlap -= carried
         if overlap:
@@ -121,9 +139,7 @@ def record_mutating_failure(
                 paths=overlap_paths,
                 candidate_tree=candidate_tree,
             )
-            carried.update(c.path for c in boundary_delta if c.path not in overlap)
-        else:
-            carried.update(c.path for c in boundary_delta)
+        carried.update(c.path for c in boundary_delta if c.path not in overlap | residue)
         publication_tree, owned = _publication_boundary(state, entry, candidate_tree, carried)
         if state.get("unclaimed_deletion_paths"):
             record_manager_attention(state, reason="path_ownership_required",
@@ -132,12 +148,7 @@ def record_mutating_failure(
         head_delta = gitstate_module.phase_delta(entry.root, entry.head, publication_tree)
         phase_delta = [c for c in head_delta if c.path in carried]
         owned = sorted(carried)
-        base_tree = entry.tree
-        resume = state.get("resume")
-        if isinstance(resume, dict) and isinstance(resume.get("source_entry_tree"), str):
-            base_tree = resume["source_entry_tree"]
-        if state.get("path_ownership"):
-            base_tree = state["path_ownership"]["entry_tree"]
+        base_tree = manifest_base(state, entry)
         closed_manifest = gitstate_module.candidate_manifest(entry.root, base_tree, publication_tree, paths=owned)
         current_head = gitstate_module.current_head(entry.root)
         uncommitted = [c for c in gitstate_module.phase_delta(entry.root, current_head, candidate_tree) if c.path in carried]
@@ -219,7 +230,8 @@ def capture_mutating_boundary(
         if isinstance(manifest, dict):
             gitstate_module.validate_candidate_manifest(manifest)
             carried.update(manifest["paths"])
-        overlap = ({change.path for change in boundary_delta} & set(entry.dirty)) - adoption.paths(state)
+        residue = interrupted_residue(state)
+        overlap = ({change.path for change in boundary_delta} & set(entry.dirty)) - adoption.paths(state) - residue
         if state.get("resumed"):
             overlap -= carried
         if overlap:
@@ -232,13 +244,11 @@ def capture_mutating_boundary(
                 paths=overlap_paths,
                 candidate_tree=candidate_tree,
             )
-            carried.update(
-                change.path
-                for change in boundary_delta
-                if change.path not in overlap
-            )
-        else:
-            carried.update(change.path for change in boundary_delta)
+        carried.update(
+            change.path
+            for change in boundary_delta
+            if change.path not in overlap | residue
+        )
         publication_tree, owned = _publication_boundary(state, entry, candidate_tree, carried)
         carried = set(owned)
         head_delta = gitstate_module.phase_delta(
@@ -246,14 +256,7 @@ def capture_mutating_boundary(
         )
         phase_delta = [change for change in head_delta if change.path in carried]
         owned = sorted(carried)
-        base_tree = entry.tree
-        resume = state.get("resume")
-        if isinstance(resume, dict) and isinstance(
-            resume.get("source_entry_tree"), str
-        ):
-            base_tree = resume["source_entry_tree"]
-        if state.get("path_ownership"):
-            base_tree = state["path_ownership"]["entry_tree"]
+        base_tree = manifest_base(state, entry)
         closed_manifest = gitstate_module.candidate_manifest(
             entry.root, base_tree, publication_tree, paths=owned
         )

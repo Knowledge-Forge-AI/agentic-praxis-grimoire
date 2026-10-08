@@ -88,18 +88,8 @@ def _default_endpoint_capabilities(endpoint_alias: str, provider: str, profile: 
     )
 
 
-def load_capabilities(root: Path | None = None) -> dict[str, EndpointCapabilities]:
-    """Load endpoint capability metadata from common/dispatcher/capabilities.toml."""
-    repository_root = root or Path(__file__).resolve().parents[2]
-    source_path = repository_root / CAPABILITIES_SOURCE
-    if not source_path.is_file():
-        return {}
-    try:
-        raw_text = source_path.read_text(encoding="utf-8")
-        data = tomllib.loads(raw_text)
-    except (OSError, UnicodeDecodeError, tomllib.TOMLDecodeError) as error:
-        raise CapabilityError(f"cannot read capabilities from {source_path}: {error}") from error
-
+def parse_capabilities(data: dict[str, Any]) -> dict[str, EndpointCapabilities]:
+    """Parse endpoints table from validated capabilities TOML dictionary."""
     if not isinstance(data, dict):
         raise CapabilityError("capabilities file must be a TOML table")
     if data.get("schema") != CAPABILITIES_SCHEMA:
@@ -139,3 +129,32 @@ def load_capabilities(root: Path | None = None) -> dict[str, EndpointCapabilitie
             posture=posture,
         )
     return result
+
+
+def load_capabilities(
+    root: Path | None = None,
+    apgr_home: Path | str | None = None,
+    roster: Any | None = None,
+) -> dict[str, EndpointCapabilities]:
+    """Load endpoint capability metadata from operator bundle or common/dispatcher/capabilities.toml."""
+    if roster is not None and getattr(roster, "capabilities_catalog", None) is not None:
+        return dict(roster.capabilities_catalog)
+
+    source_path: Path | None = None
+    from .config_routing import resolve_global_home
+    op_home = resolve_global_home(apgr_home)
+    op_disp = op_home / "dispatcher"
+    if op_disp.is_dir() and (op_disp / "capabilities.toml").is_file():
+        source_path = op_disp / "capabilities.toml"
+    if source_path is None:
+        repository_root = root or Path(__file__).resolve().parents[2]
+        source_path = repository_root / CAPABILITIES_SOURCE
+    if not source_path.is_file():
+        return {}
+    try:
+        raw_text = source_path.read_text(encoding="utf-8")
+        data = tomllib.loads(raw_text)
+    except (OSError, UnicodeDecodeError, tomllib.TOMLDecodeError) as error:
+        raise CapabilityError(f"cannot read capabilities from {source_path}: {error}") from error
+
+    return parse_capabilities(data)

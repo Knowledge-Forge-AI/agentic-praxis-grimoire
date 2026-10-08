@@ -1,0 +1,157 @@
+{
+  "schema_version": "apg.context-eval-metrics/v1",
+  "description": "Frozen evaluation metric definitions, mathematical formulas, acceptance thresholds, cohort memberships, and quality oracles for APGR v0.13 adaptive context evaluation.",
+  "frozen_at": "2026-09-20T22:11:45Z",
+  "phase": "APG159A",
+  "milestone": "V0130-A-CORR1",
+  "enforcement_status": "planned",
+  "measurement_standards": {
+    "units": "controlled UTF-8 bytes and Unicode characters",
+    "delivery_event_accounting": {
+      "initial_delivery": "Initial prompt, provider instructions, mandatory doctrine, tool definitions, and turn-1 skill bodies",
+      "mandatory_instruction_overhead": "Provider-specific instruction files (e.g. codex/AGENTS.md 7,939 B, claude/CLAUDE.md 11,071 B, antigravity/GEMINI.md 4,238 B)",
+      "tool_schema_overhead": "Provider-native tool declaration payloads for MCP and CLI adapters",
+      "late_recovery_delivery": "Exact skill bodies delivered on demand via MCP tool call or CLI stdout during subsequent turns",
+      "repeat_delivery": "Actual second transmissions of previously delivered skill bodies count again in cumulative delivery metrics; overlapping representations of a single event are not double-counted"
+    },
+    "token_overhead_policy": {
+      "provider_native_tokens": "unavailable",
+      "heuristic_token_estimation": "strictly_prohibited",
+      "policy_rule": "APGR-controlled bytes are never generalized to total tokens. Missing provider token measurements remain unavailable and cannot pass promotion gates."
+    }
+  },
+  "formulas": {
+    "initial_controlled_byte_savings": {
+      "formula": "1.0 - (adaptive_initial / static_initial)",
+      "denominator_requirement": "static_initial must be strictly positive (> 0)",
+      "cohort": "savings_eligible_cohort",
+      "target_threshold": "median >= 0.20 (20% reduction) evaluated over savings_eligible_cohort members {06, 08, 09, 10, 11, 15}; savings_eligible_calibration_subset {01, 02, 04} is development-only and never feeds the default-flip decision",
+      "unit": "ratio",
+      "mandatory": true
+    },
+    "cumulative_controlled_byte_growth": {
+      "formula": "(adaptive_cumulative / static_cumulative) - 1.0",
+      "percentile_method": "nearest-rank p95: sort n finite observations in ascending order, index = ceil(0.95 * n) - 1",
+      "cohort": "savings_eligible_cohort",
+      "target_threshold": "nearest-rank p95 <= 0.10 (10% ceiling) evaluated over savings_eligible_cohort members {06, 08, 09, 10, 11, 15}",
+      "unit": "ratio",
+      "mandatory": true
+    },
+    "missing_data_rule": "A required paired measurement that is unavailable fails the gate; it is never imputed, defaulted to zero, or excluded post hoc."
+  },
+  "cohorts": {
+    "calibration_cohort": [
+      "scenario-01",
+      "scenario-02",
+      "scenario-03",
+      "scenario-04",
+      "scenario-05"
+    ],
+    "acceptance_cohort": [
+      "scenario-06",
+      "scenario-07",
+      "scenario-08",
+      "scenario-09",
+      "scenario-10",
+      "scenario-11",
+      "scenario-12",
+      "scenario-13",
+      "scenario-14",
+      "scenario-15"
+    ],
+    "savings_eligible_cohort": [
+      "scenario-06",
+      "scenario-08",
+      "scenario-09",
+      "scenario-10",
+      "scenario-11",
+      "scenario-15"
+    ],
+    "savings_eligible_calibration_subset": [
+      "scenario-01",
+      "scenario-02",
+      "scenario-04"
+    ],
+    "correctness_failure_only_cohort": [
+      "scenario-03",
+      "scenario-07",
+      "scenario-12",
+      "scenario-13",
+      "scenario-14"
+    ],
+    "fallback_cohort": [
+      "scenario-05",
+      "scenario-13"
+    ]
+  },
+  "metrics": {
+    "initial_controlled_delivered_bytes": {
+      "definition": "Total controlled UTF-8 bytes delivered to the provider prompt, mandatory doctrine, and tool definitions on turn 1 of an actor binding.",
+      "unit": "bytes",
+      "target_threshold": ">= 20% median reduction compared to paired static baseline on savings_eligible_cohort",
+      "accounting_standard": "apg.context-footprint/v1",
+      "mandatory": true
+    },
+    "cumulative_controlled_delivered_bytes": {
+      "definition": "Cumulative controlled UTF-8 bytes delivered across all turns of an actor binding, including initial prompt, tool schemas, and late-acquired skill bodies.",
+      "unit": "bytes",
+      "target_threshold": "<= 10% nearest-rank p95 growth compared to paired static baseline on savings_eligible_cohort",
+      "accounting_standard": "apg.context-footprint/v1",
+      "mandatory": true
+    },
+    "miss_recovery_rate": {
+      "definition": "Proportion of deliberately withheld or deferred applicable skills that are successfully discovered and acquired on demand when required.",
+      "unit": "ratio",
+      "target_threshold": "1.0 (100% exact recovery on all mandatory recovery scenarios: 10, 11, 12, 14)",
+      "mandatory": true
+    },
+    "exact_body_identity": {
+      "definition": "Cryptographic equality between the SHA-256 hash of the late-acquired skill body and the canonical source skill body.",
+      "unit": "boolean",
+      "target_threshold": "true (zero tolerance for truncated, hallucinated, or modified skill bodies)",
+      "mandatory": true
+    },
+    "authority_preservation": {
+      "definition": "Verification that read-only actor bindings execute zero repository mutations, zero index modifications, and zero HEAD moves during late acquisition.",
+      "unit": "boolean",
+      "target_threshold": "true (zero authority regressions allowed across all scenarios)",
+      "mandatory": true
+    }
+  },
+  "oracles": {
+    "git_immutability_oracle": {
+      "description": "Asserts worktree, index, and HEAD identities match before and after read-only turns unless worktree drift is explicitly dispositioned under policy.",
+      "enforced_by": "observe_review_drift (planned for V0130-B)"
+    },
+    "mandatory_doctrine_oracle": {
+      "description": "Asserts non-negotiable repository doctrine (authority rules, review restrictions) is present in 100% of delivered context payloads regardless of budget limits.",
+      "enforced_by": "context_planner (planned for V0130-F)"
+    },
+    "deterministic_reproducibility_oracle": {
+      "description": "Asserts identical semantic inputs (run ID, binding, attempt, repo state) produce byte-identical context plans.",
+      "enforced_by": "skills.Resolve (planned for V0130-E)"
+    },
+    "quality_task_outcome_oracle": {
+      "description": "Asserts scenario execution completes with substantive task correctness matching expected output, not merely terminating with status 'completed'.",
+      "enforced_by": "phase_verifier (planned for V0130-H)"
+    }
+  },
+  "correction_revision": "APG159A-CORR1 (supersedes the APG159 numerical freeze retained in history)",
+  "cohort_id_vocabulary": [
+    "acceptance_cohort",
+    "calibration_cohort",
+    "correctness_failure_only_cohort",
+    "fallback_cohort",
+    "savings_eligible_calibration_subset",
+    "savings_eligible_cohort"
+  ],
+  "value_source_vocabulary": {
+    "measured": "Exact byte count reproduced from a named file at the recorded tree by a stated command.",
+    "synthetic": "Byte count of a synthetic fixture body embedded verbatim in the scenario; never evidence of canonical corpus savings.",
+    "estimate": "Planning placeholder with no measurement command; must be replaced by a measured value before it feeds any gate.",
+    "declared": "A frozen scenario parameter (for example a budget) chosen by the correction revision, not a measurement.",
+    "unavailable": "Required data that no qualified measurement supplies; never treated as zero."
+  },
+  "synthetic_input_rule": "Scenarios with synthetic_inputs=true (08, 09) contribute paired ratios computed over identical synthetic inputs in both arms. The default-flip gate is evaluated twice: over the full savings_eligible_cohort and over the subset excluding synthetic-input scenarios. Both evaluations must pass; the smaller n is disclosed.",
+  "small_sample_disclosure": "savings_eligible_cohort has n=6 (n=4 excluding synthetic-input scenarios; n=3 if scenario 15 remains contingent). With n<=6 the nearest-rank p95 is the maximum observation. This is an engineering gate, not a statistical population guarantee."
+}

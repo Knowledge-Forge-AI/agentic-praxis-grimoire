@@ -92,6 +92,17 @@ def test_all_shipped_workflows_structural_assertion() -> None:
     assert doc_pr.get("permissions") == {"contents": "read"}
     assert "pull_request" in doc_pr.get("on", {})
     assert "public-pr-gate" in doc_pr["jobs"]
+    assert "nix" in doc_pr["jobs"]
+
+    nix_job = doc_pr["jobs"]["nix"]
+    assert nix_job["runs-on"] == "${{ matrix.os }}"
+    assert "guard" in nix_job.get("needs", [])
+    nix_matrix = nix_job["strategy"]["matrix"]["include"]
+    assert {(c["os"], c["system"]) for c in nix_matrix} == {
+        ("ubuntu-latest", "x86_64-linux"),
+        ("macos-15", "aarch64-darwin"),
+    }
+    assert "nix" in doc_pr["jobs"]["public-pr-gate"]["needs"]
 
     # 2. release.yml structural assertion
     doc_rel = parse_yaml_or_json(RELEASE_WORKFLOW_PATH.read_text(encoding="utf-8"))
@@ -103,6 +114,24 @@ def test_all_shipped_workflows_structural_assertion() -> None:
 
     # 3. Structural and topology validation via existing ci_topology tool
     assert validate_all_workflows() == []
+
+
+def test_public_pr_nix_job_structure() -> None:
+    doc_pr = parse_yaml_or_json(WORKFLOW_PATH.read_text(encoding="utf-8"))
+    nix_job = doc_pr["jobs"]["nix"]
+    step_uses = [step.get("uses") for step in nix_job["steps"] if "uses" in step]
+    assert any("checkout" in u for u in step_uses)
+    assert any("install-nix-action" in u for u in step_uses)
+
+    step_runs = [step.get("run", "") for step in nix_job["steps"]]
+    exercise_step = next(run for run in step_runs if "nix flake check" in run)
+    assert "--no-update-lock-file" in exercise_step
+    assert "--no-write-lock-file" in exercise_step
+    assert "apg-qualify-nix eval-foreign" in exercise_step
+    assert "--native" in exercise_step
+
+    emit_step = next(run for run in step_runs if "matrix_receipts.py emit" in run)
+    assert 'nix-$CI_SYSTEM' in emit_step
 
 
 def test_package_export_copies_only_distribution_artifacts(tmp_path):

@@ -25,7 +25,8 @@ and pending finding dispositions block readiness; hosted acceptance is unobserve
 1. **Standard GitHub-hosted runners only**:
    Static, packaging, scanner, and CodeQL jobs execute on standard `ubuntu-latest`
    GitHub-hosted runners. The canonical APGR suite runs on standard `macos-15`
-   arm64 because its qualified Node and browser inputs are Darwin-specific. No
+   arm64 because its qualified Node and browser inputs are Darwin-specific. The `nix`
+   job exercises both `ubuntu-latest` (`x86_64-linux`) and `macos-15` (`aarch64-darwin`). No
    self-hosted runners, ephemeral private runners, or Tart VM orchestrators are used.
 
 2. **Least privilege permissions**:
@@ -128,8 +129,16 @@ The maintained `bin/apg-check-change-size` checker remains owned by the separate
 `testing/apg-change-size-policy.json`. The static runner does not apply a copied
 whole-history line-count baseline to inherited release evidence.
 
-Missing applicable tools fail closed with classification `tool-failure`. No automatic
-debt baseline is accepted by this lane, and mass reformatting is prohibited. Evidence logs are capped at 200 KB per check, sealed in
+Missing applicable tools fail closed with classification `tool-failure`, and mass
+reformatting is prohibited. No automatic baseline refresh or growth and no count-only
+debt waiver is accepted. For v0.13, exactly 512 reviewed pre-existing Ruff findings
+are grandfathered under schema `apg-ruff-baseline-v2`; their exact identity binds
+path, rule, row, column, source-derived context hash, and message. The baseline
+artifact is pinned by cryptographic digest, count, and provenance in the v0.13 release
+authority. New, moved, or content-changed findings fail closed; finding reductions
+pass without baseline edits; and future baseline changes require an intentional
+versioned release-policy change. This is grandfathering of visible debt, not a claim
+that the debt is fixed. Evidence logs are capped at 200 KB per check, sealed in
 an evidence envelope (<= 5 MB total), and verified via SHA-256 manifest.
 
 ## Syft SBOM and Grype vulnerability policy
@@ -186,7 +195,7 @@ Member jobs are wired to existing repository commands:
 - `static-analysis`: `tools/ci/run_pre_review.py`
 - `policy`: `bin/apg-check-skill-library`, `bin/apg-check-record-identity`, `bin/apg-check-change-size`
 - `unit-integration`: `bin/apg-test policy` followed by
-  `bin/apg-test unit-integration --public-version 0.12.0` using the bootstrapped runtime. This explicit public mode uses the versioned release owner's six exact private-history deselections; public behavioral fixture companions run, and component/union thresholds remain unchanged
+  `bin/apg-test unit-integration --public-version 0.13.0` using the bootstrapped runtime. This explicit public mode uses the versioned release owner's six exact private-history deselections; public behavioral fixture companions run, and component/union thresholds remain unchanged
 - `closure`: both normal and `--require-zero` roadmap-closure modes
 - `go`: `go test ./...`, `go vet ./...`, `go test -race ./...`
 - `package`: all three Go targets, the maintained Python and npm builders,
@@ -195,6 +204,13 @@ Member jobs are wired to existing repository commands:
 - `sbom-and-vulnerability`: source and actual deliverable SBOMs, exact target records, and a
   separate Grype scan of each SBOM with database freshness and finding checks
 - `codeql`: Advanced CodeQL matrix
+- `nix`: First-party Nix flake qualification across native runners (`x86_64-linux` on `ubuntu-latest` and `aarch64-darwin` on `macos-15`)
+
+The `nix` matrix job runs the flake checks against the exact built store output
+on native `x86_64-linux` and `aarch64-darwin`, evaluates/instantiates the other
+declared systems via `python3 bin/apg-qualify-nix eval-foreign`, native
+`aarch64-linux` execution is not covered by hosted CI, and no binary cache is
+used. No hosted success is claimed.
 
 Every completed member job attempts to emit an identity-bound receipt (`*-receipt.json`) with its actual
 success, failure, cancellation, or skip status. Each CodeQL language has a distinct
@@ -219,10 +235,11 @@ at least one current approval with stale approvals dismissed, an up-to-date bran
 and the following exact required checks from GitHub Actions: `guard`,
 `static-analysis`, `policy`, `unit-integration`, `closure`, `go`, `package`,
 `sbom-and-vulnerability`, `codeql (go)`, `codeql (python)`,
-`codeql (javascript-typescript)`, `codeql (actions)` and `public-pr-gate`.
+`codeql (javascript-typescript)`, `codeql (actions)`, `nix (x86_64-linux)`,
+`nix (aarch64-darwin)`, and `public-pr-gate`.
 Require CodeQL code-scanning merge protection at **High or higher** security
 severity and **Errors** alert severity. Permit squash promotion only, with subject
-`Release v0.12.0`; disallow force pushes and deletion of protected release history.
+`Release v0.13.0`; disallow force pushes and deletion of protected release history.
 Verify public `main` still equals the accepted public base immediately before
 merge. A moved base requires a newly bound candidate and qualification.
 
@@ -247,7 +264,7 @@ bootstrap and helper boundary tests remain qualification concerns.
 
 The suppression inventory records observations, not approvals. Entries lacking
 an accepted, specific, owned and unexpired decision deliberately block the
-static lane. An observed baseline does not grandfather them. No second
+static lane. An observed suppression baseline does not grandfather them. No second
 baseline allowance overrides this decision check.
 
 The enforced SBOM coverage policy is `scan.coverage`: source Go/npm inventories,
@@ -265,12 +282,12 @@ Python-shebang entry scripts in bin. It records excluded artifact classes and
 refuses missing, unreadable or empty inputs. The public prospective capture
 tracks new candidate files before scanning; development HEAD alone is insufficient.
 
-Eighteen existing oversized READINESS2 files have individual content-bound entry
-allowances. Each remains visible retained debt; growth above its bound and new
-unlisted oversized files fail. Allowances cannot transfer on removal or increase
-automatically. Reviewed reductions may tighten bounds; retire an allowance once
-its file falls to the ordinary limit. This is a no-growth migration, with no
-promise or authorization of a later refactoring campaign.
+Forty-five existing oversized files have individual line-count no-growth entry
+allowances under schema `apg-file-length-policy-v2`. Each remains visible retained debt;
+growth above its line bound and new unlisted oversized files fail. Allowances cannot transfer
+on removal or increase automatically. Content changes and reviewed reductions below the bound
+pass cleanly; retire an allowance once its file falls to the ordinary limit. This is a no-growth
+migration, with no promise or authorization of a later refactoring campaign.
 
 Suppression result schema `apg-scanner-suppression-inventory-v3` uses Python
 comment tokens and a hash of the owning statement and enclosing scope names.
@@ -282,9 +299,11 @@ work-review verification under Manager Decision C; all 225 active directives hav
 owners, reasons, and expiry 2026-12-31. Other formats use bounded quote-aware line-comment
 recognition, not a general language parser.
 
-BetterLeaks observations retain the raw count. Three manager-reviewed nonsecret
-contexts are reconciled by exact path/rule/source-line/context hashes: two
-synthetic redaction inputs and one public integrity digest. The aggregate reports
+BetterLeaks observations retain the raw count. Eleven reviewed nonsecret
+contexts are reconciled by exact path/rule/source-line/context hashes: three
+synthetic redaction inputs, one public integrity digest, and seven SHA-256
+file-content digests in sealed evaluation records whose file names trigger the
+generic key rule. The aggregate reports
 `reviewed_nonsecret`, unresolved observations and unmatched dispositions separately.
 Changed or additional matches inherit no allowance. Full redaction remains enabled;
 source bytes are hashed in memory and scanner payloads are not retained in logs.

@@ -15,6 +15,7 @@ import re
 import shutil
 import stat
 import subprocess
+import sys
 import time
 from uuid import uuid4
 
@@ -28,7 +29,14 @@ ALLOWLIST = ("bin/", "libexec/", "common/dispatcher/", "common/workers/",
              "common/skills/agent-worker/", "common/mcp.toml", "codex/profiles/",
              "codex/config.d/170-subagents.toml", "codex/AGENTS.md",
              "claude/profiles/", "claude/model-catalog-v1.json", "claude/CLAUDE.md",
-             "antigravity/profiles/", "antigravity/GEMINI.md", "README.md", "tools/add_dispatcher_roster_operator_directions.py")
+             "claude/instruction-fragments-v1.json",
+             "antigravity/profiles/", "antigravity/GEMINI.md", "README.md", "tools/add_dispatcher_roster_operator_directions.py",
+             "src/agentic_praxis_grimoire/__init__.py", "src/agentic_praxis_grimoire/paths.py",
+             "src/agentic_praxis_grimoire/config.py", "src/agentic_praxis_grimoire/rtk.py",
+             "src/agentic_praxis_grimoire/go_bridge.py",
+             "src/agentic_praxis_grimoire/acquisition.py",
+             "src/agentic_praxis_grimoire/resources/skill-metadata.json",
+             "src/agentic_praxis_grimoire/version.py", "src/agentic_praxis_grimoire/VERSION")
 
 
 class GenerationError(RuntimeError):
@@ -56,17 +64,61 @@ def canonical_root_sha256(root: Path) -> str:
     return hashlib.sha256(str(canonical_root(root)).encode()).hexdigest()
 
 
-def resolve_controller_dir(root: Path, store: Path | None = None) -> Path:
+def resolve_controller_dir(
+    root: Path,
+    store: Path | None = None,
+    apgr_home: Path | str | None = None,
+    *,
+    lookup_only: bool = True,
+    commit: str | None = None,
+) -> Path:
     if store is not None:
         return Path(store).expanduser().absolute()
-    base = Path(os.environ.get("AGENT_CENTRAL_GENERATION_STORE",
-                               "~/.local/state/agent-central/generations")).expanduser().absolute()
-    return base / canonical_root_sha256(root)
+
+    explicit = None
+    if "APGR_GENERATION_STORE" in os.environ:
+        val = os.environ["APGR_GENERATION_STORE"]
+        if val:
+            explicit = val
+    elif "AGENT_CENTRAL_GENERATION_STORE" in os.environ:
+        val = os.environ["AGENT_CENTRAL_GENERATION_STORE"]
+        if val:
+            explicit = val
+
+    if explicit:
+        base = Path(explicit).expanduser().absolute()
+        return base / canonical_root_sha256(root)
+
+    try:
+        from agent_phase.config_routing import resolve_home_with_provenance
+    except ImportError:
+        from agentic_praxis_grimoire.home import resolve_home_with_provenance
+
+    home, source = resolve_home_with_provenance(cli_home=apgr_home)
+    target = (home / "generations" / canonical_root_sha256(root)).absolute()
+
+    if lookup_only and source == "default":
+        legacy_store = (
+            Path("~/.local/state/agent-central/generations").expanduser().absolute()
+            / canonical_root_sha256(root)
+        )
+        if legacy_store.is_dir():
+            if commit is not None:
+                if (legacy_store / "objects" / commit).exists() and not (target / "objects" / commit).exists():
+                    return legacy_store
+            elif (legacy_store / "objects").exists() and not (target / "objects").exists():
+                return legacy_store
+            elif not target.exists():
+                return legacy_store
+
+    return target
 
 
 def no_symlinks(path: Path) -> None:
     for part in (path, *path.parents):
         if part.is_symlink():
+            if sys.platform == "darwin" and str(part) in ("/var", "/tmp", "/etc") and part != path:
+                continue
             raise StoreSecurityError("store path is a symlink")
         if part.exists():
             info = part.stat()
@@ -94,8 +146,8 @@ def _outside_repositories(path: Path, root: Path) -> None:
 
 
 @contextmanager
-def coordinate(root: Path, store: Path | None = None, *, timeout: float | None = None):
-    controller = resolve_controller_dir(root, store)
+def coordinate(root: Path, store: Path | None = None, apgr_home: Path | str | None = None, *, timeout: float | None = None):
+    controller = resolve_controller_dir(root, store, apgr_home=apgr_home, lookup_only=False)
     _outside_repositories(controller, canonical_root(root))
     # Parent directories are never chmod'ed. The selected store itself is private.
     private_directory(controller)
@@ -302,15 +354,25 @@ def _validate_payload(target: Path, objects: dict) -> None:
         raise GenerationValidationError("generation membership mismatch")
 
 
-def validate_generation(record: dict, controller_dir: Path) -> bool:
+def _require_private_directory(path: Path) -> None:
+    no_symlinks(path)
+    if not path.exists():
+        raise GenerationValidationError(f"generation store directory missing: {path}")
+    info = path.lstat()
+    if (not stat.S_ISDIR(info.st_mode) or info.st_uid != os.getuid()
+            or stat.S_IMODE(info.st_mode) != 0o700):
+        raise StoreSecurityError("store directory is nonprivate or group/world writable")
+
+
+def validate_generation(record: dict, controller_dir: Path, apgr_home: Path | str | None = None) -> bool:
     if not isinstance(record, dict) or record.get("schema") != SCHEMA_GENERATION or record.get("safety_established") is not True:
         raise GenerationValidationError("invalid generation record")
     commit = record.get("commit")
     if not isinstance(commit, str) or not re.fullmatch(r"(?:[0-9a-f]{40}|[0-9a-f]{64})", commit):
         raise GenerationValidationError("invalid generation commit")
-    private_directory(controller_dir)
+    _require_private_directory(controller_dir)
     for name in ("objects", "records", "manifests"):
-        private_directory(controller_dir / name)
+        _require_private_directory(controller_dir / name)
     target = controller_dir / "objects" / commit
     no_symlinks(target)
     if record.get("generation_root") != str(target) or not target.is_dir():
@@ -318,7 +380,7 @@ def validate_generation(record: dict, controller_dir: Path) -> bool:
     root = canonical_root(Path(record["controller_root"]))
     if record.get("controller_id") != canonical_root_sha256(root):
         raise GenerationValidationError("controller identity mismatch")
-    if resolve_controller_dir(root) != controller_dir:
+    if resolve_controller_dir(root, apgr_home=apgr_home, commit=commit) != controller_dir:
         # Explicit stores used by callers still bind through their record root.
         stored = json.loads(_read_private(controller_dir / "records" / (commit + ".json")))
         if stored.get("controller_root") != str(root):

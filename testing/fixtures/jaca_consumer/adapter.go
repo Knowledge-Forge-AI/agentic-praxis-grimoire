@@ -2,6 +2,7 @@ package jacaconsumer
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"slices"
 
@@ -10,6 +11,7 @@ import (
 	"github.com/Knowledge-Forge-AI/agentic-praxis-grimoire/phase"
 	"github.com/Knowledge-Forge-AI/agentic-praxis-grimoire/provider"
 	"github.com/Knowledge-Forge-AI/agentic-praxis-grimoire/routing"
+	"github.com/Knowledge-Forge-AI/agentic-praxis-grimoire/schema"
 )
 
 // CallerPhaseRequest represents the consumer-owned request structure.
@@ -81,6 +83,64 @@ type CallerObservationFact struct {
 type CallerConformanceSummary struct {
 	RowCount          int      `json:"row_count"`
 	SupportedFamilies []string `json:"supported_families"`
+}
+
+// CallerObservationLimitation captures consumer-owned observation limitation facts.
+type CallerObservationLimitation struct {
+	Kind   string `json:"kind"`
+	Detail string `json:"detail"`
+}
+
+// CallerReviewMutationObservationFact captures consumer-owned review mutation observation facts.
+type CallerReviewMutationObservationFact struct {
+	Stage                           string                        `json:"stage"`
+	AttemptID                       string                        `json:"attempt_id,omitempty"`
+	BindingID                       string                        `json:"binding_id,omitempty"`
+	AttemptNumber                   int                           `json:"attempt_number,omitempty"`
+	Role                            string                        `json:"role,omitempty"`
+	SubjectKind                     string                        `json:"subject_kind,omitempty"`
+	Limitations                     []CallerObservationLimitation `json:"limitations,omitempty"`
+	WorktreePolicy                  string                        `json:"worktree_policy"`
+	IndexPolicy                     string                          `json:"index_policy"`
+	HeadPolicy                      string                          `json:"head_policy"`
+	PolicyGeneration                int                             `json:"policy_generation"`
+	RawStdoutArtifact               string                          `json:"raw_stdout_artifact,omitempty"`
+	RawStderrArtifact               string                          `json:"raw_stderr_artifact,omitempty"`
+	SubjectDriftObserved            bool                            `json:"subject_drift_observed"`
+	WorktreeDrift                   bool                            `json:"worktree_drift"`
+	IndexDrift                      bool                            `json:"index_drift"`
+	HeadDrift                       bool                            `json:"head_drift"`
+	CandidateObservationUnavailable bool                            `json:"candidate_observation_unavailable,omitempty"`
+	IndexObservationUnavailable     bool                            `json:"index_observation_unavailable,omitempty"`
+	HeadObservationUnavailable      bool                            `json:"head_observation_unavailable,omitempty"`
+	WorktreePaths                   []string                        `json:"worktree_paths,omitempty"`
+	IndexPaths                      []string                        `json:"index_paths,omitempty"`
+	DiagnosticCode                  string                          `json:"diagnostic_code,omitempty"`
+	ActionTaken                     string                          `json:"action_taken"`
+	Sequence                        int                             `json:"sequence,omitempty"`
+	PathsComplete                   bool                            `json:"paths_complete,omitempty"`
+	Detail                          string                          `json:"detail,omitempty"`
+}
+
+// CallerSchemaManifest represents consumer-owned schema manifest facts.
+type CallerSchemaManifest struct {
+	Schema      string `json:"schema"`
+	Version     int    `json:"version"`
+	TablesCount int    `json:"tables_count"`
+}
+
+// CallerRunRecord represents consumer-owned run record facts.
+type CallerRunRecord struct {
+	RunID           string `json:"run_id"`
+	Project         string `json:"project"`
+	PhaseID         string `json:"phase_id,omitempty"`
+	SchemaVersion   int    `json:"schema_version"`
+	RequestSchema   string `json:"request_schema"`
+	WorkflowVersion string `json:"workflow_version"`
+	Lifecycle       string `json:"lifecycle"`
+	ExecutionMode   string `json:"execution_mode"`
+	Status          string `json:"status"`
+	Outcome         string `json:"outcome,omitempty"`
 }
 
 // ConsumerAdapter wraps public APGR Go libraries into consumer-owned operations.
@@ -297,3 +357,125 @@ func (a *ConsumerAdapter) VerifyProviderMatrix(ctx context.Context, matrixData [
 		SupportedFamilies: fams,
 	}, nil
 }
+
+// ValidateReviewMutationObservation verifies a review mutation observation using package evidence.
+func (a *ConsumerAdapter) ValidateReviewMutationObservation(
+	ctx context.Context,
+	obs CallerReviewMutationObservationFact,
+) error {
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+
+	policy := evidence.ReviewMutationPolicy{
+		Worktree:   evidence.ReviewMutationWorktreePolicy(obs.WorktreePolicy),
+		Index:      evidence.ReviewMutationGitPolicy(obs.IndexPolicy),
+		Head:       evidence.ReviewMutationGitPolicy(obs.HeadPolicy),
+		Generation: obs.PolicyGeneration,
+	}
+
+	var elims []evidence.ObservationLimitation
+	if len(obs.Limitations) > 0 {
+		elims = make([]evidence.ObservationLimitation, len(obs.Limitations))
+		for i, lim := range obs.Limitations {
+			elims[i] = evidence.ObservationLimitation{
+				Kind:   lim.Kind,
+				Detail: lim.Detail,
+			}
+		}
+	}
+
+	eobs := evidence.ReviewMutationObservation{
+		Stage:                           obs.Stage,
+		AttemptID:                       obs.AttemptID,
+		BindingID:                       obs.BindingID,
+		AttemptNumber:                   obs.AttemptNumber,
+		Role:                            obs.Role,
+		SubjectKind:                     obs.SubjectKind,
+		Limitations:                     elims,
+		Policy:                          policy,
+		PolicyGeneration:                obs.PolicyGeneration,
+		RawStdoutArtifact:               obs.RawStdoutArtifact,
+		RawStderrArtifact:               obs.RawStderrArtifact,
+		SubjectDriftObserved:            obs.SubjectDriftObserved,
+		WorktreeDrift:                   obs.WorktreeDrift,
+		IndexDrift:                      obs.IndexDrift,
+		HeadDrift:                       obs.HeadDrift,
+		CandidateObservationUnavailable: obs.CandidateObservationUnavailable,
+		IndexObservationUnavailable:     obs.IndexObservationUnavailable,
+		HeadObservationUnavailable:      obs.HeadObservationUnavailable,
+		WorktreePaths:                   obs.WorktreePaths,
+		IndexPaths:                      obs.IndexPaths,
+		DiagnosticCode:                  obs.DiagnosticCode,
+		ActionTaken:                     obs.ActionTaken,
+		Sequence:                        obs.Sequence,
+		PathsComplete:                   obs.PathsComplete,
+		Detail:                          obs.Detail,
+	}
+
+	if err := evidence.ValidateReviewMutationObservation(eobs); err != nil {
+		return fmt.Errorf("consumer: review mutation observation invalid: %w", err)
+	}
+	return nil
+}
+
+// ValidateSchemaManifest verifies and parses the dispatcher schema manifest.
+func (a *ConsumerAdapter) ValidateSchemaManifest(ctx context.Context, raw []byte) (*CallerSchemaManifest, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+
+	var m schema.DispatcherSchemaManifest
+	if err := json.Unmarshal(raw, &m); err != nil {
+		return nil, fmt.Errorf("consumer: schema manifest unmarshal failed: %w", err)
+	}
+
+	if err := schema.ValidateDispatcherSchemaManifest(m); err != nil {
+		return nil, fmt.Errorf("consumer: schema manifest validation failed: %w", err)
+	}
+
+	return &CallerSchemaManifest{
+		Schema:      m.Schema,
+		Version:     m.Version,
+		TablesCount: len(m.Tables),
+	}, nil
+}
+
+// ValidateRunRecord verifies and maps a serialized run record into CallerRunRecord.
+func (a *ConsumerAdapter) ValidateRunRecord(ctx context.Context, raw []byte) (*CallerRunRecord, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+
+	var r schema.RunRecord
+	if err := json.Unmarshal(raw, &r); err != nil {
+		return nil, fmt.Errorf("consumer: run record unmarshal failed: %w", err)
+	}
+
+	if r.RunID == "" || r.Project == "" {
+		return nil, fmt.Errorf("consumer: run record missing required run_id or project")
+	}
+
+	phaseID := ""
+	if r.PhaseID != nil {
+		phaseID = *r.PhaseID
+	}
+	outcome := ""
+	if r.Outcome != nil {
+		outcome = *r.Outcome
+	}
+
+	return &CallerRunRecord{
+		RunID:           r.RunID,
+		Project:         r.Project,
+		PhaseID:         phaseID,
+		SchemaVersion:   r.SchemaVersion,
+		RequestSchema:   r.RequestSchema,
+		WorkflowVersion: r.WorkflowVersion,
+		Lifecycle:       r.Lifecycle,
+		ExecutionMode:   r.ExecutionMode,
+		Status:          r.Status,
+		Outcome:         outcome,
+	}, nil
+}
+

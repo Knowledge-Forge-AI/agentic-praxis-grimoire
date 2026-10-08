@@ -485,7 +485,7 @@ class APGRoadmapClosureIntegrationTests(unittest.TestCase):
         mat_path = self.fixture_root / "docs/governance/skill-maturity-ledger.json"
         s_data = json.loads(mat_path.read_text(encoding="utf-8"))
         for s in s_data["skills"]:
-            if s["current_maturity"] == "provisional":
+            if s["skill_id"] in contract.PROVISIONAL:
                 s["disposition_status"] = "PROVISIONAL_MAINTENANCE"
                 s["maintenance_ref"] = "CSS-QD-001"
                 s["independent_review"] = ev_file
@@ -565,7 +565,11 @@ class APGRoadmapClosureIntegrationTests(unittest.TestCase):
         # individually, with explicit item-bound non-author receipts. This is
         # parser qualification, not a decision about the actual skill corpus.
         catalog_path = self.fixture_root / "skills/README.md"
-        catalog_path.write_text(catalog_path.read_text().replace("| `provisional` |", "| `deprecated` |"))
+        catalog_path.write_text("\n".join(
+            line.replace("| `provisional` |", "| `deprecated` |")
+            if any(f"[`{name}`]" in line for name in contract.PROVISIONAL) else line
+            for line in catalog_path.read_text().split("\n")
+        ))
         for leaf in s_data["skills"]:
             if leaf["skill_id"] in contract.PROVISIONAL:
                 leaf["current_maturity"] = "deprecated"

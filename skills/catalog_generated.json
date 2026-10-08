@@ -1,0 +1,1693 @@
+{
+  "schema_version": "apg.skill-catalog/v1",
+  "authorities": [
+    {
+      "path": "docs/chatgpt-manager-skill-topology.md",
+      "bytes": 8343,
+      "sha256": "fdd24019b3f88e8f95565fde992cae094ae934d4d6cfdb67d8d037fa1cde5cfc",
+      "captured": false
+    },
+    {
+      "path": "docs/governance/skill-maturity-ledger.json",
+      "bytes": 89682,
+      "sha256": "2976f2169839215ca25f3ea752a64740c3df37ae15b436fbd0abf1d8fb8fadf7",
+      "captured": false
+    },
+    {
+      "path": "docs/guides/skill-context-bundles.md",
+      "bytes": 12452,
+      "sha256": "8cb78cf72816a3fa495db760adbacfd9c88125e18b55a049bb044d48ae153c97",
+      "captured": false
+    },
+    {
+      "path": "skills/README.md",
+      "bytes": 42707,
+      "sha256": "7dc852ed1cafa09c35a4d4d4828e59b4ff2e5e4684d0a2e591c002568e06a6ab",
+      "captured": false
+    },
+    {
+      "path": "skills/rules.go",
+      "bytes": 7365,
+      "sha256": "0ce343412699303525cbf8598e4d994756a71c402b953a81a59bbd9d862d0ae1",
+      "captured": false
+    }
+  ],
+  "skills": [
+    {
+      "schema_version": "apg.skill-descriptor/v1",
+      "qualified_id": "apgr:agentic-praxis-grimoire-workflow",
+      "body_bytes": 4444,
+      "body_characters": 4444,
+      "body_sha256": "4dbbf530d31e1063ea46bff5970ed6715a6b0b4b6d36c243211a19a8f489129f",
+      "canonical_path": "agentic-praxis-grimoire-workflow/SKILL.md",
+      "description": "Use when an operator or manager needs to choose among multiple plausible APG skills, audit an APG routing decision, or diagnose a missing or stale APG capability.",
+      "description_bytes": 162,
+      "description_characters": 162,
+      "id": "agentic-praxis-grimoire-workflow",
+      "lines": 94,
+      "body_only_bytes": 4221,
+      "body_only_characters": 4221,
+      "body_only_sha256": "327cbeb533c7223a4fb7d67b4a6626dba9045f2538678c582c3e887a39640373",
+      "description_sha256": "f9b67efc433cb6cb614f52cad1469c8216b4e6239d5f221fe920bffd4d4c5a30",
+      "tokens": null,
+      "do_not_use": "Do not use this router when an explicit applicable skill was selected, one\nunambiguous APG leaf is already the obvious owner, or the work needs no APG\nspecialization. It is not a session-start bootstrap, a mandatory workflow\nchain, a delegation selector, an action-authorization mechanism, a substitute\nfor repository instructions, or a private-integration manager.\n\nDo not use the router to dispatch workers, require review as ceremony, copy a\nleaf's procedure, or infer precedence or source from duplicate skill names.",
+      "project_owned_parameters": "The task and repository continue to own authority, instructions, accepted\ndesign, delegation decisions, verification commands, review authority,\nrelease and push policy, language and framework versions, installed skill\nscopes, and any duplicate-name precedence supplied by the client.",
+      "trigger_boundary": "Multiple APG skills are plausible, a routing decision needs audit, or APG capability metadata may be missing or stale",
+      "maturity": "stable",
+      "source_declared_maturity": "",
+      "consumer_limitations": [
+        "docs/guides/skill-context-bundles.md"
+      ],
+      "selection_facts": [
+        {
+          "fact_kind": "capability",
+          "fact_value": "apg-routing",
+          "skill_id": "agentic-praxis-grimoire-workflow",
+          "source": "skills/README.md#APG16"
+        }
+      ],
+      "required_dependencies": [],
+      "support_files": [],
+      "content_identity": "cbcd0fbe564a64e14c03c4e76a814dc104305f6791940a449236407002c8213a"
+    },
+    {
+      "schema_version": "apg.skill-descriptor/v1",
+      "qualified_id": "apgr:astro-profile",
+      "body_bytes": 9949,
+      "body_characters": 9933,
+      "body_sha256": "832910e5e2b356a8bd807fb6719c3da3ded933bacc1348c9105274b3e461570b",
+      "canonical_path": "astro-profile/SKILL.md",
+      "description": "Use when Astro behavior hinges on .astro execution, islands/client directives, server/client boundaries, collections, routing, or integrations; not for React, JSX, MDX, TypeScript, Node, Vite, Starlight, CSS, accessibility, or deployment.",
+      "description_bytes": 238,
+      "description_characters": 238,
+      "id": "astro-profile",
+      "lines": 171,
+      "body_only_bytes": 9669,
+      "body_only_characters": 9653,
+      "body_only_sha256": "5edac937533092776519ac1ee9878123b33e55a543bb90101ec27408101da84c",
+      "description_sha256": "07049d1bae213cd5a1608f3841dace90ed5d50244bf7aaea1499f2b540df0869",
+      "tokens": null,
+      "do_not_use": "Do not use this profile for:\n\n- React component, Hook, state, Effect, or render semantics inside an island,\n  owned by `react-component-profile`;\n- library-independent JSX grammar or transform behavior, owned by\n  `jsx-language-profile`;\n- the MDX document/component seam, owned by `mdx-profile`;\n- TypeScript checking, owned by `typescript-language-profile`;\n- generic Node host, package, process, or runtime semantics outside the\n  Astro-owned execution boundary, owned by `nodejs-runtime-profile`;\n- Vite internals, Starlight, styling or CSS strategy, accessibility acceptance,\n  hosting, or deployment;\n- generic web-framework or package-manager advice; or\n- generic planning, debugging, review, and test-discipline procedure.\n\nA non-trigger is an exact handoff, not a Green Astro decision. Astro answers\nwhere code runs, when an island hydrates, and how Astro project, content, route,\nand integration structure works. It does not answer what an embedded component\nor language does after that framework handoff.",
+      "project_owned_parameters": "The project owns whether Astro is selected; the exact Astro, adapter,\nintegration, UI-framework, TypeScript, and Node versions; rendering and output\nmode; routes, content sources and schemas; directives and hydration policy;\nserver/client data policy; integration order; Vite and Starlight selection;\nstyling; accessibility; test environment; protected data; dependencies;\naccepted exceptions; validation; rollback; publication; hosting; and\ndeployment. Stricter repository policy controls.",
+      "trigger_boundary": "Astro behavior hinges on `.astro` execution, islands or client directives, server/client boundaries, content collections, routing, or integration conventions; not for adjacent component, syntax, language/runtime, build, style, accessibility, or deployment concerns",
+      "maturity": "provisional",
+      "source_declared_maturity": "",
+      "consumer_limitations": [
+        "docs/guides/skill-context-bundles.md"
+      ],
+      "selection_facts": [
+        {
+          "fact_kind": "capability",
+          "fact_value": "astro-framework",
+          "skill_id": "astro-profile",
+          "source": "docs/architecture/v0-6-skill-ownership-and-context-budget.md#2.4"
+        }
+      ],
+      "required_dependencies": [],
+      "support_files": [],
+      "content_identity": "c313284230940e024cf771bb1e864276609636e6a7c9ab423c243047b76432a7"
+    },
+    {
+      "schema_version": "apg.skill-descriptor/v1",
+      "qualified_id": "apgr:bash-language-profile",
+      "body_bytes": 12655,
+      "body_characters": 12611,
+      "body_sha256": "a9b32ff35ddc6eda54adabad0a38f0e6251109482246821d2e2e26805f6f050c",
+      "canonical_path": "bash-language-profile/SKILL.md",
+      "description": "Use when Bash-specific judgment is material to quoting, expansion, arrays, pipelines, traps, subprocesses, files, portability, or warning and crisis thresholds beyond repository policy.",
+      "description_bytes": 185,
+      "description_characters": 185,
+      "id": "bash-language-profile",
+      "lines": 226,
+      "body_only_bytes": 12420,
+      "body_only_characters": 12376,
+      "body_only_sha256": "09527ec577dc800c04de6de37fdd6ef1ee4bb150b0abd7a32d8f632f6ff36dac",
+      "description_sha256": "f025b7817e691825328552fe3701a312a0788c9f2ce64c7494c8164a49b8ccaa",
+      "tokens": null,
+      "do_not_use": "Do not use this profile for:\n\n- portable POSIX shell work unless Bash behavior is also materially involved;\n- Zsh-native semantics or another shell dialect;\n- Bats discovery, hooks, assertions, TAP, or runner behavior;\n- generic implementation, debugging, planning, or review procedure;\n- selecting a shell, formatter, linter, test runner, coverage target, or CI\n  command;\n- authorizing dependencies, publication, privilege, live mutation, or\n  destructive action;\n- a comment, typo, mechanical rename, or edit with no material Bash judgment;\n- automatic broad refactoring of a legacy script; or\n- structural treatment of generated, vendored, fixture, snapshot, migration,\n  or compatibility artifacts before classification.",
+      "project_owned_parameters": "The target repository owns supported Bash versions and platforms,\ninterpreter/shebang policy, POSIX compatibility, formatter and analyzer\nchoices, tests and coverage, exact commands, dependency and supply-chain\npolicy, artifact classifications, architecture, accepted exceptions,\ndeployment, privilege, mutation, release, destructive-action authority,\nvalidation, and rollback.",
+      "trigger_boundary": "Bash-specific judgment is material to quoting, expansion, arrays, pipelines, traps, subprocesses, files, portability, or warning and crisis thresholds beyond repository policy",
+      "maturity": "stable",
+      "source_declared_maturity": "",
+      "consumer_limitations": [
+        "docs/guides/skill-context-bundles.md"
+      ],
+      "selection_facts": [
+        {
+          "fact_kind": "language",
+          "fact_value": "bash",
+          "skill_id": "bash-language-profile",
+          "source": "skills/README.md"
+        }
+      ],
+      "required_dependencies": [],
+      "support_files": [],
+      "content_identity": "13fdc76567f6057831da341405a0c655ae4e76f688c501b99cff8249a6610bde"
+    },
+    {
+      "schema_version": "apg.skill-descriptor/v1",
+      "qualified_id": "apgr:bats-test-profile",
+      "body_bytes": 12086,
+      "body_characters": 12042,
+      "body_sha256": "9b4fb318b0dcaa0cb5b80e365a6fd25c292ef89c36aab231abecc4a6f74779fb",
+      "canonical_path": "bats-test-profile/SKILL.md",
+      "description": "Use when Bats-specific test judgment is material to evaluation, run status and output, hooks, fixtures, TAP, file descriptors, parallelism, background cleanup, or warning and crisis thresholds beyond repository policy.",
+      "description_bytes": 218,
+      "description_characters": 218,
+      "id": "bats-test-profile",
+      "lines": 212,
+      "body_only_bytes": 11822,
+      "body_only_characters": 11778,
+      "body_only_sha256": "b852ff2f14f8fc008480a7fef0d84bd09ae22be425535a86278108c599f39c7a",
+      "description_sha256": "e496622c29dc30b3773cbd0fdd51dc83f2fe83a7951cc40315fd5b8bb06213e2",
+      "tokens": null,
+      "do_not_use": "Do not use this profile for:\n\n- ordinary Bash implementation or review with no material Bats behavior;\n- Bash language semantics already owned by `bash-language-profile`;\n- choosing Bats, helper libraries, a runner version, formatter, coverage tool,\n  CI platform, or exact test command;\n- generic implementation, debugging, planning, or review procedure;\n- authorizing live services, host mutation, credentials, or destructive action;\n- a typo, comment, rename, or test edit with no harness-specific judgment;\n- automatic broad restructuring of legacy tests; or\n- structural judgment of generated, vendored, fixture, snapshot, migration,\n  compatibility, or data-driven artifacts before classification.",
+      "project_owned_parameters": "The repository owns Bats and Bash versions, helper libraries, file layout,\nrunner flags, formatter, TAP consumer, parallelism, timeouts, fixtures,\ntemporary roots, live-service policy, test commands, coverage, CI, artifact\nclassification, accepted exceptions, authority, validation, and rollback.",
+      "trigger_boundary": "Bats-specific test judgment is material to evaluation, run status and output, hooks, fixtures, TAP, file descriptors, parallelism, background cleanup, or warning and crisis thresholds beyond repository policy",
+      "maturity": "stable",
+      "source_declared_maturity": "",
+      "consumer_limitations": [
+        "docs/guides/skill-context-bundles.md"
+      ],
+      "selection_facts": [
+        {
+          "fact_kind": "test_framework",
+          "fact_value": "bats",
+          "skill_id": "bats-test-profile",
+          "source": "skills/README.md#APG19"
+        }
+      ],
+      "required_dependencies": [],
+      "support_files": [],
+      "content_identity": "839b0253537b4851deb9194ec6a736898abf3606776600137bf2388272e11496"
+    },
+    {
+      "schema_version": "apg.skill-descriptor/v1",
+      "qualified_id": "apgr:browser-runtime-profile",
+      "body_bytes": 14370,
+      "body_characters": 14366,
+      "body_sha256": "4124df175d5c8d0888ce1087da3d841ffcba87e44a70ec18a5caad415a0c6dc8",
+      "canonical_path": "browser-runtime-profile/SKILL.md",
+      "description": "Use when web decisions depend on browser host behavior — Window, Document, DOM mutation, event phases, tasks, microtasks, timers, rAF, MutationObserver, URL, History, Fetch, CORS, cookies, WebStorage, IndexedDB, custom elements, Shadow DOM, geometry, workers, or object URLs — for an established browser execution role.",
+      "description_bytes": 323,
+      "description_characters": 319,
+      "id": "browser-runtime-profile",
+      "lines": 228,
+      "body_only_bytes": 13995,
+      "body_only_characters": 13995,
+      "body_only_sha256": "01d4e4dc214d144aa3e285e27c8f8aaa83a2e5383c780b29c040283d0e7ebee0",
+      "description_sha256": "79803fe98647e15b070e4f02ebce25dd95173c744a349502ea1e661c9eb7023d",
+      "tokens": null,
+      "do_not_use": "Route ECMAScript and Promise/module live-binding semantics to\n`javascript-language-profile`; typing to `typescript-language-profile`; CSS\ncascade/value semantics to `css-language-profile`; SVG authoring to\n`svg-language-profile`; components to `react-component-profile`; JSX syntax to\n`jsx-language-profile`; runner mechanics to `playwright-test-profile`;\naccessible semantics and conformance hierarchy to `web-accessibility-profile`;\nbuild/dev tooling to `vite-build-profile`; selected npm package management to\n`npm-package-manager-profile`; and Node process/runtime behavior to\n`nodejs-runtime-profile`. HTML authoring outside host/runtime behavior remains\nunallocated. Select simultaneous owners only when their semantics matter.\nDo not infer actual Tauri WebView behavior from ordinary browser tests.",
+      "project_owned_parameters": "The project owns supported browser/embedded hosts, test tooling, API policy,\norigins, credentials, permissions, storage/retention limits, resource lifetimes,\nperformance targets, accessibility acceptance, and mutation/release authority.\nNo new numeric file-size or complexity policy is introduced by this profile.",
+      "trigger_boundary": "Browser host DOM, lifecycle, events, scheduling, origins, fetching, storage, resources and actual browser or WebView context affect behavior",
+      "maturity": "provisional",
+      "source_declared_maturity": "",
+      "consumer_limitations": [
+        "docs/guides/skill-context-bundles.md"
+      ],
+      "selection_facts": [],
+      "required_dependencies": [],
+      "support_files": [],
+      "content_identity": "a61ec1d601d9463e89d51ed1b4441a7ebae0f923b9c7561655236e8a4980ef54"
+    },
+    {
+      "schema_version": "apg.skill-descriptor/v1",
+      "qualified_id": "apgr:chatgpt-manager-workflow",
+      "body_bytes": 3408,
+      "body_characters": 3408,
+      "body_sha256": "3684b724282e6c8316d97fc9dc7f4339b6531234e92228356e2cff6029b8207c",
+      "canonical_path": "chatgpt/chatgpt-manager-workflow/SKILL.md",
+      "description": "Use when selection among multiple plausible ChatGPT top-level-manager capabilities is ambiguous or a ChatGPT-manager routing decision requires audit.",
+      "description_bytes": 149,
+      "description_characters": 149,
+      "id": "chatgpt-manager-workflow",
+      "lines": 76,
+      "body_only_bytes": 3206,
+      "body_only_characters": 3206,
+      "body_only_sha256": "1f5a028f4d8554c49a413922a5b6538faaffe79502287bfc33b4ecb3116dc2ce",
+      "description_sha256": "272a0de4ab67532bf019bedec22f1f957950d7b7dfba9fd769447909538dabba",
+      "tokens": null,
+      "do_not_use": "Do not use this subrouter for ordinary Codex planning, design, implementation,\ndebugging, testing, review, worker assignment, synthesis, language, database,\nor repository work. Do not use it when an explicit applicable ChatGPT-manager\nleaf is already selected or when no ChatGPT-manager capability is material.\n\nThe subrouter does not approve or revise a roadmap, compose the assignment,\ndispatch an agent, execute work, review or accept a result, or continue\nautomatically. It does not create a mandatory router chain.",
+      "project_owned_parameters": "The human-authorized task and repository own authority, approved roadmaps,\nmanager roles, source qualification, metadata precedence, dispatch,\nacceptance, continuation, release, and publication policy. The local map owns\nonly the current ChatGPT-manager capability set.",
+      "trigger_boundary": "Selection among multiple plausible ChatGPT top-level-manager capabilities is ambiguous or a ChatGPT-manager routing decision requires audit",
+      "maturity": "provisional",
+      "source_declared_maturity": "",
+      "consumer_limitations": [
+        "docs/guides/skill-context-bundles.md",
+        "chatgpt-only; docs/chatgpt-manager-skill-topology.md"
+      ],
+      "selection_facts": [
+        {
+          "fact_kind": "capability",
+          "fact_value": "chatgpt-manager-routing",
+          "skill_id": "chatgpt-manager-workflow",
+          "source": "docs/chatgpt-manager-skill-topology.md"
+        }
+      ],
+      "required_dependencies": [],
+      "support_files": [],
+      "content_identity": "d6401161f0c9fd3fa93d7b56ec75a4f3422c94ce89b93cc1f0e940cc6bfdaa10"
+    },
+    {
+      "schema_version": "apg.skill-descriptor/v1",
+      "qualified_id": "apgr:composing-approved-roadmap-assignments",
+      "body_bytes": 9182,
+      "body_characters": 9182,
+      "body_sha256": "4ce9a6fc1e70854f56434e903ac7ca58ecff75cb94b3d6dcacdfdc3a9079c75d",
+      "canonical_path": "chatgpt/composing-approved-roadmap-assignments/SKILL.md",
+      "description": "Use when a human-approved roadmap phase or explicitly approved bounded phase sequence must become a reviewable top-level coding-agent manager assignment with authority, scope, evidence, acceptance, stop, reporting, and handoff boundaries.",
+      "description_bytes": 238,
+      "description_characters": 238,
+      "id": "composing-approved-roadmap-assignments",
+      "lines": 182,
+      "body_only_bytes": 8877,
+      "body_only_characters": 8877,
+      "body_only_sha256": "5bba75f418a0c7f8ebccfd8ecc7226328e5a7ed4484396f68cff75a628721907",
+      "description_sha256": "2810f5a8a5bf464dffa1a834c96579c19c43fec02e30f54db546c267c11f6a52",
+      "tokens": null,
+      "do_not_use": "Do not use this skill to:\n\n- invent, approve, revise, reorder, merge, split, or extend a roadmap;\n- allocate a semantic phase ID;\n- handle one simple direct task that already has adequate instructions;\n- decompose implementation work owned by `planning-repository-work`;\n- compose one internal worker assignment owned by\n  `composing-bounded-worker-assignments`;\n- resolve skill-selection ambiguity owned by\n  `agentic-praxis-grimoire-workflow`;\n- review or accept a result owned by\n  `reviewing-and-verifying-repository-work`;\n- dispatch workers, schedule work, or operate a manager runtime;\n- continue automatically into a successor phase;\n- copy a private or protected prompt template; or\n- require delegation or a mandatory chain of APG skills.",
+      "project_owned_parameters": "The human, project, or current task owns:\n\n- roadmap and phase approval;\n- semantic phase IDs and current-state identities;\n- repository identities, branches, source and write scopes, and precedence;\n- exact commands, test gates, thresholds, and supported versions;\n- delegation decisions, worker roles, worker limits, and harness capabilities;\n- privacy classes, source rights, and private and public treatment;\n- commit, push, publication authority, release version, and rollback policy;\n- report commands, schemas, order, and storage;\n- application-smoke timing; and\n- result review and acceptance authority.\n\nPreserve supplied values exactly enough to remain reviewable. Mark unresolved\nrequired values as blockers; do not fabricate them or infer authority from a\nroadmap title, historic prompt, report, commit, or recommendation.",
+      "trigger_boundary": "A human-approved roadmap phase or explicitly approved bounded phase sequence needs a reviewable top-level manager assignment without added authority",
+      "maturity": "provisional",
+      "source_declared_maturity": "",
+      "consumer_limitations": [
+        "docs/guides/skill-context-bundles.md",
+        "chatgpt-only; docs/chatgpt-manager-skill-topology.md"
+      ],
+      "selection_facts": [
+        {
+          "fact_kind": "work_class",
+          "fact_value": "roadmap_delegation",
+          "skill_id": "composing-approved-roadmap-assignments",
+          "source": "docs/chatgpt-manager-skill-topology.md"
+        }
+      ],
+      "required_dependencies": [],
+      "support_files": [],
+      "content_identity": "5bf7cf22ba2ad94322619be6545d2f2e8d4a7a93f832d7cbec33d6178cba3d22"
+    },
+    {
+      "schema_version": "apg.skill-descriptor/v1",
+      "qualified_id": "apgr:composing-bounded-worker-assignments",
+      "body_bytes": 3146,
+      "body_characters": 3146,
+      "body_sha256": "4613b98e84708e97ff35dd109179139e54c9167d0bf0b11d6aa1ffa5a2c76bca",
+      "canonical_path": "composing-bounded-worker-assignments/SKILL.md",
+      "description": "Use when internal delegation is already authorized and independently selected, and one non-trivial worker assignment needs explicit scope, ownership, evidence, acceptance, or return boundaries.",
+      "description_bytes": 193,
+      "description_characters": 193,
+      "id": "composing-bounded-worker-assignments",
+      "lines": 74,
+      "body_only_bytes": 2888,
+      "body_only_characters": 2888,
+      "body_only_sha256": "ce18ee1e63819b7c56bed3822828791b4725126397011262f52a445251189924",
+      "description_sha256": "c04fd90ff5951ae17f570a2e7d88488df2c54af0578759101dca52db4ca11d28",
+      "tokens": null,
+      "do_not_use": "Do not use this skill when delegation is unauthorized, unselected, unnecessary,\nor less clear than direct work. Do not use it to resolve an objective, design,\nroadmap, or authority question; schedule or monitor workers; generate an\nexternal human prompt; create a manager runtime; or restate an already adequate\nassignment.\n\nDo not split coupled work into assignments with shared write ownership or\nmaterial whole-system context merely to enable parallelism.",
+      "project_owned_parameters": "The repository or current task owns its branch and commit policy, exact paths,\nvalidation commands, privacy classes, runtime permissions, report mechanics,\nworker limits, and integration process. Preserve those values as supplied;\ndo not generalize or fabricate them.",
+      "trigger_boundary": "Delegation is already authorized and selected, and one non-trivial worker assignment needs explicit boundaries",
+      "maturity": "stable",
+      "source_declared_maturity": "",
+      "consumer_limitations": [
+        "docs/guides/skill-context-bundles.md"
+      ],
+      "selection_facts": [
+        {
+          "fact_kind": "work_class",
+          "fact_value": "worker_delegation",
+          "skill_id": "composing-bounded-worker-assignments",
+          "source": "skills/README.md"
+        }
+      ],
+      "required_dependencies": [],
+      "support_files": [],
+      "content_identity": "e5964a3cb1a4e174c89770e27471261ee2f1f7351d56b4678ad86fd4719b123e"
+    },
+    {
+      "schema_version": "apg.skill-descriptor/v1",
+      "qualified_id": "apgr:converting-bash-scripts-to-python",
+      "body_bytes": 16669,
+      "body_characters": 16669,
+      "body_sha256": "7907af8fd29633c6b2811d239706f82d1c2478c1e2a9f8ed68b05b54a24859a0",
+      "canonical_path": "converting-bash-scripts-to-python/SKILL.md",
+      "description": "Use when an existing Bash executable or script family needs a bounded conversion to Python that preserves or deliberately migrates its observable contract.",
+      "description_bytes": 155,
+      "description_characters": 155,
+      "id": "converting-bash-scripts-to-python",
+      "lines": 297,
+      "body_only_bytes": 16452,
+      "body_only_characters": 16452,
+      "body_only_sha256": "62f759e4e6e8c34c275eed1b59b751361f519344e242dc878655768cb32f9d7e",
+      "description_sha256": "b09367ed877595f31a27ee8c7aa8c97dd4b16d864abad772386150e7ef7d6336",
+      "tokens": null,
+      "do_not_use": "Do not use this skill for:\n\n- a trivial new Python script with no existing Bash contract;\n- a Bash script that remains the clearest, safest, and best-supported\n  implementation for the required task and platforms;\n- a mandate to convert every shell script or pipeline;\n- generic Bash or Python implementation, debugging, or review guidance;\n- selecting Python, Bash, GitPython, a package manager, a dependency, a target\n  platform, or a release mechanism for the project;\n- unrelated refactoring, cleanup, feature work, or architecture change bundled\n  into a conversion;\n- inventing Windows or other platform support the project does not require;\n- replacing a sourced Bash library without inventorying its shell-level\n  callers and state contract; or\n- migration, publication, deletion, or destructive action without exact\n  authority.",
+      "project_owned_parameters": "The target repository owns:\n\n- whether conversion is desired and authorized, and the accepted migration\n  goal;\n- supported Bash, Python, Git, platform, filesystem, locale, and packaging\n  versions;\n- CLI, stream, exit, environment, path, file, locking, signal, Git, security,\n  compatibility, and release contracts;\n- dependency, license, supply-chain, package-manager, entry-point, and\n  installation policy;\n- architecture, wrappers, rollout, shadowing, deprecation, release projection,\n  validation, and rollback;\n- protected-data classification, report destinations, external resources, and\n  artifact retention; and\n- mutation, migration, publication, deletion, cutover, and destructive-action\n  authority.\n\nStricter project policy controls. No migration benefit, wrapper, test, or\ndependency grants action authority or weakens a superior safety, privacy,\ncompatibility, or task boundary.",
+      "trigger_boundary": "An existing Bash executable or script family needs a bounded conversion to Python that preserves or deliberately migrates its observable contract",
+      "maturity": "provisional",
+      "source_declared_maturity": "",
+      "consumer_limitations": [
+        "docs/guides/skill-context-bundles.md"
+      ],
+      "selection_facts": [
+        {
+          "fact_kind": "capability",
+          "fact_value": "bash-to-python-conversion",
+          "skill_id": "converting-bash-scripts-to-python",
+          "source": "skills/README.md#APG26"
+        }
+      ],
+      "required_dependencies": [],
+      "support_files": [],
+      "content_identity": "1e1020bd1a2afc8bf8d6a42dfcd1597b9696e0d30425a7e550e166c6d6193df5"
+    },
+    {
+      "schema_version": "apg.skill-descriptor/v1",
+      "qualified_id": "apgr:css-language-profile",
+      "body_bytes": 13187,
+      "body_characters": 13169,
+      "body_sha256": "055edca9b1b358621be83d42a23886240304f4cd59e44014134d2df773c277b9",
+      "canonical_path": "css-language-profile/SKILL.md",
+      "description": "Use when a material decision depends on CSS-specific static semantics — syntax validity, selector specificity, cascade ordering, inheritance, shorthand resets, custom-property substitution, or value consequences — for an established CSS region whose artifact boundary and consequence-bearing evidence are identified.",
+      "description_bytes": 320,
+      "description_characters": 316,
+      "id": "css-language-profile",
+      "lines": 247,
+      "body_only_bytes": 12818,
+      "body_only_characters": 12804,
+      "body_only_sha256": "7cfbb3fa9be4b5bf142c98865f59361974f67aca78dee1fce2bbc1733066286f",
+      "description_sha256": "3e0e41faf798f0e6dda2a64248376da822e9369ac8a421cc035fe0397335ea7f",
+      "tokens": null,
+      "do_not_use": "\u003c!-- APG-CLAUSE: CSS-NONTRIGGER --\u003e\nDo not use this profile for:\n\n- HTML or DOM structure, actual element matching without exact document and\n  state evidence, or any claim about what a selector matches at runtime;\n- accessibility, visual design approval, pixel-level rendering, layout\n  correctness, or performance and security approval;\n- browser bugs, browser support policy, or any cross-browser compatibility\n  decision;\n- Astro, Starlight, or other host component semantics, and JavaScript,\n  TypeScript, JSX, or MDX behavior;\n- PostCSS, Vite, Lightning CSS, esbuild, or any other build-time\n  transformation unless that exact role is separately evidenced, and never\n  for Sass, Less, Stylus, or CSS-in-JS semantics;\n- design-token naming policy, theme product policy, asset and font\n  correctness, network loading, build completion, or deployment; or\n- selecting the CSS source level, parser, transformer, browser targets, or\n  project configuration — those are consumed facts owned by the project.\n\nA non-trigger is a routine handoff that names the receiving owner exactly. It\nis not a CSS decision, and it never becomes one by being adjacent to CSS.",
+      "project_owned_parameters": "The repository and project own: the CSS source modules and levels in scope;\nparser, transformer, and formatter selection and configuration; browser\nsupport policy and compatibility targets; host and build tooling; layer\narchitecture and naming; design tokens and theme policy; artifact\nclassification and generated-output paths; structural and migration policy;\naccepted exceptions; and any stricter repository policy, which always\ncontrols.",
+      "trigger_boundary": "A material decision depends on CSS-specific static semantics, selector specificity, cascade ordering, inheritance, shorthand resets, custom-property substitution, or value consequences for an established CSS region with identified consequence-bearing evidence",
+      "maturity": "provisional",
+      "source_declared_maturity": "",
+      "consumer_limitations": [
+        "docs/guides/skill-context-bundles.md"
+      ],
+      "selection_facts": [
+        {
+          "fact_kind": "language",
+          "fact_value": "css",
+          "skill_id": "css-language-profile",
+          "source": "skills/README.md"
+        }
+      ],
+      "required_dependencies": [],
+      "support_files": [],
+      "content_identity": "ebf866262ae5656c8fd7222e703bb46580da21b85b5bc865ea709771806c6d3a"
+    },
+    {
+      "schema_version": "apg.skill-descriptor/v1",
+      "qualified_id": "apgr:debugging-systematically",
+      "body_bytes": 3046,
+      "body_characters": 3046,
+      "body_sha256": "d7bd9e4dfb27f9e334cdcbfb0ffaf6b8f2a8f26529ee421ee39271f383148316",
+      "canonical_path": "debugging-systematically/SKILL.md",
+      "description": "Use when behavior is failing, inconsistent, flaky, unexplained, or affected by multiple plausible causes.",
+      "description_bytes": 105,
+      "description_characters": 105,
+      "id": "debugging-systematically",
+      "lines": 70,
+      "body_only_bytes": 2888,
+      "body_only_characters": 2888,
+      "body_only_sha256": "de9030f6a2ac4ed4dbf750a94694393b6324cc56445613969f2c1a1def2d188a",
+      "description_sha256": "671564357d8dd46a2c31c688fb2c986f4fcee8a7b37feba5036798a41a1c7835",
+      "tokens": null,
+      "do_not_use": "Do not use this skill when the cause and correction are already established,\nfor unrelated preventive refactoring, or as permission to inspect or mutate\nsystems outside the authorized boundary. Route an accepted correction to the\nappropriate implementation procedure.",
+      "project_owned_parameters": "The project owns live-system access, log and data privacy, diagnostic tools,\nretry and observation limits, environment cleanup, mutation authority,\ncontainment and rollback procedure, and required regression evidence.",
+      "trigger_boundary": "Behavior is failing, inconsistent, flaky, unexplained, or has multiple plausible causes",
+      "maturity": "stable",
+      "source_declared_maturity": "",
+      "consumer_limitations": [
+        "docs/guides/skill-context-bundles.md"
+      ],
+      "selection_facts": [
+        {
+          "fact_kind": "work_class",
+          "fact_value": "debugging",
+          "skill_id": "debugging-systematically",
+          "source": "skills/README.md"
+        }
+      ],
+      "required_dependencies": [],
+      "support_files": [],
+      "content_identity": "cf5b3791b32341998bca6ba94a85d81a146065a977615031e7e431776eb9931d"
+    },
+    {
+      "schema_version": "apg.skill-descriptor/v1",
+      "qualified_id": "apgr:designing-significant-changes",
+      "body_bytes": 3033,
+      "body_characters": 3033,
+      "body_sha256": "08b9c9ecde90ce047303e25610711c26f026dd6e4e91ed7cef3b701a7e043f90",
+      "canonical_path": "designing-significant-changes/SKILL.md",
+      "description": "Use when consequential behavior, architecture, ownership, interfaces, data contracts, safety boundaries, or irreversible choices remain unresolved before implementation.",
+      "description_bytes": 169,
+      "description_characters": 169,
+      "id": "designing-significant-changes",
+      "lines": 71,
+      "body_only_bytes": 2806,
+      "body_only_characters": 2806,
+      "body_only_sha256": "7633a422a70cea7dc3266716dd96380420b21dec4393fa3c6be605d9b23947a8",
+      "description_sha256": "38e212b699ed4cbbfab004c8eeb0d3bb697ad6e086358a58bc802ee51b32a571",
+      "tokens": null,
+      "do_not_use": "Do not use this skill for an accepted design, straightforward implementation,\ntiny reversible maintenance, mechanical documentation cleanup, or a phase\nwhose design authority has already been settled. Do not reopen an accepted\ndecision merely because another design is possible.",
+      "project_owned_parameters": "The project owns its decision record format, architecture vocabulary,\ncompatibility window, security and privacy policy, migration authority,\ndependency policy, reviewers, and implementation handoff. Treat these as\ninputs rather than universal procedure.",
+      "trigger_boundary": "Consequential behavior, architecture, ownership, contracts, safety, or irreversible choices remain unresolved",
+      "maturity": "stable",
+      "source_declared_maturity": "",
+      "consumer_limitations": [
+        "docs/guides/skill-context-bundles.md"
+      ],
+      "selection_facts": [
+        {
+          "fact_kind": "work_class",
+          "fact_value": "design",
+          "skill_id": "designing-significant-changes",
+          "source": "skills/README.md"
+        }
+      ],
+      "required_dependencies": [],
+      "support_files": [],
+      "content_identity": "069417815b7298a39434112d9ff14e2468306ba4c4b7e31c84e9b734cb3262b3"
+    },
+    {
+      "schema_version": "apg.skill-descriptor/v1",
+      "qualified_id": "apgr:dockerfile-profile",
+      "body_bytes": 26102,
+      "body_characters": 26040,
+      "body_sha256": "ca48e487a14169c994ee5fc7d6b130ebebafa2e1997caa9b77cd0081baa47729",
+      "canonical_path": "dockerfile-profile/SKILL.md",
+      "description": "Use when Dockerfile-specific judgment is material to parser directives, build stages, instruction forms, variable scope, build context, copies, mounts, cache behavior, file ownership, runtime metadata, platform behavior, or warning and crisis thresholds beyond repository policy.",
+      "description_bytes": 279,
+      "description_characters": 279,
+      "id": "dockerfile-profile",
+      "lines": 419,
+      "body_only_bytes": 25776,
+      "body_only_characters": 25714,
+      "body_only_sha256": "67f7b16dc00aaf1a4a3646ad823429dee136a6fd20f20a02789c4250ddf726cc",
+      "description_sha256": "a2ab5d6e6372980391af0075c40c66275f6551d05c928cd0f7aacf92b5c3eed1",
+      "tokens": null,
+      "do_not_use": "Do not use this profile for:\n\n- ordinary application code with no material Dockerfile behavior;\n- Compose-only, Kubernetes-only, or orchestrator-only work;\n- generic shell review with no Dockerfile-specific boundary;\n- a simple text edit whose Dockerfile semantics are already established;\n- choosing Docker, a base image, tag, digest, registry, frontend, builder,\n  target platform, package manager, shell, scanner, or dependency;\n- selecting an exact build, scan, push, run, sign, publish, or deployment\n  command;\n- changing project-owned context, image, dependency, update, registry,\n  platform, runtime, CI, attestation, signing, or release policy;\n- authorizing a daemon, builder, registry, network, secret store, image,\n  container, volume, host, or cloud mutation;\n- treating a Dockerfile review as proof of a build, image, runtime, or\n  publication outcome;\n- automatic restructuring of a legacy Dockerfile; or\n- structural action on generated, vendored, fixture, compatibility, or\n  policy-owned artifacts before classification.\n\nThis profile does not grant authority to perform a Docker operation.",
+      "project_owned_parameters": "The target repository owns whether to use Docker and a Dockerfile; Dockerfile\npath or generator; base image, registry, tag, digest, update policy, and\nprovenance; frontend, builder, Engine, Buildx, and BuildKit versions; Linux or\nWindows containers; build and target platforms; context roots, ignore files,\nnamed or remote contexts; target stages; shell and package manager; dependency\nsources and exact commands; user, group, ownership, mode, ports, volumes,\nhealth, signal, entrypoint, command, and runtime policy; mount identities and\nsharing; network, cache, secret, SSH, and entitlement policy; scanners,\nexporters, SBOM, attestations, signing, registries, CI, publication, rollback,\nprotected data, external mutation, release, and destructive-action authority.",
+      "trigger_boundary": "Dockerfile-specific judgment is material to parser directives, build stages, instruction forms, variable scope, build context, copies, mounts, cache behavior, file ownership, runtime metadata, platform behavior, or warning and crisis thresholds beyond repository policy",
+      "maturity": "provisional",
+      "source_declared_maturity": "",
+      "consumer_limitations": [
+        "docs/guides/skill-context-bundles.md"
+      ],
+      "selection_facts": [
+        {
+          "fact_kind": "repository_characteristic",
+          "fact_value": "dockerfile",
+          "skill_id": "dockerfile-profile",
+          "source": "skills/README.md#APG33"
+        }
+      ],
+      "required_dependencies": [],
+      "support_files": [],
+      "content_identity": "7dc20d854f4a930e31220424132e3ed21a14fd642ef3cbd3d8a1a2eb89e37232"
+    },
+    {
+      "schema_version": "apg.skill-descriptor/v1",
+      "qualified_id": "apgr:go-cmp-test-profile",
+      "body_bytes": 15677,
+      "body_characters": 15653,
+      "body_sha256": "0c807626d00a79feb836deb1d3ae8a2bb427bda3d6c58465df1e3117c806918a",
+      "canonical_path": "go-cmp-test-profile/SKILL.md",
+      "description": "Use when a repository has already selected google/go-cmp v0.7.0 and comparison judgment is material to equality versus diff, option composition and filters, comparers and transformers, ignores and unexported fields, sorting, approximation, panics, diagnostic exposure, or thresholds beyond repository policy.",
+      "description_bytes": 308,
+      "description_characters": 308,
+      "id": "go-cmp-test-profile",
+      "lines": 276,
+      "body_only_bytes": 15321,
+      "body_only_characters": 15297,
+      "body_only_sha256": "daf781fb67e2bbd491bfbc4238d575d1bce78cd5b99f417ab4a33c27ed8180aa",
+      "description_sha256": "5e35932c18bc9ef02cacd814a4b55f928d244789c004ad8c7aa9e4857abd3da7",
+      "tokens": null,
+      "do_not_use": "Do not use this profile for:\n\n- deciding whether to adopt go-cmp, which is project-owned;\n- a repository that has not selected the dependency;\n- a selected release other than the calibrated one, until the option, sorting,\n  approximation, and panic claims are reverified against that release;\n- native test lifecycle, subtests, cleanup, or parallelism, owned by a retained\n  `go-test-profile` or project-owned native test policy;\n- terse local assertions, owned by project-owned assertion policy;\n- production equality, hashing, or ordering design for shipped types;\n- general Go semantics already owned by `go-language-profile`;\n- generic implementation, debugging, planning, or review procedure;\n- selecting commands, flags, coverage thresholds, CI, or dependency versions; or\n- authorizing live services, host mutation, credentials, or destructive action.",
+      "project_owned_parameters": "The repository owns whether the dependency exists at all, its exact version and\nupgrade policy, domain adapters and option packages, tolerance policy, ignore\npolicy, protected-data classification and redaction rules, comparison helper\ndesign, exact commands, flags, coverage thresholds, CI, accepted exceptions,\nauthority, validation, and rollback.",
+      "trigger_boundary": "A repository has already selected google/go-cmp v0.7.0 and comparison judgment is material to equality versus diff, option composition and filters, comparers and transformers, ignores and unexported fields, sorting, approximation, panics, diagnostic exposure, or thresholds beyond repository policy",
+      "maturity": "provisional",
+      "source_declared_maturity": "",
+      "consumer_limitations": [
+        "docs/guides/skill-context-bundles.md"
+      ],
+      "selection_facts": [
+        {
+          "fact_kind": "test_framework",
+          "fact_value": "go-cmp-v0.7.0",
+          "skill_id": "go-cmp-test-profile",
+          "source": "docs/specs/go-testing-component-profiles.md"
+        }
+      ],
+      "required_dependencies": [],
+      "support_files": [],
+      "content_identity": "bdd63c71f19c94dbf459725229e7aef6b23d2893ac9288ab306411cc9461b8e7"
+    },
+    {
+      "schema_version": "apg.skill-descriptor/v1",
+      "qualified_id": "apgr:go-language-profile",
+      "body_bytes": 16733,
+      "body_characters": 16681,
+      "body_sha256": "1a87a3597ed8f3a2363dda4882d27bc59641ffe2053a87630b2dc289f084c110",
+      "canonical_path": "go-language-profile/SKILL.md",
+      "description": "Use when Go-specific judgment is material to structure, errors, context, interfaces, generics, concurrency, public APIs, reflection, unsafe, cgo, subprocesses, compatibility, or warning and crisis thresholds beyond repository policy.",
+      "description_bytes": 233,
+      "description_characters": 233,
+      "id": "go-language-profile",
+      "lines": 277,
+      "body_only_bytes": 16452,
+      "body_only_characters": 16400,
+      "body_only_sha256": "a2a1090422ddd0aa38610f7beedad1d6af6d50f7c6c553fc6f1f5aabfb04935f",
+      "description_sha256": "9e126abb165a6e06d6cddc9d3ee723605f0ec3574cbece58cdfe9d0f1562d655",
+      "tokens": null,
+      "do_not_use": "Do not use this profile for:\n\n- a comment, typo, mechanical rename, or ordinary test edit with no material\n  Go-specific judgment;\n- generic planning, implementation, debugging, or review procedure;\n- selecting a Go version, module layout, formatter, analyzer, test command,\n  dependency, platform, cgo policy, or release process;\n- authorizing builds, dependency fetches, live operations, publication,\n  host mutation, or destructive action;\n- automatically refactoring existing Red code;\n- treating generated, vendored, fixture, migration, snapshot, protocol, or\n  machine-produced artifacts as maintained source before classification; or\n- treating a warning level or fallback count as deterministic semantic truth.",
+      "project_owned_parameters": "The target repository owns supported Go versions, configurations and platforms;\nmodule, package, public API, compatibility, generated-code, build-tag, cgo,\nformatter, analyzer, race, fuzz, benchmark, test, coverage, dependency,\nsupply-chain, deployment, concurrency, performance, artifact, exception,\nvalidation, rollback, mutation, release, and destructive-action policy.",
+      "trigger_boundary": "Go-specific judgment is material to structure, errors, context, interfaces, generics, concurrency, public APIs, reflection, unsafe, cgo, subprocesses, compatibility, or warning and crisis thresholds beyond repository policy",
+      "maturity": "provisional",
+      "source_declared_maturity": "",
+      "consumer_limitations": [
+        "docs/guides/skill-context-bundles.md"
+      ],
+      "selection_facts": [
+        {
+          "fact_kind": "language",
+          "fact_value": "go",
+          "skill_id": "go-language-profile",
+          "source": "skills/README.md"
+        }
+      ],
+      "required_dependencies": [],
+      "support_files": [],
+      "content_identity": "fb7dcf376e4508023f1c38b192070e8719b80d2a88321d26681eed978294ac34"
+    },
+    {
+      "schema_version": "apg.skill-descriptor/v1",
+      "qualified_id": "apgr:go-test-profile",
+      "body_bytes": 17821,
+      "body_characters": 17805,
+      "body_sha256": "725cb1b1842c8483f685a3885dc90ce6315f2c6d18b51a7c76b60b8629d6d93a",
+      "canonical_path": "go-test-profile/SKILL.md",
+      "description": "Use when native Go test judgment is material to package placement, subtests, helper attribution, cleanup and isolation, TestMain, parallelism, goroutine reporting, examples, benchmarks, fuzzing, caching, effective language version, or warning and crisis thresholds beyond repository policy.",
+      "description_bytes": 290,
+      "description_characters": 290,
+      "id": "go-test-profile",
+      "lines": 304,
+      "body_only_bytes": 17487,
+      "body_only_characters": 17471,
+      "body_only_sha256": "b675e94daabf185896bba5cf740891215e74741b1088ba2fa74cb9d5576c6e61",
+      "description_sha256": "d7b1911e0f3beb15148f49f0b996c1396e824d6029733d9365a4794acf130f44",
+      "tokens": null,
+      "do_not_use": "Do not use this profile for:\n\n- ordinary Go implementation or review with no material test-specific decision;\n- general Go semantics already owned by `go-language-profile`;\n- choosing whether to adopt an assertion or comparison dependency;\n- assertion-library behavior after selection, owned by project-owned assertion\n  policy unless a retained version-bounded owner exists;\n- go-cmp comparison behavior after selection, owned by\n  `go-cmp-test-profile` when that retained owner is available, otherwise by\n  explicit project policy;\n- generic implementation, debugging, planning, or review procedure;\n- selecting Go releases, commands, flags, race, coverage, fuzz duration,\n  benchmark, worker, platform, or CI policy;\n- authorizing live services, host mutation, credentials, or destructive action;\n- a typo, comment, rename, or test edit with no test-specific judgment; or\n- structural judgment of generated, vendored, fixture, snapshot, or\n  data-driven artifacts before classification.",
+      "project_owned_parameters": "The repository owns supported Go releases and toolchain selection, the module\n`go` directive, package layout and test placement, exact commands and flags,\nrace, coverage, fuzz duration and corpus retention, benchmark policy, worker\ncount, platform and CI policy, timeouts, fixtures, temporary roots, live-service\npolicy, artifact classification, accepted exceptions, authority, validation, and\nrollback.",
+      "trigger_boundary": "Native Go test judgment is material to package placement, subtests, helper attribution, cleanup and isolation, TestMain, parallelism, goroutine reporting, examples, benchmarks, fuzzing, caching, effective language version, or warning and crisis thresholds beyond repository policy",
+      "maturity": "provisional",
+      "source_declared_maturity": "",
+      "consumer_limitations": [
+        "docs/guides/skill-context-bundles.md"
+      ],
+      "selection_facts": [
+        {
+          "fact_kind": "test_framework",
+          "fact_value": "go-native",
+          "skill_id": "go-test-profile",
+          "source": "docs/specs/go-testing-component-profiles.md"
+        }
+      ],
+      "required_dependencies": [],
+      "support_files": [],
+      "content_identity": "493aa93eeffc487728d78df415d8b0d0c6ee8c214a958002dc84b6896d884c8b"
+    },
+    {
+      "schema_version": "apg.skill-descriptor/v1",
+      "qualified_id": "apgr:gomock-test-profile",
+      "body_bytes": 11274,
+      "body_characters": 11258,
+      "body_sha256": "bec2da5b3b11a243058e7f351129f70ec11899305981f73ede9bc7a7549921d3",
+      "canonical_path": "gomock-test-profile/SKILL.md",
+      "description": "Use when a project has already selected GoMock v0.6.0 and judgment is material to mockgen generation, generated mocks, controller lifecycle, expectations, call counts or order, matchers, or GoMock failure diagnosis; not for native test lifecycle, value diffs, or Go semantics.",
+      "description_bytes": 276,
+      "description_characters": 276,
+      "id": "gomock-test-profile",
+      "lines": 197,
+      "body_only_bytes": 10950,
+      "body_only_characters": 10934,
+      "body_only_sha256": "982f898965638faa32d9df04eba1878cea92b213b212e9d4a102b4529f126a89",
+      "description_sha256": "ab147c01a2ac499037642e602be8065a8a03a2268eb53269138202f3d0fa2e46",
+      "tokens": null,
+      "do_not_use": "Do not use this profile for:\n\n- deciding whether to adopt GoMock, `mockgen`, or any mocking dependency;\n- native `go test` placement, table-driven tests, subtests, helpers, cleanup,\n  parallelism, fuzzing, caching, or package lifecycle;\n- value equality, structured diffing, or go-cmp option behavior;\n- Go interface design, type identity, assignability, generics, concurrency, or\n  other language semantics;\n- generic test sufficiency, implementation sequence, planning, debugging, or\n  review procedure;\n- selecting Go, GoMock, generator, command, flag, package layout, coverage, CI,\n  or generated-code policy; or\n- authorizing dependency changes, host mutation, network access, publication,\n  deployment, or destructive regeneration.\n\nWhen an optional sibling is unavailable, route its surface to explicit\nproject-owned policy. Naming another owner places a boundary; it does not invoke\nthat owner or restate its procedure.",
+      "project_owned_parameters": "The target repository owns whether GoMock is selected; exact module and\ngenerator versions; supported Go versions and platforms; interface and package\nlayout; generation mode, command, flags, destinations, `go:generate` policy,\ngenerated-file classification, review, and retention; test commands, race,\ncoverage, fuzz, benchmark, worker, CI, timeout, and retry policy; matcher and\ndiagnostic conventions; protected-data rules; accepted exceptions; validation;\nrollback; dependency mutation; release; publication; deployment; and\ndestructive-action authority.\n\nStricter repository policy controls. No local exception weakens a superior\nsafety, privacy, truthfulness, compatibility, or task-authority stop.",
+      "trigger_boundary": "A project has already selected GoMock v0.6.0 and judgment is material to mockgen generation, generated mocks, controller lifecycle, expectations, call counts or order, matchers, or GoMock failure diagnosis; not for native test lifecycle, value diffs, or Go semantics",
+      "maturity": "provisional",
+      "source_declared_maturity": "",
+      "consumer_limitations": [
+        "docs/guides/skill-context-bundles.md"
+      ],
+      "selection_facts": [
+        {
+          "fact_kind": "test_framework",
+          "fact_value": "gomock-v0.6.0",
+          "skill_id": "gomock-test-profile",
+          "source": "docs/architecture/v0-6-skill-ownership-and-context-budget.md#2.6"
+        }
+      ],
+      "required_dependencies": [],
+      "support_files": [],
+      "content_identity": "0bf04552731b68c90423a286e83b96316c085a7660702775385ec640afd5f20b"
+    },
+    {
+      "schema_version": "apg.skill-descriptor/v1",
+      "qualified_id": "apgr:implementing-with-test-discipline",
+      "body_bytes": 5221,
+      "body_characters": 5221,
+      "body_sha256": "640b94bde2913ed1c1d366868a7e6069557e2e52d313e91c9562559a4c2dd13a",
+      "canonical_path": "implementing-with-test-discipline/SKILL.md",
+      "description": "Use when implementing a bugfix, new behavior, behavioral refactor, schema or contract change, or another code change whose correctness benefits from executable evidence.",
+      "description_bytes": 169,
+      "description_characters": 169,
+      "id": "implementing-with-test-discipline",
+      "lines": 110,
+      "body_only_bytes": 4990,
+      "body_only_characters": 4990,
+      "body_only_sha256": "81edd04d465423b3865d155f62ff0eb01fe9462da404a2504beea9d8fe39706d",
+      "description_sha256": "f3611b35a0819ab5ef0a213282e6bc6869beedb7665e09dbb48c9dcedffc2f9a",
+      "tokens": null,
+      "do_not_use": "Do not use this skill for pure prose or formatting edits, read-only diagnosis,\nan unresolved design, or work whose implementation is not authorized. Do not\nimpose a universal red-green ritual when executable behavior is unchanged or a\ndifferent evidence form is more appropriate.",
+      "project_owned_parameters": "The project owns test levels, commands, coverage policy, mock and fixture\nrules, database or service boundaries, generated-file treatment, acceptable\nmanual evidence, and release gates. Use those parameters without inventing\nuniversal thresholds.",
+      "trigger_boundary": "A code change benefits from executable behavioral evidence",
+      "maturity": "stable",
+      "source_declared_maturity": "",
+      "consumer_limitations": [
+        "docs/guides/skill-context-bundles.md"
+      ],
+      "selection_facts": [
+        {
+          "fact_kind": "work_class",
+          "fact_value": "implementation_testing",
+          "skill_id": "implementing-with-test-discipline",
+          "source": "skills/README.md"
+        }
+      ],
+      "required_dependencies": [],
+      "support_files": [],
+      "content_identity": "96733ce2776beba396f012668126978019a5a00ec59fc637b1ad2a279037d368"
+    },
+    {
+      "schema_version": "apg.skill-descriptor/v1",
+      "qualified_id": "apgr:javascript-language-profile",
+      "body_bytes": 17480,
+      "body_characters": 17444,
+      "body_sha256": "5af493b439e45c02b52c3baf374702ea27439e88cbc8ba2da2cdbe04234f2223",
+      "canonical_path": "javascript-language-profile/SKILL.md",
+      "description": "Use when a material decision depends on ECMAScript language semantics — evaluation order, lexical scope and temporal dead zones, coercion and equality, prototypes and property descriptors, this binding, classes, iteration, completion values, promise and async semantics, or module live bindings — for an established JavaScript source region whose parse goal, strictness state, and whole-file owner are identified.",
+      "description_bytes": 417,
+      "description_characters": 413,
+      "id": "javascript-language-profile",
+      "lines": 314,
+      "body_only_bytes": 17007,
+      "body_only_characters": 16975,
+      "body_only_sha256": "8f78a82325a5f88c032304228b41b9e4592a540b44782a14ae3f42d0d5bd2862",
+      "description_sha256": "3f44b1c88a8b601b6d50183d7473df660440acf45121419f18573d66e279a340",
+      "tokens": null,
+      "do_not_use": "\u003c!-- APG-CLAUSE: JS-NONTRIGGER --\u003e\nDo not use this profile for:\n\n- Node.js: `process`, `Buffer`, `fs`, `path`, `os`, `stream`, `child_process`,\n  `worker_threads`, signals, environment variables, exit codes, Node timers,\n  Node event-loop phases, CommonJS wrapper bindings, `require` resolution,\n  package exports, loader hooks, or Node security policy;\n- the browser and Web platform: DOM, Web APIs, browser events, timers, `fetch`,\n  storage, workers, rendering, browser module fetching, or compatibility policy;\n- module *resolution* or loading: specifier resolution, package exports and\n  imports, network fetching, filesystem lookup, CommonJS loading, bundler graph\n  construction, or loader configuration;\n- transformation and tooling: Babel, SWC, esbuild, Vite, or Astro transforms,\n  minification, bundling, source maps, lint or formatter policy, engine\n  selection, or build completion;\n- adjacent languages and hosts: TypeScript static analysis, JSX syntax or\n  transform, React component semantics, MDX or Astro whole-file semantics, CSS,\n  HTML, or JSON as a data format; or\n- project policy: JavaScript-versus-TypeScript choice, security approval,\n  architectural decomposition, performance acceptance, deployment, or product\n  behavior.\n\nA non-trigger names the receiving owner exactly. When that receiver is absent,\nthe named obligation remains `stop-and-escalate`: it is not a live handoff and\ndoes not claim completion. Adjacency to JavaScript never makes it a language\ndecision. An absent receiver is always a stopped obligation.",
+      "project_owned_parameters": "The repository and project own: the JavaScript-versus-TypeScript choice; the\nECMAScript edition in scope; engine and runtime selection; package `type`,\nextensions, and module configuration; package manager and resolution; build,\ntransform, lint, and formatter selection; host framework selection; security\napproval; performance acceptance; deployment; structural and migration policy;\naccepted exceptions; and any stricter repository policy, which always controls.",
+      "trigger_boundary": "A material decision depends on ECMAScript semantics for an established JavaScript region after parse goal, host context, language context, goal evidence, whole-file ownership, and required non-language evidence are identified",
+      "maturity": "provisional",
+      "source_declared_maturity": "",
+      "consumer_limitations": [
+        "docs/guides/skill-context-bundles.md"
+      ],
+      "selection_facts": [
+        {
+          "fact_kind": "language",
+          "fact_value": "javascript",
+          "skill_id": "javascript-language-profile",
+          "source": "skills/README.md"
+        }
+      ],
+      "required_dependencies": [],
+      "support_files": [],
+      "content_identity": "b629fbc0100817f30a64bca43c924b0e919df61d5a8e30b125bd0c5eaf7f2d22"
+    },
+    {
+      "schema_version": "apg.skill-descriptor/v1",
+      "qualified_id": "apgr:jsx-language-profile",
+      "body_bytes": 9132,
+      "body_characters": 9104,
+      "body_sha256": "ac47225907d4a3ef28df6093fa9aac020c59a27ee760831e01717423ad2ca225",
+      "canonical_path": "jsx-language-profile/SKILL.md",
+      "description": "Use when JSX-specific judgment is material to element, attribute, child, expression, fragment, spread, file-kind, or transform semantics; not for React behavior, TypeScript checking, JavaScript evaluation, runtime hosts, MDX, Astro, or build tools.",
+      "description_bytes": 248,
+      "description_characters": 248,
+      "id": "jsx-language-profile",
+      "lines": 160,
+      "body_only_bytes": 8835,
+      "body_only_characters": 8807,
+      "body_only_sha256": "ee088a93436431c5a6b29a0c5c60ec0e5c93515d36e0272a36ea710b1558d707",
+      "description_sha256": "a237137bbe312bb50cd5f5881a8568a320cc16695058f3051d75928dcce4a2f9",
+      "tokens": null,
+      "do_not_use": "Do not use this profile for:\n\n- React components, hooks, rendering, reconciliation, state, effects, context,\n  or library-facing `key` behavior; route to `react-component-profile`;\n- TypeScript checking of `.tsx`, generic component typing, prop typing, or\n  intrinsic-element declarations; route to `typescript-language-profile`;\n- JavaScript evaluation, coercion, scope, modules, promises, or runtime values;\n  route to `javascript-language-profile`;\n- Node package mapping, loaders, process state, filesystem, timers, or other\n  host behavior; route to `nodejs-runtime-profile`;\n- bundler, dev-server, minifier, compiler-package, or transpiler selection and\n  build orchestration;\n- the MDX document/component seam or Astro component, island, routing, and\n  project semantics; route to `mdx-profile` or `astro-profile`;\n- generic planning, debugging, review, or test discipline; or\n- styling, accessibility, browser behavior, product design, deployment, or\n  dependency adoption.\n\nA routed owner remains independently selected. This profile does not invoke or\nreproduce that owner's guidance.",
+      "project_owned_parameters": "The project owns the parser and transform package, exact versions and\ninvocations, file extensions and source ownership, `jsx` mode,\n`jsxImportSource`, factories and fragment factories, import/export and module\npolicy, TypeScript project and checking options, component library and runtime,\nbundler and build pipeline, generated-artifact policy, formatting, security,\naccessibility, performance, test strategy, accepted exceptions, deployment,\npublication, and rollback. Stricter repository policy controls.",
+      "trigger_boundary": "JSX-specific judgment is material to element, attribute, child, expression, fragment, spread, file-kind, or transform semantics; not for React behavior, TypeScript checking, JavaScript evaluation, runtime hosts, MDX, Astro, or build tools",
+      "maturity": "provisional",
+      "source_declared_maturity": "",
+      "consumer_limitations": [
+        "docs/guides/skill-context-bundles.md"
+      ],
+      "selection_facts": [
+        {
+          "fact_kind": "capability",
+          "fact_value": "jsx",
+          "skill_id": "jsx-language-profile",
+          "source": "docs/architecture/v0-6-skill-ownership-and-context-budget.md#2.1"
+        }
+      ],
+      "required_dependencies": [],
+      "support_files": [],
+      "content_identity": "d21b6e09ef784ac0b99b2e857bcc001b114abb1827b734367b6b0e6399766319"
+    },
+    {
+      "schema_version": "apg.skill-descriptor/v1",
+      "qualified_id": "apgr:markdown-language-profile",
+      "body_bytes": 11566,
+      "body_characters": 11522,
+      "body_sha256": "0102078f16b28b9054ec008218ab5877621540705297307482c7c58447a7013a",
+      "canonical_path": "markdown-language-profile/SKILL.md",
+      "description": "Use when a material decision depends on the repository's actual Markdown parser or selected-dialect document semantics, or on qualitative Markdown document-structure policy.",
+      "description_bytes": 173,
+      "description_characters": 173,
+      "id": "markdown-language-profile",
+      "lines": 216,
+      "body_only_bytes": 11339,
+      "body_only_characters": 11295,
+      "body_only_sha256": "7f7d818234777b030377c4a6c7496042a82a62514a346a0d0a1b4f5da42e8fb3",
+      "description_sha256": "c66aa73d24ca2f5747bb60fdf5f510191f86ae3aafdf4ca7cb787b161c279505",
+      "tokens": null,
+      "do_not_use": "\u003c!-- APG-CLAUSE: MARKDOWN-NONTRIGGER --\u003e\nDo not use this profile for:\n\n- ordinary prose drafting, tone, house style, or editorial preference;\n- fact checking or content strategy;\n- HTML element semantics, sanitization policy, or accessibility acceptance;\n- frontmatter data syntax, schema, field values, routes, or publication\n  metadata;\n- the semantics of code inside a fence — the embedded language owns fenced\n  content;\n- whole-file work on `.mdx` files — MDX owns whole-file semantics even when\n  the content looks like plain Markdown, and this profile keeps no\n  independent whole-file claim there;\n- Astro, Starlight, or other site-pipeline configuration;\n- selecting a parser, plugin, formatter, linter, or link checker; or\n- formatting runs, lint runs, builds, previews, or deployment.\n\nA non-trigger is a routine handoff, not a Green Markdown decision:\nwhole-file Markdown selection is absent, and any named receiving owner is\nidentified exactly.",
+      "project_owned_parameters": "The repository owns the actual parser and extension set; plugin and pipeline\nconfiguration; frontmatter schema and approved values; raw-HTML permission\npolicy; asset and link-checking policy; formatter, linter, and tool\nselection; document taxonomy and navigation conventions; content strategy;\npublication and deployment; artifact classifications; accepted exceptions;\nand any stricter repository policy, which always controls.",
+      "trigger_boundary": "A material decision depends on the repository's actual Markdown parser or selected-dialect document semantics, or on qualitative Markdown document-structure policy",
+      "maturity": "provisional",
+      "source_declared_maturity": "",
+      "consumer_limitations": [
+        "docs/guides/skill-context-bundles.md"
+      ],
+      "selection_facts": [
+        {
+          "fact_kind": "language",
+          "fact_value": "markdown",
+          "skill_id": "markdown-language-profile",
+          "source": "skills/README.md"
+        }
+      ],
+      "required_dependencies": [],
+      "support_files": [],
+      "content_identity": "fff4056eb6a9833050f8ac2415f9d7e7d2996605d32c378a6cdb5646113faf11"
+    },
+    {
+      "schema_version": "apg.skill-descriptor/v1",
+      "qualified_id": "apgr:mdx-profile",
+      "body_bytes": 9294,
+      "body_characters": 9278,
+      "body_sha256": "2f3cf843716cfc3348dabee8238608a78b051aaf69f914230ae55fa57152615c",
+      "canonical_path": "mdx-profile/SKILL.md",
+      "description": "Use when an MDX decision depends on the Markdown-to-JSX/component seam, imports/exports, expressions, provider mapping, or compile/runtime split; not for pure Markdown, JSX, React, TypeScript, JavaScript, or Astro.",
+      "description_bytes": 214,
+      "description_characters": 214,
+      "id": "mdx-profile",
+      "lines": 166,
+      "body_only_bytes": 9040,
+      "body_only_characters": 9024,
+      "body_only_sha256": "544fa529bad82a7fc0ac83e21d9b1c2cd7c1eacdc0b34df0ab9d24907f437ee3",
+      "description_sha256": "39d8f14a57179ca0024406fd83af0f630656fa08a86505572e9652aee7057554",
+      "tokens": null,
+      "do_not_use": "Do not use this profile for:\n\n- pure Markdown headings, lists, links, references, or dialect behavior, owned\n  by `markdown-language-profile`;\n- library-independent JSX grammar or transform configuration, owned by\n  `jsx-language-profile`;\n- React component, Hook, state, Effect, or render behavior, owned by\n  `react-component-profile`;\n- TypeScript checking of `.tsx` or imported typed components, owned by\n  `typescript-language-profile`;\n- general JavaScript evaluation semantics, owned by\n  `javascript-language-profile`;\n- Astro collection, route, island, directive, project, or integration behavior,\n  owned by `astro-profile`;\n- a site's broader content pipeline, framework configuration, deployment, or\n  publication; or\n- generic planning, debugging, review, and test-discipline procedure.\n\nA non-trigger is an exact handoff, not a Green MDX decision. If removing every\nJSX element, component expression, import, export, and provider concern leaves\nthe question intact, route the surviving decision to Markdown or its other\nactual owner.",
+      "project_owned_parameters": "The project owns whether MDX is selected; the exact compiler, integration,\nplugins, format and JSX-runtime options; enabled Markdown dialect; component\nmapping and provider; host framework and content pipeline; module trust and\nevaluation policy; generated-output ownership; TypeScript and JavaScript\npolicy; component library; test boundary; protected data; dependencies;\naccepted exceptions; validation; rollback; publication; and deployment.\nStricter repository policy controls.",
+      "trigger_boundary": "An MDX decision depends on the Markdown-to-JSX/component seam, imports or exports, expressions, provider mapping, or compile/runtime split; not for pure Markdown, JSX, React, TypeScript, JavaScript, or Astro behavior",
+      "maturity": "provisional",
+      "source_declared_maturity": "",
+      "consumer_limitations": [
+        "docs/guides/skill-context-bundles.md"
+      ],
+      "selection_facts": [
+        {
+          "fact_kind": "capability",
+          "fact_value": "mdx-documents",
+          "skill_id": "mdx-profile",
+          "source": "docs/architecture/v0-6-skill-ownership-and-context-budget.md#2.3"
+        }
+      ],
+      "required_dependencies": [],
+      "support_files": [],
+      "content_identity": "a65909d38ee4dc285c6436007a8448bd3c4050e5adeea82a00450227b2a04644"
+    },
+    {
+      "schema_version": "apg.skill-descriptor/v1",
+      "qualified_id": "apgr:minitest-test-profile",
+      "body_bytes": 20755,
+      "body_characters": 20713,
+      "body_sha256": "9b50db3e33ec007f958fb3c58e8f4e08fe3c5093ac64187a464451948778b443",
+      "canonical_path": "minitest-test-profile/SKILL.md",
+      "description": "Use when Minitest-specific judgment is material to test or spec organization, assertions, lifecycle, mocks, stubs, fixture alternatives, isolation, parallelism, filtering, runners, plugins, reporters, subprocess, filesystem, or database test boundaries, or warning and crisis thresholds beyond repository policy.",
+      "description_bytes": 312,
+      "description_characters": 312,
+      "id": "minitest-test-profile",
+      "lines": 334,
+      "body_only_bytes": 20393,
+      "body_only_characters": 20351,
+      "body_only_sha256": "04c65b60c16549725c4fe340b8793b9fcc35c11fd2a113d686d9a7f0fe180156",
+      "description_sha256": "3f74c3992adf838d502ed313f79a68e30790c2c11966f75b88decce179577ce4",
+      "tokens": null,
+      "do_not_use": "Do not use this profile for:\n\n- ordinary Ruby implementation with no material Minitest behavior;\n- RSpec-specific work when no Minitest boundary is involved;\n- a simple assertion or test edit requiring no Minitest-specific judgment;\n- choosing Minitest, a plugin, a Ruby version, a Minitest version, a mock\n  library, a reporter, a coverage tool, or another dependency;\n- framework selection or migration between test frameworks;\n- selecting project test files, exact commands, worker counts, CI matrices,\n  coverage thresholds, or support matrices;\n- changing project-owned unit, integration, coverage, CI, or test-command\n  policy;\n- harness-neutral subprocess, filesystem, or database integration with no\n  material Minitest behavior;\n- generic planning, implementation, debugging, or review procedure;\n- authorizing live services, host mutation, protected-data access, dependencies,\n  destructive action, release, or publication;\n- automatic restructuring of a legacy test tree; or\n- structural action on generated, vendored, fixture, snapshot, migration,\n  compatibility, or data-driven artifacts before classification.",
+      "project_owned_parameters": "The target repository owns Ruby engines and versions; Minitest, mock, plugin,\nreporter, Rails, Bundler, gem, and platform versions; framework selection and\ndependencies; test layout, discovery roots, naming, filters, commands, worker\ncounts, seeds, CI, coverage, fixture architecture and dependencies, timeouts,\ntemporary roots, live-service and integration policy, expected test inventory,\nsupported combinations, artifact classification, accepted exceptions,\nvalidation, rollback, protected data, external mutation, release, and\ndestructive-action authority.",
+      "trigger_boundary": "Minitest-specific judgment is material to test or spec organization, assertions, lifecycle, mocks, stubs, fixture alternatives, isolation, parallelism, filtering, runners, plugins, reporters, subprocess, filesystem, or database test boundaries, or warning and crisis thresholds beyond repository policy",
+      "maturity": "provisional",
+      "source_declared_maturity": "",
+      "consumer_limitations": [
+        "docs/guides/skill-context-bundles.md"
+      ],
+      "selection_facts": [
+        {
+          "fact_kind": "test_framework",
+          "fact_value": "minitest",
+          "skill_id": "minitest-test-profile",
+          "source": "skills/README.md#APG32"
+        }
+      ],
+      "required_dependencies": [],
+      "support_files": [],
+      "content_identity": "249b066ab16414343de1414d64659c0e12b7dd6662366b3f464542a4477f531e"
+    },
+    {
+      "schema_version": "apg.skill-descriptor/v1",
+      "qualified_id": "apgr:nix-language-profile",
+      "body_bytes": 19016,
+      "body_characters": 18954,
+      "body_sha256": "fc2836b0f09b03b80aa1bedb0240aa363f5e856d046c804f4205d64ea33090e3",
+      "canonical_path": "nix-language-profile/SKILL.md",
+      "description": "Use when Nix-specific judgment is material to expressions, attribute sets, modules, derivations, flakes, overlays, purity, evaluation, store exposure, activation, remote builders, or warning and crisis thresholds beyond repository policy.",
+      "description_bytes": 238,
+      "description_characters": 238,
+      "id": "nix-language-profile",
+      "lines": 322,
+      "body_only_bytes": 18729,
+      "body_only_characters": 18667,
+      "body_only_sha256": "2a74ef15b059240e882624e9855f9454510caa048758b723be0b357ca1b5552a",
+      "description_sha256": "74fd0fc9a6fdf19ec1fb4dc29e275a82266ced1af2a08859d42173734fde38ac",
+      "tokens": null,
+      "do_not_use": "Do not use this profile for:\n\n- a comment, typo, formatting-only edit, or mechanical rename with no material\n  Nix-specific judgment;\n- generic design, planning, implementation, debugging, or review procedure;\n- selecting a Nix, NixOS, or Nixpkgs version, formatter, analyzer, module\n  system, package source, deployment model, or host policy;\n- authorizing expression evaluation, dependency fetch, a build, store\n  inspection or mutation, garbage collection, activation, system switch,\n  remote builder, or destructive action;\n- automatically rewriting generated lock files, machine-produced expressions,\n  historical artifacts, or existing Red owners;\n- treating a hash or locked revision as proof of source trust, provenance,\n  licensing, compatibility, or review; or\n- inferring reachable attribute names, derivation contents, store paths,\n  closure size, build behavior, or activation effects by executing target Nix.",
+      "project_owned_parameters": "The target repository owns supported Nix, NixOS, and Nixpkgs versions;\nplatforms; formatter and analyzer; flake, lock, channel, overlay, module,\npackage, derivation, output, store, remote-builder, deployment, activation,\ntest, supply-chain, protected-data, exception, validation, rollback, release,\nand destructive-action policy. The current task owns whether any evaluation,\nfetch, build, store, activation, remote, or destructive operation is authorized.\nNo response level grants Nix evaluation or host access.",
+      "trigger_boundary": "Nix-specific judgment is material to expressions, attribute sets, modules, derivations, flakes, overlays, purity, evaluation, store exposure, activation, remote builders, or warning and crisis thresholds beyond repository policy",
+      "maturity": "stable",
+      "source_declared_maturity": "",
+      "consumer_limitations": [
+        "docs/guides/skill-context-bundles.md"
+      ],
+      "selection_facts": [
+        {
+          "fact_kind": "language",
+          "fact_value": "nix",
+          "skill_id": "nix-language-profile",
+          "source": "skills/README.md"
+        }
+      ],
+      "required_dependencies": [],
+      "support_files": [],
+      "content_identity": "4075480ec86ecc53cfdd5c815e9f09e8918d45ea03d1b77393b642776a191478"
+    },
+    {
+      "schema_version": "apg.skill-descriptor/v1",
+      "qualified_id": "apgr:nix-test-profile",
+      "body_bytes": 17634,
+      "body_characters": 17612,
+      "body_sha256": "856a68e344c27cfe8616f07180259ba70e68f216b5352ec8c3f68e9455ce9878",
+      "canonical_path": "nix-test-profile/SKILL.md",
+      "description": "Use when Nix test judgment is material to selecting which already-selected testing surface can prove an exact claim, package check and install-check behavior, flake checks, Nixpkgs or NixOS test ownership, test-evidence qualification across sandbox, store, builder, or cache boundaries, or Nix-test-specific structural review.",
+      "description_bytes": 326,
+      "description_characters": 326,
+      "id": "nix-test-profile",
+      "lines": 299,
+      "body_only_bytes": 17263,
+      "body_only_characters": 17241,
+      "body_only_sha256": "9eb6df50de5802a8988b5204cc048ab34c607c2ca19d9fcc06de6efa95276d05",
+      "description_sha256": "939b74147f11b57f2ea6ef5604e9b503a9ba1c589318bf52ae65a99cb7e1ebca",
+      "tokens": null,
+      "do_not_use": "Do not use this profile for:\n\n- generic Nix language semantics with no test-surface decision, owned by\n  `nix-language-profile`;\n- dependency or input selection, pinning policy as such, or exact command,\n  attribute, system, builder, or cache selection, which are project-owned;\n- ordinary package implementation with no test-surface decision, or simple\n  source edits governed by a complete repository-local policy;\n- Python semantics in a driver script alone, or shell semantics in a phase\n  script alone, owned by the applicable language profile;\n- activation or deployment execution, which is outside this profile;\n- generic implementation, debugging, planning, or review procedure; or\n- authorizing evaluation, build, store mutation, container or virtual-machine\n  execution, activation, deployment, or external services.\n\nPair with a language or process profile only when it is independently\nmaterial. No pairing is mandatory.",
+      "project_owned_parameters": "The repository owns Nix, Nixpkgs, and NixOS selection and versions, channels,\nflake inputs and pinning, exact commands and attributes, selected systems and\nplatforms, the actual sandbox and impurity configuration, builders, caches,\nemulation, node and resource budgets, expensive-test and capacity policy,\nworker and CI policy, artifact retention, protected-data classification,\nconsumers, accepted exceptions, execution authority, validation, and\nrollback.",
+      "trigger_boundary": "Nix test judgment is material to selecting which already-selected testing surface proves an exact claim, package phases, flake checks, Nixpkgs or NixOS test ownership, test-evidence qualification across sandbox, store, builder, or cache boundaries, or Nix-test-specific structural review",
+      "maturity": "provisional",
+      "source_declared_maturity": "",
+      "consumer_limitations": [
+        "docs/guides/skill-context-bundles.md"
+      ],
+      "selection_facts": [
+        {
+          "fact_kind": "test_framework",
+          "fact_value": "nix",
+          "skill_id": "nix-test-profile",
+          "source": "skills/README.md#APG40"
+        }
+      ],
+      "required_dependencies": [],
+      "support_files": [],
+      "content_identity": "f28f619d7ab5120faa7b8dd7d3dd1b178c185fe77e148896384b5f3d1daf673c"
+    },
+    {
+      "schema_version": "apg.skill-descriptor/v1",
+      "qualified_id": "apgr:nodejs-runtime-profile",
+      "body_bytes": 16864,
+      "body_characters": 16842,
+      "body_sha256": "a2fdb8256a214a58686a0bb7c02d3431feba2e6a51daa138d2befca27ec36c6d",
+      "canonical_path": "nodejs-runtime-profile/SKILL.md",
+      "description": "Use when a material decision depends on Node.js-specific host behavior — package scope and module mapping, CommonJS wrapper bindings, ESM host metadata, specifier resolution and package exports, module identity, process and CLI state, stdio and exit status, filesystem and path APIs, errors, signals, timers and the event loop, child processes and workers, or Node's exposure of network and Web-compatible APIs — for an established Node execution role whose exact version, platform, flags, package scope, loader, and whole-file owner are identified.",
+      "description_bytes": 553,
+      "description_characters": 549,
+      "id": "nodejs-runtime-profile",
+      "lines": 297,
+      "body_only_bytes": 16260,
+      "body_only_characters": 16242,
+      "body_only_sha256": "16f910f86ff4a2cede9ebbd700275dbf4fc02b6015e9eb23709e10b9fa43b0e9",
+      "description_sha256": "7b327a880b7a6512db64b7b845093d56c1fbdb0534e2dc0ecbc057dd4360512c",
+      "tokens": null,
+      "do_not_use": "\u003c!-- APG-CLAUSE: NODE-NONTRIGGER --\u003e\nDo not use this profile for:\n\n- ECMAScript language semantics: scope, coercion, ordinary object semantics,\n  functions, classes, iteration, Promise language semantics, or module binding\n  and evaluation. Node may supply host inputs such as parse-goal mapping,\n  linking, loading, or `HostEnqueuePromiseJob`; host input transfers no language\n  authority;\n- TypeScript: parsing, checking, inference, declaration emit, compiler options,\n  source transformation, or JavaScript-versus-TypeScript migration;\n- package managers: npm, pnpm, Yarn, or Bun installation, registry selection,\n  lockfile generation, workspace filtering, dependency solving, lifecycle-script\n  orchestration, publication, or supply-chain approval;\n- shell and operating system: tokenization, quoting, expansion, pipelines,\n  redirection, globbing, kernel scheduling, permissions, durability beyond the\n  Node API contract, service supervision, or container behavior;\n- network and security: DNS correctness, HTTP application correctness, TLS\n  policy, remote-service behavior, credential approval, threat acceptance, or\n  deployment exposure;\n- the browser and Web platform: DOM, rendering, storage, navigation, or browser\n  compatibility; or\n- build, test, and product policy: bundlers and transforms, lint policy,\n  test-framework semantics, release approval, readiness, publication,\n  deployment, or product architecture.\n\nA non-trigger names the receiving owner exactly. When that receiver is absent,\nthe named obligation remains `stop-and-escalate`: it is not a live handoff and\ndoes not claim completion. Adjacency to Node never makes it a Node decision.",
+      "project_owned_parameters": "The repository and project own: the JavaScript-versus-TypeScript choice; runtime\nfamily, version, platform, and flag selection; package shape, `type`,\nextensions, `exports`, and conditions; package-manager and workspace selection;\nbuild, transform, lint, and test selection; service, daemon, worker, and\nchild-process architecture; security approval; performance acceptance;\ndeployment; structural and migration policy; accepted exceptions; and any\nstricter repository policy, which always controls.",
+      "trigger_boundary": "A material decision depends on Node.js-specific host behavior for an established Node execution role whose exact version, platform, flags, package scope, loader, and whole-file owner are identified",
+      "maturity": "provisional",
+      "source_declared_maturity": "",
+      "consumer_limitations": [
+        "docs/guides/skill-context-bundles.md"
+      ],
+      "selection_facts": [
+        {
+          "fact_kind": "runtime",
+          "fact_value": "nodejs",
+          "skill_id": "nodejs-runtime-profile",
+          "source": "skills/README.md#APG81H"
+        }
+      ],
+      "required_dependencies": [],
+      "support_files": [],
+      "content_identity": "52bde20ea0af29514b1dbe0e4c42c6c4a53f3e83589549fe84b191cf49488f19"
+    },
+    {
+      "schema_version": "apg.skill-descriptor/v1",
+      "qualified_id": "apgr:npm-package-manager-profile",
+      "body_bytes": 10189,
+      "body_characters": 10187,
+      "body_sha256": "e43122620fbeb93dfce2efa3f0789d8fdc3c1f5bafdaa15b6b0f37cd620d94dc",
+      "canonical_path": "npm-package-manager-profile/SKILL.md",
+      "description": "Use when package management decisions depend on npm CLI contracts, package.json and lockfile v3 integrity, install versus ci execution, peer dependencies and overrides, workspaces, script lifecycle and ignore-scripts, local pack tarballs, caching, or publication provenance; not for Node host runtime or bundler transforms.",
+      "description_bytes": 323,
+      "description_characters": 323,
+      "id": "npm-package-manager-profile",
+      "lines": 163,
+      "body_only_bytes": 9810,
+      "body_only_characters": 9808,
+      "body_only_sha256": "f386a8f42f71f12985710e323937dd17e91724dfac79912f77a524b20b1db1d5",
+      "description_sha256": "9abb66e6c48a9f8966b9c7f289a675d2f7ea74af2075814ba97056edab11ec2b",
+      "tokens": null,
+      "do_not_use": "Do not select or upgrade npm merely to apply this profile. Do not administer\nregistry accounts, change credentials, publish packages or run unapproved code\nbecause a package command supports it. Node resolution of `exports`, process\nexecution and language semantics remain with their existing profiles.",
+      "project_owned_parameters": "Selected npm/Node identities, lock-shaping flags, workspace selection, approved script source identities, registry routing and package-content expectations belong to the project.",
+      "trigger_boundary": "Selected npm version, lockfiles, dependency resolution, scripts, workspaces, configuration and package contents",
+      "maturity": "provisional",
+      "source_declared_maturity": "",
+      "consumer_limitations": [
+        "docs/guides/skill-context-bundles.md"
+      ],
+      "selection_facts": [],
+      "required_dependencies": [],
+      "support_files": [],
+      "content_identity": "4357259b9590295728801f247b50b0053cc948a0fe164955aaa79ab27826431b"
+    },
+    {
+      "schema_version": "apg.skill-descriptor/v1",
+      "qualified_id": "apgr:planning-repository-work",
+      "body_bytes": 3975,
+      "body_characters": 3975,
+      "body_sha256": "1931f6c317202a116ecd8446e0cb185438f3606ad4a1868bca3f64f2191d64e7",
+      "canonical_path": "planning-repository-work/SKILL.md",
+      "description": "Use when an accepted objective requires multiple dependent implementation steps, cross-file coordination, staged risk reduction, or a durable handoff.",
+      "description_bytes": 150,
+      "description_characters": 150,
+      "id": "planning-repository-work",
+      "lines": 84,
+      "body_only_bytes": 3772,
+      "body_only_characters": 3772,
+      "body_only_sha256": "6ea3837ce0d613006541e2508cd3673766f273dfd82d04f3c866ff5e855ea10a",
+      "description_sha256": "08a0094d50d8b808760a9339ca0e7bae842d5965024e97c70313d9105ad3151b",
+      "tokens": null,
+      "do_not_use": "Do not use this skill for one obvious local action, unresolved design or\nauthority, open-ended exploration without a planning objective, or an adequate\nexisting plan. Do not use planning to reopen accepted design decisions.",
+      "project_owned_parameters": "The repository owns its file layout, phase model, task size, branch and commit\npolicy, test commands, required artifacts, reviewer gates, deployment process,\nand report format. A plan references or instantiates those rules without\nturning them into APG defaults.",
+      "trigger_boundary": "An accepted objective needs dependent steps, cross-file coordination, staged risk reduction, or durable handoff",
+      "maturity": "stable",
+      "source_declared_maturity": "",
+      "consumer_limitations": [
+        "docs/guides/skill-context-bundles.md"
+      ],
+      "selection_facts": [
+        {
+          "fact_kind": "work_class",
+          "fact_value": "planning",
+          "skill_id": "planning-repository-work",
+          "source": "skills/README.md"
+        }
+      ],
+      "required_dependencies": [],
+      "support_files": [],
+      "content_identity": "df224de524dd8da1faf1b25f4d654a34386b185695e27da1a21be9256b501fa7"
+    },
+    {
+      "schema_version": "apg.skill-descriptor/v1",
+      "qualified_id": "apgr:playwright-test-profile",
+      "body_bytes": 9545,
+      "body_characters": 9537,
+      "body_sha256": "55236d21aa70c5b202c2ac22f7adcdcf5313ecb75b2c42f9d4d0aeb06d1f3ccc",
+      "canonical_path": "playwright-test-profile/SKILL.md",
+      "description": "Use when a project selects Playwright Test and decisions depend on configuration, fixtures, locators, waiting, isolation, parallel execution, browser projects, network controls, or test artifacts; not for accessibility standards or general browser/runtime semantics.",
+      "description_bytes": 266,
+      "description_characters": 266,
+      "id": "playwright-test-profile",
+      "lines": 159,
+      "body_only_bytes": 9227,
+      "body_only_characters": 9219,
+      "body_only_sha256": "be3ef7c52ba90d7f81804053eb1482dcb994c84e1688b3c0f17447fe595fc69e",
+      "description_sha256": "80b1b6b1f44aa849b1ece8fe0525b1a92e57eb193187a2ce11ce6b99eea993f4",
+      "tokens": null,
+      "do_not_use": "Use only when the project has selected Playwright Test. Generic test strategy,\nJavaScript, TypeScript and Node keep their existing owners. SVG authoring belongs\nto `svg-language-profile`; accessible semantics and the evidence hierarchy belong\nto `web-accessibility-profile`. Browser/DOM runtime semantics need a separately\nselected owner. Do not install dependencies or change project policy merely to\napply this profile. Selection is explicit; adjacent profiles are not implicit.",
+      "project_owned_parameters": "The project selects versions, dependencies, browsers, environments, resources,\ntimeouts, retries, parallelism, snapshots, privacy and retention. This profile\ndoes not create universal numeric test-size or file-size limits. Caller context\nbudgets remain enforced independently of discovery-description reservations.",
+      "trigger_boundary": "Playwright-specific runner judgment is material to browser automation, fixtures, locators, auto-waiting, tracing, network interception, or page interactions; not for general test discipline, component styling, or accessibility audits",
+      "maturity": "provisional",
+      "source_declared_maturity": "",
+      "consumer_limitations": [
+        "docs/guides/skill-context-bundles.md"
+      ],
+      "selection_facts": [],
+      "required_dependencies": [],
+      "support_files": [],
+      "content_identity": "a981afcd9e5236ccc7d553a50474e19e9517a820149e925a0fc6ac84c5d2e088"
+    },
+    {
+      "schema_version": "apg.skill-descriptor/v1",
+      "qualified_id": "apgr:postgresql-database-profile",
+      "body_bytes": 17232,
+      "body_characters": 17174,
+      "body_sha256": "1994c1362dfb6c3706d47497d8b30f3c6cfde43aaab9aee5b87f7d769bd6729f",
+      "canonical_path": "postgresql-database-profile/SKILL.md",
+      "description": "Use when PostgreSQL-specific judgment is material to SQL, schemas, MVCC, transactions, locks, DDL, migrations, routines, triggers, security, backup and restore, replication, maintenance, or warning and crisis thresholds beyond repository policy.",
+      "description_bytes": 245,
+      "description_characters": 245,
+      "id": "postgresql-database-profile",
+      "lines": 287,
+      "body_only_bytes": 16931,
+      "body_only_characters": 16873,
+      "body_only_sha256": "2ae44a5453237b5894a1c2c3818ac0cc0a1895fdb3005536bdfaf259b3db6b7d",
+      "description_sha256": "b5ec018bd11835314bc3a9abe918f8ad5a65923aafd7f9aaa8b150b240f568b5",
+      "tokens": null,
+      "do_not_use": "Do not use this profile for:\n\n- a comment, typo, formatting-only edit, or ordinary parameterized query with\n  no material PostgreSQL-specific judgment;\n- generic design, planning, implementation, debugging, or review procedure;\n- selecting a PostgreSQL version, driver, ORM, migration framework, schema\n  tool, formatter, backup product, replication topology, or deployment policy;\n- authorizing a connection, query, migration, backup, restore, maintenance,\n  role change, extension, or destructive action;\n- automatically rewriting historical migrations or existing Red owners;\n- treating generated schemas, dumps, snapshots, fixtures, extension scripts,\n  or framework output as maintained source before classification; or\n- inferring production row counts, relation size, lock duration, transaction\n  age, WAL volume, lag, privileges, RPO/RTO, or restore duration from SQL text.",
+      "project_owned_parameters": "The repository owns supported PostgreSQL versions, extensions, drivers, ORM\nand migration tools, schemas, identifiers, compatibility, transaction and lock\npolicy, batch size, timeouts, deployment topology, environments, credentials,\nprivileges, RPO/RTO, backup mechanism, maintenance policy, replication, test\ncommands, rollout, and accepted exceptions. The current task owns whether any\nconnection, query, migration, backup, restore, maintenance, or destructive\noperation is authorized. No response level grants live database access.",
+      "trigger_boundary": "PostgreSQL-specific judgment is material to SQL, schemas, MVCC, transactions, locks, DDL, migrations, routines, triggers, security, backup and restore, replication, maintenance, or warning and crisis thresholds beyond repository policy",
+      "maturity": "provisional",
+      "source_declared_maturity": "",
+      "consumer_limitations": [
+        "docs/guides/skill-context-bundles.md"
+      ],
+      "selection_facts": [
+        {
+          "fact_kind": "repository_characteristic",
+          "fact_value": "postgresql",
+          "skill_id": "postgresql-database-profile",
+          "source": "skills/README.md#APG21"
+        }
+      ],
+      "required_dependencies": [],
+      "support_files": [],
+      "content_identity": "aeceeae28ecbfbe1afb6c99fedbe852b908c1e7d5b3ebc82fa53efef928d7bbc"
+    },
+    {
+      "schema_version": "apg.skill-descriptor/v1",
+      "qualified_id": "apgr:pytest-test-profile",
+      "body_bytes": 17844,
+      "body_characters": 17798,
+      "body_sha256": "94e7bb6806165cb5afc14e3c20a264c62b25bbbc7a7124e2ff160b1c57ebfd15",
+      "canonical_path": "pytest-test-profile/SKILL.md",
+      "description": "Use when pytest-specific judgment is material to discovery, collection, assertions, fixtures, parametrization, mocks, isolation, xdist, coverage, or warning and crisis thresholds beyond repository policy.",
+      "description_bytes": 204,
+      "description_characters": 204,
+      "id": "pytest-test-profile",
+      "lines": 310,
+      "body_only_bytes": 17592,
+      "body_only_characters": 17546,
+      "body_only_sha256": "b0b1f031282e6c2797c3e64858299dd77092c95280992c88368e4f9a00756fc5",
+      "description_sha256": "5b65fdb5fecdf20c1aa202a4b50a2c26c70827c9ed9edf1b43a14e695284b4e7",
+      "tokens": null,
+      "do_not_use": "Do not use this profile for:\n\n- ordinary Python implementation with no material pytest behavior;\n- `unittest` or another test harness when no pytest boundary is involved;\n- choosing pytest, a plugin, a Python version, a coverage target, a worker\n  count, an exact command, or a universal dependency set;\n- generic planning, implementation, debugging, or review procedure;\n- changing project-owned unit, integration, smoke, or release boundaries;\n- authorizing network, service, host, database, protected-data, destructive,\n  or other consequential external access;\n- a comment, spelling fix, mechanical rename, or assertion text edit with no\n  material harness judgment;\n- automatic restructuring of a legacy test tree; or\n- structural treatment of generated, vendored, snapshot, compatibility,\n  migration, or data artifacts before classification.",
+      "project_owned_parameters": "The target repository owns:\n\n- supported Python, pytest, plugin, coverage, and platform versions;\n- framework and dependency selection, package and supply-chain policy;\n- test roots, discovery patterns, markers, suites, commands, worker count,\n  scheduling, timeouts, retries, and CI behavior;\n- unit, integration, system, smoke, external-service, and release boundaries;\n- statement, line, branch, source-target, exclusion, and rounding policy;\n- fixtures, test data, generated artifacts, snapshots, compatibility matrices,\n  and accepted structural exceptions;\n- external resources, protected data, cleanup, retention, and reporting;\n- architecture, validation, rollback, mutation, release, publication, and\n  destructive-action authority.\n\nStricter project policy controls. APG's future eight-worker and 80/80/85\ncoverage policy is a project-owned example, not a universal pytest default.\nNo local exception weakens a superior safety, privacy, compatibility, or task-\nauthority stop.",
+      "trigger_boundary": "pytest-specific judgment is material to discovery, collection, assertions, fixtures, parametrization, mocks, isolation, xdist, coverage, or warning and crisis thresholds beyond repository policy",
+      "maturity": "provisional",
+      "source_declared_maturity": "",
+      "consumer_limitations": [
+        "docs/guides/skill-context-bundles.md"
+      ],
+      "selection_facts": [
+        {
+          "fact_kind": "test_framework",
+          "fact_value": "pytest",
+          "skill_id": "pytest-test-profile",
+          "source": "skills/README.md#APG26"
+        }
+      ],
+      "required_dependencies": [],
+      "support_files": [],
+      "content_identity": "1e6b6997a4fa8a24addb715a4947c515b0ae2aec14e3c90feb907da35d171127"
+    },
+    {
+      "schema_version": "apg.skill-descriptor/v1",
+      "qualified_id": "apgr:python-language-profile",
+      "body_bytes": 15448,
+      "body_characters": 15404,
+      "body_sha256": "5abc13f1a429232d1248452d668dd90012be01befbe33977f04f5435bcba2ca7",
+      "canonical_path": "python-language-profile/SKILL.md",
+      "description": "Use when Python implementation, design, debugging, or review needs Python-specific judgment about structure, complexity, public APIs, typing, concurrency, serialization, packaging, or warning and crisis thresholds beyond repository policy.",
+      "description_bytes": 239,
+      "description_characters": 239,
+      "id": "python-language-profile",
+      "lines": 281,
+      "body_only_bytes": 15157,
+      "body_only_characters": 15113,
+      "body_only_sha256": "635f86e026c8d2622a8d634417130fc85fe8c82cd31a5191ea4228043b4cb11f",
+      "description_sha256": "6c3d695d3f4ebfe907f7f0ec57a0d60aa5f22051c92714d91c9532d3d0c4564f",
+      "tokens": null,
+      "do_not_use": "Do not use this profile for:\n\n- a comment, typo, mechanical rename, or other edit with no material\n  Python-specific judgment;\n- generic planning, implementation, debugging, or review procedure;\n- selecting a framework, formatter, linter, type checker, test runner, package\n  manager, Python version, coverage target, or deployment model;\n- authorizing dependencies, migrations, live operations, publication, or\n  destructive action;\n- automatic broad refactoring of legacy code;\n- direct treatment of generated, vendored, migration, snapshot, or protocol\n  output before its ownership and generation path are classified; or\n- enforcing style preferences or warning levels as semantic truth.",
+      "project_owned_parameters": "The target repository owns:\n\n- supported Python versions and platforms;\n- framework, formatter, linter, type checker, test runner, and coverage policy;\n- package manager, build backend, dependency, and supply-chain policy;\n- public API, import, serialization, persistence, and compatibility promises;\n- generated, vendored, protocol, migration, snapshot, and test classifications;\n- deployment, concurrency, performance, and resource goals;\n- accepted threshold exceptions, architecture, validation commands, and\n  rollback form; and\n- mutation, migration, release, publication, and destructive-action authority.\n\nStricter project policy controls. A project exception does not weaken a\nsuperior safety, privacy, or task-authority stop.",
+      "trigger_boundary": "Python-specific judgment is material to structure, complexity, public APIs, typing, concurrency, serialization, packaging, or warning and crisis thresholds beyond repository policy",
+      "maturity": "stable",
+      "source_declared_maturity": "",
+      "consumer_limitations": [
+        "docs/guides/skill-context-bundles.md"
+      ],
+      "selection_facts": [
+        {
+          "fact_kind": "language",
+          "fact_value": "python",
+          "skill_id": "python-language-profile",
+          "source": "skills/README.md"
+        }
+      ],
+      "required_dependencies": [],
+      "support_files": [],
+      "content_identity": "079f575bcf4a96a02194a225c0f600aeaae74efe355590f2d95c34ebecaa3f05"
+    },
+    {
+      "schema_version": "apg.skill-descriptor/v1",
+      "qualified_id": "apgr:react-component-profile",
+      "body_bytes": 10341,
+      "body_characters": 10309,
+      "body_sha256": "68b1376e856c2366bba1afd8c92c543dbd56e5adde78ab4273acef6e11b09485",
+      "canonical_path": "react-component-profile/SKILL.md",
+      "description": "Use when React component judgment is material to composition, props, rendering, state, effects, hooks, context, memoization, error boundaries, or component testing; not for JSX syntax, language typing, runner mechanics, routing, styling, MDX, Astro, or metaframeworks.",
+      "description_bytes": 268,
+      "description_characters": 268,
+      "id": "react-component-profile",
+      "lines": 176,
+      "body_only_bytes": 10021,
+      "body_only_characters": 9989,
+      "body_only_sha256": "715bc6a360cee5035ae242c97b30fedca48f7fdfc039f39f437168bfc489aa49",
+      "description_sha256": "a786c60c7f0f123f8e627c9c1d3ea9c6e05265fdba11afc48ec7dd9147e15dcf",
+      "tokens": null,
+      "do_not_use": "Do not use this profile for:\n\n- JSX grammar, attributes, fragments, spread syntax, escaping, or transform\n  configuration; route to `jsx-language-profile`;\n- JavaScript evaluation or TypeScript prop, generic, and intrinsic-element\n  checking; route to `javascript-language-profile` or\n  `typescript-language-profile`;\n- Vitest configuration, mocks, fake timers, environment, isolation, snapshots,\n  or runner mechanics; route to `vitest-test-profile`;\n- deciding what to test, whether evidence is sufficient, or how implementation\n  proceeds; route to `implementing-with-test-discipline`;\n- routing, data loading, server components as metaframework behavior, bundling,\n  build tools, styling, accessibility, browser APIs, or deployment;\n- Astro projects and island directives or the MDX document/component seam;\n  route to `astro-profile` or `mdx-profile`; or\n- dependency adoption, generic frontend architecture, product behavior, or\n  performance acceptance.\n\nThe word “React” in a framework feature does not transfer ownership. A routed\nquestion remains open until its independently selected owner resolves it.",
+      "project_owned_parameters": "The project owns whether React is selected; exact React, renderer, host, and\ncompiler versions; component boundaries and prop contracts; state placement;\ncontext design; Effect policy; allowed Hooks; memoization and performance\nacceptance; error reporting; test renderer and environment; runner and mock\npolicy; router and metaframework; server/data boundaries; styling;\naccessibility; browser and runtime support; protected data; dependencies;\naccepted exceptions; validation; rollback; publication; and deployment.\nStricter repository policy controls.",
+      "trigger_boundary": "React component judgment is material to composition, props, rendering, state, effects, hooks, context, memoization, error boundaries, or component testing; not for JSX syntax, language typing, runner mechanics, routing, styling, MDX, Astro, or metaframeworks",
+      "maturity": "provisional",
+      "source_declared_maturity": "",
+      "consumer_limitations": [
+        "docs/guides/skill-context-bundles.md"
+      ],
+      "selection_facts": [
+        {
+          "fact_kind": "capability",
+          "fact_value": "react-components",
+          "skill_id": "react-component-profile",
+          "source": "docs/architecture/v0-6-skill-ownership-and-context-budget.md#2.2"
+        }
+      ],
+      "required_dependencies": [],
+      "support_files": [],
+      "content_identity": "30b6a6b7d5f120c7b2f2fd1ab85d5ea7843d4e0f8a2a737c9efbedde97bc0f19"
+    },
+    {
+      "schema_version": "apg.skill-descriptor/v1",
+      "qualified_id": "apgr:reviewing-and-verifying-repository-work",
+      "body_bytes": 6866,
+      "body_characters": 6866,
+      "body_sha256": "6d8c7025b7fbf8839f893b5d5e8fb7b764d97afaa5c1ffb3774452af0e55d869",
+      "canonical_path": "reviewing-and-verifying-repository-work/SKILL.md",
+      "description": "Use when a bounded repository artifact, change, phase, commit, or worker result requires evidence-backed acceptance, correction, disposition, or a completion claim.",
+      "description_bytes": 164,
+      "description_characters": 164,
+      "id": "reviewing-and-verifying-repository-work",
+      "lines": 131,
+      "body_only_bytes": 6634,
+      "body_only_characters": 6634,
+      "body_only_sha256": "26f1397627184bc50d6e76ffb0f8fd5b9cda9317bdeb68404c478997866fa5cb",
+      "description_sha256": "2c53f248ad61ad47b14062b9b51db16c64c219c2197dc4060f4b9c9d0a26de59",
+      "tokens": null,
+      "do_not_use": "Do not use this skill to invent review authority, replace unresolved design,\napprove work outside the reviewer mandate, or require a branch, pull request,\ncommit, push, or managed report that the project does not own. Casual feedback\nthat requests no disposition may use a lighter review.",
+      "project_owned_parameters": "The project owns reviewer independence, severity labels, required tests,\nsecurity and privacy review, Git and hosting workflow, correction authority,\npublication gates, durable records, and final acceptance actor.",
+      "trigger_boundary": "A bounded repository artifact, change, phase, commit, or worker result needs evidence-backed acceptance, correction, disposition, or a completion claim",
+      "maturity": "stable",
+      "source_declared_maturity": "",
+      "consumer_limitations": [
+        "docs/guides/skill-context-bundles.md"
+      ],
+      "selection_facts": [
+        {
+          "fact_kind": "work_class",
+          "fact_value": "review_verification",
+          "skill_id": "reviewing-and-verifying-repository-work",
+          "source": "skills/README.md"
+        }
+      ],
+      "required_dependencies": [],
+      "support_files": [],
+      "content_identity": "9d41988cfb2815fef22acb38abd6e9802bce09dc1301ef396dc0a13ef929ee76"
+    },
+    {
+      "schema_version": "apg.skill-descriptor/v1",
+      "qualified_id": "apgr:rtk-command-proxy",
+      "body_bytes": 6375,
+      "body_characters": 6375,
+      "body_sha256": "83434250ba929b54804ef58fe1a6e5f2a86d1456b4ab718b8b8264379d75fe3d",
+      "canonical_path": "rtk-command-proxy/SKILL.md",
+      "description": "Use when Codex or Claude Code needs to run, choose, verify, troubleshoot, or explain shell commands through RTK, including ordinary command execution, raw-output fallbacks, RTK meta commands, installation checks, name collisions, or Claude PreToolUse rewrite behavior.",
+      "description_bytes": 268,
+      "description_characters": 268,
+      "id": "rtk-command-proxy",
+      "lines": 118,
+      "body_only_bytes": 6061,
+      "body_only_characters": 6061,
+      "body_only_sha256": "7e0974241ed0b2b68c0569e28cee745097d066ca4499c095b609fdb4c17033ba",
+      "description_sha256": "7fc4f0e005d1c340f925ee9c3004c2763eac4a880e9e51bb54d36182bfbb4139",
+      "tokens": null,
+      "do_not_use": "Do not use this skill:\n\n- when the RTK integration is unconfigured, disabled, or unavailable;\n- to bypass dispatcher-owned Git brokers, approval boundaries, or sandboxes;\n- to compress authoritative evidence, including Git commit hashes, tree diffs,\n  machine JSON reports, qualification receipts, or test artifacts;\n- to install, upgrade, or modify RTK binaries, host settings, shell hooks, or\n  project rules without explicit task authority;\n- to wrap dispatcher, launcher, or orchestration lifecycle commands;\n- to blindly replay a command raw after execution failure without inspecting\n  underlying state changes; or\n- as a substitute for explicit executable configuration.",
+      "project_owned_parameters": "The target repository and operator configuration own:\n\n- RTK integration enablement (`[integrations.rtk] enabled`);\n- absolute path to the configured RTK executable (`executable`);\n- minimum acceptable RTK version (`minimum_version`);\n- per-provider declared and effective execution modes (`[integrations.rtk.providers]`);\n- hook registration and settings paths (`settings.json`);\n- tool permissions, execution boundaries, and mutation scopes; and\n- qualification and verification standards.",
+      "trigger_boundary": "RTK command proxying applies, shell-efficiency guidance is requested, or RTK CLI commands are executed; not for raw shell execution without RTK",
+      "maturity": "provisional",
+      "source_declared_maturity": "",
+      "consumer_limitations": [
+        "docs/guides/skill-context-bundles.md"
+      ],
+      "selection_facts": [],
+      "required_dependencies": [],
+      "support_files": [],
+      "content_identity": "decaa17f8ba6b96280a741175d66634dbb428f2e05055d8bc7e9a0aeee1fff5a"
+    },
+    {
+      "schema_version": "apg.skill-descriptor/v1",
+      "qualified_id": "apgr:ruby-language-profile",
+      "body_bytes": 16849,
+      "body_characters": 16795,
+      "body_sha256": "145b13a05c8d3c503e1fe11b40ae870c6d56d9b4f7cbfc772f0eeaaaa90fd088",
+      "canonical_path": "ruby-language-profile/SKILL.md",
+      "description": "Use when Ruby-specific judgment is material to structure, exceptions, blocks, shared state, dynamic dispatch, metaprogramming, callbacks, concurrency, gems, public compatibility, serialization, subprocesses, or warning and crisis thresholds beyond repository policy.",
+      "description_bytes": 266,
+      "description_characters": 266,
+      "id": "ruby-language-profile",
+      "lines": 289,
+      "body_only_bytes": 16533,
+      "body_only_characters": 16479,
+      "body_only_sha256": "4b9e007c567451692a7449b49b803391d0d5d24c81514442a981a990ec8bd5ef",
+      "description_sha256": "de35fd391bfb8fb5e0f4e63e057d74149ea58fe50f147a360f8e99c67cb40760",
+      "tokens": null,
+      "do_not_use": "Do not use this profile for:\n\n- a comment, typo, mechanical rename, or edit with no material Ruby judgment;\n- generic planning, implementation, debugging, or review procedure;\n- selecting a Ruby engine or version, framework, formatter, analyzer, parser,\n  test runner, gem manager, dependency, deployment, or release policy;\n- authorizing runtime mutation, live operations, publication, dependencies, or\n  destructive action;\n- automatically refactoring existing Red code;\n- treating generated, vendored, DSL, fixture, migration, snapshot, schema,\n  protocol, or machine-produced artifacts as maintained source before\n  classification; or\n- treating RuboCop or fallback counts as universal semantic enforcement.",
+      "project_owned_parameters": "The target repository owns supported Ruby versions and engines; frameworks,\ngems, Bundler, formatter, analyzer, parser, test and coverage policy; public API,\nserialization, compatibility, autoload, callback, concurrency, subprocess,\ngenerated and artifact policy; dependencies, supply chain, deployment,\nperformance, accepted exceptions, validation, rollback, mutation, release, and\ndestructive-action authority.",
+      "trigger_boundary": "Ruby-specific judgment is material to structure, exceptions, blocks, shared state, dynamic dispatch, metaprogramming, callbacks, concurrency, gems, public compatibility, serialization, subprocesses, or warning and crisis thresholds beyond repository policy",
+      "maturity": "provisional",
+      "source_declared_maturity": "",
+      "consumer_limitations": [
+        "docs/guides/skill-context-bundles.md"
+      ],
+      "selection_facts": [
+        {
+          "fact_kind": "language",
+          "fact_value": "ruby",
+          "skill_id": "ruby-language-profile",
+          "source": "skills/README.md"
+        }
+      ],
+      "required_dependencies": [],
+      "support_files": [],
+      "content_identity": "00c444f181263c3519b1c183f5dade479245baf8e11eb89eba715343e894374a"
+    },
+    {
+      "schema_version": "apg.skill-descriptor/v1",
+      "qualified_id": "apgr:sqlite-database-profile",
+      "body_bytes": 17265,
+      "body_characters": 17205,
+      "body_sha256": "39bce0e13fe1009f859aff146885b24fd70e3fbe66bf7b064855810ed3568065",
+      "canonical_path": "sqlite-database-profile/SKILL.md",
+      "description": "Use when SQLite-specific judgment is material to SQL, transaction modes, single-writer concurrency, busy handling, journal or WAL behavior, schema rebuilds, pragmas, affinity, file ownership, backup and integrity, extensions, or warning and crisis thresholds beyond repository policy.",
+      "description_bytes": 284,
+      "description_characters": 284,
+      "id": "sqlite-database-profile",
+      "lines": 287,
+      "body_only_bytes": 16929,
+      "body_only_characters": 16869,
+      "body_only_sha256": "e87fd6b6058abfdefb2533edada2557397aab5c652ae2fd2f3af2cea7b6158df",
+      "description_sha256": "91427959e05384229900d786349611fe2dad29e2b868d8185b85a9790991f680",
+      "tokens": null,
+      "do_not_use": "Do not use this profile for:\n\n- a comment, typo, formatting-only edit, or ordinary parameterized query with\n  no material SQLite-specific judgment;\n- generic design, planning, implementation, debugging, or review procedure;\n- selecting an SQLite version, driver, ORM, migration framework, journal mode,\n  backup tool, VFS, filesystem, deployment, or connection-pool policy;\n- authorizing a database open, query, `ATTACH`, pragma change, migration,\n  checkpoint, backup, restore, replacement, extension load, or deletion;\n- automatically rewriting historical migrations or existing Red owners;\n- treating generated schemas, dumps, snapshots, fixtures, test corpora, or\n  framework output as maintained source before classification; or\n- inferring live writer contention, lock duration, database size, journal\n  state, filesystem behavior, or restore success from SQL text.",
+      "project_owned_parameters": "The repository owns the SQLite library and driver versions, build options,\nconnection and pool policy, migration framework, schema and compatibility,\ntransaction and busy policy, journal and checkpoint mode, filesystem and\nprocess topology, VFS and URI policy, extensions, file ownership and\npermissions, backup mechanism, validation, deployment, tests, and exceptions.\nThe current task owns whether any database may be opened, queried, attached,\ncheckpointed, migrated, backed up, restored, replaced, or deleted. This profile\ndoes not grant live database access.",
+      "trigger_boundary": "SQLite-specific judgment is material to SQL, transaction modes, single-writer concurrency, busy handling, journal or WAL behavior, schema rebuilds, pragmas, affinity, file ownership, backup and integrity, extensions, or warning and crisis thresholds beyond repository policy",
+      "maturity": "provisional",
+      "source_declared_maturity": "",
+      "consumer_limitations": [
+        "docs/guides/skill-context-bundles.md"
+      ],
+      "selection_facts": [
+        {
+          "fact_kind": "repository_characteristic",
+          "fact_value": "sqlite",
+          "skill_id": "sqlite-database-profile",
+          "source": "skills/README.md#APG21"
+        }
+      ],
+      "required_dependencies": [],
+      "support_files": [],
+      "content_identity": "c20980f7f8f371592d9f5a65843245ff0adc46da71e08b5695194df315675a80"
+    },
+    {
+      "schema_version": "apg.skill-descriptor/v1",
+      "qualified_id": "apgr:svg-language-profile",
+      "body_bytes": 13328,
+      "body_characters": 13312,
+      "body_sha256": "6b69d85bf33f51f53ecae038ccce393a8b39529cee5817313783fc2a2e6ef4ba",
+      "canonical_path": "svg-language-profile/SKILL.md",
+      "description": "Use when SVG authoring depends on namespaces, viewBox, paths, transforms, paint, reuse, clipping, masking, text, naming, resources, or serialization; not for general CSS, JSX, React, browser runtime, accessibility audits, or test automation.",
+      "description_bytes": 241,
+      "description_characters": 241,
+      "id": "svg-language-profile",
+      "lines": 227,
+      "body_only_bytes": 13038,
+      "body_only_characters": 13022,
+      "body_only_sha256": "8bfe183041ebbe86768e516ee3d645f216d4682dd81bf1b4ca516731be5cca7f",
+      "description_sha256": "346a0533e6523ac84430a32b896b97ebfcc8a9153f633c128b8b94e444778651",
+      "tokens": null,
+      "do_not_use": "Do not select SVG merely because a file contains an icon. Pure CSS cascade\nbelongs to `css-language-profile`, ECMAScript semantics to\n`javascript-language-profile`, static types to `typescript-language-profile`,\nJSX syntax to `jsx-language-profile`, and React state/rendering to\n`react-component-profile`. Astro and MDX keep their document/framework seams.\nHTML parsing, DOM lifecycle, browser compatibility, accessibility audits,\nPlaywright automation, Vite and package management require their own project\nowners. Future profiles for these subjects are not assumed installed.\n\nA non-trigger is a route to its owner, not a Green SVG decision. Broader visual\ndesign, brand strategy and typography selection are product decisions.",
+      "project_owned_parameters": "The project selects SVG representation and subset, renderer/browser/version,\nembedding mode, layout and theme rules, font assets, trusted inputs, resource\npolicy, generator/optimizer options, precision tolerances, accessibility\nrequirements, performance limits, test targets, dependencies and rollback.\nThe APGR skill-file byte ceiling is a context-authoring policy, never a limit\non a user's graphic. Do not invent universal document-size or complexity bands.",
+      "trigger_boundary": "SVG namespaces, viewport, geometry, paint, reuse, text, naming, resources or deterministic authoring affect the decision; route general CSS, JSX, React, browser and accessibility audit questions separately",
+      "maturity": "provisional",
+      "source_declared_maturity": "",
+      "consumer_limitations": [
+        "docs/guides/skill-context-bundles.md"
+      ],
+      "selection_facts": [],
+      "required_dependencies": [],
+      "support_files": [],
+      "content_identity": "8a109075417af35699d3765e782b669d2ed7cbf9fc12f709d420ffede77466a6"
+    },
+    {
+      "schema_version": "apg.skill-descriptor/v1",
+      "qualified_id": "apgr:synthesizing-repository-guidance",
+      "body_bytes": 6458,
+      "body_characters": 6458,
+      "body_sha256": "c51e170ad3245a1de186c0c6f663a42b065780947a4513467d49e5b8152a16df",
+      "canonical_path": "synthesizing-repository-guidance/SKILL.md",
+      "description": "Use when a dense, duplicated, mixed-scope, private, or source-derived guidance corpus needs ownership, provenance, privacy, migration, or rejection dispositions before any rewrite.",
+      "description_bytes": 180,
+      "description_characters": 180,
+      "id": "synthesizing-repository-guidance",
+      "lines": 136,
+      "body_only_bytes": 6217,
+      "body_only_characters": 6217,
+      "body_only_sha256": "7699b1b873c1d4cb64a83100d6768021f945bdc44b132955dcc643c9ea3d30d6",
+      "description_sha256": "4e70b2ab400395fa6274bfd48bbd8f43d9c062b4581fc350942d3cd635e8264e",
+      "tokens": null,
+      "do_not_use": "Do not use this skill to author a technically valid skill after its owner,\ntrigger, scenario contract, and destination are accepted; use native Codex\nskill-authoring guidance and the repository's authoring lifecycle. Do not use\nit for a simple documentation edit, direct implementation or debugging, or one\nalready coherent project-local policy change.\n\nIt does not own automatic root reduction, one-to-one private-skill migration,\npersonal or machine integration management, or immediate cutover, deletion,\npublication, or decommissioning. It is not a standards generator, migration\nengine, or implementation authority.",
+      "project_owned_parameters": "The task and repository own migration and implementation authority, instruction\nprecedence, source scope, public/private boundaries, licensing interpretation,\nthe accepted skill catalog, language-profile status, exact commands, versions,\nframeworks, test gates, cutover timing, release policy, destructive actions,\nand private-overlay ownership.\n\nThis skill proposes destinations; the project model owns the destinations,\nprovenance policy owns source and rights facts, the accepted authoring lifecycle\nowns skill creation and behavior-bearing correction, and native skill-writing\nguidance owns technical file construction after acceptance.",
+      "trigger_boundary": "A dense, duplicated, mixed-scope, private, or source-derived guidance corpus needs bounded ownership and migration dispositions before rewrite",
+      "maturity": "stable",
+      "source_declared_maturity": "",
+      "consumer_limitations": [
+        "docs/guides/skill-context-bundles.md"
+      ],
+      "selection_facts": [
+        {
+          "fact_kind": "work_class",
+          "fact_value": "guidance_synthesis",
+          "skill_id": "synthesizing-repository-guidance",
+          "source": "skills/README.md#APG17"
+        }
+      ],
+      "required_dependencies": [],
+      "support_files": [],
+      "content_identity": "f3819d598aabffb8afab9def043a1c7c403a8003534cf1f1e6ab53f25ac0e637"
+    },
+    {
+      "schema_version": "apg.skill-descriptor/v1",
+      "qualified_id": "apgr:typescript-language-profile",
+      "body_bytes": 11163,
+      "body_characters": 11145,
+      "body_sha256": "66f3432c90f017548a7d425b1a344b67a40a8fd96adaaa800b6c61da3e67840d",
+      "canonical_path": "typescript-language-profile/SKILL.md",
+      "description": "Use when a material decision depends on TypeScript-specific static semantics or type-erasure boundaries for an established source region, after the exact compiler role, version, options, project, source kind, and declaration environment are evidenced.",
+      "description_bytes": 251,
+      "description_characters": 251,
+      "id": "typescript-language-profile",
+      "lines": 216,
+      "body_only_bytes": 10856,
+      "body_only_characters": 10838,
+      "body_only_sha256": "19961c2206b2dc81b9e4e803a9b76c314bd4d7a8ac9a2382248848ad2f6a8528",
+      "description_sha256": "8a7da47a6fcc3cd4bc65d1ed84ac377e5f6edbd664d74112caac53039775f679",
+      "tokens": null,
+      "do_not_use": "\u003c!-- APG-CLAUSE: TS-NONTRIGGER --\u003e\nDo not use this profile for:\n\n- JavaScript source-language semantics outside TypeScript-specific analysis,\n  emitted-JavaScript behavior, runtime exceptions, or runtime validation;\n- selecting the compiler package, role, version, tsconfig values, project\n  references, file inclusion, module-resolution policy, or emit policy —\n  those are consumed facts owned by project and compiler-configuration\n  owners;\n- JSX syntax or transform decisions, whole-file `.astro`/`.mdx`/Vue/Svelte\n  host work, or extraction of embedded regions from a host;\n- Node.js, browser, or platform API behavior — declarations describe them;\n  this profile never decides them;\n- type stripping, transpilation, bundling, build orchestration, or runtime\n  module loading;\n- structural decomposition policy, file-size judgment, or\n  JavaScript-to-TypeScript migration decisions; or\n- installing, upgrading, or configuring any tool.\n\nA non-trigger is a routine handoff with the receiving owner named exactly;\nit is not a TypeScript decision.",
+      "project_owned_parameters": "The repository and project own: the compiler package, role, and exact\nversion selection; tsconfig values, project references, and file inclusion;\nthe declaration environment and lib/types surface; host and embedded\ntooling and its compiler support line; build, emit, and module-loading\npolicy; structural and migration policy; artifact classifications and\naccepted exceptions; and any stricter repository policy, which always\ncontrols.",
+      "trigger_boundary": "A material decision depends on TypeScript-specific static semantics or type-erasure boundaries for an established source region, after the exact compiler role, version, options, project, source kind, and declaration environment are evidenced",
+      "maturity": "provisional",
+      "source_declared_maturity": "",
+      "consumer_limitations": [
+        "docs/guides/skill-context-bundles.md"
+      ],
+      "selection_facts": [
+        {
+          "fact_kind": "language",
+          "fact_value": "typescript",
+          "skill_id": "typescript-language-profile",
+          "source": "skills/README.md"
+        }
+      ],
+      "required_dependencies": [],
+      "support_files": [],
+      "content_identity": "d963ae7f7dca66bf8788f720354c0b3ee689e92690a4be41e5a43cb0200123a1"
+    },
+    {
+      "schema_version": "apg.skill-descriptor/v1",
+      "qualified_id": "apgr:vagrantfile-profile",
+      "body_bytes": 28338,
+      "body_characters": 28274,
+      "body_sha256": "8aad56e220a8f0f7fbecb0791a0482ea94e8880e38118060eef621119f81f128",
+      "canonical_path": "vagrantfile-profile/SKILL.md",
+      "description": "Use when Vagrantfile-specific judgment is material to configuration versions and loading, machines, boxes, provider blocks, networks, synced folders, provisioners, triggers, Vagrant state, host-dependent behavior, or warning and crisis thresholds beyond repository policy.",
+      "description_bytes": 272,
+      "description_characters": 272,
+      "id": "vagrantfile-profile",
+      "lines": 467,
+      "body_only_bytes": 28018,
+      "body_only_characters": 27954,
+      "body_only_sha256": "f212a9edb76b615186a1e9ec4343468a6b23c397d5ffca671b0d59c62b0df37d",
+      "description_sha256": "c1b43aee1e4869623f210c39e6d5d4b0f30cbb167499598c884ea52ecd5c3a50",
+      "tokens": null,
+      "do_not_use": "Do not use this profile for:\n\n- ordinary Ruby code with no material Vagrant behavior;\n- Terraform-only, Packer-only, or Docker-only work;\n- generic shell scripts, application code, or infrastructure policy with no\n  Vagrantfile-specific decision;\n- provider or hypervisor administration outside a Vagrantfile;\n- choosing Vagrant, a provider, box, plugin, host platform, provisioner,\n  synced-folder implementation, network exposure, firewall rule, dependency,\n  or tool;\n- selecting an exact Vagrant or lifecycle command, project command, CI/CD\n  workflow, release policy, or deployment procedure;\n- installing, updating, repairing, or removing a box or plugin;\n- evaluating or loading a Vagrantfile, `.vagrantplugins`, or Ruby helper;\n- creating, reloading, provisioning, suspending, halting, snapshotting, or\n  destroying a machine;\n- treating `.vagrant`, a machine index, provider identity, plugin state, or box\n  state as source;\n- assuming source review proves that a provider or plugin is installed, a box\n  is available, a port is free, a folder mounts, a machine boots, or\n  provisioning succeeds;\n- replacing general Ruby or shell guidance when those language semantics are\n  independently material;\n- treating generated, vendor-owned, home, or box configuration as maintained\n  project source before classification; or\n- automatically refactoring an existing Red Vagrantfile.\n\nThis profile does not grant authority to perform a Vagrant or provider\noperation.",
+      "project_owned_parameters": "The target repository owns whether to use Vagrant and a Vagrantfile; Vagrant,\nRuby, provider, plugin, box, metadata, architecture, URL, checksum, provenance,\nversion, and update policy; host platform, architecture, capability, provider,\nand hypervisor support; configuration layers and helpers; machine topology,\nnames, primary and autostart policy; networks, addresses, ports, bridges,\ninterfaces, collision allocation, exposure, firewall, and consumers; synced\nfolders, paths, direction, implementation, ownership, permissions, modes,\nsymlinks, and disable behavior; provisioners, triggers, interpreters,\nprivilege, environment, inputs, outputs, idempotency, lifecycle, failure,\ncleanup, and rollback; protected data; dependencies; exact commands; tests;\nperformance; accepted exceptions; mutation; release; and destructive-action\nauthority.",
+      "trigger_boundary": "Vagrantfile-specific judgment is material to configuration versions and loading, machines, boxes, provider blocks, networks, synced folders, provisioners, triggers, Vagrant state, host-dependent behavior, or warning and crisis thresholds beyond repository policy",
+      "maturity": "provisional",
+      "source_declared_maturity": "",
+      "consumer_limitations": [
+        "docs/guides/skill-context-bundles.md"
+      ],
+      "selection_facts": [
+        {
+          "fact_kind": "repository_characteristic",
+          "fact_value": "vagrantfile",
+          "skill_id": "vagrantfile-profile",
+          "source": "skills/README.md#APG34"
+        }
+      ],
+      "required_dependencies": [],
+      "support_files": [],
+      "content_identity": "43aa14b8fac306b684b487a90b1ecb6875ebdd1ea1c60f6a82daa90cfbf382c5"
+    },
+    {
+      "schema_version": "apg.skill-descriptor/v1",
+      "qualified_id": "apgr:vite-build-profile",
+      "body_bytes": 10845,
+      "body_characters": 10843,
+      "body_sha256": "c455c78206ef7dd759379d3889d9d55e888ea3700a55dfcb9b48e036e7c91482",
+      "canonical_path": "vite-build-profile/SKILL.md",
+      "description": "Use when a project selects Vite for dev serving or production building and decisions depend on root, base, publicDir, mode, env prefixes, loopback fs limits, Rolldown bundling, alias/CSS/plugin hooks, SSR seams, or preview.",
+      "description_bytes": 223,
+      "description_characters": 223,
+      "id": "vite-build-profile",
+      "lines": 174,
+      "body_only_bytes": 10575,
+      "body_only_characters": 10573,
+      "body_only_sha256": "4f65c67061cc1d35300f6e232a59f8fc848026b540fb612f7129645d2b15c222",
+      "description_sha256": "0ca97549bde8578f5fe92bc0894ba8df65bb95f53b032676ea484ce2c13ea6a6",
+      "tokens": null,
+      "do_not_use": "Do not select or install Vite merely to apply this profile. TypeScript checking,\nJavaScript semantics, React/JSX, Astro/MDX, Node process behavior, browser DOM,\naccessibility standards and Playwright automation retain their respective owners.\nTailwind/shadcn integration is consumer composition, not additional profile scope.",
+      "project_owned_parameters": "Selected Vite/Node versions, root/base/mode, config loader, serving allowlist, plugin set, build target and output disclosure policy belong to the project.",
+      "trigger_boundary": "Vite-specific build/dev configuration, environment exposure, assets, plugins, serving and Rolldown behavior",
+      "maturity": "provisional",
+      "source_declared_maturity": "",
+      "consumer_limitations": [
+        "docs/guides/skill-context-bundles.md"
+      ],
+      "selection_facts": [],
+      "required_dependencies": [],
+      "support_files": [],
+      "content_identity": "f08268504d3b5121da1cce8665ef7d99df42c000b8bc13679a467812a1c9fed0"
+    },
+    {
+      "schema_version": "apg.skill-descriptor/v1",
+      "qualified_id": "apgr:vitest-test-profile",
+      "body_bytes": 12586,
+      "body_characters": 12570,
+      "body_sha256": "fee2a2cc6b0ca495d59697a824d3707cbb691ece72a2839792503267dc0025aa",
+      "canonical_path": "vitest-test-profile/SKILL.md",
+      "description": "Use when a project has already selected Vitest 4.1 and runner-specific judgment is material to configuration, projects, environments, assertions, mocks, timers, concurrency, isolation, snapshots, or coverage providers; not for test sufficiency, language or React semantics, or coverage policy.",
+      "description_bytes": 293,
+      "description_characters": 293,
+      "id": "vitest-test-profile",
+      "lines": 214,
+      "body_only_bytes": 12245,
+      "body_only_characters": 12229,
+      "body_only_sha256": "eb75377df11627a357e7294e6c4f5a023e94c00c0fe059fecf4989eaa1bd0108",
+      "description_sha256": "62089b8bd6667ff6f41843ca2dedc2dacf4ad94e4362818d06709eb10a304a3f",
+      "tokens": null,
+      "do_not_use": "Do not use this profile for:\n\n- deciding whether to adopt Vitest, Vite, a DOM environment, browser provider,\n  coverage provider, or another dependency;\n- deciding what to test, whether evidence is sufficient, or how implementation\n  and review work should be sequenced;\n- ECMAScript evaluation, TypeScript checking or emit, Node host behavior,\n  component or hook semantics, JSX syntax, or browser and DOM correctness;\n- choosing coverage targets, exclusions, thresholds, branch policy, source\n  inventory, or acceptance;\n- package-manager resolution, Vite or bundler internals, deployment, or product\n  behavior;\n- generic planning, debugging, review, or repository architecture; or\n- authorizing dependency changes, network or service access, host mutation,\n  snapshot acceptance, publication, deployment, or destructive action.\n\nA routed question keeps its receiving owner's obligation open. Runner success\ndoes not answer a language, runtime, component, coverage-policy, or product\nquestion.",
+      "project_owned_parameters": "The target repository owns whether Vitest and each environment, pool, browser,\ncoverage, or reporting dependency is selected; exact versions and Node support;\npackage manager and lockfile; config entrypoints and precedence; projects,\npatterns, setup, globals, environment, pool, isolation, concurrency, timeouts,\nretries, reporters, cache, and CI; assertion, mock, timer, snapshot, serializer,\nand update policy; coverage sources, thresholds, exclusions, branch policy,\ncombination, retention, and acceptance; external services; protected data;\naccepted exceptions; validation; rollback; dependency mutation; release;\npublication; deployment; and destructive-action authority.\n\nStricter repository policy controls. No local exception weakens a superior\nsafety, privacy, truthfulness, compatibility, or task-authority stop.",
+      "trigger_boundary": "A project has already selected Vitest 4.1 and runner-specific judgment is material to configuration, projects, environments, assertions, mocks, timers, concurrency, isolation, snapshots, or coverage providers; not for test sufficiency, language or React semantics, or coverage policy",
+      "maturity": "provisional",
+      "source_declared_maturity": "",
+      "consumer_limitations": [
+        "docs/guides/skill-context-bundles.md"
+      ],
+      "selection_facts": [
+        {
+          "fact_kind": "test_framework",
+          "fact_value": "vitest-v4.1",
+          "skill_id": "vitest-test-profile",
+          "source": "docs/architecture/v0-6-skill-ownership-and-context-budget.md#2.5"
+        }
+      ],
+      "required_dependencies": [],
+      "support_files": [],
+      "content_identity": "f509ba2531b6be45f435a192c4508ad5399a51a77bf379bd278b77b34558c214"
+    },
+    {
+      "schema_version": "apg.skill-descriptor/v1",
+      "qualified_id": "apgr:web-accessibility-profile",
+      "body_bytes": 8942,
+      "body_characters": 8934,
+      "body_sha256": "9a31f3e1b3907260cf150b125f9c3c4918e0cc0cf20a0622867cf663f9e42a54",
+      "canonical_path": "web-accessibility-profile/SKILL.md",
+      "description": "Use when web implementation decisions affect native semantics, accessible names, keyboard and focus behavior, images/SVG, forms, dynamic content, motion, contrast, or accessibility evidence; not for test-runner mechanics or a claim of automated WCAG conformance.",
+      "description_bytes": 262,
+      "description_characters": 262,
+      "id": "web-accessibility-profile",
+      "lines": 154,
+      "body_only_bytes": 8626,
+      "body_only_characters": 8618,
+      "body_only_sha256": "8afa48a15067a41e716bc6ea76aba7566e3e85b75e93faf1615779fefed19bb9",
+      "description_sha256": "04cfc41994a335aec61c1e5b4cc3fdd01d66f1addab8c959cff6837931438a9f",
+      "tokens": null,
+      "do_not_use": "Do not use for generic visual design, SVG geometry, CSS language semantics,\nJavaScript/TypeScript behavior, React composition or Playwright runner mechanics.\nThose owners remain separate and explicitly selected. This profile does not\nreplace an accessibility audit, legal determination or assistive-technology study.",
+      "project_owned_parameters": "The project selects conformance target, user tasks, supported platforms and\nassistive technologies, widget contracts, content alternatives and review scope.\nDo not invent universal document-size thresholds or declare a draft normative\nmerely because current tooling exposes its terminology.",
+      "trigger_boundary": "Web accessibility judgment is material to accessibility auditing, ARIA attributes, semantic landmarks, focus management, screen-reader semantics, or testing hierarchy; not for CSS visual styling, component layout, or Playwright runner mechanics",
+      "maturity": "provisional",
+      "source_declared_maturity": "",
+      "consumer_limitations": [
+        "docs/guides/skill-context-bundles.md"
+      ],
+      "selection_facts": [],
+      "required_dependencies": [],
+      "support_files": [],
+      "content_identity": "fece4151e9e8b42fc99eba48699aec0579b9505fa1913ecdb78504719ebdcf2e"
+    },
+    {
+      "schema_version": "apg.skill-descriptor/v1",
+      "qualified_id": "apgr:zsh-language-profile",
+      "body_bytes": 13389,
+      "body_characters": 13339,
+      "body_sha256": "9cb35b613ddd3bcb861108e3d4336add551c17b203f2b55e4db21a3bdcc511b5",
+      "canonical_path": "zsh-language-profile/SKILL.md",
+      "description": "Use when Zsh-specific judgment is material to option state, arrays, expansion, globbing, autoloading, startup or interactive behavior, hooks, modules, processes, or warning and crisis thresholds beyond repository policy.",
+      "description_bytes": 220,
+      "description_characters": 220,
+      "id": "zsh-language-profile",
+      "lines": 231,
+      "body_only_bytes": 13120,
+      "body_only_characters": 13070,
+      "body_only_sha256": "f17131088bccf2082fa2b54656f1fcd1b1c487210d732769caec68be77480d79",
+      "description_sha256": "7d916d62d1123b1a1a212c48b33cf4c019eb7d55f5fd6f4c8df1defca2a010ff",
+      "tokens": null,
+      "do_not_use": "Do not use this profile for:\n\n- Bash, POSIX-shell, or another dialect with no material native Zsh behavior;\n- ZUnit runner, assertion, discovery, configuration, or fixture behavior;\n- generic implementation, debugging, planning, or review procedure;\n- selecting a shell, framework, formatter, linter, test runner, completion\n  system, plugin manager, or exact command;\n- authorizing startup mutation, host changes, dependencies, privilege,\n  publication, or destructive action;\n- a typo, comment, rename, or edit with no material Zsh judgment;\n- automatic broad refactoring of legacy startup or operational code; or\n- structural treatment of generated, vendored, fixture, snapshot, migration,\n  compatibility, or data artifacts before classification.",
+      "project_owned_parameters": "The repository owns Zsh versions, interpreter and invocation mode, option\nbaseline, platform, startup scope, interactive behavior, completion, ZLE,\nmodule and plugin policy, formatter and analyzer choices, tests, exact commands,\ndependencies, artifact classifications, accepted exceptions, architecture,\nprivilege, mutation, destructive-action authority, validation, and rollback.",
+      "trigger_boundary": "Zsh-specific judgment is material to option state, arrays, expansion, globbing, autoloading, startup or interactive behavior, hooks, modules, processes, or warning and crisis thresholds beyond repository policy",
+      "maturity": "stable",
+      "source_declared_maturity": "",
+      "consumer_limitations": [
+        "docs/guides/skill-context-bundles.md"
+      ],
+      "selection_facts": [
+        {
+          "fact_kind": "language",
+          "fact_value": "zsh",
+          "skill_id": "zsh-language-profile",
+          "source": "skills/README.md"
+        }
+      ],
+      "required_dependencies": [],
+      "support_files": [],
+      "content_identity": "cc513f3b1b1276cb11ebc075c5ecd7a772c60b380783fbdc4b7ff799139f9d0d"
+    },
+    {
+      "schema_version": "apg.skill-descriptor/v1",
+      "qualified_id": "apgr:zunit-test-profile",
+      "body_bytes": 12191,
+      "body_characters": 12147,
+      "body_sha256": "211463f96a00319d057a135c7fe7252508e7b2cf39efd6bda7297591933637bd",
+      "canonical_path": "zunit-test-profile/SKILL.md",
+      "description": "Use when a repository explicitly uses the APG-verified ZUnit v0.8.2 and Zsh 5.9.2 pair and needs ZUnit-specific judgment about runner invocation, discovery, assertions, hooks, configuration, output, isolation, process cleanup, compatibility, or warning and crisis thresholds beyond repository policy.",
+      "description_bytes": 300,
+      "description_characters": 300,
+      "id": "zunit-test-profile",
+      "lines": 215,
+      "body_only_bytes": 11844,
+      "body_only_characters": 11800,
+      "body_only_sha256": "9471412cb3f7778eba049ac7bca8283e813a7c91076de1a8a51fb586d9aeb26e",
+      "description_sha256": "f737bd625dcb3ca0d25f3fca40823ae8518b8e532223c552fbb03c76b7cf4a3a",
+      "tokens": null,
+      "do_not_use": "Do not use this profile for:\n\n- any ZUnit/Zsh pair other than v0.8.2 with 5.9.2;\n- ordinary Zsh work without material ZUnit behavior;\n- another Zsh test framework or a trivial edit with no framework judgment;\n- choosing ZUnit, Zsh, Revolver, the runner command, CI platform, or coverage;\n- generic implementation, debugging, planning, or review procedure;\n- global installation, startup-file mutation, live host mutation, or framework\n  maintenance;\n- inferring current support from an upstream minimum or adjacent version;\n- automatic broad restructuring of legacy tests; or\n- structural action on generated, vendored, fixture, snapshot, compatibility,\n  or data-driven artifacts before classification.",
+      "project_owned_parameters": "The repository owns exact versions, platform, Revolver source, runner command,\nstartup isolation, discovery roots, configuration, output mode, test names,\nhelpers, fixtures, time limits, process policy, CI, coverage, artifact\nclassification, accepted exceptions, authority, validation, and rollback.",
+      "trigger_boundary": "An exact APG-verified ZUnit v0.8.2 and Zsh 5.9.2 pair needs ZUnit-specific judgment about runner invocation, discovery, assertions, hooks, configuration, output, isolation, process cleanup, compatibility, or warning and crisis thresholds beyond repository policy",
+      "maturity": "stable",
+      "source_declared_maturity": "",
+      "consumer_limitations": [
+        "docs/guides/skill-context-bundles.md"
+      ],
+      "selection_facts": [
+        {
+          "fact_kind": "test_framework",
+          "fact_value": "zunit-v0.8.2-zsh-v5.9.2",
+          "skill_id": "zunit-test-profile",
+          "source": "skills/README.md#APG22B"
+        }
+      ],
+      "required_dependencies": [],
+      "support_files": [],
+      "content_identity": "ffc52a7974b5c3eaec027692d7341068a2decae6552275e48159dc0258d5d0bd"
+    }
+  ],
+  "support": {}
+}

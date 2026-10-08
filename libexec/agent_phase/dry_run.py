@@ -40,14 +40,23 @@ def run(
     candidate_module.require_worktree(dispatcher.cwd)
     project = run_module.project_name(gitstate_module.repository_root(dispatcher.cwd))
     run_module.safe_component(phase_id, "phase id")
-    roster = load_validated_roster(dispatcher.root)
+    if hasattr(dispatcher, "_ensure_roster_and_policy"):
+        roster = dispatcher._ensure_roster_and_policy()
+    else:
+        roster = getattr(dispatcher, "roster", None) or (
+            load_validated_roster(dispatcher.root, apgr_home=dispatcher.apgr_home)
+            if dispatcher.apgr_home is not None
+            else load_validated_roster(dispatcher.root)
+        )
     resolved = resolve(
         request, dispatcher.root, dispatcher.lifecycle.name,
         dispatcher.finalization_policy,
         roster=roster,
+        apgr_home=dispatcher.apgr_home,
     )
     endpoints = route(
-        request, dispatcher.lifecycle, root=dispatcher.root, roster=roster
+        request, dispatcher.lifecycle, root=dispatcher.root, roster=roster,
+        apgr_home=dispatcher.apgr_home,
     )
     dispatcher.display.run_started(
         project, phase_id, request.phase_type, request.execution_mode,

@@ -339,6 +339,7 @@ def test_v2_readonly_mutation_fails(tmp_path: Path) -> None:
             execution_mode="dynamic",
             apgr_home=home,
             runner=mutating_reviewer,
+            review_mutation_policy="block",
         )
 
 

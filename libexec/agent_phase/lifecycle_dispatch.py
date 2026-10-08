@@ -312,6 +312,7 @@ def require_unchanged(
     raise DispatchError(f"{code}: {detail}", code)
 
 
+
 def complete_review(
     dispatcher: Any,
     directory: Any,
@@ -919,10 +920,13 @@ def run_work_reviewed(
         terminal_stage,
         review_stage.name,
     )
-    state["final_candidate_reviewed"] = (
-        (not adversary_mutated)
-        and (not closer_mutated)
-        and (final_candidate["tree"] == produced["tree"])
+    from . import review_drift
+    state["final_candidate_reviewed"] = review_drift.derive_final_candidate_freshness(
+        work_review_observation=state.get("review_mutation_observations", {}).get(review_stage.name),
+        work_review_candidate_tree=str(produced["tree"]),
+        terminal_candidate_tree=str(final_candidate["tree"]),
+        has_verified_receipt=parsed_review is not None,
+        closer_mutated=closer_mutated,
     )
     return complete_terminal(
         dispatcher, directory, state, entry, terminal_stage, terminal_result, nonce,

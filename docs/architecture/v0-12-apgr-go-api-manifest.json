@@ -56,6 +56,22 @@
       "doc": "Package evidence defines structured models for review findings, severities,\ncategories, dispositions, review bindings, and completion receipts.\n\nStability: Experimental / Provisional for APGR v0.12 (ICR-004 / ICR-005).\nExported evidence types are candidate surfaces for JACA XO evaluation. Transition\nto Supported status occurs upon production qualification in v1.0.\n\nSecurity \u0026 Path Safety:\nReview findings strictly reject path traversal tokens (\"..\", leading slashes,\nor non-normalized forms) to protect consumer systems from path leakage or tampering.\n\nConcurrency and Immutability:\nAll types and values in this package are immutable once constructed and safe\nfor concurrent access across goroutines.",
       "constants": [
         {
+          "name": "ActionAllowed",
+          "value": "\"allowed\""
+        },
+        {
+          "name": "ActionBlocked",
+          "value": "\"blocked\""
+        },
+        {
+          "name": "ActionNone",
+          "value": "\"none\""
+        },
+        {
+          "name": "ActionWarned",
+          "value": "\"warned\""
+        },
+        {
           "name": "BasisAcceptedAuthority",
           "value": "\"accepted_authority\""
         },
@@ -96,6 +112,18 @@
           "value": "\"security\""
         },
         {
+          "name": "DiagnosticMutatedCandidate",
+          "value": "\"READ_ONLY_STAGE_MUTATED_CANDIDATE\""
+        },
+        {
+          "name": "DiagnosticMutatedHead",
+          "value": "\"READ_ONLY_STAGE_MUTATED_HEAD\""
+        },
+        {
+          "name": "DiagnosticMutatedIndex",
+          "value": "\"READ_ONLY_STAGE_MUTATED_INDEX\""
+        },
+        {
           "name": "DispositionAccept",
           "value": "\"accept\""
         },
@@ -112,6 +140,10 @@
           "value": "\"reject\""
         },
         {
+          "name": "GitBlock",
+          "value": "\"block\""
+        },
+        {
           "name": "OutcomeReviewedWithFindings",
           "value": "\"reviewed_with_findings\""
         },
@@ -124,6 +156,10 @@
           "value": "\"unreviewable\""
         },
         {
+          "name": "ReviewMutationObservationSchema",
+          "value": "\"agent-phase-review-mutation-observation-v1\""
+        },
+        {
           "name": "SeverityAdvisory",
           "value": "\"advisory\""
         },
@@ -134,6 +170,18 @@
         {
           "name": "SeveritySubstantive",
           "value": "\"substantive\""
+        },
+        {
+          "name": "WorktreeAllow",
+          "value": "\"allow\""
+        },
+        {
+          "name": "WorktreeBlock",
+          "value": "\"block\""
+        },
+        {
+          "name": "WorktreeWarn",
+          "value": "\"warn\""
         }
       ],
       "types": [
@@ -174,6 +222,12 @@
           "def": "string"
         },
         {
+          "name": "ObservationLimitation",
+          "doc": "ObservationLimitation captures a limitation recorded during turn observation.",
+          "kind": "struct",
+          "def": "struct {\n\tKind   string `json:\"kind\"`\n\tDetail string `json:\"detail\"`\n}"
+        },
+        {
           "name": "ReviewBinding",
           "doc": "ReviewBinding links a review execution attempt with candidate identity, outcome, and findings.",
           "kind": "struct",
@@ -184,6 +238,30 @@
           "doc": "ReviewFinding represents a structured finding reported by a Plan Reviewer or Work Reviewer.",
           "kind": "struct",
           "def": "struct {\n\tFindingID string          `json:\"finding_id\"`\n\tSeverity  FindingSeverity `json:\"severity\"`\n\tCategory  FindingCategory `json:\"category\"`\n\tSummary   string          `json:\"summary\"`\n\tFilePath  string          `json:\"file_path,omitempty\"`\n\tLineStart int             `json:\"line_start,omitempty\"`\n\tLineEnd   int             `json:\"line_end,omitempty\"`\n}"
+        },
+        {
+          "name": "ReviewMutationGitPolicy",
+          "doc": "ReviewMutationGitPolicy defines the strict policy for index and HEAD changes.",
+          "kind": "type",
+          "def": "string"
+        },
+        {
+          "name": "ReviewMutationObservation",
+          "doc": "ReviewMutationObservation captures observed drift and policy disposition for a read-only review stage.",
+          "kind": "struct",
+          "def": "struct {\n\tSchema                          string                  `json:\"schema,omitempty\"`\n\tStage                           string                  `json:\"stage\"`\n\tAttemptID                       string                  `json:\"attempt_id,omitempty\"`\n\tBindingID                       string                  `json:\"binding_id,omitempty\"`\n\tAttemptNumber                   int                     `json:\"attempt_number,omitempty\"`\n\tRole                            string                  `json:\"role,omitempty\"`\n\tSubjectKind                     string                  `json:\"subject_kind,omitempty\"`\n\tLimitations                     []ObservationLimitation `json:\"limitations,omitempty\"`\n\tPolicy                          ReviewMutationPolicy    `json:\"policy\"`\n\tPolicyGeneration                int                     `json:\"policy_generation,omitempty\"`\n\tRawStdoutArtifact               string                  `json:\"raw_stdout_artifact,omitempty\"`\n\tRawStderrArtifact               string                  `json:\"raw_stderr_artifact,omitempty\"`\n\tSubjectDriftObserved            bool                    `json:\"subject_drift_observed\"`\n\tWorktreeDrift                   bool                    `json:\"worktree_drift\"`\n\tIndexDrift                      bool                    `json:\"index_drift\"`\n\tHeadDrift                       bool                    `json:\"head_drift\"`\n\tCandidateObservationUnavailable bool                    `json:\"candidate_observation_unavailable,omitempty\"`\n\tIndexObservationUnavailable     bool                    `json:\"index_observation_unavailable,omitempty\"`\n\tHeadObservationUnavailable      bool                    `json:\"head_observation_unavailable,omitempty\"`\n\tWorktreePaths                   []string                `json:\"worktree_paths,omitempty\"`\n\tIndexPaths                      []string                `json:\"index_paths,omitempty\"`\n\tExpectedTree                    string                  `json:\"expected_tree,omitempty\"`\n\tObservedTree                    string                  `json:\"observed_tree,omitempty\"`\n\tExpectedIndex                   json.RawMessage         `json:\"expected_index,omitempty\"`\n\tObservedIndex                   json.RawMessage         `json:\"observed_index,omitempty\"`\n\tExpectedHead                    string                  `json:\"expected_head,omitempty\"`\n\tObservedHead                    string                  `json:\"observed_head,omitempty\"`\n\tDiagnosticCode                  string                  `json:\"diagnostic_code,omitempty\"`\n\tActionTaken                     string                  `json:\"action_taken\"`\n\tSequence                        int                     `json:\"sequence,omitempty\"`\n\tPathsComplete                   bool                    `json:\"paths_complete,omitempty\"`\n\tDetail                          string                  `json:\"detail,omitempty\"`\n\tTransport                       json.RawMessage         `json:\"transport,omitempty\"`\n\tPaths                           []string                `json:\"paths,omitempty\"`\n\tCode                            string                  `json:\"code,omitempty\"`\n}"
+        },
+        {
+          "name": "ReviewMutationPolicy",
+          "doc": "ReviewMutationPolicy defines the complete tri-state policy across worktree, index, and head.",
+          "kind": "struct",
+          "def": "struct {\n\tWorktree   ReviewMutationWorktreePolicy `json:\"worktree\"`\n\tIndex      ReviewMutationGitPolicy      `json:\"index\"`\n\tHead       ReviewMutationGitPolicy      `json:\"head\"`\n\tGeneration int                          `json:\"generation\"`\n}"
+        },
+        {
+          "name": "ReviewMutationWorktreePolicy",
+          "doc": "ReviewMutationWorktreePolicy defines the policy for review-stage worktree changes.",
+          "kind": "type",
+          "def": "string"
         },
         {
           "name": "ReviewOutcome",
@@ -199,6 +277,11 @@
           "signature": "func(a DispositionAction) bool"
         },
         {
+          "name": "ValidActionTaken",
+          "doc": "ValidActionTaken reports whether action is a recognized policy evaluation action.",
+          "signature": "func(action string) bool"
+        },
+        {
           "name": "ValidBasis",
           "doc": "ValidBasis reports whether b is one of the four canonical basis types.",
           "signature": "func(b BasisType) bool"
@@ -209,6 +292,11 @@
           "signature": "func(c FindingCategory) bool"
         },
         {
+          "name": "ValidDiagnosticCode",
+          "doc": "ValidDiagnosticCode reports whether code is a recognized diagnostic code or empty.",
+          "signature": "func(code string) bool"
+        },
+        {
           "name": "ValidReviewOutcome",
           "doc": "ValidReviewOutcome reports whether o is one of the three canonical review outcomes.",
           "signature": "func(o ReviewOutcome) bool"
@@ -217,6 +305,11 @@
           "name": "ValidSeverity",
           "doc": "ValidSeverity reports whether s is one of the three canonical severities.",
           "signature": "func(s FindingSeverity) bool"
+        },
+        {
+          "name": "ValidWorktreePolicy",
+          "doc": "ValidWorktreePolicy reports whether p is a supported worktree policy.",
+          "signature": "func(p ReviewMutationWorktreePolicy) bool"
         },
         {
           "name": "ValidateDisposition",
@@ -237,6 +330,16 @@
           "name": "ValidateReviewBinding",
           "doc": "ValidateReviewBinding validates structural consistency of a ReviewBinding.",
           "signature": "func(rb ReviewBinding) error"
+        },
+        {
+          "name": "ValidateReviewMutationObservation",
+          "doc": "ValidateReviewMutationObservation validates the structural invariants and logical consistency\nof a ReviewMutationObservation.",
+          "signature": "func(obs ReviewMutationObservation) error"
+        },
+        {
+          "name": "ValidateReviewMutationPolicy",
+          "doc": "ValidateReviewMutationPolicy validates that the policy contains a valid worktree choice,\nstrictly 'block' for index and head, and positive generation.",
+          "signature": "func(p ReviewMutationPolicy) error"
         }
       ]
     },
@@ -703,13 +806,620 @@
           "signature": "func(obs OperationalObservation) (string, error)"
         },
         {
-          "name": "MarshalJSON",
-          "signature": "func() ([]byte, error)"
-        },
-        {
           "name": "Resolve",
           "doc": "Resolve executes the pure, deterministic 6-stage decision ladder.\nIt performs no filesystem, subprocess, or database operations.",
           "signature": "func(ctx context.Context, req ResolveRequest) (*ResolvedActorRoute, error)"
+        }
+      ]
+    },
+    {
+      "path": "github.com/Knowledge-Forge-AI/agentic-praxis-grimoire/skills",
+      "doc": "",
+      "constants": [
+        {
+          "name": "BundleRequestSchemaV1",
+          "value": "\"apg.skill-bundle-request/v1\""
+        },
+        {
+          "name": "BundleResultSchemaV1",
+          "value": "\"apg.skill-bundle-result/v1\""
+        },
+        {
+          "name": "CatalogRuleVersionV1",
+          "value": "\"apg.catalog-selection/v1\""
+        },
+        {
+          "name": "CatalogSchemaV1",
+          "value": "\"apg.skill-catalog/v1\""
+        },
+        {
+          "name": "CompositionVersionV1",
+          "value": "\"apg.skill-composition-rules/v1\""
+        },
+        {
+          "name": "ConsumerChatGPT",
+          "value": "\"chatgpt\""
+        },
+        {
+          "name": "ConsumerClaude",
+          "value": "\"claude\""
+        },
+        {
+          "name": "ConsumerCodex",
+          "value": "\"codex\""
+        },
+        {
+          "name": "ConsumerGo",
+          "value": "\"go_library\""
+        },
+        {
+          "name": "ContextPlanSchemaV1",
+          "value": "\"apg.context-plan/v1\""
+        },
+        {
+          "name": "ContextRuleVersionV1",
+          "value": "\"apg.context-packing/v1\""
+        },
+        {
+          "name": "DescriptorSchemaV1",
+          "value": "\"apg.skill-descriptor/v1\""
+        },
+        {
+          "name": "DiscoveryPolicyVersion",
+          "value": "DiscoveryPolicyVersionV010BrowserRuntime"
+        },
+        {
+          "name": "DiscoveryPolicyVersionV010",
+          "value": "\"v0.10\""
+        },
+        {
+          "name": "DiscoveryPolicyVersionV010BrowserRuntime",
+          "value": "\"v0.10-browser-runtime\""
+        },
+        {
+          "name": "DiscoveryPolicyVersionV010BrowserUI",
+          "value": "\"v0.10-browser-ui\""
+        },
+        {
+          "name": "DiscoveryPolicyVersionV010Toolchain",
+          "value": "\"v0.10-toolchain\""
+        },
+        {
+          "name": "FootprintMaterializedBundle",
+          "value": "\"full_materialized_bundle\""
+        },
+        {
+          "name": "FootprintPromptOverhead",
+          "value": "\"provider_prompt_overhead\""
+        },
+        {
+          "name": "FootprintRepositorySupport",
+          "value": "\"repository_support_material\""
+        },
+        {
+          "name": "FootprintSelectedBodies",
+          "value": "\"selected_bodies\""
+        },
+        {
+          "name": "FootprintSelectedDescriptions",
+          "value": "\"selected_descriptions\""
+        },
+        {
+          "name": "FootprintSupportMaterial",
+          "value": "\"support_material\""
+        },
+        {
+          "name": "FrozenNPMSkillDescription",
+          "value": "\"Use when package management decisions depend on npm CLI contracts, package.json and lockfile v3 integrity, install versus ci execution, peer dependencies and overrides, workspaces, script lifecycle and ignore-scripts, local pack tarballs, caching, or publication provenance; not for Node host runtime or bundler transforms.\""
+        },
+        {
+          "name": "FrozenOriginal39Digest",
+          "value": "\"f9255d38eadff7b2bfc5ab13cd1722b8d98ac1ea974d8220475ff7067a1e8cc7\""
+        },
+        {
+          "name": "FrozenPlaywrightSkillDescription",
+          "value": "\"Use when a project selects Playwright Test and decisions depend on configuration, fixtures, locators, waiting, isolation, parallel execution, browser projects, network controls, or test artifacts; not for accessibility standards or general browser/runtime semantics.\""
+        },
+        {
+          "name": "FrozenRTKCommandProxySkillDescription",
+          "value": "\"Use when Codex or Claude Code needs to run, choose, verify, troubleshoot, or explain shell commands through RTK, including ordinary command execution, raw-output fallbacks, RTK meta commands, installation checks, name collisions, or Claude PreToolUse rewrite behavior.\""
+        },
+        {
+          "name": "FrozenSVGSkillDescription",
+          "value": "\"Use when SVG authoring depends on namespaces, viewBox, paths, transforms, paint, reuse, clipping, masking, text, naming, resources, or serialization; not for general CSS, JSX, React, browser runtime, accessibility audits, or test automation.\""
+        },
+        {
+          "name": "FrozenViteSkillDescription",
+          "value": "\"Use when a project selects Vite for dev serving or production building and decisions depend on root, base, publicDir, mode, env prefixes, loopback fs limits, Rolldown bundling, alias/CSS/plugin hooks, SSR seams, or preview.\""
+        },
+        {
+          "name": "FrozenWebAccessibilitySkillDescription",
+          "value": "\"Use when web implementation decisions affect native semantics, accessible names, keyboard and focus behavior, images/SVG, forms, dynamic content, motion, contrast, or accessibility evidence; not for test-runner mechanics or a claim of automated WCAG conformance.\""
+        },
+        {
+          "name": "GlobalDescriptionLimit",
+          "value": "int64(9527)"
+        },
+        {
+          "name": "HistoricalDescriptionBytes",
+          "value": "int64(9504)"
+        },
+        {
+          "name": "HistoricalDescriptionCharacters",
+          "value": "int64(9492)"
+        },
+        {
+          "name": "HistoricalGlobalDescriptionLimit",
+          "value": "GlobalDescriptionLimit"
+        },
+        {
+          "name": "HistoricalSkillCount",
+          "value": "39"
+        },
+        {
+          "name": "ManifestFilename",
+          "value": "\"manifest.json\""
+        },
+        {
+          "name": "ManifestSchemaV1",
+          "value": "\"apg.skill-bundle-manifest/v1\""
+        },
+        {
+          "name": "MaterializationFlatDirectory",
+          "value": "\"flat_directory\""
+        },
+        {
+          "name": "MaterializationInMemory",
+          "value": "\"in_memory\""
+        },
+        {
+          "name": "MaxCatalogFileBytes",
+          "value": "1 \u003c\u003c 20"
+        },
+        {
+          "name": "RuleTableVersionV1",
+          "value": "\"apg.skill-selection-rules/v1\""
+        },
+        {
+          "name": "V010AdmittedSkillCount",
+          "value": "40"
+        },
+        {
+          "name": "V010BrowserRuntimeAdmissionCeiling",
+          "value": "int64(11507)"
+        },
+        {
+          "name": "V010BrowserRuntimeAdmittedSkillCount",
+          "value": "46"
+        },
+        {
+          "name": "V010BrowserUIAdmissionCeiling",
+          "value": "int64(10517)"
+        },
+        {
+          "name": "V010BrowserUIAdmittedSkillCount",
+          "value": "42"
+        },
+        {
+          "name": "V010BrowserUIRequireAdmittedLeaf",
+          "value": "true"
+        },
+        {
+          "name": "V010CurrentAdmittedCandidate",
+          "value": "\"svg-language-profile\""
+        },
+        {
+          "name": "V010CurrentBrowserRuntimeAdmissionCeiling",
+          "value": "V010BrowserRuntimeAdmissionCeiling"
+        },
+        {
+          "name": "V010CurrentBrowserUIAdmissionCeiling",
+          "value": "V010BrowserUIAdmissionCeiling"
+        },
+        {
+          "name": "V010CurrentSVGAdmissionCeiling",
+          "value": "int64(9857)"
+        },
+        {
+          "name": "V010CurrentToolchainAdmissionCeiling",
+          "value": "V010ToolchainAdmissionCeiling"
+        },
+        {
+          "name": "V010MaxReservationDescriptionBytes",
+          "value": "int64(330)"
+        },
+        {
+          "name": "V010MaxSVGFileBytes",
+          "value": "int64(20480)"
+        },
+        {
+          "name": "V010OverallFutureCeiling",
+          "value": "int64(11507)"
+        },
+        {
+          "name": "V010RequireAdmittedLeaf",
+          "value": "true"
+        },
+        {
+          "name": "V010ToolchainAdmissionCeiling",
+          "value": "int64(11177)"
+        },
+        {
+          "name": "V010ToolchainAdmittedSkillCount",
+          "value": "44"
+        }
+      ],
+      "types": [
+        {
+          "name": "Budget",
+          "doc": "Budget uses nil limits for explicitly unbounded dimensions. A non-nil zero\nis an exact zero-byte limit.",
+          "kind": "struct",
+          "def": "struct {\n\tMaxBodyBytes           *int64 `json:\"max_body_bytes\"`\n\tMaxDescriptionBytes    *int64 `json:\"max_description_bytes\"`\n\tMaxInitialContextBytes *int64 `json:\"max_initial_context_bytes\"`\n\tPromptOverheadBytes    int64  `json:\"prompt_overhead_bytes\"`\n}"
+        },
+        {
+          "name": "BudgetError",
+          "kind": "struct",
+          "def": "struct {\n\tBudget BudgetResult\n}",
+          "methods": [
+            {
+              "name": "Error",
+              "signature": "func() string"
+            },
+            {
+              "name": "Unwrap",
+              "signature": "func() error"
+            }
+          ]
+        },
+        {
+          "name": "BudgetEvaluation",
+          "kind": "struct",
+          "def": "struct {\n\tLimit    *int64 `json:\"limit\"`\n\tMeasured int64  `json:\"measured\"`\n\tPassed   bool   `json:\"passed\"`\n}"
+        },
+        {
+          "name": "BudgetResult",
+          "kind": "struct",
+          "def": "struct {\n\tBodyBytes           BudgetEvaluation `json:\"body_bytes\"`\n\tDescriptionBytes    BudgetEvaluation `json:\"description_bytes\"`\n\tInitialContextBytes BudgetEvaluation `json:\"initial_context_bytes\"`\n}"
+        },
+        {
+          "name": "BundleManifest",
+          "kind": "struct",
+          "def": "struct {\n\tBundleFingerprint         string         `json:\"bundle_fingerprint\"`\n\tEmbeddedCorpusFingerprint string         `json:\"embedded_corpus_fingerprint\"`\n\tFiles                     []ManifestFile `json:\"files\"`\n\tRuleTableVersion          string         `json:\"rule_table_version\"`\n\tSchemaVersion             string         `json:\"schema_version\"`\n\tSelectedSkillIDs          []string       `json:\"selected_skill_ids\"`\n}"
+        },
+        {
+          "name": "BundleRequest",
+          "doc": "BundleRequest is the strict structured, prompt-free resolver input.",
+          "kind": "struct",
+          "def": "struct {\n\tBudget                    Budget   `json:\"budget\"`\n\tCapabilities              []string `json:\"capabilities\"`\n\tConsumer                  Consumer `json:\"consumer\"`\n\tEagerBodies               bool     `json:\"eager_bodies\"`\n\tExplicitSkillIDs          []string `json:\"explicit_skill_ids\"`\n\tLanguages                 []string `json:\"languages\"`\n\tRepositoryCharacteristics []string `json:\"repository_characteristics\"`\n\tRuntimes                  []string `json:\"runtimes\"`\n\tSchemaVersion             string   `json:\"schema_version\"`\n\tTestFrameworks            []string `json:\"test_frameworks\"`\n\tWorkClass                 string   `json:\"work_class\"`\n}",
+          "methods": [
+            {
+              "name": "CanonicalJSON",
+              "signature": "func() ([]byte, error)"
+            }
+          ]
+        },
+        {
+          "name": "BundleResult",
+          "doc": "BundleResult is the deterministic resolver result and materialization input.",
+          "kind": "struct",
+          "def": "struct {\n\tBudget                               BudgetResult        `json:\"budget\"`\n\tBundleFingerprint                    string              `json:\"bundle_fingerprint\"`\n\tCanonicalCorpusDescriptionBytes      int64               `json:\"canonical_corpus_description_bytes\"`\n\tCanonicalCorpusDescriptionCharacters int64               `json:\"canonical_corpus_description_characters\"`\n\tCanonicalCorpusSkillCount            int                 `json:\"canonical_corpus_skill_count\"`\n\tCompositionEdges                     []CompositionEdge   `json:\"composition_edges\"`\n\tCompositionRuleVersion               string              `json:\"composition_rule_version\"`\n\tConflicts                            []Conflict          `json:\"conflicts\"`\n\tConsumerKind                         ConsumerKind        `json:\"consumer_kind\"`\n\tEagerBodies                          bool                `json:\"eager_bodies\"`\n\tEmbeddedCorpusFingerprint            string              `json:\"embedded_corpus_fingerprint\"`\n\tExclusions                           []Exclusion         `json:\"exclusions\"`\n\tFixedPromptOverheadBytes             int64               `json:\"fixed_prompt_overhead_bytes\"`\n\tInitialContextBytes                  int64               `json:\"initial_context_bytes\"`\n\tMaterializationForm                  MaterializationForm `json:\"materialization_form\"`\n\tRequestFingerprint                   string              `json:\"request_fingerprint\"`\n\tRuleTableVersion                     string              `json:\"rule_table_version\"`\n\tSchemaVersion                        string              `json:\"schema_version\"`\n\tSelectedBodyBytes                    int64               `json:\"selected_body_bytes\"`\n\tSelectedDescriptionBytes             int64               `json:\"selected_description_bytes\"`\n\tSelectedSkillIDs                     []string            `json:\"selected_skill_ids\"`\n\tSelectedSkills                       []SelectedSkill     `json:\"selected_skills\"`\n}",
+          "methods": [
+            {
+              "name": "CanonicalJSON",
+              "signature": "func() ([]byte, error)"
+            }
+          ]
+        },
+        {
+          "name": "Catalog",
+          "kind": "struct",
+          "def": "struct {\n\tDerivationInputs []CatalogFile         `json:\"derivation_inputs\"`\n\tProvenance       []CatalogProvenance   `json:\"provenance\"`\n\tSchemaVersion    string                `json:\"schema_version\"`\n\tRuleVersion      string                `json:\"rule_version\"`\n\tSkills           []SkillDescriptor     `json:\"skills\"`\n\tSnapshots        []SkillSnapshot       `json:\"snapshots\"`\n\tOverrides        []CatalogOverride     `json:\"overrides\"`\n\tDiagnostics      []CatalogDiagnostic   `json:\"diagnostics\"`\n\tSources          []CatalogSourceStatus `json:\"sources\"`\n\tFingerprint      string                `json:\"fingerprint\"`\n}"
+        },
+        {
+          "name": "CatalogDiagnostic",
+          "kind": "struct",
+          "def": "struct {\n\tIdentity string `json:\"identity\"`\n\tPath     string `json:\"path\"`\n\tMessage  string `json:\"message\"`\n}"
+        },
+        {
+          "name": "CatalogFile",
+          "doc": "CatalogFile measures an explicitly declared file. Captured records a source\nsnapshot, never delivery into a provider context.",
+          "kind": "struct",
+          "def": "struct {\n\tPath     string `json:\"path\"`\n\tBytes    int64  `json:\"bytes\"`\n\tSHA256   string `json:\"sha256\"`\n\tCaptured bool   `json:\"captured\"`\n}"
+        },
+        {
+          "name": "CatalogInput",
+          "doc": "CatalogInput is an experimental pure data input; canonical bytes always come\nfrom the embedded owner. External inputs cannot assert canonical maturity.",
+          "kind": "struct",
+          "def": "struct {\n\tSchemaVersion string                `json:\"schema_version\"`\n\tSnapshots     []SkillSnapshot       `json:\"snapshots\"`\n\tOverrides     []CatalogOverride     `json:\"overrides\"`\n\tDiagnostics   []CatalogDiagnostic   `json:\"diagnostics\"`\n\tSources       []CatalogSourceStatus `json:\"sources\"`\n}"
+        },
+        {
+          "name": "CatalogOverride",
+          "doc": "CatalogOverride is explicit project authority, separate from source identity.",
+          "kind": "struct",
+          "def": "struct {\n\tRequested    string `json:\"requested\"`\n\tSelected     string `json:\"selected\"`\n\tConfigPath   string `json:\"config_path\"`\n\tConfigSHA256 string `json:\"config_sha256\"`\n}"
+        },
+        {
+          "name": "CatalogProvenance",
+          "doc": "CatalogProvenance is operation-local and excluded from portable identity.",
+          "kind": "struct",
+          "def": "struct {\n\tQualifiedID string `json:\"qualified_id\"`\n\tPath        string `json:\"path\"`\n\tSHA256      string `json:\"sha256\"`\n}"
+        },
+        {
+          "name": "CatalogSelection",
+          "doc": "CatalogSelection binds requested identity, selected body and the rule identity.",
+          "kind": "struct",
+          "def": "struct {\n\tRequestedIdentity  string        `json:\"requested_identity\"`\n\tSelectedIdentity   string        `json:\"selected_identity\"`\n\tSourceSHA256       string        `json:\"source_sha256\"`\n\tContentIdentity    string        `json:\"content_identity\"`\n\tCatalogFingerprint string        `json:\"catalog_fingerprint\"`\n\tRuleVersion        string        `json:\"rule_version\"`\n\tSnapshot           SkillSnapshot `json:\"snapshot\"`\n}"
+        },
+        {
+          "name": "CatalogSourceStatus",
+          "kind": "struct",
+          "def": "struct {\n\tSource       string `json:\"source\"`\n\tSelectedRoot string `json:\"selected_root\"`\n\tResolvedRoot string `json:\"resolved_root\"`\n\tStatus       string `json:\"status\"`\n}"
+        },
+        {
+          "name": "CompositionEdge",
+          "kind": "struct",
+          "def": "struct {\n\tFrom string `json:\"from\"`\n\tTo   string `json:\"to\"`\n}"
+        },
+        {
+          "name": "Conflict",
+          "kind": "struct",
+          "def": "struct {\n\tReason     string `json:\"reason\"`\n\tSkillID    string `json:\"skill_id\"`\n\tSourceFact string `json:\"source_fact\"`\n}"
+        },
+        {
+          "name": "Consumer",
+          "kind": "struct",
+          "def": "struct {\n\tArchitecture        string              `json:\"architecture\"`\n\tKind                ConsumerKind        `json:\"kind\"`\n\tMaterializationForm MaterializationForm `json:\"materialization_form\"`\n\tOperatingSystem     string              `json:\"operating_system\"`\n\tProviderConstraints []string            `json:\"provider_constraints\"`\n}"
+        },
+        {
+          "name": "ConsumerKind",
+          "kind": "type",
+          "def": "string"
+        },
+        {
+          "name": "ContextAffinity",
+          "kind": "struct",
+          "def": "struct {\n\tRole        string `json:\"role\"`\n\tQualifiedID string `json:\"qualified_id\"`\n\tScore       int    `json:\"score\"`\n}"
+        },
+        {
+          "name": "ContextBudget",
+          "kind": "struct",
+          "def": "struct {\n\tMaxInitialContextBytes      *int64 `json:\"max_initial_context_bytes\"`\n\tMaxInitialContextCharacters *int64 `json:\"max_initial_context_characters\"`\n}"
+        },
+        {
+          "name": "ContextComponent",
+          "kind": "struct",
+          "def": "struct {\n\tID           string `json:\"id\"`\n\tKind         string `json:\"kind\"`\n\tText         string `json:\"text\"`\n\tSourcePath   string `json:\"source_path\"`\n\tSourceSHA256 string `json:\"source_sha256\"`\n}"
+        },
+        {
+          "name": "ContextCost",
+          "kind": "struct",
+          "def": "struct {\n\tBytes      int64  `json:\"bytes\"`\n\tCharacters int64  `json:\"characters\"`\n\tSHA256     string `json:\"sha256\"`\n}"
+        },
+        {
+          "name": "ContextDecision",
+          "kind": "struct",
+          "def": "struct {\n\tRequestedID     string        `json:\"requested_id\"`\n\tSelectedID      string        `json:\"selected_id\"`\n\tStatus          string        `json:\"status\"`\n\tReason          string        `json:\"reason\"`\n\tRequired        bool          `json:\"required\"`\n\tContentIdentity string        `json:\"content_identity\"`\n\tWholeSource     ContextCost   `json:\"whole_source\"`\n\tBodyOnly        ContextCost   `json:\"body_only\"`\n\tDescription     ContextCost   `json:\"description\"`\n\tSupport         []CatalogFile `json:\"support\"`\n}"
+        },
+        {
+          "name": "ContextFact",
+          "doc": "ContextFact is an exact generated selection fact; unknown values stay unknown.",
+          "kind": "struct",
+          "def": "struct {\n\tKind  string `json:\"kind\"`\n\tValue string `json:\"value\"`\n}"
+        },
+        {
+          "name": "ContextPlan",
+          "kind": "struct",
+          "def": "struct {\n\tSchemaVersion          string                 `json:\"schema_version\"`\n\tRuleVersion            string                 `json:\"rule_version\"`\n\tRunID                  string                 `json:\"run_id\"`\n\tBindingID              string                 `json:\"binding_id\"`\n\tAttemptID              string                 `json:\"attempt_id\"`\n\tRoles                  []string               `json:\"roles\"`\n\tRequestedMode          string                 `json:\"requested_mode\"`\n\tEffectiveMode          string                 `json:\"effective_mode\"`\n\tReasons                []string               `json:\"reasons\"`\n\tCatalogFingerprint     string                 `json:\"catalog_fingerprint\"`\n\tContentIdentity        string                 `json:\"content_identity\"`\n\tCatalog                Catalog                `json:\"catalog\"`\n\tDecisions              []ContextDecision      `json:\"decisions\"`\n\tUnknownFacts           []ContextFact          `json:\"unknown_facts\"`\n\tInstructions           []InstructionComponent `json:\"instructions\"`\n\tSelectedSnapshots      []SkillSnapshot        `json:\"selected_snapshots\"`\n\tBudget                 ContextBudget          `json:\"budget\"`\n\tQualification          ContextQualification   `json:\"qualification\"`\n\tBudgetPassed           bool                   `json:\"budget_passed\"`\n\tRequiredSatisfied      bool                   `json:\"required_satisfied\"`\n\tMandatoryCost          ContextCost            `json:\"mandatory_cost\"`\n\tPayloadCost            ContextCost            `json:\"payload_cost\"`\n\tPayload                string                 `json:\"payload\"`\n\tTokens                 *int64                 `json:\"tokens\"`\n\tProviderNativeOverhead *int64                 `json:\"provider_native_overhead\"`\n}"
+        },
+        {
+          "name": "ContextPlanRequest",
+          "kind": "struct",
+          "def": "struct {\n\tSchemaVersion string                `json:\"schema_version\"`\n\tRunID         string                `json:\"run_id\"`\n\tBindingID     string                `json:\"binding_id\"`\n\tAttemptID     string                `json:\"attempt_id\"`\n\tRoles         []string              `json:\"roles\"`\n\tConsumer      ConsumerKind          `json:\"consumer\"`\n\tRequestedMode string                `json:\"requested_mode\"`\n\tCatalog       CatalogInput          `json:\"catalog\"`\n\tFacts         []ContextFact         `json:\"facts\"`\n\tRequests      []ContextSkillRequest `json:\"requests\"`\n\tMandatory     []ContextComponent    `json:\"mandatory\"`\n\tAffinities    []ContextAffinity     `json:\"affinities\"`\n\tBudget        ContextBudget         `json:\"budget\"`\n\tQualification ContextQualification  `json:\"qualification\"`\n}"
+        },
+        {
+          "name": "ContextQualification",
+          "kind": "struct",
+          "def": "struct {\n\tSelectiveProjection bool   `json:\"selective_projection\"`\n\tIndependentRecovery bool   `json:\"independent_recovery\"`\n\tEvidence            string `json:\"evidence\"`\n}"
+        },
+        {
+          "name": "ContextSkillRequest",
+          "kind": "struct",
+          "def": "struct {\n\tID       string `json:\"id\"`\n\tRequired bool   `json:\"required\"`\n}"
+        },
+        {
+          "name": "CorpusMetadata",
+          "kind": "struct",
+          "def": "struct {\n\tDescriptionBytes      int64\n\tDescriptionCharacters int64\n\tFingerprint           string\n\tManifestJSON          []byte\n\tSkills                []SkillMetadata\n}"
+        },
+        {
+          "name": "Exclusion",
+          "kind": "struct",
+          "def": "struct {\n\tReason     string `json:\"reason\"`\n\tSkillID    string `json:\"skill_id\"`\n\tSourceFact string `json:\"source_fact\"`\n}"
+        },
+        {
+          "name": "InstructionComponent",
+          "kind": "struct",
+          "def": "struct {\n\tContextComponent\n\tRendered ContextCost `json:\"rendered\"`\n}"
+        },
+        {
+          "name": "ManifestFile",
+          "kind": "struct",
+          "def": "struct {\n\tBodyBytes        int64  `json:\"body_bytes\"`\n\tBodySHA256       string `json:\"body_sha256\"`\n\tCanonicalPath    string `json:\"canonical_path\"`\n\tMaterializedPath string `json:\"materialized_path\"`\n\tSkillID          string `json:\"skill_id\"`\n}"
+        },
+        {
+          "name": "Materialization",
+          "kind": "struct",
+          "def": "struct {\n\tBundleFingerprint     string             `json:\"bundle_fingerprint\"`\n\tCleanupOwnership      string             `json:\"cleanup_ownership\"`\n\tManifestFingerprint   string             `json:\"manifest_fingerprint\"`\n\tManifestSchemaVersion string             `json:\"manifest_schema_version\"`\n\tReused                bool               `json:\"reused\"`\n\tRoot                  string             `json:\"root\"`\n\tSelectedFiles         []MaterializedFile `json:\"selected_files\"`\n}",
+          "methods": [
+            {
+              "name": "CanonicalJSON",
+              "signature": "func() ([]byte, error)"
+            }
+          ]
+        },
+        {
+          "name": "MaterializationForm",
+          "kind": "type",
+          "def": "string"
+        },
+        {
+          "name": "MaterializeRequest",
+          "kind": "struct",
+          "def": "struct {\n\tDestinationParent string\n\tResult            BundleResult\n}"
+        },
+        {
+          "name": "MaterializedFile",
+          "kind": "struct",
+          "def": "struct {\n\tBodyBytes    int64  `json:\"body_bytes\"`\n\tBodySHA256   string `json:\"body_sha256\"`\n\tRelativePath string `json:\"relative_path\"`\n\tSkillID      string `json:\"skill_id\"`\n}"
+        },
+        {
+          "name": "SelectedSkill",
+          "kind": "struct",
+          "def": "struct {\n\tBodyBytes        int64    `json:\"body_bytes\"`\n\tBodySHA256       string   `json:\"body_sha256\"`\n\tCanonicalPath    string   `json:\"canonical_path\"`\n\tDescriptionBytes int64    `json:\"description_bytes\"`\n\tID               string   `json:\"id\"`\n\tInclusionReasons []string `json:\"inclusion_reasons\"`\n\tSourceFacts      []string `json:\"source_facts\"`\n}"
+        },
+        {
+          "name": "SelectionRule",
+          "kind": "struct",
+          "def": "struct {\n\tFactKind  string `json:\"fact_kind\"`\n\tFactValue string `json:\"fact_value\"`\n\tSkillID   string `json:\"skill_id\"`\n\tSource    string `json:\"source\"`\n}"
+        },
+        {
+          "name": "SkillDescriptor",
+          "doc": "SkillDescriptor is a provisional generated view, not a classification authority.\nBodyBytes/BodySHA256 retain whole SKILL.md compatibility semantics.",
+          "kind": "struct",
+          "def": "struct {\n\tSchemaVersion string `json:\"schema_version\"`\n\tQualifiedID   string `json:\"qualified_id\"`\n\tSkillMetadata\n\tBodyOnlyBytes          int64           `json:\"body_only_bytes\"`\n\tBodyOnlyCharacters     int64           `json:\"body_only_characters\"`\n\tBodyOnlySHA256         string          `json:\"body_only_sha256\"`\n\tDescriptionSHA256      string          `json:\"description_sha256\"`\n\tTokens                 *int64          `json:\"tokens\"`\n\tDoNotUse               string          `json:\"do_not_use\"`\n\tProjectOwnedParameters string          `json:\"project_owned_parameters\"`\n\tTriggerBoundary        string          `json:\"trigger_boundary\"`\n\tMaturity               string          `json:\"maturity\"`\n\tSourceDeclaredMaturity string          `json:\"source_declared_maturity\"`\n\tConsumerLimitations    []string        `json:\"consumer_limitations\"`\n\tSelectionFacts         []SelectionRule `json:\"selection_facts\"`\n\tRequiredDependencies   []string        `json:\"required_dependencies\"`\n\tSupportFiles           []CatalogFile   `json:\"support_files\"`\n\tContentIdentity        string          `json:\"content_identity\"`\n}"
+        },
+        {
+          "name": "SkillMetadata",
+          "kind": "struct",
+          "def": "struct {\n\tBodyBytes             int64  `json:\"body_bytes\"`\n\tBodyCharacters        int64  `json:\"body_characters\"`\n\tBodySHA256            string `json:\"body_sha256\"`\n\tCanonicalPath         string `json:\"canonical_path\"`\n\tDescription           string `json:\"description\"`\n\tDescriptionBytes      int64  `json:\"description_bytes\"`\n\tDescriptionCharacters int64  `json:\"description_characters\"`\n\tID                    string `json:\"id\"`\n\tLines                 int64  `json:\"lines\"`\n}"
+        },
+        {
+          "name": "SkillSnapshot",
+          "doc": "SkillSnapshot carries exact source bytes. No source code is executed.",
+          "kind": "struct",
+          "def": "struct {\n\tQualifiedID string            `json:\"qualified_id\"`\n\tPath        string            `json:\"path\"`\n\tBody        []byte            `json:\"body\"`\n\tSupport     map[string][]byte `json:\"support\"`\n}"
+        }
+      ],
+      "functions": [
+        {
+          "name": "BuildCatalog",
+          "doc": "BuildCatalog is a provisional pure selection boundary. Malformed optional\nleaves are partial-list diagnostics; duplicate identities and invalid override\ndeclarations are input errors. It never reads paths or mutates a shared cache.",
+          "signature": "func(input CatalogInput) (Catalog, error)"
+        },
+        {
+          "name": "CaptureCatalogSource",
+          "doc": "CaptureCatalogSource is the provisional read-only filesystem adapter. The\nselected root may be a symlink; descendant access is confined with os.Root.",
+          "signature": "func(source, root string) (CatalogInput, error)"
+        },
+        {
+          "name": "CompositionRules",
+          "doc": "CompositionRules returns the complete informational v1 composition table.",
+          "signature": "func() []CompositionEdge"
+        },
+        {
+          "name": "ComputeOriginal39Digest",
+          "doc": "ComputeOriginal39Digest computes the SHA-256 hex digest of the 39 original skill identities and descriptions.",
+          "signature": "func(descriptions map[string]string) string"
+        },
+        {
+          "name": "ContextPlanFootprint",
+          "doc": "ContextPlanFootprint measures the prospective rendered transmission, not file\nmaterialization or provider/model use. It never resolves a retained catalog.",
+          "signature": "func(plan ContextPlan) (apgfootprint.Record, error)"
+        },
+        {
+          "name": "Corpus",
+          "doc": "Corpus returns a read-only filesystem containing only canonical embedded\nskill leaves. It never reads the host checkout.",
+          "signature": "func() fs.FS"
+        },
+        {
+          "name": "DecodeBundleRequest",
+          "doc": "DecodeBundleRequest rejects duplicate keys, unknown fields, missing fields,\nmalformed UTF-8, trailing JSON, and non-integer budget values.",
+          "signature": "func(content []byte) (BundleRequest, error)"
+        },
+        {
+          "name": "DecodeBundleResult",
+          "doc": "DecodeBundleResult strictly decodes a previously resolved result for CLI\nmaterialization.",
+          "signature": "func(content []byte) (BundleResult, error)"
+        },
+        {
+          "name": "DecodeCatalogInput",
+          "doc": "DecodeCatalogInput strictly decodes the versioned explicit bridge input.",
+          "signature": "func(data []byte) (CatalogInput, error)"
+        },
+        {
+          "name": "DecodeContextPlanRequest",
+          "doc": "DecodeContextPlanRequest rejects unknown and duplicate fields.",
+          "signature": "func(data []byte) (ContextPlanRequest, error)"
+        },
+        {
+          "name": "Footprint",
+          "doc": "Footprint adapts one accepted, deterministic BundleResult into an APGR\ncontext-footprint record.  It uses the deterministic materialization\ndocument as the support surface even when the caller has not written a\nfilesystem root.  Provider prompt overhead and provider total-context fit\nremain explicitly outside this first-party measurement boundary.",
+          "signature": "func(request BundleRequest, result BundleResult) (apgfootprint.Record, error)"
+        },
+        {
+          "name": "FootprintContext",
+          "doc": "FootprintContext is the cancellation-aware form of Footprint.",
+          "signature": "func(ctx context.Context, request BundleRequest, result BundleResult) (apgfootprint.Record, error)"
+        },
+        {
+          "name": "FootprintWithMaterialization",
+          "doc": "FootprintWithMaterialization adapts a result and the exact materialization\nmetadata returned by Materialize.  The root path is never copied into the\npublic record; only its deterministic, validated file metadata contributes\nto the measured bundle surface.",
+          "signature": "func(request BundleRequest, result BundleResult, materialization Materialization) (apgfootprint.Record, error)"
+        },
+        {
+          "name": "FootprintWithMaterializationContext",
+          "doc": "FootprintWithMaterializationContext is the cancellation-aware materialized\nbundle adapter.",
+          "signature": "func(ctx context.Context, request BundleRequest, result BundleResult, materialization Materialization) (apgfootprint.Record, error)"
+        },
+        {
+          "name": "GenerateCatalog",
+          "doc": "GenerateCatalog is the experimental deterministic generation owner. root is\na read-only repository FS; output has no concrete host path or clock value.",
+          "signature": "func(root fs.FS) ([]byte, error)"
+        },
+        {
+          "name": "Materialize",
+          "doc": "Materialize verifies a prior result, writes an owner-only staged view from\nembedded bytes, and atomically publishes the isolated discovery root.",
+          "signature": "func(ctx context.Context, request MaterializeRequest) (Materialization, error)"
+        },
+        {
+          "name": "MeasureFootprint",
+          "doc": "MeasureFootprint is an explicit verb alias for callers that prefer the\nmeasurement terminology used by the footprint package.",
+          "signature": "func(ctx context.Context, request BundleRequest, result BundleResult) (apgfootprint.Record, error)"
+        },
+        {
+          "name": "Metadata",
+          "doc": "Metadata returns a caller-owned projection reconstructed from embedded skill\nbodies.",
+          "signature": "func() (CorpusMetadata, error)"
+        },
+        {
+          "name": "PlanContext",
+          "doc": "PlanContext is a pure, versioned prospective plan. No paths are opened and no\nprovider capabilities are inferred. The returned catalog owns its snapshots.",
+          "signature": "func(request ContextPlanRequest) (ContextPlan, error)"
+        },
+        {
+          "name": "Resolve",
+          "doc": "Resolve deterministically selects the minimal union of explicit owners and\nexact structured-fact owners. Composition never adds a skill.",
+          "signature": "func(ctx context.Context, request BundleRequest) (BundleResult, error)"
+        },
+        {
+          "name": "ResolveCatalog",
+          "doc": "ResolveCatalog explicitly selects a qualified body. Bare IDs are accepted only\nwhen unique across all sources; unlike legacy Resolve, ambiguity is an error.\nRequired edges are validated, never automatically packed or materialized.",
+          "signature": "func(input CatalogInput, requested string, consumer ConsumerKind) (CatalogSelection, error)"
+        },
+        {
+          "name": "SelectionRules",
+          "doc": "SelectionRules returns the complete deterministic v1 fact-to-owner table.",
+          "signature": "func() []SelectionRule"
+        },
+        {
+          "name": "ValidateDiscoveryPolicy",
+          "doc": "ValidateDiscoveryPolicy validates a slice of SkillMetadata against the versioned discovery policy.\nUnder v0.10 (historical):\n- Policy version must be \"v0.10\".\n- Exactly 39 leaves (pre-leaf baseline) or 40 leaves (after SVG admission).\n- All original 39 skills must be present with exact frozen descriptions and matching digest.\n- At 39 leaves: total description bytes == 9504, chars == 9492, \u003c= GlobalDescriptionLimit (9527).\n- At 40 leaves: the 40th skill must be \"svg-language-profile\"; other candidates are rejected.\n- svg-language-profile description UTF-8 bytes \u003c= 330.\n- svg-language-profile file body bytes \u003c= 20480.\n- Total description bytes \u003c= 9857 (current SVG admission ceiling) and \u003c= 11507 (overall future ceiling).\n\nUnder v0.10-browser-ui (historical):\n- Policy version must be \"v0.10-browser-ui\".\n- Exactly 42 leaves: original 39 + svg-language-profile + playwright-test-profile + web-accessibility-profile.\n- All original 39 skills must be present with exact frozen descriptions and matching digest.\n- svg-language-profile description must be byte-identical to FrozenSVGSkillDescription.\n- svg-language-profile file body bytes \u003c= 20480.\n- playwright-test-profile and web-accessibility-profile have no added fixed body ceiling.\n- Each candidate description UTF-8 bytes \u003c= 330.\n- Total description bytes \u003c= 10517 (V010BrowserUIAdmissionCeiling) and \u003c= 11507 (overall future ceiling).\n\nUnder v0.10-toolchain (historical):\n- Policy version must be \"v0.10-toolchain\".\n- Exactly 44 leaves: original 39 + svg-language-profile + playwright-test-profile + web-accessibility-profile + vite-build-profile + npm-package-manager-profile.\n- All original 39 skills must be present with exact frozen descriptions and matching digest.\n- svg-language-profile description must be byte-identical to FrozenSVGSkillDescription.\n- svg-language-profile file body bytes \u003c= 20480.\n- playwright-test-profile description must be byte-identical to FrozenPlaywrightSkillDescription.\n- web-accessibility-profile description must be byte-identical to FrozenWebAccessibilitySkillDescription.\n- vite-build-profile and npm-package-manager-profile have no added fixed body ceiling.\n- Each candidate description UTF-8 bytes \u003c= 330.\n- Total description bytes \u003c= 11177 (V010ToolchainAdmissionCeiling) and \u003c= 11507 (overall future ceiling).\n\nUnder v0.10-browser-runtime (current):\n- Policy version must be \"v0.10-browser-runtime\".\n- Exactly 45 leaves: original 39 + svg-language-profile + playwright-test-profile + web-accessibility-profile + vite-build-profile + npm-package-manager-profile + browser-runtime-profile.\n- All original 39 skills must be present with exact frozen descriptions and matching digest.\n- svg-language-profile description must be byte-identical to FrozenSVGSkillDescription.\n- svg-language-profile file body bytes \u003c= 20480.\n- playwright-test-profile description must be byte-identical to FrozenPlaywrightSkillDescription.\n- web-accessibility-profile description must be byte-identical to FrozenWebAccessibilitySkillDescription.\n- vite-build-profile description must be byte-identical to FrozenViteSkillDescription.\n- npm-package-manager-profile description must be byte-identical to FrozenNPMSkillDescription.\n- browser-runtime-profile and other new non-SVG profiles have no added fixed body ceiling.\n- Each candidate description UTF-8 bytes \u003c= 330.\n- Total description bytes \u003c= 11507 (V010BrowserRuntimeAdmissionCeiling) and \u003c= 11507 (overall future ceiling).",
+          "signature": "func(policyVersion string, skillList []SkillMetadata) error"
+        },
+        {
+          "name": "VerifyCatalogGeneration",
+          "doc": "VerifyCatalogGeneration checks authoritative inputs as well as generated bytes.",
+          "signature": "func(root fs.FS) error"
         }
       ]
     }

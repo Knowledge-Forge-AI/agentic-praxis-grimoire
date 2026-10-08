@@ -76,6 +76,13 @@ def test_bounded_review_attempts(repository, tmp_path, bad, shape):
     source = next((tmp_path / "runs").rglob("state.json")).parent
     state = json.loads((source / "state.json").read_bytes())
     assert runner.reviews == (1 if bad == 0 else 2)
+    context_files = sorted(source.glob("04-final-review*.context-plan.json"))
+    assert len(context_files) == (1 if bad == 0 else 2)
+    context_records = [json.loads(path.read_bytes()) for path in context_files]
+    assert {record["attempt_number"] for record in context_records} == ({1} if bad == 0 else {1, 2})
+    assert len({record["attempt_id"] for record in context_records}) == len(context_records)
+    for record in context_records:
+        assert record["binding_id"] == "final_review"
     assert [s for s,p,a in runner.calls].count("work") == 1
     assert (repository / "file.txt").read_bytes() == original
     assert (repository / ".git/index").read_bytes() == index
@@ -132,6 +139,9 @@ def test_recovered_review_can_be_inherited_by_resume(repository, tmp_path):
     resolved = json.loads((resumed / "resolved.json").read_bytes())
     completed_prefix(state, resolved, resumed)
     assert (resumed / "04-final-review.recovery.json").is_file()
+    for historical in source.glob("04-final-review*.context-*.json"):
+        assert (resumed / historical.name).read_bytes() == historical.read_bytes()
+    assert not list(resumed.glob("*review*.context-failure.json"))
 
 
 @pytest.mark.parametrize("lifecycle,stage", [("plan-reviewed", "plan_review"), ("work-reviewed", "work_review")])

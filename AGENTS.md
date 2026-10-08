@@ -107,12 +107,12 @@ prerequisite, never a fabricated fact.
 
 ## Current development authority
 
-Public v0.11.0 is released across GitHub, Go, PyPI, npm, and Homebrew tap. APGR
-v0.11.0 publication is terminal. The [v0.11 roadmap](docs/v0-11-roadmap.md) and
-[closure governance](docs/governance/v0-11-closure-governance.md) represent a
-completed, immutable historical closure program with a closed 55/55/0/0 ledger.
-The [v0.12 architecture transfer roadmap](docs/v0-12-roadmap.md) is the current
-authorized development line, initiated by APG146 (stage V0120-A).
+APGR v0.12.0 is publicly released across GitHub (Release ID `392534425`), Go,
+PyPI, npm, and Homebrew tap. Post-G1 development commits (APG153E through APG158A)
+are reconciled in the [v0.12 forward reconciliation record](docs/architecture/v0-12-forward-reconciliation.md).
+The [v0.13 roadmap](docs/v0-13-roadmap.md) is the current authorized development line,
+initiated by APG159 (stage V0130-A). The [v0.12 architecture transfer roadmap](docs/v0-12-roadmap.md)
+and [v0.11 roadmap](docs/v0-11-roadmap.md) remain historical release records.
 At the historical foundation entry, APG138 implemented V0110-A only:
 55 inherited closure rows, separate maintenance and compatibility records,
 a 45-leaf maturity ledger and measured
@@ -216,8 +216,8 @@ performs no code or remote mutations; the dispatcher owns private Git publicatio
 - [Exit records](docs/status/README.md): phase outcomes and next authorization.
 - [Phase and record identity](docs/phase-and-record-identity.md): semantic phase
   IDs, independent sequences, durable references, and precommit finalization.
-- [Skill library](skills/README.md): forty-five skill owners, fourteen stable
-  and thirty-one provisional, and current scope.
+- [Skill library](skills/README.md): forty-six skill owners, fourteen stable
+  and thirty-two provisional, and current scope.
 - [Roadmap](docs/roadmap.md): completed phases and future authorization
   boundary.
 - [v0.4 roadmap](docs/v0-4-roadmap.md): dependency-ordered implementation,

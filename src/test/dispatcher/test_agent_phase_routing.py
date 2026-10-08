@@ -48,14 +48,16 @@ def expected_intelligence(
     endpoint: Endpoint,
 ) -> dict[str, object]:
     expected = dict(SYNTHETIC_INTELLIGENCE[(endpoint.provider, endpoint.profile)])
+    if endpoint.provider == "antigravity":
+        expected["effort"] = "high"
     if execution_mode == "conserve_claude" and endpoint.provider == "codex":
         source = fixture.root / "codex/config.d/170-subagents.toml"
         expected["workers"] = {
             "mode": "provider-local",
             "enabled": True,
-            "model": "gpt-5.6-luna",
+            "model": "gpt-6-luna",
             "reasoning_effort": "max",
-            "maximum_concurrency": 10,
+            "maximum_concurrency": 4,
             "source_path": "codex/config.d/170-subagents.toml",
             "source_sha256": hashlib.sha256(source.read_bytes()).hexdigest(),
         }
@@ -123,23 +125,18 @@ def test_canonical_roster_smoke_is_data_driven() -> None:
 
 def test_canonical_provenance_is_byte_exact_without_generation_coupling() -> None:
     snapshot = load_roster(ROOT)
+    assert set(snapshot.bundle.members) == {"models.toml", "workers.toml", "endpoints.toml", "routes.toml", "capabilities.toml", "policy.toml"}
+    expected_sources = {
+        name.removesuffix(".toml"): {
+            "path": member.path.relative_to(ROOT).as_posix(),
+            "sha256": hashlib.sha256(Path(member.path).read_bytes()).hexdigest(),
+        }
+        for name, member in snapshot.bundle.members.items()
+    }
     assert snapshot.provenance() == {
         "schema": "agent-phase-roster-provenance-v1",
         "generation": snapshot.generation,
-        "sources": {
-            "endpoints": {
-                "path": ENDPOINTS_SOURCE.as_posix(),
-                "sha256": hashlib.sha256(
-                    (ROOT / ENDPOINTS_SOURCE).read_bytes()
-                ).hexdigest(),
-            },
-            "routes": {
-                "path": ROUTES_SOURCE.as_posix(),
-                "sha256": hashlib.sha256(
-                    (ROOT / ROUTES_SOURCE).read_bytes()
-                ).hexdigest(),
-            },
-        },
+        "sources": expected_sources,
     }
 
 
@@ -209,8 +206,8 @@ def test_resolved_exposes_only_verified_process_posture(tmp_path: Path) -> None:
     [
         ("enabled = true", "enabled = false", "disabled"),
         (
-            'default_subagent_model = "gpt-5.6-luna"',
-            'default_subagent_model = "gpt-5.6-sol"',
+            'default_subagent_model = "gpt-6-luna"',
+            'default_subagent_model = "gpt-6-sol"',
             "model",
         ),
         (
@@ -219,7 +216,7 @@ def test_resolved_exposes_only_verified_process_posture(tmp_path: Path) -> None:
             "reasoning",
         ),
         (
-            "max_concurrent_threads_per_session = 10",
+            "max_concurrent_threads_per_session = 4",
             "max_concurrent_threads_per_session = 9",
             "concurrency",
         ),
@@ -304,7 +301,7 @@ def test_claude_intelligence_resolves_roles_and_catalog() -> None:
 
     primary = claude_intelligence(ROOT, "implementation-primary")
     assert primary["model_role"] == "primary"
-    assert primary["model"] == "claude-opus-5"
+    assert primary["model"] == "claude-opus-5-5"
     assert primary["effort"] == "medium"
     assert primary["catalog"]["schema"] == "agent-central-claude-model-catalog-v1"
     assert primary["catalog"]["relativePath"] == "claude/model-catalog-v1.json"
@@ -313,7 +310,7 @@ def test_claude_intelligence_resolves_roles_and_catalog() -> None:
 
     review = claude_intelligence(ROOT, "implementation-review")
     assert review["model_role"] == "review"
-    assert review["model"] == "claude-fable-5-1"
+    assert review["model"] == "claude-opus-5-5"
     assert review["effort"] == "medium"
     assert review["catalog"]["schema"] == "agent-central-claude-model-catalog-v1"
 
@@ -343,30 +340,23 @@ def test_gemini_opus_and_gemini_fable_canonical_acceptance(mode: str, phase_type
 
     # Review slots
     if mode == "gemini_opus":
-        assert stages["plan_review"]["intelligence"]["model"] == "claude-opus-5"
+        assert stages["plan_review"]["intelligence"]["model"] == "claude-opus-5-5"
         assert stages["plan_review"]["intelligence"]["effort"] == "high"
-        assert stages["final_review"]["intelligence"]["model"] == "claude-opus-5"
+        assert stages["final_review"]["intelligence"]["model"] == "claude-opus-5-5"
         assert stages["final_review"]["intelligence"]["effort"] == "high"
     else:  # gemini_fable
-        assert stages["plan_review"]["intelligence"]["model"] == "claude-fable-5-1"
+        assert stages["plan_review"]["intelligence"]["model"] == "claude-opus-5-5"
         assert stages["plan_review"]["intelligence"]["effort"] == "high"
-        assert stages["final_review"]["intelligence"]["model"] == "claude-opus-5"
+        assert stages["final_review"]["intelligence"]["model"] == "claude-opus-5-5"
         assert stages["final_review"]["intelligence"]["effort"] == "high"
 
     # Claude review stages have worker capability attached (allowed when agent_workers is present)
     for slot in ["plan_review", "final_review"]:
         worker_cap = stages[slot].get("worker_capability")
         assert worker_cap is not None
-        try:
-            __import__("agent_workers.policy")
-            has_workers = True
-        except ImportError:
-            has_workers = False
-        if has_workers:
-            assert worker_cap["allowed"] is True
-            assert worker_cap["limits"]["max_gemini"] == 4
-        else:
-            assert worker_cap["allowed"] is False
+        assert worker_cap["allowed"] is True
+        assert worker_cap["limits"]["max_gemini"] == 4
+        assert "luna_worker" not in worker_cap
 
     # Lifecycle projections
     for lifecycle_name in ["standard", "solo", "plan-reviewed", "work-reviewed"]:

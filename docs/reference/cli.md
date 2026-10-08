@@ -38,6 +38,8 @@ apgr env run
 apgr analyze hotspots
 apgr response capture
 apgr response record
+apgr home show
+apgr integrations rtk doctor
 ```
 
 Direct Go report execution requires explicit repository, outbox, and project
@@ -57,6 +59,26 @@ Exit classes remain 0 for success, 2 for usage, 1 for runtime/repository/
 publication failure, and 130 for keyboard interruption. SIGTERM and SIGHUP use
 the bounded runtime-failure class rather than being mislabeled as keyboard
 interruptions.
+
+## Dispatcher observations (`apgr dispatcher observations`)
+
+Repository-routed, provider-free commands over local run evidence (like
+`apgr dispatcher bundle`, they require an APGR source checkout):
+
+```text
+apgr dispatcher observations summarize [RUN_DIR ...] [--outbox-root DIR --project NAME [--phase ID]] [--v2] [--latest N] [--from-index [--index PATH] [--run-id ID ...]] [--json] [--no-feedback]
+apgr dispatcher observations index [RUN_DIR ...] [selection options] [--rebuild] [--index PATH]
+apgr dispatcher observations feedback --run-id ID [--attempt-id ID] --label helpful|missing|misleading --source operator|agent|reviewer [--skill QID] [--note TEXT]
+apgr dispatcher observations explain (RUN_DIR | --project NAME [--outbox-root DIR] [--phase ID] [--leaf LEAF] | --v2 [--leaf RUN_ID]) [--attempt ID] [--stage BINDING] [--json] [--no-feedback]
+apgr dispatcher observations list (--project NAME | --all-projects | --v2) [--phase ID] [--outbox-root DIR] [--v2] [--latest N] [--json] [--no-feedback]
+```
+
+The global `--apgr-home` is forwarded; the global `--outbox-root` is resolved
+and forwarded to `list`, which requires `--project` or `--all-projects` with it.
+`bin/agent-phase-observations` is the
+checkout-local equivalent. `--from-index` selects only by `--run-id`;
+combining it with run-directory or outbox selectors is a usage error. Usage
+errors exit 2; an unavailable optional index exits 1. See [operational observations](../guides/operational-observations.md).
 
 ## Reporting verification and retries
 
@@ -267,6 +289,55 @@ Python retains configuration and repository/project discovery, then delegates
 `response capture` and its `response record` compatibility alias to Go. The
 importable Python compatibility functions also invoke Go; no normal Python path
 contains an independent response mutation implementation.
+
+## Operator home inspection (`apgr home show`)
+
+In v0.13.0 (milestone V0130-C), `apgr home show` inspects the active APGR home directory layout without creating directories or mutating the filesystem:
+
+```text
+apgr [--apgr-home <path>] home show [--json]
+```
+
+Precedence strictly follows:
+1. `--apgr-home <path>` CLI flag
+2. `APGR_HOME` environment variable
+3. Default fallback `~/.apgr`
+
+Options:
+- `--json`: emit canonical JSON output detailing resolved home root, resolution provenance (`flag`, `env`, or `default`), whether the home directory exists, and existence of standard subdirectories and files (`config.toml`, `dispatcher/`, `claude/settings.json`, `state/dispatcher.sqlite3`, `generations/`, `scratch/`, `skills/`).
+
+Canonical Python (`src/agentic_praxis_grimoire/cli.py`) owns full configuration resolution and emits `scope: "resolved_config"`, evaluating effective paths across configuration and environment precedence. Standalone Go (`internal/cli/home.go`) provides path-only inspection with explicit `scope: "paths_only"` without evaluating TOML configuration precedence, or consumes and validates/renders a Python-produced resolved view via `--from-json <path>`. Both implementations adhere to non-mutating inspection semantics and zero coupling to `JACA_HOME`.
+
+## RTK integrations doctor (`apgr integrations rtk doctor`)
+
+In v0.13.0 (milestone V0130-D), `apgr integrations rtk doctor` inspects the active RTK integration configuration, binary availability, version, probes, hook state, and canonical skill discovery without mutating files, hooks, or settings:
+
+```text
+apgr integrations rtk doctor --from-json <path> [--json]
+```
+
+Options:
+- `--from-json <path>`: file path or `-` (stdin) supplying canonical doctor JSON output for typed parsing and rendering.
+- `--json`: emit canonical JSON output detailing resolved RTK configuration, status (`available`, `unavailable`, or `disabled`), binary resolution provenance, probe latency, version, probe output, Claude settings hook inspection, and `rtk-command-proxy` discovery status.
+
+Canonical Python (`src/agentic_praxis_grimoire/rtk.py`, `src/agentic_praxis_grimoire/cli.py`) owns live evaluation (`python3 -m agentic_praxis_grimoire.cli integrations rtk doctor [--json]`), closed configuration resolution, bounded probe execution (<= 5s), and diagnostic reporting. Standalone Go (`internal/cli/integrations.go`) provides typed view parsing, JSON validation, and human-readable formatting from a supplied Python-produced doctor view via `--from-json <path>` and `--json`. Both implementations adhere strictly to read-only diagnostics and never mutate hooks, configurations, or repository state.
+
+Declared provider mode and effective mode are separate observations. Effective
+`off`, disabled, or unavailable RTK omits RTK guidance and preserves ordinary
+commands. Claude hook mode requires known hook registration and targeting;
+uncertainty falls back to `off`. A known targeted hook overrides declared
+`instructions` to avoid double wrapping. Registration does not prove invocation
+or output compaction. Matcher inspection recognizes common Bash literals and
+tool alternations, then falls back to Python regex search; equivalence with all
+Claude matcher syntax remains unqualified (ADR 0072, F8).
+
+Explicit targets remain selected even without project configuration. A starting
+directory instead discovers the nearest ancestor Git worktree marker, without
+crossing it to find a configured parent. An ancestor `.apgr` directory alone
+is not a project marker. Failure to discover a project never selects a sibling
+or restarts discovery from an unrelated ambient cwd. V1 carries explicit target
+and discovery-start context independently of worker workspace context. Selected
+APGR home takes precedence over ambient home. These inspections perform no writes.
 
 ## Distribution
 

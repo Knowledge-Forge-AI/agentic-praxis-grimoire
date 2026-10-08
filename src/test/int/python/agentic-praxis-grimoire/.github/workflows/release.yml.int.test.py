@@ -67,6 +67,8 @@ def _fixture(
     include_non_python_assets: bool = True,
     manifest_source_mismatch: bool = False,
     aggregate_failed: bool = False,
+    omit_receipt: str | None = None,
+    aggregate_trailer: str = "",
 ) -> tuple[Path, Path]:
     active_version = fixture_version if fixture_version is not None else VERSION
     active_wheels, active_sdist, active_npm = _distribution_filenames(active_version)
@@ -112,7 +114,7 @@ def _fixture(
             },
         },
     }
-    if active_version in ("0.11.0", "0.12.0"):
+    if active_version in ("0.11.0", "0.12.0", "0.13.0"):
         manifest_obj["source_commit"] = "a" * 40 if manifest_source_mismatch else "b" * 40
         manifest_obj["source_tree"] = "e" * 40 if manifest_source_mismatch else "f" * 40
 
@@ -148,7 +150,10 @@ def _fixture(
         "codeql-python",
         "codeql-javascript-typescript",
         "codeql-actions",
+        "nix-x86_64-linux",
+        "nix-aarch64-darwin",
     )
+    receipt_jobs = tuple(job for job in receipt_jobs if job != omit_receipt)
     aggregate_members = {
         job: {
             "schema": "apg-matrix-receipt-v1",
@@ -175,7 +180,7 @@ def _fixture(
     with zipfile.ZipFile(tmp_path / "aggregate-gate.zip", "w", zipfile.ZIP_DEFLATED) as archive:
         archive.writestr(
             "matrix-aggregate.json",
-            json.dumps(aggregate, sort_keys=True, separators=(",", ":")) + "\n",
+            json.dumps(aggregate, sort_keys=True, separators=(",", ":")) + "\n" + aggregate_trailer,
         )
 
     release_assets = [
@@ -248,6 +253,9 @@ def _run(
     aggregate_mismatch: bool = False,
     aggregate_parent_mismatch: bool = False,
     aggregate_failed: bool = False,
+    omit_receipt: str | None = None,
+    omit_job: str | None = None,
+    aggregate_trailer: str = "",
     repository: str = "Knowledge-Forge-AI/agentic-praxis-grimoire",
 ) -> subprocess.CompletedProcess[str]:
     assets, event = _fixture(
@@ -270,6 +278,8 @@ def _run(
         include_non_python_assets=include_non_python_assets,
         manifest_source_mismatch=manifest_source_mismatch,
         aggregate_failed=aggregate_failed,
+        omit_receipt=omit_receipt,
+        aggregate_trailer=aggregate_trailer,
     )
     commands = tmp_path / "bin"
     commands.mkdir()
@@ -285,7 +295,8 @@ import sys
 
 event_path = Path(os.environ["GITHUB_EVENT_PATH"])
 event = json.loads(event_path.read_text(encoding="utf-8"))
-event_tag = event.get("release", {}).get("tag_name", "v0.12.0")
+event_tag = event.get("release", {}).get("tag_name", "v0.13.0")
+predecessor_tag = "v0.12.0"
 api_path = sys.argv[-1]
 accepted_base = "a" * 40
 merged_commit = "b" * 40
@@ -294,11 +305,11 @@ accepted_tag_object = "d" * 40
 pr_head = "e" * 40
 tested_sha = "6" * 40
 run_id = "123"
-if api_path.endswith("/git/ref/tags/" + event_tag) or api_path.endswith("/git/ref/tags/v0.12.0"):
+if api_path.endswith("/git/ref/tags/" + event_tag):
     value = {"object": {"sha": tag_object, "type": "tag"}}
 elif api_path.endswith("/git/tags/" + tag_object):
     value = {"object": {"sha": merged_commit, "type": "commit"}}
-elif api_path.endswith("/git/ref/tags/v0.11.0"):
+elif api_path.endswith("/git/ref/tags/" + predecessor_tag):
     value = {"object": {"sha": accepted_tag_object, "type": "tag"}}
 elif api_path.endswith("/git/tags/" + accepted_tag_object):
     value = {"object": {"sha": accepted_base, "type": "commit"}}
@@ -400,8 +411,10 @@ elif "/actions/runs/" + run_id + "/jobs?" in api_path:
     names = [
         "guard", "static-analysis", "policy", "unit-integration", "closure", "go",
         "package", "sbom-and-vulnerability", "codeql (go)", "codeql (python)",
-        "codeql (javascript-typescript)", "codeql (actions)", "public-pr-gate",
+        "codeql (javascript-typescript)", "codeql (actions)", "nix (x86_64-linux)",
+        "nix (aarch64-darwin)", "public-pr-gate",
     ]
+    names = [name for name in names if name != os.environ.get("APG_OMIT_JOB")]
     value = [{"total_count": len(names), "jobs": [
         {
             "name": name,
@@ -453,6 +466,7 @@ print(json.dumps(value), end="")
         "APG_AGGREGATE_MISMATCH": "1" if aggregate_mismatch else "0",
         "APG_AGGREGATE_PARENT_MISMATCH": "1" if aggregate_parent_mismatch else "0",
         "APG_AGGREGATE_ZIP": os.fspath(tmp_path / "aggregate-gate.zip"),
+        "APG_OMIT_JOB": omit_job or "",
         "GITHUB_EVENT_PATH": os.fspath(event),
         "GITHUB_REPOSITORY": repository,
         "RUNNER_TEMP": os.fspath(tmp_path),
@@ -704,3 +718,55 @@ def test_verification_step_rejects_unexpected_release_identity(
     result = _run(tmp_path, **arguments)
 
     assert result.returncode != 0
+
+
+@pytest.mark.parametrize("job", ("nix (x86_64-linux)", "nix (aarch64-darwin)", "static-analysis"))
+def test_verification_step_requires_every_hosted_check_including_nix_cells(
+    tmp_path: Path, job: str
+) -> None:
+    result = _run(tmp_path, omit_job=job)
+
+    assert result.returncode != 0
+    assert f"required PR job did not succeed: {job}" in result.stderr
+
+
+@pytest.mark.parametrize("receipt", ("nix-x86_64-linux", "nix-aarch64-darwin"))
+def test_verification_step_requires_nix_matrix_receipts(tmp_path: Path, receipt: str) -> None:
+    result = _run(tmp_path, omit_receipt=receipt)
+
+    assert result.returncode != 0
+    assert "aggregate gate receipt is missing" in result.stderr
+
+
+def test_workflow_receipt_set_matches_public_pr_matrix_members() -> None:
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location(
+        "matrix_receipts_for_release", REPOSITORY_ROOT / "release/ci/matrix_receipts.py"
+    )
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    run = json.loads(WORKFLOW.read_text(encoding="utf-8"))["jobs"]["publish"]["steps"][1]["run"]
+    line = next(item for item in run.splitlines() if item.startswith("required_receipts="))
+    assert set(json.loads(line.split("=", 1)[1].strip("'"))) == module.DEFAULT_MEMBER_JOBS
+    assert "expected_tag=v0.13.0" in run and "/git/ref/tags/v0.12.0" in run
+
+
+def test_verification_accepts_only_the_exact_matrix_success_trailer(tmp_path: Path) -> None:
+    # public-pr-gate redirects `matrix_receipts.py verify`, which prints JSON and
+    # then "PASSED: matrix completeness verified", into the aggregate artifact.
+    (tmp_path / "passed").mkdir()
+    (tmp_path / "other").mkdir()
+    accepted = _run(tmp_path / "passed", aggregate_trailer="PASSED: matrix completeness verified\n")
+    assert accepted.returncode == 0, accepted.stderr
+    refused = _run(tmp_path / "other", aggregate_trailer="PASSED: something else\n")
+    assert refused.returncode != 0
+    assert "unexpected aggregate trailer" in refused.stderr
+
+
+def test_aggregate_artifact_zip_is_requested_with_the_rest_api_media_type() -> None:
+    run = json.loads(WORKFLOW.read_text(encoding="utf-8"))["jobs"]["publish"]["steps"][1]["run"]
+    assert ("gh api -H 'Accept: application/vnd.github+json' "
+            '"/repos/$GITHUB_REPOSITORY/actions/artifacts/$aggregate_artifact_id/zip"') in run
+    assert list(json.loads(WORKFLOW.read_text(encoding="utf-8"))["on"]) == ["release"]

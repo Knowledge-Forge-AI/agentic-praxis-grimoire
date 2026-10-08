@@ -1042,6 +1042,14 @@ def _stage_execution_story(
             f"({len(paths)} path(s))"
         )
     story.append(f"- Final candidate covered by review: **{state.get('final_candidate_reviewed')}**")
+    obs_map = state.get("review_mutation_observations")
+    if isinstance(obs_map, dict) and obs_map:
+        story.extend(["", "### Review mutation observations", ""])
+        for stg, obs_dict in sorted(obs_map.items()):
+            if isinstance(obs_dict, dict):
+                action = obs_dict.get("action_taken", "none")
+                drift = obs_dict.get("subject_drift_observed", False)
+                story.append(f"- Stage `{stg}`: drift observed = **{drift}**, action = **{action}**")
     story.append("")
 
     story.extend(["### Manager attention reasons", ""])
@@ -1554,11 +1562,17 @@ def write(directory: Any, state: dict[str, Any], invocations: list[dict[str, Any
         "source_archive_verified": state.get("source_archive_verified"),
         "failure_candidate": state.get("failure_candidate"),
         "candidate_manifest": state.get("candidate_manifest"),
-        "adoption": state.get("adoption"),
+        "adoption": state.get("adoption"), "entry_adoption": state.get("entry_adoption"),
         "final_review_mutation": state.get("final_review_mutation"),
         "work_review_mutation": state.get("work_review_mutation"),
         "immutable_review_bindings": state.get("immutable_review_bindings", {}),
         "review_binding_invalidations": state.get("review_binding_invalidations", {}),
+        "review_mutation_policy": state.get("review_mutation_policy"),
+        "review_mutation_provenance": state.get("review_mutation_provenance"),
+        "review_mutation_provenance_chain": state.get("review_mutation_provenance_chain"),
+        "review_mutation_observations": state.get("review_mutation_observations", {}),
+        "subject_drift_observed": state.get("subject_drift_observed", False),
+        "final_candidate_reviewed": state.get("final_candidate_reviewed", False),
         "stage_delta_ledger": stage_delta_ledger,
         "stage_delta_record": stage_delta_ledger,
         "closer_disposition": closer_report["closer_disposition"],

@@ -29,6 +29,7 @@ REQUIRED_PR_JOBS = {
     "package",
     "sbom-and-vulnerability",
     "codeql",
+    "nix",
     "public-pr-gate",
 }
 
@@ -39,6 +40,10 @@ EXPECTED_CODEQL_LANGUAGES = {
     "python",
     "javascript-typescript",
     "actions",
+}
+EXPECTED_NIX_CELLS = {
+    ("ubuntu-latest", "x86_64-linux"),
+    ("macos-15", "aarch64-darwin"),
 }
 
 
@@ -100,16 +105,23 @@ def validate_public_pr(doc: dict[str, Any], path: Path) -> list[str]:
 
         # Runner check: standard GitHub-hosted runners only.  The canonical
         # APGR suite is macOS arm64 because its qualified Node/browser inputs
-        # are Darwin-specific; all other lanes use standard Ubuntu.
+        # are Darwin-specific; nix tests both Ubuntu and macOS via matrix;
+        # all other lanes use standard Ubuntu.
         runs_on = job_doc.get("runs-on")
-        if runs_on not in STANDARD_RUNNERS:
-            errors.append(
-                f"{path.name}:{job_name}: runs-on must be a standard runner, got {runs_on!r}"
-            )
-        if job_name == "unit-integration" and runs_on != "macos-15":
-            errors.append(f"{path.name}:unit-integration: runs-on must be 'macos-15'")
-        if job_name not in {"unit-integration"} and runs_on == "macos-15":
-            errors.append(f"{path.name}:{job_name}: macos-15 is reserved for unit-integration")
+        if job_name == "nix":
+            if runs_on != "${{ matrix.os }}":
+                errors.append(
+                    f"{path.name}:nix: runs-on must be '${{{{ matrix.os }}}}', got {runs_on!r}"
+                )
+        else:
+            if runs_on not in STANDARD_RUNNERS:
+                errors.append(
+                    f"{path.name}:{job_name}: runs-on must be a standard runner, got {runs_on!r}"
+                )
+            if job_name == "unit-integration" and runs_on != "macos-15":
+                errors.append(f"{path.name}:unit-integration: runs-on must be 'macos-15'")
+            if job_name not in {"unit-integration", "nix"} and runs_on == "macos-15":
+                errors.append(f"{path.name}:{job_name}: macos-15 is reserved for unit-integration and nix")
 
         if job_name in GUARDED_JOBS:
             condition = str(job_doc.get("if", ""))
@@ -175,6 +187,22 @@ def validate_public_pr(doc: dict[str, Any], path: Path) -> list[str]:
                 )
             if len(includes) != len(languages):
                 errors.append(f"{path.name}:codeql: language matrix contains duplicate members")
+
+        if job_name == "nix":
+            strategy = job_doc.get("strategy", {})
+            matrix = strategy.get("matrix", {}) if isinstance(strategy, dict) else {}
+            includes = matrix.get("include", []) if isinstance(matrix, dict) else []
+            cells = {
+                (item.get("os"), item.get("system"))
+                for item in includes
+                if isinstance(item, dict)
+            }
+            if cells != EXPECTED_NIX_CELLS:
+                errors.append(
+                    f"{path.name}:nix: matrix cells must be {sorted(EXPECTED_NIX_CELLS)}, got {sorted(cells)}"
+                )
+            if len(includes) != len(cells):
+                errors.append(f"{path.name}:nix: matrix contains duplicate cells")
 
     # 5. Guard job checks
     guard_job = jobs.get("guard", {})

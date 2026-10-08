@@ -10,6 +10,7 @@ from pathlib import Path
 from release.ci.matrix_receipts import DEFAULT_MEMBER_JOBS
 from tools.ci.ci_topology import (
     EXPECTED_CODEQL_LANGUAGES,
+    EXPECTED_NIX_CELLS,
     REQUIRED_PR_JOBS,
     load_workflow_doc,
     main,
@@ -38,10 +39,18 @@ def test_cross_binding_pr_jobs_member_jobs_release_checks_and_workflow_lanes() -
     matrix_languages = {item["language"] for item in codeql_matrix_includes}
     assert matrix_languages == EXPECTED_CODEQL_LANGUAGES
 
-    # 4. DEFAULT_MEMBER_JOBS cross-binds to REQUIRED_PR_JOBS with CodeQL expanded per language
-    expected_member_jobs = (REQUIRED_PR_JOBS - {"codeql", "public-pr-gate"}) | {
-        f"codeql-{lang}" for lang in EXPECTED_CODEQL_LANGUAGES
-    }
+    # 3b. Nix matrix cells in public-pr.yml match EXPECTED_NIX_CELLS
+    nix_job = pr_jobs["nix"]
+    nix_matrix_includes = nix_job["strategy"]["matrix"]["include"]
+    matrix_cells = {(item["os"], item["system"]) for item in nix_matrix_includes}
+    assert matrix_cells == EXPECTED_NIX_CELLS
+
+    # 4. DEFAULT_MEMBER_JOBS cross-binds to REQUIRED_PR_JOBS with CodeQL expanded per language and Nix per system
+    expected_member_jobs = (
+        (REQUIRED_PR_JOBS - {"codeql", "nix", "public-pr-gate"})
+        | {f"codeql-{lang}" for lang in EXPECTED_CODEQL_LANGUAGES}
+        | {f"nix-{cell[1]}" for cell in EXPECTED_NIX_CELLS}
+    )
     assert DEFAULT_MEMBER_JOBS == expected_member_jobs
 
     # 5. public-pr-gate dependencies and MATRIX_NEEDS_RESULTS cross-bind
@@ -53,7 +62,7 @@ def test_cross_binding_pr_jobs_member_jobs_release_checks_and_workflow_lanes() -
     matrix_needs_keys = set(json.loads(matrix_needs_raw).keys())
     assert matrix_needs_keys == DEFAULT_MEMBER_JOBS
 
-    # 6. release.yml required_checks array cross-binds to workflow lane members
+    # 6. release.yml required_checks array cross-binds to workflow lane members (v0.13 release checks)
     verify_step = next(
         step
         for step in rel_doc["jobs"]["publish"]["steps"]
@@ -65,14 +74,15 @@ def test_cross_binding_pr_jobs_member_jobs_release_checks_and_workflow_lanes() -
     assert checks_match is not None, "release.yml missing required_checks array"
     required_checks = shlex.split(checks_match.group(1))
 
-    # All non-matrix jobs appear by lane name; CodeQL appears as "codeql (<lang>)"
-    expected_required_checks = (REQUIRED_PR_JOBS - {"codeql"}) | {
+    # All non-matrix jobs appear by lane name; CodeQL appears as "codeql (<lang>)" and
+    # Nix as "nix (<system>)". v0.12.0's own tagged workflow keeps its 13 checks.
+    expected_required_checks = (REQUIRED_PR_JOBS - {"codeql", "nix"}) | {
         f"codeql ({lang})" for lang in EXPECTED_CODEQL_LANGUAGES
-    }
+    } | {f"nix ({cell[1]})" for cell in EXPECTED_NIX_CELLS}
     assert set(required_checks) == expected_required_checks
     assert len(required_checks) == len(expected_required_checks), "duplicate checks in release.yml"
 
-    # 7. release.yml required_receipts JSON array cross-binds to DEFAULT_MEMBER_JOBS
+    # 7. release.yml required_receipts JSON array cross-binds to DEFAULT_MEMBER_JOBS (v0.13 release receipts)
     receipts_match = re.search(r"^required_receipts='(.*)'$", script, re.MULTILINE)
     assert receipts_match is not None, "release.yml missing required_receipts JSON"
     required_receipts = set(json.loads(receipts_match.group(1)))

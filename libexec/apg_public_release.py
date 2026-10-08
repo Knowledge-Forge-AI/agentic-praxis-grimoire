@@ -24,7 +24,17 @@ from apg_staging_correction import (
     run_checked_command,
     verify_candidate_lineage,
 )
-
+from apg_public_release_v013 import (
+    ADVANCED_HEAD_VERSIONS,
+    INTERLEAVED_UNTAGGED_VERSIONS,
+    MERGED_CHECK_PREDECESSORS,
+    V013_CRITICAL_ADDITIONS,
+    V013_HELPER_ADDITIONS,
+    V013_PROJECTION_ADDITIONS,
+    V013_SKILL_ADDITIONS,
+    V013_TEST_ADDITIONS,
+    V013_WRAPPER_ADDITIONS,
+)
 
 
 COMMAND = "apg-public-release"
@@ -1265,6 +1275,10 @@ HISTORICAL_V06_CATEGORIES = tuple(sorted(ALLOWED_CATEGORIES))
 HISTORICAL_V06_SURFACE_SHA256 = (
     "40edfbe25f52fae4f15f2801525ce2c50cee5f360b02191393a431ca25f76b51"
 )
+PUBLISHED_SURFACE_SHA256 = {
+    "0.11.0": "59cd6cbb16451d5142ffeab80870ddf184a8e72e018ee05fa1dff82b53066deb",
+    "0.12.0": "1246fbd71c24fa54bd6d9e905df8c09920dfe8979f63a7b25c89430adedf939d",
+}
 
 # These are retained compatibility wrappers, not the old Python report
 # implementation.  The latter is deliberately omitted from the v0.7 source
@@ -1354,20 +1368,35 @@ V07_TESTS = tuple(
         }
     )
 )
-# These exact public-projected tests consume publication-excluded development
-# history or private source oracles. The private canonical gate continues to
-# run them; the release-shaped candidate cannot truthfully reconstruct those
-# inputs. Keep this node-level list narrower than the public test entrypoints.
-V07_PUBLIC_VALIDATION_DESELECTIONS = tuple(
+# These exact public-projected tests consume publication-excluded development history
+# or private oracles. Keep this node-level list narrower than public test entrypoints.
+V07_PUBLIC_VALIDATION_DESELECTIONS = (
+    "src/test/int/python/agentic-praxis-grimoire/skills/css-language-profile/SKILL.int.test.py::test_candidate_fixture_debt_and_repository_lifecycle_agree",
+    "src/test/int/python/agentic-praxis-grimoire/skills/css-language-profile/SKILL.int.test.py::test_disposable_rollback_reconstructs_preintegration_owners",
+    "src/test/int/python/agentic-praxis-grimoire/src/agentic_praxis_grimoire/cli.int.test.py::test_python_skill_bridge_matches_oracle_and_routes_new_go_surfaces",
+    "src/test/int/python/agentic-praxis-grimoire/src/test/support/apg_css_candidate_contract.int.test.py::test_apg59_and_live_counts_preserve_css_rejection_across_growth",
+    "src/test/int/python/agentic-praxis-grimoire/src/test/support/apg_css_candidate_contract.int.test.py::test_apg60a_revision_preserves_exact_unrelated_contract_semantics",
+    "src/test/int/python/agentic-praxis-grimoire/src/test/support/apg_css_candidate_contract.int.test.py::test_exact_apg58_apg59_history_and_live_integrated_surface",
+    "src/test/int/python/agentic-praxis-grimoire/src/test/support/apg_css_candidate_contract.int.test.py::test_raw_apg59_revert_restores_candidate_and_fails_closure",
+)
+V011_PUBLIC_VALIDATION_DESELECTIONS = tuple(
     sorted(
         {
-            "src/test/int/python/agentic-praxis-grimoire/skills/css-language-profile/SKILL.int.test.py::test_candidate_fixture_debt_and_repository_lifecycle_agree",
-            "src/test/int/python/agentic-praxis-grimoire/skills/css-language-profile/SKILL.int.test.py::test_disposable_rollback_reconstructs_preintegration_owners",
-            "src/test/int/python/agentic-praxis-grimoire/src/agentic_praxis_grimoire/cli.int.test.py::test_python_skill_bridge_matches_oracle_and_routes_new_go_surfaces",
-            "src/test/int/python/agentic-praxis-grimoire/src/test/support/apg_css_candidate_contract.int.test.py::test_apg59_and_live_counts_preserve_css_rejection_across_growth",
-            "src/test/int/python/agentic-praxis-grimoire/src/test/support/apg_css_candidate_contract.int.test.py::test_apg60a_revision_preserves_exact_unrelated_contract_semantics",
-            "src/test/int/python/agentic-praxis-grimoire/src/test/support/apg_css_candidate_contract.int.test.py::test_exact_apg58_apg59_history_and_live_integrated_surface",
-            "src/test/int/python/agentic-praxis-grimoire/src/test/support/apg_css_candidate_contract.int.test.py::test_raw_apg59_revert_restores_candidate_and_fails_closure",
+            node
+            for node in V07_PUBLIC_VALIDATION_DESELECTIONS
+            if "cli.int.test.py::test_python_skill_bridge_matches_oracle" not in node
+            and "test_candidate_fixture_debt_and_repository_lifecycle_agree" not in node
+        }
+        | {
+            "src/test/int/python/agentic-praxis-grimoire/skills/css-language-profile/SKILL.int.test.py::test_private_current_machine_contract_remains_source_bound"
+        }
+    )
+)
+V013_PUBLIC_VALIDATION_DESELECTIONS = tuple(
+    sorted(
+        set(V011_PUBLIC_VALIDATION_DESELECTIONS)
+        | {
+            "src/test/int/python/agentic-praxis-grimoire/bin/apg-test.int.test.py::test_standalone_unit_runner_executes_real_pytest_xdist_and_coverage_boundary"
         }
     )
 )
@@ -1382,36 +1411,10 @@ PUBLIC_VALIDATION_DESELECTIONS_BY_VERSION: dict[str, tuple[str, ...]] = {
     "0.8.1": V07_PUBLIC_VALIDATION_DESELECTIONS,
     "0.9.0": V07_PUBLIC_VALIDATION_DESELECTIONS,
     "0.10.0": V07_PUBLIC_VALIDATION_DESELECTIONS,
-    # v0.11 has a maintained public compatibility fixture for the former
-    # private-oracle CLI node and a public CSS behavior companion. The six
-    # historical CSS/history nodes remain explicitly deselected until their
-    # private source contracts are public.
-    "0.11.0": tuple(
-        sorted(
-            {
-                node
-                for node in V07_PUBLIC_VALIDATION_DESELECTIONS
-                if "cli.int.test.py::test_python_skill_bridge_matches_oracle" not in node
-                and "test_candidate_fixture_debt_and_repository_lifecycle_agree" not in node
-            }
-            | {
-                "src/test/int/python/agentic-praxis-grimoire/skills/css-language-profile/SKILL.int.test.py::test_private_current_machine_contract_remains_source_bound"
-            }
-        )
-    ),
-    "0.12.0": tuple(
-        sorted(
-            {
-                node
-                for node in V07_PUBLIC_VALIDATION_DESELECTIONS
-                if "cli.int.test.py::test_python_skill_bridge_matches_oracle" not in node
-                and "test_candidate_fixture_debt_and_repository_lifecycle_agree" not in node
-            }
-            | {
-                "src/test/int/python/agentic-praxis-grimoire/skills/css-language-profile/SKILL.int.test.py::test_private_current_machine_contract_remains_source_bound"
-            }
-        )
-    ),
+    # Maintained public compatibility fixture/deselections per release:
+    "0.11.0": V011_PUBLIC_VALIDATION_DESELECTIONS,
+    "0.12.0": V011_PUBLIC_VALIDATION_DESELECTIONS,
+    "0.13.0": V013_PUBLIC_VALIDATION_DESELECTIONS,
 }
 # None preserves historical audited selection without reading current inventory.
 # A tuple requires inventory closure over the audited files plus exactly these
@@ -1434,6 +1437,7 @@ PUBLIC_INVENTORY_SUPPLEMENTS_BY_VERSION: dict[str, tuple[str, ...] | None] = {
     # complete public selection, so no private inventory supplement is read.
     "0.11.0": None,
     "0.12.0": None,
+    "0.13.0": None,
 }
 V07_CRITICAL = tuple(
     sorted(
@@ -2083,6 +2087,16 @@ V012_LICENSING = tuple(V011_LICENSING)
 V012_PROJECTIONS = tuple(V011_PROJECTIONS)
 V012_SKILLS = tuple(V011_SKILLS)
 V012_CATEGORIES = tuple(V011_CATEGORIES)
+V013_WRAPPERS = tuple(sorted(set(V012_WRAPPERS) | set(V013_WRAPPER_ADDITIONS)))
+V013_HELPERS = tuple(sorted(set(V012_HELPERS) | set(V013_HELPER_ADDITIONS)))
+V013_TESTS = tuple(sorted(set(V012_TESTS) | set(V013_TEST_ADDITIONS)))
+V013_CRITICAL = tuple(sorted(set(V012_CRITICAL) | set(V013_CRITICAL_ADDITIONS)
+                             | set(V013_HELPER_ADDITIONS) | set(V013_TEST_ADDITIONS)
+                             | set(V013_WRAPPER_ADDITIONS)))
+V013_LICENSING = tuple(V012_LICENSING)
+V013_PROJECTIONS = tuple(sorted(set(V012_PROJECTIONS) | set(V013_PROJECTION_ADDITIONS)))
+V013_SKILLS = tuple(sorted(set(V012_SKILLS) | set(V013_SKILL_ADDITIONS)))
+V013_CATEGORIES = tuple(V012_CATEGORIES)
 
 # Source-only test oracles and generated/local output never enter the
 # release-shaped v0.7 candidate. The compatibility wrappers above are not
@@ -2668,6 +2682,28 @@ def safe_policy_path(value: str) -> bool:
     return not path.is_absolute() and not any(part in {"", ".", ".."} for part in path.parts)
 
 
+CURRENT_SURFACE_PREFIXES = {
+    "0.7.0": "V07", "0.8.0": "V08", "0.8.1": "V081", "0.9.0": "V09",
+    "0.10.0": "V010", "0.11.0": "V011", "0.12.0": "V012", "0.13.0": "V013",
+}
+
+
+def _audited_surface(prefix: str) -> dict[str, tuple[str, ...]]:
+    """Return one additive v0.7+ surface from its module-level policy tuples."""
+
+    owners = globals()
+    return {
+        "required_helpers": owners[f"{prefix}_HELPERS"],
+        "required_licensing_files": owners[f"{prefix}_LICENSING"],
+        "required_projections": owners[f"{prefix}_PROJECTIONS"],
+        "required_skills": owners[f"{prefix}_SKILLS"],
+        "required_test_entrypoints": owners[f"{prefix}_TESTS"],
+        "required_wrappers": owners[f"{prefix}_WRAPPERS"],
+        "critical_files": owners[f"{prefix}_CRITICAL"],
+        "validation_categories": owners[f"{prefix}_CATEGORIES"],
+    }
+
+
 def audited_policy_surfaces(version: str) -> tuple[dict[str, tuple[str, ...]], ...]:
     """Return exact policy surfaces allowed for one public release version."""
 
@@ -2691,93 +2727,18 @@ def audited_policy_surfaces(version: str) -> tuple[dict[str, tuple[str, ...]], .
     ).hexdigest()
     if historical_v06_digest != HISTORICAL_V06_SURFACE_SHA256:
         fail("historical public v0.6.0 policy surface changed")
-    current_v07 = {
-        "required_helpers": V07_HELPERS,
-        "required_licensing_files": V07_LICENSING,
-        "required_projections": V07_PROJECTIONS,
-        "required_skills": V07_SKILLS,
-        "required_test_entrypoints": V07_TESTS,
-        "required_wrappers": V07_WRAPPERS,
-        "critical_files": V07_CRITICAL,
-        "validation_categories": V07_CATEGORIES,
-    }
-    current_v08 = {
-        "required_helpers": V08_HELPERS,
-        "required_licensing_files": V08_LICENSING,
-        "required_projections": V08_PROJECTIONS,
-        "required_skills": V08_SKILLS,
-        "required_test_entrypoints": V08_TESTS,
-        "required_wrappers": V08_WRAPPERS,
-        "critical_files": V08_CRITICAL,
-        "validation_categories": V08_CATEGORIES,
-    }
-    current_v081 = {
-        "required_helpers": V081_HELPERS,
-        "required_licensing_files": V081_LICENSING,
-        "required_projections": V081_PROJECTIONS,
-        "required_skills": V081_SKILLS,
-        "required_test_entrypoints": V081_TESTS,
-        "required_wrappers": V081_WRAPPERS,
-        "critical_files": V081_CRITICAL,
-        "validation_categories": V081_CATEGORIES,
-    }
-    current_v09 = {
-        "required_helpers": V09_HELPERS,
-        "required_licensing_files": V09_LICENSING,
-        "required_projections": V09_PROJECTIONS,
-        "required_skills": V09_SKILLS,
-        "required_test_entrypoints": V09_TESTS,
-        "required_wrappers": V09_WRAPPERS,
-        "critical_files": V09_CRITICAL,
-        "validation_categories": V09_CATEGORIES,
-    }
-    current_v010 = {
-        "required_helpers": V010_HELPERS,
-        "required_licensing_files": V010_LICENSING,
-        "required_projections": V010_PROJECTIONS,
-        "required_skills": V010_SKILLS,
-        "required_test_entrypoints": V010_TESTS,
-        "required_wrappers": V010_WRAPPERS,
-        "critical_files": V010_CRITICAL,
-        "validation_categories": V010_CATEGORIES,
-    }
-    current_v011 = {
-        "required_helpers": V011_HELPERS,
-        "required_licensing_files": V011_LICENSING,
-        "required_projections": V011_PROJECTIONS,
-        "required_skills": V011_SKILLS,
-        "required_test_entrypoints": V011_TESTS,
-        "required_wrappers": V011_WRAPPERS,
-        "critical_files": V011_CRITICAL,
-        "validation_categories": V011_CATEGORIES,
-    }
-    current_v012 = {
-        "required_helpers": V012_HELPERS,
-        "required_licensing_files": V012_LICENSING,
-        "required_projections": V012_PROJECTIONS,
-        "required_skills": V012_SKILLS,
-        "required_test_entrypoints": V012_TESTS,
-        "required_wrappers": V012_WRAPPERS,
-        "critical_files": V012_CRITICAL,
-        "validation_categories": V012_CATEGORIES,
-    }
     if not SEMVER.fullmatch(version):
         fail("public release policy identity is malformed or unsupported")
     core = version.split("+", 1)[0].split("-", 1)[0]
-    if core == "0.12.0":
-        return (current_v012,)
-    if core == "0.11.0":
-        return (current_v011,)
-    if core == "0.10.0":
-        return (current_v010,)
-    if core == "0.9.0":
-        return (current_v09,)
-    if core == "0.8.1":
-        return (current_v081,)
-    if core == "0.8.0":
-        return (current_v08,)
-    if core == "0.7.0":
-        return (current_v07,)
+    if core in CURRENT_SURFACE_PREFIXES:
+        surface = _audited_surface(CURRENT_SURFACE_PREFIXES[core])
+        if core in PUBLISHED_SURFACE_SHA256:
+            digest = hashlib.sha256(json.dumps(
+                surface, ensure_ascii=True, separators=(",", ":"), sort_keys=True,
+            ).encode("utf-8")).hexdigest()
+            if digest != PUBLISHED_SURFACE_SHA256[core]:
+                fail(f"historical public v{core} policy surface changed")
+        return (surface,)
     if core == "0.6.0":
         return (historical_v06,)
     if core == "0.5.0":
@@ -3016,27 +2977,8 @@ def is_v07_candidate_path(path: str | bytes) -> bool:
 def is_v08_candidate_path(path: str | bytes) -> bool:
     """Return whether one source path belongs in the v0.8 public candidate."""
 
-    display = (
-        path.decode("utf-8", "surrogateescape")
-        if isinstance(path, bytes)
-        else path
-    )
-    if (
-        display == "private"
-        or display.startswith("private/")
-        or display in V07_EXCLUDED_PATHS
-        or display in V07_GENERATED_PATHS
-    ):
-        return False
-    if any(display.startswith(prefix) for prefix in V07_EXCLUDED_PREFIXES):
-        return False
-    if any(display.startswith(prefix) for prefix in V07_GENERATED_PREFIXES):
-        return False
-    if display.endswith(V07_GENERATED_SUFFIXES):
-        return False
-    if any(part == "__pycache__" or part.endswith(".egg-info") for part in display.split("/")):
-        return False
-    return True
+    # v0.8 applies exactly the v0.7 exclusions.
+    return is_v07_candidate_path(path)
 
 
 def is_v09_candidate_path(path: str | bytes) -> bool:
@@ -3082,6 +3024,20 @@ def is_v012_candidate_path(path: str | bytes) -> bool:
     return is_v011_candidate_path(path)
 
 
+def is_v013_candidate_path(path: str | bytes) -> bool:
+    """Return whether one source path belongs in the v0.13 surface."""
+
+    return is_v012_candidate_path(path)
+
+
+CANDIDATE_PATH_FILTERS = {
+    "0.7.0": is_v07_candidate_path, "0.8.0": is_v08_candidate_path,
+    "0.8.1": is_v08_candidate_path, "0.9.0": is_v09_candidate_path,
+    "0.10.0": is_v010_candidate_path, "0.11.0": is_v011_candidate_path,
+    "0.12.0": is_v012_candidate_path, "0.13.0": is_v013_candidate_path,
+}
+
+
 def public_candidate_entries(
     repository: Repository,
     version: str,
@@ -3094,18 +3050,8 @@ def public_candidate_entries(
         fail("public candidate version is malformed or unsupported")
     entries = tree_entries(repository, excluded_prefix=excluded_prefix)
     core = version.split("+", 1)[0].split("-", 1)[0]
-    if core == "0.12.0":
-        return tuple(entry for entry in entries if is_v012_candidate_path(entry.path))
-    if core == "0.11.0":
-        return tuple(entry for entry in entries if is_v011_candidate_path(entry.path))
-    if core == "0.10.0":
-        return tuple(entry for entry in entries if is_v010_candidate_path(entry.path))
-    if core == "0.9.0":
-        return tuple(entry for entry in entries if is_v09_candidate_path(entry.path))
-    if core in {"0.8.0", "0.8.1"}:
-        return tuple(entry for entry in entries if is_v08_candidate_path(entry.path))
-    if core == "0.7.0":
-        return tuple(entry for entry in entries if is_v07_candidate_path(entry.path))
+    if core in CANDIDATE_PATH_FILTERS:
+        return tuple(entry for entry in entries if CANDIDATE_PATH_FILTERS[core](entry.path))
     if core in {"0.6.0", "0.5.0", "0.4.0", "0.3.0", "0.2.0"}:
         return entries
     fail(f"public candidate version is malformed or unsupported: {version}")
@@ -3273,53 +3219,12 @@ def validate_versioned_policy_exclusions(
     if not SEMVER.fullmatch(version):
         fail("public release version is malformed or unsupported")
     core = version.split("+", 1)[0].split("-", 1)[0]
-    if core == "0.12.0":
+    if core in CANDIDATE_PATH_FILTERS:
+        # v0.7.0 keeps its original literal diagnostic label.
+        label = "0.7.0" if core == "0.7.0" else version
         for entry in entries:
-            if not is_v012_candidate_path(entry.path):
-                fail(
-                    f"public v{version} contains a publication-excluded path: "
-                    + entry.display_path
-                )
-        return
-    if core == "0.11.0":
-        for entry in entries:
-            if not is_v011_candidate_path(entry.path):
-                fail(
-                    f"public v{version} contains a publication-excluded path: "
-                    + entry.display_path
-                )
-        return
-    if core == "0.10.0":
-        for entry in entries:
-            if not is_v010_candidate_path(entry.path):
-                fail(
-                    f"public v{version} contains a publication-excluded path: "
-                    + entry.display_path
-                )
-        return
-    if core == "0.9.0":
-        for entry in entries:
-            if not is_v09_candidate_path(entry.path):
-                fail(
-                    f"public v{version} contains a publication-excluded path: "
-                    + entry.display_path
-                )
-        return
-    if core in {"0.8.0", "0.8.1"}:
-        for entry in entries:
-            if not is_v08_candidate_path(entry.path):
-                fail(
-                    f"public v{version} contains a publication-excluded path: "
-                    + entry.display_path
-                )
-        return
-    if core == "0.7.0":
-        for entry in entries:
-            if not is_v07_candidate_path(entry.path):
-                fail(
-                    "public v0.7.0 contains a publication-excluded path: "
-                    + entry.display_path
-                )
+            if not CANDIDATE_PATH_FILTERS[core](entry.path):
+                fail(f"public v{label} contains a publication-excluded path: " + entry.display_path)
         return
     if core == "0.6.0":
         return
@@ -3526,6 +3431,7 @@ def verify_public_release_lineage(
     accepted_commit: str,
     accepted_tree: str,
     allow_advanced_head: bool = False,
+    allow_interleaved_untagged: bool = False,
 ) -> tuple[ReleaseIdentity, ...]:
     """Verify the exact v0.1 identity and every later linear release commit."""
 
@@ -3582,7 +3488,7 @@ def verify_public_release_lineage(
             fail("public release history must be a strict single-parent release chain")
         commit = fields[0]
         matching = tags_by_commit.get(commit, [])
-        if passed_last_tagged:
+        if passed_last_tagged and not allow_interleaved_untagged:
             if matching:
                 fail("public release tags cannot follow untagged commits on release branch")
         elif len(matching) == 1:
@@ -3705,7 +3611,8 @@ def build_candidate(
         base,
         accepted_commit=PUBLIC_V01_COMMIT,
         accepted_tree=PUBLIC_V01_TREE,
-        allow_advanced_head=(core == "0.12.0"),
+        allow_advanced_head=(core in ADVANCED_HEAD_VERSIONS),
+        allow_interleaved_untagged=(core in INTERLEAVED_UNTAGGED_VERSIONS),
     )
     policy = load_policy(
         source,
@@ -3783,7 +3690,11 @@ def build_candidate(
 
 
 MARKDOWN_LINK = re.compile(r"(?<!!)\[[^\]]*\]\(([^)]+)\)|!\[[^\]]*\]\(([^)]+)\)")
-HUMAN_MARKDOWN_LINK_EXCLUDED_PREFIXES = (b"hotspot/testdata/classification/",)
+# Fixture content whose broken links are the test subject, not documentation.
+HUMAN_MARKDOWN_LINK_EXCLUDED_PREFIXES = (
+    b"hotspot/testdata/classification/",
+    b"testing/fixtures/context-eval/subjects/",
+)
 
 
 def validate_markdown_links(repository: Repository) -> None:
@@ -4127,7 +4038,8 @@ def check_candidate(
         base,
         accepted_commit=PUBLIC_V01_COMMIT,
         accepted_tree=PUBLIC_V01_TREE,
-        allow_advanced_head=(core == "0.12.0"),
+        allow_advanced_head=(core in ADVANCED_HEAD_VERSIONS),
+        allow_interleaved_untagged=(core in INTERLEAVED_UNTAGGED_VERSIONS),
     )
     policy = load_policy(
         source,
@@ -4142,7 +4054,7 @@ def check_candidate(
         source, version, excluded_prefix=b"private/"
     )
     candidate_entries = public_candidate_entries(candidate, version)
-    if core in {"0.7.0", "0.8.0", "0.8.1", "0.9.0", "0.10.0", "0.11.0", "0.12.0"}:
+    if core in CANDIDATE_PATH_FILTERS:
         # The development source may retain publication-excluded oracle files,
         # but a v0.7+ release candidate must not project them.  Inspect the
         # unfiltered candidate tree so the check cannot pass merely because
@@ -4272,8 +4184,8 @@ def check_merged_source(
     """
 
     core = version.split("+", 1)[0].split("-", 1)[0]
-    if core not in ("0.11.0", "0.12.0"):
-        unsafe("merged-source verification is only available for v0.11.0 and v0.12.0")
+    if core not in MERGED_CHECK_PREDECESSORS:
+        unsafe("merged-source verification is only available for v0.11.0, v0.12.0 and v0.13.0")
     if not isinstance(approved_pr, str) or not approved_pr.strip():
         unsafe("an approved public staging PR is required")
     checks = _normalise_required_checks(required_checks)
@@ -4294,13 +4206,14 @@ def check_merged_source(
             base,
             accepted_commit=PUBLIC_V01_COMMIT,
             accepted_tree=PUBLIC_V01_TREE,
-            allow_advanced_head=(core == "0.12.0"),
+            allow_advanced_head=(core in ADVANCED_HEAD_VERSIONS),
+            allow_interleaved_untagged=(core in INTERLEAVED_UNTAGGED_VERSIONS),
         )
-        expected_base_version = "0.11.0" if core == "0.12.0" else "0.10.0"
+        expected_base_version = MERGED_CHECK_PREDECESSORS[core]
         if not identities or identities[-1].version != expected_base_version:
             fail(f"accepted public base must be the v{expected_base_version} release")
         accepted_base = identities[-1]
-        if core == "0.12.0":
+        if core in ADVANCED_HEAD_VERSIONS:
             if base.head != premerge_main:
                 fail("public main moved before merge; rebind and requalify the candidate")
             is_ancestor = run_git(
@@ -4325,7 +4238,7 @@ def check_merged_source(
             ["rev-list", "--parents", "-n", "1", "HEAD"],
         ).split()
         if len(parent_record) != 2 or parent_record[1] != expected_parent:
-            if core == "0.12.0":
+            if core in ADVANCED_HEAD_VERSIONS:
                 fail("merged release commit must have exactly the pre-merge public main as parent")
             else:
                 fail(f"merged release commit must have exactly the accepted v{expected_base_version} base as parent")

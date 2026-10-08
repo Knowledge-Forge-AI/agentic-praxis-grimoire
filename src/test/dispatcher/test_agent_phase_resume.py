@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 import re
 import subprocess
@@ -453,3 +454,62 @@ def test_resumed_dry_run_performs_full_preflight_without_archive_or_provider(
     assert state["outcome"] == "dry_run"
     assert state["archive"]["attempted"] is False
     assert not Path(state["archive_path"]).exists()
+
+
+def test_resume_scoped_apgr_home_forwards_configured_and_restores_ambient(
+    repository: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    source = failed_source(repository, tmp_path, 0)
+    home_x = tmp_path / "home_x"
+    home_x.mkdir()
+    home_y = tmp_path / "home_y"
+    home_y.mkdir()
+
+    monkeypatch.setenv("APGR_HOME", str(home_y))
+
+    observed_env: list[str | None] = []
+    base_runner = Runner()
+
+    def runner_with_env(argv, prompt, cwd, max_output, on_output=None):
+        observed_env.append(os.environ.get("APGR_HOME"))
+        return base_runner(argv, prompt, cwd, max_output, on_output=on_output)
+
+    d = Dispatcher(
+        root=ROOT,
+        cwd=repository,
+        run_root=tmp_path / "resumed",
+        codex_executable="/fake/codex",
+        scanner_executable=None,
+        resolve_scanner=False,
+        runner=runner_with_env,
+        apgr_home=home_x,
+    )
+
+    state = d.resume(PHASE, REQUEST, source, finalization_policy="checkpoint")
+    assert state["complete"] is True
+    assert len(observed_env) > 0
+    assert all(env == str(home_x.resolve()) for env in observed_env)
+    assert os.environ.get("APGR_HOME") == str(home_y)
+
+    # Test restoration on failure
+    fail_observed: list[str | None] = []
+
+    def failing_runner(argv, prompt, cwd, max_output, on_output=None):
+        fail_observed.append(os.environ.get("APGR_HOME"))
+        raise RuntimeError("simulated provider failure")
+
+    d_fail = Dispatcher(
+        root=ROOT,
+        cwd=repository,
+        run_root=tmp_path / "resumed_fail",
+        codex_executable="/fake/codex",
+        scanner_executable=None,
+        resolve_scanner=False,
+        runner=failing_runner,
+        apgr_home=home_x,
+    )
+
+    with pytest.raises((DispatchError, RuntimeError)):
+        d_fail.resume(PHASE, REQUEST, source, finalization_policy="checkpoint")
+    assert fail_observed == [str(home_x.resolve())]
+    assert os.environ.get("APGR_HOME") == str(home_y)

@@ -15,6 +15,7 @@ from . import archive as archive_module
 from . import archive_verify as archive_verify_module
 from . import candidate as candidate_module
 from . import envelope as envelope_module
+from . import provider_launch as provider_launch_module
 from . import failure_boundary as failure_boundary_module
 from . import finalization as finalization_module
 from . import gitstate as gitstate_module
@@ -529,16 +530,27 @@ def qualify(
         finalization_module.validate_transition(source_policy, target_policy)
     except finalization_module.FinalizationError as error:
         raise ResumeError(error.code, error.detail) from error
-    roster = load_validated_roster(dispatcher.root)
+    roster = (
+        getattr(dispatcher, "_roster", None)
+        or (
+            load_validated_roster(dispatcher.root, apgr_home=dispatcher.apgr_home)
+            if dispatcher.apgr_home is not None
+            else load_validated_roster(dispatcher.root)
+        )
+    )
+    if hasattr(dispatcher, "roster"):
+        dispatcher.roster = roster
     current_resolved = resolve(
         request,
         dispatcher.root,
         specification.name,
         target_policy,
         roster=roster,
+        apgr_home=dispatcher.apgr_home,
     )
     endpoint = route(
-        request, specification, root=dispatcher.root, roster=roster
+        request, specification, root=dispatcher.root, roster=roster,
+        apgr_home=dispatcher.apgr_home,
     )[terminal]
     terminal_candidate = state.get("terminal_candidate")
     if not isinstance(terminal_candidate, dict):
@@ -841,14 +853,11 @@ def _initial_state(
         "effective_checkpoints": list(plan.inherited_checkpoints),
         "stage_accounting_schema": result_artifacts_module.STAGE_ACCOUNTING_SCHEMA,
         "stages_invoked": list(plan.inherited_stage_invocations),
+        "provider_launch_contract": provider_launch_module.SCHEMA, "provider_launches": [],
         "stage_transports_completed": list(plan.inherited_stage_transports),
-        "terminal_result_validated": False,
-        "stages_completed": completed,
+        "terminal_result_validated": False, "stages_completed": completed,
         "effective_stages": {stage: "inherited" for stage in plan.inherited_stages},
-        "entry": None,
-        "final_head": None,
-        "phase_delta": None,
-        "boundary_phase_delta": None,
+        "entry": None, "final_head": None, "phase_delta": None, "boundary_phase_delta": None,
         "plan_candidate": plan_candidate,
         "planner_proposal": source.get("planner_proposal"),
         "proposal_binding": proposal_binding,

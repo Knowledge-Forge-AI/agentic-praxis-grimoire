@@ -1,0 +1,5 @@
+D1-PROBE-NONCE: 8f4e2b1c6a0d3e5f7b9a1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f
+This file is the deterministic, source-owned probe fixture for APG166D-PROBE-D1.
+It is an execution-boundary probe outside the 15-scenario frozen evaluation corpus.
+Its purpose is solely to verify native Read observation and response handling
+under the qualified Claude read-only profile route.

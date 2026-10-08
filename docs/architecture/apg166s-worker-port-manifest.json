@@ -1,0 +1,70 @@
+{
+  "schema": "apgr-worker-port-manifest-v1",
+  "phase": "APG166S",
+  "status": "candidate",
+  "source": "operator-supplied worker runtime",
+  "rights": "AGPL-3.0-or-later; existing project author work",
+  "files": [
+    {
+      "destination": "libexec/apgr_workers/__init__.py",
+      "adaptation": "APGR namespace, canonical bundle, provider environment and lifecycle evidence"
+    },
+    {
+      "destination": "libexec/apgr_workers/adapter.py",
+      "adaptation": "APGR namespace, canonical bundle, provider environment and lifecycle evidence"
+    },
+    {
+      "destination": "libexec/apgr_workers/claude_parent.py",
+      "adaptation": "APGR namespace, canonical bundle, provider environment and lifecycle evidence"
+    },
+    {
+      "destination": "libexec/apgr_workers/cli.py",
+      "adaptation": "APGR namespace, canonical bundle, provider environment and lifecycle evidence"
+    },
+    {
+      "destination": "libexec/apgr_workers/codex_external.py",
+      "adaptation": "APGR namespace, canonical bundle, provider environment and lifecycle evidence"
+    },
+    {
+      "destination": "libexec/apgr_workers/facade_context.py",
+      "adaptation": "APGR namespace, canonical bundle, provider environment and lifecycle evidence"
+    },
+    {
+      "destination": "libexec/apgr_workers/gemini_parent.py",
+      "adaptation": "APGR namespace, canonical bundle, provider environment and lifecycle evidence"
+    },
+    {
+      "destination": "libexec/apgr_workers/inspection.py",
+      "adaptation": "APGR namespace, canonical bundle, provider environment and lifecycle evidence"
+    },
+    {
+      "destination": "libexec/apgr_workers/ledger.py",
+      "adaptation": "APGR namespace, canonical bundle, provider environment and lifecycle evidence"
+    },
+    {
+      "destination": "libexec/apgr_workers/mcp.py",
+      "adaptation": "APGR namespace, canonical bundle, provider environment and lifecycle evidence"
+    },
+    {
+      "destination": "libexec/apgr_workers/model_observation.py",
+      "adaptation": "APGR authored"
+    },
+    {
+      "destination": "libexec/apgr_workers/native_launch.py",
+      "adaptation": "APGR namespace, canonical bundle, provider environment and lifecycle evidence"
+    },
+    {
+      "destination": "libexec/apgr_workers/parent_custody.py",
+      "adaptation": "APGR namespace, canonical bundle, provider environment and lifecycle evidence"
+    },
+    {
+      "destination": "libexec/apgr_workers/policy.py",
+      "adaptation": "APGR namespace, canonical bundle, provider environment and lifecycle evidence"
+    },
+    {
+      "destination": "libexec/apgr_workers/supervisor.py",
+      "adaptation": "APGR namespace, canonical bundle, provider environment and lifecycle evidence"
+    }
+  ],
+  "rights_evidence": "Operator-supplied donor and receiving repository retain GNU Affero GPL v3 license texts. Exact donor-file bindings are retained in publication-excluded evidence; no external runtime dependency or new package dependency is introduced."
+}

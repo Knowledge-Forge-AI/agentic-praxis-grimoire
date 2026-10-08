@@ -283,6 +283,7 @@ func TestConsumer_ASTTypeContainment(t *testing.T) {
 		"evidence.",
 		"candidate.",
 		"provider.",
+		"schema.",
 	}
 
 	for _, decl := range node.Decls {
@@ -358,3 +359,98 @@ func TestConsumer_ContextCancellation(t *testing.T) {
 		t.Fatal("expected error on cancelled context, got nil")
 	}
 }
+
+func TestConsumer_ReviewMutationObservation(t *testing.T) {
+	adapter := jacaconsumer.NewConsumerAdapter()
+	ctx := context.Background()
+
+	validFact := jacaconsumer.CallerReviewMutationObservationFact{
+		Stage:                "work_review",
+		WorktreePolicy:       "warn",
+		IndexPolicy:          "block",
+		HeadPolicy:           "block",
+		PolicyGeneration:     7,
+		SubjectDriftObserved: true,
+		WorktreeDrift:        true,
+		IndexDrift:           false,
+		HeadDrift:            false,
+		WorktreePaths:        []string{"file.txt"},
+		DiagnosticCode:       "READ_ONLY_STAGE_MUTATED_CANDIDATE",
+		ActionTaken:          "warned",
+	}
+
+	if err := adapter.ValidateReviewMutationObservation(ctx, validFact); err != nil {
+		t.Fatalf("expected valid observation, got: %v", err)
+	}
+
+	invalidFact := validFact
+	invalidFact.ActionTaken = "invalid"
+	if err := adapter.ValidateReviewMutationObservation(ctx, invalidFact); err == nil {
+		t.Fatalf("expected error for invalid action taken, got nil")
+	}
+}
+
+func TestConsumer_SchemaManifest(t *testing.T) {
+	adapter := jacaconsumer.NewConsumerAdapter()
+	ctx := context.Background()
+
+	manifestPath := filepath.Join("..", "..", "..", "docs", "architecture", "dispatcher-sqlite-schema-v5.json")
+	data, err := os.ReadFile(manifestPath)
+	if err != nil {
+		t.Fatalf("failed to read schema manifest: %v", err)
+	}
+
+	fact, err := adapter.ValidateSchemaManifest(ctx, data)
+	if err != nil {
+		t.Fatalf("expected valid schema manifest, got: %v", err)
+	}
+
+	if fact.Schema != "dispatcher-sqlite-schema-v5" || fact.Version != 5 || fact.TablesCount == 0 {
+		t.Errorf("unexpected schema manifest fact: %+v", fact)
+	}
+
+	// Negative test: invalid JSON
+	if _, err := adapter.ValidateSchemaManifest(ctx, []byte("not-json")); err == nil {
+		t.Error("expected error for invalid JSON, got nil")
+	}
+
+	// Negative test: invalid schema version
+	invalidData := []byte(`{"schema":"dispatcher-sqlite-schema-v5","version":4,"tables":{}}`)
+	if _, err := adapter.ValidateSchemaManifest(ctx, invalidData); err == nil {
+		t.Error("expected error for version mismatch, got nil")
+	}
+}
+
+func TestConsumer_RunRecord(t *testing.T) {
+	adapter := jacaconsumer.NewConsumerAdapter()
+	ctx := context.Background()
+
+	validJSON := []byte(`{
+		"run_id": "test/APG161/run--1",
+		"project": "test",
+		"phase_id": "APG161",
+		"schema_version": 5,
+		"request_schema": "agent-phase-request-v2",
+		"workflow_version": "v1",
+		"lifecycle": "work-reviewed",
+		"execution_mode": "gemini_flash_sub",
+		"status": "completed",
+		"outcome": "success"
+	}`)
+
+	rec, err := adapter.ValidateRunRecord(ctx, validJSON)
+	if err != nil {
+		t.Fatalf("expected valid run record, got: %v", err)
+	}
+
+	if rec.RunID != "test/APG161/run--1" || rec.Project != "test" || rec.PhaseID != "APG161" || rec.Status != "completed" {
+		t.Errorf("unexpected run record: %+v", rec)
+	}
+
+	// Negative test: missing run_id
+	invalidJSON := []byte(`{"project":"test"}`)
+	if _, err := adapter.ValidateRunRecord(ctx, invalidJSON); err == nil {
+		t.Error("expected error for missing run_id, got nil")
+	}
+}
+

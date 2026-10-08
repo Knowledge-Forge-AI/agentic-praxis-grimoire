@@ -711,3 +711,72 @@ The v0.12.0 release architecture hardens the attended release operator and recon
 5. **Durable multi-channel receipts & resume (REG-P3, REG-P4)**: Each publication channel emits deterministic receipts. Resumption via `--resume` verifies prior steps and refuses re-entry or re-publication of already verified channels.
 6. **Deterministic release epoch**: Formally bound to `1789689600` (`2026-09-18T00:00:00Z`).
 
+
+## v0.13.0 first-party Nix publication target
+
+From v0.13.0, a first-party Nix flake is a required publication surface. It
+sits beside GitHub Release, Go, PyPI, npm and Homebrew and replaces none of
+them ([ADR 0076](adr/2026/09/0076-first-party-nix-flake-publication-target.md);
+see [distribution](distribution.md#first-party-nix-flake-v0130-onward)).
+"First-party" means installable through Nix flakes from this repository's own
+release tag. It does not mean an upstream nixpkgs pull request, Hydra, a binary
+cache or host activation. For current development this supersedes the v0.8,
+APG103 and earlier wording that limited Nix to a consumer handoff. Those
+sections remain accurate for their own releases, which have no Nix artifact.
+
+Release preparation must satisfy these requirements:
+
+1. **Audited surface.** `apg-public-release` has an explicit `0.13.0` surface:
+   the complete `0.12.0` surface plus `rtk-command-proxy`, the Nix critical
+   files declared by `nix/distribution.json` (`flake.nix`, `flake.lock`,
+   `nix/checks.nix`, `nix/distribution.json`, `nix/package.nix`,
+   `nix/source.nix`), the Nix and installed-runtime helpers, the exported
+   dispatcher commands, and the Nix unit tests. `release/public-surface.json`
+   is that surface. The `0.12.0` and earlier surfaces are unchanged and pinned
+   by digest tests.
+2. **Hosted checks.** Public PR CI requires 15 checks: the v0.12 set plus
+   `nix (x86_64-linux)` and `nix (aarch64-darwin)`. Each runs
+   `nix flake check` and a package build against the exact store output, plus
+   evaluation of the other systems. The aggregate gate has 14 matrix receipts.
+   `.github/workflows/release.yml` requires the same 15 checks and 14 receipts
+   for tag `v0.13.0`, with `v0.12.0` as the accepted predecessor. A `release`
+   event runs the workflow file at the tagged commit, so the published v0.12.0
+   tag keeps its own 13-check workflow. `aarch64-linux` has no native hosted
+   cell.
+3. **Lock.** The lock is used as committed (`--no-update-lock-file`). Any lock
+   update is a reviewed source change, not a release-time step.
+4. **Epoch.** The manager-confirmed v0.13 release epoch is `1790726400`
+   (`2026-09-30T00:00:00Z`). The release policy defines it in
+   `libexec/apg_python_distribution.py`; the sdist-carried build backend
+   keeps a separate default literal, and a unit test binds that default to the
+   current release epoch.
+
+There is no Nix artifact upload: the public tag is the publication surface.
+After the tag exists, the attended operator reads it back on a native host:
+
+```sh
+bin/apg-qualify-nix readback --tag v0.13.0 --scratch "$FRESH_SCRATCH" \
+  --system aarch64-darwin --expect-rev "$MERGED_RELEASE_COMMIT"
+```
+
+Readback accepts only an exact `vMAJOR.MINOR.PATCH` tag. It resolves the tag
+once with `nix flake metadata --json --refresh` and requires the locked
+revision to equal the merged release commit. It records the `narHash` and runs
+every later step against the revision-pinned reference: flake checks, package
+build, `apgr --version`, and the provider-free installed smoke from the store.
+It then installs into a disposable profile inside `$FRESH_SCRATCH`, repeats the
+smoke from that profile, and removes the profile. It never touches a default
+profile and never collects garbage.
+
+The attended operator runs this as the last channel, after GitHub Release, Go,
+PyPI, npm and Homebrew. The Nix channel has no publish step, and its receipt
+binds the tag, expected and locked revisions, `narHash`, system, readback
+digest and one digest over the readback helper files. Those files are the
+entry point, the helper and the installed-runtime smoke, and each must match
+its blob in the public tag. **v0.13.0 is not fully published until this tagged Nix
+readback succeeds.** A failed or missing readback leaves the release status
+`fully_published: false`; completed channels are neither replayed nor rolled
+back. Resume re-verifies every recorded receipt digest, skips verified channels
+and retries only the Nix readback with a fresh scratch directory.
+`x86_64-linux` evidence for the tag rests on the hosted PR cell plus the
+release workflow's tested-tree equals merged-tree check, not on a tag readback.

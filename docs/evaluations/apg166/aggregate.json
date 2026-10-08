@@ -1,0 +1,39 @@
+{
+  "benefit_gate_pass": false,
+  "default_recommendation": "retain_static",
+  "exact_recovery_pass": false,
+  "full_applicable": {
+    "expected_n": 5,
+    "measured_n": 0,
+    "median_savings": null,
+    "missing": [
+      "scenario-06",
+      "scenario-08",
+      "scenario-09",
+      "scenario-10",
+      "scenario-11"
+    ],
+    "nearest_rank_p95_growth": null,
+    "pass": false,
+    "small_sample": "p95 is the maximum for n <= 6; not a population guarantee"
+  },
+  "maturity_gate": "not_met; independent skill evidence and dispatcher review required",
+  "non_synthetic": {
+    "expected_n": 3,
+    "measured_n": 0,
+    "median_savings": null,
+    "missing": [
+      "scenario-06",
+      "scenario-10",
+      "scenario-11"
+    ],
+    "nearest_rank_p95_growth": null,
+    "pass": false,
+    "small_sample": "p95 is the maximum for n <= 6; not a population guarantee"
+  },
+  "qualified_promotions": 0,
+  "quality_and_authority_pass": false,
+  "raw_sha256": "669b6728b14087998b8ba05b6bfa79a29ae3c5ed00d2d93c708512c51cf29f77",
+  "scenario15": "contingent/unavailable",
+  "schema_version": "apg.h-aggregate/v1"
+}

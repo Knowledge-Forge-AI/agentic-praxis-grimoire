@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -39,9 +40,10 @@ CANONICAL_SETTINGS_FILE = "settings.json"
 ISOLATED_SETTING_SOURCES = ""
 READ_ONLY_TOOLS = ("Read", "Glob", "Grep", "WebFetch", "WebSearch")
 READ_ONLY_WRAPPER_FLAG = "--read-only"
-WORKER_FACADE_MARKER = "AGENT_CENTRAL_WORKER_FACADE"
+READ_ONLY_TOOLS_WRAPPER_FLAG = "--read-only-tools"
+WORKER_FACADE_MARKER = "APGR_WORKER_FACADE"
 WORKER_FACADE_SYSTEM_PROMPT = (
-    "Use the fixed Agent-Central worker MCP tools when a bounded delegation is "
+    "Use the fixed APGR worker MCP tools when a bounded delegation is "
     "useful. A read-only worker task is authorized read-only inspection; the "
     "facade's ledger and outbox writes are launcher-owned orchestration "
     "bookkeeping and do not grant product mutation. No plan-file workflow is "
@@ -74,7 +76,10 @@ class ProfileContract(NamedTuple):
 
 
 PROFILE_CONTRACTS = {
-    "implementation-primary": ProfileContract(PRIMARY_ROLE, "medium"),
+    "opus-high-plan": ProfileContract("opus", "high", "plan"),
+    "opus-high-review": ProfileContract("opus", "high", "plan"),
+    "opus-high-sysadmin-review": ProfileContract("opus", "high", "plan", HOST_DIRECTORIES, True),
+    "implementation-primary": ProfileContract(PRIMARY_ROLE, "high"),
     "implementation-review": ProfileContract(REVIEW_ROLE, "medium", "plan"),
     "architecture-docs-primary": ProfileContract(
         PRIMARY_ROLE, "high", "acceptEdits", SCRATCH_DIRECTORIES
@@ -118,6 +123,12 @@ PROFILE_CONTRACTS = {
         isolated_settings=True,
     ),
 }
+# Dedicated claude_only profiles preserve the existing execution posture.
+PROFILE_CONTRACTS.update({
+    "claude-only-implementation-primary": PROFILE_CONTRACTS["implementation-primary"]._replace(model_role="opus", effort="high"),
+    "claude-only-architecture-docs-primary": PROFILE_CONTRACTS["architecture-docs-primary"]._replace(model_role="opus", effort="high"),
+    "claude-only-sysadmin-primary": PROFILE_CONTRACTS["sysadmin-primary"]._replace(model_role="opus", effort="high"),
+})
 SUPPORTED_PROFILES = frozenset(PROFILE_CONTRACTS)
 # A result ends substantive work only when nothing else is outstanding; anything
 # after such a result is teardown. These bounds apply only then, never to
@@ -183,6 +194,8 @@ def load_profile(root: Path, name: str) -> dict[str, Any]:
     if name not in SUPPORTED_PROFILES:
         raise ProfileError(f"unsupported profile: {name}")
     path = root / "profiles" / f"{name}.json"
+    if not path.is_file() and (root / "claude" / "profiles" / f"{name}.json").is_file():
+        path = root / "claude" / "profiles" / f"{name}.json"
     try:
         value = json.loads(
             path.read_text(encoding="utf-8"), object_pairs_hook=reject_duplicate_keys
@@ -227,34 +240,91 @@ class ResolvedProfile(NamedTuple):
 def resolve_profile(root: Path, name: str) -> ResolvedProfile:
     source_profile = load_profile(root, name)
     contract = PROFILE_CONTRACTS[name]
-    from claude_model_catalog import load_catalog, resolve_role
+    from claude_model_catalog import load_catalog
 
     try:
         catalog = load_catalog(root)
-        role_info = resolve_role(catalog, contract.model_role)
     except Exception as error:
         raise ProfileError(
-            f"failed to resolve model role for {name}: {error}"
+            f"failed to load Claude catalog for {name}: {error}"
         ) from error
+
+    from agent_phase.runtime_models import selection, ModelAuthorityConflict
+    try:
+        selected = selection(root, "claude", name)
+    except ModelAuthorityConflict:
+        raise
+    except Exception as error:
+        raise ProfileError(
+            f"failed to resolve model selection for {name}: {error}"
+        ) from error
+
+    selected_model_id = selected.get("model")
+    selected_effort = selected.get("effort")
+    if not isinstance(selected_model_id, str) or not selected_model_id:
+        raise ProfileError(f"invalid selected model for profile {name}")
+    if selected_effort not in {"low", "medium", "high", "max"}:
+        raise ProfileError(f"invalid selected effort for profile {name}: {selected_effort}")
+
+    matching = [m for m in catalog.models.values() if m.id == selected_model_id]
+    if len(matching) == 0:
+        raise ProfileError(f"missing model {selected_model_id!r} in catalog for profile {name}")
+    if len(matching) > 1:
+        raise ProfileError(f"duplicate model {selected_model_id!r} in catalog for profile {name}")
+
+    record = matching[0]
+    min_version = getattr(record, "minimum_claude_code_version", None)
+    adaptive = bool(getattr(record, "adaptive_thinking", False))
+
+    source_profile = {**source_profile, "effort": selected_effort}
     return ResolvedProfile(
         profile_name=name,
         model_role=contract.model_role,
-        resolved_model_id=role_info["resolved_model_id"],
-        minimum_version=role_info["minimum_claude_code_version"],
-        adaptive_thinking=role_info["adaptive_thinking"],
-        catalog_provenance=role_info["catalog"],
+        resolved_model_id=selected_model_id,
+        minimum_version=min_version,
+        adaptive_thinking=adaptive,
+        catalog_provenance=catalog.provenance.as_dict(),
         source_profile=source_profile,
     )
 
 
 def canonical_settings_path(root: Path) -> Path:
     from controller_generation import operator_root
-    root = operator_root(root.parent) / root.name
-    path = root / CANONICAL_SETTINGS_FILE
-    if not path.is_file() or path.is_symlink():
+
+    operator_settings: Path | None = None
+    from agent_phase.config_routing import ConfigError as PathContractError, resolve_global_home
+
+    try:
+        apgr_home = resolve_global_home()
+    except PathContractError as error:
+        raise ProfileError(f"invalid APGR home configuration: {error}") from error
+    except Exception as error:
+        raise ProfileError(f"cannot resolve APGR home: {error}") from error
+
+    candidate = apgr_home / "claude" / CANONICAL_SETTINGS_FILE
+    if candidate.is_symlink() or (candidate.exists() and not candidate.is_file()):
         raise ProfileError(
-            f"canonical settings payload must be a regular non-symlink file: {path}"
+            f"canonical settings payload must be a regular non-symlink file: {candidate}"
         )
+    if candidate.is_file():
+        operator_settings = candidate
+
+    if operator_settings is not None:
+        path = operator_settings
+    else:
+        controller_root = operator_root(root.parent) / root.name
+        path = controller_root / CANONICAL_SETTINGS_FILE
+        if not path.is_file() or path.is_symlink():
+            raise ProfileError(
+                f"canonical settings payload must be a regular non-symlink file: {path}"
+            )
+
+    try:
+        json.loads(path.read_text(encoding="utf-8"))
+    except Exception as error:
+        raise ProfileError(
+            f"canonical settings payload is not valid JSON ({path}): {error}"
+        ) from error
     return path
 
 
@@ -299,6 +369,7 @@ def reject_profile_overrides(
         valued.add("--add-dir")
     if contract.isolated_settings:
         valued.update(("--settings", "--setting-sources", "--managed-settings"))
+    valued.update(("--agent", "--agents", "--plugin-url", "--plugin-dir"))
     protected |= valued
     protected_prefixes = tuple(f"{flag}=" for flag in valued)
     for argument in arguments:
@@ -318,14 +389,14 @@ def _load_worker_facade(
     """Load an optional active-parent facade without blocking Claude startup."""
     if no_tools or os.environ.get(WORKER_FACADE_MARKER) != "1":
         return None
-    expected_family = (
-        "claude_opus"
-        if PROFILE_CONTRACTS[profile_name].model_role == PRIMARY_ROLE
-        else "claude_fable"
-    )
+    model = resolve_profile(root, profile_name).resolved_model_id
+    from agent_phase.runtime_models import classify_parent_family
+    expected_family = classify_parent_family("claude", model)
+    if expected_family is None:
+        raise ProfileError("worker_unavailable: unsupported Claude parent model")
     expected_authority = "read_only" if read_only else "mutation_capable"
     try:
-        from agent_workers.facade_context import load_launcher_context
+        from apgr_workers.facade_context import load_launcher_context
 
         # ``bin/claude-profile`` resolves profiles from the ``claude/``
         # projection, while the dispatcher freezes capability provenance at
@@ -346,8 +417,8 @@ def _load_worker_facade(
         context.config()
         return context
     except Exception as error:
-        # The worker path is an enhancement.  An absent, damaged, stale, or
-        # mismatched facade must leave ordinary Claude execution available.
+        if os.environ.get("APGR_WORKERS_REQUIRED") == "1":
+            raise ProfileError(f"worker_unavailable: Claude facade ({type(error).__name__})") from error
         print(
             f"claude-profile: worker facade unavailable ({type(error).__name__})",
             file=sys.stderr,
@@ -362,14 +433,30 @@ def read_only_contract(
     no_tools: bool = False,
     worker_facade: Any | None = None,
     headless: bool = False,
+    tools: Sequence[str] | None = None,
 ) -> dict[str, Any]:
     """Validate and describe the launcher-owned read-only overlay."""
     profile = load_profile(root, profile_name)
     if not READ_ONLY_TOOLS or any(tool in {"Bash", "Write", "Edit"} for tool in READ_ONLY_TOOLS):
         raise ProfileError("read-only tool contract is not enforceable")
-    tools = [] if no_tools else list(READ_ONLY_TOOLS)
+    if tools is not None:
+        if no_tools:
+            raise ProfileError("--read-only-tools cannot be combined with --no-tools")
+        if worker_facade is not None:
+            raise ProfileError("--read-only-tools cannot compose with a worker facade")
+        if not isinstance(tools, Sequence) or isinstance(tools, (str, bytes)):
+            raise ProfileError("--read-only-tools must be a sequence of tool names")
+        if not tools or any(not isinstance(tool, str) for tool in tools):
+            raise ProfileError("--read-only-tools must contain tool names")
+        if len(set(tools)) != len(tools):
+            raise ProfileError("--read-only-tools must be non-empty and duplicate-free")
+        if any(tool not in READ_ONLY_TOOLS for tool in tools):
+            raise ProfileError("--read-only-tools contains an unsupported tool")
+        selected_tools = list(tools)
+    else:
+        selected_tools = [] if no_tools else list(READ_ONLY_TOOLS)
     if worker_facade is not None and not no_tools:
-        tools.extend(worker_facade_tool_names(worker_facade))
+        selected_tools.extend(worker_facade_tool_names(worker_facade))
     contract: dict[str, Any] = {
         "enforced": True,
         "permission_mode": (
@@ -379,7 +466,7 @@ def read_only_contract(
         "headless_worker_permission_mode": "default",
         "permission_mode_selection": "default only for headless with validated worker facade; otherwise plan",
         "task_authority": "read_only",
-        "tools": tools,
+        "tools": selected_tools,
         "setting_sources": ISOLATED_SETTING_SOURCES,
         "slash_commands": False,
         "chrome": False,
@@ -393,7 +480,7 @@ def read_only_contract(
         ),
     }
     if worker_facade is not None and not no_tools:
-        from agent_workers.facade_context import WorkerFacadeContext
+        from apgr_workers.facade_context import WorkerFacadeContext
 
         if isinstance(worker_facade, WorkerFacadeContext):
             contract["facade_evidence"] = {
@@ -404,7 +491,7 @@ def read_only_contract(
 
 def worker_facade_tool_names(_worker_facade: Any) -> list[str]:
     """Return the fixed MCP tool names exposed by a validated facade."""
-    from agent_workers.facade_context import MCP_TOOL_NAMES, WorkerFacadeContext
+    from apgr_workers.facade_context import MCP_TOOL_NAMES, WorkerFacadeContext
 
     if isinstance(_worker_facade, WorkerFacadeContext):
         return list(_worker_facade.mcp_tool_names())
@@ -434,6 +521,49 @@ def extract_wrapper_flags(
     return cleaned, read_only, no_tools
 
 
+def extract_read_only_tools(
+    arguments: Sequence[str],
+) -> tuple[list[str], list[str] | None]:
+    """Consume the wrapper-owned read-only tool subset option.
+
+    The option is intentionally parsed separately from ``extract_wrapper_flags``
+    so existing callers retain their three-value return contract.  Arguments
+    after ``--`` belong to the native command and are left untouched.
+    """
+    cleaned: list[str] = []
+    selected: list[str] | None = None
+    index = 0
+    while index < len(arguments):
+        argument = arguments[index]
+        if argument == "--":
+            cleaned.extend(arguments[index:])
+            break
+        raw: str | None = None
+        if argument == READ_ONLY_TOOLS_WRAPPER_FLAG:
+            index += 1
+            if index >= len(arguments) or arguments[index] == "--":
+                raise ProfileError("--read-only-tools requires a comma-separated value")
+            raw = arguments[index]
+        elif argument.startswith(f"{READ_ONLY_TOOLS_WRAPPER_FLAG}="):
+            raw = argument.split("=", 1)[1]
+        if raw is None:
+            cleaned.append(argument)
+            index += 1
+            continue
+        if selected is not None:
+            raise ProfileError("--read-only-tools may be supplied only once")
+        values = raw.split(",")
+        if not raw or any(not value for value in values):
+            raise ProfileError("--read-only-tools must be non-empty")
+        if len(set(values)) != len(values):
+            raise ProfileError("--read-only-tools must not contain duplicates")
+        if any(value not in READ_ONLY_TOOLS for value in values):
+            raise ProfileError("--read-only-tools contains an unsupported tool")
+        selected = values
+        index += 1
+    return cleaned, selected
+
+
 def extract_read_only(arguments: Sequence[str]) -> tuple[list[str], bool]:
     cleaned, read_only, _no_tools = extract_wrapper_flags(arguments)
     return cleaned, read_only
@@ -443,11 +573,11 @@ def reject_read_only_overrides(arguments: Sequence[str]) -> None:
     valued = {
         "--permission-mode", "--tools", "--allowedTools", "--allowed-tools",
         "--disallowedTools", "--disallowed-tools", "--setting-sources",
-        "--mcp-config", "--agent", "--agents", "--plugin-dir", "--plugin-url",
+        "--mcp-config", "--strict-mcp-config", "--agent", "--agents", "--plugin-dir", "--plugin-url",
         "--append-system-prompt", "--append-system-prompt-file",
     }
     protected = valued | {
-        "--chrome", "--dangerously-skip-permissions",
+        "--chrome", "--strict-mcp-config", "--dangerously-skip-permissions",
         "--allow-dangerously-skip-permissions",
     }
     prefixes = tuple(f"{flag}=" for flag in valued)
@@ -628,6 +758,16 @@ class TerminalResultObserver:
     def active_tasks(self) -> frozenset[str]:
         with self._lock:
             return frozenset(self._active_tasks)
+
+    @property
+    def capture_complete(self) -> bool:
+        """Whether the drained stream ended at an observed terminal record."""
+        with self._lock:
+            return (
+                self._phase == PHASE_TERMINAL
+                and not self._buffer
+                and not self._discarding_oversized
+            )
 
     def phase(self) -> tuple[str, int]:
         """Read phase and generation together so a waiter cannot act on a torn pair."""
@@ -899,6 +1039,27 @@ def describe_missing_artifact(path: Path) -> str | None:
     return None
 
 
+def retain_native_read_evidence(environment, log_path, *, complete, process_status=0):
+    """Keep optional evaluation imports out of ordinary live-log launches."""
+    from agent_phase.transmission import SCOPE_ENV
+    try:
+        scope = json.loads(environment.get(SCOPE_ENV, "{}"))
+    except ValueError:
+        return True  # Invalid scope cannot produce a bound completion receipt.
+    if not isinstance(scope, dict) or scope.get("claude_read_stream") is None:
+        return True
+    try:
+        from agent_phase.claude_read_observer import retain_completion
+        return retain_completion(
+            environment,
+            log_path,
+            complete=complete,
+            process_status=process_status,
+        )
+    except ImportError:
+        return False
+
+
 def run_live(
     executable: str,
     argv: Sequence[str],
@@ -942,12 +1103,15 @@ def run_live(
     failures: list[tuple[str, Exception]] = []
     lingering = False
     artifact_problem: str | None = None
+    from agent_phase.transmission import SCOPE_ENV
+    native_environment = dict(environment)
+    native_environment.pop(SCOPE_ENV, None)
     try:
         try:
             process = subprocess.Popen(
                 argv,
                 executable=executable,
-                env=environment,
+                env=native_environment,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 bufsize=0,
@@ -956,6 +1120,8 @@ def run_live(
         except OSError as error:
             raise ProfileError(f"cannot launch claude: {error}") from error
         child[0] = process
+        from agent_phase.transmission import launcher_started
+        launcher_started(argv, environment, process=process)
         for signum in received_signals:
             terminate_process_group(process, signum)
         assert process.stdout is not None
@@ -1029,6 +1195,22 @@ def run_live(
         status = 1 if observer.is_error else 0
     if artifact_problem is not None:
         status = status or 1
+    capture_complete = (
+        not failures
+        and not lingering
+        and not received_signals
+        and not forced_cleanup
+        and returncode >= 0
+        and observer.capture_complete
+        and artifact_problem is None
+    )
+    if not retain_native_read_evidence(
+        environment,
+        log_path,
+        complete=capture_complete,
+        process_status=status,
+    ):
+        failures.append(("native-read-evidence", OSError("raw stream retention incomplete")))
     if failures:
         channels = ", ".join(channel for channel, _error in failures)
         print(
@@ -1044,23 +1226,58 @@ def launch(
     root: Path, profile_name: str, arguments: Sequence[str]
 ) -> int | NoReturn:
     reject_resume_flags(arguments)
+    arguments, read_only_tools = extract_read_only_tools(arguments)
+    handoff_path = None
+    if any(a.split("=", 1)[0] == "--apgr-acquisition-handoff" for a in arguments):
+        from agent_phase.claude_acquisition_handoff import split_option
+        try:
+            arguments, handoff_path = split_option(arguments)
+        except ValueError as error:
+            raise ProfileError(str(error)) from error
+    instruction_path = None
+    if any(a.split("=", 1)[0] == "--apgr-instruction-projection" for a in arguments):
+        from agent_phase.claude_instruction_handoff import split_option as split_instruction_option
+        try:
+            arguments, instruction_path = split_instruction_option(arguments)
+        except ValueError as error:
+            raise ProfileError(str(error)) from error
+        if instruction_path is not None and handoff_path is not None:
+            raise ProfileError("instruction projection cannot compose with the evaluation handoff")
+    context_path = None
+    if any(a.split("=", 1)[0] == "--apgr-context-acquisition" for a in arguments):
+        from agent_phase.claude_context_acquisition import split_option as split_context_option
+        try:
+            arguments, context_path = split_context_option(arguments)
+        except ValueError as error:
+            raise ProfileError(str(error)) from error
+        if handoff_path is not None:
+            raise ProfileError("context acquisition cannot compose with the evaluation handoff")
     resolved = resolve_profile(root, profile_name)
+    if handoff_path is not None:
+        from agent_phase.claude_acquisition_argv import validate
+        if os.environ.get(WORKER_FACADE_MARKER) == "1":
+            raise ProfileError("internal acquisition cannot compose with worker facade")
+        try:
+            arguments = validate(arguments, observation=True)
+        except ValueError as error:
+            raise ProfileError(str(error)) from error
     arguments, wrapper_read_only, no_tools = extract_wrapper_flags(arguments)
     read_only = (
         wrapper_read_only
         or PROFILE_CONTRACTS[profile_name].permission_mode == "plan"
     )
+    if read_only_tools is not None and not read_only:
+        raise ProfileError("--read-only-tools requires an effective read-only profile")
     if no_tools and not read_only:
         raise ProfileError("--no-tools requires an effective read-only profile")
     reject_profile_overrides(profile_name, arguments)
-    worker_facade = _load_worker_facade(
-        root,
-        profile_name,
-        read_only=read_only,
-        no_tools=no_tools,
-    )
+    worker_facade = _load_worker_facade(root, profile_name, read_only=read_only, no_tools=no_tools)
     if worker_facade is not None and not no_tools:
         reject_worker_facade_overrides(arguments)
+    plugin_dir = None
+    if worker_facade is not None:
+        from apgr_workers.claude_native import profile_plugin, apply_profile_native_argv, native_readback
+        plugin_dir = profile_plugin(root, worker_facade, read_only, arguments)
     options = list(arguments)
     if "--" in options:
         options = options[:options.index("--")]
@@ -1072,11 +1289,78 @@ def launch(
             no_tools=no_tools,
             worker_facade=worker_facade,
             headless=headless,
+            tools=read_only_tools,
         )
+        if plugin_dir:
+            overlay["tools"].append("Agent")
         reject_read_only_overrides(arguments)
     claude_arguments, live_log, requested_display, require_artifact = (
         parse_wrapper_arguments(arguments)
     )
+    instruction_projection = None
+    if instruction_path is not None:
+        # Validated and claimed before any other run-owned handoff; it can only
+        # replace standing-instruction text and never changes the argv below.
+        if not headless or live_log is not None or PROFILE_CONTRACTS[profile_name].isolated_settings:
+            raise ProfileError("instruction projection requires an ordinary headless non-isolated launch")
+        from agent_phase.claude_instruction_handoff import consume as consume_instruction
+        try:
+            instruction_projection = consume_instruction(instruction_path, os.environ, root=root,
+                                                         ambient_tools=not read_only)
+        except (OSError, ValueError, KeyError, TypeError) as error:
+            raise ProfileError(f"invalid internal instruction projection handoff: {type(error).__name__}: {error}") from error
+    acquisition_handoff = None
+    if handoff_path is not None:
+        if read_only_tools is not None:
+            raise ProfileError("--read-only-tools cannot compose with an acquisition handoff")
+        if live_log is None:
+            raise ProfileError("internal acquisition requires --live-log")
+        if (not read_only or no_tools or worker_facade is not None or not headless
+                or PROFILE_CONTRACTS[profile_name].additional_directories is not None):
+            raise ProfileError("internal acquisition requires exclusive read-only headless profile")
+        if any(a.split("=", 1)[0] in {"--settings", "--managed-settings", "--add-dir"} for a in arguments):
+            raise ProfileError("internal acquisition cannot override settings or directories")
+        from agent_phase.claude_acquisition_handoff import consume
+        try:
+            acquisition_handoff = consume(handoff_path, os.environ)
+        except (OSError, ValueError, KeyError, TypeError) as error:
+            raise ProfileError("invalid internal acquisition handoff: " + type(error).__name__) from error
+        # Native plan mode denies MCP calls even with an exact allowlist.
+        # As with the existing headless facade, permission is noninteractive
+        # only for the fixed MCP list; the available native tool set is Read.
+        overlay = {**overlay, "tools": acquisition_handoff["tools"], "permission_mode": "default",
+                   "permission_mode_selection": "default only for validated internal APGR acquisition handoff"}
+    context_acquisition = None
+    if context_path is not None:
+        # Ordinary adaptive route: the same tool set and permission mode as the
+        # existing headless worker-facade posture plus three fixed MCP tool
+        # names and exact recovery-file reads. No shell, write or directory.
+        if read_only_tools is not None or no_tools or not headless or live_log is not None:
+            raise ProfileError("context acquisition requires an ordinary headless tool-enabled launch")
+        if PROFILE_CONTRACTS[profile_name].isolated_settings:
+            raise ProfileError("context acquisition is unsupported for isolated-settings profiles")
+        if any(a.split("=", 1)[0] in {"--settings", "--managed-settings", "--add-dir", "--mcp-config",
+                                      "--strict-mcp-config", "--allowed-tools", "--allowedTools"}
+               for a in options):
+            raise ProfileError("context acquisition cannot combine with caller MCP, permission, settings or directories")
+        from agent_phase.claude_context_acquisition import consume as consume_context
+        try:
+            context_acquisition = consume_context(context_path, os.environ)
+        except (OSError, ValueError, KeyError, TypeError) as error:
+            raise ProfileError("invalid internal context acquisition handoff: " + type(error).__name__) from error
+        if read_only:
+            overlay = {**overlay, "tools": [*overlay["tools"], *context_acquisition["tools"]],
+                       "permission_mode": "default",
+                       "permission_mode_selection": "default for headless with validated worker facade "
+                                                    "or ordinary APGR context acquisition; otherwise plan"}
+    context_allowed = ([*context_acquisition["tools"], *context_acquisition["read_rules"]]
+                       if context_acquisition is not None else [])
+    if acquisition_handoff is not None and live_log is not None:
+        from agent_phase.claude_acquisition_handoff import decode
+        from agent_phase.transmission import SCOPE_ENV
+        scope = decode(os.environ.get(SCOPE_ENV, "{}"))
+        if scope.get("claude_read_stream") != str(live_log):
+            raise ProfileError("internal acquisition log differs from observation scope")
     executable = shutil.which("claude")
     if executable is None:
         raise ProfileError("claude executable not found")
@@ -1100,99 +1384,212 @@ def launch(
     environment.pop("CLAUDE_CODE_EFFORT_LEVEL", None)
     environment.pop("CLAUDE_EFFORT", None)
     if os.environ.get(WORKER_FACADE_MARKER) == "1":
-        # The MCP child receives a complete fixed context in its config env.
-        # Keep descriptive fields out of Claude's ambient environment.  A
-        # writable parent also uses the same inherited ID/state for CLI calls;
-        # read-only parents have no shell path and therefore keep all context
-        # fields private to the facade.
         environment.pop(WORKER_FACADE_MARKER, None)
         for key in (
-            "AGENT_CENTRAL_WORKER_SOURCE_ROOT",
-            "AGENT_CENTRAL_WORKER_WORKSPACE",
-            "AGENT_CENTRAL_WORKER_PARENT_FAMILY",
-            "AGENT_CENTRAL_WORKER_TASK_AUTHORITY",
-            "AGENT_CENTRAL_WORKER_LIFECYCLE_GENERATION",
-            "AGENT_CENTRAL_WORKER_PROFILE",
+            "APGR_WORKER_SOURCE_ROOT",
+            "APGR_WORKER_WORKSPACE",
+            "APGR_WORKER_PARENT_FAMILY",
+            "APGR_WORKER_TASK_AUTHORITY",
+            "APGR_WORKER_LIFECYCLE_GENERATION",
+            "APGR_WORKER_PROFILE",
         ):
             environment.pop(key, None)
         if read_only:
-            for key in ("AGENT_CENTRAL_PARENT_ID", "AGENT_CENTRAL_WORKER_STATE_DIR"):
+            for key in ("APGR_PARENT_ID", "APGR_WORKER_STATE_DIR"):
                 environment.pop(key, None)
-    argv = [
-        executable,
-        "--model",
-        resolved.resolved_model_id,
-        "--effort",
-        resolved.source_profile["effort"],
-    ]
     contract = PROFILE_CONTRACTS[profile_name]
-    source_prompt, source_reads = "", []
-    readback: dict[str, Any] | None = None
-    # Reuse the already-selected overlay names for exposure, grants and evidence.
-    # Optional inspection-server discovery must not be repeated for each field.
-    facade_tools = (
-        overlay["tools"][len(READ_ONLY_TOOLS):] if read_only
-        else worker_facade_tool_names(worker_facade)
-    ) if worker_facade is not None and not no_tools else []
-    if (read_only or worker_facade is not None or os.environ.get("AGENT_CENTRAL_MANAGED_PARENT") == "1") and not no_tools:
-        from agent_source_guidance import source_guidance
-
-        source_prompt, source_reads = source_guidance(
-            root, arguments, workers=worker_facade is not None
-        )
-    if contract.permission_mode is not None and not read_only:
-        argv.extend(("--permission-mode", resolved.source_profile["permissionMode"]))
-    if read_only:
-        argv.extend(("--permission-mode", overlay["permission_mode"]))
-        if no_tools:
-            argv.extend(("--tools", ""))
-        else:
-            argv.extend(("--tools", ",".join(overlay["tools"])))
-        argv.extend(("--setting-sources", ISOLATED_SETTING_SOURCES))
-        mcp_config = (
-            worker_facade.config()
-            if worker_facade is not None and not no_tools
-            else '{"mcpServers":{}}'
-        )
-        argv.extend(("--mcp-config", mcp_config))
-        if worker_facade is not None and not no_tools:
-            argv.extend(("--allowed-tools", ",".join([*facade_tools, *source_reads])))
-        argv.extend(("--strict-mcp-config", "--disable-slash-commands", "--no-chrome"))
-        if headless and (os.environ.get("AGENT_CENTRAL_MANAGED_PARENT") == "1"
-                         or os.environ.get(WORKER_FACADE_MARKER) == "1"):
-            # Launch-time readback, after optional facade validation. Routing's
-            # conditional contract is not proof that a facade actually loaded.
-            readback = {**overlay, "mcp": "stdio" if worker_facade is not None and not no_tools else "strict-empty",
-                        "argv_scope": "launcher-owned options; task text excluded",
-                        "model": resolved.resolved_model_id,
-                        "effort": resolved.source_profile["effort"],
-                        "allowed_tools": [*facade_tools, *source_reads]
-                        if worker_facade is not None and not no_tools else []}
-    if worker_facade is not None and not no_tools:
-        source_prompt = "\n\n".join(filter(None, (WORKER_FACADE_SYSTEM_PROMPT, source_prompt)))
-    if source_prompt:
-        argv.extend(("--append-system-prompt", source_prompt))
-    if contract.additional_directories is not None:
-        for directory in resolve_profile_directories(resolved.source_profile["additionalDirectories"]):
-            argv.extend(("--add-dir", os.fspath(directory)))
+    settings_file: Path | None = None
+    settings_sha256: str | None = None
     if contract.isolated_settings:
-        argv.extend(("--settings", os.fspath(canonical_settings_path(root))))
-        if not read_only:
-            argv.extend(("--setting-sources", ISOLATED_SETTING_SOURCES))
-    if worker_facade is not None and not read_only:
-        argv.extend(("--mcp-config", worker_facade.config()))
-        argv.extend(("--allowed-tools", ",".join([*facade_tools, *source_reads])))
-    if worker_facade is not None and not no_tools:
-        from agent_workers.facade_context import WorkerFacadeContext
+        settings_file = canonical_settings_path(root)
+        try:
+            settings_sha256 = hashlib.sha256(settings_file.read_bytes()).hexdigest()
+        except OSError as error:
+            raise ProfileError(f"cannot read canonical settings file: {error}") from error
 
-        if isinstance(worker_facade, WorkerFacadeContext):
-            print("claude-profile: worker facade evidence " + json.dumps(
-                {"serena": worker_facade.serena_evidence()}, sort_keys=True),
-                file=sys.stderr, flush=True)
-    argv.extend(claude_arguments)
+    def _verify_settings_integrity() -> None:
+        if settings_file is not None and settings_sha256 is not None:
+            if not settings_file.is_file() or settings_file.is_symlink():
+                raise ProfileError(
+                    f"canonical settings payload missing or altered: {settings_file}"
+                )
+            try:
+                current_sha256 = hashlib.sha256(settings_file.read_bytes()).hexdigest()
+            except OSError as error:
+                raise ProfileError(f"cannot read canonical settings file: {error}") from error
+            if current_sha256 != settings_sha256:
+                raise ProfileError(
+                    f"canonical settings payload modified during launch preparation: {settings_file}"
+                )
+
+    try:
+        argv = [
+            executable,
+            "--model",
+            resolved.resolved_model_id,
+            "--effort",
+            resolved.source_profile["effort"],
+        ]
+        source_prompt, source_reads = "", []
+        static_source_prompt: str | None = None
+        guidance_attempted = False
+        readback: dict[str, Any] | None = None
+        # Reuse the already-selected overlay names for exposure, grants and evidence.
+        # Optional inspection-server discovery must not be repeated for each field.
+        facade_tools = (
+            [tool for tool in overlay["tools"][len(READ_ONLY_TOOLS):] if tool not in context_allowed and tool != "Agent"]
+            if read_only else worker_facade_tool_names(worker_facade)
+        ) if worker_facade is not None and not no_tools else []
+        if ((read_only or worker_facade is not None or os.environ.get("APGR_MANAGED_PARENT") == "1")
+                and not no_tools and "--safe-mode" not in arguments):
+            from agent_source_guidance import source_guidance
+
+            rtk_res = None
+            src_path = str(root.parent / "src")
+            inserted = False
+            if src_path not in sys.path:
+                sys.path.insert(0, src_path)
+                inserted = True
+            try:
+                from agentic_praxis_grimoire.rtk import resolve_rtk_configuration
+                effective_launch_arguments = list(arguments)
+                if read_only or contract.isolated_settings:
+                    effective_launch_arguments.extend(["--setting-sources", ISOLATED_SETTING_SOURCES])
+                if contract.isolated_settings and settings_file is not None:
+                    effective_launch_arguments.extend(["--settings", os.fspath(settings_file)])
+
+                target_project = os.environ.get("APGR_TARGET_PROJECT_ROOT") or None
+                rtk_res = resolve_rtk_configuration(
+                    project_root=target_project,
+                    start=os.environ.get("APGR_TARGET_PROJECT_START") or Path.cwd(),
+                    apgr_home=os.environ.get("APGR_HOME"),
+                    launch_arguments=effective_launch_arguments,
+                    environment=environment,
+                )
+                if getattr(rtk_res, "status", None) == "unavailable":
+                    diags = getattr(rtk_res, "diagnostics", [])
+                    msg = diags[0] if diags else "rtk unavailable"
+                    print(f"claude-profile: rtk unavailable: {msg}", file=sys.stderr, flush=True)
+            except Exception as err:
+                err_text = str(err)
+                print(f"claude-profile: rtk resolution unavailable: {err_text}", file=sys.stderr, flush=True)
+                from agent_phase.rtk_fallback import unavailable_rtk_resolution
+                rtk_res = unavailable_rtk_resolution(err_text)
+            finally:
+                if inserted:
+                    try:
+                        sys.path.remove(src_path)
+                    except ValueError:
+                        pass
+
+            guidance = source_guidance(
+                root,
+                arguments,
+                workers=worker_facade is not None,
+                rtk=rtk_res,
+                provider="claude",
+                projection=instruction_projection,
+            )
+            source_prompt, source_reads = guidance
+            static_source_prompt = guidance.static_prompt
+            guidance_attempted = True
+        if contract.permission_mode is not None and not read_only:
+            argv.extend(("--permission-mode", resolved.source_profile["permissionMode"]))
+        if read_only:
+            argv.extend(("--permission-mode", overlay["permission_mode"]))
+            if no_tools:
+                argv.extend(("--tools", ""))
+            else:
+                argv.extend(("--tools", ",".join(overlay["tools"])))
+            argv.extend(("--setting-sources", ISOLATED_SETTING_SOURCES))
+            mcp_config = (
+                worker_facade.config()
+                if worker_facade is not None and not no_tools
+                else '{"mcpServers":{}}'
+            )
+            if acquisition_handoff is not None:
+                mcp_config = acquisition_handoff["config"]["path"]
+            if context_acquisition is not None:
+                from agent_phase.claude_context_acquisition import merge_mcp
+                mcp_config = merge_mcp(mcp_config, context_acquisition["server"])
+            argv.extend(("--mcp-config", mcp_config))
+            if acquisition_handoff is not None:
+                argv.extend(("--allowed-tools", ",".join(acquisition_handoff["allowed_tools"])))
+                argv.extend(("--add-dir", acquisition_handoff["recovery_authority"]["path"]))
+            if worker_facade is not None and not no_tools:
+                argv.extend(("--allowed-tools", ",".join([*facade_tools, *source_reads, *context_allowed])))
+            elif context_acquisition is not None:
+                argv.extend(("--allowed-tools", ",".join(context_allowed)))
+            argv.extend(("--strict-mcp-config", "--disable-slash-commands", "--no-chrome"))
+            if headless and (acquisition_handoff is not None or os.environ.get("APGR_MANAGED_PARENT") == "1"
+                             or os.environ.get(WORKER_FACADE_MARKER) == "1" or context_acquisition is not None):
+                # Launch-time readback, after optional facade validation. Routing's
+                # conditional contract is not proof that a facade actually loaded.
+                readback = {**overlay, "mcp": "stdio" if worker_facade is not None and not no_tools else "strict-empty",
+                            "argv_scope": "launcher-owned options; task text excluded",
+                            "model": resolved.resolved_model_id,
+                            "effort": resolved.source_profile["effort"],
+                            "allowed_tools": [*facade_tools, *source_reads]
+                            if worker_facade is not None and not no_tools else []}
+                if acquisition_handoff is not None:
+                    readback.update(mcp="apgr-run-owned-stdio", allowed_tools=acquisition_handoff["allowed_tools"])
+                if context_acquisition is not None:
+                    readback.update(allowed_tools=[*readback["allowed_tools"], *context_allowed],
+                                    context_acquisition=context_acquisition["summary"])
+                    if worker_facade is None:
+                        readback["mcp"] = "apgr-context-stdio"
+        if worker_facade is not None and not no_tools:
+            source_prompt = "\n\n".join(filter(None, (WORKER_FACADE_SYSTEM_PROMPT, source_prompt)))
+            if static_source_prompt is not None:
+                static_source_prompt = "\n\n".join(filter(None, (WORKER_FACADE_SYSTEM_PROMPT, static_source_prompt)))
+        instruction_view = None
+        if instruction_projection is not None:
+            instruction_view = _instruction_view(instruction_projection, arguments, source_prompt, static_source_prompt,
+                                                 attempted=guidance_attempted)
+        if source_prompt:
+            argv.extend(("--append-system-prompt", source_prompt))
+        if contract.additional_directories is not None:
+            for directory in resolve_profile_directories(resolved.source_profile["additionalDirectories"]):
+                argv.extend(("--add-dir", os.fspath(directory)))
+        if contract.isolated_settings:
+            assert settings_file is not None
+            argv.extend(("--settings", os.fspath(settings_file)))
+            if not read_only:
+                argv.extend(("--setting-sources", ISOLATED_SETTING_SOURCES))
+        if worker_facade is not None and not read_only:
+            mcp_config = worker_facade.config()
+            if context_acquisition is not None:
+                from agent_phase.claude_context_acquisition import merge_mcp
+                mcp_config = merge_mcp(mcp_config, context_acquisition["server"])
+            argv.extend(("--mcp-config", mcp_config))
+            argv.extend(("--allowed-tools", ",".join([*facade_tools, *source_reads, *context_allowed])))
+        elif context_acquisition is not None and not read_only:
+            # Mutating stages keep their existing permission mode and ambient
+            # MCP sources; only the run-owned server and its grants are added.
+            from agent_phase.claude_context_acquisition import merge_mcp
+            argv.extend(("--mcp-config", merge_mcp(None, context_acquisition["server"])))
+            argv.extend(("--allowed-tools", ",".join(context_allowed)))
+        if context_acquisition is not None and not read_only:
+            print("claude-profile: context acquisition " + json.dumps(
+                context_acquisition["summary"], sort_keys=True), file=sys.stderr, flush=True)
+        if worker_facade is not None and not no_tools:
+            from apgr_workers.facade_context import WorkerFacadeContext
+
+            if isinstance(worker_facade, WorkerFacadeContext):
+                print("claude-profile: worker facade evidence " + json.dumps(
+                    {"serena": worker_facade.serena_evidence()}, sort_keys=True),
+                    file=sys.stderr, flush=True)
+        if worker_facade is not None:
+            apply_profile_native_argv(argv, plugin_dir, worker_facade, read_only)
+        argv.extend(claude_arguments)
+        if plugin_dir is not None:
+            from apgr_workers.claude_native import validate_profile_native_argv
+            validate_profile_native_argv(argv, plugin_dir)
+    finally:
+        _verify_settings_integrity()
     if readback is not None:
-        # Protected options cannot be overridden; tokens after -- are task text,
-        # not later mode/tool flags. Never dump caller prompts into diagnostics.
+        if plugin_dir is not None:
+            readback["native_worker"] = native_readback(plugin_dir, "read_only" if read_only else "mutation_capable")
         print("claude-profile: read-only contract " + json.dumps(readback, sort_keys=True),
               file=sys.stderr, flush=True)
     if live_log is not None:
@@ -1206,7 +1603,29 @@ def launch(
             profile_name,
             require_artifact,
         )
+    from agent_phase.transmission import SCOPE_ENV, run_observed_inherited
+    if SCOPE_ENV in environment:
+        return run_observed_inherited(executable, argv, environment, instruction_view=instruction_view)
     os.execve(executable, argv, environment)
+
+
+def _instruction_view(projection: dict[str, Any], arguments: Sequence[str], prompt: str,
+                      static_prompt: str | None, *, attempted: bool) -> dict[str, Any]:
+    """Launch-boundary facts for a consumed projection; witnessed later in native argv."""
+    applied = bool(prompt) and projection["body"] in prompt
+    reason = None
+    if not applied:
+        safe = "--safe-mode" in arguments or os.environ.get("CLAUDE_CODE_SAFE_MODE") == "1"
+        reason = ("safe_mode" if safe else "standing_instructions_unavailable" if attempted
+                  else "source_guidance_inactive")
+    return {"schema": "apg.claude-instruction-launch/v1", "applied": applied, "reason": reason,
+            "projection": projection["projection"], "source": projection["source"],
+            "classes": projection["classes"], "omitted": projection["omitted"],
+            "static_counterfactual_instructions_bytes": (len(static_prompt.encode()) if applied and static_prompt
+                                                         else None),
+            "counterfactual_boundary": "complete --append-system-prompt value the static path would have "
+                                       "built from the same reads; computed by the wrapper, not transmitted",
+            "_body": projection["body"]}
 
 
 def main() -> int:

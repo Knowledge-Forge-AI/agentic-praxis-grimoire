@@ -7,8 +7,8 @@ one provider and one provider profile. `routes.toml` assigns every supported
 `plan_review`, `work`, `final_review`, and `closeout`.
 
 Lifecycle topology is not duplicated here. The lifecycle registry projects
-lightweight semantic stages onto the standard slots. Provider profile sources
-remain authoritative for model and reasoning effort. Executables, paths,
+lightweight semantic stages onto the standard slots. The captured `models.toml` is authoritative for model and reasoning effort.
+Provider profile sources retain permission and tool posture. Executables, paths,
 environment, credentials, permissions, approval modes, sandbox settings, and
 hooks are forbidden roster concerns; security-sensitive configuration remains
 owned by `agent-security-nd`.
@@ -29,11 +29,11 @@ cross-phase orchestration, capacity-aware selection, and multi-phase authority.
 Edit `endpoints.toml` when adding or renaming a stable endpoint alias. Each
 alias contains only `provider` and `profile`. Edit `routes.toml` when changing a
 stage roster; every supported phase/mode table must contain exactly the five
-standard slots. Provider profiles own model, effort, and runtime semantics;
+standard slots. The bundle owns model and effort; provider profiles own launch posture;
 endpoints alias provider plus profile; routes alias phase, mode, and stage.
 Do not copy model or reasoning-effort values into either roster file.
 
-Both files carry one positive `generation`. Advance it in both files as one
+All six bundle members carry one positive `generation`. Advance them as one
 operator edit; a mismatch is unusable roster state and dispatch fails closed.
 Select `execution_mode` from the explicit current operator instruction for each
 run. These directions define no active default and do not change routing policy.
@@ -62,10 +62,10 @@ bin/agent-phase-resolve path/to/request.json
 bin/agent-phase-dispatch --help
 ```
 
-The first command closed-validates both canonical TOML files and checks these
+The first command validates the canonical bundle and checks these
 managed directions. The tests cover completeness, referential integrity,
 provider-profile validation, and behavioral routing. Resolution is provider-free
-and exposes selected aliases, profile-derived intelligence, the shared
+and exposes selected aliases, captured-bundle intelligence, the shared
 generation, repository-relative source paths, and SHA-256 source digests.
 Inspect that evidence before using a changed roster. A passing local check does
 not authorize dispatch, publication, or workstation installation.
@@ -148,3 +148,67 @@ capacity selection, and future lifecycle authority belong to JACA.
 Agent-Security is a possible optional integrated authority for a future
 high-assurance or multi-tenant deployment, not a prerequisite for this
 proportionate single-user boundary.
+
+## APG166S worker and home authority
+
+`models.toml` and `workers.toml` complete the dispatcher bundle. The APGR-home
+capture is runtime authority; `common/dispatcher` supplies source defaults.
+`apgr dispatcher bundle project` and `verify` implement the standalone staging
+contract described in [the bundle specification](../../docs/specs/apgr-dispatcher-bundle-v1.md).
+No live operator bundle is migrated automatically.
+
+The standard `gemini_sub` roster uses Opus 5.5/high for planning and both reviews,
+and GPT-6.1 Sol/xhigh for work and closeout. Each stage requires the independent
+4+4+4 worker pools. APGR owns the workers and resolves their entrypoints within
+its candidate root. Dynamic routes qualify runtime workers before launch.
+Configuration alone is not observed worker-canary evidence.
+
+### v0.13 execution-mode compatibility and specialist exceptions
+
+`gemini_fable` is a deprecated v0.13 compatibility alias to `gemini_opus`.
+Both remain separately accepted execution-mode inputs for every supported
+phase type. Their effective stage launch contracts are equivalent: Gemini
+3.8-Flash High handles plan, work and closeout; Claude Opus 5.5/high handles
+both reviews. Neither mode selects a Fable parent. Redesign, renaming or
+removal belongs to a future-version decision; v0.13 retains both names.
+
+Effective equivalence includes provider, model, effort, minimum CLI version,
+profile permission/scope/isolated settings, process posture, stage launch
+transport and worker capability/transports. It does not mean profile-identity
+equality. These are the only retained `plan_review` identity differences:
+
+| Phase type | `gemini_opus` alias / profile | `gemini_fable` alias / profile |
+| --- | --- | --- |
+| `implementation_testing` | `claude-normal-final-review` / `normal-final-review` | `claude-normal-plan-review` / `normal-plan-review` |
+| `architecture_docs` | `claude-normal-final-review` / `normal-final-review` | `claude-normal-plan-review` / `normal-plan-review` |
+| `sysadmin` | `claude-sysadmin-opus-review` / `sysadmin-opus-review` | `claude-normal-sysadmin-plan-review` / `normal-sysadmin-plan-review` |
+
+For each row, the `gemini_opus` inventory `role` and profile `model_role` are
+`primary`; the `gemini_fable` values are `review`. These compatibility metadata
+differences preserve the same launch behavior and are pinned by the tests.
+
+General Claude primary/review parent routes use Opus 5.5. Exactly two static
+specialist closeout routes intentionally select the
+`fable-architecture-docs-primary` alias/profile instead:
+
+- `architecture_docs.normal.closeout`
+- `architecture_docs.gemini_flash_sub.closeout`
+
+They resolve to `claude-fable-5-1` at high effort and require Claude Code
+`2.1.250` or later, just as explicit use of that profile does. Its stable name
+and `review` role metadata are retained for compatibility; the route selects
+specialist closeout work, not a general primary/review default.
+
+Request V2's `dynamic` mode selects no Fable default when all endpoints are
+eligible and no operational observations are active. It can automatically
+select the Fable architecture-docs specialist for producer turns when
+observations rank it highest, through score adjustments or exclusions. This
+dynamic selection is separate from the two static closeout exceptions.
+
+The maintained-resolver contract tests in
+[`test_apg167d_fable_route_contract.py`](../../src/test/dispatcher/test_apg167d_fable_route_contract.py)
+cover both accepted mode names, all phase types and lifecycles, those exact
+metadata differences, the two static exceptions, general Claude Opus defaults,
+and dynamic score-only and exclusion cases. Any additional identity/launch
+divergence between the aliases or any third static Fable route fails that
+contract. These documentation and test contracts preserve effective routing.

@@ -177,7 +177,7 @@ ROW_SCHEMAS = {
         "required_evidence_categories": TEXTS,
         "evidence": obj({name: TEXTS for name in EVIDENCE_CATEGORIES}),
         "independent_review": nullable(TEXT), "next_lifecycle_trigger": TEXT,
-        "disposition_status": enum("EXISTING_STABLE", "PENDING_V0110_B", "STABLE", "PROVISIONAL_MAINTENANCE", "DEPRECATED_OR_SUPERSEDED"),
+        "disposition_status": enum("PROVISIONAL_ADMISSION", "EXISTING_STABLE", "PENDING_V0110_B", "STABLE", "PROVISIONAL_MAINTENANCE", "DEPRECATED_OR_SUPERSEDED"),
         "maintenance_ref": nullable(TEXT),
     }),
 }

@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "apg.h-evaluation/v1",
+  "title": "APG166 paired raw observations",
+  "type": "object",
+  "required": ["schema_version", "seal_sha256", "boundary", "scenario15", "rows"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {"const": "apg.h-evaluation/v1"},
+    "seal_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "boundary": {"const": "apgr-controlled-channel-write/v1"},
+    "scenario15": {"enum": ["qualified", "contingent/unavailable"]},
+    "rows": {
+      "type": "array", "minItems": 15, "maxItems": 15,
+      "items": {
+        "type": "object",
+        "required": ["scenario_id", "subset", "synthetic_inputs", "synthetic_materialization", "arms", "mechanism"],
+        "additionalProperties": false,
+        "properties": {
+          "scenario_id": {"type": "string", "pattern": "^scenario-(0[1-9]|1[0-5])$"},
+          "subset": {"enum": ["calibration", "acceptance"]},
+          "synthetic_inputs": {"type": "boolean"},
+          "synthetic_materialization": {"type": ["object", "null"]},
+          "mechanism": {"type": "object"},
+          "arms": {
+            "type": "object", "required": ["static", "adaptive"], "additionalProperties": false,
+            "properties": {"static": {"$ref": "#/$defs/arm"}, "adaptive": {"$ref": "#/$defs/arm"}}
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "delivery": {
+      "type": "object", "required": ["id", "phase", "bytes", "sha256", "channel", "source"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"type": "string", "minLength": 1}, "phase": {"enum": ["initial", "late"]},
+        "bytes": {"type": "integer", "minimum": 0},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "channel": {"enum": ["prompt", "instructions", "mcp_configuration", "mcp", "cli", "recovery_read"]},
+        "source": {"const": "measured"}
+      }
+    },
+    "observation": {
+      "type": "object", "required": ["source", "value"],
+      "properties": {"source": {"enum": ["measured", "synthetic", "declared", "unavailable"]}, "value": {}, "reason": {"type": "string"}},
+      "additionalProperties": false,
+      "if": {"properties": {"source": {"const": "unavailable"}}},
+      "then": {"required": ["reason"], "properties": {"value": {"type": "null"}}}
+    },
+    "arm": {
+      "type": "object",
+      "required": ["route", "initial", "cumulative", "deliveries", "coverage", "task_outcome", "quality_oracle", "retries", "producer_revisions", "missing_guidance_findings", "restart_required_incidents", "authority", "exact_recovery", "late_acquisitions", "provider_native_bytes", "tokens"],
+      "additionalProperties": false,
+      "properties": {
+        "route": {"type": "object"}, "deliveries": {"type": "array", "items": {"$ref": "#/$defs/delivery"}}, "quality_oracle": {"type": "object"},
+        "initial": {"$ref": "#/$defs/observation"}, "cumulative": {"$ref": "#/$defs/observation"},
+        "coverage": {"$ref": "#/$defs/observation"}, "task_outcome": {"$ref": "#/$defs/observation"},
+        "retries": {"$ref": "#/$defs/observation"}, "producer_revisions": {"$ref": "#/$defs/observation"},
+        "missing_guidance_findings": {"$ref": "#/$defs/observation"}, "restart_required_incidents": {"$ref": "#/$defs/observation"},
+        "authority": {"$ref": "#/$defs/observation"}, "exact_recovery": {"$ref": "#/$defs/observation"},
+        "late_acquisitions": {"$ref": "#/$defs/observation"}, "provider_native_bytes": {"$ref": "#/$defs/observation"},
+        "tokens": {"$ref": "#/$defs/observation"}, "selective_discovery": {"$ref": "#/$defs/observation"}
+      }
+    }
+  }
+}

@@ -91,6 +91,34 @@ def test_rejects_incomplete_codeql_matrix(valid_public_pr_doc: dict) -> None:
     assert any("language matrix" in e for e in errors)
 
 
+def test_rejects_expensive_nix_job_without_public_guard(valid_public_pr_doc: dict) -> None:
+    doc = copy.deepcopy(valid_public_pr_doc)
+    doc["jobs"]["nix"].pop("if")
+    errors = validate_public_pr(doc, Path("public-pr.yml"))
+    assert any("nix: missing job-level public guard" in e for e in errors)
+
+
+def test_rejects_incomplete_nix_matrix(valid_public_pr_doc: dict) -> None:
+    doc = copy.deepcopy(valid_public_pr_doc)
+    doc["jobs"]["nix"]["strategy"]["matrix"]["include"].pop()
+    errors = validate_public_pr(doc, Path("public-pr.yml"))
+    assert any("nix: matrix cells must be" in e for e in errors)
+
+
+def test_rejects_non_matrix_runner_for_nix(valid_public_pr_doc: dict) -> None:
+    doc = copy.deepcopy(valid_public_pr_doc)
+    doc["jobs"]["nix"]["runs-on"] = "ubuntu-latest"
+    errors = validate_public_pr(doc, Path("public-pr.yml"))
+    assert any("nix: runs-on must be '${{ matrix.os }}'" in e for e in errors)
+
+
+def test_rejects_macos_on_non_permitted_job(valid_public_pr_doc: dict) -> None:
+    doc = copy.deepcopy(valid_public_pr_doc)
+    doc["jobs"]["policy"]["runs-on"] = "macos-15"
+    errors = validate_public_pr(doc, Path("public-pr.yml"))
+    assert any("macos-15 is reserved for unit-integration and nix" in e for e in errors)
+
+
 def test_validate_all_shipped_workflows() -> None:
     errors = validate_all_workflows()
     assert errors == []

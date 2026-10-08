@@ -1,0 +1,118 @@
+{
+  "scenario_id": "scenario-15",
+  "name": "Claude Isolated Settings and Skill Projection Acceptance",
+  "subset": "acceptance",
+  "cohort": "savings_eligible_cohort",
+  "phase": "APG159A",
+  "task_input": {
+    "instruction": "Implement TypeScript React component in frontend/src/App.tsx using projected typescript-language-profile guidelines under isolated Claude settings.",
+    "task_authority": "phase_owned",
+    "mutation_scope": [
+      "frontend/src/App.tsx"
+    ]
+  },
+  "provider": "claude",
+  "role_binding": {
+    "binding_id": "binding-producer-08",
+    "roles": [
+      "Producer"
+    ],
+    "allowed_tools": [
+      "view_file",
+      "replace_file_content",
+      "write_to_file",
+      "run_command"
+    ]
+  },
+  "repository_evidence": {
+    "files": [
+      "frontend/src/App.tsx",
+      "frontend/package.json"
+    ],
+    "primary_language": "typescript",
+    "dependency_facts": {
+      "package_json": "{\"name\": \"frontend\", \"dependencies\": {\"react\": \"^19.0.0\", \"typescript\": \"^5.5.0\"}}"
+    }
+  },
+  "claude_launch_configuration": {
+    "qualification_state": "inspected_candidate_mechanism",
+    "qualification_note": "Candidate projection via isolated settings directory; live selective discovery remains unproven pending V0130-F/H empirical qualification",
+    "settings_source": "<run_dir>/isolated-claude-settings.json",
+    "projected_skills_dir": "<run_dir>/01-producer.skills"
+  },
+  "mandatory_instructions": {
+    "provider_file": "claude/CLAUDE.md",
+    "provider_instruction_bytes": 11071,
+    "mandatory_doctrine_bytes": 2500
+  },
+  "skill_sources": {
+    "apgr:typescript-language-profile": {
+      "canonical_path": "skills/typescript-language-profile/SKILL.md",
+      "whole_bytes": 11163,
+      "body_bytes": 10856,
+      "status": "selected",
+      "body_sha256": "19961c2206b2dc81b9e4e803a9b76c314bd4d7a8ac9a2382248848ad2f6a8528",
+      "source_kind": "canonical_measured"
+    }
+  },
+  "budget": {
+    "scope": "apgr_controlled_initial_bytes",
+    "max_initial_controlled_bytes": 30000,
+    "allocated_skill_body_bytes": 18000
+  },
+  "expected_outcome": {
+    "mode": "adaptive",
+    "operator_settings_unmutated": true,
+    "projected_skills_isolated_to_run": true,
+    "selected_skills": [
+      "apgr:typescript-language-profile"
+    ],
+    "native_discovery_scoped_to_plan": true,
+    "mandatory_doctrine_preserved": true,
+    "savings_contingency": "Savings contribution to default-flip gate is contingent on verifying live selective discovery without global skills leakage in V0130-F/H",
+    "quality_oracle": {
+      "command": "npm run build --prefix frontend",
+      "expected_exit_code": 0,
+      "assertions": "component builds cleanly; operator claude settings remain unmutated; zero global discovery pollution"
+    }
+  },
+  "status": "frozen_corrected",
+  "value_sources": {
+    "mandatory_instructions.provider_instruction_bytes": {
+      "source": "measured",
+      "basis": "wc -c claude/CLAUDE.md at the APG159A workspace tree"
+    },
+    "mandatory_instructions.mandatory_doctrine_bytes": {
+      "source": "estimate",
+      "basis": "Planning placeholder. The non-negotiable doctrine slice is not yet a separately measurable artifact; V0130-F must replace this with a measured value before any savings computation uses it."
+    },
+    "skill_sources.apgr:typescript-language-profile.whole_bytes": {
+      "source": "measured",
+      "basis": "python3 measurement over skills/typescript-language-profile/SKILL.md"
+    },
+    "skill_sources.apgr:typescript-language-profile.body_bytes": {
+      "source": "measured",
+      "basis": "python3 measurement over skills/typescript-language-profile/SKILL.md"
+    },
+    "budget.max_initial_controlled_bytes": {
+      "source": "declared",
+      "basis": "Frozen scenario budget parameter chosen by this correction revision."
+    },
+    "budget.allocated_skill_body_bytes": {
+      "source": "declared",
+      "basis": "Frozen scenario budget parameter chosen by this correction revision."
+    }
+  },
+  "value_source_vocabulary": "measured | synthetic | estimate | declared | unavailable (see context-eval-metrics-and-oracles.json)",
+  "correction_revision": {
+    "revision": "APG159A-CORR1",
+    "supersedes": "APG159 numerical freeze (retained in Git history at Exit 00205)",
+    "nature": "pre-implementation correction, not tuning against a held-out set"
+  },
+  "f_accounting_correction": {
+    "revision": "F-CONTEXT1",
+    "owner": "f-context1-accounting.json",
+    "historical_fields": "mandatory_instructions and value_sources retain the earlier freeze; their estimates are superseded for F packing by measured mandatory_cost in the correction owner",
+    "qualification": "prospective fixture only; normal effective transport remains static; no H benefit claim"
+  }
+}

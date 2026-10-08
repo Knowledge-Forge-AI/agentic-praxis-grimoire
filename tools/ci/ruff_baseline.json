@@ -1,0 +1,4106 @@
+{
+  "carry_forward_commit": "a7159723478b1f8029d938212b83ce0a6bd6ea25",
+  "carry_forward_tree": "d5f8b7cfe98ff1ca074c248e5121810ef9be3f39",
+  "description": "Grandfathered Ruff 0.9.10 baseline findings for APGR v0.13.0. Reconstructed from pre-ZE authority (commit 129a2959, tree 0f5381be) where 543 lint findings existed. Elimination of 31 E402 module-level import findings in libexec/agent_phase/dispatch.py reduced the total to 512 carry-forward findings. 508 findings have identical locations and context hashes; 4 findings in dispatch.py and resume_dispatch.py shifted line numbers due to compaction while preserving exact line content and context hash. All 512 findings are proven descendants of pre-ZE authority; 2 APG140 fixture findings in src/test/support/apg_external_compatibility_fixture.py remain separate historical fixture classifications.",
+  "findings": [
+    {
+      "code": "E731",
+      "col": 21,
+      "context_hash": "f5ccd0043ca1e636a165683d9de238d7d51561b93bf02bd94e2ce0da1f0d9128",
+      "message": "Do not assign a `lambda` expression, use a `def`",
+      "path": "libexec/agent_phase/acquisition_records.py",
+      "row": 55
+    },
+    {
+      "code": "F401",
+      "col": 8,
+      "context_hash": "582f9ff727d7496ab22b435e59b0f09b8ec415b0c8e8482ad2547f28cb6beb37",
+      "message": "`shutil` imported but unused",
+      "path": "libexec/agent_phase/bundle.py",
+      "row": 40
+    },
+    {
+      "code": "F401",
+      "col": 19,
+      "context_hash": "546b910b8d094d64ed3e3e6fd958c132586d2a2e7d5e247a3dbc7623178b05a3",
+      "message": "`types.MappingProxyType` imported but unused",
+      "path": "libexec/agent_phase/bundle.py",
+      "row": 43
+    },
+    {
+      "code": "F401",
+      "col": 46,
+      "context_hash": "eab14b8cb98b0b9ab208dd9476d05f23b285a24d91529431f399063f1951f1d2",
+      "message": "`typing.Sequence` imported but unused",
+      "path": "libexec/agent_phase/bundle.py",
+      "row": 44
+    },
+    {
+      "code": "F401",
+      "col": 8,
+      "context_hash": "8b76fbd04977ff1374e576968aa39b50c9624e0167d31c40d0e604e697d4216e",
+      "message": "`uuid` imported but unused",
+      "path": "libexec/agent_phase/bundle.py",
+      "row": 45
+    },
+    {
+      "code": "F401",
+      "col": 5,
+      "context_hash": "c55b4a1b6d739c461b307d2bb833bf5b3c77f3362002c075d38279863c36840f",
+      "message": "`.bundle_io.LEGACY_MEMBERS` imported but unused",
+      "path": "libexec/agent_phase/bundle.py",
+      "row": 48
+    },
+    {
+      "code": "F401",
+      "col": 5,
+      "context_hash": "4daffa9dd46015a60456f07428efa284ff2f8f54529c4991f68516f210a8b364",
+      "message": "`.bundle_io.MAX_MEMBER_BYTES` imported but unused",
+      "path": "libexec/agent_phase/bundle.py",
+      "row": 50
+    },
+    {
+      "code": "F401",
+      "col": 5,
+      "context_hash": "7802d223a5c7f656b1474c17690bf30449db2424fb619465572d1bda0aec6559",
+      "message": "`.bundle_io.LegacyBundleError` imported but unused",
+      "path": "libexec/agent_phase/bundle.py",
+      "row": 55
+    },
+    {
+      "code": "F401",
+      "col": 5,
+      "context_hash": "bc1b0c137b4f9c86fdb30b28e69f44ba3c44c9745177f5c13e2d36def28f7dd7",
+      "message": "`.bundle_io.PhysicalIdentity` imported but unused",
+      "path": "libexec/agent_phase/bundle.py",
+      "row": 56
+    },
+    {
+      "code": "F401",
+      "col": 5,
+      "context_hash": "2cc8cfa1b67ca105bfb432f7a281b4450c381a54934bbbc15daeb5c426429c15",
+      "message": "`.bundle_io.atomic_exchange_directories` imported but unused",
+      "path": "libexec/agent_phase/bundle.py",
+      "row": 57
+    },
+    {
+      "code": "F401",
+      "col": 5,
+      "context_hash": "7b08370e5ab635d48c7e36fb9a05e4a4d18266a50cd63a38074dd1b237d56e95",
+      "message": "`.bundle_io.open_parent_no_follow` imported but unused",
+      "path": "libexec/agent_phase/bundle.py",
+      "row": 60
+    },
+    {
+      "code": "F811",
+      "col": 28,
+      "context_hash": "a1dc5894ce928168dc0e130d787b33e775c49f7d152c9ebce4144dd9379f9df7",
+      "message": "Redefinition of unused `PhysicalIdentity` from line 56",
+      "path": "libexec/agent_phase/bundle.py",
+      "row": 367
+    },
+    {
+      "code": "F841",
+      "col": 5,
+      "context_hash": "f840a2946d6aac6a8599bc2efba110531331ccbe2c70e6a45ac908b320fca392",
+      "message": "Local variable `root_identity` is assigned to but never used",
+      "path": "libexec/agent_phase/bundle.py",
+      "row": 467
+    },
+    {
+      "code": "F841",
+      "col": 5,
+      "context_hash": "ddac9fee9c159569650e597192bb6f9573d88200c0e312371831304e000796ad",
+      "message": "Local variable `identities` is assigned to but never used",
+      "path": "libexec/agent_phase/bundle.py",
+      "row": 481
+    },
+    {
+      "code": "F401",
+      "col": 8,
+      "context_hash": "de2abade832c8e350a1bdc98cfcdb1e202ac4749c5fc51a4a970d41736b6df5c",
+      "message": "`os` imported but unused",
+      "path": "libexec/agent_phase/bundle_cli.py",
+      "row": 13
+    },
+    {
+      "code": "E402",
+      "col": 1,
+      "context_hash": "10adbc8c1add8c0196c0ce2f84e06e7003c6c261d8b7fc0028af6277fdcab115",
+      "message": "Module level import not at top of file",
+      "path": "libexec/agent_phase/bundle_cli.py",
+      "row": 19
+    },
+    {
+      "code": "F401",
+      "col": 5,
+      "context_hash": "07ec8bc31c89bf5e20c2b8b564018cbf31482eb43ecd3b8d5cf4a53effac32f7",
+      "message": "`agent_phase.bundle.BUNDLE_GENERATION` imported but unused",
+      "path": "libexec/agent_phase/bundle_cli.py",
+      "row": 20
+    },
+    {
+      "code": "F401",
+      "col": 5,
+      "context_hash": "834c6837086f46abbbb9ffcef45baa7c9025740e7db3d8e7d84b603d89304c06",
+      "message": "`agent_phase.bundle.BUNDLE_MEMBERS` imported but unused",
+      "path": "libexec/agent_phase/bundle_cli.py",
+      "row": 21
+    },
+    {
+      "code": "F401",
+      "col": 5,
+      "context_hash": "f5e507f529e1a6e8e9eb8ff139d0c14fb81b77435a2a9e8c31cc8dca85ab57ed",
+      "message": "`agent_phase.bundle.BUNDLE_SCHEMA` imported but unused",
+      "path": "libexec/agent_phase/bundle_cli.py",
+      "row": 22
+    },
+    {
+      "code": "F401",
+      "col": 5,
+      "context_hash": "39e3d13c327efdf9a0a6c2847d7e1f55635ccf1b077e685e46fa89470989cab2",
+      "message": "`agent_phase.bundle.MANIFEST_FILENAME` imported but unused",
+      "path": "libexec/agent_phase/bundle_cli.py",
+      "row": 23
+    },
+    {
+      "code": "F401",
+      "col": 5,
+      "context_hash": "b922be15f84b77e6908f73d687602e6d866d477d03fcea8eedfb400a0350cc7f",
+      "message": "`agent_phase.bundle.BundleNotFoundError` imported but unused",
+      "path": "libexec/agent_phase/bundle_cli.py",
+      "row": 26
+    },
+    {
+      "code": "E402",
+      "col": 1,
+      "context_hash": "2ebd1a78d2ee76e9991ed3459ba0e68cc32d0f11165b62b981fa7425b000b0c1",
+      "message": "Module level import not at top of file",
+      "path": "libexec/agent_phase/bundle_cli.py",
+      "row": 34
+    },
+    {
+      "code": "F821",
+      "col": 40,
+      "context_hash": "0e4015e1ac4c93cf68e58800afca01f138cc17fcdaa092b22a61d03b0fc95a27",
+      "message": "Undefined name `Any`",
+      "path": "libexec/agent_phase/capabilities.py",
+      "row": 91
+    },
+    {
+      "code": "F821",
+      "col": 13,
+      "context_hash": "39d0b3858e47a2f543092fa93821cf0470f2c0020210cd7dae7c6cfe6268493f",
+      "message": "Undefined name `Any`",
+      "path": "libexec/agent_phase/capabilities.py",
+      "row": 137
+    },
+    {
+      "code": "F401",
+      "col": 32,
+      "context_hash": "e8a3a191bf7ae7d65ee6115e00185d5db0fe4e396695284026a0c1dbb288d748",
+      "message": "`agent_phase.roster.load_roster` imported but unused",
+      "path": "libexec/agent_phase/cli.py",
+      "row": 56
+    },
+    {
+      "code": "F401",
+      "col": 5,
+      "context_hash": "1cd070c609b2f813f52544aaa6b02ce81c2bc6f02a4c29ed0a0c4dda7199eff1",
+      "message": "`agent_phase.config_routing.ReviewMutationPolicy` imported but unused",
+      "path": "libexec/agent_phase/cli.py",
+      "row": 61
+    },
+    {
+      "code": "F841",
+      "col": 9,
+      "context_hash": "4dfe25db40dde6ac53b0da97d1b5d5fd815b7493964eae208981125276dce079",
+      "message": "Local variable `worker_guidance` is assigned to but never used",
+      "path": "libexec/agent_phase/dispatch.py",
+      "row": 850
+    },
+    {
+      "code": "F841",
+      "col": 9,
+      "context_hash": "aefa77331cfc9a9f0336d8962cdda85ade5d5b0d0b8c4a34874984a15290e5f7",
+      "message": "Local variable `adversary_mutated` is assigned to but never used",
+      "path": "libexec/agent_phase/dispatch.py",
+      "row": 2468
+    },
+    {
+      "code": "F401",
+      "col": 32,
+      "context_hash": "fc3d5c39b52fcc66adfd99f8c927b0127a1446ab77697a320d32689c44311e4c",
+      "message": "`.worker_capability.MANDATORY_WORKER_MODES` imported but unused",
+      "path": "libexec/agent_phase/dynamic_router.py",
+      "row": 24
+    },
+    {
+      "code": "F811",
+      "col": 50,
+      "context_hash": "39b33ae4a8b82ba5d709731480ebbdb0d82bcf8814a9685f2c355e21241c520e",
+      "message": "Redefinition of unused `MANDATORY_WORKER_MODES` from line 24",
+      "path": "libexec/agent_phase/dynamic_router.py",
+      "row": 169
+    },
+    {
+      "code": "F841",
+      "col": 5,
+      "context_hash": "29cf84ea66fe173f398b180390bbc299dbc41797ddeb2832d63b14fb254b8d0b",
+      "message": "Local variable `adversary_mutated` is assigned to but never used",
+      "path": "libexec/agent_phase/lifecycle_dispatch.py",
+      "row": 894
+    },
+    {
+      "code": "E731",
+      "col": 5,
+      "context_hash": "574bd5f00500c4f15b7f95ee2a70a76229f16169094e3c7c495415138567ed92",
+      "message": "Do not assign a `lambda` expression, use a `def`",
+      "path": "libexec/agent_phase/observations_explain.py",
+      "row": 236
+    },
+    {
+      "code": "E731",
+      "col": 5,
+      "context_hash": "ce0e4fc752738091990123fb47b54d8493a73ad9cc5c9efab9eca7950ae04454",
+      "message": "Do not assign a `lambda` expression, use a `def`",
+      "path": "libexec/agent_phase/observations_list.py",
+      "row": 108
+    },
+    {
+      "code": "E731",
+      "col": 5,
+      "context_hash": "3a1458c11d14027ae96a28201c0688852c39bf8de44438753afa1e0313d17112",
+      "message": "Do not assign a `lambda` expression, use a `def`",
+      "path": "libexec/agent_phase/observations_list.py",
+      "row": 288
+    },
+    {
+      "code": "F401",
+      "col": 8,
+      "context_hash": "9e77b3746ea081eb4c557e71cc84ca29dc66a89d18a07e85dba66a336e7310ae",
+      "message": "`sys` imported but unused",
+      "path": "libexec/agent_phase/outbox_projection.py",
+      "row": 20
+    },
+    {
+      "code": "F401",
+      "col": 5,
+      "context_hash": "d8583689f309bb639ce090203464a282fb8b0fdb1e97e933c316c730130ad2f5",
+      "message": "`.config_routing.DEFAULT_OUTBOX_RELATIVE` imported but unused",
+      "path": "libexec/agent_phase/outbox_projection.py",
+      "row": 26
+    },
+    {
+      "code": "F401",
+      "col": 5,
+      "context_hash": "e307083dc0dcdd0526e45fbddd56530da55de3bf9ecabecf882a4b576ebacf21",
+      "message": "`.config_routing.default_outbox_root` imported but unused",
+      "path": "libexec/agent_phase/outbox_projection.py",
+      "row": 27
+    },
+    {
+      "code": "F401",
+      "col": 5,
+      "context_hash": "8838a0311e1febee1bf7f3de2d4bb93640e1a818e9b19b9d9be10b4285b53444",
+      "message": "`.config_routing.resolve_outbox_root` imported but unused",
+      "path": "libexec/agent_phase/outbox_projection.py",
+      "row": 28
+    },
+    {
+      "code": "E402",
+      "col": 1,
+      "context_hash": "279d97cba553038a5f7c2719854f44aae0897aef17aad8175fb5f5979e041851",
+      "message": "Module level import not at top of file",
+      "path": "libexec/agent_phase/provider.py",
+      "row": 27
+    },
+    {
+      "code": "F841",
+      "col": 5,
+      "context_hash": "aefa77331cfc9a9f0336d8962cdda85ade5d5b0d0b8c4a34874984a15290e5f7",
+      "message": "Local variable `adversary_mutated` is assigned to but never used",
+      "path": "libexec/agent_phase/resume_dispatch.py",
+      "row": 956
+    },
+    {
+      "code": "F841",
+      "col": 5,
+      "context_hash": "5e2f8945d2ecb5b3df3dc218420e5ce0dc1f039d77f6ef78cdab03fc5261576b",
+      "message": "Local variable `adversary_mutated` is assigned to but never used",
+      "path": "libexec/agent_phase/resume_dispatch.py",
+      "row": 1435
+    },
+    {
+      "code": "F401",
+      "col": 5,
+      "context_hash": "685a4f9ae1b6c375c4d758ea1eb71780526334ab0f13b49d0bdabf45bc832f76",
+      "message": "`.config_routing.SUPPORTED_WORKTREE_POLICIES` imported but unused",
+      "path": "libexec/agent_phase/review_drift.py",
+      "row": 20
+    },
+    {
+      "code": "F841",
+      "col": 9,
+      "context_hash": "70b7f0ef65a5387c914293caa83a0158176e4f5636685dc68bb8aca1d1f9babd",
+      "message": "Local variable `idx_policy` is assigned to but never used",
+      "path": "libexec/agent_phase/review_drift.py",
+      "row": 395
+    },
+    {
+      "code": "F841",
+      "col": 9,
+      "context_hash": "9899294d46e6afc45f3f1a16fb2c27b4f901d0c1aa088aa6aae056652764a4b0",
+      "message": "Local variable `hd_policy` is assigned to but never used",
+      "path": "libexec/agent_phase/review_drift.py",
+      "row": 396
+    },
+    {
+      "code": "F821",
+      "col": 24,
+      "context_hash": "8b52f6c7cbc90b36af1990ec28dd16bb9dd12c17702f267ec9129f46e8b2a2d1",
+      "message": "Undefined name `json`",
+      "path": "libexec/agent_phase/review_drift.py",
+      "row": 698
+    },
+    {
+      "code": "E731",
+      "col": 5,
+      "context_hash": "ec89f67a7a17805e0323b4d20206930db110d5399a053067553ad41e37bab387",
+      "message": "Do not assign a `lambda` expression, use a `def`",
+      "path": "libexec/agent_phase/runtime_identity.py",
+      "row": 37
+    },
+    {
+      "code": "E731",
+      "col": 5,
+      "context_hash": "7c8bf598e329995e585ffaa6e74038cdd3c3d73650420267d1ea284b2e800bee",
+      "message": "Do not assign a `lambda` expression, use a `def`",
+      "path": "libexec/agent_phase/runtime_models.py",
+      "row": 41
+    },
+    {
+      "code": "F401",
+      "col": 8,
+      "context_hash": "9e77b3746ea081eb4c557e71cc84ca29dc66a89d18a07e85dba66a336e7310ae",
+      "message": "`sys` imported but unused",
+      "path": "libexec/agent_phase/schema_manifest.py",
+      "row": 8
+    },
+    {
+      "code": "E731",
+      "col": 5,
+      "context_hash": "f5ccd0043ca1e636a165683d9de238d7d51561b93bf02bd94e2ce0da1f0d9128",
+      "message": "Do not assign a `lambda` expression, use a `def`",
+      "path": "libexec/agent_phase/transmission.py",
+      "row": 41
+    },
+    {
+      "code": "F401",
+      "col": 31,
+      "context_hash": "4a5b8eb37ccf84d5d1babbd40aca77a1aba7e4fa53b694ca1e9761c21b5602eb",
+      "message": "`.review_drift` imported but unused",
+      "path": "libexec/agent_phase/v2_dispatch.py",
+      "row": 63
+    },
+    {
+      "code": "F401",
+      "col": 8,
+      "context_hash": "de2abade832c8e350a1bdc98cfcdb1e202ac4749c5fc51a4a970d41736b6df5c",
+      "message": "`os` imported but unused",
+      "path": "libexec/agent_phase/v2_turns.py",
+      "row": 17
+    },
+    {
+      "code": "E402",
+      "col": 1,
+      "context_hash": "ecc0d41bc4339bdfe43c4030560f04ae1e125eab5671e0c81a0959b19983a724",
+      "message": "Module level import not at top of file",
+      "path": "libexec/agent_phase/v2_turns.py",
+      "row": 1226
+    },
+    {
+      "code": "F401",
+      "col": 8,
+      "context_hash": "ada1d9e0a360cda0fd1c8757d297aa74a4fc8d7193a69d3c28b43afc6950e9f9",
+      "message": "`hashlib` imported but unused",
+      "path": "libexec/agent_phase/worker_canary.py",
+      "row": 5
+    },
+    {
+      "code": "F401",
+      "col": 5,
+      "context_hash": "a2d246fb5f11231eb927d5c28a5450875cf1f332486fe67bc55582afd33bf618",
+      "message": "`.canary_budget.canonical_budget_path` imported but unused",
+      "path": "libexec/agent_phase/worker_canary.py",
+      "row": 17
+    },
+    {
+      "code": "F401",
+      "col": 8,
+      "context_hash": "856a29a936ceb53098a8d45c076bcb67d3b911d9303db4f7bca5b423ded40744",
+      "message": "`importlib` imported but unused",
+      "path": "libexec/agent_phase/worker_capability.py",
+      "row": 13
+    },
+    {
+      "code": "F401",
+      "col": 25,
+      "context_hash": "7840d4914026396611bdb589d622086fc4cdd2edf2ba1484a48f3d3a8dd0df20",
+      "message": "`typing.Callable` imported but unused",
+      "path": "libexec/agent_phase/worker_capability.py",
+      "row": 19
+    },
+    {
+      "code": "F401",
+      "col": 24,
+      "context_hash": "d1fb4773d1b30a9a90221cebf4792332ebac46dbc6dce7aaca008e8e3d631f98",
+      "message": "`typing.Mapping` imported but unused",
+      "path": "libexec/agent_phase/worker_capability.py",
+      "row": 257
+    },
+    {
+      "code": "F821",
+      "col": 10,
+      "context_hash": "f38a894cb40bacf7ec5d16f21d41fc3b3cf9e7807a5592170e79a175754aff5e",
+      "message": "Undefined name `Any`",
+      "path": "libexec/agent_source_guidance.py",
+      "row": 173
+    },
+    {
+      "code": "F821",
+      "col": 10,
+      "context_hash": "1b578ab21db25dca3be89ca67b775bafdb5a67a9239543c1009101f53c2969ae",
+      "message": "Undefined name `Any`",
+      "path": "libexec/agent_source_guidance.py",
+      "row": 220
+    },
+    {
+      "code": "F821",
+      "col": 10,
+      "context_hash": "1b578ab21db25dca3be89ca67b775bafdb5a67a9239543c1009101f53c2969ae",
+      "message": "Undefined name `Any`",
+      "path": "libexec/agent_source_guidance.py",
+      "row": 277
+    },
+    {
+      "code": "F401",
+      "col": 8,
+      "context_hash": "de2abade832c8e350a1bdc98cfcdb1e202ac4749c5fc51a4a970d41736b6df5c",
+      "message": "`os` imported but unused",
+      "path": "libexec/apgr_workers/claude_parent.py",
+      "row": 7
+    },
+    {
+      "code": "F401",
+      "col": 60,
+      "context_hash": "ef396d3e1217ade92359202cca7fb635231561deaf6dc0beec1280b440ffd966",
+      "message": "`.ledger.ParentNotFoundError` imported but unused",
+      "path": "libexec/apgr_workers/cli.py",
+      "row": 24
+    },
+    {
+      "code": "E402",
+      "col": 1,
+      "context_hash": "d7a2bb1bdfbb1673903d54a0436035d1f818676f58ef1e72f53b7c8453ece791",
+      "message": "Module level import not at top of file",
+      "path": "libexec/apgr_workers/inspection.py",
+      "row": 37
+    },
+    {
+      "code": "E731",
+      "col": 5,
+      "context_hash": "cd46bbfe237a7b6eb36c26625c8db0f1074359d509e2ce56a7d2c91b06ed1dbe",
+      "message": "Do not assign a `lambda` expression, use a `def`",
+      "path": "libexec/apgr_workers/inspection.py",
+      "row": 185
+    },
+    {
+      "code": "E731",
+      "col": 5,
+      "context_hash": "7c8bf598e329995e585ffaa6e74038cdd3c3d73650420267d1ea284b2e800bee",
+      "message": "Do not assign a `lambda` expression, use a `def`",
+      "path": "libexec/apgr_workers/model_observation.py",
+      "row": 39
+    },
+    {
+      "code": "E731",
+      "col": 9,
+      "context_hash": "7c8bf598e329995e585ffaa6e74038cdd3c3d73650420267d1ea284b2e800bee",
+      "message": "Do not assign a `lambda` expression, use a `def`",
+      "path": "libexec/apgr_workers/model_observation.py",
+      "row": 67
+    },
+    {
+      "code": "F401",
+      "col": 5,
+      "context_hash": "5028e089ebc71fabd49027946d98359f13f1fa810755d35a28d362709e3ca0c1",
+      "message": "`.facade_context.FACADE_MARKER` imported but unused",
+      "path": "libexec/apgr_workers/native_launch.py",
+      "row": 39
+    },
+    {
+      "code": "F401",
+      "col": 39,
+      "context_hash": "5fd29444cfa707c1fb2fbef12df23c0d199c0c133622474287b7765f84955583",
+      "message": "`controller_generation.binding_for_root` imported but unused",
+      "path": "libexec/apgr_workers/native_launch.py",
+      "row": 605
+    },
+    {
+      "code": "F401",
+      "col": 21,
+      "context_hash": "6d69f2ac09017b8a49d050ab336e953b8fa02ae08c24396916ea7ea42418e627",
+      "message": "`pathlib.Path` imported but unused",
+      "path": "libexec/apgr_workers/parent_custody.py",
+      "row": 4
+    },
+    {
+      "code": "F401",
+      "col": 8,
+      "context_hash": "f9e42ccd54cc9de18179025fa0bf90642c41392da38ee9faa647e9e85573f63e",
+      "message": "`stat` imported but unused",
+      "path": "libexec/apgr_workers/policy.py",
+      "row": 9
+    },
+    {
+      "code": "F811",
+      "col": 12,
+      "context_hash": "f9e42ccd54cc9de18179025fa0bf90642c41392da38ee9faa647e9e85573f63e",
+      "message": "Redefinition of unused `stat` from line 9",
+      "path": "libexec/apgr_workers/policy.py",
+      "row": 56
+    },
+    {
+      "code": "E731",
+      "col": 17,
+      "context_hash": "7c8bf598e329995e585ffaa6e74038cdd3c3d73650420267d1ea284b2e800bee",
+      "message": "Do not assign a `lambda` expression, use a `def`",
+      "path": "libexec/apgr_workers/policy.py",
+      "row": 100
+    },
+    {
+      "code": "E731",
+      "col": 13,
+      "context_hash": "8c0de7a720870d6b91d45f1428f55b8c6589269a82087839f8d664e5b8e2e449",
+      "message": "Do not assign a `lambda` expression, use a `def`",
+      "path": "src/agentic_praxis_grimoire/skill_catalog.py",
+      "row": 93
+    },
+    {
+      "code": "E402",
+      "col": 1,
+      "context_hash": "db7b0741c94798db5932296122312b7b87d6e5a9e2ee29833a9949d1f774f40b",
+      "message": "Module level import not at top of file",
+      "path": "src/test/dispatcher/conftest.py",
+      "row": 24
+    },
+    {
+      "code": "E702",
+      "col": 27,
+      "context_hash": "c8b828677a00751d21f2e2e9bb85c7d446304c242a4104260897bacd89c0555d",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_agent_phase_acquisition.py",
+      "row": 79
+    },
+    {
+      "code": "E702",
+      "col": 29,
+      "context_hash": "6c32c3f53d1fa22371b63386181198fce66e0c5228db21f5ac3ae0a930a05a0b",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_agent_phase_acquisition.py",
+      "row": 106
+    },
+    {
+      "code": "E702",
+      "col": 27,
+      "context_hash": "c8b828677a00751d21f2e2e9bb85c7d446304c242a4104260897bacd89c0555d",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_agent_phase_acquisition.py",
+      "row": 107
+    },
+    {
+      "code": "E702",
+      "col": 29,
+      "context_hash": "6c32c3f53d1fa22371b63386181198fce66e0c5228db21f5ac3ae0a930a05a0b",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_agent_phase_acquisition.py",
+      "row": 151
+    },
+    {
+      "code": "E702",
+      "col": 27,
+      "context_hash": "c8b828677a00751d21f2e2e9bb85c7d446304c242a4104260897bacd89c0555d",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_agent_phase_acquisition.py",
+      "row": 152
+    },
+    {
+      "code": "E702",
+      "col": 75,
+      "context_hash": "cec1d1edf79d9d4e765e022d4d11bcefbd12cf0e54941077682ced06a0ffaa51",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_agent_phase_acquisition.py",
+      "row": 163
+    },
+    {
+      "code": "E702",
+      "col": 163,
+      "context_hash": "ebef023416d537ad6ffa4e9347065eac4318c20376dbc97441d70cd4da0cca60",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_agent_phase_acquisition.py",
+      "row": 170
+    },
+    {
+      "code": "E702",
+      "col": 30,
+      "context_hash": "cd3d4728d223fc163f108fb5c1d2c0288dbd11455aac703e85a541a1a7874e69",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_agent_phase_acquisition.py",
+      "row": 185
+    },
+    {
+      "code": "E702",
+      "col": 33,
+      "context_hash": "85cc4f96f0bf13603a5f08aeaa0939a1699a4700fa0e9630306862956373400e",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_agent_phase_acquisition.py",
+      "row": 186
+    },
+    {
+      "code": "E702",
+      "col": 56,
+      "context_hash": "85cc4f96f0bf13603a5f08aeaa0939a1699a4700fa0e9630306862956373400e",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_agent_phase_acquisition.py",
+      "row": 186
+    },
+    {
+      "code": "E702",
+      "col": 35,
+      "context_hash": "f1ec5017532bdd1b9bd33821efbcc50153afb8983cd599a8b2a69a66b476a9b9",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_agent_phase_acquisition.py",
+      "row": 251
+    },
+    {
+      "code": "E702",
+      "col": 31,
+      "context_hash": "45732f6d1ae8ee47f5a2e8a55c8691a7a69448565f7f80691e5988cb9be82d23",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_agent_phase_acquisition.py",
+      "row": 256
+    },
+    {
+      "code": "E702",
+      "col": 64,
+      "context_hash": "a7f97bcc060f9a205279d9050af7f7f58689b486b539e526bb6de5d9706cb6a7",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_agent_phase_acquisition.py",
+      "row": 258
+    },
+    {
+      "code": "E702",
+      "col": 38,
+      "context_hash": "e9504ab737203fd14a5d7644f6afde393a44b464adc8c7133591a1670f59b7c0",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_agent_phase_acquisition.py",
+      "row": 318
+    },
+    {
+      "code": "E702",
+      "col": 38,
+      "context_hash": "e9504ab737203fd14a5d7644f6afde393a44b464adc8c7133591a1670f59b7c0",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_agent_phase_acquisition.py",
+      "row": 338
+    },
+    {
+      "code": "F821",
+      "col": 15,
+      "context_hash": "371dbeb25aae57ba81e01e53cc50377c2d72b75d6217d90cb87864115cd219dd",
+      "message": "Undefined name `Any`",
+      "path": "src/test/dispatcher/test_agent_phase_antigravity.py",
+      "row": 239
+    },
+    {
+      "code": "F841",
+      "col": 5,
+      "context_hash": "0f5fe60c5af5743c9968eb308626119a2f454a5cf68beeacc7b226b2a04d6951",
+      "message": "Local variable `saved_path` is assigned to but never used",
+      "path": "src/test/dispatcher/test_agent_phase_config_routing.py",
+      "row": 481
+    },
+    {
+      "code": "F401",
+      "col": 36,
+      "context_hash": "c277899cce83471ec13d3785495f8b3053a0505b7906c8b3f63d326921afae2c",
+      "message": "`agent_phase.run` imported but unused",
+      "path": "src/test/dispatcher/test_agent_phase_config_routing.py",
+      "row": 533
+    },
+    {
+      "code": "F401",
+      "col": 36,
+      "context_hash": "48395e8291b70c9e7137c2457f76a8fa160069ae60fd3c96925ce4f82c03027b",
+      "message": "`agent_phase.dispatch` imported but unused",
+      "path": "src/test/dispatcher/test_agent_phase_config_routing.py",
+      "row": 561
+    },
+    {
+      "code": "F401",
+      "col": 8,
+      "context_hash": "37effa9caacd97bad7e2ded872a87a97b8975fca47afea9c20251191e2a288dd",
+      "message": "`copy` imported but unused",
+      "path": "src/test/dispatcher/test_agent_phase_context.py",
+      "row": 3
+    },
+    {
+      "code": "E701",
+      "col": 42,
+      "context_hash": "fa1d6a5102b37e3e29d74e78836bef3b8e95336b3fcb6b19a1399a3d39b9c686",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_agent_phase_context.py",
+      "row": 85
+    },
+    {
+      "code": "E702",
+      "col": 29,
+      "context_hash": "96a74582f992961ab2bf8b569d22abf18644199cc8ab13b19e057c1c579cffc5",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_agent_phase_context.py",
+      "row": 93
+    },
+    {
+      "code": "E701",
+      "col": 36,
+      "context_hash": "e0eec66860fc41177269f6987072cc4fb6b8f6ebf52aeadc40cac1e781bc9aa4",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_agent_phase_context.py",
+      "row": 94
+    },
+    {
+      "code": "E701",
+      "col": 36,
+      "context_hash": "e151c325dbd498f803e3527eba7246483ff8b3b38a96ddd9e790baa75420e9b5",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_agent_phase_context.py",
+      "row": 95
+    },
+    {
+      "code": "E702",
+      "col": 31,
+      "context_hash": "041e5fa1f05b1a114b4b1b58e9f05f872c6838db5154cd8d2f1a401eb3e356bd",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_agent_phase_context.py",
+      "row": 99
+    },
+    {
+      "code": "E702",
+      "col": 69,
+      "context_hash": "041e5fa1f05b1a114b4b1b58e9f05f872c6838db5154cd8d2f1a401eb3e356bd",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_agent_phase_context.py",
+      "row": 99
+    },
+    {
+      "code": "E702",
+      "col": 28,
+      "context_hash": "6cfa9c65c7d40d9ff90af0189e1ccda5b0e2b41c51f02bc99b7e3f936039573f",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_agent_phase_context.py",
+      "row": 100
+    },
+    {
+      "code": "E702",
+      "col": 44,
+      "context_hash": "6cfa9c65c7d40d9ff90af0189e1ccda5b0e2b41c51f02bc99b7e3f936039573f",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_agent_phase_context.py",
+      "row": 100
+    },
+    {
+      "code": "E702",
+      "col": 74,
+      "context_hash": "6cfa9c65c7d40d9ff90af0189e1ccda5b0e2b41c51f02bc99b7e3f936039573f",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_agent_phase_context.py",
+      "row": 100
+    },
+    {
+      "code": "E702",
+      "col": 31,
+      "context_hash": "49e58b8e53e4200dde52e0822c08371db497211666ac66daf80d673adac37c2c",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_agent_phase_context.py",
+      "row": 101
+    },
+    {
+      "code": "E702",
+      "col": 47,
+      "context_hash": "49e58b8e53e4200dde52e0822c08371db497211666ac66daf80d673adac37c2c",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_agent_phase_context.py",
+      "row": 101
+    },
+    {
+      "code": "E702",
+      "col": 27,
+      "context_hash": "fefaf738d6595592863d79690a521eaa01ea49237117f2a057efd4688d09a28d",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_agent_phase_context.py",
+      "row": 108
+    },
+    {
+      "code": "E702",
+      "col": 26,
+      "context_hash": "91ada065b13c9ca87f5c1e911c30583aad487f0645c7996792a2da4533dbc1ab",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_agent_phase_context.py",
+      "row": 120
+    },
+    {
+      "code": "E702",
+      "col": 29,
+      "context_hash": "35aaa8d6beb767603f65d449e149ca169d5233deb5ba55e7becd6aba22919101",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_agent_phase_context.py",
+      "row": 124
+    },
+    {
+      "code": "E702",
+      "col": 45,
+      "context_hash": "35aaa8d6beb767603f65d449e149ca169d5233deb5ba55e7becd6aba22919101",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_agent_phase_context.py",
+      "row": 124
+    },
+    {
+      "code": "E702",
+      "col": 41,
+      "context_hash": "ef1aaaa2a1a6e158bd5fc3cd246c2d03e48c3f26d6a13e591bbdb7ba2616c09b",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_agent_phase_context.py",
+      "row": 142
+    },
+    {
+      "code": "E702",
+      "col": 29,
+      "context_hash": "6433977fe7f8c2a3c86e515e9c3e9975c9a9cae119f9df52c778091c814ad358",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_agent_phase_context.py",
+      "row": 144
+    },
+    {
+      "code": "E702",
+      "col": 42,
+      "context_hash": "6433977fe7f8c2a3c86e515e9c3e9975c9a9cae119f9df52c778091c814ad358",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_agent_phase_context.py",
+      "row": 144
+    },
+    {
+      "code": "E702",
+      "col": 70,
+      "context_hash": "6433977fe7f8c2a3c86e515e9c3e9975c9a9cae119f9df52c778091c814ad358",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_agent_phase_context.py",
+      "row": 144
+    },
+    {
+      "code": "E702",
+      "col": 37,
+      "context_hash": "9704a2175a96f97bd0796d4d7c0f723d90841f97f7b5c667cfd3cd3aa16faae0",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_agent_phase_context.py",
+      "row": 190
+    },
+    {
+      "code": "E702",
+      "col": 27,
+      "context_hash": "88987cb233e64fc6d074c06e4cef5ca9f9553d443550085b0f13b326bf88427b",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_agent_phase_context.py",
+      "row": 191
+    },
+    {
+      "code": "E701",
+      "col": 50,
+      "context_hash": "af5fbb96e8a679fbf7a9a5f80d2ab116f7effb4d35a019fedd6741784c651373",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_agent_phase_context.py",
+      "row": 211
+    },
+    {
+      "code": "E702",
+      "col": 25,
+      "context_hash": "ed0ab125451695722349dec53f0f8887ba75664ad5a7cb0a8ac7adf6c297cea0",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_agent_phase_context.py",
+      "row": 226
+    },
+    {
+      "code": "E702",
+      "col": 38,
+      "context_hash": "ed0ab125451695722349dec53f0f8887ba75664ad5a7cb0a8ac7adf6c297cea0",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_agent_phase_context.py",
+      "row": 226
+    },
+    {
+      "code": "E702",
+      "col": 65,
+      "context_hash": "ed0ab125451695722349dec53f0f8887ba75664ad5a7cb0a8ac7adf6c297cea0",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_agent_phase_context.py",
+      "row": 226
+    },
+    {
+      "code": "E702",
+      "col": 26,
+      "context_hash": "b48ab0a7e5ac045038871422d64fea4af532485392abcb5e674461e3fe0c8092",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_agent_phase_context.py",
+      "row": 227
+    },
+    {
+      "code": "E702",
+      "col": 33,
+      "context_hash": "65dd78b9c6ad48c5605d4856ca375ac4133c1e32660f256a0f195cf7247326d5",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_agent_phase_context.py",
+      "row": 275
+    },
+    {
+      "code": "F401",
+      "col": 8,
+      "context_hash": "de2abade832c8e350a1bdc98cfcdb1e202ac4749c5fc51a4a970d41736b6df5c",
+      "message": "`os` imported but unused",
+      "path": "src/test/dispatcher/test_agent_phase_context_inputs.py",
+      "row": 4
+    },
+    {
+      "code": "F401",
+      "col": 21,
+      "context_hash": "6d69f2ac09017b8a49d050ab336e953b8fa02ae08c24396916ea7ea42418e627",
+      "message": "`pathlib.Path` imported but unused",
+      "path": "src/test/dispatcher/test_agent_phase_context_inputs.py",
+      "row": 5
+    },
+    {
+      "code": "F401",
+      "col": 8,
+      "context_hash": "db7b0741c94798db5932296122312b7b87d6e5a9e2ee29833a9949d1f774f40b",
+      "message": "`pytest` imported but unused",
+      "path": "src/test/dispatcher/test_agent_phase_flash_generation.py",
+      "row": 13
+    },
+    {
+      "code": "F401",
+      "col": 8,
+      "context_hash": "b000f4590d6af9cfe633ffe0faae301a05dde8e4ca7757d7566f899d61f240b8",
+      "message": "`io` imported but unused",
+      "path": "src/test/dispatcher/test_agent_phase_home_show.py",
+      "row": 4
+    },
+    {
+      "code": "F401",
+      "col": 8,
+      "context_hash": "de2abade832c8e350a1bdc98cfcdb1e202ac4749c5fc51a4a970d41736b6df5c",
+      "message": "`os` imported but unused",
+      "path": "src/test/dispatcher/test_agent_phase_home_show.py",
+      "row": 6
+    },
+    {
+      "code": "F401",
+      "col": 8,
+      "context_hash": "f9e42ccd54cc9de18179025fa0bf90642c41392da38ee9faa647e9e85573f63e",
+      "message": "`stat` imported but unused",
+      "path": "src/test/dispatcher/test_agent_phase_home_show.py",
+      "row": 10
+    },
+    {
+      "code": "E402",
+      "col": 1,
+      "context_hash": "9a8194d0253ce1ac588c61f27a787e0f95403f39ca8cd9f7da42877c7780376c",
+      "message": "Module level import not at top of file",
+      "path": "src/test/dispatcher/test_agent_phase_home_show.py",
+      "row": 20
+    },
+    {
+      "code": "E402",
+      "col": 1,
+      "context_hash": "16acacae1a8fc56399f9e31227638c65f4c3750478f132c83aabfa0774ee5e6b",
+      "message": "Module level import not at top of file",
+      "path": "src/test/dispatcher/test_agent_phase_home_show.py",
+      "row": 26
+    },
+    {
+      "code": "E402",
+      "col": 1,
+      "context_hash": "02a951d754d620fea6dfab6bfbf9f8085b2ec66223eb3cee2f47eaeff0dc3a8f",
+      "message": "Module level import not at top of file",
+      "path": "src/test/dispatcher/test_agent_phase_home_show.py",
+      "row": 27
+    },
+    {
+      "code": "F401",
+      "col": 8,
+      "context_hash": "2069b02c6551ab4ca734bd000fb3d1fbb54cab17c8117ff2fb7d9cc26a198b78",
+      "message": "`functools` imported but unused",
+      "path": "src/test/dispatcher/test_agent_phase_instruction_route.py",
+      "row": 9
+    },
+    {
+      "code": "F401",
+      "col": 8,
+      "context_hash": "66ec018201fb03f10df19f1a56a1264beb2654e8f07c2f163f023ebd53a751e4",
+      "message": "`re` imported but unused",
+      "path": "src/test/dispatcher/test_agent_phase_instruction_route.py",
+      "row": 14
+    },
+    {
+      "code": "F401",
+      "col": 8,
+      "context_hash": "7d8752c4c7ea34c2c6d04a15aa31a1f25f62848f8c3c82528fd62439c01a225b",
+      "message": "`subprocess` imported but unused",
+      "path": "src/test/dispatcher/test_agent_phase_instruction_route.py",
+      "row": 17
+    },
+    {
+      "code": "F401",
+      "col": 8,
+      "context_hash": "9e77b3746ea081eb4c557e71cc84ca29dc66a89d18a07e85dba66a336e7310ae",
+      "message": "`sys` imported but unused",
+      "path": "src/test/dispatcher/test_agent_phase_instruction_route.py",
+      "row": 18
+    },
+    {
+      "code": "F811",
+      "col": 57,
+      "context_hash": "184aaabd42ffc0522de591207bb8f8970ee9899b81356c2e931109fc70801084",
+      "message": "Redefinition of unused `pilot` from line 413",
+      "path": "src/test/dispatcher/test_agent_phase_instruction_route.py",
+      "row": 421
+    },
+    {
+      "code": "F811",
+      "col": 75,
+      "context_hash": "dea43355d35c37e2d9e9c75e6669ddfe7c9c281ae1cc18d3ad31468fded053ef",
+      "message": "Redefinition of unused `pilot` from line 413",
+      "path": "src/test/dispatcher/test_agent_phase_instruction_route.py",
+      "row": 453
+    },
+    {
+      "code": "F821",
+      "col": 85,
+      "context_hash": "6c06f080e0586c8191fe7a72c93defae4a1b873d06f72a475b4d727aabacfdef",
+      "message": "Undefined name `Any`",
+      "path": "src/test/dispatcher/test_agent_phase_lifecycle_dispatch.py",
+      "row": 354
+    },
+    {
+      "code": "F811",
+      "col": 18,
+      "context_hash": "2eb10bb4c8597eaa4205d92bbad0a0b6ab7809806df945faaec40049a5d4c8f4",
+      "message": "Redefinition of unused `repository` from line 29",
+      "path": "src/test/dispatcher/test_agent_phase_observations.py",
+      "row": 47
+    },
+    {
+      "code": "F811",
+      "col": 58,
+      "context_hash": "a66ecf3a9b2b9492911d7d3ade182acc7f1b172c012e60ea4454606bcde74cba",
+      "message": "Redefinition of unused `repository` from line 29",
+      "path": "src/test/dispatcher/test_agent_phase_observations.py",
+      "row": 61
+    },
+    {
+      "code": "F811",
+      "col": 5,
+      "context_hash": "724d349a2fb6e719d239ee24266ebfe93164eae61b6e28f72120cf8a6756d9ab",
+      "message": "Redefinition of unused `repository` from line 29",
+      "path": "src/test/dispatcher/test_agent_phase_observations.py",
+      "row": 84
+    },
+    {
+      "code": "F811",
+      "col": 5,
+      "context_hash": "724d349a2fb6e719d239ee24266ebfe93164eae61b6e28f72120cf8a6756d9ab",
+      "message": "Redefinition of unused `repository` from line 29",
+      "path": "src/test/dispatcher/test_agent_phase_observations.py",
+      "row": 101
+    },
+    {
+      "code": "F811",
+      "col": 5,
+      "context_hash": "724d349a2fb6e719d239ee24266ebfe93164eae61b6e28f72120cf8a6756d9ab",
+      "message": "Redefinition of unused `repository` from line 29",
+      "path": "src/test/dispatcher/test_agent_phase_observations.py",
+      "row": 117
+    },
+    {
+      "code": "F811",
+      "col": 19,
+      "context_hash": "b59b2cf073d65e782c97198fd4c60b8758b8a3a7baa90e1724121c408efc3bde",
+      "message": "Redefinition of unused `repository` from line 29",
+      "path": "src/test/dispatcher/test_agent_phase_observations.py",
+      "row": 303
+    },
+    {
+      "code": "F811",
+      "col": 69,
+      "context_hash": "c965253300a89bb6f88848c866167d4006be881262388ed2a12da0487a867059",
+      "message": "Redefinition of unused `repository` from line 29",
+      "path": "src/test/dispatcher/test_agent_phase_observations.py",
+      "row": 322
+    },
+    {
+      "code": "F811",
+      "col": 5,
+      "context_hash": "82b9c6dbae997a9d53c2ff7333ad40defbc41266167e4fc985102d94b8840f7c",
+      "message": "Redefinition of unused `repository` from line 29",
+      "path": "src/test/dispatcher/test_agent_phase_observations.py",
+      "row": 344
+    },
+    {
+      "code": "F811",
+      "col": 5,
+      "context_hash": "82b9c6dbae997a9d53c2ff7333ad40defbc41266167e4fc985102d94b8840f7c",
+      "message": "Redefinition of unused `repository` from line 29",
+      "path": "src/test/dispatcher/test_agent_phase_observations.py",
+      "row": 386
+    },
+    {
+      "code": "F811",
+      "col": 5,
+      "context_hash": "82b9c6dbae997a9d53c2ff7333ad40defbc41266167e4fc985102d94b8840f7c",
+      "message": "Redefinition of unused `repository` from line 29",
+      "path": "src/test/dispatcher/test_agent_phase_observations.py",
+      "row": 418
+    },
+    {
+      "code": "F811",
+      "col": 65,
+      "context_hash": "41e81b60982fbbf65652e0ad7c6e778f2799a79ba94886afc2cd8c63cadea6ff",
+      "message": "Redefinition of unused `repository` from line 29",
+      "path": "src/test/dispatcher/test_agent_phase_observations.py",
+      "row": 454
+    },
+    {
+      "code": "F811",
+      "col": 52,
+      "context_hash": "1d82ddae21bfeb9a2564c669b245e3b181ca29ece765b0fb928374052c2b6d61",
+      "message": "Redefinition of unused `repository` from line 29",
+      "path": "src/test/dispatcher/test_agent_phase_observations.py",
+      "row": 483
+    },
+    {
+      "code": "F811",
+      "col": 50,
+      "context_hash": "7319dfb9f56df25d808b6366cb25827f262aa7fc821354d2d8db72a53a8d347a",
+      "message": "Redefinition of unused `repository` from line 29",
+      "path": "src/test/dispatcher/test_agent_phase_observations.py",
+      "row": 496
+    },
+    {
+      "code": "F811",
+      "col": 53,
+      "context_hash": "5bcb56aefb4510a47aa97b2182cbcc4fceeac285ba49cbf7fcdf1bd740d8431f",
+      "message": "Redefinition of unused `repository` from line 21",
+      "path": "src/test/dispatcher/test_agent_phase_observations_list.py",
+      "row": 528
+    },
+    {
+      "code": "F401",
+      "col": 35,
+      "context_hash": "86d336d7a7a4b366cfec294d5268b5eb66f72b0a6aed1bd9bea07b54fa804dfc",
+      "message": "`agent_phase.result` imported but unused",
+      "path": "src/test/dispatcher/test_agent_phase_retained_repair.py",
+      "row": 9
+    },
+    {
+      "code": "F401",
+      "col": 8,
+      "context_hash": "cc7487a3355899f953a3226e58b5045e147345842f2058c2c71266a27d7aa44e",
+      "message": "`sqlite3` imported but unused",
+      "path": "src/test/dispatcher/test_agent_phase_review_mutation_policy.py",
+      "row": 32
+    },
+    {
+      "code": "F401",
+      "col": 5,
+      "context_hash": "1cd070c609b2f813f52544aaa6b02ce81c2bc6f02a4c29ed0a0c4dda7199eff1",
+      "message": "`agent_phase.config_routing.ReviewMutationPolicy` imported but unused",
+      "path": "src/test/dispatcher/test_agent_phase_review_mutation_policy.py",
+      "row": 35
+    },
+    {
+      "code": "F401",
+      "col": 5,
+      "context_hash": "5cccbbd8df3daa916b2c24c08b7fca5d104e9739bddf1b2e0049024eb1b8cab0",
+      "message": "`agent_phase.config_routing.resolve_review_mutation_policy` imported but unused",
+      "path": "src/test/dispatcher/test_agent_phase_review_mutation_policy.py",
+      "row": 36
+    },
+    {
+      "code": "F401",
+      "col": 49,
+      "context_hash": "bcd071a244513e90830ff292820e4e231bfa96f6e22a47528ff309ea0a519024",
+      "message": "`agent_phase.dispatch.Dispatcher` imported but unused",
+      "path": "src/test/dispatcher/test_agent_phase_review_mutation_policy.py",
+      "row": 38
+    },
+    {
+      "code": "F401",
+      "col": 35,
+      "context_hash": "f7bfa743d6168419dc0d381c5df1baec5dbc79bc1224da9f4aa6802db35c055c",
+      "message": "`agent_phase.lifecycle.LIFECYCLES` imported but unused",
+      "path": "src/test/dispatcher/test_agent_phase_review_mutation_policy.py",
+      "row": 39
+    },
+    {
+      "code": "F841",
+      "col": 5,
+      "context_hash": "5ac88ba063a9f05223680c2cf7a6b27c932fd4a399383b24ec59d6cfd261540d",
+      "message": "Local variable `head_commit` is assigned to but never used",
+      "path": "src/test/dispatcher/test_agent_phase_review_mutation_policy.py",
+      "row": 93
+    },
+    {
+      "code": "F821",
+      "col": 46,
+      "context_hash": "7b5695cb936fce155b17b4a1430ed96e035b8b14754cc2266d04be1ecf7fba2e",
+      "message": "Undefined name `Any`",
+      "path": "src/test/dispatcher/test_agent_phase_review_mutation_policy.py",
+      "row": 447
+    },
+    {
+      "code": "F821",
+      "col": 58,
+      "context_hash": "7b5695cb936fce155b17b4a1430ed96e035b8b14754cc2266d04be1ecf7fba2e",
+      "message": "Undefined name `Any`",
+      "path": "src/test/dispatcher/test_agent_phase_review_mutation_policy.py",
+      "row": 447
+    },
+    {
+      "code": "F401",
+      "col": 5,
+      "context_hash": "5cccbbd8df3daa916b2c24c08b7fca5d104e9739bddf1b2e0049024eb1b8cab0",
+      "message": "`agent_phase.config_routing.resolve_review_mutation_policy` imported but unused",
+      "path": "src/test/dispatcher/test_agent_phase_review_mutation_repair.py",
+      "row": 32
+    },
+    {
+      "code": "F401",
+      "col": 5,
+      "context_hash": "d2143499bc5f5bbcf4be0d1d6eaf219150db892c75f087662340568b89056e37",
+      "message": "`agent_phase.persistence.SCHEMA_VERSION` imported but unused",
+      "path": "src/test/dispatcher/test_agent_phase_review_mutation_repair.py",
+      "row": 36
+    },
+    {
+      "code": "F401",
+      "col": 33,
+      "context_hash": "a2497640c9290f98f5b88331d3375583eabad6105c96403ff0a21b41ed4db138",
+      "message": "`agent_phase.request.PhaseRequestV2` imported but unused",
+      "path": "src/test/dispatcher/test_agent_phase_review_mutation_repair.py",
+      "row": 63
+    },
+    {
+      "code": "F401",
+      "col": 40,
+      "context_hash": "8d6d42e1490a60e1b278db3b18ad557d4befc5805fa1113b8de86746e0da3f58",
+      "message": "`agent_phase.semantic_roles.create_default_binding_policy` imported but unused",
+      "path": "src/test/dispatcher/test_agent_phase_review_mutation_repair.py",
+      "row": 65
+    },
+    {
+      "code": "F401",
+      "col": 38,
+      "context_hash": "fb75ead7735d60d69484074cfc96a84db02deae54d276ef40de71fe45494a0c3",
+      "message": "`agent_phase.capabilities.EndpointCapabilities` imported but unused",
+      "path": "src/test/dispatcher/test_agent_phase_review_mutation_repair.py",
+      "row": 66
+    },
+    {
+      "code": "F401",
+      "col": 37,
+      "context_hash": "a2dbcd2fe22a29ef04b55bd77811b6b7a9fb95dde266ccaa304d7754f200591b",
+      "message": "`agent_phase.persistence.record_actor_bindings` imported but unused",
+      "path": "src/test/dispatcher/test_agent_phase_review_mutation_repair.py",
+      "row": 67
+    },
+    {
+      "code": "F401",
+      "col": 60,
+      "context_hash": "a2dbcd2fe22a29ef04b55bd77811b6b7a9fb95dde266ccaa304d7754f200591b",
+      "message": "`agent_phase.persistence.record_semantic_responsibility` imported but unused",
+      "path": "src/test/dispatcher/test_agent_phase_review_mutation_repair.py",
+      "row": 67
+    },
+    {
+      "code": "F541",
+      "col": 21,
+      "context_hash": "0152a518002e2d3705053a2fe7461ff6271ceb2f2f06ad4ed4c3e4d34fd46a0a",
+      "message": "f-string without any placeholders",
+      "path": "src/test/dispatcher/test_agent_phase_review_mutation_repair.py",
+      "row": 190
+    },
+    {
+      "code": "F811",
+      "col": 42,
+      "context_hash": "fb75ead7735d60d69484074cfc96a84db02deae54d276ef40de71fe45494a0c3",
+      "message": "Redefinition of unused `EndpointCapabilities` from line 66",
+      "path": "src/test/dispatcher/test_agent_phase_review_mutation_repair.py",
+      "row": 1475
+    },
+    {
+      "code": "F811",
+      "col": 9,
+      "context_hash": "b4d5c8d617b51e10b25f13abbdbd14b97c56bef7c6ee388eac5e1f622bb7ea49",
+      "message": "Redefinition of unused `record_actor_bindings` from line 67",
+      "path": "src/test/dispatcher/test_agent_phase_review_mutation_repair.py",
+      "row": 1478
+    },
+    {
+      "code": "F811",
+      "col": 9,
+      "context_hash": "56feee925d49b1fb019b3ddbe1f33006f077959f900ba4b656ac85d657c4c704",
+      "message": "Redefinition of unused `record_semantic_responsibility` from line 67",
+      "path": "src/test/dispatcher/test_agent_phase_review_mutation_repair.py",
+      "row": 1480
+    },
+    {
+      "code": "F821",
+      "col": 46,
+      "context_hash": "732f5a4fc36432a7cec976cc843cae5ef178873662b4f5ebb597981ed5e93b30",
+      "message": "Undefined name `Any`",
+      "path": "src/test/dispatcher/test_agent_phase_review_mutation_repair.py",
+      "row": 1545
+    },
+    {
+      "code": "F821",
+      "col": 58,
+      "context_hash": "732f5a4fc36432a7cec976cc843cae5ef178873662b4f5ebb597981ed5e93b30",
+      "message": "Undefined name `Any`",
+      "path": "src/test/dispatcher/test_agent_phase_review_mutation_repair.py",
+      "row": 1545
+    },
+    {
+      "code": "F821",
+      "col": 114,
+      "context_hash": "732f5a4fc36432a7cec976cc843cae5ef178873662b4f5ebb597981ed5e93b30",
+      "message": "Undefined name `Any`",
+      "path": "src/test/dispatcher/test_agent_phase_review_mutation_repair.py",
+      "row": 1545
+    },
+    {
+      "code": "F821",
+      "col": 122,
+      "context_hash": "732f5a4fc36432a7cec976cc843cae5ef178873662b4f5ebb597981ed5e93b30",
+      "message": "Undefined name `Any`",
+      "path": "src/test/dispatcher/test_agent_phase_review_mutation_repair.py",
+      "row": 1545
+    },
+    {
+      "code": "F841",
+      "col": 5,
+      "context_hash": "62b15e9991519c50347345ef5aae53af9d0b4a59bc02ec061a00fa8ef231ba3d",
+      "message": "Local variable `obs2` is assigned to but never used",
+      "path": "src/test/dispatcher/test_agent_phase_review_mutation_repair.py",
+      "row": 1842
+    },
+    {
+      "code": "F821",
+      "col": 46,
+      "context_hash": "5b61d4caa064dc9500d5584c893762bed8817ef1cb71cbe4f6255686b32b59e1",
+      "message": "Undefined name `Any`",
+      "path": "src/test/dispatcher/test_agent_phase_review_mutation_repair.py",
+      "row": 1899
+    },
+    {
+      "code": "F821",
+      "col": 58,
+      "context_hash": "5b61d4caa064dc9500d5584c893762bed8817ef1cb71cbe4f6255686b32b59e1",
+      "message": "Undefined name `Any`",
+      "path": "src/test/dispatcher/test_agent_phase_review_mutation_repair.py",
+      "row": 1899
+    },
+    {
+      "code": "F821",
+      "col": 50,
+      "context_hash": "f23fd62e2dcd70e39de2d922b81f7f98c4e7ef1fe0cef3d185ff8aa27b5a1821",
+      "message": "Undefined name `Any`",
+      "path": "src/test/dispatcher/test_agent_phase_review_mutation_repair.py",
+      "row": 1940
+    },
+    {
+      "code": "F821",
+      "col": 62,
+      "context_hash": "f23fd62e2dcd70e39de2d922b81f7f98c4e7ef1fe0cef3d185ff8aa27b5a1821",
+      "message": "Undefined name `Any`",
+      "path": "src/test/dispatcher/test_agent_phase_review_mutation_repair.py",
+      "row": 1940
+    },
+    {
+      "code": "F401",
+      "col": 32,
+      "context_hash": "7e13e689a9be6f84c733332d978203fb6f88064778b0c9a65e614cf0d23a7b26",
+      "message": "`agent_phase.roster.ENDPOINTS_SOURCE` imported but unused",
+      "path": "src/test/dispatcher/test_agent_phase_routing.py",
+      "row": 11
+    },
+    {
+      "code": "F401",
+      "col": 50,
+      "context_hash": "7e13e689a9be6f84c733332d978203fb6f88064778b0c9a65e614cf0d23a7b26",
+      "message": "`agent_phase.roster.ROUTES_SOURCE` imported but unused",
+      "path": "src/test/dispatcher/test_agent_phase_routing.py",
+      "row": 11
+    },
+    {
+      "code": "E402",
+      "col": 1,
+      "context_hash": "09b4584030db94937155a49d4d3ffa3b9d21ecb0ea1a77730a921aa9b99d7e67",
+      "message": "Module level import not at top of file",
+      "path": "src/test/dispatcher/test_agent_phase_rtk.py",
+      "row": 18
+    },
+    {
+      "code": "E402",
+      "col": 1,
+      "context_hash": "8f8af107c56a62b4ea95780a51c18fd07f61dd251eab34895241a485342dfa33",
+      "message": "Module level import not at top of file",
+      "path": "src/test/dispatcher/test_agent_phase_rtk.py",
+      "row": 23
+    },
+    {
+      "code": "E402",
+      "col": 1,
+      "context_hash": "02a951d754d620fea6dfab6bfbf9f8085b2ec66223eb3cee2f47eaeff0dc3a8f",
+      "message": "Module level import not at top of file",
+      "path": "src/test/dispatcher/test_agent_phase_rtk.py",
+      "row": 31
+    },
+    {
+      "code": "E402",
+      "col": 1,
+      "context_hash": "18cee3a033fe385a025341c6a3e92767dfb94a30556b79066b9120dd0f6df67e",
+      "message": "Module level import not at top of file",
+      "path": "src/test/dispatcher/test_agent_phase_rtk.py",
+      "row": 34
+    },
+    {
+      "code": "E402",
+      "col": 1,
+      "context_hash": "41d27999c56c25004bd52e87dabe95411271a049f1259e8ffd2f46dd645cfb2e",
+      "message": "Module level import not at top of file",
+      "path": "src/test/dispatcher/test_agent_phase_rtk.py",
+      "row": 35
+    },
+    {
+      "code": "E741",
+      "col": 24,
+      "context_hash": "93bb8dd6800b22450813940a0e48394db26655058990200380156325caca8ce2",
+      "message": "Ambiguous variable name: `l`",
+      "path": "src/test/dispatcher/test_agent_phase_rtk.py",
+      "row": 310
+    },
+    {
+      "code": "E741",
+      "col": 54,
+      "context_hash": "8e326fcfc9ba1213ebc7b259051b53b96b95da552645454e5eacb043ab160111",
+      "message": "Ambiguous variable name: `l`",
+      "path": "src/test/dispatcher/test_agent_phase_rtk.py",
+      "row": 320
+    },
+    {
+      "code": "F401",
+      "col": 68,
+      "context_hash": "cc07a66bf7a8424288a9f9b9e15f2f659c16da4dfcc08482a69175947483d6f7",
+      "message": "`controller_generation_store.is_allowlisted` imported but unused",
+      "path": "src/test/dispatcher/test_agent_phase_rtk.py",
+      "row": 920
+    },
+    {
+      "code": "F401",
+      "col": 37,
+      "context_hash": "154d000dd7f63914e29ba6418969268b7c8a8070cb5f668e35d8125f7693cba4",
+      "message": "`agent_phase.routing.Endpoint` imported but unused",
+      "path": "src/test/dispatcher/test_agent_phase_rtk.py",
+      "row": 1565
+    },
+    {
+      "code": "F401",
+      "col": 38,
+      "context_hash": "614c847304abb9be021c23f38af2c1bf10f9c61549ddde2aaa0228cb28565d2a",
+      "message": "`agent_phase.envelope.render` imported but unused",
+      "path": "src/test/dispatcher/test_agent_phase_rtk.py",
+      "row": 1566
+    },
+    {
+      "code": "F401",
+      "col": 46,
+      "context_hash": "614c847304abb9be021c23f38af2c1bf10f9c61549ddde2aaa0228cb28565d2a",
+      "message": "`agent_phase.envelope.Segment` imported but unused",
+      "path": "src/test/dispatcher/test_agent_phase_rtk.py",
+      "row": 1566
+    },
+    {
+      "code": "F401",
+      "col": 55,
+      "context_hash": "614c847304abb9be021c23f38af2c1bf10f9c61549ddde2aaa0228cb28565d2a",
+      "message": "`agent_phase.envelope.SEGMENT_TASK_PROMPT` imported but unused",
+      "path": "src/test/dispatcher/test_agent_phase_rtk.py",
+      "row": 1566
+    },
+    {
+      "code": "F401",
+      "col": 33,
+      "context_hash": "0a18cc6a8a65aee190278e4c41b178dd09be06505b35e2b4da5ad99cdb025db3",
+      "message": "`agent_phase.run.RunDirectory` imported but unused",
+      "path": "src/test/dispatcher/test_agent_phase_rtk.py",
+      "row": 1567
+    },
+    {
+      "code": "F401",
+      "col": 41,
+      "context_hash": "86f87f2f9bc6e77e00185d7ffa7fcb70cb303e3184e2e4781028824c9ff9a6ae",
+      "message": "`agent_phase.provider` imported but unused",
+      "path": "src/test/dispatcher/test_agent_phase_rtk.py",
+      "row": 1568
+    },
+    {
+      "code": "F401",
+      "col": 12,
+      "context_hash": "4f9b8491ba4deee622e6c29ca383c71279fa604b7aff389b0bf5ba279f4453c3",
+      "message": "`time` imported but unused",
+      "path": "src/test/dispatcher/test_agent_phase_rtk.py",
+      "row": 1569
+    },
+    {
+      "code": "F401",
+      "col": 21,
+      "context_hash": "6d69f2ac09017b8a49d050ab336e953b8fa02ae08c24396916ea7ea42418e627",
+      "message": "`pathlib.Path` imported but unused",
+      "path": "src/test/dispatcher/test_agent_phase_rtk_callpaths.py",
+      "row": 6
+    },
+    {
+      "code": "F401",
+      "col": 46,
+      "context_hash": "bc9557402c06264d5575ea33e7faf865d58642c15f1acff82e0fbf27d7078515",
+      "message": "`test_agent_phase_rtk.write_fake_evidence` imported but unused",
+      "path": "src/test/dispatcher/test_agent_phase_rtk_callpaths.py",
+      "row": 12
+    },
+    {
+      "code": "F401",
+      "col": 21,
+      "context_hash": "6d69f2ac09017b8a49d050ab336e953b8fa02ae08c24396916ea7ea42418e627",
+      "message": "`pathlib.Path` imported but unused",
+      "path": "src/test/dispatcher/test_agent_phase_schema_manifest.py",
+      "row": 6
+    },
+    {
+      "code": "F401",
+      "col": 8,
+      "context_hash": "cc7487a3355899f953a3226e58b5045e147345842f2058c2c71266a27d7aa44e",
+      "message": "`sqlite3` imported but unused",
+      "path": "src/test/dispatcher/test_agent_phase_schema_manifest.py",
+      "row": 7
+    },
+    {
+      "code": "F401",
+      "col": 8,
+      "context_hash": "db7b0741c94798db5932296122312b7b87d6e5a9e2ee29833a9949d1f774f40b",
+      "message": "`pytest` imported but unused",
+      "path": "src/test/dispatcher/test_agent_phase_schema_manifest.py",
+      "row": 9
+    },
+    {
+      "code": "F401",
+      "col": 53,
+      "context_hash": "617d22a88ea4f695390f2a66a062964f7a895e4fbf4195407b5cf4bc9644a3e8",
+      "message": "`agent_phase.persistence.migrate_schema` imported but unused",
+      "path": "src/test/dispatcher/test_agent_phase_schema_manifest.py",
+      "row": 11
+    },
+    {
+      "code": "F401",
+      "col": 42,
+      "context_hash": "764e45511dc963ba1ee17cfdf0c0577bab251e27a925524d54c3032890f610eb",
+      "message": "`test_agent_phase_acquisition.binary` imported but unused",
+      "path": "src/test/dispatcher/test_apg166_records.py",
+      "row": 9
+    },
+    {
+      "code": "F811",
+      "col": 55,
+      "context_hash": "aa05bf79428f6d6a5826281e8d16c8dfa831f84acb976a5647a04812b748f9d7",
+      "message": "Redefinition of unused `binary` from line 9",
+      "path": "src/test/dispatcher/test_apg166_records.py",
+      "row": 22
+    },
+    {
+      "code": "E702",
+      "col": 46,
+      "context_hash": "5f75fa5df3bf9f0124efb4481602027723994ec0ccf17e62ec1f7e468de2131b",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_apg166_records.py",
+      "row": 67
+    },
+    {
+      "code": "F401",
+      "col": 42,
+      "context_hash": "a95ac8e20b21c1154f0d6865352e3f2843c9fbf879be50279bc7c7838c8e494a",
+      "message": "`agent_phase.roster.load_roster` imported but unused",
+      "path": "src/test/dispatcher/test_apg166s_launch_authority.py",
+      "row": 12
+    },
+    {
+      "code": "F401",
+      "col": 8,
+      "context_hash": "ff3e4d4dcf7250cae8d622d77c9a6d69aefcf4ab04ef9920218fafe93c0f1991",
+      "message": "`json` imported but unused",
+      "path": "src/test/dispatcher/test_apg166s_r1_authority.py",
+      "row": 2
+    },
+    {
+      "code": "F401",
+      "col": 8,
+      "context_hash": "de2abade832c8e350a1bdc98cfcdb1e202ac4749c5fc51a4a970d41736b6df5c",
+      "message": "`os` imported but unused",
+      "path": "src/test/dispatcher/test_apg166s_r1_authority.py",
+      "row": 3
+    },
+    {
+      "code": "F401",
+      "col": 8,
+      "context_hash": "d0cc22ec251cd0d6e2696946318046053ead75dd787f48eb0d0ea4b9d8b147dc",
+      "message": "`tomllib` imported but unused",
+      "path": "src/test/dispatcher/test_apg166s_r1_authority.py",
+      "row": 6
+    },
+    {
+      "code": "F401",
+      "col": 5,
+      "context_hash": "7d6d6bcc92815ae3a27bad7f6d81f2beaa4a5ab3abfd72192b6983856df84cec",
+      "message": "`apgr_workers.codex_external.CodexExternalError` imported but unused",
+      "path": "src/test/dispatcher/test_apg166s_r1_authority.py",
+      "row": 28
+    },
+    {
+      "code": "F401",
+      "col": 5,
+      "context_hash": "56e3c194781ece6b2b7a0dc26c78624af7005a1a1cc21ac8577a7e82c112479d",
+      "message": "`apgr_workers.codex_external.LunaProfile` imported but unused",
+      "path": "src/test/dispatcher/test_apg166s_r1_authority.py",
+      "row": 29
+    },
+    {
+      "code": "F401",
+      "col": 5,
+      "context_hash": "a4698ee5d30e03ebd0d5eb576a43c088b79b0fb15c0a8530ffd03c2af69722bb",
+      "message": "`apgr_workers.native_launch.NativeLaunchBinding` imported but unused",
+      "path": "src/test/dispatcher/test_apg166s_r1_authority.py",
+      "row": 34
+    },
+    {
+      "code": "F401",
+      "col": 8,
+      "context_hash": "de2abade832c8e350a1bdc98cfcdb1e202ac4749c5fc51a4a970d41736b6df5c",
+      "message": "`os` imported but unused",
+      "path": "src/test/dispatcher/test_apg166s_r1_canary.py",
+      "row": 5
+    },
+    {
+      "code": "F401",
+      "col": 27,
+      "context_hash": "8b2cd358872c5cf6d2ec686f37e5bd9b6c1d8a7e541d0226bd1872716ce32a1b",
+      "message": "`unittest.mock.MagicMock` imported but unused",
+      "path": "src/test/dispatcher/test_apg166s_r1_canary.py",
+      "row": 8
+    },
+    {
+      "code": "F401",
+      "col": 5,
+      "context_hash": "ce0140344f1b2f261ab83e2a53720d74528cf06e588de5a35ff34d68d766c591",
+      "message": "`agent_phase.runtime_identity.runtime_manifest` imported but unused",
+      "path": "src/test/dispatcher/test_apg166s_r1_canary.py",
+      "row": 22
+    },
+    {
+      "code": "F401",
+      "col": 5,
+      "context_hash": "9ce0d1a84613eb6ee870ebc4e4761224f880ac0e06781bf5df5ddf7c90b74ebe",
+      "message": "`agent_phase.worker_canary.CASES` imported but unused",
+      "path": "src/test/dispatcher/test_apg166s_r1_canary.py",
+      "row": 30
+    },
+    {
+      "code": "F401",
+      "col": 8,
+      "context_hash": "db7b0741c94798db5932296122312b7b87d6e5a9e2ee29833a9949d1f774f40b",
+      "message": "`pytest` imported but unused",
+      "path": "src/test/dispatcher/test_apg166s_r1_observation.py",
+      "row": 5
+    },
+    {
+      "code": "F841",
+      "col": 5,
+      "context_hash": "a3b74157ad90eaff1c48ed5605fc12afae24b5c313d4c6fc7b71c4456720a451",
+      "message": "Local variable `evidence_prefix` is assigned to but never used",
+      "path": "src/test/dispatcher/test_apg166s_r1_observation.py",
+      "row": 365
+    },
+    {
+      "code": "E402",
+      "col": 1,
+      "context_hash": "76cd5f19a944d677ef4102e2c6c8bc1c5bcf349f8764bc52f830d7fe8b768c2b",
+      "message": "Module level import not at top of file",
+      "path": "src/test/dispatcher/test_apg166s_r2_carry_forward.py",
+      "row": 27
+    },
+    {
+      "code": "E402",
+      "col": 1,
+      "context_hash": "bc6089b7426448b3357a14ce6b4790fa25fe55f75153ab6ef4b5c65a0b0366a6",
+      "message": "Module level import not at top of file",
+      "path": "src/test/dispatcher/test_apg166s_r2_carry_forward.py",
+      "row": 33
+    },
+    {
+      "code": "F401",
+      "col": 8,
+      "context_hash": "7d8752c4c7ea34c2c6d04a15aa31a1f25f62848f8c3c82528fd62439c01a225b",
+      "message": "`subprocess` imported but unused",
+      "path": "src/test/dispatcher/test_apg166s_r2_home_route.py",
+      "row": 11
+    },
+    {
+      "code": "E402",
+      "col": 1,
+      "context_hash": "8625a17f2d01f78ff5265129be17898aa156d7a83b2cdb151114214f649b5e5a",
+      "message": "Module level import not at top of file",
+      "path": "src/test/dispatcher/test_apg166s_r2_home_route.py",
+      "row": 22
+    },
+    {
+      "code": "E402",
+      "col": 1,
+      "context_hash": "bcd071a244513e90830ff292820e4e231bfa96f6e22a47528ff309ea0a519024",
+      "message": "Module level import not at top of file",
+      "path": "src/test/dispatcher/test_apg166s_r2_home_route.py",
+      "row": 23
+    },
+    {
+      "code": "E402",
+      "col": 1,
+      "context_hash": "e459fcc329ef5875ec4eeee1ca8c42137faa9a6ac3d9d92d32893113d3771fc8",
+      "message": "Module level import not at top of file",
+      "path": "src/test/dispatcher/test_apg166s_r2_home_route.py",
+      "row": 24
+    },
+    {
+      "code": "E402",
+      "col": 1,
+      "context_hash": "d56b2d6d7b842e60f4bd4c74a88222fe42f12ca548d0bf33ecb68efcfe2f081b",
+      "message": "Module level import not at top of file",
+      "path": "src/test/dispatcher/test_apg166s_r2_home_route.py",
+      "row": 25
+    },
+    {
+      "code": "E402",
+      "col": 1,
+      "context_hash": "76feed15a8ab9fa96fd2f8cd000e9823f9ed3416cade37172d1b05cb2a5f1d15",
+      "message": "Module level import not at top of file",
+      "path": "src/test/dispatcher/test_apg166s_r2_home_route.py",
+      "row": 26
+    },
+    {
+      "code": "E402",
+      "col": 1,
+      "context_hash": "ca896429e665ec8c70e282d24146af5f635e72c100e09d1c174cf04260b44e00",
+      "message": "Module level import not at top of file",
+      "path": "src/test/dispatcher/test_apg166s_r2_home_route.py",
+      "row": 27
+    },
+    {
+      "code": "E402",
+      "col": 1,
+      "context_hash": "608b50a7b73db3cfb77e45026521b9c67b2d8890666de9fbb37b94c494e1d940",
+      "message": "Module level import not at top of file",
+      "path": "src/test/dispatcher/test_apg166s_r2_home_route.py",
+      "row": 28
+    },
+    {
+      "code": "E402",
+      "col": 1,
+      "context_hash": "311cd4d6ca1662962956d7d0d801667ea885625ace8fd32bb18a677bbcda5aaf",
+      "message": "Module level import not at top of file",
+      "path": "src/test/dispatcher/test_apg166s_r2_home_route.py",
+      "row": 29
+    },
+    {
+      "code": "F841",
+      "col": 5,
+      "context_hash": "a35536f63494fdf57efcd7a5e33772960bcca5a93acb3105ab01ec01c05529e3",
+      "message": "Local variable `endpoints_path` is assigned to but never used",
+      "path": "src/test/dispatcher/test_apg166s_r2_home_route.py",
+      "row": 469
+    },
+    {
+      "code": "E702",
+      "col": 25,
+      "context_hash": "af63d5e11dd639a7e83e95a687db8fdafdea9d8bdb058c1f6f1dae139adf4f9b",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_claude_only_mode.py",
+      "row": 13
+    },
+    {
+      "code": "E702",
+      "col": 35,
+      "context_hash": "3a2d56cdbfee7b52d1be59b9973865e035096229c04d2406ea8cdf5a17fb87e8",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_claude_only_mode.py",
+      "row": 31
+    },
+    {
+      "code": "E702",
+      "col": 57,
+      "context_hash": "3a2d56cdbfee7b52d1be59b9973865e035096229c04d2406ea8cdf5a17fb87e8",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_claude_only_mode.py",
+      "row": 31
+    },
+    {
+      "code": "F401",
+      "col": 8,
+      "context_hash": "f9e42ccd54cc9de18179025fa0bf90642c41392da38ee9faa647e9e85573f63e",
+      "message": "`stat` imported but unused",
+      "path": "src/test/dispatcher/test_controller_generation_installed.py",
+      "row": 8
+    },
+    {
+      "code": "F401",
+      "col": 45,
+      "context_hash": "d80530036bb1b5bbc63e4d48b2e4cd23cd2bc422ab53cd886979456267371bae",
+      "message": "`controller_generation_store.coordinate` imported but unused",
+      "path": "src/test/dispatcher/test_controller_generation_store.py",
+      "row": 697
+    },
+    {
+      "code": "F401",
+      "col": 46,
+      "context_hash": "fb67043cf76f07bb4dd1c29b78b5321146b005c525361448f9193c9862a70660",
+      "message": "`agent_phase.claude_read_observer.capture_recovery` imported but unused",
+      "path": "src/test/dispatcher/test_h_acquisition_boundaries.py",
+      "row": 12
+    },
+    {
+      "code": "F401",
+      "col": 33,
+      "context_hash": "b8f8e7a24fa0b61109b5116dbfa3392d847bf1b88fde0cde85299a47e2024df9",
+      "message": "`test_h_claude_reads.case` imported but unused",
+      "path": "src/test/dispatcher/test_h_acquisition_boundaries.py",
+      "row": 13
+    },
+    {
+      "code": "F401",
+      "col": 36,
+      "context_hash": "942a66df21184cfc0ffbede2ca44f3e634042d37c34285066041970477f6b72d",
+      "message": "`test_h_wrapper_handoff.binary` imported but unused",
+      "path": "src/test/dispatcher/test_h_acquisition_boundaries.py",
+      "row": 14
+    },
+    {
+      "code": "F811",
+      "col": 65,
+      "context_hash": "eb86289f34bcbd1784f95e62457afc68c72d8fe5dcda27e9f3ee90c2f81e26b9",
+      "message": "Redefinition of unused `binary` from line 14",
+      "path": "src/test/dispatcher/test_h_acquisition_boundaries.py",
+      "row": 18
+    },
+    {
+      "code": "F811",
+      "col": 48,
+      "context_hash": "dbec9b7934246bad063cfad4c72ee0a0ec1f61f2c0e42034dcfffa84fa0337bc",
+      "message": "Redefinition of unused `case` from line 13",
+      "path": "src/test/dispatcher/test_h_acquisition_boundaries.py",
+      "row": 57
+    },
+    {
+      "code": "F811",
+      "col": 54,
+      "context_hash": "dae85947d0625fbe09733026bee1e15e66708986800b4a55cc94aef1643312ed",
+      "message": "Redefinition of unused `binary` from line 14",
+      "path": "src/test/dispatcher/test_h_acquisition_boundaries.py",
+      "row": 70
+    },
+    {
+      "code": "E702",
+      "col": 30,
+      "context_hash": "7c5e8c9f87fedc245ffd66905b3522afc1e13504bf74c756c4ab31610e67d821",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_h_acquisition_boundaries.py",
+      "row": 74
+    },
+    {
+      "code": "F811",
+      "col": 48,
+      "context_hash": "8f0a1244990ba27765c52478f5628f8952842252779fd8edc2d4760ac28644e1",
+      "message": "Redefinition of unused `binary` from line 14",
+      "path": "src/test/dispatcher/test_h_acquisition_boundaries.py",
+      "row": 89
+    },
+    {
+      "code": "E701",
+      "col": 27,
+      "context_hash": "9dbf2a9db51bd7d171e7fb2a7a5f812f4a6f08f68673b5cc19b2c2d8ec5ccd6e",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_acquisition_boundaries.py",
+      "row": 98
+    },
+    {
+      "code": "E701",
+      "col": 28,
+      "context_hash": "588a244cb07ca3991111982245bb918d4bdc69762e04068aea29e3686b00d36e",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_acquisition_boundaries.py",
+      "row": 99
+    },
+    {
+      "code": "E701",
+      "col": 30,
+      "context_hash": "58d84ebff6b50a86edad81317970b4c098cb3197b70950817aa836c3631907de",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_acquisition_boundaries.py",
+      "row": 101
+    },
+    {
+      "code": "E701",
+      "col": 13,
+      "context_hash": "18ed9392ee7f70f763ce58839f27c992859f64173ae026affe2e02e703323ef5",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_acquisition_boundaries.py",
+      "row": 102
+    },
+    {
+      "code": "F811",
+      "col": 40,
+      "context_hash": "eb64d2c19b7918947fb3ca37933724f59fb9f899da305740e3b176651a6ea37b",
+      "message": "Redefinition of unused `binary` from line 14",
+      "path": "src/test/dispatcher/test_h_acquisition_boundaries.py",
+      "row": 117
+    },
+    {
+      "code": "E702",
+      "col": 30,
+      "context_hash": "857aa461c86420ae79182e0e9f236471886a8281131af7746f980d8197f05cc2",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_h_acquisition_boundaries.py",
+      "row": 119
+    },
+    {
+      "code": "E702",
+      "col": 76,
+      "context_hash": "857aa461c86420ae79182e0e9f236471886a8281131af7746f980d8197f05cc2",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_h_acquisition_boundaries.py",
+      "row": 119
+    },
+    {
+      "code": "E701",
+      "col": 25,
+      "context_hash": "e34e93cab6fa59e121b06c8ffd05b0163201243f4539e2bf2c311f6e226b1898",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_acquisition_boundaries.py",
+      "row": 124
+    },
+    {
+      "code": "E702",
+      "col": 45,
+      "context_hash": "6e9453bdeb098c2125e815db985ab282f78eeb7e6396c38a9af6e7c89d895538",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_h_acquisition_boundaries.py",
+      "row": 127
+    },
+    {
+      "code": "E702",
+      "col": 60,
+      "context_hash": "0b38a7a12f7bb48f2bb2115af3159f706cc56393dfecabe58be24948e9c84207",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_h_acquisition_boundaries.py",
+      "row": 137
+    },
+    {
+      "code": "E702",
+      "col": 88,
+      "context_hash": "0b38a7a12f7bb48f2bb2115af3159f706cc56393dfecabe58be24948e9c84207",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_h_acquisition_boundaries.py",
+      "row": 137
+    },
+    {
+      "code": "E701",
+      "col": 13,
+      "context_hash": "cee70ed94bcdaddd136d55d593434d1ea9c3f8c965f87f62000a5cca203b39be",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_acquisition_boundaries.py",
+      "row": 138
+    },
+    {
+      "code": "F811",
+      "col": 79,
+      "context_hash": "312b40bba3b8a41a989e59f703455ee7a4b1b8e357b917f94023130b0a4c15dd",
+      "message": "Redefinition of unused `binary` from line 14",
+      "path": "src/test/dispatcher/test_h_acquisition_boundaries.py",
+      "row": 146
+    },
+    {
+      "code": "E702",
+      "col": 31,
+      "context_hash": "2d81a2e5b9c6d02f6412e4bedd4c1276457cbdb2832bccf2c2f60077eced885c",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_h_acquisition_boundaries.py",
+      "row": 148
+    },
+    {
+      "code": "E701",
+      "col": 40,
+      "context_hash": "8a0fe87ed2052b381e142f3477fb511cb3a099d30a3b92efb7d5e9b6070b028f",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_acquisition_boundaries.py",
+      "row": 159
+    },
+    {
+      "code": "E702",
+      "col": 33,
+      "context_hash": "64f1b94b6ae87c85973e87ae21cf475bfb684a7ddac6efd34201c6bca7a91700",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_h_acquisition_boundaries.py",
+      "row": 160
+    },
+    {
+      "code": "F401",
+      "col": 51,
+      "context_hash": "581c43bf638546f2a6a5ab325e0c8e5b6d8b6e3ec75507d092d657b5ea3fb20b",
+      "message": "`testing.h_eval.execution_evidence.derive_exact_recovery` imported but unused",
+      "path": "src/test/dispatcher/test_h_arm_evidence_qual6.py",
+      "row": 405
+    },
+    {
+      "code": "F401",
+      "col": 12,
+      "context_hash": "de2abade832c8e350a1bdc98cfcdb1e202ac4749c5fc51a4a970d41736b6df5c",
+      "message": "`os` imported but unused",
+      "path": "src/test/dispatcher/test_h_authority.py",
+      "row": 68
+    },
+    {
+      "code": "F401",
+      "col": 12,
+      "context_hash": "10f4eea8db43494c2dac862c74fe855e285da947f5228dffb3480b571b7574ef",
+      "message": "`signal` imported but unused",
+      "path": "src/test/dispatcher/test_h_authority.py",
+      "row": 69
+    },
+    {
+      "code": "F401",
+      "col": 12,
+      "context_hash": "4f9b8491ba4deee622e6c29ca383c71279fa604b7aff389b0bf5ba279f4453c3",
+      "message": "`time` imported but unused",
+      "path": "src/test/dispatcher/test_h_authority.py",
+      "row": 72
+    },
+    {
+      "code": "F401",
+      "col": 8,
+      "context_hash": "ada1d9e0a360cda0fd1c8757d297aa74a4fc8d7193a69d3c28b43afc6950e9f9",
+      "message": "`hashlib` imported but unused",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 3
+    },
+    {
+      "code": "E701",
+      "col": 28,
+      "context_hash": "b0f154cb171eca91562d4440699d44be253b83904d85da3bcd2455c69773d537",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 94
+    },
+    {
+      "code": "E701",
+      "col": 31,
+      "context_hash": "a5e981d41eadea58daf4996f1a9af321d447c57321f841982388ca1817a25977",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 95
+    },
+    {
+      "code": "E701",
+      "col": 37,
+      "context_hash": "348b67e62b203173e6352702da6b3de3c863ccabdc0e7bb9a7119d15d39b9cce",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 96
+    },
+    {
+      "code": "E701",
+      "col": 40,
+      "context_hash": "c8f23601dff1f8f5e79de90932b00a23099818115d87a37f1a0423dd35d8a5bc",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 97
+    },
+    {
+      "code": "E701",
+      "col": 29,
+      "context_hash": "c5f43df93189fa4247c9f725ce13b403442ef89d5a6637ed1e800875540b3360",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 98
+    },
+    {
+      "code": "E701",
+      "col": 31,
+      "context_hash": "cd9231219aa36b07b67f17fda72ff89ab8dfa99480c844c3350da36df1fc578c",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 99
+    },
+    {
+      "code": "E701",
+      "col": 38,
+      "context_hash": "90a6e3d8f7432311fd2fa03fda2e736825497e671b47aed24977ef0df8b71803",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 100
+    },
+    {
+      "code": "E701",
+      "col": 39,
+      "context_hash": "356b784e10693a78a7f12ac3fe7cab23dcbaef2965df8a0659a4af33fa368d61",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 101
+    },
+    {
+      "code": "E701",
+      "col": 50,
+      "context_hash": "8d56ca28311b45b48522919bbd414425464c12afceb38df298225368340fd981",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 102
+    },
+    {
+      "code": "E701",
+      "col": 27,
+      "context_hash": "6ce394de0311864c2816ce1ada13227a1d1c35970018777c2772f9b015137df7",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 103
+    },
+    {
+      "code": "E701",
+      "col": 29,
+      "context_hash": "6f3a186d39a9e1af0589dfb0768223808df56d064dabdc99f9ce87567c2b5044",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 104
+    },
+    {
+      "code": "E701",
+      "col": 29,
+      "context_hash": "4e0493358184517d896f9e92fae3b18f8d79e9fbc74bc913d3539236fe79bd00",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 105
+    },
+    {
+      "code": "E701",
+      "col": 33,
+      "context_hash": "e247f60864cd5961085c16775a2b70db4df7dd6129694ccda2ad01995a53be2f",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 106
+    },
+    {
+      "code": "E701",
+      "col": 40,
+      "context_hash": "fd91982fb1febfa4487d656eb8d3ee111ae918119baa142c40687598edbdadb7",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 107
+    },
+    {
+      "code": "E701",
+      "col": 31,
+      "context_hash": "cab4a5d168a3a495f90a4296eba843c5cf33e58829648d5d22ee0effd90517dc",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 108
+    },
+    {
+      "code": "E701",
+      "col": 39,
+      "context_hash": "8bbf27c820811a2c4e54be090c2cff08d539e8760dd62107a8f3a9feb400d649",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 109
+    },
+    {
+      "code": "E701",
+      "col": 40,
+      "context_hash": "7b5dd70e597ee8b408afb800df0ae5a9ac4a8d94cb916c7a060106a0cfa782c6",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 110
+    },
+    {
+      "code": "E701",
+      "col": 38,
+      "context_hash": "51d93b2b4898ce06ef9274b39f6581da8336bf6e254eec5b58e80dfe29f57f4b",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 111
+    },
+    {
+      "code": "E701",
+      "col": 39,
+      "context_hash": "b33f5f8773215fb2d07e3d1e571ea5c4ed596a8744dcbc4397f2fddf5272ff2a",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 112
+    },
+    {
+      "code": "E701",
+      "col": 35,
+      "context_hash": "632c3d7887358fdfe3dfc6970b2057ecc2a5c0e49d1df9c64e973809478bd290",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 113
+    },
+    {
+      "code": "E701",
+      "col": 35,
+      "context_hash": "7ea53e18d7ebebc1d9d47c2ac7db32ee5263a1bd2e395fbc8a878b70e30ce032",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 114
+    },
+    {
+      "code": "E701",
+      "col": 51,
+      "context_hash": "cc6986ce89bf830f0fbcac55be25b187551b224bc5c9b26f6ec7bc0bc82e24e1",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 120
+    },
+    {
+      "code": "E701",
+      "col": 54,
+      "context_hash": "611c64af7c134b68cfa39e31bfed5b51015c2ba92f6e1756661811ef17befa17",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 126
+    },
+    {
+      "code": "E701",
+      "col": 54,
+      "context_hash": "14331579d3b8c4853e1987e9b7d7b1ed02eacb9fb21b8fbbb3705c222d67f0dd",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 130
+    },
+    {
+      "code": "E701",
+      "col": 54,
+      "context_hash": "14331579d3b8c4853e1987e9b7d7b1ed02eacb9fb21b8fbbb3705c222d67f0dd",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 132
+    },
+    {
+      "code": "E701",
+      "col": 49,
+      "context_hash": "06c28c07adcbefe8c89f40435c8d5c06161b0fdb010a1fca32d55522c4a4edad",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 140
+    },
+    {
+      "code": "E701",
+      "col": 52,
+      "context_hash": "f8666cdb362f778c303549850ada3394dc9a70a257ad328457b34f71864b6878",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 143
+    },
+    {
+      "code": "F841",
+      "col": 5,
+      "context_hash": "ddb9e6c637378290b119f73cde058f5b348541375011f4bcc61c39b76fecf943",
+      "message": "Local variable `argv` is assigned to but never used",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 154
+    },
+    {
+      "code": "E702",
+      "col": 38,
+      "context_hash": "0fe713f156ea67dda6c587e9bfc92d4c56dca5fdd5059e66ff443ac8dc667bba",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 156
+    },
+    {
+      "code": "E701",
+      "col": 35,
+      "context_hash": "01f3d36be2dc7e13773347800ee5c07eae28506713dd6a7d1137712b97928979",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 168
+    },
+    {
+      "code": "E701",
+      "col": 52,
+      "context_hash": "bffa100411964cee3d0293cc85ee1fb9f6b26122643cafcab4cee0daddbfb32a",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 170
+    },
+    {
+      "code": "E702",
+      "col": 30,
+      "context_hash": "7c5e8c9f87fedc245ffd66905b3522afc1e13504bf74c756c4ab31610e67d821",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 181
+    },
+    {
+      "code": "E702",
+      "col": 35,
+      "context_hash": "356191f1ae887b20d4a45fcaf72b7366b784e6f7311ee36f8491668fa1ea272c",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 205
+    },
+    {
+      "code": "E702",
+      "col": 27,
+      "context_hash": "c8b828677a00751d21f2e2e9bb85c7d446304c242a4104260897bacd89c0555d",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 206
+    },
+    {
+      "code": "E702",
+      "col": 58,
+      "context_hash": "2b5a60c7e9a8db5a8aaacc83be3fa73e01407eba003b6f8adf00210926566702",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 207
+    },
+    {
+      "code": "E701",
+      "col": 32,
+      "context_hash": "ed82df0cfe7f08ab48fc6efbb7330ba2833c65775f173eca81943b2068aabab3",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 236
+    },
+    {
+      "code": "E701",
+      "col": 31,
+      "context_hash": "f16d0a0f276b781b6b5fa3ae397278466d4e2461d726740baf4c158c9ec1250e",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 237
+    },
+    {
+      "code": "E701",
+      "col": 39,
+      "context_hash": "2e2e52efa5bf60a28d2ac91d0ecc3188ef8cada980c9558e2ee32d12fa9bcb45",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 246
+    },
+    {
+      "code": "E701",
+      "col": 39,
+      "context_hash": "08ccd385c501cc1fb327437862a89add01fec6091a7c5d0c24581bf93a270d6a",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 258
+    },
+    {
+      "code": "E701",
+      "col": 58,
+      "context_hash": "245bd53dc8687a6e47bbe2162a550ab8da961e0b985b939523b4dbfd15e1360e",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 264
+    },
+    {
+      "code": "E701",
+      "col": 28,
+      "context_hash": "19063760eee17b9116d4d7f515241b2f1ba7a60f02ef5724c7f5593846bf34fe",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 272
+    },
+    {
+      "code": "E701",
+      "col": 28,
+      "context_hash": "f37962f7f0b4faa9f79fbc1da6bf0a5bd790fb0584ae0b94205ea541b1e7b10c",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 273
+    },
+    {
+      "code": "E701",
+      "col": 37,
+      "context_hash": "5b155071ce3661b201edcf15228ad29c30d00387dde23f271e27f6091a3aed99",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 274
+    },
+    {
+      "code": "E701",
+      "col": 34,
+      "context_hash": "dbf56882f81c62002e9cd298cf772f2361c225e88fcc4506e05cd5d4463e8044",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 275
+    },
+    {
+      "code": "E701",
+      "col": 33,
+      "context_hash": "ef19374c871a5b674e853dc0ec1dc2a4dcc6535e15c8126755d0d93f03c95216",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 276
+    },
+    {
+      "code": "E701",
+      "col": 32,
+      "context_hash": "48fbf9243e9345c7440a9b578f5228e7cb7ce947f5f9eaea5cd8da8a9e5d5e90",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 277
+    },
+    {
+      "code": "E701",
+      "col": 34,
+      "context_hash": "bf62862c349fedb7822d5f364ce8b2412479ae2b1b5c79aacff9f4cae42949de",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 278
+    },
+    {
+      "code": "E701",
+      "col": 34,
+      "context_hash": "398808f9b88dc0e04a596a6c7e3202393a56f84fe377ce4447189fdd066d8eab",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 279
+    },
+    {
+      "code": "E701",
+      "col": 35,
+      "context_hash": "e6942237c487a0df6a14057065ff5146cc9a4f7a637604bdae6952fcff9dce8d",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 280
+    },
+    {
+      "code": "E701",
+      "col": 41,
+      "context_hash": "053d4fe2f3c555f0a2427f2d3cafc84d833e579568f39a8d241a5daa97de12bd",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 281
+    },
+    {
+      "code": "E701",
+      "col": 28,
+      "context_hash": "e841996b1937d118efe6dd5fbfa2071438d533192f77295aabbd78d8116f4299",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 283
+    },
+    {
+      "code": "E701",
+      "col": 35,
+      "context_hash": "7ea53e18d7ebebc1d9d47c2ac7db32ee5263a1bd2e395fbc8a878b70e30ce032",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 284
+    },
+    {
+      "code": "E701",
+      "col": 39,
+      "context_hash": "b1f17b7f680af73bdea86b624818b950087d84315b556cdb6884b343f3f084cd",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 303
+    },
+    {
+      "code": "E701",
+      "col": 35,
+      "context_hash": "b1f17b7f680af73bdea86b624818b950087d84315b556cdb6884b343f3f084cd",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 306
+    },
+    {
+      "code": "E702",
+      "col": 35,
+      "context_hash": "cda42850afd686938eac134dae5a14f1cbde2df053a32feca6a76384fab5309b",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 309
+    },
+    {
+      "code": "E702",
+      "col": 57,
+      "context_hash": "cda42850afd686938eac134dae5a14f1cbde2df053a32feca6a76384fab5309b",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 309
+    },
+    {
+      "code": "E701",
+      "col": 35,
+      "context_hash": "b1f17b7f680af73bdea86b624818b950087d84315b556cdb6884b343f3f084cd",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 310
+    },
+    {
+      "code": "E701",
+      "col": 35,
+      "context_hash": "15bd1ac66950c6db6d56a54f255b225b72d5ae7060edf3c1c687f3519bf8c9af",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 316
+    },
+    {
+      "code": "E701",
+      "col": 51,
+      "context_hash": "bde835a4c34cfb6eff686f18f1f6008563e56e78a32ed378c58e2094137b8a2e",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 327
+    },
+    {
+      "code": "E701",
+      "col": 35,
+      "context_hash": "a8416dfa685d38156d156c6b22a1852bf3a41acdb62851d4f3a7d0a6b11f2a72",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 350
+    },
+    {
+      "code": "E701",
+      "col": 35,
+      "context_hash": "44310ec8e320f2a8c62fb58e043ee503a3925446dd16401629452834db07b739",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 351
+    },
+    {
+      "code": "E701",
+      "col": 35,
+      "context_hash": "03a3d1d710a80fe6f9326caefafbf0c0ccbb6f047a72e679327e600cdaf575f5",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 352
+    },
+    {
+      "code": "E701",
+      "col": 35,
+      "context_hash": "189855b8be796d0c64f21a6a1ec746b9f6db1b8376597644868b54f658b1a9e2",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 354
+    },
+    {
+      "code": "E701",
+      "col": 52,
+      "context_hash": "407d6d03f3a9d129ea8ebf1f01eef85d20822d72c12a8aae1096409686d924a9",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 391
+    },
+    {
+      "code": "E701",
+      "col": 52,
+      "context_hash": "407d6d03f3a9d129ea8ebf1f01eef85d20822d72c12a8aae1096409686d924a9",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 395
+    },
+    {
+      "code": "E702",
+      "col": 62,
+      "context_hash": "5fd910fc710b1b9a97af98a4b902ceddd48637e3d0b3678685a1e98370444aad",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 402
+    },
+    {
+      "code": "E701",
+      "col": 40,
+      "context_hash": "cc0c2b0feb830480793e8cb9fbcca8a27b8b60f040df900f0da0b2e5e5c0dfdc",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 412
+    },
+    {
+      "code": "E701",
+      "col": 35,
+      "context_hash": "1722fa5511d5016d10ab954f9c3f88dcc9840c919c6cc4a4194b96acfdc4602c",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 414
+    },
+    {
+      "code": "E702",
+      "col": 38,
+      "context_hash": "0fe713f156ea67dda6c587e9bfc92d4c56dca5fdd5059e66ff443ac8dc667bba",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 424
+    },
+    {
+      "code": "E701",
+      "col": 25,
+      "context_hash": "06285e839eee73868a9ea6aed7a482e040915681ab3ea6043e92a3920ccc85df",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 493
+    },
+    {
+      "code": "E701",
+      "col": 26,
+      "context_hash": "ff43c2ebc1e108d6c62bdbc9aa73ad70d6306bd6166730a76722d339638838a6",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 494
+    },
+    {
+      "code": "E701",
+      "col": 29,
+      "context_hash": "62d73d4352a16b68d8bea5041ba5971764b3f793d6186683b112edce31655b71",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 495
+    },
+    {
+      "code": "E701",
+      "col": 29,
+      "context_hash": "8766fb2ef6bbd2d399bc692de2cfa2e1a334748e6498f48238c45ede141b9bb9",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 496
+    },
+    {
+      "code": "E701",
+      "col": 35,
+      "context_hash": "e9df1e88f1b1a48391003cae93d9ca91e543e25427c7e94ce4bb24fd394c56e9",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 497
+    },
+    {
+      "code": "E701",
+      "col": 33,
+      "context_hash": "f525c2ab9b9a77492bde476acacba0bd951043dfc7540ac5441e6e2db95d2dbb",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 498
+    },
+    {
+      "code": "E701",
+      "col": 27,
+      "context_hash": "1459a8ddf7343ed74343fdded3bbf8c5f2205f344cfc2c6544ac79b7b9023f24",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 499
+    },
+    {
+      "code": "E701",
+      "col": 27,
+      "context_hash": "7449e8803da5c5b252cd66c8285581aff9d43ddc30513d47dbd28b62ac591dfe",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 500
+    },
+    {
+      "code": "E701",
+      "col": 32,
+      "context_hash": "a91528b8ce12c79778c04f5f847f4501979712ac59febe7a533c20b1348fda2c",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 501
+    },
+    {
+      "code": "E702",
+      "col": 40,
+      "context_hash": "fb9267e2475143ffbe57aa47e3691cec5e8bdde312e67582619953caa361f6cc",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 504
+    },
+    {
+      "code": "E702",
+      "col": 57,
+      "context_hash": "fb9267e2475143ffbe57aa47e3691cec5e8bdde312e67582619953caa361f6cc",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 504
+    },
+    {
+      "code": "E701",
+      "col": 46,
+      "context_hash": "c96293842549e613861f7c928143d6a2bd8a787c531ed551511ad39f229fffcc",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_claude_reads.py",
+      "row": 505
+    },
+    {
+      "code": "F401",
+      "col": 31,
+      "context_hash": "a68f9a5a7392d4233790048a925ecd82c1c99a3a1ca1204fdfa3cd2e1c632ab4",
+      "message": "`test_h_d1_repair1.installed` imported but unused",
+      "path": "src/test/dispatcher/test_h_d1_repair2.py",
+      "row": 33
+    },
+    {
+      "code": "F811",
+      "col": 93,
+      "context_hash": "16c282675a03f8158e34b347e28b6609b0dad2cd515aa88b156038fc83738d78",
+      "message": "Redefinition of unused `installed` from line 33",
+      "path": "src/test/dispatcher/test_h_d1_repair2.py",
+      "row": 197
+    },
+    {
+      "code": "F811",
+      "col": 71,
+      "context_hash": "f03eab097c0bc70dd8bcef1aa268f7ce9982866ad919c9c5722818e6b6c0d3e5",
+      "message": "Redefinition of unused `installed` from line 33",
+      "path": "src/test/dispatcher/test_h_d1_repair2.py",
+      "row": 236
+    },
+    {
+      "code": "F811",
+      "col": 75,
+      "context_hash": "a1fccc42773f743199ecc1560402145b2fefab9f4d1ea779ffebfaf9865a29f0",
+      "message": "Redefinition of unused `installed` from line 33",
+      "path": "src/test/dispatcher/test_h_d1_repair2.py",
+      "row": 264
+    },
+    {
+      "code": "F811",
+      "col": 67,
+      "context_hash": "26e17a4e6b34cc592599ecabea912333245275d5eb90e851aa9862d4de22e6c1",
+      "message": "Redefinition of unused `installed` from line 33",
+      "path": "src/test/dispatcher/test_h_d1_repair2.py",
+      "row": 310
+    },
+    {
+      "code": "F811",
+      "col": 64,
+      "context_hash": "0ec00af6c6c4674943fef9aaf63a14cc8b3b59e8c193c0dbcfc759299491c4a2",
+      "message": "Redefinition of unused `installed` from line 33",
+      "path": "src/test/dispatcher/test_h_d1_repair2.py",
+      "row": 335
+    },
+    {
+      "code": "F811",
+      "col": 63,
+      "context_hash": "f1315ab0bd3a9aa7d1a84181e07fc74fd8420d50e20c7cd39c7ac0e7e88dcc95",
+      "message": "Redefinition of unused `installed` from line 33",
+      "path": "src/test/dispatcher/test_h_d1_repair2.py",
+      "row": 359
+    },
+    {
+      "code": "F811",
+      "col": 66,
+      "context_hash": "fe91579cc6efb239b3ff35a4f135ebc448f0c227dca619fc3eb52812f62e464a",
+      "message": "Redefinition of unused `installed` from line 33",
+      "path": "src/test/dispatcher/test_h_d1_repair2.py",
+      "row": 874
+    },
+    {
+      "code": "F401",
+      "col": 8,
+      "context_hash": "582f9ff727d7496ab22b435e59b0f09b8ec415b0c8e8482ad2547f28cb6beb37",
+      "message": "`shutil` imported but unused",
+      "path": "src/test/dispatcher/test_h_d1_seam.py",
+      "row": 24
+    },
+    {
+      "code": "F401",
+      "col": 42,
+      "context_hash": "e1fdaf9687fef6534f5aad82f3847198b28c315088621eebf6f6f184115697c7",
+      "message": "`testing.h_eval.provider_free.LaunchGuard` imported but unused",
+      "path": "src/test/dispatcher/test_h_d1_seam.py",
+      "row": 32
+    },
+    {
+      "code": "F401",
+      "col": 26,
+      "context_hash": "32902ddf5600c47743598c4a6743e2f879a3653240e3098de24b63ba67552670",
+      "message": "`subprocess` imported but unused",
+      "path": "src/test/dispatcher/test_h_d1_seam.py",
+      "row": 701
+    },
+    {
+      "code": "F401",
+      "col": 42,
+      "context_hash": "6b43f7ea807148882db20af260f9f40f5e848929d02893e6f41e8a3cbb6745b6",
+      "message": "`test_agent_phase_acquisition.binary` imported but unused",
+      "path": "src/test/dispatcher/test_h_delivery.py",
+      "row": 14
+    },
+    {
+      "code": "F811",
+      "col": 53,
+      "context_hash": "d613c55abf9318cbc5cbd9971947efd3db231c3b94ab7519672cf8ef21663bfd",
+      "message": "Redefinition of unused `binary` from line 14",
+      "path": "src/test/dispatcher/test_h_delivery.py",
+      "row": 22
+    },
+    {
+      "code": "F811",
+      "col": 66,
+      "context_hash": "9b3018a598f4b9a6447c74c622e8faf2ba8ade98147f78d0fcdc451656064af6",
+      "message": "Redefinition of unused `binary` from line 14",
+      "path": "src/test/dispatcher/test_h_delivery.py",
+      "row": 37
+    },
+    {
+      "code": "F811",
+      "col": 52,
+      "context_hash": "f968e95792ed678c9c1ebcd8e48ad5c3e04167e388d944db583b35fc8caef935",
+      "message": "Redefinition of unused `binary` from line 14",
+      "path": "src/test/dispatcher/test_h_delivery.py",
+      "row": 47
+    },
+    {
+      "code": "F811",
+      "col": 57,
+      "context_hash": "ab60ea39d6bb89c8dfb429c16aa62a045cf76036ed3478006af6698360c5cb58",
+      "message": "Redefinition of unused `binary` from line 14",
+      "path": "src/test/dispatcher/test_h_delivery.py",
+      "row": 58
+    },
+    {
+      "code": "E702",
+      "col": 35,
+      "context_hash": "ecf84462a4b9f2f0cafe30a1296742f80354ba9b1cfd79dcad6d4875b9d80d08",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_h_delivery.py",
+      "row": 88
+    },
+    {
+      "code": "E702",
+      "col": 32,
+      "context_hash": "607391d7bbb93ce08abaf0c0c5e5b17fb17f5a50b15bfa22412a74fc628f1252",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_h_delivery.py",
+      "row": 119
+    },
+    {
+      "code": "E702",
+      "col": 33,
+      "context_hash": "58e119e8718ca64a481edb0189b6ec96fddaa9bed6fc1e3249763e436e9f9f8f",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_h_delivery.py",
+      "row": 126
+    },
+    {
+      "code": "F811",
+      "col": 63,
+      "context_hash": "762c3787e6bee808bebc1aa970f9e87b30502484d707b6a4342220342d0e151a",
+      "message": "Redefinition of unused `binary` from line 14",
+      "path": "src/test/dispatcher/test_h_delivery.py",
+      "row": 152
+    },
+    {
+      "code": "E702",
+      "col": 21,
+      "context_hash": "dbfa59ee819d4867d53367cde376b49a1e41489f500fbe1fb9ecfe2c6da9f05c",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_h_delivery.py",
+      "row": 206
+    },
+    {
+      "code": "E702",
+      "col": 25,
+      "context_hash": "dbfa59ee819d4867d53367cde376b49a1e41489f500fbe1fb9ecfe2c6da9f05c",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_h_delivery.py",
+      "row": 209
+    },
+    {
+      "code": "E702",
+      "col": 35,
+      "context_hash": "d0518050b9a2936b9ed49b1ed28b0ceb5c9096f8e6b32a46ef2f6db7ae10687d",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_h_delivery.py",
+      "row": 218
+    },
+    {
+      "code": "E702",
+      "col": 31,
+      "context_hash": "c35f69e91241cf60c3dfa36998e43b5a385e5943cd0863e3e4bcd0a630d69dfc",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_h_delivery.py",
+      "row": 219
+    },
+    {
+      "code": "E702",
+      "col": 29,
+      "context_hash": "dfc522932971db03f99999dc819b5d050e12887df53d88ab0e3eeb88be6d7ff0",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_h_delivery.py",
+      "row": 237
+    },
+    {
+      "code": "F811",
+      "col": 62,
+      "context_hash": "eeb4a7224d657d405d9cd6369d638004eb03867df7b50c19b1b92bc13bac3e29",
+      "message": "Redefinition of unused `binary` from line 14",
+      "path": "src/test/dispatcher/test_h_delivery.py",
+      "row": 289
+    },
+    {
+      "code": "F401",
+      "col": 8,
+      "context_hash": "37effa9caacd97bad7e2ded872a87a97b8975fca47afea9c20251191e2a288dd",
+      "message": "`copy` imported but unused",
+      "path": "src/test/dispatcher/test_h_evaluation.py",
+      "row": 2
+    },
+    {
+      "code": "F401",
+      "col": 35,
+      "context_hash": "703373e3791e1aed31d062275760949b61c9635abf5f482e3a9072a98cc27d0b",
+      "message": "`h_regression_fixtures.current_source` imported but unused",
+      "path": "src/test/dispatcher/test_h_execution_package.py",
+      "row": 12
+    },
+    {
+      "code": "F811",
+      "col": 79,
+      "context_hash": "35022465cd7847aee8dba315cb9ca927ce6ae906041b59186f5caffa85bfd766",
+      "message": "Redefinition of unused `current_source` from line 12",
+      "path": "src/test/dispatcher/test_h_execution_package.py",
+      "row": 18
+    },
+    {
+      "code": "F811",
+      "col": 72,
+      "context_hash": "7467e1ca23f923e7b74f636be71103660483dbf431b5171814fcb7719d90b0d3",
+      "message": "Redefinition of unused `current_source` from line 12",
+      "path": "src/test/dispatcher/test_h_execution_package.py",
+      "row": 144
+    },
+    {
+      "code": "F811",
+      "col": 81,
+      "context_hash": "eee44aa35ff614b83c4e2837aaa139a5bf34ff44e14e45067b3313f5271c2cfb",
+      "message": "Redefinition of unused `current_source` from line 12",
+      "path": "src/test/dispatcher/test_h_execution_package.py",
+      "row": 178
+    },
+    {
+      "code": "F811",
+      "col": 96,
+      "context_hash": "64ac7ecae73acde9d52875f97cf55aeec93e02546fea985860d3e2c2a34792f4",
+      "message": "Redefinition of unused `current_source` from line 12",
+      "path": "src/test/dispatcher/test_h_execution_package.py",
+      "row": 186
+    },
+    {
+      "code": "F811",
+      "col": 55,
+      "context_hash": "552fbb42681f7933293d3f348736bfc40279a92bf3ac7b24c5e02575496521bd",
+      "message": "Redefinition of unused `current_source` from line 12",
+      "path": "src/test/dispatcher/test_h_execution_package.py",
+      "row": 233
+    },
+    {
+      "code": "E402",
+      "col": 1,
+      "context_hash": "d15f96e1523e1703dbfa7aec43f0978d77eda017375e23fd801b375ae1331fa4",
+      "message": "Module level import not at top of file",
+      "path": "src/test/dispatcher/test_h_pair_runner.py",
+      "row": 13
+    },
+    {
+      "code": "E402",
+      "col": 1,
+      "context_hash": "92c96543b165375030a4c861bf2ce54c23f2811c1e00550ffff4d6258e86b87f",
+      "message": "Module level import not at top of file",
+      "path": "src/test/dispatcher/test_h_pair_runner.py",
+      "row": 14
+    },
+    {
+      "code": "E402",
+      "col": 1,
+      "context_hash": "1caee667bb9c2e0d23bcc2d3ccbef091ecf095b84ef3a02f072dab9f0d2c76bd",
+      "message": "Module level import not at top of file",
+      "path": "src/test/dispatcher/test_h_pair_runner.py",
+      "row": 15
+    },
+    {
+      "code": "F401",
+      "col": 42,
+      "context_hash": "1caee667bb9c2e0d23bcc2d3ccbef091ecf095b84ef3a02f072dab9f0d2c76bd",
+      "message": "`test_agent_phase_acquisition.binary` imported but unused",
+      "path": "src/test/dispatcher/test_h_pair_runner.py",
+      "row": 15
+    },
+    {
+      "code": "F811",
+      "col": 55,
+      "context_hash": "2f4442aa550788cce48485ad14fa147f0b12ac5b209b8092cd2aec6c14ea93e2",
+      "message": "Redefinition of unused `binary` from line 15",
+      "path": "src/test/dispatcher/test_h_pair_runner.py",
+      "row": 126
+    },
+    {
+      "code": "F401",
+      "col": 8,
+      "context_hash": "de2abade832c8e350a1bdc98cfcdb1e202ac4749c5fc51a4a970d41736b6df5c",
+      "message": "`os` imported but unused",
+      "path": "src/test/dispatcher/test_h_postrun_retention.py",
+      "row": 23
+    },
+    {
+      "code": "F401",
+      "col": 35,
+      "context_hash": "703373e3791e1aed31d062275760949b61c9635abf5f482e3a9072a98cc27d0b",
+      "message": "`h_regression_fixtures.current_source` imported but unused",
+      "path": "src/test/dispatcher/test_h_preregistration.py",
+      "row": 8
+    },
+    {
+      "code": "F811",
+      "col": 12,
+      "context_hash": "4a68622b9d1c4912161d2578eae01c6bd7ac919d46e8ecd63c49f44ab27702dc",
+      "message": "Redefinition of unused `current_source` from line 8",
+      "path": "src/test/dispatcher/test_h_preregistration.py",
+      "row": 14
+    },
+    {
+      "code": "F811",
+      "col": 74,
+      "context_hash": "45781f3bfd66c2f546be3e69388b63d261d47a2a40caa086bf0ac95ab0682c88",
+      "message": "Redefinition of unused `current_source` from line 8",
+      "path": "src/test/dispatcher/test_h_preregistration.py",
+      "row": 25
+    },
+    {
+      "code": "E701",
+      "col": 40,
+      "context_hash": "1a68dfe605444998a8806ceb7e2a12b19bbc037416d45e91119b6f1c488f09d9",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_preregistration.py",
+      "row": 39
+    },
+    {
+      "code": "E702",
+      "col": 42,
+      "context_hash": "602c680e974c37250805a2dd5d7c6c5dcf549c4ec478745c2ae18da69278bfb7",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_h_preregistration.py",
+      "row": 47
+    },
+    {
+      "code": "E701",
+      "col": 24,
+      "context_hash": "773cbb3b88fabc25901c10d2146f430abb7b98424a980c5fab8afd93ea38e45a",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_preregistration.py",
+      "row": 48
+    },
+    {
+      "code": "E701",
+      "col": 27,
+      "context_hash": "a041f017f84f2440e4ede9bcbbf1bb6187d5526de8d51ec71a7bb10e158d492a",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_preregistration.py",
+      "row": 49
+    },
+    {
+      "code": "E701",
+      "col": 26,
+      "context_hash": "1c3c1a02651bc60930ff35ca4148653e73fa27f00095efbc7262bb850bca5bd3",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_preregistration.py",
+      "row": 50
+    },
+    {
+      "code": "E701",
+      "col": 28,
+      "context_hash": "2f960c18101dea7777fe791b4c46daea9a816016b37dc77ba6b4233977abd92b",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_preregistration.py",
+      "row": 51
+    },
+    {
+      "code": "E701",
+      "col": 33,
+      "context_hash": "69534bfb92c9d106a99b7ed90006f8bd683166f850a8cbb8a3a27922b6f91b17",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_preregistration.py",
+      "row": 52
+    },
+    {
+      "code": "E701",
+      "col": 31,
+      "context_hash": "75d871a2be28526767fbf3b6797d4cf25d0b47e2f3cf5c605ba73a7b27c677d1",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_preregistration.py",
+      "row": 53
+    },
+    {
+      "code": "E701",
+      "col": 28,
+      "context_hash": "707287efb788d0b15362ec54e94f216e95601c26d6099b64d160d3770fddc2c4",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_preregistration.py",
+      "row": 54
+    },
+    {
+      "code": "E701",
+      "col": 42,
+      "context_hash": "a361ab996c130d60037e62faf646594f9fd5aa6c2852e4aa44e6d30b3eb97a49",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_preregistration.py",
+      "row": 57
+    },
+    {
+      "code": "E701",
+      "col": 35,
+      "context_hash": "d77d78b224c29e41ad4a3894e13d8d601f95aa3a08af493a60c5dfbc1f450028",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_preregistration.py",
+      "row": 61
+    },
+    {
+      "code": "E701",
+      "col": 17,
+      "context_hash": "50bf0c7adfaf2f17093fda07ed7fad66a151db58c1536e1fa0f7d303e6dfa45a",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_preregistration.py",
+      "row": 62
+    },
+    {
+      "code": "E702",
+      "col": 42,
+      "context_hash": "23e20d5304f10fc60ba9571a522607adcaddb0219e593b6b6014ef50943aabca",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_h_preregistration.py",
+      "row": 76
+    },
+    {
+      "code": "E701",
+      "col": 24,
+      "context_hash": "cc165865f4091f503dfa95dc0ecd42e1152482e19f13f4d9c69370eab080a1ce",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_preregistration.py",
+      "row": 77
+    },
+    {
+      "code": "E701",
+      "col": 30,
+      "context_hash": "64c97cf43654ef94486c800fde20f36ac7a847593da67b42cce43b312e47e810",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_preregistration.py",
+      "row": 78
+    },
+    {
+      "code": "E701",
+      "col": 26,
+      "context_hash": "e5d72bd89703b9259d9b7a47e77dae8244f8fbd02ccb099c328827fbbc60dd1a",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_preregistration.py",
+      "row": 79
+    },
+    {
+      "code": "E701",
+      "col": 27,
+      "context_hash": "5f580cfc3725d2f215e259f4474a98a323bea83123e8db0615913d8ca8ac234a",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_preregistration.py",
+      "row": 80
+    },
+    {
+      "code": "E701",
+      "col": 29,
+      "context_hash": "45e3d05a726e37ffb17ee385fbba11b9729045fcafa72592eed144f71c9a6bbe",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_preregistration.py",
+      "row": 81
+    },
+    {
+      "code": "E701",
+      "col": 28,
+      "context_hash": "cca83e3610f91b0f64d59be4448ba94f723adf244283dabf605ab3d7719f5346",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_preregistration.py",
+      "row": 82
+    },
+    {
+      "code": "E701",
+      "col": 35,
+      "context_hash": "1ddf7df3370390dd7503ffcfbed7b292244083190dcf306fedc344077e51d9d9",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_preregistration.py",
+      "row": 84
+    },
+    {
+      "code": "E702",
+      "col": 39,
+      "context_hash": "b0769541abe88414b1ad17fcc3ec97bb695c33af3e876ab727e0c4f134479d86",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_h_preregistration.py",
+      "row": 88
+    },
+    {
+      "code": "E701",
+      "col": 50,
+      "context_hash": "ccda9aaaf03f21a9edabf518a663c7b0d23012eaa82f419cb0ce56775d9150e2",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_preregistration.py",
+      "row": 94
+    },
+    {
+      "code": "F401",
+      "col": 21,
+      "context_hash": "6d69f2ac09017b8a49d050ab336e953b8fa02ae08c24396916ea7ea42418e627",
+      "message": "`pathlib.Path` imported but unused",
+      "path": "src/test/dispatcher/test_h_promotion_execution.py",
+      "row": 11
+    },
+    {
+      "code": "E702",
+      "col": 38,
+      "context_hash": "3096f5b589603f9ded0038dccde1fa87429dd52a031f426eab9f6198ea086a04",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_h_provider_free_readiness.py",
+      "row": 74
+    },
+    {
+      "code": "F401",
+      "col": 8,
+      "context_hash": "37effa9caacd97bad7e2ded872a87a97b8975fca47afea9c20251191e2a288dd",
+      "message": "`copy` imported but unused",
+      "path": "src/test/dispatcher/test_h_qualification_receipts.py",
+      "row": 2
+    },
+    {
+      "code": "F401",
+      "col": 35,
+      "context_hash": "703373e3791e1aed31d062275760949b61c9635abf5f482e3a9072a98cc27d0b",
+      "message": "`h_regression_fixtures.current_source` imported but unused",
+      "path": "src/test/dispatcher/test_h_ready1.py",
+      "row": 8
+    },
+    {
+      "code": "F811",
+      "col": 50,
+      "context_hash": "dd2abbae7a14f603460c8e49cccbaaa5a79efe4c01247e82f80bf7808737ee31",
+      "message": "Redefinition of unused `current_source` from line 8",
+      "path": "src/test/dispatcher/test_h_ready1.py",
+      "row": 43
+    },
+    {
+      "code": "E701",
+      "col": 24,
+      "context_hash": "b1276598879337905b0e400cc6410ca58efcc1c6a1d9eae39b9100823530801d",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_ready1.py",
+      "row": 46
+    },
+    {
+      "code": "E701",
+      "col": 31,
+      "context_hash": "77b82c3a44c0ab09186e279bf45ce6f3580ead511606866bc318fc4cd809962b",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_ready1.py",
+      "row": 47
+    },
+    {
+      "code": "E701",
+      "col": 28,
+      "context_hash": "ca7b523b7135137118d6b59f40911fabf9650b90097916f5c8cf10f4af433a6e",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_ready1.py",
+      "row": 48
+    },
+    {
+      "code": "E701",
+      "col": 30,
+      "context_hash": "bed7d78da52f4e902fe56601ea60638fd12d03b7c53c5fc4e70c1b6cf53b8673",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_ready1.py",
+      "row": 49
+    },
+    {
+      "code": "E701",
+      "col": 9,
+      "context_hash": "1153bf80a4d1df2dbbeab8b2494af2f104e3441006abb586a3920ec3662b4099",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_ready1.py",
+      "row": 50
+    },
+    {
+      "code": "E702",
+      "col": 33,
+      "context_hash": "490e1eeaa387e56e382757370cf065cb9b584ff134de0b533af8f7c0a6bcd3c7",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_h_runtime_complete.py",
+      "row": 29
+    },
+    {
+      "code": "E701",
+      "col": 28,
+      "context_hash": "d7a2ffe53e3e5ca79b8d21d0f8665916e3743f91f394d55dacf545e13a5a3838",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_runtime_complete.py",
+      "row": 44
+    },
+    {
+      "code": "E701",
+      "col": 29,
+      "context_hash": "a56437323029244e64f969e808cdc608c35eec9f0d7434ba5dcdfdddc125f874",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_runtime_complete.py",
+      "row": 45
+    },
+    {
+      "code": "E701",
+      "col": 27,
+      "context_hash": "10c17a821aa63af05c9ccc5245b048a8abcb3989eff91bed4f1e0535f38c8a55",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_runtime_complete.py",
+      "row": 46
+    },
+    {
+      "code": "E701",
+      "col": 28,
+      "context_hash": "504c05eb940db1d6ff91160942229448a60a981b24585f6761e7dc260b95b01c",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_runtime_complete.py",
+      "row": 47
+    },
+    {
+      "code": "E701",
+      "col": 29,
+      "context_hash": "0023fcd847a11b8943bcd0903ee126c8ebc7d0dedc6a0d93086cfc0ac11632e8",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_runtime_complete.py",
+      "row": 48
+    },
+    {
+      "code": "E701",
+      "col": 28,
+      "context_hash": "2d66613c9dc4051b7820a7002c7849494fac59312fcc9ef1b72626bd4cd6b23b",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_runtime_complete.py",
+      "row": 49
+    },
+    {
+      "code": "E701",
+      "col": 37,
+      "context_hash": "722bdfa7efc046362e53961d64f5f3ca2aabbe350c8c33b79518f916baa0f466",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_runtime_complete.py",
+      "row": 50
+    },
+    {
+      "code": "E702",
+      "col": 34,
+      "context_hash": "a0c7546b2f99954a64b8821f9befb6083c828d057ef534afdc5d42ebecef62fb",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_h_runtime_complete.py",
+      "row": 52
+    },
+    {
+      "code": "E702",
+      "col": 24,
+      "context_hash": "07802ea1f38ac7988cf6a1186a9adc7d20e20aca760edb6da49486973d3f6eba",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_h_runtime_complete.py",
+      "row": 53
+    },
+    {
+      "code": "E701",
+      "col": 35,
+      "context_hash": "b6ed230461db9a858950154df207fcb61d989ac15a5528f34967ce73bc6be78f",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_runtime_complete.py",
+      "row": 54
+    },
+    {
+      "code": "E702",
+      "col": 33,
+      "context_hash": "490e1eeaa387e56e382757370cf065cb9b584ff134de0b533af8f7c0a6bcd3c7",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_h_runtime_complete.py",
+      "row": 78
+    },
+    {
+      "code": "E702",
+      "col": 31,
+      "context_hash": "84a58ae0cb5fc1a727913788f417569a7b8108c70b4ae27fa2366d01e9a2af48",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_h_runtime_complete.py",
+      "row": 79
+    },
+    {
+      "code": "E702",
+      "col": 46,
+      "context_hash": "84a58ae0cb5fc1a727913788f417569a7b8108c70b4ae27fa2366d01e9a2af48",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_h_runtime_complete.py",
+      "row": 79
+    },
+    {
+      "code": "E702",
+      "col": 29,
+      "context_hash": "67cf89fe2faa80b18dadf36525c6d0af08e84a98787fa517b132abe549164e7c",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_h_runtime_complete.py",
+      "row": 80
+    },
+    {
+      "code": "E702",
+      "col": 30,
+      "context_hash": "1dc4e39ff9fb48becf3fcadc3333603c8e4ccfe46ddec9aac06128d6226aeb10",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_h_runtime_complete.py",
+      "row": 105
+    },
+    {
+      "code": "E702",
+      "col": 35,
+      "context_hash": "f41b9359d3eb182ddb6a4c86facdba059e392db2cb7562812953876b433cd584",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_h_runtime_complete.py",
+      "row": 106
+    },
+    {
+      "code": "E702",
+      "col": 36,
+      "context_hash": "431d52a541543deb3b89e13e86083f2ffb33335a3ef51a386a34a6a905d84e63",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_h_runtime_complete.py",
+      "row": 107
+    },
+    {
+      "code": "E702",
+      "col": 43,
+      "context_hash": "ebace00af53a0ff21fbe8ba414a9c23ed90620e3814e42e4b91a9a4a4cf1ac9b",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_h_runtime_complete.py",
+      "row": 123
+    },
+    {
+      "code": "E702",
+      "col": 18,
+      "context_hash": "5f25b5c19581d3ccc600bb1c85ef151e3d550570738fe57dafd911aaf80eaf0b",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_h_runtime_complete.py",
+      "row": 125
+    },
+    {
+      "code": "E702",
+      "col": 18,
+      "context_hash": "06fbfd040a6a65c92200b6021fabe431f5025f27f15cd94442a4b447f7e6cbb7",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_h_runtime_complete.py",
+      "row": 129
+    },
+    {
+      "code": "E702",
+      "col": 30,
+      "context_hash": "ee00669b3aef2712a15bfdd32595d34064d5b8f656a0ed2a42cb4c88236d0d2a",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_h_runtime_complete.py",
+      "row": 140
+    },
+    {
+      "code": "E702",
+      "col": 46,
+      "context_hash": "ee00669b3aef2712a15bfdd32595d34064d5b8f656a0ed2a42cb4c88236d0d2a",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_h_runtime_complete.py",
+      "row": 140
+    },
+    {
+      "code": "E702",
+      "col": 36,
+      "context_hash": "431d52a541543deb3b89e13e86083f2ffb33335a3ef51a386a34a6a905d84e63",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_h_runtime_complete.py",
+      "row": 141
+    },
+    {
+      "code": "E702",
+      "col": 29,
+      "context_hash": "b25f8344ac143fadad59b0b85f7cd9b7117a0d60a573720cabd3f38cdb697fc0",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_h_runtime_complete.py",
+      "row": 153
+    },
+    {
+      "code": "E702",
+      "col": 29,
+      "context_hash": "b25f8344ac143fadad59b0b85f7cd9b7117a0d60a573720cabd3f38cdb697fc0",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_h_runtime_complete.py",
+      "row": 161
+    },
+    {
+      "code": "E702",
+      "col": 33,
+      "context_hash": "e14ae754ce01e4fea19edb45271368391a054acf09fded70b95cf915fda67344",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_h_runtime_complete.py",
+      "row": 162
+    },
+    {
+      "code": "E702",
+      "col": 33,
+      "context_hash": "490e1eeaa387e56e382757370cf065cb9b584ff134de0b533af8f7c0a6bcd3c7",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_h_runtime_complete.py",
+      "row": 188
+    },
+    {
+      "code": "E702",
+      "col": 42,
+      "context_hash": "bdb1d9ffaff1041df1e15f16d5f4811d5b1aa28885d7851d2969ef014c3104ee",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_h_runtime_complete.py",
+      "row": 211
+    },
+    {
+      "code": "E702",
+      "col": 29,
+      "context_hash": "8967513f58adad02d73a73525b4e3e80be8107f1b37d0273493eb480e910b42d",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_h_runtime_complete.py",
+      "row": 278
+    },
+    {
+      "code": "E702",
+      "col": 35,
+      "context_hash": "356191f1ae887b20d4a45fcaf72b7366b784e6f7311ee36f8491668fa1ea272c",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_h_runtime_complete.py",
+      "row": 279
+    },
+    {
+      "code": "E702",
+      "col": 37,
+      "context_hash": "817be0e276c91ed256ff87269b98560081211b0bdd065b4f589d92dcd0eebdac",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_h_runtime_complete.py",
+      "row": 280
+    },
+    {
+      "code": "E702",
+      "col": 39,
+      "context_hash": "4ad197b9df28f15bae8e1873c0f896d8d9468d54a41536c7d6b21153ef902a06",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_h_runtime_complete.py",
+      "row": 281
+    },
+    {
+      "code": "E702",
+      "col": 33,
+      "context_hash": "490e1eeaa387e56e382757370cf065cb9b584ff134de0b533af8f7c0a6bcd3c7",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_h_runtime_complete.py",
+      "row": 312
+    },
+    {
+      "code": "F401",
+      "col": 8,
+      "context_hash": "37effa9caacd97bad7e2ded872a87a97b8975fca47afea9c20251191e2a288dd",
+      "message": "`copy` imported but unused",
+      "path": "src/test/dispatcher/test_h_wrapper_handoff.py",
+      "row": 2
+    },
+    {
+      "code": "F401",
+      "col": 42,
+      "context_hash": "1caee667bb9c2e0d23bcc2d3ccbef091ecf095b84ef3a02f072dab9f0d2c76bd",
+      "message": "`test_agent_phase_acquisition.binary` imported but unused",
+      "path": "src/test/dispatcher/test_h_wrapper_handoff.py",
+      "row": 15
+    },
+    {
+      "code": "F811",
+      "col": 21,
+      "context_hash": "ea41996bde47603331b3054e0deffe2931088894f151aabf2bc593c2166273a7",
+      "message": "Redefinition of unused `binary` from line 15",
+      "path": "src/test/dispatcher/test_h_wrapper_handoff.py",
+      "row": 20
+    },
+    {
+      "code": "F811",
+      "col": 35,
+      "context_hash": "7dddf75383cbe8c52af7c847e1b5cf5b8d880966bf97966fbe3f6f57198d5183",
+      "message": "Redefinition of unused `binary` from line 15",
+      "path": "src/test/dispatcher/test_h_wrapper_handoff.py",
+      "row": 44
+    },
+    {
+      "code": "F811",
+      "col": 19,
+      "context_hash": "02c7c03dfe0ad3b6bba8ed0e2781e5577a5e99e5c2c8117aa67e1ee606261011",
+      "message": "Redefinition of unused `binary` from line 15",
+      "path": "src/test/dispatcher/test_h_wrapper_handoff.py",
+      "row": 57
+    },
+    {
+      "code": "E701",
+      "col": 27,
+      "context_hash": "8dbda46a2520b8040f991051500866761437e96ccea49fb9973f931d3303d909",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_wrapper_handoff.py",
+      "row": 63
+    },
+    {
+      "code": "E701",
+      "col": 28,
+      "context_hash": "8d75c3b6795e93ac5e0c7380c77d125834a53de7ee88be6c75dcf6e6aa45e997",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_wrapper_handoff.py",
+      "row": 66
+    },
+    {
+      "code": "E701",
+      "col": 28,
+      "context_hash": "ecde88ccbef5012b1e0f8870b1d08fc855158f812be7a4c68c787adbd114f853",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_wrapper_handoff.py",
+      "row": 67
+    },
+    {
+      "code": "E702",
+      "col": 45,
+      "context_hash": "f79f4e35b52ca530fea3005a079905c4f8c4ee55ef93e979cfa2357adc1204af",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_h_wrapper_handoff.py",
+      "row": 69
+    },
+    {
+      "code": "E702",
+      "col": 67,
+      "context_hash": "f79f4e35b52ca530fea3005a079905c4f8c4ee55ef93e979cfa2357adc1204af",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_h_wrapper_handoff.py",
+      "row": 69
+    },
+    {
+      "code": "E701",
+      "col": 28,
+      "context_hash": "09b75f037a5c11fb6f675d02e5650f2806cbe2189a36aad07f7f8058f5711170",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_wrapper_handoff.py",
+      "row": 70
+    },
+    {
+      "code": "E701",
+      "col": 28,
+      "context_hash": "1e2f193aed878d799002ca6cc81ed99a04bffcf1e36c0244831039de589edb82",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_wrapper_handoff.py",
+      "row": 72
+    },
+    {
+      "code": "E702",
+      "col": 43,
+      "context_hash": "9df0edeb7c3fac749f8fd47fa9f7946475c63fabcf53520f02bc5434d1421bb8",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_h_wrapper_handoff.py",
+      "row": 77
+    },
+    {
+      "code": "E701",
+      "col": 27,
+      "context_hash": "9bc7001431d994099b9b3b279bfe19d35af3d7656a21f915e4f4948447f19202",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_wrapper_handoff.py",
+      "row": 78
+    },
+    {
+      "code": "F811",
+      "col": 35,
+      "context_hash": "abf5944ea18ad6a73296a068e7fc5f4a33a03ca8dd2a4d06662a7df0765bbc25",
+      "message": "Redefinition of unused `binary` from line 15",
+      "path": "src/test/dispatcher/test_h_wrapper_handoff.py",
+      "row": 83
+    },
+    {
+      "code": "E702",
+      "col": 30,
+      "context_hash": "7c5e8c9f87fedc245ffd66905b3522afc1e13504bf74c756c4ab31610e67d821",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_h_wrapper_handoff.py",
+      "row": 87
+    },
+    {
+      "code": "F401",
+      "col": 35,
+      "context_hash": "46e3c95bee0ca50c91c90f87d56dcefdff69d6822f60f017dac08b8c43bbad2a",
+      "message": "`claude_vc_profile.reject_profile_overrides` imported but unused",
+      "path": "src/test/dispatcher/test_h_wrapper_handoff.py",
+      "row": 109
+    },
+    {
+      "code": "F811",
+      "col": 53,
+      "context_hash": "ecd82b8f6db0218165cbfb77f85672e492499b049213caf4fcea483f7bf41d5a",
+      "message": "Redefinition of unused `binary` from line 15",
+      "path": "src/test/dispatcher/test_h_wrapper_handoff.py",
+      "row": 122
+    },
+    {
+      "code": "E702",
+      "col": 30,
+      "context_hash": "7c5e8c9f87fedc245ffd66905b3522afc1e13504bf74c756c4ab31610e67d821",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_h_wrapper_handoff.py",
+      "row": 126
+    },
+    {
+      "code": "E701",
+      "col": 33,
+      "context_hash": "58524f83e099682560e5f25a9bf10521979945a0b3c4498159052809cf5fc480",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_wrapper_handoff.py",
+      "row": 158
+    },
+    {
+      "code": "E701",
+      "col": 33,
+      "context_hash": "f365b9e63f637d9755fb5746340c9536caa5667608d5d7167da9098f671750ea",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_wrapper_handoff.py",
+      "row": 159
+    },
+    {
+      "code": "E701",
+      "col": 29,
+      "context_hash": "451dd6ebb00ca739c259f8f7b2c191d744b890b0ca8bd713cc81c7fe89d04dd7",
+      "message": "Multiple statements on one line (colon)",
+      "path": "src/test/dispatcher/test_h_wrapper_handoff.py",
+      "row": 160
+    },
+    {
+      "code": "E702",
+      "col": 35,
+      "context_hash": "356191f1ae887b20d4a45fcaf72b7366b784e6f7311ee36f8491668fa1ea272c",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/dispatcher/test_h_wrapper_handoff.py",
+      "row": 166
+    },
+    {
+      "code": "F401",
+      "col": 21,
+      "context_hash": "6d69f2ac09017b8a49d050ab336e953b8fa02ae08c24396916ea7ea42418e627",
+      "message": "`pathlib.Path` imported but unused",
+      "path": "src/test/int/python/agentic-praxis-grimoire/src/agentic_praxis_grimoire/skill_catalog.int.test.py",
+      "row": 7
+    },
+    {
+      "code": "E702",
+      "col": 27,
+      "context_hash": "c8b828677a00751d21f2e2e9bb85c7d446304c242a4104260897bacd89c0555d",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/int/python/agentic-praxis-grimoire/src/agentic_praxis_grimoire/skill_catalog.int.test.py",
+      "row": 68
+    },
+    {
+      "code": "E702",
+      "col": 54,
+      "context_hash": "bd968b28e9aec8b32fb51628a5488b622f58fa43d67ba3c9d716726b98f7590e",
+      "message": "Multiple statements on one line (semicolon)",
+      "path": "src/test/int/python/agentic-praxis-grimoire/src/agentic_praxis_grimoire/skill_catalog.int.test.py",
+      "row": 87
+    },
+    {
+      "code": "F401",
+      "col": 8,
+      "context_hash": "de2abade832c8e350a1bdc98cfcdb1e202ac4749c5fc51a4a970d41736b6df5c",
+      "message": "`os` imported but unused",
+      "path": "src/test/python/test_apgr_dispatcher_bundle.py",
+      "row": 16
+    },
+    {
+      "code": "F401",
+      "col": 8,
+      "context_hash": "582f9ff727d7496ab22b435e59b0f09b8ec415b0c8e8482ad2547f28cb6beb37",
+      "message": "`shutil` imported but unused",
+      "path": "src/test/python/test_apgr_dispatcher_bundle.py",
+      "row": 18
+    },
+    {
+      "code": "F401",
+      "col": 8,
+      "context_hash": "f9e42ccd54cc9de18179025fa0bf90642c41392da38ee9faa647e9e85573f63e",
+      "message": "`stat` imported but unused",
+      "path": "src/test/python/test_apgr_dispatcher_bundle.py",
+      "row": 19
+    },
+    {
+      "code": "F401",
+      "col": 20,
+      "context_hash": "063e3d97fbe5c7382df417aae2453be61a01861561f37741b5ce484cfd6551d0",
+      "message": "`typing.Any` imported but unused",
+      "path": "src/test/python/test_apgr_dispatcher_bundle.py",
+      "row": 24
+    },
+    {
+      "code": "E402",
+      "col": 1,
+      "context_hash": "10adbc8c1add8c0196c0ce2f84e06e7003c6c261d8b7fc0028af6277fdcab115",
+      "message": "Module level import not at top of file",
+      "path": "src/test/python/test_apgr_dispatcher_bundle.py",
+      "row": 34
+    },
+    {
+      "code": "F401",
+      "col": 5,
+      "context_hash": "07ec8bc31c89bf5e20c2b8b564018cbf31482eb43ecd3b8d5cf4a53effac32f7",
+      "message": "`agent_phase.bundle.BUNDLE_GENERATION` imported but unused",
+      "path": "src/test/python/test_apgr_dispatcher_bundle.py",
+      "row": 35
+    },
+    {
+      "code": "E402",
+      "col": 1,
+      "context_hash": "2a1689bed0ac0f8a0bc50fdc1075879191fa827f7f3fa2603986b24b618efd02",
+      "message": "Module level import not at top of file",
+      "path": "src/test/python/test_apgr_dispatcher_bundle.py",
+      "row": 50
+    },
+    {
+      "code": "F401",
+      "col": 30,
+      "context_hash": "2a1689bed0ac0f8a0bc50fdc1075879191fa827f7f3fa2603986b24b618efd02",
+      "message": "`agent_phase.bundle` imported but unused",
+      "path": "src/test/python/test_apgr_dispatcher_bundle.py",
+      "row": 50
+    },
+    {
+      "code": "F401",
+      "col": 8,
+      "context_hash": "de2abade832c8e350a1bdc98cfcdb1e202ac4749c5fc51a4a970d41736b6df5c",
+      "message": "`os` imported but unused",
+      "path": "src/test/python/test_apgr_worker_qualification.py",
+      "row": 17
+    },
+    {
+      "code": "F401",
+      "col": 20,
+      "context_hash": "fd46e15ed9f57262edec694e7f34c9cd4f0aff19cb252a83b8fecf231e8e2ccc",
+      "message": "`typing.Any` imported but unused",
+      "path": "src/test/python/test_apgr_worker_qualification.py",
+      "row": 21
+    },
+    {
+      "code": "F401",
+      "col": 25,
+      "context_hash": "fd46e15ed9f57262edec694e7f34c9cd4f0aff19cb252a83b8fecf231e8e2ccc",
+      "message": "`typing.Mapping` imported but unused",
+      "path": "src/test/python/test_apgr_worker_qualification.py",
+      "row": 21
+    },
+    {
+      "code": "E402",
+      "col": 1,
+      "context_hash": "fb75ead7735d60d69484074cfc96a84db02deae54d276ef40de71fe45494a0c3",
+      "message": "Module level import not at top of file",
+      "path": "src/test/python/test_apgr_worker_qualification.py",
+      "row": 31
+    },
+    {
+      "code": "E402",
+      "col": 1,
+      "context_hash": "2f93a67383127dc845825e9f0179dc6b14dd05250cf30c43899bb73cc9821c2b",
+      "message": "Module level import not at top of file",
+      "path": "src/test/python/test_apgr_worker_qualification.py",
+      "row": 32
+    },
+    {
+      "code": "E402",
+      "col": 1,
+      "context_hash": "cefbe9c3a9dbbd0e1e55f606db596f4966b05268d84164cca17bf49f10e0b609",
+      "message": "Module level import not at top of file",
+      "path": "src/test/python/test_apgr_worker_qualification.py",
+      "row": 36
+    },
+    {
+      "code": "F401",
+      "col": 5,
+      "context_hash": "c31517cc7ccd4289cf00ae9a526f7170c4e92a11522f388069dd00ec031875ae",
+      "message": "`agent_phase.semantic_roles.ROLE_PRODUCER` imported but unused",
+      "path": "src/test/python/test_apgr_worker_qualification.py",
+      "row": 38
+    },
+    {
+      "code": "E402",
+      "col": 1,
+      "context_hash": "f4693d4a67eb3ddfaab48dc325bc5c4a07a629ac02b09ab90753d6c103ded6f5",
+      "message": "Module level import not at top of file",
+      "path": "src/test/python/test_apgr_worker_qualification.py",
+      "row": 40
+    },
+    {
+      "code": "F401",
+      "col": 8,
+      "context_hash": "f9e42ccd54cc9de18179025fa0bf90642c41392da38ee9faa647e9e85573f63e",
+      "message": "`stat` imported but unused",
+      "path": "src/test/python/test_apgr_workers.py",
+      "row": 14
+    },
+    {
+      "code": "F401",
+      "col": 8,
+      "context_hash": "09d25239ae3d62e91c70b74fa5baa1d52a22c5c2397a785935889e61f91a8557",
+      "message": "`tempfile` imported but unused",
+      "path": "src/test/python/test_apgr_workers.py",
+      "row": 17
+    },
+    {
+      "code": "E402",
+      "col": 1,
+      "context_hash": "989c99dce75648624e827d2969a2ff81880f8899f2f0d41d521bc64c44e89a72",
+      "message": "Module level import not at top of file",
+      "path": "src/test/python/test_apgr_workers.py",
+      "row": 27
+    },
+    {
+      "code": "E402",
+      "col": 1,
+      "context_hash": "d755f9f440714550ac7d9ca6827f62c99e4e99225ddd0e531fd692d0d85e6875",
+      "message": "Module level import not at top of file",
+      "path": "src/test/python/test_apgr_workers.py",
+      "row": 28
+    },
+    {
+      "code": "E402",
+      "col": 1,
+      "context_hash": "e2a0b30f1fc21a15c154c118e1dc5ee9cef9a8cd33b741988e37c9ec9b698336",
+      "message": "Module level import not at top of file",
+      "path": "src/test/python/test_apgr_workers.py",
+      "row": 29
+    },
+    {
+      "code": "E402",
+      "col": 1,
+      "context_hash": "8192e2fafd300dc6b6cbeb568ad624cb19fd0091b0def16af105caf8d7502321",
+      "message": "Module level import not at top of file",
+      "path": "src/test/python/test_apgr_workers.py",
+      "row": 30
+    },
+    {
+      "code": "E402",
+      "col": 1,
+      "context_hash": "67e91db7b7d55c9d1ba1e0083b6f1fa8ce4463d4d6160199915f5cb7413c91aa",
+      "message": "Module level import not at top of file",
+      "path": "src/test/python/test_apgr_workers.py",
+      "row": 31
+    },
+    {
+      "code": "E402",
+      "col": 1,
+      "context_hash": "e5ed64daaf6658a7af95aac3315340aeae4bae870b20deef3dee46779c4f4a8d",
+      "message": "Module level import not at top of file",
+      "path": "src/test/python/test_apgr_workers.py",
+      "row": 32
+    },
+    {
+      "code": "E402",
+      "col": 1,
+      "context_hash": "a3402377a236cd4350e678768557c107cdd78658a6f67e64a6f2a551ed3cdbc1",
+      "message": "Module level import not at top of file",
+      "path": "src/test/python/test_apgr_workers.py",
+      "row": 33
+    },
+    {
+      "code": "E402",
+      "col": 1,
+      "context_hash": "9a56a4e6c51e9d80b7ea46a1a0e7be5133da744c4aa7b03b10a970083f1e0468",
+      "message": "Module level import not at top of file",
+      "path": "src/test/python/test_apgr_workers.py",
+      "row": 34
+    },
+    {
+      "code": "E402",
+      "col": 1,
+      "context_hash": "b1a160827dfd2786690abd1cd9a633e3a518f930ef2d36ec93e90e5074088b4c",
+      "message": "Module level import not at top of file",
+      "path": "src/test/python/test_apgr_workers.py",
+      "row": 35
+    },
+    {
+      "code": "E402",
+      "col": 1,
+      "context_hash": "b6f81927e8fbaf7fef568eb25c5b2ce98172431e29dc9b39018b6b86885d037c",
+      "message": "Module level import not at top of file",
+      "path": "src/test/python/test_apgr_workers.py",
+      "row": 36
+    },
+    {
+      "code": "E402",
+      "col": 1,
+      "context_hash": "84c044dc2744fd105f651986b95290e158ac7bc3159d763853f3683ae00e6149",
+      "message": "Module level import not at top of file",
+      "path": "src/test/python/test_apgr_workers.py",
+      "row": 37
+    },
+    {
+      "code": "E402",
+      "col": 1,
+      "context_hash": "093c438ffcf4fb5afba68ffed5aef0b30a29bf64c4c99b43b04d324522c7c7d7",
+      "message": "Module level import not at top of file",
+      "path": "src/test/python/test_apgr_workers.py",
+      "row": 38
+    },
+    {
+      "code": "E402",
+      "col": 1,
+      "context_hash": "81a0dd85eec6a8e3c06385a8e597793c6c783d47135daa5131290c13d55e90f5",
+      "message": "Module level import not at top of file",
+      "path": "src/test/python/test_apgr_workers.py",
+      "row": 39
+    },
+    {
+      "code": "E402",
+      "col": 1,
+      "context_hash": "257a1205f12fc16760f3d053977ee7b612f9b6f70ad516f6883420172fd1e70c",
+      "message": "Module level import not at top of file",
+      "path": "src/test/python/test_apgr_workers.py",
+      "row": 40
+    }
+  ],
+  "origin_commit": "129a29590b0ab73f3d5a72afff8cbd406accce63",
+  "origin_tree": "0f5381be0a7bab42da533861c0657cbf593538d9",
+  "schema": "apg-ruff-baseline-v2"
+}

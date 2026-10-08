@@ -354,7 +354,7 @@ class TestCatalogAndMaturityDecision(unittest.TestCase):
 
     def test_catalog_parses_real_skills_readme(self) -> None:
         cat = closure.catalog(REPOSITORY_ROOT)
-        self.assertEqual(len(cat), 45)
+        self.assertEqual(set(cat), {p.parent.name for p in (REPOSITORY_ROOT / "skills").rglob("SKILL.md")})
         self.assertIn("python-language-profile", cat)
         self.assertEqual(cat["python-language-profile"][1], "stable")
         self.assertEqual(cat["css-language-profile"][1], "provisional")
@@ -464,7 +464,7 @@ class TestMaturityValidation(unittest.TestCase):
         maintenance = closure.check_maintenance(REPOSITORY_ROOT, records, errors)
         rows = closure.check_maturity(REPOSITORY_ROOT, records, maintenance, errors)
         self.assertEqual(errors, [])
-        self.assertEqual(len(rows), 45)
+        self.assertEqual(set(rows), set(closure.catalog(REPOSITORY_ROOT)))
 
     def test_check_maturity_provisional_faking_existing_stable(self) -> None:
         records, _ = closure.load_records(REPOSITORY_ROOT)
@@ -964,3 +964,19 @@ class TestCheckRoadmapClosureApiAndCli(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+def test_rtk_admission_is_not_a_maturity_decision():
+    import copy
+    records, errors = closure.load_records(REPOSITORY_ROOT)
+    assert not errors
+    row = next(row for row in records["maturity"]["skills"] if row["skill_id"] == "rtk-command-proxy")
+    assert closure.maturity_decision_valid(REPOSITORY_ROOT, row, {})
+    assert row["disposition_status"] == "PROVISIONAL_ADMISSION"
+    for key, value in (("skill_id", "go-language-profile"), ("current_maturity", "stable"), ("independent_review", "docs/README.md")):
+        changed = copy.deepcopy(row)
+        changed[key] = value
+        assert not closure.maturity_decision_valid(REPOSITORY_ROOT, changed, {})
+    changed = copy.deepcopy(row)
+    changed["evidence"]["repeated_positive_use"] = ["docs/README.md"]
+    assert not closure.maturity_decision_valid(REPOSITORY_ROOT, changed, {})

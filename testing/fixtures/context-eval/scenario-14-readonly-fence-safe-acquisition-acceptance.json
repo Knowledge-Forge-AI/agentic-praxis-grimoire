@@ -1,0 +1,96 @@
+{
+  "scenario_id": "scenario-14",
+  "name": "Read-Only Reviewer Fence-Safe Acquisition Acceptance",
+  "subset": "acceptance",
+  "cohort": "correctness_failure_only_cohort",
+  "phase": "APG159A",
+  "task_input": {
+    "instruction": "Review database models in pkg/data/models.go without write authority. Acquire apgr:sqlite-database-profile in-band via MCP.",
+    "task_authority": "read_only",
+    "mutation_scope": []
+  },
+  "provider": "claude",
+  "role_binding": {
+    "binding_id": "binding-reviewer-06",
+    "roles": [
+      "Work Review"
+    ],
+    "allowed_tools": [
+      "view_file",
+      "skill_search",
+      "skill_acquire",
+      "context_explain"
+    ]
+  },
+  "repository_evidence": {
+    "files": [
+      "pkg/data/models.go"
+    ],
+    "primary_language": "go",
+    "dependency_facts": {}
+  },
+  "role_constraints": {
+    "read_only": true,
+    "bash_tool_permitted": false
+  },
+  "acquisition": {
+    "channel": "mcp",
+    "tool": "skill_acquire",
+    "arguments": {
+      "id": "apgr:sqlite-database-profile"
+    }
+  },
+  "skill_sources": {
+    "apgr:sqlite-database-profile": {
+      "canonical_path": "skills/sqlite-database-profile/SKILL.md",
+      "whole_bytes": 17265,
+      "body_bytes": 16929,
+      "body_sha256": "e87fd6b6058abfdefb2533edada2557397aab5c652ae2fd2f3af2cea7b6158df",
+      "source_kind": "canonical_measured"
+    }
+  },
+  "mandatory_instructions": {
+    "provider_file": "claude/CLAUDE.md",
+    "provider_instruction_bytes": 11071,
+    "mandatory_doctrine_bytes": 2500,
+    "mcp_protocol_version": "2025-11-25"
+  },
+  "expected_outcome": {
+    "acquisition_status": "success",
+    "body_returned_in_tool_result": true,
+    "event_emitted": "<run_dir>/acquisitions/events-001.jsonl",
+    "target_repository_worktree_changed": false,
+    "target_repository_index_changed": false,
+    "target_repository_head_changed": false,
+    "subject_drift_observed": false,
+    "immutability_fence_preserved": true,
+    "quality_oracle": {
+      "assertions": "in-band MCP acquisition delivers skill body to reviewer without repository writes; worktree, index, and HEAD remain strictly unchanged"
+    }
+  },
+  "status": "frozen_corrected",
+  "value_sources": {
+    "mandatory_instructions.provider_instruction_bytes": {
+      "source": "measured",
+      "basis": "wc -c claude/CLAUDE.md at the APG159A workspace tree"
+    },
+    "mandatory_instructions.mandatory_doctrine_bytes": {
+      "source": "estimate",
+      "basis": "Planning placeholder. The non-negotiable doctrine slice is not yet a separately measurable artifact; V0130-F must replace this with a measured value before any savings computation uses it."
+    },
+    "skill_sources.apgr:sqlite-database-profile.whole_bytes": {
+      "source": "measured",
+      "basis": "python3 measurement over skills/sqlite-database-profile/SKILL.md"
+    },
+    "skill_sources.apgr:sqlite-database-profile.body_bytes": {
+      "source": "measured",
+      "basis": "python3 measurement over skills/sqlite-database-profile/SKILL.md"
+    }
+  },
+  "value_source_vocabulary": "measured | synthetic | estimate | declared | unavailable (see context-eval-metrics-and-oracles.json)",
+  "correction_revision": {
+    "revision": "APG159A-CORR1",
+    "supersedes": "APG159 numerical freeze (retained in Git history at Exit 00205)",
+    "nature": "pre-implementation correction, not tuning against a held-out set"
+  }
+}

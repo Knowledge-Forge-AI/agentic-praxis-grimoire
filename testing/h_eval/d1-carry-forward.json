@@ -1,0 +1,27 @@
+{
+  "schema": "apg.h-d1-carry-forward/v1",
+  "phase": "APG166V",
+  "attempts": {
+    "D1-01": {"recorded_status": "failed", "consumed": true},
+    "D1-02": {"recorded_status": "failed", "readback_status": "unqualified_with_readback", "consumed": true}
+  },
+  "observation": {
+    "attempt": "D1-02",
+    "classification": "inherited-observation",
+    "native_read_and_exact_nonce": true,
+    "profile": "normal-final-review"
+  },
+  "replay": {
+    "reference": "APG166T-REPAIR2 finalized offline interpretation",
+    "status": "passing",
+    "classification": "corrected-offline-replay",
+    "live_provider_run": false
+  },
+  "manager_decision": {
+    "reference": "APG166V-H-READY1 manager disposition dated 2026-09-28",
+    "custody": "external",
+    "self_certified": false
+  },
+  "historical_custody": "Original identities, failed records and consumed ledgers retained externally; not rewritten or re-read here",
+  "scope": "Native Read capability and separate corrected replay only; not selective projection, adaptive acquisition, H benefit or a live grant"
+}

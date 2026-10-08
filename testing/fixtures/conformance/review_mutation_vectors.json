@@ -1,0 +1,326 @@
+{
+  "schema": "apgr-conformance-review-mutation-v1",
+  "worktree_policies": [
+    "block",
+    "warn",
+    "allow"
+  ],
+  "git_policies": [
+    "block"
+  ],
+  "actions_taken": [
+    "blocked",
+    "warned",
+    "allowed",
+    "none"
+  ],
+  "diagnostic_codes": [
+    "READ_ONLY_STAGE_MUTATED_CANDIDATE",
+    "READ_ONLY_STAGE_MUTATED_INDEX",
+    "READ_ONLY_STAGE_MUTATED_HEAD"
+  ],
+  "sample_policy": {
+    "worktree": "warn",
+    "index": "block",
+    "head": "block",
+    "generation": 7
+  },
+  "valid_observations": [
+    {
+      "name": "clean_no_drift",
+      "observation": {
+        "stage": "plan_review",
+        "policy": {
+          "worktree": "warn",
+          "index": "block",
+          "head": "block",
+          "generation": 7
+        },
+        "subject_drift_observed": false,
+        "worktree_drift": false,
+        "index_drift": false,
+        "head_drift": false,
+        "action_taken": "none"
+      }
+    },
+    {
+      "name": "worktree_drift_blocked",
+      "observation": {
+        "stage": "plan_review",
+        "policy": {
+          "worktree": "block",
+          "index": "block",
+          "head": "block",
+          "generation": 7
+        },
+        "subject_drift_observed": true,
+        "worktree_drift": true,
+        "index_drift": false,
+        "head_drift": false,
+        "worktree_paths": ["src/main.py"],
+        "diagnostic_code": "READ_ONLY_STAGE_MUTATED_CANDIDATE",
+        "action_taken": "blocked"
+      }
+    },
+    {
+      "name": "worktree_drift_warned",
+      "observation": {
+        "stage": "work_review",
+        "policy": {
+          "worktree": "warn",
+          "index": "block",
+          "head": "block",
+          "generation": 7
+        },
+        "subject_drift_observed": true,
+        "worktree_drift": true,
+        "index_drift": false,
+        "head_drift": false,
+        "worktree_paths": ["docs/notes.md"],
+        "diagnostic_code": "READ_ONLY_STAGE_MUTATED_CANDIDATE",
+        "action_taken": "warned"
+      }
+    },
+    {
+      "name": "worktree_drift_allowed",
+      "observation": {
+        "stage": "final_review",
+        "policy": {
+          "worktree": "allow",
+          "index": "block",
+          "head": "block",
+          "generation": 7
+        },
+        "subject_drift_observed": true,
+        "worktree_drift": true,
+        "index_drift": false,
+        "head_drift": false,
+        "worktree_paths": ["README.md"],
+        "diagnostic_code": "",
+        "action_taken": "allowed"
+      }
+    },
+    {
+      "name": "index_drift_blocked_under_warn",
+      "observation": {
+        "stage": "work_review",
+        "policy": {
+          "worktree": "warn",
+          "index": "block",
+          "head": "block",
+          "generation": 7
+        },
+        "subject_drift_observed": true,
+        "worktree_drift": false,
+        "index_drift": true,
+        "head_drift": false,
+        "index_paths": ["staged_file.py"],
+        "expected_index": {"paths": 5, "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"},
+        "observed_index": {"paths": 6, "sha256": "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"},
+        "diagnostic_code": "READ_ONLY_STAGE_MUTATED_INDEX",
+        "action_taken": "blocked"
+      }
+    },
+    {
+      "name": "head_drift_blocked_under_warn",
+      "observation": {
+        "stage": "work_review",
+        "policy": {
+          "worktree": "warn",
+          "index": "block",
+          "head": "block",
+          "generation": 7
+        },
+        "subject_drift_observed": true,
+        "worktree_drift": false,
+        "index_drift": false,
+        "head_drift": true,
+        "expected_head": "0123456789abcdef0123456789abcdef01234567",
+        "observed_head": "fedcba9876543210fedcba9876543210fedcba98",
+        "diagnostic_code": "READ_ONLY_STAGE_MUTATED_HEAD",
+        "action_taken": "blocked"
+      }
+    },
+    {
+      "name": "candidate_observation_unavailable_blocked",
+      "observation": {
+        "stage": "plan_review",
+        "attempt_id": "turn-001",
+        "binding_id": "binding_plan_review",
+        "attempt_number": 1,
+        "role": "plan_reviewer",
+        "subject_kind": "plan",
+        "policy": {
+          "worktree": "warn",
+          "index": "block",
+          "head": "block",
+          "generation": 7
+        },
+        "policy_generation": 7,
+        "raw_stdout_artifact": "turn-001.stdout.md",
+        "raw_stderr_artifact": "turn-001.stderr.txt",
+        "subject_drift_observed": false,
+        "worktree_drift": false,
+        "index_drift": false,
+        "head_drift": false,
+        "candidate_observation_unavailable": true,
+        "limitations": [
+          {"kind": "candidate_observation_unavailable", "detail": "failed reading candidate"}
+        ],
+        "diagnostic_code": "READ_ONLY_STAGE_MUTATED_CANDIDATE",
+        "action_taken": "blocked"
+      }
+    },
+    {
+      "name": "index_observation_unavailable_blocked",
+      "observation": {
+        "stage": "work_review",
+        "policy": {
+          "worktree": "warn",
+          "index": "block",
+          "head": "block",
+          "generation": 7
+        },
+        "subject_drift_observed": false,
+        "worktree_drift": false,
+        "index_drift": false,
+        "head_drift": false,
+        "index_observation_unavailable": true,
+        "diagnostic_code": "READ_ONLY_STAGE_MUTATED_INDEX",
+        "action_taken": "blocked"
+      }
+    },
+    {
+      "name": "head_observation_unavailable_blocked",
+      "observation": {
+        "stage": "work_review",
+        "policy": {
+          "worktree": "warn",
+          "index": "block",
+          "head": "block",
+          "generation": 7
+        },
+        "subject_drift_observed": false,
+        "worktree_drift": false,
+        "index_drift": false,
+        "head_drift": false,
+        "head_observation_unavailable": true,
+        "diagnostic_code": "READ_ONLY_STAGE_MUTATED_HEAD",
+        "action_taken": "blocked"
+      }
+    }
+  ],
+  "invalid_observations": [
+    {
+      "name": "empty_stage",
+      "observation": {
+        "stage": "",
+        "policy": {
+          "worktree": "warn",
+          "index": "block",
+          "head": "block",
+          "generation": 7
+        },
+        "subject_drift_observed": false,
+        "worktree_drift": false,
+        "index_drift": false,
+        "head_drift": false,
+        "action_taken": "none"
+      }
+    },
+    {
+      "name": "inconsistent_drift_flag",
+      "observation": {
+        "stage": "plan_review",
+        "policy": {
+          "worktree": "warn",
+          "index": "block",
+          "head": "block",
+          "generation": 7
+        },
+        "subject_drift_observed": false,
+        "worktree_drift": true,
+        "index_drift": false,
+        "head_drift": false,
+        "action_taken": "warned",
+        "diagnostic_code": "READ_ONLY_STAGE_MUTATED_CANDIDATE"
+      }
+    },
+    {
+      "name": "worktree_path_traversal",
+      "observation": {
+        "stage": "plan_review",
+        "policy": {
+          "worktree": "warn",
+          "index": "block",
+          "head": "block",
+          "generation": 7
+        },
+        "subject_drift_observed": true,
+        "worktree_drift": true,
+        "index_drift": false,
+        "head_drift": false,
+        "worktree_paths": ["../outside.txt"],
+        "action_taken": "warned",
+        "diagnostic_code": "READ_ONLY_STAGE_MUTATED_CANDIDATE"
+      }
+    },
+    {
+      "name": "index_drift_not_blocked",
+      "observation": {
+        "stage": "plan_review",
+        "policy": {
+          "worktree": "warn",
+          "index": "block",
+          "head": "block",
+          "generation": 7
+        },
+        "subject_drift_observed": true,
+        "worktree_drift": false,
+        "index_drift": true,
+        "head_drift": false,
+        "index_paths": ["foo.py"],
+        "action_taken": "warned",
+        "diagnostic_code": "READ_ONLY_STAGE_MUTATED_INDEX"
+      }
+    },
+    {
+      "name": "unavailable_drift_flag_inconsistent",
+      "observation": {
+        "stage": "work_review",
+        "policy": {
+          "worktree": "warn",
+          "index": "block",
+          "head": "block",
+          "generation": 7
+        },
+        "subject_drift_observed": true,
+        "worktree_drift": false,
+        "index_drift": false,
+        "head_drift": false,
+        "candidate_observation_unavailable": true,
+        "diagnostic_code": "READ_ONLY_STAGE_MUTATED_CANDIDATE",
+        "action_taken": "blocked"
+      }
+    },
+    {
+      "name": "unavailable_not_blocked",
+      "observation": {
+        "stage": "work_review",
+        "policy": {
+          "worktree": "warn",
+          "index": "block",
+          "head": "block",
+          "generation": 7
+        },
+        "subject_drift_observed": false,
+        "worktree_drift": false,
+        "index_drift": false,
+        "head_drift": false,
+        "candidate_observation_unavailable": true,
+        "diagnostic_code": "READ_ONLY_STAGE_MUTATED_CANDIDATE",
+        "action_taken": "none"
+      }
+    }
+  ]
+}

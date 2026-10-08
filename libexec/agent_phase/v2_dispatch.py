@@ -8,6 +8,7 @@ projection, and complete terminal artifact sealing.
 from __future__ import annotations
 
 from collections.abc import Callable, Mapping, Sequence
+from contextlib import contextmanager
 import hashlib
 import json
 import os
@@ -32,12 +33,18 @@ from .lifecycle import (
     get_lifecycle,
     validate_finalization,
 )
+from .config_routing import (
+    RETAINED_STATIC_MODES,
+    ReviewMutationPolicy,
+    resolve_review_mutation_policy,
+)
 from .outbox_projection import (
     build_locator_payload,
     project_v2_run,
     resolve_outbox_root,
 )
 from .persistence import (
+    check_dispatcher_db_compatibility,
     get_run,
     open_dispatcher_db,
     record_actor_bindings,
@@ -45,6 +52,7 @@ from .persistence import (
     record_configuration_provenance,
     record_operational_observation,
     record_resume_relation,
+    record_review_mutation_policy_provenance,
     record_run,
     record_semantic_responsibility,
     resolve_dispatcher_db_path,
@@ -52,6 +60,7 @@ from .persistence import (
 )
 from .probes import collect_operational_observations
 from .publication import PublicationError
+from . import review_drift as review_drift_module
 from .request import PhaseRequestV2
 from .roster import load_roster
 from .run import (
@@ -100,6 +109,25 @@ def run_id_for_v2(phase_type: str) -> str:
     return f"apgr-run-v2-{phase_type}-{timestamp}-{rand_hex}"
 
 
+@contextmanager
+def _scoped_apgr_home(apgr_home: Path | str | None):
+    if apgr_home is None:
+        yield
+        return
+    cand = Path(apgr_home).expanduser()
+    if not cand.is_absolute():
+        raise ValueError(f"apgr_home must be an absolute path: {apgr_home}")
+    saved = os.environ.get("APGR_HOME")
+    try:
+        os.environ["APGR_HOME"] = str(cand.resolve())
+        yield
+    finally:
+        if saved is None:
+            os.environ.pop("APGR_HOME", None)
+        else:
+            os.environ["APGR_HOME"] = saved
+
+
 def dispatch_v2(
     repository_root: Path,
     work_tree: Path,
@@ -128,16 +156,131 @@ def dispatch_v2(
     entry_adoption: str | None = None,
     native_git_authority: str | None = None,
     now: float | None = None,
+    review_mutation_policy: ReviewMutationPolicy | Mapping[str, Any] | str | None = None,
+    review_mutation_provenance: Mapping[str, Any] | None = None,
+    review_mutation_provenance_chain: Sequence[Mapping[str, Any]] | None = None,
+    roster: Any | None = None,
 ) -> dict[str, Any]:
     """Execute or dry-run a Request V2 single-phase dispatch with SQLite persistence."""
+    with _scoped_apgr_home(apgr_home):
+        return _dispatch_v2_impl(
+            repository_root,
+            work_tree,
+            request,
+            raw_request,
+            execution_mode=execution_mode,
+            provenance=provenance,
+            provenance_chain=provenance_chain,
+            apgr_home=apgr_home,
+            outbox_root=outbox_root,
+            lifecycle=lifecycle,
+            finalization_policy=finalization_policy,
+            dry_run=dry_run,
+            display=display,
+            operational_observations=operational_observations,
+            injected_observations=injected_observations,
+            runner=runner,
+            attempt_number=attempt_number,
+            run_id=run_id,
+            resume_from_run_id=resume_from_run_id,
+            binding_policy=binding_policy,
+            request_path=request_path,
+            phase_id=phase_id,
+            continue_from=continue_from,
+            entry_adoption=entry_adoption,
+            native_git_authority=native_git_authority,
+            now=now,
+            review_mutation_policy=review_mutation_policy,
+            review_mutation_provenance=review_mutation_provenance,
+            review_mutation_provenance_chain=review_mutation_provenance_chain,
+            roster=roster,
+        )
+
+
+def _dispatch_v2_impl(
+    repository_root: Path,
+    work_tree: Path,
+    request: PhaseRequestV2,
+    raw_request: bytes,
+    *,
+    execution_mode: str = "dynamic",
+    provenance: Mapping[str, Any] | None = None,
+    provenance_chain: Sequence[Mapping[str, Any]] | None = None,
+    apgr_home: Path | None = None,
+    outbox_root: Path | str | None = None,
+    lifecycle: str = LIFECYCLE_STANDARD,
+    finalization_policy: str = FINALIZATION_PUBLISH,
+    dry_run: bool = False,
+    display: Display | None = None,
+    operational_observations: Sequence[OperationalObservation] = (),
+    injected_observations: Sequence[OperationalObservation] | None = None,
+    runner: Callable[..., Any] | None = None,
+    attempt_number: int = 1,
+    run_id: str | None = None,
+    resume_from_run_id: str | None = None,
+    binding_policy: ActorBindingPolicy | None = None,
+    request_path: Path | None = None,
+    phase_id: str | None = None,
+    continue_from: str | None = None,
+    entry_adoption: str | None = None,
+    native_git_authority: str | None = None,
+    now: float | None = None,
+    review_mutation_policy: ReviewMutationPolicy | Mapping[str, Any] | str | None = None,
+    review_mutation_provenance: Mapping[str, Any] | None = None,
+    review_mutation_provenance_chain: Sequence[Mapping[str, Any]] | None = None,
+    roster: Any | None = None,
+) -> dict[str, Any]:
+    if resume_from_run_id is not None and not dry_run:
+        raise PreLaunchFailureError(
+            f"V2 execution does not support resume_from_run_id ({resume_from_run_id}): suffix-resume is not implemented and would replay producer work"
+        )
     candidate.require_worktree(work_tree)
+    if apgr_home is not None:
+        cand_home = Path(apgr_home).expanduser()
+        if not cand_home.is_absolute():
+            raise ValueError(f"apgr_home must be an absolute path: {apgr_home}")
     spec = get_lifecycle(lifecycle)
     valid_finalization_policy = validate_finalization(finalization_policy)
-    load_roster(repository_root)
-    caps_catalog = load_capabilities(repository_root)
+    roster_snapshot = roster or load_roster(repository_root, apgr_home=apgr_home)
+    caps_catalog = load_capabilities(repository_root, apgr_home=apgr_home, roster=roster_snapshot)
+    if execution_mode not in RETAINED_STATIC_MODES and not caps_catalog:
+        raise PreLaunchFailureError(
+            "dynamic execution mode requires a usable capabilities catalog, but capabilities are missing or empty"
+        )
     policy = binding_policy or create_default_binding_policy()
 
     repo_root = gitstate_module.repository_root(work_tree)
+    if review_mutation_policy is None or isinstance(review_mutation_policy, str):
+        res_policy = resolve_review_mutation_policy(
+            work_tree=work_tree,
+            explicit=review_mutation_policy if isinstance(review_mutation_policy, str) else None,
+            project=repo_root,
+            apgr_home=apgr_home,
+            roster=roster_snapshot,
+        )
+        effective_rm_policy = res_policy.policy
+        effective_rm_prov = res_policy.winner.as_dict()
+        effective_rm_chain = [p.as_dict() for p in res_policy.provenance_chain]
+    else:
+        effective_rm_policy = review_mutation_policy
+        effective_rm_prov = dict(review_mutation_provenance or {})
+        effective_rm_chain = list(review_mutation_provenance_chain or [])
+
+    if effective_rm_prov.get("source_type") == "operator_default":
+        policy_gen = getattr(effective_rm_policy, "generation", None)
+        if policy_gen is not None and policy_gen != roster_snapshot.generation:
+            raise PreLaunchFailureError(
+                f"coherence failure: review mutation policy generation {policy_gen} "
+                f"does not match roster snapshot generation {roster_snapshot.generation}"
+            )
+        if (
+            roster_snapshot.policy_source is not None
+            and effective_rm_prov.get("content_digest") != roster_snapshot.policy_source.sha256
+        ):
+            raise PreLaunchFailureError(
+                "coherence failure: review mutation policy digest does not match roster snapshot policy digest"
+            )
+
     project = project_name(repo_root)
     if phase_id is not None:
         effective_phase_id = safe_component(phase_id, "phase id")
@@ -183,6 +326,7 @@ def dispatch_v2(
     request_file.write_bytes(raw_request)
 
     conn = open_dispatcher_db(db_path)
+    check_dispatcher_db_compatibility(conn)
     try:
         # Check if run exists already (for recovery/resume of same run)
         existing_run = get_run(conn, actual_run_id)
@@ -208,6 +352,19 @@ def dispatch_v2(
             if not chain and provenance:
                 chain = [dict(provenance)]
             record_configuration_provenance(conn, actual_run_id, chain)
+
+            # Persist Review Mutation Policy Provenance
+            wt_pol = getattr(effective_rm_policy, "worktree", None) or (effective_rm_policy.get("worktree") if isinstance(effective_rm_policy, dict) else "warn")
+            idx_pol = getattr(effective_rm_policy, "index", None) or (effective_rm_policy.get("index") if isinstance(effective_rm_policy, dict) else "block")
+            hd_pol = getattr(effective_rm_policy, "head", None) or (effective_rm_policy.get("head") if isinstance(effective_rm_policy, dict) else "block")
+            record_review_mutation_policy_provenance(
+                conn,
+                actual_run_id,
+                provenance_chain=effective_rm_chain,
+                worktree_policy=wt_pol,
+                index_policy=idx_pol,
+                head_policy=hd_pol,
+            )
 
             # 3. Persist Actor Bindings
             record_actor_bindings(conn, actual_run_id, [b.as_dict() for b in policy.bindings])
@@ -271,6 +428,38 @@ def dispatch_v2(
                 detail=obs.detail,
             )
 
+        # Resolve RTK configuration once for V2 turns
+        rtk_resolution = None
+        try:
+            import sys
+            src_path = str(repository_root / "src")
+            inserted = False
+            if src_path not in sys.path:
+                sys.path.insert(0, src_path)
+                inserted = True
+            try:
+                from agentic_praxis_grimoire.rtk import resolve_rtk_configuration
+                rtk_resolution = resolve_rtk_configuration(
+                    project_root=work_tree,
+                    apgr_home=apgr_home,
+                )
+                if getattr(rtk_resolution, "status", None) == "unavailable":
+                    diags = getattr(rtk_resolution, "diagnostics", [])
+                    msg = diags[0] if diags else "rtk unavailable"
+                    print(f"agent-phase: v2 rtk unavailable: {msg}", file=sys.stderr, flush=True)
+            finally:
+                if inserted:
+                    try:
+                        sys.path.remove(src_path)
+                    except ValueError:
+                        pass
+        except Exception as err:
+            import sys
+            err_text = str(err)
+            print(f"agent-phase: v2 rtk resolution unavailable: {err_text}", file=sys.stderr, flush=True)
+            from .rtk_fallback import unavailable_rtk_resolution
+            rtk_resolution = unavailable_rtk_resolution(err_text)
+
         # Execute semantic turns
         try:
             turn_result = execute_v2_turns(
@@ -292,6 +481,10 @@ def dispatch_v2(
                 attempt_number=attempt_number,
                 injected_observations=injected,
                 now=ref_now,
+                review_mutation_policy=effective_rm_policy,
+                roster=roster_snapshot,
+                apgr_home=apgr_home,
+                rtk_resolution=rtk_resolution,
             )
         except NoRouteAvailableError as exc:
             update_run_status(conn, actual_run_id, "failed", outcome="no_route", semantic_outcome="no_route")
@@ -346,6 +539,9 @@ def dispatch_v2(
                 "archive_path": None,
                 "archive_sha256": None,
                 "archive_status": "pending_sealing",
+                "review_mutation_policy": effective_rm_policy.as_dict() if hasattr(effective_rm_policy, "as_dict") else dict(effective_rm_policy),
+                "review_mutation_provenance": effective_rm_prov,
+                "review_mutation_provenance_chain": effective_rm_chain,
                 "run_directory": str(run_dir),
                 "db_path": str(db_path),
                 "projection_paths": target_projection_paths,
@@ -466,10 +662,12 @@ def dispatch_v2(
                     "terminal_candidate": {"tree": turn_result["final_tree"]},
                     "closeout_candidate": {"tree": turn_result["final_tree"]},
                     "native_git_transition": native_transition,
-                    "path_dispositions": [d._asdict() for d in parsed_closeout.path_dispositions] if parsed_closeout else [],
+                    "path_dispositions": [d._asdict() if hasattr(d, "_asdict") else dict(d) for d in parsed_closeout.path_dispositions] if parsed_closeout else [],
                     "phase_owned_paths": [],
                     "stage_deltas": {},
                     "ownership_challenges": None,
+                    "review_mutation_policy": effective_rm_policy.as_dict() if hasattr(effective_rm_policy, "as_dict") else dict(effective_rm_policy),
+                    "review_window_mutation_paths": turn_result.get("surviving_review_paths", []),
                     "entry": entry.as_dict(),
                 }
                 if entry_adoption_record is not None:
@@ -503,6 +701,7 @@ def dispatch_v2(
                             finalization_status = "failed"
                             overall_status = "failed"
                     elif valid_finalization_policy == FINALIZATION_COMMIT_LOCAL:
+                        publication_status = "not_attempted"
                         if repo_finalized and fin_outcome in ("completed", "reused"):
                             finalization_status = "completed"
                             overall_status = "completed"
@@ -521,11 +720,17 @@ def dispatch_v2(
                     else:
                         finalization_status = "completed"
                         overall_status = "completed"
-                except (FinalizationError, PublicationError, gitstate_module.GitStateError):
+                except (FinalizationError, PublicationError, gitstate_module.GitStateError) as fin_err:
                     finalization_status = "failed"
                     overall_status = "failed"
+                    err_code = getattr(fin_err, "code", getattr(fin_err, "diagnostic_code", type(fin_err).__name__))
+                    err_detail = str(fin_err)
+                    fin_state["finalization_error"] = {"code": err_code, "detail": err_detail}
                     push_rec = fin_state.get("push", {})
-                    publication_status = push_rec.get("status", "failed")
+                    if valid_finalization_policy == FINALIZATION_COMMIT_LOCAL:
+                        publication_status = "not_attempted"
+                    else:
+                        publication_status = push_rec.get("status", "failed")
                     remote_readback = push_rec
         elif dry_run:
             semantic_status = "dry_run"
@@ -560,6 +765,8 @@ def dispatch_v2(
             "semantic_status": semantic_status,
             "finalization_policy": valid_finalization_policy,
             "finalization_status": finalization_status,
+            "finalization_error": fin_state.get("finalization_error") if "fin_state" in locals() else None,
+            "transport_exit_code": turn_result.get("transport_exit_code", 0),
             "request_schema": request.schema,
             "phase_type": request.phase_type,
             "execution_mode": execution_mode,
@@ -578,6 +785,12 @@ def dispatch_v2(
             "auxiliary_provider_invocations_performed": auxiliary_performed,
             "total_effective_provider_turns": total_effective_turns,
             "result_repair": repair_evidence,
+            "review_mutation_policy": effective_rm_policy.as_dict() if hasattr(effective_rm_policy, "as_dict") else dict(effective_rm_policy),
+            "review_mutation_provenance": effective_rm_prov,
+            "review_mutation_provenance_chain": effective_rm_chain,
+            "review_mutation_observations": turn_result.get("review_mutation_observations", {}),
+            "subject_drift_observed": turn_result.get("subject_drift_observed", False),
+            "final_candidate_reviewed": turn_result.get("final_candidate_reviewed", False),
             "run_directory": str(run_dir),
             "db_path": str(db_path),
             "projection_paths": target_projection_paths,
@@ -601,6 +814,10 @@ def dispatch_v2(
             f"- **Commit**: `{commit_info.get('sha') if commit_info else 'none'}` "
             f"({commit_info.get('subject') if commit_info else 'none'})\n"
             f"- **Publication Status**: `{publication_status or 'none'}`\n\n"
+            f"## Review Mutation Policy\n\n"
+            f"- **Policy**: `{effective_rm_policy.worktree if hasattr(effective_rm_policy, 'worktree') else effective_rm_policy.get('worktree')}`\n"
+            f"- **Subject Drift Observed**: `{turn_result.get('subject_drift_observed', False)}`\n"
+            f"- **Final Candidate Reviewed**: `{turn_result.get('final_candidate_reviewed', False)}`\n\n"
             f"## Turns & Routes Executed\n\n"
         )
         for b_id, r in turn_result["prior_resolutions"].items():

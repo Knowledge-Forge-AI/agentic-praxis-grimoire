@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import dataclasses
 import json
 import os
 from pathlib import Path
@@ -441,10 +442,25 @@ class APGUserSkillsUnitTests(APGUserSkillsCaseMixin, unittest.TestCase):
                     user_skills.public_release,
                     "verify_public_release_lineage",
                     return_value=lineage,
-                ),
+                ) as verify_lineage,
                 mock.patch.object(user_skills, "check_library", return_value=valid_library),
             ):
                 identity = user_skills.verify_source(root)
+            self.assertEqual(verify_lineage.call_args.kwargs["allow_advanced_head"], True)
+            self.assertEqual(verify_lineage.call_args.kwargs["allow_interleaved_untagged"], True)
+            advanced = (*lineage[:-1], dataclasses.replace(lineage[-1], commit="f" * 40))
+            with (
+                mock.patch.object(user_skills, "run_git", side_effect=git),
+                mock.patch.object(
+                    user_skills,
+                    "text_git",
+                    side_effect=(user_skills.PUBLIC_V01_COMMIT, user_skills.PUBLIC_V01_TREE),
+                ),
+                mock.patch.object(user_skills.public_release, "resolve_repository", return_value=mock.Mock()),
+                mock.patch.object(user_skills.public_release, "verify_public_release_lineage", return_value=advanced),
+                self.assertRaisesRegex(user_skills.ToolError, "exact public release tag"),
+            ):
+                user_skills.verify_source(root)
         self.assertEqual(identity.commit, user_skills.PUBLIC_V01_COMMIT)
         self.assertEqual(identity.skill_names, user_skills.SKILLS)
         self.assertTrue(all(len(digest) == 64 for _name, digest in identity.skill_hashes))

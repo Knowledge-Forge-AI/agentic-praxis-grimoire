@@ -77,8 +77,8 @@ func TestDiscoveryPolicyConstants(t *testing.T) {
 	if V010ToolchainAdmittedSkillCount != 44 {
 		t.Fatalf("V010ToolchainAdmittedSkillCount = %d, want 44", V010ToolchainAdmittedSkillCount)
 	}
-	if V010BrowserRuntimeAdmittedSkillCount != 45 {
-		t.Fatalf("V010BrowserRuntimeAdmittedSkillCount = %d, want 45", V010BrowserRuntimeAdmittedSkillCount)
+	if V010BrowserRuntimeAdmittedSkillCount != 46 {
+		t.Fatalf("V010BrowserRuntimeAdmittedSkillCount = %d, want 46", V010BrowserRuntimeAdmittedSkillCount)
 	}
 	if len([]byte(FrozenSVGSkillDescription)) != 241 || !strings.HasPrefix(FrozenSVGSkillDescription, "Use when ") {
 		t.Fatalf("FrozenSVGSkillDescription invalid length or prefix")
@@ -94,6 +94,9 @@ func TestDiscoveryPolicyConstants(t *testing.T) {
 	}
 	if len([]byte(FrozenNPMSkillDescription)) != 323 || !strings.HasPrefix(FrozenNPMSkillDescription, "Use when ") {
 		t.Fatalf("FrozenNPMSkillDescription invalid length or prefix")
+	}
+	if len([]byte(FrozenRTKCommandProxySkillDescription)) != 268 || !strings.HasPrefix(FrozenRTKCommandProxySkillDescription, "Use when ") {
+		t.Fatalf("FrozenRTKCommandProxySkillDescription invalid length or prefix")
 	}
 
 	expectedCandidates := []string{
@@ -150,6 +153,7 @@ func TestDiscoveryPolicyConstants(t *testing.T) {
 		"vite-build-profile",
 		"npm-package-manager-profile",
 		"browser-runtime-profile",
+		"rtk-command-proxy",
 	}
 	if len(V010BrowserRuntimeAdmittedCandidates) != len(expectedBrowserRuntimeAdmitted) {
 		t.Fatalf("V010BrowserRuntimeAdmittedCandidates len = %d, want %d", len(V010BrowserRuntimeAdmittedCandidates), len(expectedBrowserRuntimeAdmitted))
@@ -1241,6 +1245,7 @@ func browserRuntimeBaseline45() []SkillMetadata {
 		makeCandidateMetadata("vite-build-profile", FrozenViteSkillDescription, 25000),
 		makeCandidateMetadata("npm-package-manager-profile", FrozenNPMSkillDescription, 30000),
 		makeCandidateMetadata("browser-runtime-profile", "Use when browser host runtime behavior, Web APIs, DOM, workers, or navigation are evaluated.", 28000),
+		makeCandidateMetadata("rtk-command-proxy", FrozenRTKCommandProxySkillDescription, 5000),
 	)
 	return list
 }
@@ -1248,7 +1253,7 @@ func browserRuntimeBaseline45() []SkillMetadata {
 func TestValidateDiscoveryPolicyV010BrowserRuntimeExactBoundaries(t *testing.T) {
 	baseline45 := browserRuntimeBaseline45()
 	if err := ValidateDiscoveryPolicy(DiscoveryPolicyVersionV010BrowserRuntime, baseline45); err != nil {
-		t.Fatalf("valid 45-skill baseline under %s must pass: %v", DiscoveryPolicyVersionV010BrowserRuntime, err)
+		t.Fatalf("valid 46-skill baseline under %s must pass: %v", DiscoveryPolicyVersionV010BrowserRuntime, err)
 	}
 
 	// SVG body at exactly 20480 bytes passes
@@ -1303,35 +1308,35 @@ func TestValidateDiscoveryPolicyV010BrowserRuntimeOneOverBoundaries(t *testing.T
 		t.Fatal("expected failure for 20481-byte SVG file (limit is 20480)")
 	}
 
-	// 3. Count 44 (missing browser-runtime-profile)
-	skills44 := browserRuntimeBaseline45()[:44]
-	if err := ValidateDiscoveryPolicy(DiscoveryPolicyVersionV010BrowserRuntime, skills44); err == nil {
-		t.Fatal("expected failure for 44 skills under v0.10-browser-runtime (must be exactly 45)")
+	// 3. Count 45 (missing rtk-command-proxy)
+	skills45 := browserRuntimeBaseline45()[:45]
+	if err := ValidateDiscoveryPolicy(DiscoveryPolicyVersionV010BrowserRuntime, skills45); err == nil {
+		t.Fatal("expected failure for 45 skills under v0.10-browser-runtime (must be exactly 46)")
 	}
 
-	// 4. Count 46 (extra candidate)
+	// 4. Count 47 (extra candidate)
 	candExtra := makeCandidateMetadata("unregistered-profile", "Use when unregistered profile applies.", 1000)
-	skills46 := append(browserRuntimeBaseline45(), candExtra)
-	if err := ValidateDiscoveryPolicy(DiscoveryPolicyVersionV010BrowserRuntime, skills46); err == nil {
-		t.Fatal("expected failure for 46 skills under v0.10-browser-runtime (must be exactly 45)")
+	skills47 := append(browserRuntimeBaseline45(), candExtra)
+	if err := ValidateDiscoveryPolicy(DiscoveryPolicyVersionV010BrowserRuntime, skills47); err == nil {
+		t.Fatal("expected failure for 47 skills under v0.10-browser-runtime (must be exactly 46)")
 	}
 
 	// 5. Count 42 (historical browser-ui count)
 	skills42 := browserRuntimeBaseline45()[:42]
 	if err := ValidateDiscoveryPolicy(DiscoveryPolicyVersionV010BrowserRuntime, skills42); err == nil {
-		t.Fatal("expected failure for 42 skills under v0.10-browser-runtime (must be exactly 45)")
+		t.Fatal("expected failure for 42 skills under v0.10-browser-runtime (must be exactly 46)")
 	}
 
 	// 6. Count 40 (historical v0.10 count)
 	skills40 := browserRuntimeBaseline45()[:40]
 	if err := ValidateDiscoveryPolicy(DiscoveryPolicyVersionV010BrowserRuntime, skills40); err == nil {
-		t.Fatal("expected failure for 40 skills under v0.10-browser-runtime (must be exactly 45)")
+		t.Fatal("expected failure for 40 skills under v0.10-browser-runtime (must be exactly 46)")
 	}
 
 	// 7. Count 39 (historical baseline count)
 	skills39 := baselineSkillMetadataList()
 	if err := ValidateDiscoveryPolicy(DiscoveryPolicyVersionV010BrowserRuntime, skills39); err == nil {
-		t.Fatal("expected failure for 39 skills under v0.10-browser-runtime (must be exactly 45)")
+		t.Fatal("expected failure for 39 skills under v0.10-browser-runtime (must be exactly 46)")
 	}
 }
 
@@ -1492,6 +1497,20 @@ func TestValidateDiscoveryPolicyV010BrowserRuntimeFrozenDescriptions(t *testing.
 	}
 	if err := ValidateDiscoveryPolicy(DiscoveryPolicyVersionV010BrowserRuntime, theftNPM); err == nil {
 		t.Fatal("mutating npm description under v0.10-browser-runtime must fail as reservation theft")
+	}
+
+	// 7. Mutate rtk-command-proxy description under v0.10-browser-runtime
+	theftRTK := browserRuntimeBaseline45()
+	for i := range theftRTK {
+		if theftRTK[i].ID == "rtk-command-proxy" {
+			theftRTK[i].Description = "Use when RTK command proxying applies."
+			theftRTK[i].DescriptionBytes = int64(len([]byte(theftRTK[i].Description)))
+			theftRTK[i].DescriptionCharacters = int64(utf8.RuneCountInString(theftRTK[i].Description))
+			break
+		}
+	}
+	if err := ValidateDiscoveryPolicy(DiscoveryPolicyVersionV010BrowserRuntime, theftRTK); err == nil {
+		t.Fatal("mutating rtk-command-proxy description under v0.10-browser-runtime must fail as reservation theft")
 	}
 }
 

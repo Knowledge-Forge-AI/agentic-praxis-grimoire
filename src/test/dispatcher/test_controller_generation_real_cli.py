@@ -30,8 +30,8 @@ def candidate(root):
 def test_actual_cli_smoke_and_pinned_immutable_review(tmp_path, monkeypatch):
     root = tmp_path / "controller"
     candidate(root)
-    monkeypatch.setenv("AGENT_CENTRAL_GENERATION_STORE", str(tmp_path / "store"))
-    monkeypatch.setenv("AGENT_CENTRAL_ACTIVE_ROOT", str(root))
+    monkeypatch.setenv("APGR_GENERATION_STORE", str(tmp_path / "store"))
+    monkeypatch.setenv("APGR_ACTIVE_ROOT", str(root))
     monkeypatch.setenv("PYTHONDONTWRITEBYTECODE", "1")
     sentinels = tmp_path / "provider-sentinels"
     sentinels.mkdir()
@@ -110,7 +110,47 @@ assert state['controller_generation']['safety_established'] is True
 assert state['checkpoints_completed'] == [] and not state.get('commit')
 assert [call['stage'] for call in runner.calls] == ['produce', 'work_review']
 '''
-    result = subprocess.run([sys.executable, "-B", "-c", driver, str(record_file), str(ROOT / "tests"), str(tmp_path)],
-                            capture_output=True, timeout=90)
+    env = dict(os.environ)
+    env["PYTHONPATH"] = os.pathsep.join(sys.path)
+    result = subprocess.run([sys.executable, "-B", "-c", driver, str(record_file), str(ROOT / "src/test/dispatcher"), str(tmp_path)],
+                            capture_output=True, timeout=90, env=env)
     assert result.returncode == 0, result.stderr.decode()
     assert not marker.exists(), "test-only lifecycle injection escaped to a provider"
+
+
+def test_materialized_context_bridge_owns_resources(tmp_path, monkeypatch):
+    root = tmp_path / "controller"
+    candidate(root)
+    monkeypatch.setenv("APGR_GENERATION_STORE", str(tmp_path / "store"))
+    with coordinate(root) as store:
+        record = materialize(root, store)
+    pinned = Path(record["generation_root"])
+    binary = ROOT / "build/apgr-context"
+    assert binary.is_file(), "build the explicit context qualification binary first"
+    driver = r'''
+import json, sys
+from pathlib import Path
+root, run_dir = Path(sys.argv[1]), Path(sys.argv[2])
+sys.path.insert(0, str(root / "libexec"))
+from agent_phase.context_config import capture_context_config
+from agent_phase.context_adapter import prepare
+assert "agentic_praxis_grimoire" not in sys.modules
+run_dir.mkdir()
+target = run_dir / "target"
+(target / ".apgr").mkdir(parents=True)
+(target / ".apgr/config.toml").write_text('[dispatcher.context]\nmode="adaptive"\n')
+capture = capture_context_config(project_root=target, apgr_home=run_dir/"missing-home")
+argv,prompt,state = prepare(capture=capture, run_dir=run_dir, prefix="01-work", run_id="r", binding_id="work", attempt_id="1", roles=["work"], consumer="codex", argv=["fixture"], prompt=b"immutable", facts=[{"kind":"language","value":"go"}])
+assert state["record"]["planned"], state
+assert state["record"]["effective_mode"] == "static"
+assert len(state["record"]["prospective_plan"]["selected_snapshots"]) == 1
+assert "agentic_praxis_grimoire" not in sys.modules
+assert not (run_dir/"missing-home").exists()
+print("materialized context bridge qualified without ambient package")
+'''
+    env = dict(os.environ, APGR_GO_BINARY=str(binary))
+    env.pop("PYTHONPATH", None)
+    result = subprocess.run([sys.executable, "-I", "-c", driver, str(pinned), str(tmp_path/"context-run")],
+                            cwd=tmp_path, env=env, capture_output=True, text=True, timeout=30)
+    assert result.returncode == 0, result.stderr
+    assert "without ambient package" in result.stdout

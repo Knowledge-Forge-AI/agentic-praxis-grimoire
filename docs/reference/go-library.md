@@ -255,12 +255,13 @@ delegation. The [distribution contract](../distribution.md) documents
 supported targets, the multi-registry packaging model, and the package
 architecture. The published v0.9.0 release includes the public `footprint`
 package alongside the core Go packages (`schema`, `report`, `skills`, `envsnap`, `hotspot`).
-This documentation covers v0.10.0 and preview additions for v0.12.0. APGR retains compatibility with v0.8.1 across all
+This documentation covers v0.10.0 and the additions published in v0.12.0. APGR retains compatibility with v0.8.1 across all
 six public Go packages (`schema`, `report`, `skills`, `envsnap`, `hotspot`, `footprint`). In v0.12, five additive
 domain packages (`phase`, `routing`, `evidence`, `candidate`, `provider`) are added with Provisional / Experimental
 stability (ICR-004 / ICR-005) for JACA XO consumer qualification. (Note: `phase` imports `routing` for route binding adapters;
 `routing` may be consumed independently, while `phase` brings in `routing`.)
-Once published, Go consumers can require `github.com/Knowledge-Forge-AI/agentic-praxis-grimoire v0.12.0`
+Go consumers can require the published `github.com/Knowledge-Forge-AI/agentic-praxis-grimoire v0.12.0`
 (or `go get github.com/Knowledge-Forge-AI/agentic-praxis-grimoire@v0.12.0`) through the normal
-public Go proxy and checksum database.
+public Go proxy and checksum database. In the v0.13.0 candidate, the Go API manifest label
+remains `v0.12.0-provisional`.
 

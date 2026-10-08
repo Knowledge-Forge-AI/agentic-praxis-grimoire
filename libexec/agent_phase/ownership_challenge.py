@@ -20,10 +20,18 @@ RECORD_SCHEMA = "agent-phase-ownership-challenge-v1"
 MAX_RECORDS = 1024
 MAX_RECORD_BYTES = 32 * 1024
 MAX_LEDGER_BYTES = 8 * 1024 * 1024
+# Bytes a killed mutating stage may have written before the resumed entry.
+# Their author (dead stage or operator) is unknowable, so only a manager decides.
+RESIDUE = "interrupted_stage_residue"
 DECISIONS = {
     "unclaimed_tracked_deletion": ["phase_owned", "exclude_unrelated"],
     "entry_dirt_overlap": ["phase_owned"],
+    "review_window_mutation": ["phase_owned", "exclude_unrelated", "exclude_environment"],
+    RESIDUE: ["phase_owned", "exclude_unrelated"],
 }
+RESUME_CONTEXT_FIELDS = {"resume_entry_tree", "resume_entry_head",
+                         "resume_entry_object", "source_entry_dirty"}
+
 
 
 def invalid(detail):
@@ -73,7 +81,7 @@ def _phase_delta(root, before, after):
 
 def _provider_eligible(record):
     return (record["boundary"] != "post_terminal"
-            and record["reason"] != "entry_dirt_overlap")
+            and record["reason"] not in ("entry_dirt_overlap", RESIDUE))
 
 def encoded(value):
     try:
@@ -150,7 +158,26 @@ def validate_record(root, record):
         invalid("deletion challenge is not a tracked deletion")
     if reason == "entry_dirt_overlap" and record["entry_object"] == record["base_object"]:
         invalid("entry overlap lacks original dirty object")
+    _validate_resume_context(root, record)
     return record
+
+
+def _validate_resume_context(root, record):
+    """Residue binds both boundaries: the source entry and the resumed entry."""
+    context = record["ownership_context"]
+    resume = context.get("resume") if isinstance(context, dict) else None
+    if record["reason"] != RESIDUE:
+        if resume is not None:
+            invalid("only interruption residue carries resumed-entry context")
+        return
+    if not isinstance(resume, dict) or set(resume) != RESUME_CONTEXT_FIELDS:
+        invalid("interruption residue lacks resumed-entry context")
+    validate_tree(resume["resume_entry_tree"])
+    validate_tree(resume["resume_entry_head"])
+    if object_at(root, resume["resume_entry_tree"], record["path"]) != resume["resume_entry_object"]:
+        invalid("residue resumed-entry object differs from Git evidence")
+    if resume["resume_entry_object"] == record["entry_object"]:
+        invalid("interruption residue did not change before the resumed entry")
 
 
 def statuses(state):
@@ -260,19 +287,23 @@ def _transition(state, path, before, after, transitions):
                           'file/symlink type transitions require repository resolution')
 
 
-def _reason(root, entry, change, after, carried, inherited_deletions):
+def _reason(root, entry, change, after, carried, inherited_deletions, review_window_paths=(), closer_dispositioned_paths=()):
     path = change.path
     if path in entry.dirty and path not in carried and object_at(root, entry.tree, path) != after:
         return 'entry_dirt_overlap'
     if change.status == 'D' and path not in inherited_deletions:
         return 'unclaimed_tracked_deletion'
+    if path in review_window_paths:
+        if path not in closer_dispositioned_paths:
+            return 'review_window_mutation'
+        return None
     if change.status in ('A', 'M') or path in carried:
         return None
     raise ResultError('OWNERSHIP_TYPE_CHANGE_UNSUPPORTED', 'unsupported destructive change status')
 
 
 @_with_facts
-def observe(root, state, entry, raw, stage, boundary):
+def observe(root, state, entry, raw, stage, boundary, path_dispositions=None):
     """Observe before parsing terminal output, never interpreting provider claims."""
     from . import adoption
     if state.get('ownership_challenges') is None:
@@ -299,6 +330,24 @@ def observe(root, state, entry, raw, stage, boundary):
     existing = {r["path"] for r in ledger["records"] if active[r["challenge_id"]] != "superseded"}
     resolved = decisions(state)
     mechanical, transitions = [], []
+    resume_boundary = ((state.get("resume") or {}).get("resume_boundary") or {}) if state.get("resumed") else {}
+    residue = set(resume_boundary.get("interrupted_residue_paths", ()))
+
+    policy = state.get("review_mutation_policy")
+    wt_policy = getattr(policy, "worktree", None) or (policy.get("worktree") if isinstance(policy, dict) else "warn")
+    review_window_paths = set(state.get("review_window_mutation_paths", ())) if wt_policy == "warn" else set()
+
+    # Collect closer dispositions for review-window mutation paths
+    disps = path_dispositions if path_dispositions is not None else state.get("path_dispositions")
+    closer_dispositioned_paths = set()
+    if disps:
+        valid_decisions = set(DECISIONS["review_window_mutation"])
+        for item in disps:
+            d_path = item.get("path") if isinstance(item, dict) else getattr(item, "path", None)
+            d_disp = item.get("disposition") if isinstance(item, dict) else getattr(item, "disposition", None)
+            if d_path and d_disp in valid_decisions:
+                closer_dispositioned_paths.add(d_path)
+
     for change in observed:
         path = change.path
         validate_path(root, path)
@@ -307,21 +356,43 @@ def observe(root, state, entry, raw, stage, boundary):
         # Resolved authority is exact-object authority and never survives drift.
         if path in resolved or path in existing:
             continue
-        reason = _reason(root, entry, change, after, carried, inherited_deletions)
+        reason = (RESIDUE if path in residue and path not in carried else
+                  _reason(root, entry, change, after, carried, inherited_deletions, review_window_paths, closer_dispositioned_paths))
+
         if reason is None:
             mechanical.append(path)
             continue
+        context = {"entry_dirty": path in entry.dirty, "carried": path in carried,
+                   "adoption_digest": digest(state.get("adoption")), "resume_source": (state.get("resume") or {}).get("source_run_id")}
+        # Every object/tree fact of one record comes from one boundary.
+        entry_tree, base_head, status, entry_object = base, entry.head, change.status, before
+        if reason == "entry_dirt_overlap":
+            # Dirt is defined at the current entry, so the record is too.
+            entry_tree, entry_object = entry.tree, object_at(root, entry.tree, path)
+            status = {c.path: c.status for c in _phase_delta(root, entry.tree, raw)}[path]
+        elif reason == RESIDUE:
+            # Residue is a claim about the source boundary; the resumed entry
+            # object is bound separately so neither boundary borrows the other.
+            entry_tree, base_head = resume_boundary["source_entry_tree"], resume_boundary["source_entry_head"]
+            status = {c.path: c.status for c in _phase_delta(root, entry_tree, raw)}.get(path)
+            if status is None:
+                continue  # Restored to the source object: nothing to own.
+            entry_object = object_at(root, entry_tree, path)
+            context["resume"] = {
+                "resume_entry_tree": entry.tree, "resume_entry_head": entry.head,
+                "resume_entry_object": object_at(root, entry.tree, path),
+                "source_entry_dirty": path in resume_boundary.get("source_entry_dirty_paths", ()),
+            }
         record = {"schema": RECORD_SCHEMA, "observation_sequence": len(ledger["records"]),
                   "repository": str(root.resolve()),
                   "project": state.get("project"), "run_id": state.get("run_id"),
                   "controller_generation": state.get("controller_generation"),
                   "phase_id": state.get("phase_id"), "lifecycle": state.get("lifecycle", "standard"),
                   "stage": stage, "boundary": boundary, "path": path, "reason": reason,
-                  "status": change.status, "entry_tree": base, "base_head": entry.head,
-                  "raw_tree": raw, "entry_object": before, "current_object": after,
-                  "base_object": object_at(root, entry.head, path),
-                  "ownership_context": {"entry_dirty": path in entry.dirty, "carried": path in carried,
-                      "adoption_digest": digest(state.get("adoption")), "resume_source": (state.get("resume") or {}).get("source_run_id")},
+                  "status": status, "entry_tree": entry_tree, "base_head": base_head,
+                  "raw_tree": raw, "entry_object": entry_object, "current_object": after,
+                  "base_object": object_at(root, base_head, path),
+                  "ownership_context": context,
                   "allowed_decisions": DECISIONS[reason],
                   "created_at": datetime.now(timezone.utc).isoformat(timespec="seconds")}
         record["challenge_id"] = "ownch1-" + digest(record)
@@ -359,8 +430,9 @@ def validate_resolutions(value):
         if (not isinstance(item, dict) or set(item) != {"challenge_id", "decision"}
                 or not isinstance(item["challenge_id"], str)
                 or not re.fullmatch(r"ownch1-[0-9a-f]{64}", item["challenge_id"])
-                or item["decision"] not in ("phase_owned", "exclude_unrelated")
+                or item["decision"] not in ("phase_owned", "exclude_unrelated", "exclude_environment")
                 or item["challenge_id"] in seen):
+
             invalid_provider("invalid or duplicate ownership resolution")
         seen.add(item["challenge_id"])
     return value

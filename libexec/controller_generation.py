@@ -12,7 +12,7 @@ from controller_generation_process import process_identity
 from controller_generation_store import coordinate, validate_generation
 
 SCHEMA = "controller-generation-lease-v1"
-LEASE_ENV = "AGENT_CENTRAL_GENERATION_LEASE"
+LEASE_ENV = "APGR_GENERATION_LEASE"
 MAX_RECORD = 64 * 1024
 STARTUP_LOCK_TIMEOUT = 300.0
 _current: dict | None = None
@@ -132,6 +132,83 @@ def observe_development(root: Path) -> None:
                     "tree": values[1], "controller_root": str(root),
                     "generation_root": None, "safety_established": False,
                     "reason": "source_development_worktree", "pid": os.getpid(),
+                    "process_identity": process_identity(os.getpid()), "created_at": time.time()}
+
+
+INSTALLED_MARKER = "apgr-installed-runtime.json"
+INSTALLED_SCHEMA = "apgr.installed-runtime/v1"
+# Installed mode is recognized only inside this store; no environment override.
+NIX_STORE_DIR = Path("/nix/store")
+NIX_BASE32 = frozenset("0123456789abcdfghijklmnpqrsvwxyz")
+
+
+def nix_store_object(root: Path) -> Path | None:
+    """Return the write-protected Nix store object containing canonical root."""
+    try:
+        if os.path.realpath(root) != str(root):
+            return None
+        first = root.relative_to(NIX_STORE_DIR).parts[0]
+        info = (NIX_STORE_DIR / first).lstat()
+    except (OSError, ValueError, IndexError):
+        return None
+    digest, separator, name = first.partition("-")
+    if (len(digest) != 32 or not separator or not name or not set(digest) <= NIX_BASE32
+            or not stat.S_ISDIR(info.st_mode) or info.st_mode & 0o222):
+        return None
+    return NIX_STORE_DIR / first
+
+
+def installed_runtime(root: Path) -> dict | None:
+    """Return the build-owned marker of an immutable Nix store runtime, else None.
+
+    Recognition requires a canonical, write-protected, non-Git tree inside a
+    write-protected ``/nix/store`` object whose marker names that root. It
+    rejects accidental or copied trees; it is not tamper-proof against an
+    account that can write the store.
+    """
+    try:
+        marker = root / INSTALLED_MARKER
+        info, root_info = marker.lstat(), root.lstat()
+        if (not stat.S_ISREG(info.st_mode) or not stat.S_ISDIR(root_info.st_mode)
+                or info.st_mode & 0o222 or root_info.st_mode & 0o222
+                or info.st_size > MAX_RECORD):
+            return None
+        if any(os.path.lexists(path / ".git") for path in (root, *root.parents)):
+            return None
+        value = json.loads(marker.read_bytes())
+        version = (root / "src/agentic_praxis_grimoire/VERSION").read_text(encoding="ascii").strip()
+    except (OSError, ValueError, UnicodeError):
+        return None
+    digest = value.get("runtime_digest") if isinstance(value, dict) else None
+    if (not isinstance(value, dict)
+            or set(value) != {"schema", "distribution", "runtime_root", "runtime_digest", "version"}
+            or value["schema"] != INSTALLED_SCHEMA or value["runtime_root"] != str(root)
+            or value["distribution"] != "nix" or nix_store_object(root) is None
+            or value["version"] != version or not isinstance(digest, str) or len(digest) != 64
+            or any(character not in "0123456789abcdef" for character in digest)):
+        return None
+    return value
+
+
+def verify_installed_digest(root: Path, marker: dict) -> None:
+    """Recompute the recorded runtime digest once before installed execution."""
+    from apg_nix_distribution import DistributionError, runtime_digest
+    try:
+        observed = runtime_digest(root)
+    except (OSError, DistributionError) as error:
+        raise RuntimeError(f"installed runtime content cannot be verified: {error}") from error
+    if observed != marker["runtime_digest"]:
+        raise RuntimeError("installed runtime content does not match its recorded runtime_digest")
+
+
+def observe_installed(root: Path, marker: dict) -> None:
+    """Record packaged immutable execution; it has no Git identity or lease."""
+    global _development
+    _development = {"schema": "controller-generation-v1", "commit": None, "tree": None,
+                    "controller_root": str(root), "generation_root": None,
+                    "safety_established": False, "reason": "installed_immutable_runtime",
+                    "distribution": marker["distribution"], "runtime_version": marker["version"],
+                    "runtime_digest": marker["runtime_digest"], "pid": os.getpid(),
                     "process_identity": process_identity(os.getpid()), "created_at": time.time()}
 
 

@@ -1,0 +1,2354 @@
+{
+  "schema": "dispatcher-sqlite-schema-v5",
+  "version": 5,
+  "tables": {
+    "actor_bindings": {
+      "columns": [
+        {
+          "cid": 0,
+          "name": "run_id",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 1
+        },
+        {
+          "cid": 1,
+          "name": "binding_id",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 2
+        },
+        {
+          "cid": 2,
+          "name": "policy_name",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 3,
+          "name": "merged_roles_json",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 4,
+          "name": "required_capabilities_json",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 5,
+          "name": "process_read_only",
+          "type": "INTEGER",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 6,
+          "name": "is_mutating",
+          "type": "INTEGER",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        }
+      ],
+      "foreign_keys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "to_table": "runs",
+          "from_column": "run_id",
+          "to_column": "run_id",
+          "on_update": "NO ACTION",
+          "on_delete": "CASCADE",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "sqlite_autoindex_actor_bindings_1",
+          "unique": true,
+          "origin": "pk",
+          "partial": false,
+          "columns": [
+            "run_id",
+            "binding_id"
+          ]
+        }
+      ]
+    },
+    "artifacts": {
+      "columns": [
+        {
+          "cid": 0,
+          "name": "artifact_id",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 1
+        },
+        {
+          "cid": 1,
+          "name": "run_id",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 2,
+          "name": "artifact_name",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 3,
+          "name": "relative_path",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 4,
+          "name": "size_bytes",
+          "type": "INTEGER",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 5,
+          "name": "sha256",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 6,
+          "name": "content_type",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 7,
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        }
+      ],
+      "foreign_keys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "to_table": "runs",
+          "from_column": "run_id",
+          "to_column": "run_id",
+          "on_update": "NO ACTION",
+          "on_delete": "CASCADE",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "sqlite_autoindex_artifacts_1",
+          "unique": true,
+          "origin": "pk",
+          "partial": false,
+          "columns": [
+            "artifact_id"
+          ]
+        }
+      ]
+    },
+    "candidates": {
+      "columns": [
+        {
+          "cid": 0,
+          "name": "candidate_id",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 1
+        },
+        {
+          "cid": 1,
+          "name": "run_id",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 2,
+          "name": "responsibility_name",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 3,
+          "name": "candidate_type",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 4,
+          "name": "tree_sha",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 5,
+          "name": "head_sha",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 6,
+          "name": "manifest_json",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 7,
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        }
+      ],
+      "foreign_keys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "to_table": "runs",
+          "from_column": "run_id",
+          "to_column": "run_id",
+          "on_update": "NO ACTION",
+          "on_delete": "CASCADE",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "sqlite_autoindex_candidates_1",
+          "unique": true,
+          "origin": "pk",
+          "partial": false,
+          "columns": [
+            "candidate_id"
+          ]
+        }
+      ]
+    },
+    "completion_receipts": {
+      "columns": [
+        {
+          "cid": 0,
+          "name": "receipt_id",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 1
+        },
+        {
+          "cid": 1,
+          "name": "run_id",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 2,
+          "name": "phase_id",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 3,
+          "name": "final_head",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 4,
+          "name": "finalization_policy",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 5,
+          "name": "finalization_outcome",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 6,
+          "name": "commit_sha",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 7,
+          "name": "push_status",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 8,
+          "name": "receipt_json",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 9,
+          "name": "completed_at",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        }
+      ],
+      "foreign_keys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "to_table": "runs",
+          "from_column": "run_id",
+          "to_column": "run_id",
+          "on_update": "NO ACTION",
+          "on_delete": "CASCADE",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "sqlite_autoindex_completion_receipts_1",
+          "unique": true,
+          "origin": "pk",
+          "partial": false,
+          "columns": [
+            "receipt_id"
+          ]
+        }
+      ]
+    },
+    "configuration_provenance": {
+      "columns": [
+        {
+          "cid": 0,
+          "name": "run_id",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 1
+        },
+        {
+          "cid": 1,
+          "name": "source_type",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 2
+        },
+        {
+          "cid": 2,
+          "name": "source_path",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 3,
+          "name": "content_digest",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 4,
+          "name": "resolved_mode",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 5,
+          "name": "is_winner",
+          "type": "INTEGER",
+          "notnull": true,
+          "default_value": "0",
+          "pk": 0
+        },
+        {
+          "cid": 6,
+          "name": "precedence_rank",
+          "type": "INTEGER",
+          "notnull": true,
+          "default_value": "0",
+          "pk": 0
+        },
+        {
+          "cid": 7,
+          "name": "resolved_at",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        }
+      ],
+      "foreign_keys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "to_table": "runs",
+          "from_column": "run_id",
+          "to_column": "run_id",
+          "on_update": "NO ACTION",
+          "on_delete": "CASCADE",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "sqlite_autoindex_configuration_provenance_1",
+          "unique": true,
+          "origin": "pk",
+          "partial": false,
+          "columns": [
+            "run_id",
+            "source_type"
+          ]
+        }
+      ]
+    },
+    "invocation_attempts": {
+      "columns": [
+        {
+          "cid": 0,
+          "name": "attempt_id",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 1
+        },
+        {
+          "cid": 1,
+          "name": "run_id",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 2,
+          "name": "binding_id",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 3,
+          "name": "attempt_number",
+          "type": "INTEGER",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 4,
+          "name": "predecessor_attempt_id",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 5,
+          "name": "provider",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 6,
+          "name": "profile",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 7,
+          "name": "endpoint_alias",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 8,
+          "name": "status",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 9,
+          "name": "exit_code",
+          "type": "INTEGER",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 10,
+          "name": "started_at",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 11,
+          "name": "completed_at",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 12,
+          "name": "route_resolution_id",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 13,
+          "name": "attempt_kind",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": "'semantic'",
+          "pk": 0
+        }
+      ],
+      "foreign_keys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "to_table": "runs",
+          "from_column": "run_id",
+          "to_column": "run_id",
+          "on_update": "NO ACTION",
+          "on_delete": "CASCADE",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "sqlite_autoindex_invocation_attempts_1",
+          "unique": true,
+          "origin": "pk",
+          "partial": false,
+          "columns": [
+            "attempt_id"
+          ]
+        }
+      ]
+    },
+    "invocation_observation_relations": {
+      "columns": [
+        {
+          "cid": 0,
+          "name": "attempt_id",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 1
+        },
+        {
+          "cid": 1,
+          "name": "observation_id",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 2
+        },
+        {
+          "cid": 2,
+          "name": "relation_type",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 3,
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        }
+      ],
+      "foreign_keys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "to_table": "operational_observations",
+          "from_column": "observation_id",
+          "to_column": "observation_id",
+          "on_update": "NO ACTION",
+          "on_delete": "CASCADE",
+          "match": "NONE"
+        },
+        {
+          "id": 1,
+          "seq": 0,
+          "to_table": "invocation_attempts",
+          "from_column": "attempt_id",
+          "to_column": "attempt_id",
+          "on_update": "NO ACTION",
+          "on_delete": "CASCADE",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "sqlite_autoindex_invocation_observation_relations_1",
+          "unique": true,
+          "origin": "pk",
+          "partial": false,
+          "columns": [
+            "attempt_id",
+            "observation_id"
+          ]
+        }
+      ]
+    },
+    "legacy_quarantine_review_mutation_observations": {
+      "columns": [
+        {
+          "cid": 0,
+          "name": "run_id",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 1,
+          "name": "stage",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 2,
+          "name": "sequence",
+          "type": "INTEGER",
+          "notnull": true,
+          "default_value": "0",
+          "pk": 0
+        },
+        {
+          "cid": 3,
+          "name": "worktree_policy",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 4,
+          "name": "index_policy",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 5,
+          "name": "head_policy",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 6,
+          "name": "action_taken",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 7,
+          "name": "subject_drift_observed",
+          "type": "INTEGER",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 8,
+          "name": "worktree_drift",
+          "type": "INTEGER",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 9,
+          "name": "index_drift",
+          "type": "INTEGER",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 10,
+          "name": "head_drift",
+          "type": "INTEGER",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 11,
+          "name": "diagnostic_code",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 12,
+          "name": "worktree_paths_json",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 13,
+          "name": "index_paths_json",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 14,
+          "name": "expected_tree",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 15,
+          "name": "observed_tree",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 16,
+          "name": "expected_index",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 17,
+          "name": "observed_index",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 18,
+          "name": "expected_head",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 19,
+          "name": "observed_head",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 20,
+          "name": "recorded_at",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 21,
+          "name": "attempt_id",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 22,
+          "name": "binding_id",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 23,
+          "name": "attempt_number",
+          "type": "INTEGER",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 24,
+          "name": "role",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 25,
+          "name": "subject_kind",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 26,
+          "name": "limitations_json",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 27,
+          "name": "policy_generation",
+          "type": "INTEGER",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 28,
+          "name": "raw_stdout_artifact",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 29,
+          "name": "raw_stderr_artifact",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 30,
+          "name": "candidate_observation_unavailable",
+          "type": "INTEGER",
+          "notnull": false,
+          "default_value": "0",
+          "pk": 0
+        },
+        {
+          "cid": 31,
+          "name": "index_observation_unavailable",
+          "type": "INTEGER",
+          "notnull": false,
+          "default_value": "0",
+          "pk": 0
+        },
+        {
+          "cid": 32,
+          "name": "head_observation_unavailable",
+          "type": "INTEGER",
+          "notnull": false,
+          "default_value": "0",
+          "pk": 0
+        },
+        {
+          "cid": 33,
+          "name": "quarantined_at",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 34,
+          "name": "quarantine_reason",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        }
+      ],
+      "foreign_keys": [],
+      "indexes": []
+    },
+    "legacy_quarantine_review_mutation_policies": {
+      "columns": [
+        {
+          "cid": 0,
+          "name": "run_id",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 1,
+          "name": "source_type",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 2,
+          "name": "source_path",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 3,
+          "name": "content_digest",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 4,
+          "name": "worktree_policy",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 5,
+          "name": "index_policy",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 6,
+          "name": "head_policy",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 7,
+          "name": "resolved_mode",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 8,
+          "name": "policy_generation",
+          "type": "INTEGER",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 9,
+          "name": "is_winner",
+          "type": "INTEGER",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 10,
+          "name": "precedence_rank",
+          "type": "INTEGER",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 11,
+          "name": "resolved_at",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 12,
+          "name": "quarantined_at",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 13,
+          "name": "quarantine_reason",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        }
+      ],
+      "foreign_keys": [],
+      "indexes": []
+    },
+    "operational_observations": {
+      "columns": [
+        {
+          "cid": 0,
+          "name": "observation_id",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 1
+        },
+        {
+          "cid": 1,
+          "name": "producer",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 2,
+          "name": "observation_type",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 3,
+          "name": "provider",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 4,
+          "name": "profile",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 5,
+          "name": "timestamp",
+          "type": "REAL",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 6,
+          "name": "expires_at",
+          "type": "REAL",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 7,
+          "name": "digest",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 8,
+          "name": "state_value",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 9,
+          "name": "detail_json",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        }
+      ],
+      "foreign_keys": [],
+      "indexes": [
+        {
+          "name": "sqlite_autoindex_operational_observations_1",
+          "unique": true,
+          "origin": "pk",
+          "partial": false,
+          "columns": [
+            "observation_id"
+          ]
+        }
+      ]
+    },
+    "resume_relations": {
+      "columns": [
+        {
+          "cid": 0,
+          "name": "run_id",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 1
+        },
+        {
+          "cid": 1,
+          "name": "prior_run_id",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 2
+        },
+        {
+          "cid": 2,
+          "name": "resumed_from_stage",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 3,
+          "name": "relation_type",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        }
+      ],
+      "foreign_keys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "to_table": "runs",
+          "from_column": "run_id",
+          "to_column": "run_id",
+          "on_update": "NO ACTION",
+          "on_delete": "CASCADE",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "sqlite_autoindex_resume_relations_1",
+          "unique": true,
+          "origin": "pk",
+          "partial": false,
+          "columns": [
+            "run_id",
+            "prior_run_id"
+          ]
+        }
+      ]
+    },
+    "review_dispositions": {
+      "columns": [
+        {
+          "cid": 0,
+          "name": "disposition_id",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 1
+        },
+        {
+          "cid": 1,
+          "name": "run_id",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 2,
+          "name": "responsibility_name",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 3,
+          "name": "review_id",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 4,
+          "name": "disposition_outcome",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 5,
+          "name": "rationale",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 6,
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        }
+      ],
+      "foreign_keys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "to_table": "runs",
+          "from_column": "run_id",
+          "to_column": "run_id",
+          "on_update": "NO ACTION",
+          "on_delete": "CASCADE",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "sqlite_autoindex_review_dispositions_1",
+          "unique": true,
+          "origin": "pk",
+          "partial": false,
+          "columns": [
+            "disposition_id"
+          ]
+        }
+      ]
+    },
+    "review_findings": {
+      "columns": [
+        {
+          "cid": 0,
+          "name": "finding_id",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 1
+        },
+        {
+          "cid": 1,
+          "name": "review_id",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 2,
+          "name": "severity",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 3,
+          "name": "title",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 4,
+          "name": "detail",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 5,
+          "name": "disposition_status",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 6,
+          "name": "disposition_rationale",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        }
+      ],
+      "foreign_keys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "to_table": "review_records",
+          "from_column": "review_id",
+          "to_column": "review_id",
+          "on_update": "NO ACTION",
+          "on_delete": "CASCADE",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "sqlite_autoindex_review_findings_1",
+          "unique": true,
+          "origin": "pk",
+          "partial": false,
+          "columns": [
+            "finding_id"
+          ]
+        }
+      ]
+    },
+    "review_mutation_observations": {
+      "columns": [
+        {
+          "cid": 0,
+          "name": "run_id",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 1
+        },
+        {
+          "cid": 1,
+          "name": "stage",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 2
+        },
+        {
+          "cid": 2,
+          "name": "sequence",
+          "type": "INTEGER",
+          "notnull": true,
+          "default_value": "0",
+          "pk": 3
+        },
+        {
+          "cid": 3,
+          "name": "worktree_policy",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 4,
+          "name": "index_policy",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 5,
+          "name": "head_policy",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 6,
+          "name": "action_taken",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 7,
+          "name": "subject_drift_observed",
+          "type": "INTEGER",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 8,
+          "name": "worktree_drift",
+          "type": "INTEGER",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 9,
+          "name": "index_drift",
+          "type": "INTEGER",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 10,
+          "name": "head_drift",
+          "type": "INTEGER",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 11,
+          "name": "diagnostic_code",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 12,
+          "name": "worktree_paths_json",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 13,
+          "name": "index_paths_json",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 14,
+          "name": "expected_tree",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 15,
+          "name": "observed_tree",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 16,
+          "name": "expected_index",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 17,
+          "name": "observed_index",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 18,
+          "name": "expected_head",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 19,
+          "name": "observed_head",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 20,
+          "name": "recorded_at",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 21,
+          "name": "attempt_id",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 22,
+          "name": "binding_id",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 23,
+          "name": "attempt_number",
+          "type": "INTEGER",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 24,
+          "name": "role",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 25,
+          "name": "subject_kind",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 26,
+          "name": "limitations_json",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 27,
+          "name": "policy_generation",
+          "type": "INTEGER",
+          "notnull": true,
+          "default_value": "7",
+          "pk": 0
+        },
+        {
+          "cid": 28,
+          "name": "raw_stdout_artifact",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 29,
+          "name": "raw_stderr_artifact",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 30,
+          "name": "candidate_observation_unavailable",
+          "type": "INTEGER",
+          "notnull": true,
+          "default_value": "0",
+          "pk": 0
+        },
+        {
+          "cid": 31,
+          "name": "index_observation_unavailable",
+          "type": "INTEGER",
+          "notnull": true,
+          "default_value": "0",
+          "pk": 0
+        },
+        {
+          "cid": 32,
+          "name": "head_observation_unavailable",
+          "type": "INTEGER",
+          "notnull": true,
+          "default_value": "0",
+          "pk": 0
+        }
+      ],
+      "foreign_keys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "to_table": "runs",
+          "from_column": "run_id",
+          "to_column": "run_id",
+          "on_update": "NO ACTION",
+          "on_delete": "CASCADE",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "idx_review_mutation_obs_attempt",
+          "unique": false,
+          "origin": "c",
+          "partial": false,
+          "columns": [
+            "run_id",
+            "stage",
+            "attempt_id"
+          ]
+        },
+        {
+          "name": "idx_review_mutation_obs_run",
+          "unique": false,
+          "origin": "c",
+          "partial": false,
+          "columns": [
+            "run_id"
+          ]
+        },
+        {
+          "name": "sqlite_autoindex_review_mutation_observations_1",
+          "unique": true,
+          "origin": "pk",
+          "partial": false,
+          "columns": [
+            "run_id",
+            "stage",
+            "sequence"
+          ]
+        }
+      ]
+    },
+    "review_mutation_policies": {
+      "columns": [
+        {
+          "cid": 0,
+          "name": "run_id",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 1
+        },
+        {
+          "cid": 1,
+          "name": "source_type",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 2
+        },
+        {
+          "cid": 2,
+          "name": "source_path",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 3,
+          "name": "content_digest",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 4,
+          "name": "worktree_policy",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 5,
+          "name": "index_policy",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 6,
+          "name": "head_policy",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 7,
+          "name": "resolved_mode",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 8,
+          "name": "policy_generation",
+          "type": "INTEGER",
+          "notnull": true,
+          "default_value": "7",
+          "pk": 0
+        },
+        {
+          "cid": 9,
+          "name": "is_winner",
+          "type": "INTEGER",
+          "notnull": true,
+          "default_value": "0",
+          "pk": 0
+        },
+        {
+          "cid": 10,
+          "name": "precedence_rank",
+          "type": "INTEGER",
+          "notnull": true,
+          "default_value": "0",
+          "pk": 0
+        },
+        {
+          "cid": 11,
+          "name": "resolved_at",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        }
+      ],
+      "foreign_keys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "to_table": "runs",
+          "from_column": "run_id",
+          "to_column": "run_id",
+          "on_update": "NO ACTION",
+          "on_delete": "CASCADE",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "sqlite_autoindex_review_mutation_policies_1",
+          "unique": true,
+          "origin": "pk",
+          "partial": false,
+          "columns": [
+            "run_id",
+            "source_type"
+          ]
+        }
+      ]
+    },
+    "review_records": {
+      "columns": [
+        {
+          "cid": 0,
+          "name": "review_id",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 1
+        },
+        {
+          "cid": 1,
+          "name": "run_id",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 2,
+          "name": "responsibility_name",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 3,
+          "name": "candidate_id",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 4,
+          "name": "reviewer_provider",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 5,
+          "name": "reviewer_profile",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 6,
+          "name": "outcome",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 7,
+          "name": "findings_count",
+          "type": "INTEGER",
+          "notnull": true,
+          "default_value": "0",
+          "pk": 0
+        },
+        {
+          "cid": 8,
+          "name": "raw_artifact_id",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 9,
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        }
+      ],
+      "foreign_keys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "to_table": "runs",
+          "from_column": "run_id",
+          "to_column": "run_id",
+          "on_update": "NO ACTION",
+          "on_delete": "CASCADE",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "sqlite_autoindex_review_records_1",
+          "unique": true,
+          "origin": "pk",
+          "partial": false,
+          "columns": [
+            "review_id"
+          ]
+        }
+      ]
+    },
+    "route_resolutions": {
+      "columns": [
+        {
+          "cid": 0,
+          "name": "resolution_id",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 1
+        },
+        {
+          "cid": 1,
+          "name": "run_id",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 2,
+          "name": "binding_id",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 3,
+          "name": "attempt_number",
+          "type": "INTEGER",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 4,
+          "name": "provider",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 5,
+          "name": "profile",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 6,
+          "name": "endpoint_alias",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 7,
+          "name": "intelligence_json",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 8,
+          "name": "policy_snapshot_json",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 9,
+          "name": "observation_ids_json",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 10,
+          "name": "selection_rationale",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 11,
+          "name": "resolved_at",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        }
+      ],
+      "foreign_keys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "to_table": "runs",
+          "from_column": "run_id",
+          "to_column": "run_id",
+          "on_update": "NO ACTION",
+          "on_delete": "CASCADE",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "sqlite_autoindex_route_resolutions_1",
+          "unique": true,
+          "origin": "pk",
+          "partial": false,
+          "columns": [
+            "resolution_id"
+          ]
+        }
+      ]
+    },
+    "runs": {
+      "columns": [
+        {
+          "cid": 0,
+          "name": "run_id",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 1
+        },
+        {
+          "cid": 1,
+          "name": "project",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 2,
+          "name": "phase_id",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 3,
+          "name": "schema_version",
+          "type": "INTEGER",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 4,
+          "name": "request_schema",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 5,
+          "name": "request_digest",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 6,
+          "name": "workflow_version",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 7,
+          "name": "lifecycle",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 8,
+          "name": "execution_mode",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 9,
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 10,
+          "name": "status",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 11,
+          "name": "outcome",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 12,
+          "name": "semantic_outcome",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 13,
+          "name": "finalization_policy",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 14,
+          "name": "finalization_outcome",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 15,
+          "name": "run_directory",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 16,
+          "name": "archive_path",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 17,
+          "name": "archive_sha256",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        }
+      ],
+      "foreign_keys": [],
+      "indexes": [
+        {
+          "name": "sqlite_autoindex_runs_1",
+          "unique": true,
+          "origin": "pk",
+          "partial": false,
+          "columns": [
+            "run_id"
+          ]
+        }
+      ]
+    },
+    "schema_migrations": {
+      "columns": [
+        {
+          "cid": 0,
+          "name": "version",
+          "type": "INTEGER",
+          "notnull": false,
+          "default_value": null,
+          "pk": 1
+        },
+        {
+          "cid": 1,
+          "name": "applied_at",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        }
+      ],
+      "foreign_keys": [],
+      "indexes": []
+    },
+    "semantic_responsibilities": {
+      "columns": [
+        {
+          "cid": 0,
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 1
+        },
+        {
+          "cid": 1,
+          "name": "run_id",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 2,
+          "name": "responsibility_name",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 3,
+          "name": "binding_id",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 4,
+          "name": "status",
+          "type": "TEXT",
+          "notnull": true,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 5,
+          "name": "started_at",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 6,
+          "name": "completed_at",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 7,
+          "name": "outcome",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 8,
+          "name": "candidate_id",
+          "type": "TEXT",
+          "notnull": false,
+          "default_value": null,
+          "pk": 0
+        }
+      ],
+      "foreign_keys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "to_table": "runs",
+          "from_column": "run_id",
+          "to_column": "run_id",
+          "on_update": "NO ACTION",
+          "on_delete": "CASCADE",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "sqlite_autoindex_semantic_responsibilities_1",
+          "unique": true,
+          "origin": "pk",
+          "partial": false,
+          "columns": [
+            "id"
+          ]
+        }
+      ]
+    }
+  }
+}

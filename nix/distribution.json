@@ -1,0 +1,81 @@
+{
+  "commands": [
+    "agent-phase-adopt",
+    "agent-phase-adopt-entry",
+    "agent-phase-dispatch",
+    "agent-phase-finalize",
+    "agent-phase-observations",
+    "agent-phase-ownership",
+    "agent-phase-resolve",
+    "apgr",
+    "apgr-dispatcher-bundle"
+  ],
+  "excluded_names": [
+    ".DS_Store",
+    ".git",
+    "__pycache__",
+    "settings.json",
+    "settings.local.json"
+  ],
+  "go_excluded": [
+    "footprint/testdata",
+    "hotspot/testdata",
+    "report/testdata"
+  ],
+  "go_sources": [
+    "candidate",
+    "cmd",
+    "envsnap",
+    "evidence",
+    "footprint",
+    "go.mod",
+    "hotspot",
+    "internal",
+    "phase",
+    "provider",
+    "report",
+    "routing",
+    "schema",
+    "skills"
+  ],
+  "package": "agentic-praxis-grimoire",
+  "publication": {
+    "critical_files": [
+      "flake.lock",
+      "flake.nix",
+      "nix/checks.nix",
+      "nix/distribution.json",
+      "nix/package.nix",
+      "nix/source.nix"
+    ],
+    "first_version": "0.13.0",
+    "flake_ref": "github:Knowledge-Forge-AI/agentic-praxis-grimoire"
+  },
+  "runtime": [
+    "COMMERCIAL-LICENSE.md",
+    "LICENSE",
+    "NOTICE",
+    "README.md",
+    "antigravity/GEMINI.md",
+    "antigravity/profiles",
+    "bin",
+    "claude/CLAUDE.md",
+    "claude/instruction-fragments-v1.json",
+    "claude/model-catalog-v1.json",
+    "claude/profiles",
+    "codex/AGENTS.md",
+    "codex/config.d/170-subagents.toml",
+    "codex/profiles",
+    "common/dispatcher",
+    "common/skills/agent-worker",
+    "libexec",
+    "src/agentic_praxis_grimoire",
+    "tools/add_dispatcher_roster_operator_directions.py"
+  ],
+  "schema": "apgr.nix-distribution/v1",
+  "systems": {
+    "aarch64-darwin": "darwin/arm64",
+    "aarch64-linux": "linux/arm64",
+    "x86_64-linux": "linux/amd64"
+  }
+}

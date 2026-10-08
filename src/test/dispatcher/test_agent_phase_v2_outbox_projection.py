@@ -39,6 +39,8 @@ def _setup_canonical(tmp_path: Path) -> tuple[Path, Path, Path, Path]:
 
 
 def test_default_outbox_path(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.delenv("APGR_OUTBOX_ROOT", raising=False)
+    monkeypatch.delenv("APGR_RUN_ROOT", raising=False)
     monkeypatch.delenv("AGENT_PHASE_RUN_ROOT", raising=False)
     fake_home = tmp_path / "fake_home"
     resolved = resolve_outbox_root(home=fake_home)
@@ -46,9 +48,16 @@ def test_default_outbox_path(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) ->
 
 
 def test_project_and_global_outbox_overrides(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.delenv("APGR_HOME", raising=False)
+    monkeypatch.delenv("APGR_OUTBOX_ROOT", raising=False)
     env_target = tmp_path / "env_outbox"
+    monkeypatch.delenv("APGR_RUN_ROOT", raising=False)
     monkeypatch.setenv("AGENT_PHASE_RUN_ROOT", str(env_target))
     assert resolve_outbox_root() == env_target.resolve()
+
+    apgr_target = tmp_path / "apgr_outbox"
+    monkeypatch.setenv("APGR_RUN_ROOT", str(apgr_target))
+    assert resolve_outbox_root() == apgr_target.resolve()
 
     explicit_target = tmp_path / "explicit_outbox"
     assert resolve_outbox_root(explicit=explicit_target) == explicit_target.resolve()
@@ -60,7 +69,7 @@ def test_project_and_global_outbox_overrides(tmp_path: Path, monkeypatch: pytest
     (proj_apgr / "config.toml").write_text(f'outbox_root = "{proj_outbox}"\n', encoding="utf-8")
     assert resolve_outbox_root(project_root=proj_dir) == proj_outbox.resolve()
 
-    # Project TOML overrides AGENT_PHASE_RUN_ROOT
+    # Project TOML overrides APGR_RUN_ROOT
     assert resolve_outbox_root(project_root=proj_dir) == proj_outbox.resolve()
 
     fake_home = tmp_path / "fake_home"
@@ -68,6 +77,7 @@ def test_project_and_global_outbox_overrides(tmp_path: Path, monkeypatch: pytest
     global_apgr.mkdir(parents=True)
     global_outbox = tmp_path / "global_outbox"
     (global_apgr / "config.toml").write_text(f'outbox_root = "{global_outbox}"\n', encoding="utf-8")
+    monkeypatch.delenv("APGR_RUN_ROOT", raising=False)
     monkeypatch.delenv("AGENT_PHASE_RUN_ROOT", raising=False)
     assert resolve_outbox_root(home=fake_home) == global_outbox.resolve()
 

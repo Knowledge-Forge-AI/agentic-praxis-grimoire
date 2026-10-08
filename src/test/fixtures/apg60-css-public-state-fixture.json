@@ -54,13 +54,13 @@
     },
     {
       "candidate_surface": "present",
-      "canonical_skills": 45,
-      "catalog_rows": 45,
-      "general_routes": 43,
+      "canonical_skills": 46,
+      "catalog_rows": 46,
+      "general_routes": 44,
       "known_debt": "present",
       "local_routes": 1,
-      "projections": 45,
-      "provisional": 31,
+      "projections": 46,
+      "provisional": 32,
       "stable": 14,
       "state": "current"
     }

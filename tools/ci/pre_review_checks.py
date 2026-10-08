@@ -70,6 +70,24 @@ def checks(scratch_dir: Path, tool_root: Path | None = None) -> tuple[Check, ...
         "src/test",
     )
 
+    mypy_command = [
+        python,
+        "tools/ci/python_type_check.py",
+        "--manifest",
+        "tools/ci/python_type_ownership.json",
+    ]
+    if tool_root is not None:
+        mypy_command.extend(["--tool-root", str(tool_root)])
+
+    ratchets_command = [
+        python,
+        "tools/ci/retained_python_ratchets.py",
+        "--baseline",
+        "tools/ci/retained_python_ratchets.json",
+    ]
+    if tool_root is not None:
+        ratchets_command.extend(["--tool-root", str(tool_root)])
+
     return (
         Check("ruff", (python, "-m", "ruff", "check", "--output-format=json", *ruff_roots), policy="ruff", python_owned=True),
         Check(
@@ -79,31 +97,23 @@ def checks(scratch_dir: Path, tool_root: Path | None = None) -> tuple[Check, ...
                 "-m",
                 "ruff",
                 "check",
+                "--output-format=json",
                 "--select",
                 "F",
                 "src/agentic_praxis_grimoire",
                 "libexec",
             ),
+            policy="pyflakes",
             python_owned=True,
         ),
         Check(
             "mypy",
-            (
-                python,
-                "tools/ci/python_type_check.py",
-                "--manifest",
-                "tools/ci/python_type_ownership.json",
-            ),
+            tuple(mypy_command),
             python_owned=True,
         ),
         Check(
             "retained-python-ratchets",
-            (
-                python,
-                "tools/ci/retained_python_ratchets.py",
-                "--baseline",
-                "tools/ci/retained_python_ratchets.json",
-            ),
+            tuple(ratchets_command),
             policy="retained-python-ratchets",
             python_owned=True,
         ),

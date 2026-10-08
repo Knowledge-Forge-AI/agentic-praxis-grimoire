@@ -1,0 +1,79 @@
+{
+  "arms": {
+    "adaptive": {
+      "route": {
+        "identity_sources": [
+          "common/dispatcher/routes.toml",
+          "common/dispatcher/endpoints.toml",
+          "antigravity/profiles/gemini-3.8-flash-high.json"
+        ],
+        "model": "gemini-3.8-flash-high",
+        "profile": "gemini-3.8-flash-high",
+        "provider": "antigravity",
+        "requested_mode": "adaptive",
+        "role_binding": {
+          "allowed_tools": [
+            "view_file",
+            "replace_file_content",
+            "write_to_file",
+            "run_command"
+          ],
+          "binding_id": "binding-producer-03",
+          "roles": [
+            "Producer"
+          ]
+        },
+        "source_sha256": {
+          "antigravity/profiles/gemini-3.8-flash-high.json": "27e520268856f24c598ad322f3200a33c3b470a5d3d26e1016f704949bfa77ea",
+          "common/dispatcher/endpoints.toml": "a3ae4c8654cf16a314d277877c99f98bffefdea2ae593d1475df3a6c1fc8a4b9",
+          "common/dispatcher/routes.toml": "c194887b362159141db6e345951cae20c229f05c1f5cf72eeb8305e5e8135673"
+        }
+      },
+      "status": "unavailable"
+    },
+    "static": {
+      "route": {
+        "identity_sources": [
+          "common/dispatcher/routes.toml",
+          "common/dispatcher/endpoints.toml",
+          "antigravity/profiles/gemini-3.8-flash-high.json"
+        ],
+        "model": "gemini-3.8-flash-high",
+        "profile": "gemini-3.8-flash-high",
+        "provider": "antigravity",
+        "requested_mode": "static",
+        "role_binding": {
+          "allowed_tools": [
+            "view_file",
+            "replace_file_content",
+            "write_to_file",
+            "run_command"
+          ],
+          "binding_id": "binding-producer-03",
+          "roles": [
+            "Producer"
+          ]
+        },
+        "source_sha256": {
+          "antigravity/profiles/gemini-3.8-flash-high.json": "27e520268856f24c598ad322f3200a33c3b470a5d3d26e1016f704949bfa77ea",
+          "common/dispatcher/endpoints.toml": "a3ae4c8654cf16a314d277877c99f98bffefdea2ae593d1475df3a6c1fc8a4b9",
+          "common/dispatcher/routes.toml": "c194887b362159141db6e345951cae20c229f05c1f5cf72eeb8305e5e8135673"
+        }
+      },
+      "status": "unavailable"
+    }
+  },
+  "blockers": [
+    "Concrete clean subject factory not frozen",
+    "Provider result importer not frozen",
+    "Substantive external oracle implementation not frozen",
+    "Live projection/runtime authority not frozen"
+  ],
+  "oracle_executed": false,
+  "phase": "APG166C",
+  "provider_invocations": 0,
+  "scenario_id": "scenario-05",
+  "scenario_sha256": "83f4129fb82738ac4ee3fbc8ef7a0d99899c7f71d88a7e0a5b5a8010440f9131",
+  "status": "unavailable",
+  "subject_materialized": false
+}
