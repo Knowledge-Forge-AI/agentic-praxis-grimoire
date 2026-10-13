@@ -1,16 +1,17 @@
 # Agent-Central Ownership Transition Handoff (v0.12)
 
-- Status: **Proposed** — APGR-side decision recorded; delivered unaccepted for Agent-Central team disposition
+- Status: **Historical v0.12 Proposal** — Delivered unaccepted; succeeded for forward development by [v0-13 Agent-Central transition](v0-13-agent-central-ownership-transition.md)
 - Target Version: APGR v0.12 / Agent-Central Evolution
 - Inspected Pinned Baseline: Agent-Central `56e9bb039536dfc8893e61a431681d6a32167b6f` (verified present; working tree clean and unmodified by this phase)
 - Governing Decisions: ADR 0058, ADR 0061
 
 ## Status and authority
 
-This document has **no** authority over Agent-Central. It records APGR's own
-ownership decision and offers coordination guidance. Nothing here has been
-reviewed or accepted by the Agent-Central team, APGR mutates nothing in that
-repository, and every recommendation below is declinable.
+This document has **no** authority over Agent-Central. It records APGR's historical
+proposals during v0.12. Forward v0.13 transition doctrine and the reversible
+owner-executed decommission path are documented in [v0-13 Agent-Central transition](v0-13-agent-central-ownership-transition.md).
+Nothing here has been reviewed or accepted by the Agent-Central team, and every
+recommendation remains declinable.
 
 ## Overview
 

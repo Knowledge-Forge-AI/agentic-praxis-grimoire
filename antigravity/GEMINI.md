@@ -21,27 +21,6 @@ When agent-central supplies a transport completion fence instruction:
 - Emit the exact completion fence as the final line of the response.
 - Make NO tool calls after the completion fence.
 
-## RTK shell-output efficiency
-
-For supported shell and development commands, prefer the RTK-proxied form so
-output is compacted before it reaches model context. Typical examples include
-`rtk git status`, `rtk git diff`, `rtk git log`, `rtk pytest`, `rtk cargo test`,
-`rtk cargo build`, `rtk npm test`, `rtk npm run build`, `rtk cat <file>`,
-`rtk rg <pattern>`, and `rtk ls <path>`.
-
-Run RTK meta commands directly: `rtk gain`, `rtk gain --history`, and
-`rtk discover`. When genuinely raw, unfiltered output is required, use
-`rtk proxy <cmd>`. If RTK does not support a command or changes semantics the
-task requires, run the raw command instead of forcing RTK.
-
-This is prompt-based efficiency guidance, not a transparent Antigravity shell
-hook and not a security boundary. A repository-local
-`.agents/rules/antigravity-rtk-rules.md` may reinforce it, but agent-central
-does not require or install that project-local file.
-
-This integration imposes no additional sandbox restriction. Follow the task's
-actual authority and stop boundaries.
-
 ## Dispatcher-bound Gemini Flash parent
 
 For a Gemini 3.8 Flash High parent in `gemini_flash_sub` or
@@ -77,3 +56,10 @@ security-grade anti-bypass guarantee. Provider-native nested delegation has not
 been qualified and must not be used. Read-only worker tasks forbid all test
 runners, builds, installers, formatters and Git mutations. Never create a new
 root parent budget or invoke a phase dispatcher from a worker.
+
+## APGR ownership
+
+Worker launches use the candidate's absolute APGR entrypoints and captured
+`models.toml`/`workers.toml`. APGR worker state uses `APGR_*` variables; no
+Agent-Central runtime or shared mutable configuration is required. Leaves may
+not delegate. Required worker routes may not degrade to parent-only execution.

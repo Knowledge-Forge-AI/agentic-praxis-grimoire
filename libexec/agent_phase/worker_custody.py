@@ -61,7 +61,7 @@ class WorkerCustody:
         self.directory.write_json("state.json", self.state)
         self._armed = True
 
-    def drain(self) -> dict[str, Any] | None:
+    def drain(self, *, parent_exit_observed=False) -> dict[str, Any] | None:
         if self.ledger is None or self.summary is not None:
             return self.summary
         pending = {
@@ -82,7 +82,10 @@ class WorkerCustody:
             )
         interruption: BaseException | None = None
         try:
-            self.summary = self.ledger.drain_and_close(timeout_seconds=15.0)
+            import inspect
+            parameters = inspect.signature(self.ledger.drain_and_close).parameters
+            evidence = {"parent_exit_observed": parent_exit_observed} if "parent_exit_observed" in parameters else {}
+            self.summary = self.ledger.drain_and_close(timeout_seconds=15.0, **evidence)
             if not isinstance(self.summary, dict) or type(self.summary.get("uncertain_cleanup")) is not bool:
                 raise ValueError("worker drain returned no cleanup decision")
         except BaseException as error:

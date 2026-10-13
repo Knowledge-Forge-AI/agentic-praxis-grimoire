@@ -364,3 +364,74 @@ def test_cli_error_clean_exit_code_2(tmp_path: Path) -> None:
     with pytest.raises(SystemExit) as exc_info:
         resolve_main([str(req_v1), "--execution-mode", "codex_only"])
     assert exc_info.value.code == 2
+
+
+def test_dispatch_v2_single_bundle_threading_and_coherence_rejection(tmp_path: Path) -> None:
+    from agent_phase.v2_dispatch import dispatch_v2
+    from agent_phase.v2_turns import PreLaunchFailureError
+    from agent_phase.config_routing import ReviewMutationPolicy
+    from agent_phase.roster import load_roster
+    from agent_phase.request import parse_request_v2
+
+    root = _repo_root()
+    repo = _init_repo(tmp_path / "repo")
+    op_home = tmp_path / "operator_home"
+    disp = tmp_path / "bundle-source"
+    disp.mkdir(parents=True)
+    gen = 42
+
+    for name in ("routes.toml", "endpoints.toml", "capabilities.toml", "policy.toml", "models.toml", "workers.toml"):
+        src = root / "common" / "dispatcher" / name
+        content = src.read_text(encoding="utf-8")
+        import re
+        updated = re.sub(r"generation = \d+", f"generation = {gen}", content)
+        (disp / name).write_text(updated, encoding="utf-8")
+    from agent_phase.bundle import publish_bundle
+    publish_bundle(disp, op_home / "dispatcher")
+
+    raw_req = _make_v2_request_bytes()
+    req = parse_request_v2(raw_req)
+
+    # Clean execution with operator bundle
+    res = dispatch_v2(
+        root,
+        repo,
+        req,
+        raw_req,
+        execution_mode="codex_only",
+        apgr_home=op_home,
+        dry_run=True,
+    )
+    assert res["status"] == "dry_run"
+
+    roster = load_roster(root, apgr_home=op_home)
+
+    # Coherence rejection: policy generation mismatch
+    mismatched_policy = ReviewMutationPolicy(worktree="block", index="block", head="block", generation=999)
+    with pytest.raises(PreLaunchFailureError, match="coherence failure.*generation"):
+        dispatch_v2(
+            root,
+            repo,
+            req,
+            raw_req,
+            execution_mode="codex_only",
+            apgr_home=op_home,
+            dry_run=True,
+            review_mutation_policy=mismatched_policy,
+            review_mutation_provenance={"source_type": "operator_default", "content_digest": roster.policy_source.sha256},
+        )
+
+    # Coherence rejection: policy digest mismatch
+    matching_policy = ReviewMutationPolicy(worktree="block", index="block", head="block", generation=gen)
+    with pytest.raises(PreLaunchFailureError, match="coherence failure.*digest"):
+        dispatch_v2(
+            root,
+            repo,
+            req,
+            raw_req,
+            execution_mode="codex_only",
+            apgr_home=op_home,
+            dry_run=True,
+            review_mutation_policy=matching_policy,
+            review_mutation_provenance={"source_type": "operator_default", "content_digest": "bad" * 16},
+        )

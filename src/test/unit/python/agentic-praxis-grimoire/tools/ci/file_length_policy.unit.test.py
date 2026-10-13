@@ -84,7 +84,7 @@ def test_classify_exact_boundaries(
 def test_load_policy_success(tmp_path: Path) -> None:
     policy_file = tmp_path / "policy.json"
     policy_doc = {
-        "schema": "apg-file-length-policy-v1",
+        "schema": "apg-file-length-policy-v2",
         "warning_limit": 400,
         "failure_limit": 1000,
         "allowances": [
@@ -92,7 +92,6 @@ def test_load_policy_success(tmp_path: Path) -> None:
                 "path": "libexec/sample.py",
                 "role": "maintained-source",
                 "owner": "sample-owner",
-                "sha256": "a" * 64,
                 "count": 1200,
                 "rationale": "Sample oversized component",
                 "maintenance": "Refactor planned",
@@ -101,7 +100,7 @@ def test_load_policy_success(tmp_path: Path) -> None:
     }
     policy_file.write_text(json.dumps(policy_doc), encoding="utf-8")
     loaded = load_policy(policy_file)
-    assert loaded.schema == "apg-file-length-policy-v1"
+    assert loaded.schema == "apg-file-length-policy-v2"
     assert loaded.warning_limit == 400
     assert loaded.failure_limit == 1000
     assert "libexec/sample.py" in loaded.allowances
@@ -136,7 +135,7 @@ def test_load_policy_rejects_invalid_limits(tmp_path: Path) -> None:
     policy_file = tmp_path / "policy.json"
     policy_file.write_text(
         json.dumps({
-            "schema": "apg-file-length-policy-v1",
+            "schema": "apg-file-length-policy-v2",
             "warning_limit": 1000,
             "failure_limit": 400,
             "allowances": [],
@@ -149,7 +148,7 @@ def test_load_policy_rejects_invalid_limits(tmp_path: Path) -> None:
 
 @pytest.mark.parametrize("mutation", ["missing", "unknown", "duplicate", "increase", "boolean"])
 def test_closed_policy_cannot_silently_relax_gate(tmp_path, mutation):
-    document = {"schema": "apg-file-length-policy-v1", "warning_limit": 400,
+    document = {"schema": "apg-file-length-policy-v2", "warning_limit": 400,
                 "failure_limit": 1000, "allowances": []}
     if mutation == "missing":
         del document["failure_limit"]
@@ -174,14 +173,13 @@ def test_load_policy_rejects_duplicate_allowance_paths(tmp_path: Path) -> None:
         "path": "libexec/dup.py",
         "role": "maintained-source",
         "owner": "test",
-        "sha256": "b" * 64,
         "count": 1500,
         "rationale": "test",
         "maintenance": "test",
     }
     policy_file.write_text(
         json.dumps({
-            "schema": "apg-file-length-policy-v1",
+            "schema": "apg-file-length-policy-v2",
             "warning_limit": 400,
             "failure_limit": 1000,
             "allowances": [entry, entry],
@@ -198,14 +196,13 @@ def test_load_policy_rejects_path_escape(tmp_path: Path) -> None:
         "path": "../escaping.py",
         "role": "maintained-source",
         "owner": "test",
-        "sha256": "c" * 64,
         "count": 1500,
         "rationale": "test",
         "maintenance": "test",
     }
     policy_file.write_text(
         json.dumps({
-            "schema": "apg-file-length-policy-v1",
+            "schema": "apg-file-length-policy-v2",
             "warning_limit": 400,
             "failure_limit": 1000,
             "allowances": [entry],
@@ -222,14 +219,13 @@ def test_load_policy_rejects_allowance_below_failure_limit(tmp_path: Path) -> No
         "path": "libexec/small.py",
         "role": "maintained-source",
         "owner": "test",
-        "sha256": "d" * 64,
         "count": 900,
         "rationale": "test",
         "maintenance": "test",
     }
     policy_file.write_text(
         json.dumps({
-            "schema": "apg-file-length-policy-v1",
+            "schema": "apg-file-length-policy-v2",
             "warning_limit": 400,
             "failure_limit": 1000,
             "allowances": [entry],
@@ -240,27 +236,27 @@ def test_load_policy_rejects_allowance_below_failure_limit(tmp_path: Path) -> No
         load_policy(policy_file)
 
 
-def test_load_policy_rejects_invalid_sha256(tmp_path: Path) -> None:
+def test_load_policy_rejects_disallowed_fields_such_as_sha256(tmp_path: Path) -> None:
     policy_file = tmp_path / "policy.json"
     entry = {
         "path": "libexec/bad_sha.py",
         "role": "maintained-source",
         "owner": "test",
-        "sha256": "not-a-valid-sha256",
+        "sha256": "a" * 64,
         "count": 1500,
         "rationale": "test",
         "maintenance": "test",
     }
     policy_file.write_text(
         json.dumps({
-            "schema": "apg-file-length-policy-v1",
+            "schema": "apg-file-length-policy-v2",
             "warning_limit": 400,
             "failure_limit": 1000,
             "allowances": [entry],
         }),
         encoding="utf-8",
     )
-    with pytest.raises(FileLengthOperationalError, match="must be a 64-char hex string"):
+    with pytest.raises(FileLengthOperationalError, match="allowance fields differ from the closed contract"):
         load_policy(policy_file)
 
 
@@ -269,14 +265,13 @@ def test_load_shipped_policy() -> None:
     shipped_policy = repo_root / "tools/ci/file_length_policy.json"
     assert shipped_policy.is_file()
     policy = load_policy(shipped_policy)
-    assert policy.schema == "apg-file-length-policy-v1"
+    assert policy.schema == "apg-file-length-policy-v2"
     declared = json.loads(shipped_policy.read_text(encoding="utf-8"))["allowances"]
     assert policy.allowances
     assert set(policy.allowances) == {entry["path"] for entry in declared}
     assert len(policy.allowances) == len(declared)
     for allowance in policy.allowances.values():
         assert allowance.count > 1000
-        assert len(allowance.sha256) == 64
 
 
 def test_render_json_is_deterministic_and_newline_terminated() -> None:

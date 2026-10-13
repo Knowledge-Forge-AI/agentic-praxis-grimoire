@@ -754,11 +754,14 @@ def normalize_index_if_needed(
                     f"cannot normalize index with unmerged paths: {all_unmerged_paths[0]}",
                 )
             if head_moved:
+                if review_binding.is_review(state, stage_name):
+                    return record
                 raise gitstate_module.GitStateError(
                     "HEAD_MOVED_WITHOUT_COMMIT",
                     "cannot normalize index after an unaccounted HEAD change; preserve current state",
                 )
         return record
+
 
     # Safe to reset index back to HEAD without modifying worktree
     reset_res = subprocess.run(

@@ -1,0 +1,9 @@
+#!/usr/bin/env python3
+"""Candidate-owned dispatcher bundle entrypoint."""
+import os
+from pathlib import Path
+import sys
+os.environ.pop("PYTHONPATH", None)
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "libexec"))
+from agent_phase.bundle_cli import main
+raise SystemExit(main())

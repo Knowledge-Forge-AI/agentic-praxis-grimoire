@@ -504,12 +504,13 @@ export function resolveScenarioAuthority(table, targetScenarioIds) {
   throw new Error(`Unsupported scenario family mix: ${Array.from(selectedFamilies).sort().join(', ')}`);
 }
 
-export function writeReceiptFile(receiptPath, scenarios, browserVersions, startTime, artifactsDir, allArtifacts, manifestOrRegister = null, browserEnvironments = null, resolvedAuthority = null, customTablePath = null, customRegisterPath = null) {
+export function writeReceiptFile(receiptPath, scenarios, browserVersions, startTime, artifactsDir, allArtifacts, manifestOrRegister = null, browserEnvironments = null, resolvedAuthority = null, customTablePath = null, customRegisterPath = null, engineErrors = [], selectedScenarioIds = null) {
+  engineErrors ||= [];
   const passedCount = scenarios.filter((s) => s.status === 'passed').length;
   const failedCount = scenarios.filter((s) => s.status === 'failed').length;
   const artifactsList = Array.from(allArtifacts || []).sort();
 
-  if (failedCount === 0 && artifactsDir) {
+  if (failedCount === 0 && engineErrors.length === 0 && artifactsDir) {
     for (const art of artifactsList) {
       const p = path.join(artifactsDir, art);
       if (!fs.existsSync(p) || fs.statSync(p).size === 0) {
@@ -545,10 +546,17 @@ export function writeReceiptFile(receiptPath, scenarios, browserVersions, startT
   validateFamilyTable(activeTable);
 
   const scenarioIds = Array.from(new Set(scenarios.map((s) => s.scenario_id || s.id).filter(Boolean)));
-  if (scenarioIds.length === 0) {
+  if (!scenarioIds.length && engineErrors.length) {
+    scenarioIds.push(...new Set(engineErrors.flatMap(error => error.target_scenarios || [])));
+  }
+  if (selectedScenarioIds && scenarioIds.some(id => !selectedScenarioIds.includes(id))) {
+    throw new Error('Receipt scenario outside selected target set');
+  }
+  const authorityIds = selectedScenarioIds || scenarioIds;
+  if (authorityIds.length === 0) {
     throw new Error('Target scenarios must not be empty');
   }
-  const authority = resolveScenarioAuthority(activeTable, scenarioIds);
+  const authority = resolveScenarioAuthority(activeTable, authorityIds);
   if (resolvedAuthority && resolvedAuthority !== authority) {
     throw new Error('Resolved authority disagrees with receipt family table');
   }
@@ -589,15 +597,16 @@ export function writeReceiptFile(receiptPath, scenarios, browserVersions, startT
     timestamp: new Date().toISOString(),
     total_duration_ms: Date.now() - startTime,
     summary: {
-      total: scenarios.length,
+      total: scenarios.length + engineErrors.length,
       passed: passedCount,
-      failed: failedCount,
+      failed: failedCount + engineErrors.length,
       skipped: 0,
     },
     scenarios,
     artifacts: artifactsList,
   };
 
+  if (engineErrors.length) receipt.engine_errors = engineErrors;
   fs.writeFileSync(receiptPath, JSON.stringify(receipt, null, 2), 'utf-8');
   return receipt;
 }
@@ -2497,6 +2506,117 @@ export async function closeServers(servers, initiatingError = null) {
   }
 }
 
+let lastRecordedMonotonicMs = 0;
+export function resetProgressMonotonicForTesting() { lastRecordedMonotonicMs = 0; }
+
+export function recordProgress(root, { phase, engine = null, scenario = null, boundary = 'start', monotonic_ms = performance.now() }) {
+  if (!root) return;
+  const ms = Number.isFinite(monotonic_ms) ? Math.max(lastRecordedMonotonicMs, monotonic_ms) : lastRecordedMonotonicMs;
+  lastRecordedMonotonicMs = ms;
+  const entry = { phase, engine, scenario, boundary, monotonic_ms: ms };
+  const sanitized = Object.fromEntries(Object.entries(entry).map(([key, value]) =>
+    [key, typeof value === 'string' ? sanitizeDiagnosticText(value) : value]));
+  try {
+    const fd = fs.openSync(path.join(root, 'progress.jsonl'), fs.constants.O_WRONLY | fs.constants.O_APPEND | fs.constants.O_CREAT | fs.constants.O_NOFOLLOW, 0o600);
+    try { fs.writeSync(fd, JSON.stringify(sanitized) + '\n'); } finally { fs.closeSync(fd); }
+  } catch (error) { console.error('Progress persistence error:', JSON.stringify(sanitizeError(error))); }
+  return sanitized;
+}
+
+export function persistReceiptSafe(receiptPath, scenarios, versions, start, artifactsDir, artifacts, options = {}) {
+  const { primaryError = null, scratchDir = null, browserName = null, scenarioId = null } = options;
+  const progress = boundary => recordProgress(scratchDir, { phase: 'receipt persistence', engine: browserName, scenario: scenarioId, boundary });
+  progress('start');
+  try {
+    const receipt = writeReceiptFile(receiptPath, scenarios, versions, start, artifactsDir, artifacts,
+      options.manifestOrRegister, options.browserEnvironments, options.resolvedAuthority,
+      options.customTablePath, options.customRegisterPath, options.engineErrors, options.selectedScenarioIds);
+    progress('end');
+    return { success: true, receipt };
+  } catch (error) {
+    progress('error');
+    if (!primaryError) throw error;
+    console.error('Secondary receipt persistence error:', JSON.stringify(sanitizeError(error)));
+    return { success: false, error, preservedSeparately: true };
+  }
+}
+
+export async function closeBrowserSafe(browser, primary = null, { scratchDir = null, browserName = null } = {}) {
+  const progress = boundary => recordProgress(scratchDir, { phase: 'browser cleanup', engine: browserName, boundary });
+  progress('start');
+  try {
+    await browser.close();
+    progress('end');
+    return { success: true };
+  } catch (error) {
+    progress('error');
+    console.error('Browser cleanup error:', JSON.stringify(sanitizeError(error)));
+    return { success: false, error, preservedSeparately: Boolean(primary) };
+  }
+}
+
+export async function runScenarioLifecycle({ scenario, browserName, browser = null, context = null,
+  createContextFn = null, executeFn, scratchDir = null, checkAbruptDisconnect = null, persistPending = null }) {
+  const start = Date.now();
+  const id = scenario?.id || null;
+  const progress = (phase, boundary) => recordProgress(scratchDir, { phase, engine: browserName, scenario: id, boundary });
+  let primary = null, secondary = null, engineError = null;
+  let assertions = [], artifacts = [];
+  const snapshot = () => ({ scenario_id: id, group: scenario?.group, browser: browserName,
+    status: primary ? 'failed' : 'passed', duration_ms: Date.now() - start, assertions, artifacts,
+    error: primary ? sanitizeError(primary).message : null, error_details: primary ? sanitizeError(primary) : null,
+    cleanup_error: secondary ? sanitizeError(secondary).message : null,
+    cleanup_error_details: secondary ? sanitizeError(secondary) : null,
+    cleanup_only: Boolean(secondary && primary === secondary), primary_error: primary,
+    secondary_error: secondary, engine_error: engineError });
+  const disconnected = () => checkAbruptDisconnect ? checkAbruptDisconnect()
+    : browser && !browser.isConnected() ? Object.assign(new Error(`Browser ${browserName} disconnected unexpectedly`), { name: 'BrowserDisconnectError' }) : null;
+  const observeDisconnect = () => {
+    const error = disconnected();
+    if (error) {
+      primary ||= error;
+      engineError ||= { phase: 'execution', engine: browserName, scenario: id, stage: 'abrupt_disconnect', error: sanitizeError(error) };
+    }
+  };
+  let stage = 'context_creation';
+  progress('execution', 'start');
+  try {
+    context ||= await createContextFn();
+    stage = 'page_creation';
+    const page = await context.newPage();
+    stage = 'scenario';
+    const result = await executeFn(page, context);
+    assertions = result?.assertions || [];
+    artifacts = result?.artifacts || [];
+  } catch (error) {
+    primary = error;
+    if (stage !== 'scenario') engineError = { phase: 'execution', engine: browserName, scenario: id, stage, error: sanitizeError(error) };
+  }
+  observeDisconnect();
+  progress('execution', primary ? 'error' : 'end');
+  // Persist the pending record BEFORE awaiting cleanup, including a cleanup hang.
+  if (persistPending) {
+    try { persistPending(snapshot()); }
+    catch (error) {
+      if (!primary) primary = error;
+      else console.error('Secondary pending receipt error:', JSON.stringify(sanitizeError(error)));
+    }
+  }
+  if (context) {
+    progress('context cleanup', 'start');
+    try { await context.close(); progress('context cleanup', 'end'); }
+    catch (error) {
+      secondary = error;
+      primary ||= error;
+      console.error('Context cleanup error:', JSON.stringify(sanitizeError(error)));
+      progress('context cleanup', 'error');
+      if (primary === secondary) engineError ||= { phase: 'context cleanup', engine: browserName, scenario: id, stage: 'cleanup_only', error: sanitizeError(error) };
+    }
+  }
+  observeDisconnect();
+  return snapshot();
+}
+
 export async function main(customArgs = null) {
   const cliArgs = customArgs || process.argv.slice(2);
   const custody = validateRunnerCustody(cliArgs);
@@ -2598,6 +2718,7 @@ export async function main(customArgs = null) {
   const allArtifacts = new Set();
 
   try {
+    recordProgress(scratchDir, { phase: 'server setup', boundary: 'start' });
     const s1Res = await startServer();
     server1 = s1Res.server;
     server1Origin = s1Res.origin;
@@ -2607,122 +2728,166 @@ export async function main(customArgs = null) {
     server2 = s2Res.server;
     server2Origin = s2Res.origin;
     getServer2Requests = s2Res.getObservedRequests;
+    recordProgress(scratchDir, { phase: 'server setup', boundary: 'end' });
 
+    const engineErrors = [];
+    const persist = (primaryError = null, browserName = null, scenarioId = null) =>
+      persistReceiptSafe(receiptPath, executedScenarios, browserVersions, startTime, artifactsDir, allArtifacts, {
+        manifestOrRegister: activeRegister, browserEnvironments, resolvedAuthority,
+        customTablePath: tablePath, customRegisterPath: registerPath, engineErrors,
+        selectedScenarioIds: targetScenarioIds,
+        primaryError, scratchDir, browserName, scenarioId,
+      });
+    const record = outcome => {
+      const { primary_error, secondary_error, engine_error, ...serializable } = outcome;
+      return serializable;
+    };
     for (const browserName of requestedBrowsers) {
       const engine = BROWSER_ENGINES[browserName];
-      if (!engine) {
-        throw new Error(`Unsupported browser engine: ${browserName}`);
-      }
-
-      const browser = await engine.launch({ headless: true });
+      let browser = null, primary = null, disconnected = null, expectedClose = false;
+      let scenarioId = null;
+      let phase = 'launch';
+      const progress = (name, boundary) => recordProgress(scratchDir, { phase: name, engine: browserName, boundary });
+      const engineFailure = (error, stage) => ({ phase, engine: browserName, scenario: scenarioId, stage,
+        error: sanitizeError(error), target_scenarios: targetScenarioIds });
+      const checkDisconnect = () => disconnected || (browser && !browser.isConnected()
+        ? Object.assign(new Error(`Browser ${browserName} disconnected unexpectedly`), { name: 'BrowserDisconnectError' }) : null);
       try {
+        if (!engine) throw new Error(`Unsupported browser engine: ${browserName}`);
+        progress('launch', 'start');
+        browser = await engine.launch({ headless: true });
+        progress('launch', 'end');
+        browser.on('disconnected', () => {
+          if (!expectedClose) {
+            disconnected = Object.assign(new Error(`Browser ${browserName} disconnected unexpectedly`), { name: 'BrowserDisconnectError' });
+            progress('engine disconnect', 'error');
+          }
+        });
+        phase = 'ua_probe';
+        progress('ua_probe', 'start');
         const actualVersion = browser.version();
         browserVersions[browserName] = actualVersion;
-
-        // Query UA and capture browser environment features
-        const uaContext = await createSecureContext(browser, server1Origin, server2Origin);
-        const uaPage = await uaContext.newPage();
-        await uaPage.goto(`${server1Origin}/index.html`);
-        const envDetection = await uaPage.evaluate(() => {
-          return {
-            userAgent: navigator.userAgent,
-            windowOrigin: window.origin || window.location.origin,
-            features: {
-              customElements: typeof window.customElements !== 'undefined',
-              shadowDOM: typeof Element.prototype.attachShadow === 'function',
-              Worker: typeof window.Worker === 'function',
-              MutationObserver: typeof window.MutationObserver === 'function',
-              localStorage: (() => {
-                try { return typeof window.localStorage !== 'undefined' && window.localStorage !== null; } catch { return false; }
-              })(),
-              sessionStorage: (() => {
-                try { return typeof window.sessionStorage !== 'undefined' && window.sessionStorage !== null; } catch { return false; }
-              })(),
-              fetch: typeof window.fetch === 'function',
-              requestAnimationFrame: typeof window.requestAnimationFrame === 'function',
-            },
-          };
-        });
-        await uaContext.close();
-
-        browserEnvironments[browserName] = {
-          engine: browserName,
-          version: actualVersion,
-          user_agent: envDetection.userAgent,
-          platform: process.platform,
-          arch: process.arch,
-          os_release: os.release(),
-          origin_role: 'primary',
-          window_origin_role: 'primary',
-          window_origin: envDetection.windowOrigin,
-          headless: true,
-          context: {
-            service_workers: 'block',
-            viewport: { width: 1280, height: 720 },
-          },
-          features: envDetection.features,
-        };
-
-        const scenariosToRun = activeRegister.scenarios.filter((sc) => targetScenarioIds.includes(sc.id));
-
-        for (const sc of scenariosToRun) {
-          const scStart = Date.now();
-          const context = await createSecureContext(browser, server1Origin, server2Origin);
-          const page = await context.newPage();
-
-          let status = 'passed';
-          let errMessage = null;
-          let errDetails = null;
-          let assertions = [];
-          let artifacts = [];
-          let caughtErr = null;
-
-          try {
-            const result = await executeScenario(sc.id, browserName, page, context, server1Origin, server2Origin, platform, {
-              getServer1Requests,
-              getServer2Requests,
-            });
-            assertions = result.assertions;
-            artifacts = result.artifacts;
-            artifacts.forEach((a) => allArtifacts.add(a));
-          } catch (err) {
-            status = 'failed';
-            caughtErr = err;
-            errDetails = sanitizeError(err);
-            errMessage = errDetails.message;
-          } finally {
-            await context.close();
-          }
-
-          const scDuration = Date.now() - scStart;
-          executedScenarios.push({
-            scenario_id: sc.id,
-            group: sc.group,
-            browser: browserName,
-            status,
-            duration_ms: scDuration,
-            assertions,
-            artifacts,
-            error: errMessage,
-            error_details: errDetails,
-          });
-
-          if (status === 'failed') {
-            writeReceiptFile(receiptPath, executedScenarios, browserVersions, startTime, artifactsDir, allArtifacts, activeRegister, browserEnvironments, resolvedAuthority, tablePath, registerPath);
-            const failureErr = new Error(`Scenario ${sc.id} failed on ${browserName}: ${errMessage}`);
-            failureErr.name = errDetails.class;
-            if (caughtErr && caughtErr.cause) {
-              failureErr.cause = caughtErr.cause;
+        const uaOutcome = await runScenarioLifecycle({ scenario: null, browserName, browser, scratchDir,
+          createContextFn: () => createSecureContext(browser, server1Origin, server2Origin),
+          checkAbruptDisconnect: checkDisconnect,
+          persistPending: outcome => {
+            if (outcome.primary_error) {
+              engineErrors.push(engineFailure(outcome.primary_error, 'ua_setup'));
+              persist(outcome.primary_error, browserName);
             }
-            throw failureErr;
+          },
+          executeFn: async uaPage => {
+            await uaPage.goto(`${server1Origin}/index.html`);
+            const envDetection = await uaPage.evaluate(() => {
+              return {
+                userAgent: navigator.userAgent,
+                windowOrigin: window.origin || window.location.origin,
+                features: {
+                  customElements: typeof window.customElements !== 'undefined',
+                  shadowDOM: typeof Element.prototype.attachShadow === 'function',
+                  Worker: typeof window.Worker === 'function',
+                  MutationObserver: typeof window.MutationObserver === 'function',
+                  localStorage: (() => {
+                    try { return typeof window.localStorage !== 'undefined' && window.localStorage !== null; } catch { return false; }
+                  })(),
+                  sessionStorage: (() => {
+                    try { return typeof window.sessionStorage !== 'undefined' && window.sessionStorage !== null; } catch { return false; }
+                  })(),
+                  fetch: typeof window.fetch === 'function',
+                  requestAnimationFrame: typeof window.requestAnimationFrame === 'function',
+                },
+              };
+            });
+
+            browserEnvironments[browserName] = {
+              engine: browserName,
+              version: actualVersion,
+              user_agent: envDetection.userAgent,
+              platform: process.platform,
+              arch: process.arch,
+              os_release: os.release(),
+              origin_role: 'primary',
+              window_origin_role: 'primary',
+              window_origin: envDetection.windowOrigin,
+              headless: true,
+              context: {
+                service_workers: 'block',
+                viewport: { width: 1280, height: 720 },
+              },
+              features: envDetection.features,
+            };
+            return { assertions: [], artifacts: [] };
+          },
+        });
+        progress('ua_probe', uaOutcome.primary_error ? 'error' : 'end');
+        if (uaOutcome.secondary_error) {
+          engineErrors.push(engineFailure(uaOutcome.secondary_error,
+            uaOutcome.cleanup_only ? 'ua_context_cleanup_only' : 'ua_context_cleanup_secondary'));
+          persist(uaOutcome.primary_error, browserName);
+        }
+        if (uaOutcome.primary_error) throw uaOutcome.primary_error;
+        phase = 'execution';
+        const scenariosToRun = activeRegister.scenarios.filter(sc => targetScenarioIds.includes(sc.id));
+        for (const sc of scenariosToRun) {
+          scenarioId = sc.id;
+          const index = executedScenarios.length;
+          const outcome = await runScenarioLifecycle({ scenario: sc, browserName, browser, scratchDir,
+            createContextFn: () => createSecureContext(browser, server1Origin, server2Origin),
+            checkAbruptDisconnect: checkDisconnect,
+            persistPending: pending => {
+              executedScenarios[index] = { ...record(pending), status: pending.primary_error ? 'failed' : 'pending_cleanup' };
+              pending.artifacts.forEach(artifact => allArtifacts.add(artifact));
+              persist(pending.primary_error, browserName, sc.id);
+            },
+            executeFn: (page, context) => executeScenario(sc.id, browserName, page, context, server1Origin, server2Origin, platform,
+              { getServer1Requests, getServer2Requests }),
+          });
+          executedScenarios[index] = record(outcome);
+          outcome.artifacts.forEach(artifact => allArtifacts.add(artifact));
+          if (outcome.engine_error) engineErrors.push(outcome.engine_error);
+          persist(outcome.primary_error, browserName, sc.id);
+          if (outcome.primary_error) throw outcome.primary_error;
+        }
+      } catch (error) {
+        primary = error;
+        progress(phase, 'error');
+        if (!executedScenarios.some(sc => sc.status === 'failed') &&
+            !engineErrors.some(item => item.error.message === sanitizeError(error).message)) {
+          engineErrors.push(engineFailure(error, phase));
+        }
+        persist(primary, browserName);
+      } finally {
+        if (browser) {
+          const abrupt = checkDisconnect();
+          if (abrupt && !primary) {
+            primary = abrupt;
+            engineErrors.push(engineFailure(abrupt, 'abrupt_disconnect'));
+          } else if (abrupt && !engineErrors.some(item => item.engine === browserName &&
+              item.stage?.startsWith('abrupt_disconnect'))) {
+            engineErrors.push(engineFailure(abrupt, 'abrupt_disconnect_secondary'));
+          }
+          try { persist(primary, browserName); }
+          catch (error) { primary ||= error; }
+          expectedClose = true;
+          const closed = await closeBrowserSafe(browser, primary, { scratchDir, browserName });
+          if (!closed.success) {
+            engineErrors.push(engineFailure(closed.error, primary ? 'browser_close_secondary' : 'browser_close_cleanup_only'));
+            primary ||= closed.error;
+            persist(primary, browserName);
           }
         }
-      } finally {
-        await browser.close();
+      }
+      if (primary) {
+        const attributed = new Error(scenarioId
+          ? `Scenario ${scenarioId} failed on ${browserName}: ${primary.message}`
+          : `Browser ${browserName} failed during ${phase}: ${primary.message}`, { cause: primary });
+        attributed.name = primary.name || 'Error';
+        throw attributed;
       }
     }
   } catch (err) {
     initiatingError = err;
+    recordProgress(scratchDir, { phase: 'runner', boundary: 'error' });
     throw err;
   } finally {
     await closeServers([server1, server2], initiatingError);

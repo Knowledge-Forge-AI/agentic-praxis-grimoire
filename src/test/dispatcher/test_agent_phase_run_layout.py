@@ -250,6 +250,8 @@ def create_historical_v1_run(
 
 
 def test_01_default_root_is_documents_agent_outbox(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.delenv("APGR_OUTBOX_ROOT", raising=False)
+    monkeypatch.delenv("APGR_RUN_ROOT", raising=False)
     monkeypatch.delenv("AGENT_PHASE_RUN_ROOT", raising=False)
     expected = Path.home() / "Documents" / "agent" / "outbox"
     assert run_module.default_root() == expected
@@ -257,8 +259,19 @@ def test_01_default_root_is_documents_agent_outbox(monkeypatch: pytest.MonkeyPat
 
 def test_02_default_root_honors_env_var(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     custom = tmp_path / "custom_outbox"
+    monkeypatch.delenv("APGR_OUTBOX_ROOT", raising=False)
+    monkeypatch.delenv("APGR_RUN_ROOT", raising=False)
     monkeypatch.setenv("AGENT_PHASE_RUN_ROOT", str(custom))
     assert run_module.default_root() == custom
+
+
+def test_02b_default_root_apgr_run_root_wins(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    legacy_outbox = tmp_path / "legacy_outbox"
+    apgr_outbox = tmp_path / "apgr_outbox"
+    monkeypatch.delenv("APGR_OUTBOX_ROOT", raising=False)
+    monkeypatch.setenv("AGENT_PHASE_RUN_ROOT", str(legacy_outbox))
+    monkeypatch.setenv("APGR_RUN_ROOT", str(apgr_outbox))
+    assert run_module.default_root() == apgr_outbox
 
 
 def test_03_fresh_dispatch_creates_v2_hierarchy(repository: Path, tmp_path: Path) -> None:

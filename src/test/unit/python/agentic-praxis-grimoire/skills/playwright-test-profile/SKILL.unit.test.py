@@ -127,14 +127,26 @@ const cases = [
   ['premature', 'process.exit(1);', 'before readiness'],
 ];
 const outcomes = [];
+const browserExecutables = ['/cache/chromium/chrome'];
 for (const [name, handler, expected] of cases) {
   const ready = path.join(scratch, name + '.signal');
+  const readinessFields = JSON.stringify({ browserName: 'chromium', browserExecutables });
   const program = "const fs = require('node:fs');" + handler +
-    "fs.writeFileSync(process.argv[1], 'ready'); setInterval(() => {}, 100);";
+    `fs.writeFileSync(process.argv[1], JSON.stringify({pid: process.pid + 10000, ...${readinessFields}})); setInterval(() => {}, 100);`;
   const child = spawn(process.execPath, ['-e', program, ready], {
     detached: true, stdio: ['ignore', 'pipe', 'pipe'],
   });
-  const exited = new Promise(resolve => child.once('exit', resolve));
+  let childExited = false;
+  const mockedOwnedCleanup = [];
+  const exited = new Promise(resolve => child.once('exit', (...result) => {
+    childExited = true;
+    resolve(result);
+  }));
+  const processSnapshot = async () => childExited ? [] : [
+    { pid: child.pid, ppid: process.pid, state: 'S', started: 'Mon Oct 12 12:00:00 2026', command: `${process.execPath} runner` },
+    { pid: child.pid + 10000, ppid: child.pid, state: 'S', started: 'Mon Oct 12 12:00:01 2026', command: '/repo/node_modules/@playwright/test/cli.js test-worker' },
+    { pid: child.pid + 10001, ppid: child.pid + 10000, state: 'S', started: 'Mon Oct 12 12:00:02 2026', command: browserExecutables[0] + ' --no-sandbox' },
+  ];
   const emergencyCleanup = () => {
     try { process.kill(-child.pid, 'SIGKILL'); }
     catch (error) { if (error.code !== 'ESRCH') throw error; }
@@ -143,9 +155,22 @@ for (const [name, handler, expected] of cases) {
   let failure;
   const started = Date.now();
   try {
-  try { await interruptReadyRunner(child, ready, { readinessMs: 2000, interruptionMs: 200, cleanupMs: 2000 }); }
+  try { await interruptReadyRunner(child, ready, {
+    browserName: 'chromium', browserExecutables, readinessMs: 2000, interruptionMs: 200, cleanupMs: 2000, processSnapshot,
+    signalOwnedProcess: (pid, signal) => {
+      if (signal !== 'SIGKILL' || ![child.pid + 10000, child.pid + 10001].includes(pid)) {
+        throw new Error('mock cleanup received an unowned process identity');
+      }
+      mockedOwnedCleanup.push(pid);
+      return true;
+    },
+  }); }
   catch (error) { failure = error.message; }
   if (expected ? !failure?.includes(expected) : failure) throw new Error(name + ': ' + failure);
+  if (name === 'hang' && JSON.stringify(mockedOwnedCleanup) !== JSON.stringify([child.pid + 10000, child.pid + 10001])) {
+    throw new Error(name + ': mock descendants were not identity-checked before cleanup');
+  }
+  if (name !== 'hang' && mockedOwnedCleanup.length) throw new Error(name + ': unexpected mock descendant cleanup');
   let dead = false;
   try { process.kill(-child.pid, 0); } catch (error) { dead = error.code === 'ESRCH'; }
   if (!dead) throw new Error(name + ': group survived');
@@ -190,4 +215,23 @@ def test_supervisor_lifecycle_ordering_and_cleanup_errors(tmp_path: Path) -> Non
         capture_output=True, text=True, timeout=10, check=False,
     )
     assert result.returncode == 0, result.stdout + result.stderr
-    assert len(json.loads(result.stdout)) == 9
+    assert len(json.loads(result.stdout)) == 27
+
+
+def test_supervisor_real_observation_and_bounded_controlled_runs(tmp_path: Path) -> None:
+    """Use source ps output, real filesystem publication/cache discovery and bounded Node children."""
+    import os
+    import shutil
+    import subprocess
+
+    node = os.environ.get("APG_JAVASCRIPT_NODE") or shutil.which("node")
+    assert node, "Node is required for the supervisor observation contract"
+    result = subprocess.run(
+        [node, str(FIXTURES_DIR / "supervisor_observation_contract.mjs"), str(tmp_path)],
+        capture_output=True, text=True, timeout=15, check=False,
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert json.loads(result.stdout) == [
+        "portable-process-parser", "source-ps-command-adapter", "canonical-browser-cache-discovery",
+        "atomic-readiness-visibility", "controlled-run-status-watchdog-and-reaping",
+    ]

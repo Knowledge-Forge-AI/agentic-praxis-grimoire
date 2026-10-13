@@ -257,22 +257,32 @@ def qualify(
     ):
         _reject("source failure candidate identity is unavailable")
     try:
+        from .failure_boundary import manifest_base
+        base_tree = manifest_base(state, source_entry)
         mechanical_paths = {
             change.path
             for change in gitstate_module.phase_delta(
                 root, source_entry.tree, failure["tree"]
             )
         }
+        if state.get("entry_adoption"):
+            mechanical_paths = set(resume_module._entry_adopted_paths(
+                state, source_entry, failure["tree"]))
         if mechanical_paths != set(failure["paths"]):
             _reject("failure candidate path inventory is not the exact tree delta")
         from . import adoption
         adoption.guard_boundary(state, root, failure["tree"])
         manifest = gitstate_module.candidate_manifest(
             root,
-            source_entry.tree,
+            base_tree,
             failure["tree"],
             paths=sorted(set(failure["paths"]) | adoption.paths(state)),
         )
+        recorded = state.get("candidate_manifest")
+        if (state.get("entry_adoption") and isinstance(recorded, dict)
+                and recorded.get("candidate_tree") == failure["tree"] and recorded != manifest):
+            raise validation_module.ResumeError("RESUME_ARTIFACT_MISMATCH",
+                                               "recorded candidate manifest disagrees with Git trees")
         current_entry = gitstate_module.capture_entry(root)
         if current_entry.branch != source_entry.branch:
             _reject("live candidate is not on the source branch")

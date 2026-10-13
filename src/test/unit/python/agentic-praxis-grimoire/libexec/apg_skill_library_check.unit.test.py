@@ -1279,7 +1279,7 @@ class DiscoveryPolicyParityTests(unittest.TestCase):
         self.assertEqual(checker.V010_ADMITTED_SKILL_COUNT, 40)
         self.assertEqual(checker.V010_BROWSER_UI_ADMITTED_SKILL_COUNT, 42)
         self.assertEqual(checker.V010_TOOLCHAIN_ADMITTED_SKILL_COUNT, 44)
-        self.assertEqual(checker.V010_BROWSER_RUNTIME_ADMITTED_SKILL_COUNT, 45)
+        self.assertEqual(checker.V010_BROWSER_RUNTIME_ADMITTED_SKILL_COUNT, 46)
         self.assertEqual(
             checker.V010_ELIGIBLE_CANDIDATES,
             frozenset(
@@ -1325,6 +1325,7 @@ class DiscoveryPolicyParityTests(unittest.TestCase):
                     "vite-build-profile",
                     "npm-package-manager-profile",
                     "browser-runtime-profile",
+                    "rtk-command-proxy",
                 }
             ),
         )
@@ -1357,6 +1358,12 @@ class DiscoveryPolicyParityTests(unittest.TestCase):
         )
         self.assertTrue(
             checker.FROZEN_NPM_SKILL_DESCRIPTION.startswith("Use when ")
+        )
+        self.assertEqual(
+            len(checker.FROZEN_RTK_COMMAND_PROXY_SKILL_DESCRIPTION.encode("utf-8")), 268
+        )
+        self.assertTrue(
+            checker.FROZEN_RTK_COMMAND_PROXY_SKILL_DESCRIPTION.startswith("Use when ")
         )
         self.assertEqual(
             checker.FROZEN_ORIGINAL_39_DIGEST,
@@ -1496,6 +1503,10 @@ class DiscoveryPolicyParityTests(unittest.TestCase):
         self.assertEqual(
             extract_str("FrozenNPMSkillDescription"),
             checker.FROZEN_NPM_SKILL_DESCRIPTION,
+        )
+        self.assertEqual(
+            extract_str("FrozenRTKCommandProxySkillDescription"),
+            checker.FROZEN_RTK_COMMAND_PROXY_SKILL_DESCRIPTION,
         )
         self.assertEqual(
             extract_str("FrozenOriginal39Digest"),
@@ -2544,6 +2555,13 @@ class DiscoveryPolicyBrowserRuntimeBoundaryTests(unittest.TestCase):
                 "characters": 319,
                 "blob_bytes": 20085,
             },
+            {
+                "name": "rtk-command-proxy",
+                "description": checker.FROZEN_RTK_COMMAND_PROXY_SKILL_DESCRIPTION,
+                "bytes": len(checker.FROZEN_RTK_COMMAND_PROXY_SKILL_DESCRIPTION.encode("utf-8")),
+                "characters": len(checker.FROZEN_RTK_COMMAND_PROXY_SKILL_DESCRIPTION),
+                "blob_bytes": 5702,
+            },
         ]
         return orig + candidates
 
@@ -2588,12 +2606,12 @@ class DiscoveryPolicyBrowserRuntimeBoundaryTests(unittest.TestCase):
         failures = checker.validate_discovery_policy("v0.10-browser-runtime", over_svg)
         self.assertTrue(any("exceeds SVG file limit of 20480" in f for f in failures))
 
-        # 3. Count 44 fails
-        skills44 = self.baseline_skills_45()[:44]
-        failures = checker.validate_discovery_policy("v0.10-browser-runtime", skills44)
-        self.assertTrue(any("expected 45 leaves" in f for f in failures))
+        # 3. Count 45 fails
+        skills45 = self.baseline_skills_45()[:45]
+        failures = checker.validate_discovery_policy("v0.10-browser-runtime", skills45)
+        self.assertTrue(any("expected 46 leaves" in f for f in failures))
 
-        # 4. Count 46 fails
+        # 4. Count 47 fails
         extra = {
             "name": "extra-test-profile",
             "description": "Use when extra profile applies.",
@@ -2601,24 +2619,29 @@ class DiscoveryPolicyBrowserRuntimeBoundaryTests(unittest.TestCase):
             "characters": len("Use when extra profile applies."),
             "blob_bytes": 1000,
         }
-        skills46 = self.baseline_skills_45() + [extra]
-        failures = checker.validate_discovery_policy("v0.10-browser-runtime", skills46)
-        self.assertTrue(any("expected 45 leaves" in f for f in failures))
+        skills47 = self.baseline_skills_45() + [extra]
+        failures = checker.validate_discovery_policy("v0.10-browser-runtime", skills47)
+        self.assertTrue(any("expected 46 leaves" in f for f in failures))
 
-        # 5. Count 42 fails
+        # 5. Count 44 fails
+        skills44 = self.baseline_skills_45()[:44]
+        failures = checker.validate_discovery_policy("v0.10-browser-runtime", skills44)
+        self.assertTrue(any("expected 46 leaves" in f for f in failures))
+
+        # 6. Count 42 fails
         skills42 = self.baseline_skills_45()[:42]
         failures = checker.validate_discovery_policy("v0.10-browser-runtime", skills42)
-        self.assertTrue(any("expected 45 leaves" in f for f in failures))
+        self.assertTrue(any("expected 46 leaves" in f for f in failures))
 
-        # 6. Count 40 fails
+        # 7. Count 40 fails
         skills40 = self.baseline_skills_45()[:40]
         failures = checker.validate_discovery_policy("v0.10-browser-runtime", skills40)
-        self.assertTrue(any("expected 45 leaves" in f for f in failures))
+        self.assertTrue(any("expected 46 leaves" in f for f in failures))
 
-        # 7. Count 39 fails
+        # 8. Count 39 fails
         skills39 = [s for s in self.baseline_skills_45() if s["name"] in checker.ORIGINAL_39_SKILL_DESCRIPTIONS]
         failures = checker.validate_discovery_policy("v0.10-browser-runtime", skills39)
-        self.assertTrue(any("expected 45 leaves" in f for f in failures))
+        self.assertTrue(any("expected 46 leaves" in f for f in failures))
 
     def test_multibyte_enforcement(self) -> None:
         multibyte330 = "Use when " + ("é" * 160) + "x"
@@ -2747,11 +2770,22 @@ class DiscoveryPolicyBrowserRuntimeBoundaryTests(unittest.TestCase):
         failures = checker.validate_discovery_policy("v0.10-browser-runtime", theft_npm)
         self.assertTrue(any("reservation theft" in f or "mutated" in f for f in failures))
 
+        # Mutating RTK description fails
+        theft_rtk = self.baseline_skills_45()
+        for s in theft_rtk:
+            if s["name"] == "rtk-command-proxy":
+                s["description"] = "Use when rtk applies."
+                s["bytes"] = len(s["description"].encode("utf-8"))
+                s["characters"] = len(s["description"])
+                break
+        failures = checker.validate_discovery_policy("v0.10-browser-runtime", theft_rtk)
+        self.assertTrue(any("reservation theft" in f or "mutated" in f for f in failures))
+
     def test_body_ceiling_exemption_and_svg_limit(self) -> None:
         # Non-SVG candidate with large body bytes (> 20480) passes
         large_bodies = self.baseline_skills_45()
         for s in large_bodies:
-            if s["name"] in ("playwright-test-profile", "web-accessibility-profile", "vite-build-profile", "npm-package-manager-profile", "browser-runtime-profile"):
+            if s["name"] in ("playwright-test-profile", "web-accessibility-profile", "vite-build-profile", "npm-package-manager-profile", "browser-runtime-profile", "rtk-command-proxy"):
                 s["blob_bytes"] = 50000
         self.assertEqual(checker.validate_discovery_policy("v0.10-browser-runtime", large_bodies), [])
 

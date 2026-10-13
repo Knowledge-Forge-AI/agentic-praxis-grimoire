@@ -1,0 +1,141 @@
+{
+  "scenario_id": "scenario-08",
+  "name": "Skill Catalog Multi-Source Supplement Collision",
+  "subset": "acceptance",
+  "cohort": "savings_eligible_cohort",
+  "phase": "APG159A",
+  "task_input": {
+    "instruction": "Implement project-specific Go logging wrapper in pkg/log/logger.go conforming to project:go-language-profile guidelines.",
+    "task_authority": "phase_owned",
+    "mutation_scope": [
+      "pkg/log/logger.go"
+    ]
+  },
+  "provider": "codex",
+  "role_binding": {
+    "binding_id": "binding-producer-05",
+    "roles": [
+      "Producer"
+    ],
+    "allowed_tools": [
+      "view_file",
+      "replace_file_content",
+      "write_to_file",
+      "run_command"
+    ]
+  },
+  "repository_evidence": {
+    "files": [
+      "main.go",
+      ".apgr/skills/go-language-profile/SKILL.md"
+    ],
+    "primary_language": "go",
+    "dependency_facts": {}
+  },
+  "catalog_sources": {
+    "apgr": {
+      "id": "apgr:go-language-profile",
+      "canonical_path": "skills/go-language-profile/SKILL.md",
+      "whole_bytes": 16733,
+      "body_bytes": 16452,
+      "body_sha256": "a2a1090422ddd0aa38610f7beedad1d6af6d50f7c6c553fc6f1f5aabfb04935f",
+      "source_kind": "canonical_measured"
+    },
+    "project": {
+      "id": "project:go-language-profile",
+      "canonical_path": ".apgr/skills/go-language-profile/SKILL.md",
+      "source_kind": "synthetic",
+      "synthetic_fixture_name": "synthetic-project-go-language-profile-v1",
+      "synthetic_body": "---\nname: go-language-profile\ndescription: Synthetic project-local Go conventions fixture for APGR context-eval scenarios 08 and 09. Not a canonical APGR skill.\n---\n\n# Synthetic project Go profile (fixture)\n\nThis is a synthetic miniature skill fixture. It exists only to exercise\n`project:` namespace collision and explicit override behaviour in the APGR\ncontext-eval corpus. It is not guidance and carries no canonical-corpus\nsavings evidence.\n\n## Project conventions\n\n- Use `pkg/log` for structured logging; never call `log.Printf` directly.\n- Wrap sentinel errors with `%w` and expose them through `pkg/errs`.\n- Open database handles only through `pkg/db.Open`, which enforces timeouts.\n",
+      "whole_bytes": 690,
+      "body_bytes": 525,
+      "whole_sha256": "76192c9275bc2c26d4702bfcfbc3022cc13bd0806b1703f34024eba2ab9440b8",
+      "body_sha256": "4607e41ed55c9851f54b6e4ffa59f39f0cf1da2f7ff26380f1200db7b9433b5d",
+      "note": "Synthetic miniature fixture. The path does not exist in the APGR repository; an evaluation harness materializes synthetic_body at that project-relative path. Never used to claim canonical corpus savings."
+    }
+  },
+  "collision_policy": "supplement",
+  "mandatory_instructions": {
+    "provider_file": "codex/AGENTS.md",
+    "provider_instruction_bytes": 7939,
+    "mandatory_doctrine_bytes": 2500
+  },
+  "budget": {
+    "scope": "apgr_controlled_initial_bytes",
+    "max_initial_controlled_bytes": 50000,
+    "allocated_skill_body_bytes": 35000
+  },
+  "expected_outcome": {
+    "mode": "adaptive",
+    "collision_resolution": "both_retained_namespaced",
+    "selected_skills": [
+      "project:go-language-profile",
+      "apgr:go-language-profile"
+    ],
+    "implicit_shadowing_observed": false,
+    "mandatory_doctrine_preserved": true,
+    "quality_oracle": {
+      "assertions": "both project: and apgr: skills are retained under explicit namespaces; zero silent shadowing; project skill ranked ahead of canonical"
+    }
+  },
+  "status": "frozen_corrected",
+  "synthetic_inputs": true,
+  "synthetic_input_policy": "Paired static/adaptive ratios for this scenario are computed over identical synthetic inputs in both arms and are reported with synthetic_inputs=true. They are not evidence of canonical corpus savings; the default-flip gate must also pass with synthetic-input scenarios excluded (see context-eval-metrics-and-oracles.json synthetic_input_rule).",
+  "value_sources": {
+    "mandatory_instructions.provider_instruction_bytes": {
+      "source": "measured",
+      "basis": "wc -c codex/AGENTS.md at the APG159A workspace tree"
+    },
+    "mandatory_instructions.mandatory_doctrine_bytes": {
+      "source": "estimate",
+      "basis": "Planning placeholder. The non-negotiable doctrine slice is not yet a separately measurable artifact; V0130-F must replace this with a measured value before any savings computation uses it."
+    },
+    "catalog_sources.apgr.whole_bytes": {
+      "source": "measured",
+      "basis": "python3 measurement over skills/go-language-profile/SKILL.md"
+    },
+    "catalog_sources.apgr.body_bytes": {
+      "source": "measured",
+      "basis": "python3 measurement over skills/go-language-profile/SKILL.md"
+    },
+    "catalog_sources.project.whole_bytes": {
+      "source": "synthetic",
+      "basis": "UTF-8 length of the embedded synthetic_body"
+    },
+    "catalog_sources.project.body_bytes": {
+      "source": "synthetic",
+      "basis": "UTF-8 length of synthetic_body after the closing frontmatter delimiter"
+    },
+    "budget.max_initial_controlled_bytes": {
+      "source": "declared",
+      "basis": "Frozen scenario budget parameter chosen by this correction revision."
+    },
+    "budget.allocated_skill_body_bytes": {
+      "source": "declared",
+      "basis": "Frozen scenario budget parameter chosen by this correction revision."
+    }
+  },
+  "value_source_vocabulary": "measured | synthetic | estimate | declared | unavailable (see context-eval-metrics-and-oracles.json)",
+  "correction_revision": {
+    "revision": "APG159A-CORR1",
+    "supersedes": "APG159 numerical freeze (retained in Git history at Exit 00205)",
+    "nature": "pre-implementation correction, not tuning against a held-out set"
+  },
+  "catalog_contract_correction": {
+    "revision": "E-CATALOG1",
+    "phase": "APG163",
+    "scope": "Executable catalog source/collision contract coverage supersedes untested catalog assumptions only. Frozen synthetic payloads, budgets and H acceptance expectations are unchanged.",
+    "evidence_owners": [
+      "skills/catalog_test.go",
+      "testing/fixtures/catalog_consumer/catalog_test.go",
+      "src/test/int/python/agentic-praxis-grimoire/src/agentic_praxis_grimoire/skill_catalog.int.test.py"
+    ],
+    "evaluation_status": "H not run; synthetic_inputs remains true"
+  },
+  "f_accounting_correction": {
+    "revision": "F-CONTEXT1",
+    "owner": "f-context1-accounting.json",
+    "historical_fields": "mandatory_instructions and value_sources retain the earlier freeze; their estimates are superseded for F packing by measured mandatory_cost in the correction owner",
+    "qualification": "prospective fixture only; normal effective transport remains static; no H benefit claim"
+  }
+}

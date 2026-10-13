@@ -58,6 +58,7 @@ SKILLS = tuple(
             "pytest-test-profile",
             "python-language-profile",
             "react-component-profile",
+            "rtk-command-proxy",
             "ruby-language-profile",
             "sqlite-database-profile",
             "svg-language-profile",
@@ -436,7 +437,7 @@ class APGProjectSkillsTests(unittest.TestCase):
         result = self.run_command("check")
         self.assert_success(result)
         self.assertIn("compliant", result.stdout.lower())
-        self.assertIn("45 managed", result.stdout.lower())
+        self.assertIn("46 managed", result.stdout.lower())
 
     def test_06_adopts_compatible_manual_links_without_retargeting(self) -> None:
         links = [self.create_manual_link(skill) for skill in SKILLS]

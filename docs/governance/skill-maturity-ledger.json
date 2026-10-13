@@ -1650,6 +1650,42 @@
       "resolved_debts": []
     },
     {
+      "skill_id": "rtk-command-proxy",
+      "path": "skills/rtk-command-proxy/SKILL.md",
+      "current_maturity": "provisional",
+      "blocking_debts": [],
+      "source_references": [
+        "skills/rtk-command-proxy/SKILL.md",
+        "docs/adr/2026/09/0072-optional-rtk-integration-and-conditional-slices.md",
+        "docs/status/2026/09/22/00218-apg162c-v0130-d-callpath1-exit.md"
+      ],
+      "required_evidence_categories": [
+        "repeated_positive_use",
+        "representative_non_triggers",
+        "defect_debt_disposition",
+        "rollback",
+        "provenance",
+        "independent_review",
+        "current_validation"
+      ],
+      "evidence": {
+        "repeated_positive_use": [],
+        "representative_non_triggers": [],
+        "defect_debt_disposition": [],
+        "rollback": [],
+        "provenance": [],
+        "independent_review": [],
+        "current_validation": []
+      },
+      "independent_review": null,
+      "next_lifecycle_trigger": "Individual review when maturity evidence becomes available; APG163 reconciles D admission only.",
+      "disposition_status": "PROVISIONAL_ADMISSION",
+      "maintenance_ref": null,
+      "debt_authority": "docs/governance/language-profile-known-debt.json",
+      "active_debts": [],
+      "resolved_debts": []
+    },
+    {
       "skill_id": "ruby-language-profile",
       "path": "skills/ruby-language-profile/SKILL.md",
       "current_maturity": "provisional",

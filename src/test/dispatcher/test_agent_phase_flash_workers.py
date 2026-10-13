@@ -14,9 +14,8 @@ from agent_phase.gitstate import capture_entry
 from agent_phase.lifecycle import LIFECYCLES
 from agent_phase.routing import Endpoint
 from agent_phase.run import RunDirectory, stage_parent_id
-pytest.importorskip("agent_workers", reason="agent_workers subsystem retained in Agent-Central")
-from agent_workers.ledger import ParentLedger
-from test_agent_worker_capture_order import repository
+from apgr_workers.ledger import ParentLedger
+from test_agent_phase_antigravity import repository
 
 ROOT = Path(__file__).resolve().parents[3]
 
@@ -27,9 +26,9 @@ if '--version' in sys.argv:
     print('agy fixture'); raise SystemExit(0)
 assert sys.argv[sys.argv.index('--model') + 1] == 'gemini-3.8-flash-high'
 assert os.environ['HOME'] == os.environ['FLASH_EXPECTED_HOME']
-if os.environ.get('AGENT_CENTRAL_WORKER_LEAF') == '1':
-    assert 'AGENT_CENTRAL_PARENT_ID' not in os.environ
-    assert 'AGENT_CENTRAL_WORKER_FACADE' not in os.environ
+if os.environ.get('APGR_WORKER_LEAF') == '1':
+    assert 'APGR_PARENT_ID' not in os.environ
+    assert 'APGR_WORKER_FACADE' not in os.environ
     if os.environ.get('FLASH_CHILD_OUTCOME') == 'cancelled':
         time.sleep(60)
     if os.environ.get('FLASH_CHILD_OUTCOME') == 'failed':
@@ -40,9 +39,9 @@ else:
     source = Path(os.environ['FLASH_SOURCE'])
     prompt = sys.argv[sys.argv.index('-p') + 1]
     assert str(source / 'bin/agent-worker') in prompt
-    assert 'Both pools use external leaf processes' in prompt
+    assert 'All three pools use external leaf processes' in prompt
     assert 'Capacity is a ceiling' in prompt
-    assert 'AGENT_CENTRAL_WORKER_FACADE' not in os.environ
+    assert 'APGR_WORKER_FACADE' not in os.environ
     def cli(*args):
         result = subprocess.run([str(source / 'bin/agent-worker'), *args], capture_output=True, text=True, timeout=30)
         assert result.returncode == 0 or args[:2] in (('job','wait'), ('job','cancel')), result.stderr
@@ -71,7 +70,7 @@ else:
         assert result['cleanup_proven'] is True, result
         jobs.append(result['job_id'])
     status = cli('parent', 'status')
-    assert status['external_counts'] == {'gemini': 0, 'luna': 0}
+    assert status['external_counts'] == {'gemini': 0, 'luna': 0, 'sonnet': 0}
     response = json.dumps({'jobs': jobs, 'family': cap['parent_family']})
 print(json.dumps({'type':'agent_response', 'text_delta':response}), flush=True)
 print(json.dumps({'type':'result', 'status':'SUCCESS', 'result':response}), flush=True)
@@ -80,11 +79,11 @@ print(json.dumps({'type':'result', 'status':'SUCCESS', 'result':response}), flus
 CODEX = r'''
 import json, os, sys, time
 assert os.environ['HOME'] == os.environ['FLASH_EXPECTED_HOME']
-assert os.environ.get('AGENT_CENTRAL_WORKER_LEAF') == '1'
-assert 'AGENT_CENTRAL_PARENT_ID' not in os.environ
-assert 'AGENT_CENTRAL_WORKER_FACADE' not in os.environ
+assert os.environ.get('APGR_WORKER_LEAF') == '1'
+assert 'APGR_PARENT_ID' not in os.environ
+assert 'APGR_WORKER_FACADE' not in os.environ
 assert 'agents.enabled=false' in sys.argv
-assert 'model="gpt-5.6-luna"' in sys.argv
+assert 'model="gpt-6-luna"' in sys.argv
 assert 'model_reasoning_effort="max"' in sys.argv
 assert sys.argv[sys.argv.index('--sandbox') + 1] == 'read-only'
 sys.stdin.read()
@@ -114,7 +113,7 @@ def flash_binaries(tmp_path, monkeypatch):
 @pytest.mark.parametrize('read_only', [False, True])
 @pytest.mark.parametrize('outcome', ['completed', 'failed', 'cancelled'])
 def test_real_gemini_parent_cli_launches_both_external_leaves(tmp_path, monkeypatch, flash_binaries, mode, read_only, outcome):
-    repo = repository(tmp_path / 'repo')
+    repo = repository.__wrapped__(tmp_path)
     directory = RunDirectory(tmp_path / 'runs', 'flash-fixture', 'PARENT')
     dispatcher = Dispatcher(ROOT, repo, resolve_scanner=False)
     state = {'execution_mode': mode, 'controller_generation': {'commit': 'a' * 40}}
@@ -134,7 +133,7 @@ def test_real_gemini_parent_cli_launches_both_external_leaves(tmp_path, monkeypa
     ledger = ParentLedger(stage_parent_id(directory.run_id, 'work', 1), directory.path / 'workers')
     status = ledger.get_status()
     assert status['status'] == 'closed'
-    assert status['external_counts'] == {'gemini': 0, 'luna': 0}
+    assert status['external_counts'] == {'gemini': 0, 'luna': 0, 'sonnet': 0}
     cap = status['worker_capability']
     assert cap['parent_run_id'] == directory.run_id
     assert cap['parent_stage'] == 'work'
@@ -149,14 +148,14 @@ def test_lifecycle_roles_keep_read_only_worker_authority(tmp_path, monkeypatch, 
     from agent_phase.provider import Result
     import time
 
-    repo = repository(tmp_path / 'repo')
+    repo = repository.__wrapped__(tmp_path)
     directory = RunDirectory(tmp_path / 'runs', 'flash-roles', life.name)
     observed = []
 
     def runner(argv, prompt, cwd, max_output, on_output=None):
         from test_agent_phase_antigravity import write_fake_evidence
         write_fake_evidence(list(argv), 0)
-        ledger = ParentLedger(os.environ['AGENT_CENTRAL_PARENT_ID'], Path(os.environ['AGENT_CENTRAL_WORKER_STATE_DIR']))
+        ledger = ParentLedger(os.environ['APGR_PARENT_ID'], Path(os.environ['APGR_WORKER_STATE_DIR']))
         observed.append(ledger.get_status()['task_authority'])
         now = time.time()
         return Result(0, b'fixture', b'', False, now, now)

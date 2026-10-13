@@ -45,7 +45,7 @@ def test_parity_corpus_route_matrix_completeness(golden_corpus: dict) -> None:
         routed = route(req, root=ROOT, roster=roster)
         aliases = roster.route_aliases(pt, em)
 
-        expected_stages = route_def["stages"]
+        expected_stages = golden_corpus["current_roster_overrides"].get(em, {}).get(pt, route_def["stages"])
         assert set(routed.keys()) == set(expected_stages.keys())
 
         for stage_name, ep in routed.items():
@@ -130,11 +130,11 @@ def test_parity_corpus_intelligence_readback(golden_corpus: dict) -> None:
     routed = route(req, root=ROOT, roster=roster)
 
     expected_intel = {
-        "plan": ("codex", "architecture-docs-primary", "gpt-6-astra", "medium"),
-        "plan_review": ("claude", "normal-plan-review", "claude-fable-5-1", "high"),
+        "plan": ("codex", "architecture-docs-primary", "gpt-6.1-sol", "xhigh"),
+        "plan_review": ("claude", "normal-plan-review", "claude-opus-5-5", "high"),
         "work": ("antigravity", "gemini-3.8-flash-high", "gemini-3.8-flash-high", None),
-        "final_review": ("claude", "normal-final-review", "claude-opus-5", "high"),
-        "closeout": ("codex", "implementation-testing", "gpt-6-astra", "medium"),
+        "final_review": ("claude", "normal-final-review", "claude-opus-5-5", "high"),
+        "closeout": ("codex", "implementation-testing", "gpt-6.1-sol", "xhigh"),
     }
 
     for stage_name, (exp_prov, exp_prof, exp_model, exp_effort) in expected_intel.items():

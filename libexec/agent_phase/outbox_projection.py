@@ -22,59 +22,11 @@ from typing import Any, Mapping
 
 from .run import RunPathError, safe_component
 
-# Ensure src is accessible for config resolution if needed
-_ROOT = Path(__file__).resolve().parents[2]
-_SRC = _ROOT / "src"
-if _SRC.is_dir() and str(_SRC) not in sys.path:
-    sys.path.insert(0, str(_SRC))
-
-try:
-    from agentic_praxis_grimoire.config import (
-        DEFAULT_OUTBOX_RELATIVE,
-        default_outbox_root,
-        resolve_outbox_root as _resolve_config_outbox_root,
-    )
-except ImportError:
-    DEFAULT_OUTBOX_RELATIVE = Path("Documents") / "agent" / "outbox"
-
-    def default_outbox_root(*, home: str | os.PathLike[str] | None = None) -> Path:
-        base = Path.home() if home is None else Path(home).expanduser().resolve()
-        return base / DEFAULT_OUTBOX_RELATIVE
-
-    def _resolve_config_outbox_root(
-        explicit: str | os.PathLike[str] | None = None,
-        *,
-        home: str | os.PathLike[str] | None = None,
-        **kwargs: Any,
-    ) -> Path:
-        if explicit is not None:
-            return Path(explicit).expanduser().resolve()
-        return default_outbox_root(home=home)
-
-
-def resolve_outbox_root(
-    explicit: str | os.PathLike[str] | None = None,
-    *,
-    project_root: str | os.PathLike[str] | None = None,
-    apgr_home: str | os.PathLike[str] | None = None,
-    home: str | os.PathLike[str] | None = None,
-    **kwargs: Any,
-) -> Path:
-    if explicit is not None:
-        return Path(explicit).expanduser().resolve()
-    resolved = _resolve_config_outbox_root(
-        explicit=None,
-        project_root=project_root,
-        apgr_home=apgr_home,
-        home=home,
-        **kwargs,
-    )
-    def_root = default_outbox_root(home=home).expanduser().resolve()
-    if resolved == def_root:
-        env_root = os.environ.get("AGENT_PHASE_RUN_ROOT")
-        if env_root:
-            return Path(env_root).expanduser().resolve()
-    return resolved.expanduser().resolve()
+from .config_routing import (
+    DEFAULT_OUTBOX_RELATIVE,
+    default_outbox_root,
+    resolve_outbox_root,
+)
 
 
 LOCATOR_SCHEMA = "agent-phase-dispatch-locator-v1"

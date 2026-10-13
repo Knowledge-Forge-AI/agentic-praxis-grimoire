@@ -82,7 +82,7 @@
           "name": "Set up Go",
           "uses": "actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e",
           "with": {
-            "go-version": "1.25.14",
+            "go-version": "1.26.9",
             "cache": false
           }
         },
@@ -224,7 +224,7 @@
           "name": "Set up Go",
           "uses": "actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e",
           "with": {
-            "go-version": "1.25.14",
+            "go-version": "1.26.9",
             "cache": false
           }
         },
@@ -243,7 +243,7 @@
         },
         {
           "name": "Run unit and integration suite",
-          "run": "set -euo pipefail\n\"${APGR_TEST_PYTHON}\" bin/apg-test policy \\\n  --summary-file \"${RUNNER_TEMP}/apgr-policy-summary.json\"\n\"${APGR_TEST_PYTHON}\" bin/apg-test unit-integration --public-version 0.12.0 \\\n  --summary-file \"${RUNNER_TEMP}/apgr-unit-integration-summary.json\"\n"
+          "run": "set -euo pipefail\n\"${APGR_TEST_PYTHON}\" bin/apg-test policy \\\n  --summary-file \"${RUNNER_TEMP}/apgr-policy-summary.json\"\n\"${APGR_TEST_PYTHON}\" bin/apg-test unit-integration --public-version 0.13.0 \\\n  --summary-file \"${RUNNER_TEMP}/apgr-unit-integration-summary.json\"\n"
         },
         {
           "name": "Emit unit-integration receipt",
@@ -272,6 +272,17 @@
             "name": "canonical-suite-evidence",
             "path": "${{ runner.temp }}/apgr-*-summary.json",
             "if-no-files-found": "warn",
+            "retention-days": 7
+          }
+        },
+        {
+          "name": "Retain sanitized browser failure evidence",
+          "if": "${{ failure() }}",
+          "uses": "actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f",
+          "with": {
+            "name": "browser-failure-evidence",
+            "path": "${{ runner.temp }}/apgr-runtime/evidence/browser-run-*-failure.json",
+            "if-no-files-found": "ignore",
             "retention-days": 7
           }
         }
@@ -347,7 +358,7 @@
           "name": "Set up Go",
           "uses": "actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e",
           "with": {
-            "go-version": "1.25.14",
+            "go-version": "1.26.9",
             "cache": false
           }
         },
@@ -368,170 +379,6 @@
           "uses": "actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f",
           "with": {
             "name": "go-receipt",
-            "path": "${{ runner.temp }}/receipts",
-            "retention-days": 7,
-            "if-no-files-found": "error"
-          },
-          "if": "${{ always() }}"
-        }
-      ]
-    },
-    "package": {
-      "name": "package",
-      "if": "${{ needs.guard.result == 'success' && github.repository == 'Knowledge-Forge-AI/agentic-praxis-grimoire' && github.repository_id == 1306002537 && github.base_ref == 'main' && github.head_ref == 'staging' && github.event.pull_request.head.repo.full_name == github.repository }}",
-      "needs": [
-        "guard"
-      ],
-      "runs-on": "ubuntu-latest",
-      "timeout-minutes": 25,
-      "steps": [
-        {
-          "name": "Check out repository",
-          "uses": "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
-          "with": {
-            "persist-credentials": false,
-            "fetch-depth": 0
-          }
-        },
-        {
-          "name": "Set up Python",
-          "uses": "actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97",
-          "with": {
-            "python-version": "3.13"
-          }
-        },
-        {
-          "name": "Set up Go",
-          "uses": "actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e",
-          "with": {
-            "go-version": "1.25.14",
-            "cache": false
-          }
-        },
-        {
-          "name": "Set up Node for isolated Linux npm entrypoints",
-          "uses": "actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38",
-          "with": {
-            "node-version": "22.22.2",
-            "package-manager-cache": false
-          }
-        },
-        {
-          "name": "Build deterministic release deliverables",
-          "run": "bash tools/ci/qualify_packages.sh",
-          "env": {
-            "PIP_CACHE_DIR": "${{ runner.temp }}/pip-cache",
-            "npm_config_cache": "${{ runner.temp }}/npm-cache",
-            "GOCACHE": "${{ runner.temp }}/go-cache",
-            "GOMODCACHE": "${{ runner.temp }}/go-mod-cache",
-            "GOTOOLCHAIN": "local",
-            "PYTHONPYCACHEPREFIX": "${{ runner.temp }}/pycache"
-          }
-        },
-        {
-          "name": "Retain deliverable artifacts",
-          "uses": "actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f",
-          "with": {
-            "name": "deliverables",
-            "path": "${{ runner.temp }}/deliverables/",
-            "retention-days": 7,
-            "if-no-files-found": "error"
-          }
-        },
-        {
-          "name": "Emit package receipt",
-          "if": "${{ always() }}",
-          "run": "mkdir -p \"${RUNNER_TEMP}/receipts\"\npython3 release/ci/matrix_receipts.py emit --job package --status \"$CI_JOB_STATUS\" --dir \"${RUNNER_TEMP}/receipts\" --sha \"${COMMIT_SHA:-$GITHUB_SHA}\" --artifact \"$RUNNER_TEMP/deliverables/apg-distribution-manifest.json\"\n",
-          "env": {
-            "CI_JOB_STATUS": "${{ job.status }}"
-          }
-        },
-        {
-          "name": "Retain package receipt",
-          "uses": "actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f",
-          "with": {
-            "name": "package-receipt",
-            "path": "${{ runner.temp }}/receipts",
-            "retention-days": 7,
-            "if-no-files-found": "error"
-          },
-          "if": "${{ always() }}"
-        }
-      ]
-    },
-    "sbom-and-vulnerability": {
-      "name": "sbom-and-vulnerability",
-      "if": "${{ needs.guard.result == 'success' && github.repository == 'Knowledge-Forge-AI/agentic-praxis-grimoire' && github.repository_id == 1306002537 && github.base_ref == 'main' && github.head_ref == 'staging' && github.event.pull_request.head.repo.full_name == github.repository }}",
-      "needs": [
-        "guard",
-        "package"
-      ],
-      "runs-on": "ubuntu-latest",
-      "timeout-minutes": 25,
-      "steps": [
-        {
-          "name": "Check out repository",
-          "uses": "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
-          "with": {
-            "persist-credentials": false,
-            "fetch-depth": 0
-          }
-        },
-        {
-          "name": "Set up Python",
-          "uses": "actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97",
-          "with": {
-            "python-version": "3.13"
-          }
-        },
-        {
-          "name": "Download exact qualified deliverables",
-          "uses": "actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16",
-          "with": {
-            "name": "deliverables",
-            "path": "${{ runner.temp }}/deliverables"
-          }
-        },
-        {
-          "name": "Set up Go for the isolated sdist build",
-          "uses": "actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e",
-          "with": {
-            "go-version": "1.25.14",
-            "cache": false
-          }
-        },
-        {
-          "name": "Bootstrap verified scanner binaries",
-          "run": "mkdir -p \"$RUNNER_TEMP/scanners\"\nfor tool in syft grype; do python3 tools/ci/bootstrap_tool.py --tool \"$tool\" --bin-dir \"$RUNNER_TEMP/scanners\"; done\n"
-        },
-        {
-          "name": "Scan exact public source and every release deliverable",
-          "run": "python3 tools/ci/sbom_records.py scan --source \"$GITHUB_WORKSPACE\" --artifacts \"$RUNNER_TEMP/deliverables\" --output \"$RUNNER_TEMP/sbom-evidence\" --scanner-root \"$RUNNER_TEMP/scanners\"\n"
-        },
-        {
-          "name": "Retain bounded SBOM and vulnerability evidence",
-          "if": "${{ always() }}",
-          "uses": "actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f",
-          "with": {
-            "name": "sbom-and-vulnerability-reports",
-            "path": "${{ runner.temp }}/sbom-evidence",
-            "if-no-files-found": "warn",
-            "retention-days": 7
-          }
-        },
-        {
-          "name": "Emit sbom-and-vulnerability receipt",
-          "if": "${{ always() }}",
-          "run": "mkdir -p \"${RUNNER_TEMP}/receipts\"\npython3 release/ci/matrix_receipts.py emit --job sbom-and-vulnerability --status \"$CI_JOB_STATUS\" --dir \"${RUNNER_TEMP}/receipts\" --sha \"${COMMIT_SHA:-$GITHUB_SHA}\" --artifact \"$RUNNER_TEMP/sbom-evidence/scan-results.json\"\n",
-          "env": {
-            "CI_JOB_STATUS": "${{ job.status }}"
-          }
-        },
-        {
-          "name": "Retain sbom-and-vulnerability receipt",
-          "uses": "actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f",
-          "with": {
-            "name": "sbom-and-vulnerability-receipt",
             "path": "${{ runner.temp }}/receipts",
             "retention-days": 7,
             "if-no-files-found": "error"
@@ -589,7 +436,7 @@
           "if": "matrix.language == 'go'",
           "uses": "actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e",
           "with": {
-            "go-version": "1.25.14",
+            "go-version": "1.26.9",
             "cache": false
           }
         },
@@ -674,14 +521,12 @@
         "unit-integration",
         "closure",
         "go",
-        "package",
-        "sbom-and-vulnerability",
         "codeql"
       ],
       "runs-on": "ubuntu-latest",
       "timeout-minutes": 10,
       "env": {
-        "MATRIX_NEEDS_RESULTS": "{\"guard\":\"${{ needs.guard.result }}\",\"static-analysis\":\"${{ needs.static-analysis.result }}\",\"policy\":\"${{ needs.policy.result }}\",\"unit-integration\":\"${{ needs.unit-integration.result }}\",\"closure\":\"${{ needs.closure.result }}\",\"go\":\"${{ needs.go.result }}\",\"package\":\"${{ needs.package.result }}\",\"sbom-and-vulnerability\":\"${{ needs.sbom-and-vulnerability.result }}\",\"codeql-go\":\"${{ needs.codeql.result }}\",\"codeql-python\":\"${{ needs.codeql.result }}\",\"codeql-javascript-typescript\":\"${{ needs.codeql.result }}\",\"codeql-actions\":\"${{ needs.codeql.result }}\"}"
+        "MATRIX_NEEDS_RESULTS": "{\"guard\":\"${{ needs.guard.result }}\",\"static-analysis\":\"${{ needs.static-analysis.result }}\",\"policy\":\"${{ needs.policy.result }}\",\"unit-integration\":\"${{ needs.unit-integration.result }}\",\"closure\":\"${{ needs.closure.result }}\",\"go\":\"${{ needs.go.result }}\",\"codeql-go\":\"${{ needs.codeql.result }}\",\"codeql-python\":\"${{ needs.codeql.result }}\",\"codeql-javascript-typescript\":\"${{ needs.codeql.result }}\",\"codeql-actions\":\"${{ needs.codeql.result }}\"}"
       },
       "steps": [
         {

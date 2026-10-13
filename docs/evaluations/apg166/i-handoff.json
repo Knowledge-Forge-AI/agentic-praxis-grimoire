@@ -1,0 +1,25 @@
+{
+  "applicable_cohort_n": 5,
+  "applicable_subset_only": true,
+  "default_recommendation": "retain_static",
+  "established": false,
+  "gate": "V0130_H_MATURITY_TRANCHE_AND_MEASURED_BENEFIT",
+  "limits": [
+    "No qualified live paired provider harness",
+    "No verified new repeated positive skill-use evidence",
+    "Independent review declined all five promotions; documentation amendments have no second review",
+    "Controlled recovery is not model observation",
+    "H0.2 lacks tested engine-to-delivery mapping and complete initial transport observations",
+    "Provider-launcher UUID artifacts remain outside installed-CLI retention cap"
+  ],
+  "measured_pairs": 0,
+  "milestone": "V0130-H-EVAL1",
+  "non_synthetic_cohort_n": 3,
+  "phase": "APG166",
+  "provider_binding_scope_qualified": [],
+  "qualified_promotions": 0,
+  "scenario15": "contingent/unavailable",
+  "schema_version": "apg.h-i-handoff/v1",
+  "shipped_default": "static",
+  "successor_authority": "No I execution or publication authority"
+}

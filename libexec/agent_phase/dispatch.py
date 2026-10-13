@@ -6,58 +6,87 @@ continuity is never relied upon.
 
 from __future__ import annotations
 
+from contextlib import contextmanager
 import json
 import os
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any, Callable, Mapping, Sequence
 
-from . import archive as archive_module
-from . import antigravity_evidence as antigravity_evidence_module
-from . import candidate as candidate_module
-from . import capacity as capacity_module
-from . import display as display_module
-from . import dry_run as dry_run_module
-from . import envelope as envelope_module
-from . import failure_boundary as failure_boundary_module
-from . import finalization as finalization_module
-from . import gitstate as gitstate_module
-from . import lifecycle_dispatch as lifecycle_dispatch_module
+from . import (
+    adoption as adoption_module, antigravity_evidence as antigravity_evidence_module,
+    archive as archive_module, candidate as candidate_module,
+    capacity as capacity_module, display as display_module,
+    dry_run as dry_run_module, envelope as envelope_module,
+    failure_boundary as failure_boundary_module, finalization as finalization_module,
+    gitstate as gitstate_module, lifecycle_dispatch as lifecycle_dispatch_module,
+    prompt_policy as prompt_policy_module, provider as provider_module,
+    provider_launch as provider_launch_module, result as result_module,
+    result_artifacts as result_artifacts_module, resume as resume_module,
+    resume_dispatch as resume_dispatch_module, review_drift as review_drift_module,
+    review_result as review_result_module, run as run_module,
+    scanner as scanner_module, stage_delta as stage_delta_module,
+    stage_prompts as stage_prompts_module,
+)
 from .lifecycle import (
-    FINALIZATION_PUBLISH,
-    LIFECYCLE_STANDARD,
-    get_lifecycle,
-    validate_finalization,
+    FINALIZATION_PUBLISH, LIFECYCLE_STANDARD, get_lifecycle, validate_finalization,
 )
 from .publication import record as push_record
-from . import prompt_policy as prompt_policy_module
-from . import provider as provider_module
-from . import result as result_module
-from . import review_result as review_result_module
-from . import result_artifacts as result_artifacts_module
-from . import resume as resume_module
-from . import adoption as adoption_module
-from . import resume_dispatch as resume_dispatch_module
-from . import run as run_module
-from . import scanner as scanner_module
-from . import stage_delta as stage_delta_module
 from .request import PhaseRequest, WORKER_CAPABLE_MODES
+from .roster import RosterSnapshot
 from .routing import (
-    Endpoint,
-    PROVIDER_ANTIGRAVITY,
-    PROVIDER_CODEX,
-    antigravity_intelligence,
-    load_validated_roster,
-    resolve,
-    route,
+    Endpoint, PROVIDER_ANTIGRAVITY, PROVIDER_CODEX, antigravity_intelligence,
+    load_validated_roster, resolve, route,
 )
-from .transport import (
-    PromptLimitError,
-    ensure_prompt_fits,
-)
+from .transport import PromptLimitError, ensure_prompt_fits
 from .worker_capability import resolve_worker_capability
 from .worker_custody import WorkerCustody
 
 RESULT_SCHEMA = result_artifacts_module.RESULT_SCHEMA
+# The maintained gated runner, pinned at import: the launch-gate tripwire
+# applies to this implementation, not to a substituted attribute.
+GATED_PROVIDER_RUN = provider_module.run
+
+
+@contextmanager
+def _scoped_apgr_home(apgr_home: Path | str | None):
+    if apgr_home is None:
+        yield
+        return
+    cand = Path(apgr_home).expanduser()
+    if not cand.is_absolute():
+        raise ValueError(f"apgr_home must be an absolute path: {apgr_home}")
+    saved = os.environ.get("APGR_HOME")
+    try:
+        os.environ["APGR_HOME"] = str(cand.resolve())
+        yield
+    finally:
+        if saved is None:
+            os.environ.pop("APGR_HOME", None)
+        else:
+            os.environ["APGR_HOME"] = saved
+
+
+@contextmanager
+def _scoped_target_project(project_root: Path | None, start: Path):
+    # RTK target authority is independent of worker custody/workspace context.
+    values = {
+        "APGR_TARGET_PROJECT_ROOT": str(project_root) if project_root is not None else None,
+        "APGR_TARGET_PROJECT_START": str(start),
+    }
+    saved = {key: os.environ.get(key) for key in values}
+    try:
+        for key, value in values.items():
+            if value is None:
+                os.environ.pop(key, None)
+            else:
+                os.environ[key] = value
+        yield
+    finally:
+        for key, value in saved.items():
+            if value is None:
+                os.environ.pop(key, None)
+            else:
+                os.environ[key] = value
 
 
 class DispatchError(RuntimeError):
@@ -95,10 +124,30 @@ class Dispatcher:
         resolve_scanner: bool = True,
         runner: Callable[..., provider_module.Result] = provider_module.run,
         display: display_module.Display | None = None,
+        review_mutation_policy: Any = None,
+        review_mutation_provenance: Mapping[str, Any] | None = None,
+        review_mutation_provenance_chain: Sequence[Mapping[str, Any]] | None = None,
+        apgr_home: Path | str | None = None,
+        roster: RosterSnapshot | None = None,
+        project_root: Path | str | None = None,
     ) -> None:
         self.root = root
+
         self.cwd = cwd
-        self.run_root = run_root or run_module.default_root()
+        # cwd is an execution/discovery start; only an explicit selection pins
+        # project authority (including a target with no project config).
+        self.project_root = (
+            Path(project_root).expanduser().resolve()
+            if project_root is not None else None
+        )
+        if apgr_home is not None:
+            cand = Path(apgr_home).expanduser()
+            if not cand.is_absolute():
+                raise ValueError(f"apgr_home must be an absolute path: {apgr_home}")
+            self.apgr_home = cand.resolve()
+        else:
+            self.apgr_home = None
+        self.run_root = run_root or run_module.default_root(self.apgr_home, project_root=self.cwd)
         self.codex_executable = codex_executable
         self.claude_launcher = claude_launcher
         self.antigravity_launcher = antigravity_launcher
@@ -124,9 +173,132 @@ class Dispatcher:
         self._entry_state: gitstate_module.EntryState | None = None
         self._adoption: dict[str, Any] | None = None
         self._native_git_authority: dict[str, Any] | None = None
-        self._entry_adoption: dict[str, Any] | None = None
         self.lifecycle = get_lifecycle(LIFECYCLE_STANDARD)
         self.finalization_policy = FINALIZATION_PUBLISH
+        self._roster: RosterSnapshot | None = roster
+        self._initial_review_mutation_policy = review_mutation_policy
+        self._review_mutation_policy = (
+            review_mutation_policy
+            if review_mutation_policy is not None and not isinstance(review_mutation_policy, str)
+            else None
+        )
+        self.review_mutation_provenance = review_mutation_provenance
+        self.review_mutation_provenance_chain = review_mutation_provenance_chain
+        self._rtk_resolution: Any = None
+        self._rtk_resolved: bool = False
+
+        if self.review_mutation_provenance is not None:
+            self._ensure_roster_and_policy()
+
+    @property
+    def roster(self) -> RosterSnapshot:
+        if self._roster is None:
+            self._ensure_roster_and_policy()
+        return self._roster
+
+    @roster.setter
+    def roster(self, value: RosterSnapshot | None) -> None:
+        self._roster = value
+
+    @property
+    def review_mutation_policy(self) -> Any:
+        if self._review_mutation_policy is None:
+            self._ensure_roster_and_policy()
+        return self._review_mutation_policy
+
+    @review_mutation_policy.setter
+    def review_mutation_policy(self, value: Any) -> None:
+        self._review_mutation_policy = value
+
+    def _ensure_roster_and_policy(self) -> RosterSnapshot:
+        if self._roster is None:
+            if self.apgr_home is not None:
+                self._roster = load_validated_roster(self.root, apgr_home=self.apgr_home)
+            else:
+                self._roster = load_validated_roster(self.root)
+
+        if self._review_mutation_policy is None or isinstance(self._initial_review_mutation_policy, str):
+            from .config_routing import resolve_review_mutation_policy
+            resolved_policy = resolve_review_mutation_policy(
+                work_tree=self.cwd,
+                explicit=self._initial_review_mutation_policy if isinstance(self._initial_review_mutation_policy, str) else None,
+                project=self.cwd,
+                apgr_home=self.apgr_home,
+                roster=self._roster,
+            )
+            self._review_mutation_policy = resolved_policy.policy
+            self.review_mutation_provenance = (
+                self.review_mutation_provenance or resolved_policy.winner.as_dict()
+            )
+            self.review_mutation_provenance_chain = (
+                self.review_mutation_provenance_chain
+                or [p.as_dict() for p in resolved_policy.provenance_chain]
+            )
+
+        operator_prov = None
+        if self.review_mutation_provenance and self.review_mutation_provenance.get("source_type") == "operator_default":
+            operator_prov = self.review_mutation_provenance
+        elif self.review_mutation_provenance_chain:
+            for p in self.review_mutation_provenance_chain:
+                if isinstance(p, dict) and p.get("source_type") == "operator_default":
+                    operator_prov = p
+                    break
+
+        if operator_prov and self._roster is not None:
+            policy_gen = operator_prov.get("generation") or getattr(self._review_mutation_policy, "generation", None)
+            if policy_gen is not None and policy_gen != self._roster.generation:
+                raise DispatchError(
+                    f"coherence failure: review mutation policy generation {policy_gen} "
+                    f"does not match roster generation {self._roster.generation}",
+                    "ROSTER_POLICY_GENERATION_MISMATCH",
+                )
+            if (
+                self._roster.policy_source is not None
+                and operator_prov.get("content_digest")
+                and operator_prov.get("content_digest") != self._roster.policy_source.sha256
+            ):
+                raise DispatchError(
+                    "coherence failure: review mutation policy digest does not match roster policy source sha256",
+                    "ROSTER_POLICY_DIGEST_MISMATCH",
+                )
+        from .bundle import require_fresh_bundle
+        require_fresh_bundle(self._roster.bundle)
+        return self._roster
+    def _ensure_rtk_resolution(self) -> Any:
+        if not self._rtk_resolved:
+            import sys
+            src_path = str(self.root / "src")
+            path_inserted = False
+            if src_path not in sys.path:
+                sys.path.insert(0, src_path)
+                path_inserted = True
+            try:
+                try:
+                    from agentic_praxis_grimoire.rtk import resolve_rtk_configuration
+                    self._rtk_resolution = resolve_rtk_configuration(
+                        project_root=self.project_root,
+                        start=self.cwd,
+                        apgr_home=self.apgr_home,
+                    )
+                    if getattr(self._rtk_resolution, "status", None) == "unavailable":
+                        diags = getattr(self._rtk_resolution, "diagnostics", [])
+                        msg = diags[0] if diags else "rtk unavailable"
+                        print(f"agent-phase: rtk unavailable: {msg}", file=sys.stderr, flush=True)
+                except Exception as err:
+                    import sys
+                    err_text = str(err)
+                    print(f"agent-phase: rtk resolution unavailable: {err_text}", file=sys.stderr, flush=True)
+                    from .rtk_fallback import unavailable_rtk_resolution
+                    self._rtk_resolution = unavailable_rtk_resolution(err_text)
+            finally:
+                if path_inserted:
+                    try:
+                        sys.path.remove(src_path)
+                    except ValueError:
+                        pass
+            self._rtk_resolved = True
+        return self._rtk_resolution
+
 
     def _bind_stage_accounting(
         self,
@@ -149,6 +321,84 @@ class Dispatcher:
         state["shadow"] = self._shadow_state()
         directory.write_json("state.json", state)
 
+    def _record_provider_launch(self, prefix: str, *, persist: bool) -> None:
+        """Name a prepared launch in state before its provider can be spawned."""
+        state = self._stage_accounting_state
+        directory = self._stage_accounting_directory
+        if state is None or directory is None:
+            return
+        state.setdefault(provider_launch_module.STATE_CONTRACT, provider_launch_module.SCHEMA)
+        launches = state.setdefault(provider_launch_module.STATE_LAUNCHES, [])
+        if prefix not in launches:
+            launches.append(prefix)
+        if persist:
+            state["shadow"] = self._shadow_state()
+            directory.write_json("state.json", state)
+
+    def _record_observation(
+        self, directory, prefix, stage, index, endpoint, invocation_kind,
+        worker_parent_id, prepared, active, error,
+    ) -> None:
+        """Optional attempt observation; failures are bounded and never block.
+
+        This runs after worker-custody drain inside the attempt's ``finally``,
+        so no Exception may escape it and replace the attempt's own outcome.
+        """
+        try:
+            self._record_observation_unchecked(
+                directory, prefix, stage, index, endpoint, invocation_kind,
+                worker_parent_id, prepared, active, error)
+        except Exception as failure:
+            if self._stage_accounting_state is not None:
+                self._stage_accounting_state.setdefault("observation_failures", []).append(
+                    {"prefix": prefix, "diagnostic": type(failure).__name__})
+
+    def _record_observation_unchecked(
+        self, directory, prefix, stage, index, endpoint, invocation_kind,
+        worker_parent_id, prepared, active, error,
+    ) -> None:
+        from . import observations as observations_module
+        if active is None:
+            active = observations_module.configured(
+                project_root=self.project_root, start=self.cwd, apgr_home=self.apgr_home)
+        state = self._stage_accounting_state or {}
+        routes = state.get("effective_stage_routes")
+        route = routes.get(stage) if isinstance(routes, dict) else None
+        route = route if isinstance(route, dict) else {}
+        intelligence = route.get("intelligence") if isinstance(route.get("intelligence"), dict) else {}
+        generation = state.get("controller_generation")
+        predecessor = None
+        review_context = getattr(self, "_review_attempt_context", None)
+        if invocation_kind == "auxiliary_review_retry" and isinstance(review_context, dict) \
+                and isinstance(review_context.get("index"), int):
+            predecessor = f"att-{directory.run_id}-{stage}-{review_context['index']}"
+        disposition = observations_module.record_attempt(
+            directory.path, prefix, active=active, error=error, dispatcher="v1",
+            run_id=directory.run_id, binding_id=stage,
+            attempt_id=f"att-{directory.run_id}-{stage}-{index}",
+            attempt_number=2 if invocation_kind == "auxiliary_review_retry" else 1,
+            invocation_kind=invocation_kind, predecessor_attempt_id=predecessor,
+            worker_parent_id=worker_parent_id,
+            task={"project": state.get("project"), "phase_type": state.get("phase_type"),
+                  "execution_mode": state.get("execution_mode"), "category": None},
+            route={"provider": endpoint.provider, "profile": endpoint.profile,
+                   "endpoint_alias": route.get("endpoint_alias"),
+                   "requested_model": intelligence.get("model"),
+                   "requested_effort": intelligence.get("effort"),
+                   "source": "effective_stage_routes" if intelligence else None},
+            build=observations_module.build_identity(generation if isinstance(generation, dict) else None),
+            prepared=prepared,
+            artifacts={"meta": f"{prefix}.meta.json", "stdout": f"{prefix}.stdout.md",
+                       "stderr": f"{prefix}.stderr.log"},
+        )
+        if disposition["status"] == "failed":
+            entry = {"prefix": prefix, "diagnostic": disposition["diagnostic"]}
+            if self._stage_accounting_state is not None:
+                self._stage_accounting_state.setdefault("observation_failures", []).append(entry)
+            else:
+                import sys
+                sys.stderr.write(f"agent-phase: optional observation not recorded ({entry['diagnostic']})\n")
+
     def _record_stage_transport(
         self, stage: str, status: str, **facts: Any
     ) -> None:
@@ -164,37 +414,12 @@ class Dispatcher:
     # -- prompt assembly ---------------------------------------------------
 
     def _header(self, stage: str, request: PhaseRequest, run_id: str) -> str:
-        return envelope_module.stage_header(
-            stage,
-            run_id,
-            request.phase_type,
-            request.execution_mode,
-            self.lifecycle.name,
-            self.lifecycle.checkpoints,
-            self.finalization_policy,
-        ) + adoption_module.prompt_context(getattr(self, "_adoption", None))
+        return stage_prompts_module._header(self, stage, request, run_id)
 
     def plan_prompt(
         self, request: PhaseRequest, run_id: str, task_prompt: str | None = None
     ) -> envelope_module.RenderedPrompt:
-        return envelope_module.render(
-            [
-                envelope_module.Segment(
-                    envelope_module.SEGMENT_ENVELOPE,
-                    self._header(envelope_module.STAGE_PLAN, request, run_id)
-                    + "\n"
-                    + envelope_module.PLAN_ENVELOPE
-                    + "\n\n"
-                    + envelope_module.PROVIDER_NOTE
-                    + "\n\n"
-                    + envelope_module.TASK_PROMPT_HEADER,
-                ),
-                envelope_module.Segment(
-                    envelope_module.SEGMENT_TASK_PROMPT,
-                    request.prompt if task_prompt is None else task_prompt,
-                ),
-            ]
-        )
+        return stage_prompts_module.plan_prompt(self, request, run_id, task_prompt)
 
     def review_prompt(
         self,
@@ -206,41 +431,7 @@ class Dispatcher:
         task_prompt: str,
         review_contract: str,
     ) -> envelope_module.RenderedPrompt:
-        task_header = (
-            self._header(stage, request, run_id)
-            + "\n"
-            + envelope_module.REVIEWER_ENVELOPE
-            + "\n\n"
-            + review_contract
-            + "\n\n"
-            + envelope_module.GIT_IDENTITY_POLICY
-            + "\n\n"
-            + envelope_module.TASK_PROMPT_HEADER
-        )
-        material_header = (
-            "Candidate binding:\n"
-            + "\n".join(f"  {key}: {value}" for key, value in sorted(binding.items()))
-            + "\n\n"
-            + envelope_module.REVIEWER_INDEPENDENCE
-            + "\n\n"
-            + envelope_module.PRIOR_MATERIAL_HEADER
-        )
-        return envelope_module.render(
-            [
-                envelope_module.Segment(
-                    envelope_module.SEGMENT_ENVELOPE, task_header
-                ),
-                envelope_module.Segment(
-                    envelope_module.SEGMENT_TASK_PROMPT, task_prompt
-                ),
-                envelope_module.Segment(
-                    envelope_module.SEGMENT_ENVELOPE, material_header
-                ),
-                envelope_module.Segment(
-                    envelope_module.SEGMENT_PRIOR_MATERIAL, material
-                ),
-            ]
-        )
+        return stage_prompts_module.review_prompt(self, stage, request, run_id, binding, material, task_prompt, review_contract)
 
     def continuation_prompt(
         self,
@@ -253,58 +444,7 @@ class Dispatcher:
         contract: str | None = None,
         task_prompt: str | None = None,
     ) -> envelope_module.RenderedPrompt:
-        header = (
-            self._header(stage, request, run_id)
-            + "\n"
-            + directive
-            + "\n\n"
-            + envelope_module.PROVIDER_NOTE
-        )
-        segments = [envelope_module.Segment(envelope_module.SEGMENT_ENVELOPE, header)]
-        if include_task_prompt:
-            segments.append(
-                envelope_module.Segment(
-                    envelope_module.SEGMENT_ENVELOPE,
-                    "\n" + envelope_module.TASK_PROMPT_HEADER,
-                )
-            )
-            segments.append(
-                envelope_module.Segment(
-                    envelope_module.SEGMENT_TASK_PROMPT,
-                    request.prompt if task_prompt is None else task_prompt,
-                )
-            )
-        segments.append(
-            envelope_module.Segment(
-                envelope_module.SEGMENT_ENVELOPE,
-                "\n" + envelope_module.PRIOR_MATERIAL_HEADER,
-            )
-        )
-        for title, body in prior:
-            if isinstance(body, bytes):
-                payload: str | bytes = (
-                    f"\n## {title}\n\n".encode("utf-8") + body
-                )
-            else:
-                payload = f"\n## {title}\n\n{body}"
-            segments.append(
-                envelope_module.Segment(
-                    envelope_module.SEGMENT_PRIOR_MATERIAL,
-                    payload,
-                )
-            )
-        if contract is not None:
-            # Keep the nonce-bound contract at the absolute prompt end. Do not
-            # place any task, prior material, or contextual headers after this
-            # segment: the provider's exact ending must be unambiguous.
-            segments.append(
-                envelope_module.Segment(
-                    envelope_module.SEGMENT_ENVELOPE,
-                    "\n" + envelope_module.TERMINAL_CONTRACT_PRECEDER
-                    + "\n" + contract,
-                )
-            )
-        return envelope_module.render(segments)
+        return stage_prompts_module.continuation_prompt(self, stage, request, run_id, directive, prior, include_task_prompt, contract, task_prompt)
 
     def closeout_prompt(
         self,
@@ -320,39 +460,9 @@ class Dispatcher:
         *,
         stage_delta_summary: str | None = None,
         qualification_evidence: str | None = None,
+        review_window_mutations: Sequence[str] | str | None = None,
     ) -> envelope_module.RenderedPrompt:
-        prior_segments: list[tuple[str, str | bytes]] = [
-            (
-                "Producer candidate binding (dispatcher-owned exact identity)",
-                json.dumps(producer_binding, sort_keys=True, separators=(",", ":")),
-            ),
-            (
-                "Current exact worktree product (dispatcher-owned binding)",
-                json.dumps(current_product, sort_keys=True, separators=(",", ":")),
-            ),
-            ("Producer summary/output (optional whole artifact)", producer_narrative),
-            ("Independent work-review findings", findings),
-        ]
-        if stage_delta_summary:
-            prior_segments.append(
-                ("Prior stage-delta summary (dispatcher-owned evidence)", stage_delta_summary)
-            )
-        if qualification_evidence:
-            prior_segments.append(
-                ("Qualification evidence available in the run", qualification_evidence)
-            )
-        return self.continuation_prompt(
-            envelope_module.STAGE_CLOSEOUT,
-            request,
-            run_id,
-            envelope_module.CLOSEOUT_ENVELOPE,
-            prior_segments,
-            include_task_prompt=True,
-            contract=envelope_module.CLOSEOUT_RESULT_CONTRACT.format(
-                begin=begin, end=end
-            ),
-            task_prompt=task_prompt,
-        )
+        return stage_prompts_module.closeout_prompt(self, request, run_id, task_prompt, producer_binding, current_product, producer_narrative, findings, begin, end, stage_delta_summary=stage_delta_summary, qualification_evidence=qualification_evidence, review_window_mutations=review_window_mutations)
 
     def _sanitize(
         self,
@@ -433,7 +543,12 @@ class Dispatcher:
             ),
         }
 
-    def _stage(
+    def _stage(self, directory, *args, **kwargs):
+        from .runtime_models import launch_capture
+        with launch_capture(self.roster.bundle, directory.path):
+            return self._stage_captured(directory, *args, **kwargs)
+
+    def _stage_captured(
         self,
         directory: run_module.RunDirectory,
         index: int,
@@ -467,10 +582,22 @@ class Dispatcher:
         if (self._stage_accounting_state is not None
                 and invocation_kind in ("semantic", "auxiliary_review_retry")
                 and review_binding.is_review(self._stage_accounting_state, stage)):
+            attempt_id = f"att-{directory.run_id}-{stage}-{index}"
+            attempt_number = 1 if invocation_kind == "semantic" else 2
             if invocation_kind == "semantic":
-                review_binding.bind(self.cwd, self._stage_accounting_state, stage, binding)
+                review_binding.bind(
+                    self.cwd, self._stage_accounting_state, stage, binding,
+                    attempt_id=attempt_id, binding_id=stage, attempt_number=attempt_number,
+                )
             else:
-                review_binding.verify(self.cwd, self._stage_accounting_state, stage)
+                bound_rec = self._stage_accounting_state.get("immutable_review_bindings", {}).get(stage)
+                if bound_rec is not None:
+                    bound_rec["attempt_id"] = attempt_id
+                    bound_rec["attempt_number"] = attempt_number
+                review_binding.verify(
+                    self.cwd, self._stage_accounting_state, stage,
+                    attempt_id=attempt_id, binding_id=stage, attempt_number=attempt_number,
+                )
         if role == "reviewer" and invocation_kind == "semantic":
             self._review_attempt_context = {
                 "index": index, "endpoint": endpoint, "rendered": rendered,
@@ -487,24 +614,26 @@ class Dispatcher:
                 worker_cap = resolve_worker_capability(
                     self.root, endpoint.provider, endpoint.profile, exec_mode
                 )
+        required_workers = bool(worker_cap and worker_cap.get("requirement") == "required")
+        if required_workers and not worker_cap.get("allowed"):
+            raise DispatchError(str(worker_cap.get("reason", "worker unavailable")), "worker_unavailable")
         effective_read_only = role == "reviewer" if read_only is None else read_only
-        # Astra's native Luna pool is runtime-owned.  For the selected fixed
+        # Codex's native Luna pool is runtime-owned.  For the selected fixed
         # policy, bind its launch-local cap and worker facade before rendering
-        # the prompt or registering the parent ledger.  Binding is optional at
-        # the dispatcher boundary: a stale/missing launcher yields a durable
-        # diagnostic and the ordinary provider task continues without workers.
+        # the prompt or registering the parent ledger. Required worker modes
+        # reject missing bindings before invoking the parent provider.
         native_binding = None
         argv: list[str] | None = None
-        native_astra = bool(
+        native_codex = bool(
             worker_cap
             and worker_cap.get("allowed")
             and endpoint.provider == PROVIDER_CODEX
-            and worker_cap.get("parent_family") == "codex_astra"
-            and worker_cap.get("policy_selection") == "dual_pool_4x4"
+            and worker_cap.get("parent_family") == "codex_parent"
+            and worker_cap.get("policy_selection") == "triple_pool_4x4x4"
         )
-        if native_astra:
+        if native_codex:
             try:
-                from agent_workers.native_launch import (
+                from apgr_workers.native_launch import (
                     apply_native_binding,
                     capability_with_native_binding,
                     prepare_native_binding,
@@ -547,23 +676,54 @@ class Dispatcher:
                     "allowed": False,
                     "available": False,
                     "reason": (
-                        "Astra native launch binding unavailable"
+                        "Codex native launch binding unavailable"
                         + (f" ({type(error).__name__}: {detail})" if detail else "")
                     ),
                 }
+        if required_workers and not worker_cap.get("allowed"):
+            raise DispatchError(str(worker_cap.get("reason")), "worker_unavailable")
         if worker_cap and worker_cap.get("allowed") and endpoint.provider == "claude":
             worker_cap = {**worker_cap, "interface": "stdio-mcp"}
-        worker_guidance = ""
-        if worker_cap and worker_cap.get("allowed") and endpoint.provider == PROVIDER_ANTIGRAVITY:
+        instruction_records = []
+        _worker_guidance = ""
+        if endpoint.provider == PROVIDER_ANTIGRAVITY:
+            has_workers = bool(worker_cap and worker_cap.get("allowed"))
             from agent_source_guidance import source_guidance
-            worker_guidance, _ = source_guidance(
-                self.root / "antigravity", [], workers=True, instruction_file="GEMINI.md"
+            ag_source = source_guidance(
+                self.root / "antigravity",
+                [],
+                workers=has_workers,
+                instruction_file="GEMINI.md",
+                rtk=self._ensure_rtk_resolution(),
+                provider="antigravity",
             )
-        if worker_cap is not None:
+            ag_guidance, _ = ag_source
+            instruction_records.extend(ag_source.instruction_components)
+            worker_envelope_text = (
+                envelope_module.worker_envelope(worker_cap, str(self.root / "bin/agent-worker"))
+                if has_workers
+                else ""
+            )
+            env_text = (ag_guidance + "\n" + worker_envelope_text).strip()
+            if env_text:
+                rendered = envelope_module.render([
+                    envelope_module.Segment(
+                        envelope_module.SEGMENT_ENVELOPE,
+                        env_text,
+                    ),
+                    *[
+                        envelope_module.Segment(
+                            segment["kind"],
+                            rendered.data[segment["start"]:segment["end"]],
+                        )
+                        for segment in rendered.segments
+                    ],
+                ])
+        elif worker_cap is not None:
             rendered = envelope_module.render([
                 envelope_module.Segment(
                     envelope_module.SEGMENT_ENVELOPE,
-                    worker_guidance + "\n" + envelope_module.worker_envelope(worker_cap, str(self.root / "bin/agent-worker")),
+                    envelope_module.worker_envelope(worker_cap, str(self.root / "bin/agent-worker")),
                 ),
                 *[
                     envelope_module.Segment(
@@ -621,17 +781,30 @@ class Dispatcher:
                     else None
                 ),
             )
-            if endpoint.provider == PROVIDER_CODEX and invocation_kind in ("semantic", "auxiliary_review_retry"):
-                # Profiles/auth remain provider-home owned. Fresh ordinary
-                # stages receive this implementation's guidance, just as native
-                # worker parents do in apply_native_binding. Do not add it twice
-                # or change the detached result formatter's inspection contract.
-                from agent_source_guidance import codex_guidance_overrides
+        else:
+            # Native-bound argv was built unpinned; ordinary build_argv already
+            # applies the captured selection. Each path selects exactly once.
+            from .runtime_models import apply_selection
+            argv = apply_selection(argv, endpoint, self.root, bundle=self.roster.bundle)
+        if endpoint.provider == PROVIDER_CODEX and invocation_kind in ("semantic", "auxiliary_review_retry"):
+            # Profiles/auth remain provider-home owned. Fresh ordinary
+            # stages and native worker parents receive this implementation's guidance.
+            # Do not add it twice or change the detached result formatter's inspection contract.
+            from agent_source_guidance import codex_guidance_overrides
 
-                additions = []
-                for override in codex_guidance_overrides(self.root, workers=False):
+            has_workers = bool(worker_cap and worker_cap.get("allowed"))
+            additions = []
+            for override in codex_guidance_overrides(
+                self.root, workers=has_workers, rtk=self._ensure_rtk_resolution(),
+                instruction_records=instruction_records,
+            ):
+                if override not in argv:
                     additions.extend(("-c", override))
+            if additions:
                 argv = argv[:-1] + additions + argv[-1:]
+        if native_binding is not None:
+            from apgr_workers.native_launch import claim_fresh_launch
+            claim_fresh_launch(native_binding, argv=argv, require_empty_ledger=True)
         self.display.stage_started(
             index,
             stage,
@@ -641,51 +814,93 @@ class Dispatcher:
             if display_stage_count is None else display_stage_count,
         )
         parent_ledger = None
-        prior_parent_id = os.environ.get("AGENT_CENTRAL_PARENT_ID")
-        prior_worker_state = os.environ.get("AGENT_CENTRAL_WORKER_STATE_DIR")
-        prior_facade = os.environ.get("AGENT_CENTRAL_WORKER_FACADE")
+        prior_parent_id = os.environ.get("APGR_PARENT_ID")
+        prior_worker_state = os.environ.get("APGR_WORKER_STATE_DIR")
+        prior_facade = os.environ.get("APGR_WORKER_FACADE")
+        prior_required = os.environ.get("APGR_WORKERS_REQUIRED")
         custody = WorkerCustody(None, directory, prefix, self._stage_accounting_state)
         drain_summary: dict[str, Any] | None = None
+        context_prepared = {"reference": None}
+        observation_active: bool | None = None
+        registration_observation = {
+            "schema": "apgr.stage-worker-registration/v1", "run_id": directory.run_id,
+            "parent_id": parent_id, "stage": stage, "prefix": prefix, "index": index,
+            "lifecycle_generation": f"{directory.run_id}:{stage}:{index}",
+            "lifecycle": self.lifecycle.name, "complete": False,
+            "register_entered": False, "provider_entered": False,
+            "registration_status": "not_requested",
+        }
         try:
             if worker_cap and worker_cap.get("allowed"):
                 candidate_ledger = None
                 try:
-                    # The ledger is optional too.  Keep its import inside the same
-                    # fallback boundary as registration so a missing or stale
-                    # worker package cannot stop the parent provider invocation.
-                    from agent_workers.ledger import ParentLedger
+                    # Required modes reject registration failures before launch;
+                    # optional modes retain an explicit unavailable disposition.
+                    from apgr_workers.ledger import ParentLedger
 
-                    parent_family = worker_cap["parent_family"]
+                    parent_family = worker_cap.get("parent_family")
                     effective_read_only = role == "reviewer" if read_only is None else read_only
                     task_authority = "read_only" if effective_read_only else "mutation_capable"
                     worker_state_dir = directory.path / "workers"
                     candidate_ledger = ParentLedger(parent_id, worker_state_dir)
                     custody.adopt_if_present(candidate_ledger)
+
+                    accounting = self._stage_accounting_state
+                    accounting_mode = (accounting or {}).get("execution_mode")
+                    explicit_mode = worker_cap.get("execution_mode")
+                    if accounting is not None:
+                        if explicit_mode is not None and explicit_mode != accounting_mode:
+                            raise ValueError("explicit execution mode conflicts with authoritative accounting state")
+                        effective_mode = accounting_mode
+                    else:
+                        effective_mode = explicit_mode
+                    is_gemini = parent_family == "gemini_flash" or endpoint.provider == PROVIDER_ANTIGRAVITY
+                    if is_gemini or (accounting is None and explicit_mode is not None):
+                        if effective_mode is None:
+                            raise ValueError("Gemini registration execution_mode provenance missing")
+                        resolved_cap = resolve_worker_capability(self.root, endpoint.provider,
+                            endpoint.profile, effective_mode, bundle=self.roster.bundle)
+                        if not resolved_cap or not resolved_cap.get("allowed"):
+                            raise ValueError("worker capability re-resolution not allowed: " +
+                                             str((resolved_cap or {}).get("reason")))
+                        fields = ("parent_family", "policy_selection", "policy_sha256", "limits",
+                                  "gemini_worker", "luna_worker", "sonnet_worker", "native_worker",
+                                  "parent_provider", "parent_profile", "parent_model", "parent_effort",
+                                  "source_root", "execution_mode")
+                        # The canary's required override is local qualification policy.
+                        for field in fields:
+                            if worker_cap.get(field) != resolved_cap.get(field):
+                                raise ValueError("explicit worker capability provenance mismatch: " + field)
+                    registration_observation["register_entered"] = True
                     registered = candidate_ledger.register(
                         parent_family=parent_family,
                         task_authority=task_authority,
                         workspace=str(self.cwd if working_directory is None else working_directory),
-                        policy_path=self.root / worker_cap["policy_source"],
+                        policy_path=Path(os.environ["APGR_DISPATCH_WORKERS"]),
                         worker_capability={
                             **worker_cap,
-                            "policy_source": str((self.root / worker_cap["policy_source"]).resolve()),
+                            "policy_source": os.environ["APGR_DISPATCH_WORKERS"],
                             "source_root": str(self.root),
                             "lifecycle_generation": f"{directory.run_id}:{stage}:{index}",
-                            "execution_mode": (self._stage_accounting_state or {}).get("execution_mode"),
+                            "execution_mode": effective_mode,
                             "parent_provider": endpoint.provider,
                             "parent_profile": endpoint.profile,
                             "parent_run_id": directory.run_id,
                             "parent_stage": stage,
-                            "controller_generation": (self._stage_accounting_state or {}).get("controller_generation"),
+                            "controller_generation": (self._stage_accounting_state or {}).get("controller_generation") or worker_cap.get("controller_generation"),
                         },
                     )
+                    worker_cap["execution_mode"] = effective_mode
+                    registration_observation["registration_status"] = "registered"
                     parent_ledger = candidate_ledger
                     custody.ledger = candidate_ledger
                     if registered["policy"]["policy_sha256"] != worker_cap["policy_sha256"]:
                         raise ValueError("worker policy changed after resolution")
-                    os.environ["AGENT_CENTRAL_PARENT_ID"] = parent_id
-                    os.environ["AGENT_CENTRAL_WORKER_STATE_DIR"] = str(worker_state_dir)
+                    os.environ["APGR_PARENT_ID"] = parent_id
+                    os.environ["APGR_WORKER_STATE_DIR"] = str(worker_state_dir)
                 except BaseException as error:
+                    registration_observation["registration_status"] = (
+                        "uncertain" if registration_observation["register_entered"] else "refused_before_register")
                     if candidate_ledger is not None:
                         custody.adopt_if_present(candidate_ledger)
                     if not isinstance(error, Exception):
@@ -695,12 +910,26 @@ class Dispatcher:
                         # unpersisted state for a worker-free stage.
                         custody.arm()
                         raise
+                    detail = str(error).replace("\n", " ").strip()[:240]
+                    registration_observation["failure"] = {
+                        "category": "parent registration unavailable",
+                        "error_type": type(error).__name__,
+                        "detail": detail,
+                    }
+                    generic_reason = f"parent registration unavailable ({type(error).__name__})"
                     worker_cap = {
                         **worker_cap,
                         "allowed": False,
                         "available": False,
-                        "reason": f"parent registration unavailable ({type(error).__name__})",
+                        "reason": generic_reason,
                     }
+                    if required_workers:
+                        detailed_reason = (
+                            f"parent registration unavailable ({type(error).__name__}: {detail})"
+                            if detail
+                            else f"parent registration unavailable ({type(error).__name__})"
+                        )
+                        raise DispatchError(detailed_reason, "worker_unavailable") from error
                     rendered = envelope_module.render([
                         envelope_module.Segment(
                             envelope_module.SEGMENT_ENVELOPE,
@@ -716,18 +945,52 @@ class Dispatcher:
                     ])
                     ensure_prompt_fits(stage, endpoint, rendered)
                     directory.write_bytes(f"{prefix}.prompt.md", rendered.data)
+            from .context_config import capture_context_config
+            from . import context_adapter
+            context_prompt = rendered.data
+            context_prepared = {"reference": None}
+            if invocation_kind in ("semantic", "auxiliary_review_retry"):
+                context_capture = capture_context_config(
+                    project_root=self.project_root, start=self.cwd, apgr_home=self.apgr_home,
+                )
+                from . import observations as observations_module
+                observation_active = observations_module.enabled(context_capture.get("observations"))
+                from . import context_route
+                route_argv = list(argv)
+                argv, context_prompt, context_prepared = context_adapter.prepare(
+                    capture=context_capture, run_dir=directory.path, prefix=prefix,
+                    run_id=directory.run_id, binding_id=stage,
+                    attempt_id=f"att-{directory.run_id}-{stage}-{index}",
+                    attempt_number=2 if invocation_kind == "auxiliary_review_retry" else 1,
+                    roles=[stage], consumer=endpoint.provider, argv=argv, prompt=rendered.data,
+                    instruction_records=instruction_records,
+                    postures=context_route.postures_v1(stage, role),
+                    work_tree=self.cwd if working_directory is None else working_directory,
+                    route=lambda: context_route.ordinary_projection(
+                        provider=endpoint.provider, profile=endpoint.profile, argv=route_argv, prefix=prefix,
+                        classes=context_route.instruction_classes_v1(stage, role)),
+                    facts=[{"kind": "work_class", "value": (
+                        "review_verification" if role == "reviewer" else
+                        "planning" if stage == "plan" else
+                        (self._stage_accounting_state or {}).get("phase_type", "")
+                    )}],
+                )
+                if self._stage_accounting_state is not None and context_prepared.get("reference"):
+                    self._stage_accounting_state.setdefault("context_plans", []).append(context_prepared["reference"])
             # Registration is the admission boundary. Arm and persist the
             # marker before any provider code can launch a worker; a hard
             # parent exit therefore leaves resume/capture fenced on disk.
             custody.arm()
+            os.environ["APGR_WORKERS_REQUIRED"] = "1" if required_workers else "0"
             if parent_ledger is not None and worker_cap.get("allowed") and endpoint.provider == "claude":
-                os.environ["AGENT_CENTRAL_WORKER_FACADE"] = "1"
+                os.environ["APGR_WORKER_FACADE"] = "1"
             else:
-                os.environ.pop("AGENT_CENTRAL_WORKER_FACADE", None)
+                os.environ.pop("APGR_WORKER_FACADE", None)
             if on_provider_invoke is not None:
                 try:
                     on_provider_invoke()
                 except BaseException as error:
+                    context_adapter.observe(context_prepared, status="not_started")
                     if boundary is not None:
                         custody.close_boundary(boundary, ok=False, error=error)
                     if invocation_kind == "semantic":
@@ -735,6 +998,17 @@ class Dispatcher:
                             stage, "boundary_rejected_before_invocation"
                         )
                     raise
+            # Durable launch evidence precedes the persisted invocation record
+            # and any spawn. State names it, so recovery can require it.
+            try:
+                launch = provider_launch_module.prepare(
+                    directory.path, run_id=directory.run_id, stage=stage, prefix=prefix,
+                    index=index, invocation_kind=invocation_kind,
+                    provider=endpoint.provider, profile=endpoint.profile,
+                )
+            except provider_launch_module.LaunchEvidenceError as error:
+                raise DispatchError(str(error), error.code) from error
+            self._record_provider_launch(prefix, persist=invocation_kind != "semantic")
             if invocation_kind == "semantic":
                 self._record_stage_accounting("stages_invoked", stage)
                 self._record_stage_transport(stage, "invoking")
@@ -746,14 +1020,23 @@ class Dispatcher:
             notice_kwargs: dict[str, Any] = {}
             if self.runner is provider_module.run:
                 notice_kwargs["on_notice"] = self.display.stage_notice
-            result = self.runner(
-                argv,
-                rendered.data,
-                self.cwd if working_directory is None else working_directory,
-                provider_module.MAX_STAGE_OUTPUT_BYTES,
-                self.display.stage_output,
-                **notice_kwargs,
-            )
+            # Carry the selected authority to the Claude adapter independently
+            # of the provider's execution directory and ambient launcher state.
+            with _scoped_target_project(self.project_root, self.cwd), _scoped_apgr_home(self.apgr_home), \
+                    provider_launch_module.bound(launch):
+                registration_observation["provider_entered"] = True
+                result = context_adapter.invoke(
+                    context_prepared, self.runner,
+                    argv,
+                    context_prompt,
+                    self.cwd if working_directory is None else working_directory,
+                    provider_module.MAX_STAGE_OUTPUT_BYTES,
+                    self.display.stage_output,
+                    **notice_kwargs,
+                )
+            if self.runner is GATED_PROVIDER_RUN and not launch.consumed:
+                raise DispatchError("provider ran without its launch evidence gate",
+                                    "PROVIDER_LAUNCH_GATE_BYPASSED")
         except provider_module.ProviderLivenessExpired as expired:
             policy = {
                 "inactivity_seconds": expired.policy.inactivity_seconds,
@@ -982,22 +1265,52 @@ class Dispatcher:
             self.invocations.append(invocation)
             raise
         finally:
+            import sys
+            in_flight = sys.exc_info()[1]
+            if context_prepared.get("reference") and not context_prepared.get("invoked"):
+                from . import context_adapter
+                context_adapter.observe(context_prepared, status="not_started")
             try:
-                drain_summary = custody.drain()
+                drain_summary = custody.drain(parent_exit_observed=in_flight is None)
+                if native_binding is not None:
+                    from apgr_workers.native_launch import _update_launch_record
+                    _update_launch_record(native_binding,
+                        status="closed" if drain_summary and not drain_summary.get("uncertain_cleanup") else "stopping",
+                        ledger_drain=drain_summary)
             finally:
-                if prior_facade is not None:
-                    os.environ["AGENT_CENTRAL_WORKER_FACADE"] = prior_facade
+                if prior_required is None:
+                    os.environ.pop("APGR_WORKERS_REQUIRED", None)
                 else:
-                    os.environ.pop("AGENT_CENTRAL_WORKER_FACADE", None)
+                    os.environ["APGR_WORKERS_REQUIRED"] = prior_required
+                if prior_facade is not None:
+                    os.environ["APGR_WORKER_FACADE"] = prior_facade
+                else:
+                    os.environ.pop("APGR_WORKER_FACADE", None)
                 if parent_ledger is not None:
                     if prior_parent_id is not None:
-                        os.environ["AGENT_CENTRAL_PARENT_ID"] = prior_parent_id
+                        os.environ["APGR_PARENT_ID"] = prior_parent_id
                     else:
-                        os.environ.pop("AGENT_CENTRAL_PARENT_ID", None)
+                        os.environ.pop("APGR_PARENT_ID", None)
                     if prior_worker_state is not None:
-                        os.environ["AGENT_CENTRAL_WORKER_STATE_DIR"] = prior_worker_state
+                        os.environ["APGR_WORKER_STATE_DIR"] = prior_worker_state
                     else:
-                        os.environ.pop("AGENT_CENTRAL_WORKER_STATE_DIR", None)
+                        os.environ.pop("APGR_WORKER_STATE_DIR", None)
+            # Explicit stage callers receive affirmative registration/custody evidence.
+            # A possibly committed register call never becomes a no-admission assertion.
+            registration_observation.update(
+                complete=True,
+                custody_status="not_acquired" if custody.ledger is None else "acquired",
+                process_state="entered" if registration_observation["provider_entered"] else "not_started",
+            )
+            if worker_capability is not None:
+                directory.write_json(f"{prefix}.registration.json", registration_observation)
+            # After drain and environment restoration, so an interrupt during
+            # this optional write cannot skip worker custody cleanup.
+            self._record_observation(
+                directory, prefix, stage, index, endpoint, invocation_kind,
+                parent_id if parent_ledger is not None else None,
+                context_prepared, observation_active, in_flight,
+            )
         if invocation_kind == "semantic":
             self._record_stage_transport(
                 stage,
@@ -1062,6 +1375,10 @@ class Dispatcher:
             self.provider_evidence.append({"stage": stage, **evidence})
         if worker_cap is not None:
             meta["worker_capability"] = worker_cap
+            from .worker_evidence import disposition
+            status = json.loads(parent_ledger.data_path.read_text()) if parent_ledger is not None else None
+            meta["worker_disposition"] = disposition(worker_cap, status, result.stdout)
+            meta["registration_observation"] = registration_observation
         directory.write_json(f"{prefix}.meta.json", meta)
         if drain_summary and drain_summary.get("uncertain_cleanup"):
             has_candidate = False
@@ -1237,11 +1554,11 @@ class Dispatcher:
         if (challenge_state is not None and self._entry_state is not None
                 and invocation_kind == "semantic" and not read_only
                 and stage in self.lifecycle.stage_names
-                and self.lifecycle.stage(stage).is_mutating):
+                and self.lifecycle.stage(stage).is_mutating
+                and stage != self.lifecycle.terminal_result_stage):
             try:
                 ownership_challenge.observe(self.cwd, challenge_state, self._entry_state,
-                    candidate_module.tree_identity(self.cwd)["tree"], stage,
-                    "post_terminal" if stage == self.lifecycle.terminal_result_stage else "post_producer")
+                    candidate_module.tree_identity(self.cwd)["tree"], stage, "post_producer")
             except result_module.ResultError as error:
                 raise DispatchError(str(error), error.code) from error
         return result, meta
@@ -1313,7 +1630,30 @@ class Dispatcher:
         request: PhaseRequest,
         lifecycle: str = LIFECYCLE_STANDARD,
         finalization_policy: str = FINALIZATION_PUBLISH,
-        *, continue_from: Path | None = None,
+        *,
+        continue_from: Path | None = None,
+        native_git_authority: Path | None = None,
+        entry_adoption: Path | None = None,
+    ) -> dict[str, Any]:
+        with _scoped_apgr_home(self.apgr_home):
+            return self._dispatch_impl(
+                phase_id,
+                request,
+                lifecycle=lifecycle,
+                finalization_policy=finalization_policy,
+                continue_from=continue_from,
+                native_git_authority=native_git_authority,
+                entry_adoption=entry_adoption,
+            )
+
+    def _dispatch_impl(
+        self,
+        phase_id: str,
+        request: PhaseRequest,
+        lifecycle: str = LIFECYCLE_STANDARD,
+        finalization_policy: str = FINALIZATION_PUBLISH,
+        *,
+        continue_from: Path | None = None,
         native_git_authority: Path | None = None,
         entry_adoption: Path | None = None,
     ) -> dict[str, Any]:
@@ -1375,16 +1715,21 @@ class Dispatcher:
         self.telemetry_failures = []
         self.scan_rows = []
         self.prompt_policy_segments = []
-        roster = load_validated_roster(self.root)
+        roster = self._ensure_roster_and_policy()
         resolved = resolve(
             request,
             self.root,
             self.lifecycle.name,
             self.finalization_policy,
             roster=roster,
+            apgr_home=self.apgr_home,
         )
         endpoints = route(
-            request, self.lifecycle, root=self.root, roster=roster
+            request,
+            self.lifecycle,
+            root=self.root,
+            roster=roster,
+            apgr_home=self.apgr_home,
         )
 
         self.display.run_started(
@@ -1414,33 +1759,24 @@ class Dispatcher:
             "effective_stage_routes": state_effective_routes,
             "route_transition": resolved.get("route_transition"),
             "expected_stages": list(self.lifecycle.stage_names),
-            "expected_provider_invocations": (
-                self.lifecycle.expected_provider_invocations
-            ),
+            "expected_provider_invocations": self.lifecycle.expected_provider_invocations,
             "expected_review_count": self.lifecycle.expected_review_count,
             "terminal_result_stage": self.lifecycle.terminal_result_stage,
             "cwd": str(self.cwd),
             "checkpoints_completed": [],
-            "stage_accounting_schema": (
-                result_artifacts_module.STAGE_ACCOUNTING_SCHEMA
-            ),
-            "stages_invoked": [],
-            "stage_transports_completed": [],
+            "stage_accounting_schema": result_artifacts_module.STAGE_ACCOUNTING_SCHEMA,
+            "stages_invoked": [], "stage_transports_completed": [], "stages_completed": [],
+            "provider_launch_contract": provider_launch_module.SCHEMA, "provider_launches": [],
             "terminal_result_validated": False,
-            "stages_completed": [],
             "entry": entry.as_dict(),
             "entry_dirt_identities": entry.dirty,
             "_previous_operational_metadata": stage_delta_module.scan_operational_metadata(entry.root),
             "final_head": entry.head,
-            "phase_delta": [],
-            "phase_owned_paths": [],
-            "revision_paths": [],
+            "phase_delta": [], "phase_owned_paths": [], "revision_paths": [],
             "terminal_transport": None,
             "finalization_attempted": False,
             "finalization_outcome": "not_attempted",
-            "pre_final_candidate": None,
-            "closeout_candidate": None,
-            "terminal_candidate": None,
+            "pre_final_candidate": None, "closeout_candidate": None, "terminal_candidate": None,
             "commit": None,
             "push": push_record(),
             "archive_path": str(directory.archive_path),
@@ -1451,13 +1787,9 @@ class Dispatcher:
                 "total_removal_count": 0,
                 "evidence_artifact": "prompt-policy.json",
             },
-            "provider_outcomes": {},
-            "review_outcomes": {},
-            "outcome": None,
-            "semantic_outcome": None,
-            "blocking_reason": None,
-            "complete": False,
-            "manager_disposition_required": False,
+            "provider_outcomes": {}, "review_outcomes": {},
+            "outcome": None, "semantic_outcome": None, "blocking_reason": None,
+            "complete": False, "manager_disposition_required": False,
             "shadow": self._shadow_state(),
             "entry_repository_identity": {
                 "root": str(entry.root),
@@ -1491,6 +1823,16 @@ class Dispatcher:
             "stage_git_commit_delta": [],
             "external_evidence_delta": [],
             "publication_delta": [],
+            "review_mutation_policy": (
+                self.review_mutation_policy.as_dict()
+                if hasattr(self.review_mutation_policy, "as_dict")
+                else dict(self.review_mutation_policy)
+            ),
+            "review_mutation_provenance": self.review_mutation_provenance,
+            "review_mutation_provenance_chain": self.review_mutation_provenance_chain,
+            "review_mutation_observations": {},
+            "subject_drift_observed": False,
+            "review_window_mutation_paths": [],
         }
         def checkpoint(name: str) -> None:
             state["checkpoints_completed"].append(name)
@@ -1523,6 +1865,16 @@ class Dispatcher:
             )
             directory.write_json("request.json", request.as_dict())
             directory.write_json("resolved.json", resolved)
+            directory.write_json("review-mutation-policy.json", {
+                "schema": "agent-phase-policy-v1",
+                "policy": (
+                    self.review_mutation_policy.as_dict()
+                    if hasattr(self.review_mutation_policy, "as_dict")
+                    else dict(self.review_mutation_policy)
+                ),
+                "provenance": self.review_mutation_provenance,
+                "provenance_chain": self.review_mutation_provenance_chain,
+            })
             directory.write_json("entry-evidence.json", {
                 **entry.as_dict(), "dirty": entry.dirty,
             })
@@ -1601,28 +1953,29 @@ class Dispatcher:
         result_repair_commit_body_file: Path | None = None,
     ) -> dict[str, Any]:
         """Create a new run that inherits one validated semantic prefix."""
-        try:
-            return resume_dispatch_module.start(
-                self,
-                phase_id,
-                request,
-                source,
-                from_stage,
-                lifecycle=lifecycle,
-                finalization_policy=finalization_policy,
-                dry_run=dry_run,
-                result_repair_commit_subject=result_repair_commit_subject,
-                result_repair_commit_body_file=result_repair_commit_body_file,
-            )
-        except (
-            resume_module.ResumeError,
-            finalization_module.FinalizationError,
-            archive_module.ArchiveError,
-        ) as error:
-            raise DispatchError(
-                getattr(error, "detail", str(error)),
-                getattr(error, "code", type(error).__name__),
-            ) from error
+        with _scoped_apgr_home(self.apgr_home):
+            try:
+                return resume_dispatch_module.start(
+                    self,
+                    phase_id,
+                    request,
+                    source,
+                    from_stage,
+                    lifecycle=lifecycle,
+                    finalization_policy=finalization_policy,
+                    dry_run=dry_run,
+                    result_repair_commit_subject=result_repair_commit_subject,
+                    result_repair_commit_body_file=result_repair_commit_body_file,
+                )
+            except (
+                resume_module.ResumeError,
+                finalization_module.FinalizationError,
+                archive_module.ArchiveError,
+            ) as error:
+                raise DispatchError(
+                    getattr(error, "detail", str(error)),
+                    getattr(error, "code", type(error).__name__),
+                ) from error
 
     def _terminal_contract(self, stage: str, begin: str, end: str) -> str:
         return lifecycle_dispatch_module.terminal_contract(stage, begin, end)
@@ -1967,6 +2320,7 @@ class Dispatcher:
                     end,
                     stage_delta_summary=prior_stage_deltas,
                     qualification_evidence=qualification_evidence,
+                    review_window_mutations=state.get("review_window_mutation_paths"),
                 ),
                 forwarded_work,
                 source_stage=work_stage.name,
@@ -2015,7 +2369,7 @@ class Dispatcher:
         state["revisor_candidate"] = closeout_candidate
         state["terminal_candidate"] = closeout_candidate
         closer_mutated = closeout_candidate["tree"] != closer_entry_candidate["tree"]
-        adversary_mutated = closer_entry_candidate["tree"] != pre_final["tree"]
+        _adversary_mutated = closer_entry_candidate["tree"] != pre_final["tree"]
         state["closeout_delta"] = {
             "changed": closer_mutated,
             "paths": candidate_module.tree_delta(
@@ -2044,10 +2398,12 @@ class Dispatcher:
             closeout_stage,
             final_review_stage.name,
         )
-        state["final_candidate_reviewed"] = (
-            (not adversary_mutated)
-            and (not closer_mutated)
-            and (closeout_candidate["tree"] == pre_final["tree"])
+        state["final_candidate_reviewed"] = review_drift_module.derive_final_candidate_freshness(
+            work_review_observation=state.get("review_mutation_observations", {}).get(final_review_stage.name),
+            work_review_candidate_tree=str(pre_final["tree"]),
+            terminal_candidate_tree=str(closeout_candidate["tree"]),
+            has_verified_receipt=parsed_final_review is not None,
+            closer_mutated=closer_mutated,
         )
         return self._complete_terminal(
             directory,
@@ -2065,7 +2421,30 @@ class Dispatcher:
         request: PhaseRequest,
         lifecycle: str = LIFECYCLE_STANDARD,
         finalization_policy: str = FINALIZATION_PUBLISH,
-        *, continue_from: Path | None = None,
+        *,
+        continue_from: Path | None = None,
+        native_git_authority: Path | None = None,
+        entry_adoption: Path | None = None,
+    ) -> dict[str, Any]:
+        with _scoped_apgr_home(self.apgr_home):
+            return self._dry_run_impl(
+                phase_id,
+                request,
+                lifecycle=lifecycle,
+                finalization_policy=finalization_policy,
+                continue_from=continue_from,
+                native_git_authority=native_git_authority,
+                entry_adoption=entry_adoption,
+            )
+
+    def _dry_run_impl(
+        self,
+        phase_id: str,
+        request: PhaseRequest,
+        lifecycle: str = LIFECYCLE_STANDARD,
+        finalization_policy: str = FINALIZATION_PUBLISH,
+        *,
+        continue_from: Path | None = None,
         native_git_authority: Path | None = None,
         entry_adoption: Path | None = None,
     ) -> dict[str, Any]:
@@ -2083,7 +2462,7 @@ class Dispatcher:
             return {"outcome": "dry_run", "dry_run": True,
                     "run_id": record["continuation_run_id"], "adoption": record,
                     "provider_invocations": 0, "provider_invocations_inherited": 0,
-                    "resolved": resolve(request, self.root, lifecycle, finalization_policy)}
+                    "resolved": resolve(request, self.root, lifecycle, finalization_policy, roster=self.roster, apgr_home=self.apgr_home)}
         if native_git_authority is not None:
             from . import native_git as native_git_module
             try:
@@ -2102,7 +2481,7 @@ class Dispatcher:
                 "native_git_authority": record,
                 "provider_invocations": 0,
                 "provider_invocations_inherited": 0,
-                "resolved": resolve(request, self.root, lifecycle, finalization_policy),
+                "resolved": resolve(request, self.root, lifecycle, finalization_policy, roster=self.roster, apgr_home=self.apgr_home),
             }
         if entry_adoption is not None:
             from . import entry_adoption as entry_adoption_module
@@ -2122,7 +2501,7 @@ class Dispatcher:
                 "entry_adoption": record,
                 "provider_invocations": 0,
                 "provider_invocations_inherited": 0,
-                "resolved": resolve(request, self.root, lifecycle, finalization_policy),
+                "resolved": resolve(request, self.root, lifecycle, finalization_policy, roster=self.roster, apgr_home=self.apgr_home),
             }
         self._adoption = None
         self._native_git_authority = None

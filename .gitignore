@@ -24,6 +24,10 @@ reports/
 
 # Local database and generated graph artifacts
 data/
+# Manifest-required H Scenario 14 subject input (exact file only).
+!/testing/fixtures/context-eval/subjects/scenario-14/pkg/data/
+/testing/fixtures/context-eval/subjects/scenario-14/pkg/data/*
+!/testing/fixtures/context-eval/subjects/scenario-14/pkg/data/models.go
 tmp/
 *.db
 *.sqlite
@@ -32,3 +36,7 @@ tmp/
 
 # Keep explicit examples and templates trackable.
 !.env.example
+
+# Nix build output links
+/result
+/result-*

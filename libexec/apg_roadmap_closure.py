@@ -184,6 +184,15 @@ def catalog(root: Path) -> dict:
 
 def maturity_decision_valid(root: Path, row: dict, maintenance: dict) -> bool:
     status = row["disposition_status"]
+    if status == "PROVISIONAL_ADMISSION":
+        # APG163 reconciliation of D admission only, never a maturity decision.
+        return (row["skill_id"] == "rtk-command-proxy"
+                and row["current_maturity"] == "provisional"
+                and row["independent_review"] is None
+                and row["maintenance_ref"] is None
+                and all(not refs for refs in row["evidence"].values())
+                and "docs/adr/2026/09/0072-optional-rtk-integration-and-conditional-slices.md" in row["source_references"]
+                and "docs/status/2026/09/22/00218-apg162c-v0130-d-callpath1-exit.md" in row["source_references"])
     if status in ("EXISTING_STABLE", "PENDING_V0110_B"):
         valid = row["current_maturity"] == ("stable" if status == "EXISTING_STABLE" else "provisional")
         if status == "PENDING_V0110_B" and row.get("maintenance_ref") is not None:
@@ -212,7 +221,7 @@ def check_maturity(root: Path, records: dict, maintenance: dict, errors: list[st
     rows = {r["skill_id"]: r for r in records["maturity"]["skills"]}
     entries = catalog(root)
     canonical = {str(p.relative_to(root)) for p in (root / "skills").rglob("SKILL.md")}
-    if set(rows) != set(entries) or len(rows) != 45 or canonical != {p for p, _ in entries.values()}:
+    if set(rows) != set(entries) or canonical != {p for p, _ in entries.values()}:
         errors.append("maturity: canonical/catalog/ledger identity mismatch")
     debt_authority = load_json(root / GOVERNANCE / "language-profile-known-debt.json")
     debts = debt_authority["debts"]

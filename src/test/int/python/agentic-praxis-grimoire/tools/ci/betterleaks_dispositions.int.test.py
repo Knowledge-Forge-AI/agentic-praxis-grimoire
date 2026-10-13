@@ -12,9 +12,10 @@ from tools.ci.pre_review_records import ROOT, Check
 from tools.ci.run_pre_review import execute_all
 
 
-def test_manager_dispositions_bind_all_four_current_source_contexts():
+def test_reviewed_dispositions_bind_all_eleven_current_source_contexts():
+    # Four manager-reviewed records plus seven APG166ZM sealed file digests.
     records = load_records(ROOT / "tools/ci/betterleaks_dispositions.json")
-    assert len(records) == 4
+    assert len(records) == 11
     observations = []
     for record in records:
         lines = (ROOT / record["path"]).read_bytes().splitlines(keepends=True)
@@ -24,7 +25,7 @@ def test_manager_dispositions_bind_all_four_current_source_contexts():
         observations.append({"File": record["path"], "RuleID": record["rule"],
                              "StartLine": matches[0], "EndLine": matches[0]})
     assert reconcile(ROOT, observations, records) == {
-        "observations": 4, "reviewed_nonsecret": 4, "unresolved": 0, "unmatched_dispositions": 0,
+        "observations": 11, "reviewed_nonsecret": 11, "unresolved": 0, "unmatched_dispositions": 0,
     }
 
 

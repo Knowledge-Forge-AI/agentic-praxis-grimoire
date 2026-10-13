@@ -40,6 +40,55 @@ run directory, starts two ephemeral loopback servers and launches independent br
 runs. The latter inspect controlled pass/failure artifacts and issue SIGINT only
 after the child has loaded the fixture and signaled readiness.
 
+## Bounded execution and the shared browser slot
+
+Real-browser suites must not overlap: the four heavy callers (`apg123` 72 cases,
+`browser_runtime` 42, Playwright plus SVG 39, accessibility 33; 186 executions in all)
+can compete for CPU under parallel pytest workers and delay shutdown or scenario completion.
+`execute_browser_harness` therefore takes an exclusive `flock` on
+`.apg-real-browser.lock` directly inside the shared `scratch_root` before it starts
+Node, and holds it through process start and bounded communication; the descriptor is
+released on every exit path, including exceptions. The lock file is opened without
+following symlinks, close-on-exec and non-blocking, and must be a regular file owned by the
+effective user with one link and no group/other write bit; anything else is refused. The
+wait is polled without blocking and ends after 2100 seconds. Both refusal and wait timeout
+retain failure evidence like any other harness failure, and never start a browser.
+
+Each run's deadline is `max(180, 30 + 4 * cases)` seconds for an integer case count in
+1..114, plus 180 seconds per browser when `PW10` is selected: two controlled runs
+at 30 seconds each plus five-second drain bounds; up to 45 seconds each for readiness
+and interruption; five seconds for cleanup; and 15 seconds for process observation
+and drain overhead. The four callers receive 858 (`apg123`), 198 (`browser_runtime`),
+726 (Playwright plus SVG) and 180 (accessibility) seconds: 1962 in total, which with
+cleanup grace stays under the 2100-second slot wait. A case count outside 1..114 is refused
+before any directory or lock is created. These are upper bounds, not performance claims.
+
+On the deadline the harness first appends a `{"source": "harness", "phase": "harness
+deadline", "boundary": "signal"}` line to `progress.jsonl`, then signals the owned process
+group. Ordering relative to Node's lines is by append order only; no Node and Python clocks
+are compared. Successful receipts carry `scheduling` (`wait_seconds`, `budget_seconds`,
+`selected_cases`, `terminated_by_harness_deadline`) and retained failure JSON records the
+same object. Detached descendants outside the owned process group are still not signalled
+or verified by outer harness cleanup; its evidence keeps `detached_descendants: not_verified`.
+
+PW10 separately requires actual runner-only SIGINT delivery, exit exactly 130 and
+disappearance of the captured worker/browser descendants before any cleanup kill.
+Its atomically renamed readiness payload binds the worker PID and selected engine executable facts;
+bounded process-table reads capture descendants even when they have detached groups.
+PID plus start time identifies survivors independently of process-title changes.
+The interruption deadline is `clamp(ceil(1.5 * max(passRunMs, failRunMs)), 15000, 45000)`
+milliseconds, measured from the preceding controlled runs; readiness uses the same
+bound. Controlled-run watchdogs report failure with captured output and bounded
+cleanup instead of relying on the outer harness deadline. Snapshot parsing uses
+the C locale and variable date spacing, validates malformed rows in the owned tree
+or at a captured PID, and canonicalizes selected executable paths through symlinks.
+Source fixtures cover the command adapter, representative Darwin/Linux layouts,
+cache discovery, atomic publication and real controlled child watchdog/reaping;
+actual operating-system process-table and browser shutdown remain hosted evidence.
+Screenshot and trace policy
+remains enabled. Success retains timing evidence; timeout, missing custody, failed
+signal delivery or surviving processes remain failures with diagnostics before cleanup.
+
 ## Policy and limitations
 
 Only fixed synthetic loopback files and endpoints are served. Context routing

@@ -2,8 +2,8 @@
 
 ## Current status
 
-The development catalog contains forty-five canonical skills: fourteen
-stable rows and thirty-one provisional rows. The provisional rows are the
+The development catalog contains forty-six canonical skills: fourteen
+stable rows and thirty-two provisional rows. The provisional rows are the
 ChatGPT-manager subrouter, approved-roadmap manager-assignment leaf, CSS,
 JavaScript, JSX, Node.js, Go, and Ruby language profiles, the React component,
 MDX, Astro, and SVG profiles, PostgreSQL and SQLite profiles,
@@ -11,7 +11,8 @@ pytest, Minitest, Vitest, and GoMock test profiles, Dockerfile and Vagrantfile
 profiles, the Bash-to-Python conversion skill, the native Go and go-cmp test
 profiles, the Nix test profile, the Markdown language profile,
 the TypeScript language profile, the Playwright test profile, the web
-accessibility profile, Vite and npm profiles, and the browser runtime profile.
+accessibility profile, Vite and npm profiles, the browser runtime profile,
+and the RTK command proxy skill.
 
 The historical v0.8 CAP0 decision added no skill. APG122 admitted SVG as
 one provisional v0.10 candidate under a versioned capacity policy; the other
@@ -21,16 +22,19 @@ APG123's Browser/UI slice and APG124's Toolchain slice are accepted.
 APG124 is `V0100_TOOLCHAIN_SLICE_QUALIFIED`; its historical consumer failures
 and later-drift attribution limitation remain unchanged.
 APG125 adds provisional `browser-runtime-profile` under `v0.10-browser-runtime`.
-Development contains 45 canonical leaves, 45 catalog rows and 45 projections,
-with 14 stable / 31 provisional. The six-candidate ceiling is 11,507 description
+Development contained 45 canonical leaves, 45 catalog rows and 45 projections,
+with 14 stable / 31 provisional. The six-candidate ceiling was 11,507 description
 bytes, with no unused named reservation. APG126 qualified the preserved APG125 candidate after its original provider
 block. Public v0.10.0 is now released across GitHub, Go, PyPI and npm.
 [APG138](../docs/evaluations/apg138-v0-11-foundation-closure.md) establishes the
 [v0.11 closure roadmap](../docs/v0-11-roadmap.md) and individual
 [maturity ledger](../docs/governance/skill-maturity-ledger.json). All 31
-provisional leaves retain that maturity pending V0110-B. The v0.11 capacity
-ADR retains the effective ceiling and existing enforcement policy identity;
-no new leaf or description compression is admitted.
+provisional leaves retained that maturity pending V0110-B. The v0.11 capacity
+ADR retained the effective ceiling and existing enforcement policy identity;
+no new leaf or description compression was admitted.
+APG162 adds provisional `rtk-command-proxy` under Milestone V0130-D within the
+11,507-byte discovery ceiling. Development contains 46 canonical leaves, 46 catalog
+rows and 46 projections, with 14 stable / 32 provisional.
 
 Public v0.2.0 appended one intentionally squashed release commit and annotated
 tag to preserved public v0.1.0 and supplied the maintainer's separately managed
@@ -443,6 +447,7 @@ APG0 basis.
 | [`vite-build-profile`](vite-build-profile/SKILL.md) | Vite-specific build/dev configuration, environment exposure, assets, plugins, serving and Rolldown behavior | `provisional` |
 | [`npm-package-manager-profile`](npm-package-manager-profile/SKILL.md) | Selected npm version, lockfiles, dependency resolution, scripts, workspaces, configuration and package contents | `provisional` |
 | [`web-accessibility-profile`](web-accessibility-profile/SKILL.md) | Web accessibility judgment is material to accessibility auditing, ARIA attributes, semantic landmarks, focus management, screen-reader semantics, or testing hierarchy; not for CSS visual styling, component layout, or Playwright runner mechanics | `provisional` |
+| [`rtk-command-proxy`](rtk-command-proxy/SKILL.md) | RTK command proxying applies, shell-efficiency guidance is requested, or RTK CLI commands are executed; not for raw shell execution without RTK | `provisional` |
 | [`nix-language-profile`](nix-language-profile/SKILL.md) | Nix-specific judgment is material to expressions, attribute sets, modules, derivations, flakes, overlays, purity, evaluation, store exposure, activation, remote builders, or warning and crisis thresholds beyond repository policy | `stable` |
 | [`nix-test-profile`](nix-test-profile/SKILL.md) | Nix test judgment is material to selecting which already-selected testing surface proves an exact claim, package phases, flake checks, Nixpkgs or NixOS test ownership, test-evidence qualification across sandbox, store, builder, or cache boundaries, or Nix-test-specific structural review | `provisional` |
 | [`postgresql-database-profile`](postgresql-database-profile/SKILL.md) | PostgreSQL-specific judgment is material to SQL, schemas, MVCC, transactions, locks, DDL, migrations, routines, triggers, security, backup and restore, replication, maintenance, or warning and crisis thresholds beyond repository policy | `provisional` |
@@ -501,7 +506,7 @@ Clean A/B superiority and a positive use in a second repository are valuable
 evidence but are not independent stability blockers under ADR 0006. A concrete
 unresolved material authority, privacy, safety, or procedure defect may block an
 individual skill. The current catalog contains fourteen `stable` rows and
-thirty-one `provisional` rows, individually tracked in the
+thirty-two `provisional` rows, individually tracked in the
 [v0.11 maturity ledger](../docs/governance/skill-maturity-ledger.json). Public
 v0.1.0 retains its historical provisional catalog; public v0.2.0 contains the
 six stable leaves. APG14 changes no skill procedure or maturity row. APG16,
@@ -525,3 +530,12 @@ the same immutable public and active v0.3.0 boundary. APG33 adds one provisional
 Dockerfile profile, APG34 adds one provisional Vagrantfile profile, APG38 adds
 two provisional Go test-component profiles, and APG40 adds one provisional Nix
 test profile without changing that boundary.
+
+## Catalog consumer references
+
+All canonical leaves retain the limitations in the
+[Common consumer limitations](../docs/guides/skill-context-bundles.md).
+Nested ChatGPT leaves additionally retain the
+[ChatGPT consumer limitations](../docs/chatgpt-manager-skill-topology.md).
+These maintained references are inputs to generated descriptors; they do not
+change consumer eligibility or declare required dependencies.

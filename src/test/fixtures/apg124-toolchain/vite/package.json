@@ -6,5 +6,8 @@
   "description": "Maintained Vite 8.2.2 test fixture for APG124",
   "scripts": {
     "test": "node runner.mjs"
+  },
+  "dependencies": {
+    "vite": "8.2.2"
   }
 }

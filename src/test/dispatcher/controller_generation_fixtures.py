@@ -322,8 +322,8 @@ def start_fixture_dispatcher(
     output_file = scratch_dir / f"output_{proc_id}.bin"
 
     env = os.environ.copy()
-    env["AGENT_CENTRAL_GENERATION_STORE"] = str(layout["store"])
-    env["AGENT_CENTRAL_ACTIVE_ROOT"] = str(layout["active"])
+    env["APGR_GENERATION_STORE"] = str(layout["store"])
+    env["APGR_ACTIVE_ROOT"] = str(layout["active"])
     env["PYTHONDONTWRITEBYTECODE"] = "1"
 
     cmd = [
@@ -371,8 +371,8 @@ def cutover_env(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> Any:
     proc_mgr = ProcessManager()
 
     layout = make_cutover_fixture(scratch_dir)
-    monkeypatch.setenv("AGENT_CENTRAL_GENERATION_STORE", str(layout["store"]))
-    monkeypatch.setenv("AGENT_CENTRAL_ACTIVE_ROOT", str(layout["active"]))
+    monkeypatch.setenv("APGR_GENERATION_STORE", str(layout["store"]))
+    monkeypatch.setenv("APGR_ACTIVE_ROOT", str(layout["active"]))
     monkeypatch.setenv("PYTHONDONTWRITEBYTECODE", "1")
 
     layout["proc_mgr"] = proc_mgr

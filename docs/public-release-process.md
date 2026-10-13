@@ -469,7 +469,7 @@ manifest. The trusted local input is the exact reviewed release reconstruction;
 the operator binds its public Git identity and artifact metadata before upload.
 GitHub Release upload consumes only that directory.
 
-The v0.6 PyPI workflow runs only for a published GitHub Release and downloads
+The historical v0.6 PyPI workflow ran only for a published GitHub Release and downloads
 the triggering release's exact three asset IDs. It rejects any tag, filename,
 asset count, or checksum mismatch before supplying only the verified wheel and
 sdist directory to PyPA Trusted Publishing. The checked-in action identity is
@@ -535,7 +535,7 @@ machine-readable inventory of the ten GitHub Release assets and their roles (one
 manifest, one checksum file, three platform Python wheels, one Python sdist,
 three npm platform packages, and one npm launcher package).
 
-The v0.7 PyPI release workflow (`.github/workflows/release.yml`) runs on
+The historical v0.7 PyPI release workflow ran on
 published GitHub Releases, enforces OIDC Trusted Publishing (`id-token: write`,
 environment `pypi`), verifies repository and `v0.7.0` tag identity, and
 safely distinguishes the four Python distribution artifacts from all other release
@@ -672,7 +672,7 @@ release commits to public `main` is retired in favor of PR-governed integration.
   The latter requires the observed merged commit, the accepted pre-merge `main` identity,
   a caller-supplied approved-PR receipt, and an explicit success receipt for every required
   check. These local arguments are attestations; the command does not contact GitHub or
-  establish that a review was actually approved. The release publisher performs that host
+  establish that a review was actually approved. The historical release publisher performed that host
   readback, requiring a current approval bound to the PR head and successful `public-pr`
   GitHub Actions check-runs. It also requires the v0.11 distribution manifest's
   `source_commit` and `source_tree` to equal the observed merged commit and tree. The
@@ -711,3 +711,132 @@ The v0.12.0 release architecture hardens the attended release operator and recon
 5. **Durable multi-channel receipts & resume (REG-P3, REG-P4)**: Each publication channel emits deterministic receipts. Resumption via `--resume` verifies prior steps and refuses re-entry or re-publication of already verified channels.
 6. **Deterministic release epoch**: Formally bound to `1789689600` (`2026-09-18T00:00:00Z`).
 
+
+## v0.13.0 first-party Nix publication target
+
+From v0.13.0, a first-party Nix flake is a required publication surface. It
+sits beside GitHub Release, Go, PyPI, npm and Homebrew and replaces none of
+them ([ADR 0076](adr/2026/09/0076-first-party-nix-flake-publication-target.md);
+see [distribution](distribution.md#first-party-nix-flake-v0130-onward)).
+"First-party" means installable through Nix flakes from this repository's own
+release tag. It does not mean an upstream nixpkgs pull request, Hydra, a binary
+cache or host activation. For current development this supersedes the v0.8,
+APG103 and earlier wording that limited Nix to a consumer handoff. Those
+sections remain accurate for their own releases, which have no Nix artifact.
+
+Release preparation must satisfy these requirements:
+
+1. **Audited surface.** `apg-public-release` has an explicit `0.13.0` surface:
+   the complete `0.12.0` surface plus `rtk-command-proxy`, the Nix critical
+   files declared by `nix/distribution.json` (`flake.nix`, `flake.lock`,
+   `nix/checks.nix`, `nix/distribution.json`, `nix/package.nix`,
+   `nix/source.nix`), the Nix and installed-runtime helpers, the exported
+   dispatcher commands, and the Nix unit tests. `release/public-surface.json`
+   is that surface. The `0.12.0` and earlier surfaces are unchanged and pinned
+   by digest tests.
+2. **Hosted checks.** Ordinary PR CI retains security and governance with ten
+   member receipts and `public-pr-gate`. The separate native qualification
+   workflow requires Darwin ARM64, Linux x64 and Linux ARM64 Go/Nix execution,
+   assembly of eleven distributables without compilation, smoke of the sealed
+   packages on all three native hosts, and fourteen scan views.
+   `native-release-candidate-gate` requires all nine prerequisite jobs and their
+   bound evidence. Release verification requires both hosted workflow gates
+   on the exact PR head and tested source tree. A `release` event uses the
+   workflow at its tagged commit; historical release workflows are unchanged.
+   Required-check settings must migrate through a separately authorized
+   attended administrator before merge; see [public PR CI](public-pr-ci.md).
+3. **Lock.** The lock is used as committed (`--no-update-lock-file`). Any lock
+   update is a reviewed source change, not a release-time step.
+4. **Epoch.** The manager-confirmed v0.13 release epoch is `1790726400`
+   (`2026-09-30T00:00:00Z`). The release policy defines it in
+   `libexec/apg_python_distribution.py`; the sdist-carried build backend
+   keeps a separate default literal, and a unit test binds that default to the
+   current release epoch.
+
+Native PR archives are sealed before consumer smoke and may not be rebuilt or
+repacked before promotion. The existing private post-merge asset builder
+compiles locally and is unusable under the current owner direction. Publication
+remains blocked until a separately reviewed protocol reconciles squash commit
+provenance with the native candidate's tested tree, or supplies native hosted
+post-merge qualification. Fourteen-day PR artifact expiry requires a rerun;
+there is no local-build fallback. Source-only staging requires fresh ref/PR/
+ruleset readback and an explicit lease bound to the observed old staging head.
+Merge, tag and each publication channel require separate authorization.
+
+The current `release.yml` is knowingly unsatisfiable for this PR-native bundle:
+the distribution manifest binds the PR merge-ref commit, while the publication
+verifier requires the squash-merged release commit. That equality check remains
+intact. Changing the manifest after packaged smoke would violate the no-repack
+contract; publication requires its own reviewed provenance reconciliation.
+
+There is no Nix artifact upload: the public tag is the publication surface.
+After the tag exists, the attended operator reads it back on a native host:
+
+```sh
+bin/apg-qualify-nix readback --tag v0.13.0 --scratch "$FRESH_SCRATCH" \
+  --system aarch64-darwin --expect-rev "$MERGED_RELEASE_COMMIT"
+```
+
+Readback accepts only an exact `vMAJOR.MINOR.PATCH` tag. It resolves the tag
+once with `nix flake metadata --json --refresh` and requires the locked
+revision to equal the merged release commit. It records the `narHash` and runs
+every later step against the revision-pinned reference: flake checks, package
+build, `apgr --version`, and the provider-free installed smoke from the store.
+It then installs into a disposable profile inside `$FRESH_SCRATCH`, repeats the
+smoke from that profile, and removes the profile. It never touches a default
+profile and never collects garbage.
+
+The attended operator runs this as the last channel, after GitHub Release, Go,
+PyPI, npm and Homebrew. The Nix channel has no publish step, and its receipt
+binds the tag, expected and locked revisions, `narHash`, system, readback
+digest and one digest over the readback helper files. Those files are the
+entry point, the helper and the installed-runtime smoke, and each must match
+its blob in the public tag. **v0.13.0 is not fully published until this tagged Nix
+readback succeeds.** A failed or missing readback leaves the release status
+`fully_published: false`; completed channels are neither replayed nor rolled
+back. Resume re-verifies every recorded receipt digest, skips verified channels
+and retries only the Nix readback with a fresh scratch directory.
+`x86_64-linux` evidence for the tag rests on the hosted PR cell plus the
+release workflow's tested-tree equals merged-tree check, not on a tag readback.
+
+
+## v0.13 GitHub-only boundary (APG167U candidate)
+
+The current source candidate retires automatic package publication on GitHub
+Release events. The release workflow performs a read-only postpublication
+audit. No workflow can mint an OIDC publication token or run a package-manager
+publisher. The attended operation must verify the draft before publishing;
+the hosted audit does not provide that prepublication stop.
+
+The no-rebuild boundary binds successful public and native workflows to the
+same PR head/base, synthetic merge parents and exact tested source tree. The
+actual squash merge must preserve that tree, have the frozen base as sole
+parent, the exact release subject and PR association. Manifests keep their
+tested merge-ref source commit; no post-CI rebuild or manifest rewrite is
+permitted. An annotated tag binds the actual merged public commit.
+
+Capture the run-to-PR associations and tested merge parents/tree before merge.
+Postmerge checks compare durable run metadata and pinned artifact bytes to
+that candidate instead of fetching a removed synthetic commit or relying on
+mutable run PR associations. Retain the operator-accepted candidate digest.
+
+Eleven distributables and three binary manifests are retained unchanged,
+alongside the distribution manifest and checksum authority: sixteen release
+files. Attestation maps every logical checksum path to its flat release
+filename. Exact names, sizes and SHA-256 must pass draft and published download
+readback. Exact CI run IDs and canonical attestations accompany the notes.
+
+Active strict checks from the expected GitHub Actions source, no bypass actors
+and current eligible approval or an explicitly reviewed waiver are mandatory.
+Administrative setup, source staging, merge, tagging and release publication
+remain separate attended operations. Fresh native aggregate success is still
+pending. Historical producer success is not RC qualification. Actions artifact
+expiry fails closed and can prevent late audit reruns.
+The public aggregate's seven-day retention bounds the operation even though
+native evidence is retained fourteen days; use the earliest actual expiry.
+
+After verified GitHub publication, Release Starport 9 receives URLs, tagged
+source identity, asset hashes and provenance. PyPI, npm, Homebrew and all
+package-manager publication are excluded from this phase. The legacy private
+multichannel operator is not usable for this boundary. See
+[ADR 0079](adr/2026/10/0079-github-release-only-boundary-and-tree-bound-attestation.md).

@@ -45,3 +45,16 @@ def test_transport_digest_changes_with_actual_source(
     assert hashlib.sha256(after).hexdigest() in second
     assert hashlib.sha256(before).hexdigest() not in second
     assert second.endswith(after.decode())
+
+
+def test_instruction_identity_preserves_captured_utf8_line_endings(tmp_path):
+    import hashlib
+    from agent_source_guidance import source_guidance
+    raw = "Standing doctrine é\r\nAuthority is unchanged.\r\n".encode("utf-8")
+    (tmp_path / "CLAUDE.md").write_bytes(raw)
+    result = source_guidance(tmp_path, [], workers=False, provider_mode="off")
+    assert raw.decode("utf-8") in result.prompt
+    component = result.instruction_components[0]
+    assert component["source_sha256"] == hashlib.sha256(raw).hexdigest()
+    assert component["source_sha256"] == component["rendered_sha256"]
+    assert component["source_bytes"] == len(raw)
