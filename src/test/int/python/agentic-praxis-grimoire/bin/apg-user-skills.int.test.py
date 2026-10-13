@@ -667,36 +667,29 @@ class APGUserSkillsTests(unittest.TestCase):
         self.git(self.second, "tag", "-d", "v0.2.0-apg12.1")
         self.git(self.second, "tag", "-a", "v0.2.0-01", "-m", "Invalid SemVer tag")
         result = self.invoke("list", source=self.second)
+        # The invalid tag is not a release tag, so HEAD is not a verified release.
         self.assertEqual(result.returncode, 1)
-        self.assertIn("exactly one matching", result.stderr)
+        self.assertIn("source public release lineage is invalid", result.stderr)
 
-    def test_30_release_source_rejects_an_untagged_intermediate_commit(self) -> None:
+    def test_30_release_source_rejects_an_untagged_head_commit(self) -> None:
+        # Public history may interleave untagged commits with tags; the source
+        # itself must still be checked out at the last exact release tag.
         parent = self.git(self.second, "rev-parse", "HEAD").stdout.strip()
         tree = self.git(self.second, "rev-parse", "HEAD^{tree}").stdout.strip()
-        intermediate = self.git(
+        untagged = self.git(
             self.second,
             "commit-tree",
             tree,
             "-p",
             parent,
             "-m",
-            "Untagged intermediate",
+            "Untagged public commit",
         ).stdout.strip()
-        release_commit = self.git(
-            self.second,
-            "commit-tree",
-            tree,
-            "-p",
-            intermediate,
-            "-m",
-            "Release v0.3.0",
-        ).stdout.strip()
-        self.git(self.second, "update-ref", "refs/heads/main", release_commit)
-        self.git(self.second, "reset", "-q", "--hard", release_commit)
-        self.git(self.second, "tag", "-a", "v0.3.0", "-m", "Release v0.3.0")
+        self.git(self.second, "update-ref", "refs/heads/main", untagged)
+        self.git(self.second, "reset", "-q", "--hard", untagged)
         result = self.invoke("list", source=self.second)
         self.assertEqual(result.returncode, 1)
-        self.assertIn("release tag", result.stderr)
+        self.assertIn("exact public release tag", result.stderr)
 
     def test_31_absent_check_does_not_create_state_or_lock(self) -> None:
         directory = self.state_path.parent

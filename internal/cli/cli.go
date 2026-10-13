@@ -13,7 +13,7 @@ import (
 	"github.com/Knowledge-Forge-AI/agentic-praxis-grimoire/internal/buildinfo"
 )
 
-const help = `Usage: apgr [--repository PATH] [--outbox-root PATH] [--project NAME] <command>
+const help = `Usage: apgr [--apgr-home PATH] [--repository PATH] [--outbox-root PATH] [--project NAME] <command>
 
 Commands:
   build-info            print deterministic machine-readable build information
@@ -36,6 +36,7 @@ Commands:
   env resolve           resolve an isolated or overlay environment
   env run               run one exact command argv without a shell
   analyze hotspots      analyze one exact source root without executing it
+  home show             show canonical operator home layout (--json)
   response record       capture one immutable numbered response (alias: capture)
 
 Options:
@@ -53,6 +54,7 @@ type config struct {
 	repository    string
 	outbox        string
 	project       string
+	apgrHome      string
 	legacy        bool
 	compatibility bool
 }
@@ -104,12 +106,18 @@ func RunWithInput(ctx context.Context, arguments []string, stdin io.Reader, stdo
 		err = runReport(ctx, configuration, tail[1:], stdout)
 	case "skills":
 		err = runSkills(ctx, tail[1:], stdin, stdout)
+	case "mcp":
+		err = runMCP(tail[1:], stdin, stdout, stderr)
 	case "footprint":
 		err = runFootprint(ctx, tail[1:], stdin, stdout)
 	case "env":
 		err = runEnv(ctx, tail[1:], stdin, stdout, stderr)
 	case "analyze":
 		err = runAnalyze(ctx, configuration, tail[1:], stdout)
+	case "home":
+		err = runHome(ctx, configuration, tail[1:], stdout)
+	case "integrations":
+		err = runIntegrations(ctx, configuration, tail[1:], stdout)
 	case "response":
 		err = runResponse(ctx, configuration, tail[1:], stdin, stdout)
 	case "legacy":
@@ -163,6 +171,11 @@ func parseGlobal(arguments []string) (config, []string, error) {
 		option, value := values[0], values[1]
 		values = values[2:]
 		switch option {
+		case "--apgr-home":
+			if result.apgrHome != "" {
+				return result, nil, usageError{"apgr home may be specified only once"}
+			}
+			result.apgrHome = value
 		case "--repository", "--repo":
 			if result.repository != "" {
 				return result, nil, usageError{"repository may be specified only once"}

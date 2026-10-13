@@ -1,0 +1,169 @@
+{
+  "scenario_id": "scenario-02",
+  "name": "Multi-Role Binding Context Merging",
+  "subset": "calibration",
+  "cohort": "savings_eligible_calibration_subset",
+  "phase": "APG159A",
+  "task_input": {
+    "instruction": "Disposition plan review findings for Python application refactor and implement test cases in tests/test_app.py.",
+    "task_authority": "phase_owned",
+    "mutation_scope": [
+      "tests/test_app.py",
+      "docs/plan-disposition.md"
+    ]
+  },
+  "provider": "codex",
+  "role_binding": {
+    "binding_id": "binding-merged-01",
+    "roles": [
+      "Plan Review Disposition",
+      "Producer"
+    ],
+    "allowed_tools": [
+      "view_file",
+      "replace_file_content",
+      "write_to_file",
+      "run_command"
+    ]
+  },
+  "repository_evidence": {
+    "files": [
+      "src/app.py",
+      "tests/test_app.py",
+      "docs/plan.md"
+    ],
+    "primary_language": "python",
+    "dependency_facts": {
+      "pyproject_toml": "[project]\nname = \"app\"\ndependencies = [\"pytest>=8.0\"]\n"
+    }
+  },
+  "mandatory_instructions": {
+    "provider_file": "codex/AGENTS.md",
+    "provider_instruction_bytes": 7939,
+    "mandatory_doctrine_bytes": 2500,
+    "tool_schema_overhead": "unavailable_provider_native"
+  },
+  "skill_sources": {
+    "apgr:planning-repository-work": {
+      "canonical_path": "skills/planning-repository-work/SKILL.md",
+      "status": "selected",
+      "whole_bytes": 3975,
+      "body_bytes": 3772,
+      "body_sha256": "6ea3837ce0d613006541e2508cd3673766f273dfd82d04f3c866ff5e855ea10a",
+      "source_kind": "canonical_measured"
+    },
+    "apgr:reviewing-and-verifying-repository-work": {
+      "canonical_path": "skills/reviewing-and-verifying-repository-work/SKILL.md",
+      "status": "selected",
+      "whole_bytes": 6866,
+      "body_bytes": 6634,
+      "body_sha256": "26f1397627184bc50d6e76ffb0f8fd5b9cda9317bdeb68404c478997866fa5cb",
+      "source_kind": "canonical_measured"
+    },
+    "apgr:pytest-test-profile": {
+      "canonical_path": "skills/pytest-test-profile/SKILL.md",
+      "whole_bytes": 17844,
+      "body_bytes": 17592,
+      "status": "selected",
+      "body_sha256": "b0b1f031282e6c2797c3e64858299dd77092c95280992c88368e4f9a00756fc5",
+      "source_kind": "canonical_measured"
+    },
+    "apgr:converting-bash-scripts-to-python": {
+      "canonical_path": "skills/converting-bash-scripts-to-python/SKILL.md",
+      "status": "deferred_for_late_acquisition",
+      "whole_bytes": 16669,
+      "body_bytes": 16452,
+      "body_sha256": "62f759e4e6e8c34c275eed1b59b751361f519344e242dc878655768cb32f9d7e",
+      "source_kind": "canonical_measured"
+    }
+  },
+  "budget": {
+    "scope": "apgr_controlled_initial_bytes",
+    "max_initial_controlled_bytes": 45000,
+    "allocated_skill_body_bytes": 32000
+  },
+  "expected_outcome": {
+    "mode": "adaptive",
+    "selected_skills": [
+      "apgr:planning-repository-work",
+      "apgr:reviewing-and-verifying-repository-work",
+      "apgr:pytest-test-profile"
+    ],
+    "deferred_skills": [
+      "apgr:converting-bash-scripts-to-python"
+    ],
+    "inapplicable_skills": [
+      "apgr:go-language-profile"
+    ],
+    "mandatory_doctrine_preserved": true,
+    "static_fallback_triggered": false,
+    "quality_oracle": {
+      "command": "pytest tests/",
+      "expected_exit_code": 0,
+      "assertions": "plan review disposition is recorded and pytest suite passes cleanly"
+    }
+  },
+  "status": "frozen_corrected",
+  "value_sources": {
+    "mandatory_instructions.provider_instruction_bytes": {
+      "source": "measured",
+      "basis": "wc -c codex/AGENTS.md at the APG159A workspace tree"
+    },
+    "mandatory_instructions.mandatory_doctrine_bytes": {
+      "source": "estimate",
+      "basis": "Planning placeholder. The non-negotiable doctrine slice is not yet a separately measurable artifact; V0130-F must replace this with a measured value before any savings computation uses it."
+    },
+    "skill_sources.apgr:planning-repository-work.whole_bytes": {
+      "source": "measured",
+      "basis": "python3 measurement over skills/planning-repository-work/SKILL.md"
+    },
+    "skill_sources.apgr:planning-repository-work.body_bytes": {
+      "source": "measured",
+      "basis": "python3 measurement over skills/planning-repository-work/SKILL.md"
+    },
+    "skill_sources.apgr:reviewing-and-verifying-repository-work.whole_bytes": {
+      "source": "measured",
+      "basis": "python3 measurement over skills/reviewing-and-verifying-repository-work/SKILL.md"
+    },
+    "skill_sources.apgr:reviewing-and-verifying-repository-work.body_bytes": {
+      "source": "measured",
+      "basis": "python3 measurement over skills/reviewing-and-verifying-repository-work/SKILL.md"
+    },
+    "skill_sources.apgr:pytest-test-profile.whole_bytes": {
+      "source": "measured",
+      "basis": "python3 measurement over skills/pytest-test-profile/SKILL.md"
+    },
+    "skill_sources.apgr:pytest-test-profile.body_bytes": {
+      "source": "measured",
+      "basis": "python3 measurement over skills/pytest-test-profile/SKILL.md"
+    },
+    "skill_sources.apgr:converting-bash-scripts-to-python.whole_bytes": {
+      "source": "measured",
+      "basis": "python3 measurement over skills/converting-bash-scripts-to-python/SKILL.md"
+    },
+    "skill_sources.apgr:converting-bash-scripts-to-python.body_bytes": {
+      "source": "measured",
+      "basis": "python3 measurement over skills/converting-bash-scripts-to-python/SKILL.md"
+    },
+    "budget.max_initial_controlled_bytes": {
+      "source": "declared",
+      "basis": "Frozen scenario budget parameter chosen by this correction revision."
+    },
+    "budget.allocated_skill_body_bytes": {
+      "source": "declared",
+      "basis": "Frozen scenario budget parameter chosen by this correction revision."
+    }
+  },
+  "value_source_vocabulary": "measured | synthetic | estimate | declared | unavailable (see context-eval-metrics-and-oracles.json)",
+  "correction_revision": {
+    "revision": "APG159A-CORR1",
+    "supersedes": "APG159 numerical freeze (retained in Git history at Exit 00205)",
+    "nature": "pre-implementation correction, not tuning against a held-out set"
+  },
+  "f_accounting_correction": {
+    "revision": "F-CONTEXT1",
+    "owner": "f-context1-accounting.json",
+    "historical_fields": "mandatory_instructions and value_sources retain the earlier freeze; their estimates are superseded for F packing by measured mandatory_cost in the correction owner",
+    "qualification": "prospective fixture only; normal effective transport remains static; no H benefit claim"
+  }
+}

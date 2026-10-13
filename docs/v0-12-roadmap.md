@@ -6,7 +6,7 @@ The operator-approved roadmap goal for APGR v0.12 is the transfer, consolidation
 
 APGR v0.11.0 publication is terminal, historical, and closed across GitHub Release, Go, PyPI, npm, and Homebrew tap. The [v0.11 closure roadmap](v0-11-roadmap.md) and its [closure ledger](governance/v0-11-closure-ledger.json) are complete and immutable with a 55/55/0/0 closed ledger.
 
-This roadmap (`docs/v0-12-roadmap.md`) establishes the active development line for v0.12.
+APGR v0.12.0 is publicly released across GitHub (Release ID `392534425`), PyPI, npm, Go proxy, and Homebrew tap. Development commits following V0120-G1 (APG153E through APG158A) are reconciled forward in the [v0.12 forward reconciliation record](architecture/v0-12-forward-reconciliation.md). The active development line is the [v0.13 roadmap](v0-13-roadmap.md), initiated by APG159 (stage V0130-A). This document (`docs/v0-12-roadmap.md`) remains historical reference for v0.12.
 
 ## Governance Model: Engineering Milestone Progression vs Backlog Closure
 

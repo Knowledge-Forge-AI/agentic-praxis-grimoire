@@ -1,87 +1,132 @@
-"""Integration tests for CI topology, cross-binding contracts, and shipped workflows."""
+"""Integration tests for CI topology, cross-binding contracts, and the two shipped PR workflows."""
 
 from __future__ import annotations
 
 import json
-import re
-import shlex
 from pathlib import Path
 
-from release.ci.matrix_receipts import DEFAULT_MEMBER_JOBS
+import pytest
+
+from release.ci.matrix_receipts import (
+    DEFAULT_MEMBER_JOBS,
+    NATIVE_MEMBER_JOBS,
+    NATIVE_PRESCRIBED_ARTIFACTS,
+    PROFILES,
+)
 from tools.ci.ci_topology import (
     EXPECTED_CODEQL_LANGUAGES,
+    EXPECTED_VERIFY_PERMISSIONS,
+    RELEASE_CHECKOUT_ACTION,
+    RELEASE_CHECKOUT_PIN,
+    RELEASE_STEP_NAMES,
+    RELEASE_VERIFY_COMMAND,
     REQUIRED_PR_JOBS,
     load_workflow_doc,
     main,
     validate_all_workflows,
 )
+from tools.ci.native_topology import (
+    GATE,
+    MEMBER_JOBS,
+    NATIVE_DOWNLOAD_PIN,
+    REQUIRED_NATIVE_JOBS,
+)
 
 ROOT = Path(__file__).resolve().parents[7]
-PUBLIC_PR_WORKFLOW = ROOT / ".github/workflows/public-pr.yml"
-RELEASE_WORKFLOW = ROOT / ".github/workflows/release.yml"
+WORKFLOWS = ROOT / ".github/workflows"
+PUBLIC_PR_WORKFLOW = WORKFLOWS / "public-pr.yml"
+NATIVE_WORKFLOW = WORKFLOWS / "native-qualification.yml"
+RELEASE_WORKFLOW = WORKFLOWS / "release.yml"
 
 
-def test_cross_binding_pr_jobs_member_jobs_release_checks_and_workflow_lanes() -> None:
-    """Cross-bind REQUIRED_PR_JOBS, DEFAULT_MEMBER_JOBS, release.yml required_checks, and workflow lanes."""
-    # 1. Load workflows
-    pr_doc = load_workflow_doc(PUBLIC_PR_WORKFLOW)
-    rel_doc = load_workflow_doc(RELEASE_WORKFLOW)
 
-    # 2. Workflow lane members in public-pr.yml match REQUIRED_PR_JOBS
-    pr_jobs = pr_doc.get("jobs", {})
-    workflow_lane_members = set(pr_jobs.keys())
-    assert workflow_lane_members == REQUIRED_PR_JOBS
+def test_shipped_workflow_directory_is_exactly_the_two_pr_workflows_plus_release() -> None:
+    assert sorted(path.name for path in WORKFLOWS.iterdir()) == [
+        "native-qualification.yml", "public-pr.yml", "release.yml",
+    ]
 
-    # 3. CodeQL matrix languages in public-pr.yml match EXPECTED_CODEQL_LANGUAGES
-    codeql_job = pr_jobs["codeql"]
-    codeql_matrix_includes = codeql_job["strategy"]["matrix"]["include"]
-    matrix_languages = {item["language"] for item in codeql_matrix_includes}
+
+def test_cross_binding_public_jobs_members_and_gate() -> None:
+    pr_jobs = load_workflow_doc(PUBLIC_PR_WORKFLOW)["jobs"]
+    assert set(pr_jobs) == REQUIRED_PR_JOBS
+
+    matrix_languages = {item["language"] for item in pr_jobs["codeql"]["strategy"]["matrix"]["include"]}
     assert matrix_languages == EXPECTED_CODEQL_LANGUAGES
 
-    # 4. DEFAULT_MEMBER_JOBS cross-binds to REQUIRED_PR_JOBS with CodeQL expanded per language
-    expected_member_jobs = (REQUIRED_PR_JOBS - {"codeql", "public-pr-gate"}) | {
-        f"codeql-{lang}" for lang in EXPECTED_CODEQL_LANGUAGES
+    expected_members = (REQUIRED_PR_JOBS - {"codeql", "public-pr-gate"}) | {
+        f"codeql-{language}" for language in EXPECTED_CODEQL_LANGUAGES
     }
-    assert DEFAULT_MEMBER_JOBS == expected_member_jobs
+    assert DEFAULT_MEMBER_JOBS == expected_members
+    assert len(DEFAULT_MEMBER_JOBS) == 10
 
-    # 5. public-pr-gate dependencies and MATRIX_NEEDS_RESULTS cross-bind
-    gate_job = pr_jobs["public-pr-gate"]
-    gate_needs = set(gate_job["needs"])
-    assert gate_needs == REQUIRED_PR_JOBS - {"public-pr-gate"}
+    gate = pr_jobs["public-pr-gate"]
+    assert set(gate["needs"]) == REQUIRED_PR_JOBS - {"public-pr-gate"}
+    assert set(json.loads(gate["env"]["MATRIX_NEEDS_RESULTS"])) == DEFAULT_MEMBER_JOBS
 
-    matrix_needs_raw = gate_job["env"]["MATRIX_NEEDS_RESULTS"]
-    matrix_needs_keys = set(json.loads(matrix_needs_raw).keys())
-    assert matrix_needs_keys == DEFAULT_MEMBER_JOBS
 
-    # 6. release.yml required_checks array cross-binds to workflow lane members
-    verify_step = next(
-        step
-        for step in rel_doc["jobs"]["publish"]["steps"]
-        if step.get("name") == "Verify merged source, PR approval, and workflow checks"
-    )
-    script = verify_step["run"]
+def test_cross_binding_native_jobs_members_and_gate() -> None:
+    native_jobs = load_workflow_doc(NATIVE_WORKFLOW)["jobs"]
+    assert set(native_jobs) == REQUIRED_NATIVE_JOBS
+    assert NATIVE_MEMBER_JOBS == set(MEMBER_JOBS) and len(NATIVE_MEMBER_JOBS) == 9
+    gate = native_jobs[GATE]
+    assert set(gate["needs"]) == NATIVE_MEMBER_JOBS
+    assert set(json.loads(gate["env"]["MATRIX_NEEDS_RESULTS"])) == NATIVE_MEMBER_JOBS
+    assert set(NATIVE_PRESCRIBED_ARTIFACTS) == NATIVE_MEMBER_JOBS
 
-    checks_match = re.search(r"^required_checks=\((.*)\)$", script, re.MULTILINE)
-    assert checks_match is not None, "release.yml missing required_checks array"
-    required_checks = shlex.split(checks_match.group(1))
 
-    # All non-matrix jobs appear by lane name; CodeQL appears as "codeql (<lang>)"
-    expected_required_checks = (REQUIRED_PR_JOBS - {"codeql"}) | {
-        f"codeql ({lang})" for lang in EXPECTED_CODEQL_LANGUAGES
-    }
-    assert set(required_checks) == expected_required_checks
-    assert len(required_checks) == len(expected_required_checks), "duplicate checks in release.yml"
+def test_receipt_profiles_bind_the_shipped_workflow_files() -> None:
+    assert PROFILES["public-pr"].workflow_path == PUBLIC_PR_WORKFLOW
+    assert PROFILES["native-qualification"].workflow_path == NATIVE_WORKFLOW
+    assert PROFILES["public-pr"].member_jobs == DEFAULT_MEMBER_JOBS
+    assert PROFILES["native-qualification"].member_jobs == NATIVE_MEMBER_JOBS
+    assert NATIVE_WORKFLOW.is_file() and PUBLIC_PR_WORKFLOW.is_file()
 
-    # 7. release.yml required_receipts JSON array cross-binds to DEFAULT_MEMBER_JOBS
-    receipts_match = re.search(r"^required_receipts='(.*)'$", script, re.MULTILINE)
-    assert receipts_match is not None, "release.yml missing required_receipts JSON"
-    required_receipts = set(json.loads(receipts_match.group(1)))
-    assert required_receipts == DEFAULT_MEMBER_JOBS
+
+def test_every_native_member_emits_its_own_prescribed_artifacts_with_actual_status() -> None:
+    native_jobs = load_workflow_doc(NATIVE_WORKFLOW)["jobs"]
+    for job in sorted(NATIVE_MEMBER_JOBS):
+        emits = [s for s in native_jobs[job]["steps"] if "matrix_receipts.py emit" in s.get("run", "")]
+        assert len(emits) == 1, job
+        assert "--workflow native-qualification" in emits[0]["run"]
+        assert '--status "$CI_JOB_STATUS"' in emits[0]["run"]
+        assert emits[0]["env"]["CI_JOB_STATUS"] == "${{ job.status }}"
+        assert "always()" in emits[0]["if"]
+        for artifact in NATIVE_PRESCRIBED_ARTIFACTS[job]:
+            assert f"/{artifact}" in emits[0]["run"]
+
+
+def test_release_workflow_has_exact_verify_topology() -> None:
+    doc = load_workflow_doc(RELEASE_WORKFLOW)
+    assert set(doc["jobs"]) == {"verify"}
+    job = doc["jobs"]["verify"]
+    assert job["runs-on"] == "ubuntu-latest"
+    assert "environment" not in job
+    assert job["permissions"] == EXPECTED_VERIFY_PERMISSIONS
+    assert [step["name"] for step in job["steps"]] == RELEASE_STEP_NAMES
+    checkout_step, verify_step = job["steps"]
+    assert checkout_step["uses"] == f"{RELEASE_CHECKOUT_ACTION}@{RELEASE_CHECKOUT_PIN}"
+    assert checkout_step["with"]["persist-credentials"] is False
+    assert verify_step["run"] == RELEASE_VERIFY_COMMAND
+    assert verify_step["env"] == {"GH_TOKEN": "${{ github.token }}"}
+    assert "uses" not in verify_step
+
+
+def test_native_post_lane_jobs_use_the_artifact_id_capable_download_pin_only() -> None:
+    native_jobs = load_workflow_doc(NATIVE_WORKFLOW)["jobs"]
+    for job_id, job in native_jobs.items():
+        for step in job["steps"]:
+            if str(step.get("uses", "")).startswith("actions/download-artifact@"):
+                assert step["uses"].endswith(NATIVE_DOWNLOAD_PIN), job_id
+                assert job["permissions"] == {"contents": "read", "actions": "read"}, job_id
+
+
+@pytest.mark.parametrize("path", [PUBLIC_PR_WORKFLOW, NATIVE_WORKFLOW, RELEASE_WORKFLOW])
+def test_workflow_files_are_strict_json_documents(path: Path) -> None:
+    assert isinstance(load_workflow_doc(path), dict)
 
 
 def test_ci_topology_validation_passes_on_shipped_workflows() -> None:
-    errors = validate_all_workflows()
-    assert errors == []
+    assert validate_all_workflows() == []
 
 
 def test_ci_topology_cli_main_passes() -> None:

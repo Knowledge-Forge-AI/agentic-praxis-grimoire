@@ -46,7 +46,7 @@ MAX_VERSION_OUTPUT_BYTES = 4096
 # The provider wrapper owns this private, inherited pipe only when launched by
 # the exact managed provider path. Its payload is a closed token vocabulary;
 # nested AGY receives a sanitized environment and never inherits the writer FD.
-ACTIVITY_PIPE_ENV = "AGENT_CENTRAL_ANTIGRAVITY_ACTIVITY_FD"
+ACTIVITY_PIPE_ENV = "APGR_ANTIGRAVITY_ACTIVITY_FD"
 ACTIVITY_MAX_TOKEN_BYTES = 64
 ACTIVITY_STDOUT_TOKEN = b"O\n"
 ACTIVITY_STDERR_TOKEN = b"E\n"
@@ -238,7 +238,7 @@ def format_transport_instructions(nonce: str) -> str:
     fence = format_completion_fence(nonce)
     return (
         "\n\n---\n"
-        "# Agent-Central Transport Instructions\n"
+        "# APGR Transport Instructions\n"
         "1. Run every required local build, test, or validation command in the foreground. Do NOT launch a local command in the background and then keep waiting for it indefinitely, and do NOT emit heartbeat or no-op output to keep the turn alive.\n"
         "2. A required local foreground command MAY run longer than fifteen minutes, and MAY produce no output while it runs. Let it finish. Do not abandon, background, or truncate it merely because it is slow or quiet, and do not wrap it in a short timeout.\n"
         "3. Complete or terminate every local child process you started before beginning your final response.\n"
@@ -270,7 +270,8 @@ def load_profile(root: Path, name: str) -> Profile:
     model = document["model"]
     if not isinstance(model, str) or not PROFILE_NAME_PATTERN.fullmatch(model):
         raise ProfileError(f"invalid Antigravity model slug in {path}")
-    return Profile(model=model)
+    from agent_phase.runtime_models import selection
+    return Profile(model=selection(root, "antigravity", name)["model"])
 
 
 def decode_prompt(data: bytes) -> str:
@@ -1390,6 +1391,9 @@ def run_supervised(
 
     try:
         try:
+            from agent_phase.transmission import SCOPE_ENV
+            observation_environment = dict(nested_environment)
+            nested_environment.pop(SCOPE_ENV, None)
             process = subprocess.Popen(
                 command,
                 stdout=subprocess.PIPE,
@@ -1407,6 +1411,8 @@ def run_supervised(
             raise ProfileError(f"cannot start Antigravity CLI: {error}") from error
 
         child_ref[0] = process
+        from agent_phase.transmission import launcher_started
+        launcher_started(command, observation_environment, prompt_flag="-p")
         child_started = True
         process_group_pgid = _source_process_group(process)
 

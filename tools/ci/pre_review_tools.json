@@ -136,8 +136,8 @@
       "repository": "https://github.com/pypa/pip-audit",
       "license": "Apache-2.0",
       "version": "2.10.1",
-      "immutable_pin": "PyPI 2.10.1 with transitive hashed lock",
-      "integrity": "SHA-256 hashes for pinned Python distributions",
+      "immutable_pin": "exact direct pin pip-audit==2.10.1",
+      "integrity": "exact direct pins, unhashed transitive/test requirements",
       "linux_architecture_support": [
         "amd64"
       ],
@@ -171,9 +171,9 @@
       "product": "Semgrep CLI",
       "repository": "https://github.com/semgrep/semgrep",
       "license": "LGPL-2.1-or-later",
-      "version": "1.174.0",
-      "immutable_pin": "PyPI 1.174.0 with transitive hashed lock",
-      "integrity": "SHA-256 hashes for pinned Python distributions",
+      "version": "1.179.0",
+      "immutable_pin": "exact direct pin semgrep==1.179.0",
+      "integrity": "exact direct pins, unhashed transitive/test requirements",
       "linux_architecture_support": [
         "amd64"
       ],
@@ -190,8 +190,8 @@
       "repository": "https://github.com/octolabo/malskanner",
       "license": "MIT",
       "version": "0.1.3",
-      "immutable_pin": "npm 0.1.3 with package-lock integrity",
-      "integrity": "npm package-lock SHA-512 integrity",
+      "immutable_pin": "exact direct pin malskanner@0.1.3",
+      "integrity": "npm no committed package-lock",
       "linux_architecture_support": [
         "amd64"
       ],
@@ -204,12 +204,12 @@
       "sanitized_artifact_policy": "finding metadata only"
     },
     "prompt-defense-audit": {
-      "product": "Prompt Defense Audit",
-      "repository": "https://github.com/ppcvote/prompt-defense-audit",
-      "license": "MIT",
-      "version": "1.8.1",
-      "immutable_pin": "npm 1.8.1 with package-lock integrity",
-      "integrity": "npm package-lock SHA-512 integrity",
+      "product": "prompt_defense",
+      "repository": "tools/ci/prompt_defense_check.py",
+      "license": "AGPL-3.0-or-later",
+      "version": "project-owned",
+      "immutable_pin": "tools/ci/prompt_defense_check.py",
+      "integrity": "prompt_defense is project-owned script",
       "linux_architecture_support": [
         "amd64"
       ],

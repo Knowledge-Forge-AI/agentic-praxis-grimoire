@@ -230,3 +230,52 @@ def test_validate_generation_detects_synthetic_tampered_mode(
 
     with pytest.raises(GenerationValidationError, match="Mode mismatch"):
         validate_generation(record, ctrl_dir)
+
+
+# APG166ZM: hosted CodeQL py/overly-permissive-file results in the bundle
+# publisher and the H custody fixtures.  Every explicit chmod/open/mkdir mode
+# there is a literal without group or other bits; a computed mode or a
+# Path.chmod indirection would hide the same permission from the query.
+CODEQL_PERMISSION_FILES = (
+    REPO_ROOT / "libexec" / "agent_phase" / "bundle_io.py",
+    DISPATCHER_TEST_DIR / "h_live_fixtures.py",
+    DISPATCHER_TEST_DIR / "test_h_live_admission.py",
+    DISPATCHER_TEST_DIR / "test_h_replacement_admission.py",
+)
+
+
+def _explicit_modes(tree: ast.AST) -> list[tuple[int, str, ast.expr]]:
+    modes = []
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Call) or not isinstance(node.func, (ast.Attribute, ast.Name)):
+            continue
+        func = node.func
+        name = func.attr if isinstance(func, ast.Attribute) else func.id
+        os_call = isinstance(func, ast.Attribute) and isinstance(func.value, ast.Name) and func.value.id == "os"
+        index = {"chmod": 1 if os_call else 0, "mkdir": 1 if os_call else 0, "open": 2}.get(name)
+        if index is None or (name == "open" and not os_call):
+            continue
+        mode = next((keyword.value for keyword in node.keywords if keyword.arg == "mode"), None)
+        if mode is None and len(node.args) > index:
+            mode = node.args[index]
+        if mode is not None or name == "chmod":
+            modes.append((node.lineno, name, mode))
+    return modes
+
+
+@pytest.mark.parametrize("path", CODEQL_PERMISSION_FILES, ids=lambda path: path.name)
+def test_codeql_permission_files_use_only_literal_owner_private_modes(path: Path) -> None:
+    modes = _explicit_modes(ast.parse(path.read_text(encoding="utf-8"), filename=str(path)))
+    for lineno, name, mode in modes:
+        assert isinstance(mode, ast.Constant) and type(mode.value) is int, (
+            f"{path.name}:{lineno} {name} mode must be an integer literal")
+        assert mode.value & 0o077 == 0, f"{path.name}:{lineno} {name} grants {oct(mode.value)}"
+    if path.name == "bundle_io.py":
+        assert {(name, mode.value) for _, name, mode in modes} == {("mkdir", 0o700), ("open", 0o600)}
+
+
+def test_explicit_mode_scan_detects_group_and_computed_modes() -> None:
+    source = ("import os\nos.chmod(p, 0o620)\nPath(p).chmod(MODE)\n"
+              "os.open(p, flags, 0o644)\nq.mkdir(mode=0o755)\nos.open(p, flags)\n")
+    found = [(name, getattr(mode, "value", None)) for _, name, mode in _explicit_modes(ast.parse(source))]
+    assert found == [("chmod", 0o620), ("chmod", None), ("open", 0o644), ("mkdir", 0o755)]

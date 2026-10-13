@@ -1,0 +1,69 @@
+{
+  "scenario_id": "scenario-13",
+  "name": "Pre-Launch No-MCP Fallback Acceptance",
+  "subset": "acceptance",
+  "cohort": "fallback_cohort",
+  "phase": "APG159A",
+  "task_input": {
+    "instruction": "Review Go auth module in pkg/auth/auth.go when MCP integration is disabled or broken before launch.",
+    "task_authority": "read_only",
+    "mutation_scope": []
+  },
+  "provider": "claude",
+  "role_binding": {
+    "binding_id": "binding-reviewer-05",
+    "roles": [
+      "Work Review"
+    ],
+    "allowed_tools": [
+      "view_file"
+    ]
+  },
+  "repository_evidence": {
+    "files": [
+      "pkg/auth/auth.go"
+    ],
+    "primary_language": "go",
+    "dependency_facts": {}
+  },
+  "mcp_prelaunch_status": "disabled_or_unavailable",
+  "mandatory_instructions": {
+    "provider_file": "claude/CLAUDE.md",
+    "provider_instruction_bytes": 11071,
+    "mandatory_doctrine_bytes": 2500
+  },
+  "expected_outcome": {
+    "mode": "static",
+    "prelaunch_fallback_triggered": true,
+    "fallback_reason": "mcp_adapter_unavailable_at_prelaunch",
+    "all_canonical_skills_delivered": true,
+    "mandatory_doctrine_preserved": true,
+    "dispatch_success": true,
+    "quality_oracle": {
+      "assertions": "dispatcher detects disabled/unavailable MCP before launch; cleanly chooses static context mode; zero attempted broken JSON-RPC connections"
+    }
+  },
+  "status": "frozen_corrected",
+  "value_sources": {
+    "mandatory_instructions.provider_instruction_bytes": {
+      "source": "measured",
+      "basis": "wc -c claude/CLAUDE.md at the APG159A workspace tree"
+    },
+    "mandatory_instructions.mandatory_doctrine_bytes": {
+      "source": "estimate",
+      "basis": "Planning placeholder. The non-negotiable doctrine slice is not yet a separately measurable artifact; V0130-F must replace this with a measured value before any savings computation uses it."
+    }
+  },
+  "value_source_vocabulary": "measured | synthetic | estimate | declared | unavailable (see context-eval-metrics-and-oracles.json)",
+  "correction_revision": {
+    "revision": "APG159A-CORR1",
+    "supersedes": "APG159 numerical freeze (retained in Git history at Exit 00205)",
+    "nature": "pre-implementation correction, not tuning against a held-out set"
+  },
+  "f_accounting_correction": {
+    "revision": "F-CONTEXT1",
+    "owner": "f-context1-accounting.json",
+    "historical_fields": "mandatory_instructions and value_sources retain the earlier freeze; their estimates are superseded for F packing by measured mandatory_cost in the correction owner",
+    "qualification": "prospective fixture only; normal effective transport remains static; no H benefit claim"
+  }
+}

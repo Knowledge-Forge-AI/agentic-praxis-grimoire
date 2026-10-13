@@ -1,8 +1,10 @@
 {
   "schema": "agent-central-claude-model-catalog-v1",
   "roles": {
-    "primary": "opus-current",
-    "review": "fable-current"
+    "primary": "opus-5-5",
+    "review": "opus-5-5",
+    "opus": "opus-5-5",
+    "worker": "sonnet-5-5"
   },
   "models": {
     "opus-current": {
@@ -12,6 +14,13 @@
       "id": "claude-fable-5-1",
       "minimumClaudeCodeVersion": "2.1.250",
       "adaptiveThinking": true
+    },
+    "opus-5-5": {
+      "id": "claude-opus-5-5",
+      "adaptiveThinking": true
+    },
+    "sonnet-5-5": {
+      "id": "claude-sonnet-5-5"
     }
   }
 }

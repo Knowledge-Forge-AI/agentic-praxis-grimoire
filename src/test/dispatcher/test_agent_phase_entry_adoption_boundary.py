@@ -641,6 +641,7 @@ def test_full_lifecycle_reviewer_mutating_adopted_path_blocked(
         scanner_executable=None,
         resolve_scanner=False,
         runner=runner,
+        review_mutation_policy="block",
     )
 
     with pytest.raises(DispatchError) as exc_info:

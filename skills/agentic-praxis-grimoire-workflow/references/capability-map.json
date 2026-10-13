@@ -161,6 +161,11 @@
       "trigger": "A bounded artifact or resulting repository state needs evidence-backed acceptance, correction, disposition, or a completion claim."
     },
     {
+      "capability_class": "RTK command proxy",
+      "name": "rtk-command-proxy",
+      "trigger": "RTK command proxying applies, shell-efficiency guidance is requested, or RTK CLI commands are executed; not for raw shell execution without RTK."
+    },
+    {
       "capability_class": "Ruby language profile",
       "name": "ruby-language-profile",
       "trigger": "Ruby-specific judgment is material to structure, exceptions, blocks, shared state, dynamic dispatch, metaprogramming, callbacks, concurrency, gems, public compatibility, serialization, subprocesses, or warning and crisis thresholds beyond repository policy."

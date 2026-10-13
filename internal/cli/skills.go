@@ -21,6 +21,14 @@ func runSkills(ctx context.Context, arguments []string, stdin io.Reader, stdout 
 		return usageError{"skills requires a command"}
 	}
 	switch arguments[0] {
+	case "search", "acquire":
+		return runAcquisition(arguments[0], arguments[1:], stdout)
+	case "plan":
+		return runSkillPlan(arguments[1:], stdin, stdout)
+	case "catalog":
+		return runSkillCatalog(arguments[1:], stdin, stdout)
+	case "generate-catalog":
+		return generateSkillCatalog(arguments[1:], stdout)
 	case "list":
 		return runSkillsList(arguments[1:], stdout)
 	case "context-report":
@@ -37,6 +45,11 @@ func runSkills(ctx context.Context, arguments []string, stdin io.Reader, stdout 
 }
 
 func runSkillsList(arguments []string, stdout io.Writer) error {
+	for _, argument := range arguments {
+		if argument == "--all-sources" {
+			return runSkillCatalogList(arguments, stdout)
+		}
+	}
 	jsonOutput, err := parseSkillFormat(arguments, false)
 	if err != nil {
 		return err

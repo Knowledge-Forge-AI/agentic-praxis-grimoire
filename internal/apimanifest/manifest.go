@@ -60,7 +60,7 @@ func nodeToString(fset *token.FileSet, node any) string {
 
 // Generate extracts the exported API manifest from the specified repository root.
 func Generate(root string) (*Manifest, error) {
-	pkgPaths := []string{"phase", "routing", "evidence", "candidate", "provider"}
+	pkgPaths := []string{"phase", "routing", "evidence", "candidate", "provider", "skills"}
 	slices.Sort(pkgPaths)
 
 	fset := token.NewFileSet()
@@ -84,6 +84,7 @@ func Generate(root string) (*Manifest, error) {
 			typeMap := make(map[string]*TypeSymbol)
 			var typeNames []string
 			var functions []FunctionSymbol
+			methods := make(map[string][]FunctionSymbol)
 
 			for filename, file := range astPkg.Files {
 				if strings.HasSuffix(filename, "doc.go") && file.Doc != nil {
@@ -156,10 +157,8 @@ func Generate(root string) (*Manifest, error) {
 						if d.Recv != nil && len(d.Recv.List) > 0 {
 							recvType := nodeToString(fset, d.Recv.List[0].Type)
 							recvType = strings.TrimPrefix(recvType, "*")
-							if ts, ok := typeMap[recvType]; ok {
-								ts.Methods = append(ts.Methods, fn)
-								continue
-							}
+							methods[recvType] = append(methods[recvType], fn)
+							continue
 						}
 						functions = append(functions, fn)
 					}
@@ -176,6 +175,7 @@ func Generate(root string) (*Manifest, error) {
 			slices.Sort(typeNames)
 			for _, name := range typeNames {
 				ts := typeMap[name]
+				ts.Methods = methods[name]
 				slices.SortFunc(ts.Methods, func(a, b FunctionSymbol) int {
 					return strings.Compare(a.Name, b.Name)
 				})

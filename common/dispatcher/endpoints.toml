@@ -1,5 +1,5 @@
 schema = "agent-phase-endpoints-v1"
-generation = 7
+generation = 9
 
 [endpoints.antigravity-gemini-medium]
 provider = "antigravity"
@@ -80,3 +80,28 @@ profile = "sysadmin-primary"
 [endpoints.codex-sysadmin-review]
 provider = "codex"
 profile = "sysadmin-review"
+
+[endpoints.claude-opus-high-plan]
+provider = "claude"
+profile = "opus-high-plan"
+
+[endpoints.claude-opus-high-review]
+provider = "claude"
+profile = "opus-high-review"
+
+[endpoints.claude-opus-high-sysadmin-review]
+provider = "claude"
+profile = "opus-high-sysadmin-review"
+
+[endpoints.claude-only-implementation-primary]
+provider = "claude"
+profile = "claude-only-implementation-primary"
+
+[endpoints.claude-only-architecture-docs-primary]
+provider = "claude"
+profile = "claude-only-architecture-docs-primary"
+
+[endpoints.claude-only-sysadmin-primary]
+provider = "claude"
+profile = "claude-only-sysadmin-primary"
+

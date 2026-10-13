@@ -11,6 +11,7 @@ import json
 import os
 from pathlib import Path
 import sys
+
 import pytest
 
 from src.test.apg_test_support import repository_root
@@ -442,3 +443,69 @@ def test_child_environment_does_not_inherit_caller_secrets(monkeypatch, tmp_path
     assert "VITE_PRIVATE_TEST_SECRET" not in captured
     assert "NODE_OPTIONS" not in captured
     assert set(captured) == {"HOME", "TMPDIR", "PATH", "NO_COLOR", "APG_VITE_OWNED_SCRATCH_ROOT", "APG_VITE_PACKAGE_ROOT"}
+
+
+def test_vite_fixture_lockfile_pins_safe_source_map_js() -> None:
+    """Bind the compatible patch to its verified registry URL and integrity."""
+    lock_path = FIXTURES_DIR / "package-lock.json"
+    assert lock_path.is_file()
+    lock = json.loads(lock_path.read_text(encoding="utf-8"))
+
+    packages = lock.get("packages", {})
+    root_pkg = packages.get("", {})
+    assert root_pkg.get("dependencies", {}).get("vite") == EXPECTED_VITE_VERSION
+    assert packages.get("node_modules/vite", {}).get("version") == EXPECTED_VITE_VERSION
+    assert packages.get("node_modules/rolldown", {}).get("version") == EXPECTED_ROLLDOWN_VERSION
+
+    postcss = packages.get("node_modules/postcss", {})
+    assert postcss.get("version") == "8.5.28"
+    assert postcss.get("dependencies", {}).get("source-map-js") == "^1.2.1"
+
+    source_maps = [record for key, record in packages.items() if key.endswith("node_modules/source-map-js")]
+    assert source_maps, "Active fixture lockfile must retain source-map-js inventory"
+
+    for sm in source_maps:
+        assert sm.get("version") == "1.2.2"
+        assert sm.get("resolved") == "https://registry.npmjs.org/source-map-js/-/source-map-js-1.2.2.tgz"
+        assert sm.get("integrity") == (
+            "sha512-KGj/8Y43x35aZVDtt+J4mK1hoLGHULMYfSkODJNQjNDC3oW1PqPoxMwo0pLUsWM/UEGzON/NxeHywEfNXNP3Vw=="
+        )
+        assert sm.get("license") == "BSD-3-Clause"
+        assert sm.get("engines", {}).get("node") == ">=0.10.0"
+
+
+def _fixture_root_drift(manifest, lock):
+    root = lock['packages']['']
+    fields = ('name', 'version', 'dependencies', 'devDependencies',
+              'optionalDependencies', 'peerDependencies')
+    return [field for field in fields if manifest.get(field) != root.get(field)]
+
+
+def test_vite_fixture_manifest_aligns_with_lock_root():
+    manifest = json.loads((FIXTURES_DIR / 'package.json').read_text(encoding='utf-8'))
+    lock = json.loads((FIXTURES_DIR / 'package-lock.json').read_text(encoding='utf-8'))
+    assert not _fixture_root_drift(manifest, lock)
+    assert manifest['name'] == lock['name'] == 'apg124-vite-fixture'
+    assert manifest['version'] == lock['version'] == EXPECTED_VITE_VERSION
+    assert manifest['dependencies'] == {'vite': EXPECTED_VITE_VERSION}
+    assert manifest['scripts'] == {'test': 'node runner.mjs'}
+    assert manifest['private'] is True and manifest['type'] == 'module'
+    assert manifest['description'] == 'Maintained Vite 8.2.2 test fixture for APG124'
+    # The immutable lock's stale npm-init license is not fixture license authority.
+    assert 'license' not in manifest
+    assert lock['packages']['']['license'] == 'ISC'
+
+
+@pytest.mark.parametrize('mutation', ['version_pin', 'removed', 'extra', 'name', 'version'])
+def test_vite_fixture_manifest_lock_drift_is_detected(mutation):
+    manifest = json.loads((FIXTURES_DIR / 'package.json').read_text(encoding='utf-8'))
+    lock = json.loads((FIXTURES_DIR / 'package-lock.json').read_text(encoding='utf-8'))
+    if mutation == 'version_pin':
+        manifest['dependencies']['vite'] = '8.2.3'
+    elif mutation == 'removed':
+        del manifest['dependencies']
+    elif mutation == 'extra':
+        manifest['dependencies']['unowned'] = '1.0.0'
+    else:
+        manifest[mutation] = 'drift'
+    assert _fixture_root_drift(manifest, lock)

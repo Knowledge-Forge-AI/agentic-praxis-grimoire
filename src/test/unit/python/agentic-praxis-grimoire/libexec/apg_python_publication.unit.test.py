@@ -28,8 +28,8 @@ import apg_python_distribution as distribution  # noqa: E402
 import apg_python_publication as publication  # noqa: E402
 
 
-CURRENT_VERSION = "0.12.0"
-HISTORICAL_VERSION = "0.11.0"
+CURRENT_VERSION = "0.13.0"
+HISTORICAL_VERSION = "0.12.0"
 
 
 def _identity(
@@ -198,8 +198,11 @@ def test_bundle_builds_three_targets_twice_and_reuses_exact_bytes(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     original = backend._build_binary
+    builds = []
 
     def fake_build(root: Path, target: str, output: Path) -> backend.BinaryIdentity:
+        assert not output.exists(), "maintained release builds must use fresh outputs"
+        builds.append((target, output))
         identity = _identity(
             root,
             target,
@@ -220,6 +223,9 @@ def test_bundle_builds_three_targets_twice_and_reuses_exact_bytes(
     finally:
         monkeypatch.setattr(backend, "_build_binary", original)
     assert tuple(path.name for path in result) == publication.BUNDLE_NAMES
+    assert len(builds) == 6
+    assert {target for target, _output in builds} == set(publication.SUPPORTED_TARGETS)
+    assert len({output for _target, output in builds}) == 6
     publication.validate_bundle(output)
     assert (output / publication.CHECKSUM_NAME).read_text(encoding="ascii").count("\n") == 4
     assert all((output / name).stat().st_mode & 0o777 == 0o644 for name in publication.BUNDLE_NAMES[:-1])
@@ -485,12 +491,9 @@ def test_sdist_structure_and_comparison_refusals_are_explicit(tmp_path: Path) ->
 
 
 def test_release_workflow_targets_current_version_and_tag() -> None:
-    workflow = json.loads(
-        (REPOSITORY_ROOT / ".github/workflows/release.yml").read_text(encoding="utf-8")
-    )
-    command = workflow["jobs"]["publish"]["steps"][0]["run"]
-    assert f"expected_tag=v{CURRENT_VERSION}" in command
-    assert f"expected_version={CURRENT_VERSION}" in command
+    from tools.ci.release_boundary import EXPECTED_TAG, EXPECTED_VERSION
+    assert EXPECTED_TAG == f"v{CURRENT_VERSION}"
+    assert EXPECTED_VERSION == CURRENT_VERSION
 
 
 def test_backend_manifest_and_configuration_refusals_are_complete(tmp_path: Path) -> None:
@@ -673,9 +676,12 @@ def test_package_links_refuse_repository_escape(target: str) -> None:
         backend._package_readme(f"[license]({target})", "0.8.1")
 
 
-def test_publication_epoch_alias_tracks_v0120_candidate() -> None:
-    assert publication.EPOCH == distribution.V012_RELEASE_EPOCH
+def test_publication_epoch_alias_tracks_v0130_candidate() -> None:
+    assert publication.EPOCH == distribution.V013_RELEASE_EPOCH
     assert publication.EPOCH == distribution.release_epoch(publication.VERSION)
+    # The sdist-carried backend cannot import the distribution policy, so its
+    # default is a separate literal that must track the current release epoch.
+    assert backend.DEFAULT_EPOCH == distribution.release_epoch(publication.VERSION)
 
 
 # Keep this exact public surface inventory aligned with the APG116/APG134 audit.
@@ -705,7 +711,7 @@ OLDER_FORBIDDEN_WORDING = (
 
 def _assert_current_release_wording(text: str) -> None:
     normalized = " ".join(text.lower().split())
-    # Current candidate surfaces announce v0.12.0; retained v0.11.0 and v0.10.0
+    # Current candidate surfaces announce v0.13.0; retained v0.12.0 and v0.10.0
     # references remain valid for historical documentation and release pins.
     assert (
         f"this documentation covers the **unreleased v{CURRENT_VERSION} candidate**" in normalized
@@ -717,7 +723,11 @@ def _assert_current_release_wording(text: str) -> None:
         "development qualification", "documentation candidate", "preparing for v0.10.0",
         "public v0.9.0 remains", "public v0.9 remains", "remains released",
         "remains the released", "finalization remains pending", "candidate freeze is next",
-        "deterministic public candidate freeze", "dispatcher", "operator preflight",
+        "deterministic public candidate freeze", "operator preflight",
+        # v0.13 ships the dispatcher publicly; only internal process leakage
+        # about dispatcher stages and Git finalization remains forbidden.
+        "dispatcher git finalization", "dispatcher-owned", "dispatcher pre-final",
+        "dispatcher checkpoint", "dispatcher stage",
         "separate authorization is required", "no automatic successor",
         "agentic-praxis-grimoire==0.9.0", "@knowledge-forge-ai/apgr@0.9.0",
         "agentic-praxis-grimoire@v0.9.0", "agentic-praxis-grimoire v0.9.0",
@@ -743,6 +753,20 @@ def test_package_metadata_has_v0110_release_source_guidance() -> None:
     assert f"/blob/v{CURRENT_VERSION}/docs/" in metadata
     assert "](docs/" not in metadata
     assert "](release/" not in metadata
+
+
+def test_package_readme_states_v013_pilot_support_truthfully() -> None:
+    metadata = " ".join(backend._metadata(REPOSITORY_ROOT).decode("utf-8").split()).lower()
+    for claim in (
+        "the independently usable single-phase dispatcher shipped with apgr",
+        "static context remains the shipped default",
+        "adaptive selected-skill and instruction projection are experimental and opt-in",
+        "no token or context-window saving is claimed",
+        "native `aarch64-linux` execution",
+        "these commands work only after the `v0.13.0` tag is published",
+    ):
+        assert claim in metadata, claim
+    assert "#agentic-praxis-grimoire/main" not in metadata
 
 
 def test_audited_surfaces_exact_enumeration() -> None:

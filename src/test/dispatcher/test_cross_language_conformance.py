@@ -161,3 +161,85 @@ def test_conformance_provider_matrix() -> None:
         assert "codex" in row["support"]
         assert "claude" in row["support"]
         assert "antigravity" in row["support"]
+
+
+def test_conformance_review_mutation_policy() -> None:
+    from agent_phase.config_routing import (
+        DEFAULT_REVIEW_MUTATION_GIT,
+        DEFAULT_REVIEW_MUTATION_WORKTREE,
+        SUPPORTED_POLICY_GENERATION,
+        SUPPORTED_WORKTREE_POLICIES,
+        ReviewMutationPolicy,
+    )
+    from agent_phase.review_drift import (
+        ACTION_ALLOWED,
+        ACTION_BLOCKED,
+        ACTION_NONE,
+        ACTION_WARNED,
+        READ_ONLY_STAGE_MUTATED_CANDIDATE,
+        READ_ONLY_STAGE_MUTATED_HEAD,
+        READ_ONLY_STAGE_MUTATED_INDEX,
+        ReviewObservation,
+        apply_review_mutation_policy,
+    )
+
+    path = FIXTURES_DIR / "review_mutation_vectors.json"
+    data = json.loads(path.read_text(encoding="utf-8"))
+
+    assert sorted(SUPPORTED_WORKTREE_POLICIES) == sorted(data["worktree_policies"])
+    assert [DEFAULT_REVIEW_MUTATION_GIT] == data["git_policies"]
+    assert sorted([ACTION_BLOCKED, ACTION_WARNED, ACTION_ALLOWED, ACTION_NONE]) == sorted(data["actions_taken"])
+    assert sorted([
+        READ_ONLY_STAGE_MUTATED_CANDIDATE,
+        READ_ONLY_STAGE_MUTATED_INDEX,
+        READ_ONLY_STAGE_MUTATED_HEAD,
+    ]) == sorted(data["diagnostic_codes"])
+
+    sample_p = data["sample_policy"]
+    p = ReviewMutationPolicy(
+        worktree=sample_p["worktree"],
+        index=sample_p["index"],
+        head=sample_p["head"],
+        generation=sample_p["generation"],
+    )
+    assert p.worktree == DEFAULT_REVIEW_MUTATION_WORKTREE
+    assert p.generation == SUPPORTED_POLICY_GENERATION
+
+    for item in data["valid_observations"]:
+        raw_obs = item["observation"]
+        pol = ReviewMutationPolicy(
+            worktree=raw_obs["policy"]["worktree"],
+            index=raw_obs["policy"]["index"],
+            head=raw_obs["policy"]["head"],
+            generation=raw_obs["policy"]["generation"],
+        )
+        obs = ReviewObservation(
+            stage=raw_obs["stage"],
+            policy=pol,
+            subject_drift_observed=raw_obs["subject_drift_observed"],
+            worktree_drift=raw_obs["worktree_drift"],
+            index_drift=raw_obs["index_drift"],
+            head_drift=raw_obs["head_drift"],
+            worktree_paths=raw_obs.get("worktree_paths", []),
+            index_paths=raw_obs.get("index_paths", []),
+            expected_index=raw_obs.get("expected_index"),
+            observed_index=raw_obs.get("observed_index"),
+            expected_head=raw_obs.get("expected_head", ""),
+            observed_head=raw_obs.get("observed_head", ""),
+            candidate_observation_unavailable=raw_obs.get("candidate_observation_unavailable", False),
+            index_observation_unavailable=raw_obs.get("index_observation_unavailable", False),
+            head_observation_unavailable=raw_obs.get("head_observation_unavailable", False),
+            observation_limitations=raw_obs.get("observation_limitations", raw_obs.get("limitations", [])),
+            role=raw_obs.get("role"),
+            subject_kind=raw_obs.get("subject_kind"),
+            sequence=raw_obs.get("sequence", 0),
+            attempt_id=raw_obs.get("attempt_id"),
+            binding_id=raw_obs.get("binding_id"),
+            attempt_number=raw_obs.get("attempt_number"),
+            paths_complete=raw_obs.get("paths_complete", True),
+        )
+        evaluated = apply_review_mutation_policy(obs, pol, raise_on_block=False)
+        assert evaluated.action_taken == raw_obs["action_taken"], f"Failed for {item['name']}"
+        expected_diag = raw_obs.get("diagnostic_code", "")
+        assert evaluated.diagnostic_code == expected_diag, f"Diagnostic mismatch for {item['name']}"
+

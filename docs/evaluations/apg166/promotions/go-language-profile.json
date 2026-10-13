@@ -1,0 +1,95 @@
+{
+  "active_debts": [],
+  "blocking_debts": [],
+  "body_only": {
+    "bytes": 16452,
+    "sha256": "a2a1090422ddd0aa38610f7beedad1d6af6d50f7c6c553fc6f1f5aabfb04935f"
+  },
+  "dependency_closure": [],
+  "descriptor": {
+    "bytes": 2772,
+    "sha256": "074ee0f45299701aad9f53063fc2ca70205d752f14928f09259babc867f4f4f3"
+  },
+  "eligible_for_stable": false,
+  "entry_encoding": "UTF-8 json.dumps(sort_keys=True, indent=2) plus LF",
+  "evidence": {
+    "current_validation": {
+      "assessment": "LIMITED",
+      "observation": "Fresh structural, fact-selection, exact-source and acquisition checks are recorded by H qualification. They do not establish effective guidance use.",
+      "references": [
+        "skills/h_promotion_test.go",
+        "docs/evaluations/apg166-maturity-and-integrated-evaluation.md"
+      ]
+    },
+    "defect_debt_disposition": {
+      "assessment": "SUPPORTED",
+      "observation": "No active entry for this leaf in the maintained language-profile debt authority. This is not proof that all semantic defects are absent. Current independent semantic review remains pending. No debt is resolved by this inventory.",
+      "references": [
+        "docs/governance/language-profile-known-debt.json",
+        "skills/go-language-profile/SKILL.md",
+        "docs/evaluations/apg20a-go-and-ruby-profile-corrections.md",
+        "docs/evaluations/apg41-v0-4-readiness-and-pre-release-smoke.md"
+      ]
+    },
+    "independent_review": {
+      "assessment": "PENDING",
+      "observation": "Dispatcher-owned APG166 work review pending. Explicit individual disposition of this exact body and evidence is required; historical APG139 acceptance is maintenance only.",
+      "references": []
+    },
+    "provenance": {
+      "assessment": "SUPPORTED",
+      "observation": "Retained canonical source/maintenance boundary and APG provenance record remain the source authority. Historical evaluations identify their original phase and scope; they are reused only for the observations stated here. No external source text is copied or new source refresh claimed.",
+      "references": [
+        "skills/go-language-profile/SKILL.md",
+        "docs/provenance.md",
+        "docs/evaluations/apg20a-go-and-ruby-profile-corrections.md",
+        "docs/evaluations/apg41-v0-4-readiness-and-pre-release-smoke.md"
+      ]
+    },
+    "repeated_positive_use": {
+      "assessment": "LIMITED",
+      "observation": "APG20A corrects semantic cases; APG22 pairs guidance and APG41 applies owner boundaries. The evidence remains calibration-dominated and does not establish repeated ordinary guidance-use outcomes. APG166 supplies no newly verified repeated guidance-use invocations. Planner and acquisition fixtures do not fill this gap.",
+      "references": [
+        "skills/go-language-profile/SKILL.md",
+        "docs/evaluations/apg20a-go-and-ruby-profile-corrections.md",
+        "docs/evaluations/apg41-v0-4-readiness-and-pre-release-smoke.md"
+      ]
+    },
+    "representative_non_triggers": {
+      "assessment": "LIMITED",
+      "observation": "Positive material structured fact, two representative foreign-owner facts, and Producer/Work Review role variations exercise deterministic selection. This proves a fact boundary, not semantic guidance efficacy or live non-trigger judgment.",
+      "references": [
+        "skills/h_promotion_test.go",
+        "skills/go-language-profile/SKILL.md"
+      ]
+    },
+    "rollback": {
+      "assessment": "SUPPORTED",
+      "observation": "Use the canonical removal/maintenance contract and referenced lifecycle evaluation to reconcile current leaf, projection, catalog and focused validation surfaces while preserving phase history. This maturity campaign changes no target application, database, machine, script or deployment state.",
+      "references": [
+        "skills/go-language-profile/SKILL.md",
+        "docs/skill-authoring-and-maintenance.md",
+        "docs/evaluations/apg20a-go-and-ruby-profile-corrections.md",
+        "docs/evaluations/apg41-v0-4-readiness-and-pre-release-smoke.md"
+      ]
+    }
+  },
+  "independent_review": null,
+  "late_acquisition": "Shared G engine exact-source contract; H qualification checks all five primary bodies. Live native recovery unavailable.",
+  "ledger_entry": {
+    "bytes": 1992,
+    "sha256": "405fc7686d4ddf5e7ddb13ce6e9323d810412b419b85cdaf80358b7175830cdf"
+  },
+  "next_lifecycle_trigger": "Supply repeated actual Go guidance decisions involving errors, cancellation, concurrency, API or resource semantics with exact toolchain context and claim-appropriate validation; include mechanical-edit non-triggers and unsafe/cgo stops where applicable, then independent review.",
+  "phase": "APG166",
+  "proposed_outcome": "RETAIN_PROVISIONAL_INSUFFICIENT_EVIDENCE",
+  "rollback": "Historical supported removal contract retained. H changes no body, ledger maturity or live projection; no new live de-projection is claimed.",
+  "schema_version": "apg.h-promotion-evidence/v1",
+  "skill_id": "go-language-profile",
+  "source_path": "skills/go-language-profile/SKILL.md",
+  "verified_new_positive_invocations": 0,
+  "whole_source": {
+    "bytes": 16733,
+    "sha256": "1a87a3597ed8f3a2363dda4882d27bc59641ffe2053a87630b2dc289f084c110"
+  }
+}

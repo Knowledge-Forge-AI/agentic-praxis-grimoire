@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -102,10 +103,16 @@ def _terminal_result(
     nonces = re.findall(r"<<<AGENT-PHASE-RESULT ([0-9a-f]{32})>>>", prompt)
     if len(set(nonces)) != 1:
         raise ResumeError("RESUME_ARTIFACT_MISMATCH", "terminal prompt nonce is ambiguous")
+    from .retained_terminal_repair import read_recorded_repair
+    original_stdout = (source / f"{prefix}.stdout.md").read_bytes()
     try:
-        return result_module.parse(
-            (source / f"{prefix}.stdout.md").read_bytes(), terminal, nonces[0]
-        )
+        repaired = read_recorded_repair(source, state, terminal, nonces[0], original_stdout)
+    except (ValueError, OSError, result_module.ResultError) as error:
+        raise ResumeError("RESUME_ARTIFACT_MISMATCH", str(error)) from error
+    if repaired is not None:
+        return repaired
+    try:
+        return result_module.parse(original_stdout, terminal, nonces[0])
     except result_module.ResultError:
         return None
 
@@ -141,6 +148,11 @@ def artifact_records(
     records: list[dict[str, Any]] = []
     for stage in inherited:
         prefix = lifecycle.prefixes[stage]
+        from .context_adapter import retained_records
+        try:
+            records.extend(retained_records(source, prefix, stage))
+        except (OSError, ValueError) as error:
+            raise ResumeError("RESUME_ARTIFACT_MISMATCH", "retained context artifact is invalid") from error
         for suffix in ("prompt.md", "stdout.md", "stderr.log", "meta.json"):
             name = f"{prefix}.{suffix}"
             path = source / name
@@ -240,7 +252,38 @@ def _candidate_tree_for_inherited_prefix(
         candidate = state.get(stage.candidate_key)
         if isinstance(candidate, dict) and isinstance(candidate.get("tree"), str):
             return candidate["tree"]
-    return source_entry.tree
+    return (state.get("entry_adoption") or {}).get("candidate_tree", source_entry.tree)
+
+
+def _entry_adopted_paths(state: dict[str, Any], source_entry: gitstate_module.EntryState,
+                         candidate_tree: str) -> list[str]:
+    """Carry closed inherited paths before adding this source's later delta."""
+    from . import adoption
+
+    record = state["entry_adoption"]
+    if candidate_tree == record["candidate_tree"]:
+        return sorted(adoption.paths(state))
+    carried = set(adoption.paths(state))
+    inherited = state.get("inherited_candidate_manifest")
+    if inherited is not None:
+        gitstate_module.validate_candidate_manifest(inherited)
+        if (inherited != (state.get("resume") or {}).get("candidate_manifest")
+                or inherited["entry_tree"] != record["base_tree"]
+                or gitstate_module.candidate_manifest(source_entry.root, record["base_tree"],
+                    inherited["candidate_tree"], paths=sorted(inherited["paths"])) != inherited
+                or gitstate_module.candidate_manifest_conflicts(source_entry.root, source_entry.tree, inherited)):
+            raise ResumeError("RESUME_ARTIFACT_MISMATCH", "inherited entry adoption manifest differs")
+        carried.update(inherited["paths"])
+    carried.update(c.path for c in gitstate_module.phase_delta(
+        source_entry.root, source_entry.tree, candidate_tree))
+    adoption.guard_owned(state, carried)
+    from . import ownership_challenge
+    residue = set((state.get("resume_boundary") or {}).get("interrupted_residue_paths", []))
+    manager_owned = {p for p, decision in ownership_challenge.decisions(state).items()
+                     if decision == "phase_owned"}
+    if carried & (residue - manager_owned):
+        raise ResumeError("RESUME_ARTIFACT_MISMATCH", "interruption residue is not inherited ownership")
+    return sorted(carried)
 
 
 def _inherited_candidate_manifest(
@@ -256,6 +299,10 @@ def _inherited_candidate_manifest(
     )
     try:
         recorded = state.get("candidate_manifest")
+        entry_record = state.get("entry_adoption")
+        if entry_record is not None:
+            from . import entry_adoption
+            entry_adoption.validate_retained_entry(source_entry.root, entry_record)
         from . import ownership_challenge
         try:
             ownership_challenge.validate(source_entry.root, state)
@@ -264,6 +311,8 @@ def _inherited_candidate_manifest(
         if chosen == 'finalize' and ownership_challenge.open_records(state):
             raise ResumeError('OWNERSHIP_CHALLENGE_OPEN', 'open challenges require the exact manager-resolution lane')
         ownership = state.get("path_ownership")
+        if entry_record is not None and ownership is not None and ownership["entry_tree"] != entry_record["base_tree"]:
+            raise ResumeError("RESUME_ARTIFACT_MISMATCH", "ownership entry adoption base differs")
         if ownership is not None:
             from .path_disposition import normalize, validate_evidence
             from .result import ResultError
@@ -282,24 +331,38 @@ def _inherited_candidate_manifest(
             except (ResultError, candidate_module.CandidateError) as error:
                 raise ResumeError("RESUME_ARTIFACT_MISMATCH", str(error)) from error
         explicit_paths = None
-        if state.get("adoption"):
+        if entry_record is not None and ownership is None:
+            explicit_paths = _entry_adopted_paths(state, source_entry, candidate_tree)
+            if isinstance(recorded, dict) and recorded.get("candidate_tree") == candidate_tree:
+                gitstate_module.validate_candidate_manifest(recorded)
+                missing = set(explicit_paths) - set(recorded["paths"])
+                excluded = set(state.get("excluded_paths", [])) | set(state.get("unclaimed_deletion_paths", []))
+                if set(recorded["paths"]) - set(explicit_paths) or missing - excluded:
+                    raise ResumeError("RESUME_ARTIFACT_MISMATCH", "recorded candidate manifest disagrees with Git trees")
+                explicit_paths = sorted(recorded["paths"])
+        elif state.get("adoption"):
             from . import adoption
             # Replaying an earlier prefix still carries explicitly adopted
             # starting objects, even when unchanged relative to this entry.
             explicit_paths = sorted(adoption.paths(state) | {
                 c.path for c in gitstate_module.phase_delta(
                     source_entry.root, source_entry.tree, candidate_tree)})
-        if isinstance(recorded, dict) and state.get("candidate_manifest_derivation") == "mechanical_failure_boundary" and recorded.get("candidate_tree") == candidate_tree:
+        if entry_record is None and isinstance(recorded, dict) and state.get("candidate_manifest_derivation") == "mechanical_failure_boundary" and recorded.get("candidate_tree") == candidate_tree:
             gitstate_module.validate_candidate_manifest(recorded)
             explicit_paths = recorded["paths"]
         if ownership is not None and isinstance(recorded, dict) and recorded.get("candidate_tree") == candidate_tree:
             explicit_paths = recorded["paths"]
             if set(explicit_paths) & {item['path'] for item in ownership['dispositions'] if item['disposition'] != 'phase_owned'}:
                 raise ResumeError("RESUME_ARTIFACT_MISMATCH", "excluded path appears in publication manifest")
+        base = ownership["entry_tree"] if ownership else (entry_record or {}).get("base_tree", source_entry.tree)
         manifest = gitstate_module.candidate_manifest(
-            source_entry.root, (ownership or {}).get("entry_tree", source_entry.tree),
+            source_entry.root, base,
             candidate_tree, paths=explicit_paths,
         )
+        if entry_record is not None and candidate_tree == entry_record["candidate_tree"]:
+            if (manifest != entry_record["candidate_manifest"]
+                    or gitstate_module.candidate_manifest_conflicts(source_entry.root, source_entry.tree, manifest)):
+                raise ResumeError("RESUME_ARTIFACT_MISMATCH", "entry adopted candidate differs from retained manifest")
         if isinstance(recorded, dict):
             # A completed source may have a manifest for its terminal
             # candidate. It is authoritative only when this resume inherits
@@ -314,10 +377,12 @@ def _inherited_candidate_manifest(
                     )
                 manifest = recorded
         return manifest, candidate_tree
-    except gitstate_module.GitStateError as error:
+    except ResumeError:
+        raise
+    except (gitstate_module.GitStateError, ValueError, RuntimeError, KeyError, TypeError) as error:
         raise ResumeError(
             "RESUME_ARTIFACT_MISMATCH",
-            f"candidate manifest is unavailable: {error.detail}",
+            f"candidate manifest is unavailable: {getattr(error, 'detail', str(error))}",
         ) from error
 
 
@@ -488,6 +553,11 @@ def preflight(
         source_entry, current_entry, inherited_candidate_tree,
         inherited_manifest, root,
     )
+    from .interrupted_recovery import residue_facts
+    boundary.update(residue_facts(
+        state, lifecycle, source_entry, current_entry, inherited_candidate_tree,
+        inherited_manifest, root,
+    ))
     context_marker = None
     failure = state.get("failure_candidate")
     if (
@@ -594,6 +664,9 @@ def copy_inherited(plan: InheritedPlan, target: Path) -> list[dict[str, Any]]:
         ("resolved.json", "source-resolved.json"),
     ):
         shutil.copyfile(plan.source / source_name, inherited / destination_name)
+    if (plan.source / "interrupted-recovery.json").is_file():
+        shutil.copyfile(plan.source / "interrupted-recovery.json",
+                        inherited / "source-interrupted-recovery.json")
     return copied
 
 
@@ -624,6 +697,7 @@ def provenance(plan: ResumePlan, copied: list[dict[str, Any]]) -> dict[str, Any]
         "resume_start_tree": plan.current_tree,
         "candidate_manifest": plan.candidate_manifest,
         "adoption": plan.source_state.get("adoption"),
+        "entry_adoption": plan.source_state.get("entry_adoption"),
         "resume_boundary": plan.boundary_facts,
         "evidence_boundary_skew": plan.evidence_boundary_skew,
         "failure_candidate": failure,
@@ -638,4 +712,22 @@ def provenance(plan: ResumePlan, copied: list[dict[str, Any]]) -> dict[str, Any]
     }
     if plan.output_recovery is not None:
         record["antigravity_output_recovery"] = plan.output_recovery
+    # Resume identity is semantic; the exact retained bytes stay inherited.
+    canonical = json.dumps(
+        load_request_dict(plan.source), sort_keys=True, ensure_ascii=False,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    record["request_identity"] = {
+        "comparison": "semantic_v1",
+        "retained_request_sha256": sha256(plan.source / "request.json"),
+        "canonical_request_sha256": hashlib.sha256(canonical).hexdigest(),
+    }
+    if plan.source_state.get("interrupted_recovery") is not None:
+        record["source_interrupted_recovery"] = plan.source_state["interrupted_recovery"]
     return record
+
+
+def load_request_dict(source: Path) -> dict[str, str]:
+    from .resume_validation import retained_request
+
+    return retained_request(source).as_dict()

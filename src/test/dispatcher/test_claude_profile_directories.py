@@ -664,3 +664,85 @@ def test_launch_rejects_add_dir_command_line_override(
         launcher.launch(
             claude_root, "sysadmin-primary", ["--add-dir", "/custom", "--print", "test"]
         )
+
+
+def test_resolve_scratch_create_false(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    fake_home = tmp_path / "home"
+    monkeypatch.delenv(APGR_HOME_ENVIRONMENT, raising=False)
+    monkeypatch.delenv(APGR_SCRATCH_OVERRIDE_ENVIRONMENT, raising=False)
+    apgr_home = fake_home / ".apgr"
+    scratch = resolve_scratch(home=fake_home, create=False)
+    assert scratch == apgr_home / "scratch"
+    assert not scratch.exists()
+    assert not apgr_home.exists()
+
+
+def test_canonical_settings_path_precedence_and_validation(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    fake_apgr_home = tmp_path / "custom_apgr_home"
+    monkeypatch.delenv(APGR_HOME_ENVIRONMENT, raising=False)
+
+    fake_controller = tmp_path / "controller"
+    fake_claude_root = fake_controller / "claude"
+    fake_claude_root.mkdir(parents=True, mode=0o700)
+    fake_controller_settings = fake_claude_root / "settings.json"
+    fake_controller_settings.write_text('{"controller": true}', encoding="utf-8")
+
+    # 1. When APGR_HOME/claude/settings.json does not exist, falls back to controller root
+    fallback = launcher.canonical_settings_path(fake_claude_root)
+    assert fallback == fake_controller_settings
+
+    # 2. When APGR_HOME/claude/settings.json exists and is valid JSON, it wins
+    monkeypatch.setenv(APGR_HOME_ENVIRONMENT, str(fake_apgr_home))
+    operator_settings = fake_apgr_home / "claude" / "settings.json"
+    operator_settings.parent.mkdir(parents=True, mode=0o700)
+    operator_settings.write_text('{"operator": true}', encoding="utf-8")
+
+    chosen = launcher.canonical_settings_path(fake_claude_root)
+    assert chosen == operator_settings
+
+    # 3. When operator settings is invalid JSON, raises ProfileError
+    operator_settings.write_text('not-json', encoding="utf-8")
+    with pytest.raises(launcher.ProfileError, match="not valid JSON"):
+        launcher.canonical_settings_path(fake_claude_root)
+
+    # 4. When operator settings is a symlink, raises ProfileError
+    operator_settings.unlink()
+    real_file = tmp_path / "real_settings.json"
+    real_file.write_text("{}", encoding="utf-8")
+    operator_settings.symlink_to(real_file)
+    with pytest.raises(launcher.ProfileError, match="must be a regular non-symlink file"):
+        launcher.canonical_settings_path(fake_claude_root)
+
+
+def test_launch_detects_settings_tampering_during_prep(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    fake_settings = tmp_path / "settings.json"
+    fake_settings.write_text('{"initial": 1}', encoding="utf-8")
+
+    monkeypatch.setattr(launcher, "canonical_settings_path", lambda r: fake_settings)
+    monkeypatch.setattr(launcher.shutil, "which", lambda name: "/fixture/claude")
+    monkeypatch.setattr(
+        catalog, "probe_claude_version", lambda executable: ("2.1.999", "available")
+    )
+    monkeypatch.setattr(launcher.os, "execve", lambda *args: None)
+    home = tmp_path / "home"
+    home.mkdir(mode=0o700)
+    scratch = tmp_path / "scratch"
+    scratch.mkdir(mode=0o700)
+    monkeypatch.setenv("HOME", str(home))
+    monkeypatch.setenv(APGR_SCRATCH_OVERRIDE_ENVIRONMENT, str(scratch))
+
+    # Mock resolve_profile_directories so we tamper settings during argv preparation
+    orig_resolve = launcher.resolve_profile_directories
+    def tamper_resolve(tokens):
+        fake_settings.write_text('{"tampered": 2}', encoding="utf-8")
+        return orig_resolve(tokens)
+
+    monkeypatch.setattr(launcher, "resolve_profile_directories", tamper_resolve)
+
+    claude_root = Path(__file__).resolve().parents[3] / "claude"
+    with pytest.raises(launcher.ProfileError, match="canonical settings payload modified"):
+        launcher.launch(claude_root, "sysadmin-primary", ["--print", "hello"])

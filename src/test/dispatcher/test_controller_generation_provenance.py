@@ -59,8 +59,8 @@ def test_actual_ownership_command_activates_pinned_generation(repository, tmp_pa
     source, state = source_with_challenges(repository, tmp_path)
     controller = tmp_path / "controller"
     candidate(controller)
-    monkeypatch.setenv("AGENT_CENTRAL_GENERATION_STORE", str(tmp_path / "store"))
-    monkeypatch.setenv("AGENT_CENTRAL_ACTIVE_ROOT", str(controller))
+    monkeypatch.setenv("APGR_GENERATION_STORE", str(tmp_path / "store"))
+    monkeypatch.setenv("APGR_ACTIVE_ROOT", str(controller))
     monkeypatch.delenv(generation.LEASE_ENV, raising=False)
     output = tmp_path / "manager-resolution.json"
     process = subprocess.run([

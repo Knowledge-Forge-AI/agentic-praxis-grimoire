@@ -1,0 +1,852 @@
+{
+  "basis": "current exact source; synthetic fixed task/role envelope; no live provider",
+  "boundary": "prospective UTF-8 stdin including serialized selected payload; native discovery, argv, provider overhead and tokens not measured here",
+  "collision_cases": "E-CATALOG1 scenarios 08/09 retained; this canonical accounting view does not replace their synthetic collision tests",
+  "historical_scenario_03": {
+    "adaptive_fit": false,
+    "components_bytes": 31544,
+    "limit_bytes": 30000
+  },
+  "phase": "APG164",
+  "revision": "F-CONTEXT1",
+  "rows": [
+    {
+      "budget": {
+        "allocated_skill_body_bytes": 42000,
+        "feasible_packing_explanation": "Canonical SKILL.md sources for the three primary skills sum to 39,775 whole-file bytes (38,929 body bytes). The budget scope is APGR-controlled initial bytes, which covers the 7,939 B provider instruction file, the estimated mandatory doctrine slice, and the three complete canonical bodies; provider-native tool-schema and token overhead are accounted separately and remain unavailable. A 55,000 B controlled budget with a 42,000 B skill-body allocation holds all three complete bodies without truncation. Under the originally frozen 25,000 B budget the three bodies cannot fit, so go-test-profile is deferred to turn 2 through late acquisition; that alternative is retained as a deferred plan, not as the calibration expectation.",
+        "max_initial_controlled_bytes": 55000,
+        "scope": "apgr_controlled_initial_bytes",
+        "superseded_apg159_budget": {
+          "max_initial_controlled_bytes": 25000,
+          "reason": "infeasible for three complete canonical bodies; superseded by this correction revision"
+        }
+      },
+      "catalog_fingerprint": "ec04ba684bf6660e37bd387ede5f95a4bc8d54c6c52fcf58317f4d92bb72dc4f",
+      "cohort": "savings_eligible_calibration_subset",
+      "content_identity": "d6e9f07e1cffe6d8a52ade54779602a906add9429f1cb5d0565db3ee04b18870",
+      "decisions": [
+        {
+          "body_only": {
+            "bytes": 16452,
+            "characters": 16400,
+            "sha256": "a2a1090422ddd0aa38610f7beedad1d6af6d50f7c6c553fc6f1f5aabfb04935f"
+          },
+          "content_identity": "fb7dcf376e4508023f1c38b192070e8719b80d2a88321d26681eed978294ac34",
+          "description": {
+            "bytes": 233,
+            "characters": 233,
+            "sha256": "9e126abb165a6e06d6cddc9d3ee723605f0ec3574cbece58cdfe9d0f1562d655"
+          },
+          "reason": "explicit_request",
+          "requested_id": "apgr:go-language-profile",
+          "required": true,
+          "selected_id": "apgr:go-language-profile",
+          "status": "selected",
+          "support": [],
+          "whole_source": {
+            "bytes": 16733,
+            "characters": 16681,
+            "sha256": "1a87a3597ed8f3a2363dda4882d27bc59641ffe2053a87630b2dc289f084c110"
+          }
+        },
+        {
+          "body_only": {
+            "bytes": 17487,
+            "characters": 17471,
+            "sha256": "b675e94daabf185896bba5cf740891215e74741b1088ba2fa74cb9d5576c6e61"
+          },
+          "content_identity": "493aa93eeffc487728d78df415d8b0d0c6ee8c214a958002dc84b6896d884c8b",
+          "description": {
+            "bytes": 290,
+            "characters": 290,
+            "sha256": "d7b1911e0f3beb15148f49f0b996c1396e824d6029733d9365a4794acf130f44"
+          },
+          "reason": "explicit_request",
+          "requested_id": "apgr:go-test-profile",
+          "required": true,
+          "selected_id": "apgr:go-test-profile",
+          "status": "selected",
+          "support": [],
+          "whole_source": {
+            "bytes": 17821,
+            "characters": 17805,
+            "sha256": "725cb1b1842c8483f685a3885dc90ce6315f2c6d18b51a7c76b60b8629d6d93a"
+          }
+        },
+        {
+          "body_only": {
+            "bytes": 4990,
+            "characters": 4990,
+            "sha256": "81edd04d465423b3865d155f62ff0eb01fe9462da404a2504beea9d8fe39706d"
+          },
+          "content_identity": "96733ce2776beba396f012668126978019a5a00ec59fc637b1ad2a279037d368",
+          "description": {
+            "bytes": 169,
+            "characters": 169,
+            "sha256": "f3611b35a0819ab5ef0a213282e6bc6869beedb7665e09dbb48c9dcedffc2f9a"
+          },
+          "reason": "explicit_request",
+          "requested_id": "apgr:implementing-with-test-discipline",
+          "required": true,
+          "selected_id": "apgr:implementing-with-test-discipline",
+          "status": "selected",
+          "support": [],
+          "whole_source": {
+            "bytes": 5221,
+            "characters": 5221,
+            "sha256": "640b94bde2913ed1c1d366868a7e6069557e2e52d313e91c9562559a4c2dd13a"
+          }
+        }
+      ],
+      "effective_mode": "static",
+      "mandatory_cost": {
+        "bytes": 8193,
+        "characters": 8193,
+        "sha256": "416db7c1dbedd03deefcfee10a783bd8d038c5a8cc68ad0693cd4453729083b4"
+      },
+      "payload_cost": {
+        "bytes": 49221,
+        "characters": 49153,
+        "sha256": "ee5ee844462f308dcb5a6b36a61c888390c0bfd27ce75060149b01ec2fd806bb"
+      },
+      "reasons": [
+        "selective_projection_unqualified",
+        "independent_recovery_unqualified"
+      ],
+      "rule_version": "apg.context-packing/v1",
+      "scenario_id": "scenario-01",
+      "selected": [
+        {
+          "id": "apgr:go-language-profile",
+          "sha256": "1a87a3597ed8f3a2363dda4882d27bc59641ffe2053a87630b2dc289f084c110"
+        },
+        {
+          "id": "apgr:go-test-profile",
+          "sha256": "725cb1b1842c8483f685a3885dc90ce6315f2c6d18b51a7c76b60b8629d6d93a"
+        },
+        {
+          "id": "apgr:implementing-with-test-discipline",
+          "sha256": "640b94bde2913ed1c1d366868a7e6069557e2e52d313e91c9562559a4c2dd13a"
+        }
+      ],
+      "standing_source": {
+        "bytes": 7698,
+        "path": "codex/AGENTS.md",
+        "sha256": "b7eb1ceb0d45e813cd1054f7a591630bae5041fd11a1d03342af71e5732f70bd"
+      },
+      "subset": "calibration"
+    },
+    {
+      "budget": {
+        "allocated_skill_body_bytes": 32000,
+        "max_initial_controlled_bytes": 45000,
+        "scope": "apgr_controlled_initial_bytes"
+      },
+      "catalog_fingerprint": "ec04ba684bf6660e37bd387ede5f95a4bc8d54c6c52fcf58317f4d92bb72dc4f",
+      "cohort": "savings_eligible_calibration_subset",
+      "content_identity": "e06ad532bc68fd56724adf75a23c6049bc0167aead57bccb097ca6913d212164",
+      "decisions": [
+        {
+          "body_only": {
+            "bytes": 3772,
+            "characters": 3772,
+            "sha256": "6ea3837ce0d613006541e2508cd3673766f273dfd82d04f3c866ff5e855ea10a"
+          },
+          "content_identity": "df224de524dd8da1faf1b25f4d654a34386b185695e27da1a21be9256b501fa7",
+          "description": {
+            "bytes": 150,
+            "characters": 150,
+            "sha256": "08a0094d50d8b808760a9339ca0e7bae842d5965024e97c70313d9105ad3151b"
+          },
+          "reason": "explicit_request",
+          "requested_id": "apgr:planning-repository-work",
+          "required": true,
+          "selected_id": "apgr:planning-repository-work",
+          "status": "selected",
+          "support": [],
+          "whole_source": {
+            "bytes": 3975,
+            "characters": 3975,
+            "sha256": "1931f6c317202a116ecd8446e0cb185438f3606ad4a1868bca3f64f2191d64e7"
+          }
+        },
+        {
+          "body_only": {
+            "bytes": 17592,
+            "characters": 17546,
+            "sha256": "b0b1f031282e6c2797c3e64858299dd77092c95280992c88368e4f9a00756fc5"
+          },
+          "content_identity": "1e6b6997a4fa8a24addb715a4947c515b0ae2aec14e3c90feb907da35d171127",
+          "description": {
+            "bytes": 204,
+            "characters": 204,
+            "sha256": "5b65fdb5fecdf20c1aa202a4b50a2c26c70827c9ed9edf1b43a14e695284b4e7"
+          },
+          "reason": "explicit_request",
+          "requested_id": "apgr:pytest-test-profile",
+          "required": true,
+          "selected_id": "apgr:pytest-test-profile",
+          "status": "selected",
+          "support": [],
+          "whole_source": {
+            "bytes": 17844,
+            "characters": 17798,
+            "sha256": "94e7bb6806165cb5afc14e3c20a264c62b25bbbc7a7124e2ff160b1c57ebfd15"
+          }
+        },
+        {
+          "body_only": {
+            "bytes": 6634,
+            "characters": 6634,
+            "sha256": "26f1397627184bc50d6e76ffb0f8fd5b9cda9317bdeb68404c478997866fa5cb"
+          },
+          "content_identity": "9d41988cfb2815fef22acb38abd6e9802bce09dc1301ef396dc0a13ef929ee76",
+          "description": {
+            "bytes": 164,
+            "characters": 164,
+            "sha256": "2c53f248ad61ad47b14062b9b51db16c64c219c2197dc4060f4b9c9d0a26de59"
+          },
+          "reason": "explicit_request",
+          "requested_id": "apgr:reviewing-and-verifying-repository-work",
+          "required": true,
+          "selected_id": "apgr:reviewing-and-verifying-repository-work",
+          "status": "selected",
+          "support": [],
+          "whole_source": {
+            "bytes": 6866,
+            "characters": 6866,
+            "sha256": "6d8c7025b7fbf8839f893b5d5e8fb7b764d97afaa5c1ffb3774452af0e55d869"
+          }
+        }
+      ],
+      "effective_mode": "static",
+      "mandatory_cost": {
+        "bytes": 8171,
+        "characters": 8171,
+        "sha256": "092086f997cd7b2f2f0371cfa376060cf1d7a20c37e9ced99309bb1b439536c6"
+      },
+      "payload_cost": {
+        "bytes": 38015,
+        "characters": 37969,
+        "sha256": "3af91d21c99db84ec1e929cc339d3a95eb8e48cfbdfa0cdd881c0546b01de917"
+      },
+      "reasons": [
+        "selective_projection_unqualified",
+        "independent_recovery_unqualified"
+      ],
+      "rule_version": "apg.context-packing/v1",
+      "scenario_id": "scenario-02",
+      "selected": [
+        {
+          "id": "apgr:planning-repository-work",
+          "sha256": "1931f6c317202a116ecd8446e0cb185438f3606ad4a1868bca3f64f2191d64e7"
+        },
+        {
+          "id": "apgr:pytest-test-profile",
+          "sha256": "94e7bb6806165cb5afc14e3c20a264c62b25bbbc7a7124e2ff160b1c57ebfd15"
+        },
+        {
+          "id": "apgr:reviewing-and-verifying-repository-work",
+          "sha256": "6d8c7025b7fbf8839f893b5d5e8fb7b764d97afaa5c1ffb3774452af0e55d869"
+        }
+      ],
+      "standing_source": {
+        "bytes": 7698,
+        "path": "codex/AGENTS.md",
+        "sha256": "b7eb1ceb0d45e813cd1054f7a591630bae5041fd11a1d03342af71e5732f70bd"
+      },
+      "subset": "calibration"
+    },
+    {
+      "budget": {
+        "allocated_skill_body_bytes": 20000,
+        "max_initial_controlled_bytes": 30000,
+        "scope": "apgr_controlled_initial_bytes"
+      },
+      "catalog_fingerprint": "ec04ba684bf6660e37bd387ede5f95a4bc8d54c6c52fcf58317f4d92bb72dc4f",
+      "cohort": "correctness_failure_only_cohort",
+      "content_identity": "3bc3e97529993b212bbb385ea020c8a9e12ded44784c629f2bda3ad1e7f1ca63",
+      "decisions": [
+        {
+          "body_only": {
+            "bytes": 11339,
+            "characters": 11295,
+            "sha256": "7f7d818234777b030377c4a6c7496042a82a62514a346a0d0a1b4f5da42e8fb3"
+          },
+          "content_identity": "fff4056eb6a9833050f8ac2415f9d7e7d2996605d32c378a6cdb5646113faf11",
+          "description": {
+            "bytes": 173,
+            "characters": 173,
+            "sha256": "c66aa73d24ca2f5747bb60fdf5f510191f86ae3aafdf4ca7cb787b161c279505"
+          },
+          "reason": "explicit_request",
+          "requested_id": "apgr:markdown-language-profile",
+          "required": true,
+          "selected_id": "apgr:markdown-language-profile",
+          "status": "selected",
+          "support": [],
+          "whole_source": {
+            "bytes": 11566,
+            "characters": 11522,
+            "sha256": "0102078f16b28b9054ec008218ab5877621540705297307482c7c58447a7013a"
+          }
+        },
+        {
+          "body_only": {
+            "bytes": 6634,
+            "characters": 6634,
+            "sha256": "26f1397627184bc50d6e76ffb0f8fd5b9cda9317bdeb68404c478997866fa5cb"
+          },
+          "content_identity": "9d41988cfb2815fef22acb38abd6e9802bce09dc1301ef396dc0a13ef929ee76",
+          "description": {
+            "bytes": 164,
+            "characters": 164,
+            "sha256": "2c53f248ad61ad47b14062b9b51db16c64c219c2197dc4060f4b9c9d0a26de59"
+          },
+          "reason": "required_closure_exceeds_budget",
+          "requested_id": "apgr:reviewing-and-verifying-repository-work",
+          "required": true,
+          "selected_id": "apgr:reviewing-and-verifying-repository-work",
+          "status": "deferred",
+          "support": [],
+          "whole_source": {
+            "bytes": 6866,
+            "characters": 6866,
+            "sha256": "6d8c7025b7fbf8839f893b5d5e8fb7b764d97afaa5c1ffb3774452af0e55d869"
+          }
+        }
+      ],
+      "effective_mode": "static",
+      "mandatory_cost": {
+        "bytes": 11400,
+        "characters": 11386,
+        "sha256": "a65669cb577d75e52a326ef0553bde615389e6e8a40f49910cced887722b842f"
+      },
+      "payload_cost": {
+        "bytes": 23400,
+        "characters": 23342,
+        "sha256": "45beda19d341cdbb29bcafef5181194cc0e1fd0d231894cd8d84a95c36ba2170"
+      },
+      "reasons": [
+        "required_skills_unsatisfied",
+        "selective_projection_unqualified",
+        "independent_recovery_unqualified"
+      ],
+      "rule_version": "apg.context-packing/v1",
+      "scenario_id": "scenario-03",
+      "selected": [
+        {
+          "id": "apgr:markdown-language-profile",
+          "sha256": "0102078f16b28b9054ec008218ab5877621540705297307482c7c58447a7013a"
+        }
+      ],
+      "standing_source": {
+        "bytes": 11071,
+        "path": "claude/CLAUDE.md",
+        "sha256": "b8f7adaa54096479d561255ce02409af0710d55c9d964a4bea71b07344feea87"
+      },
+      "subset": "calibration"
+    },
+    {
+      "budget": {
+        "allocated_skill_body_bytes": 15000,
+        "max_initial_controlled_bytes": 25000,
+        "scope": "apgr_controlled_initial_bytes"
+      },
+      "catalog_fingerprint": "ec04ba684bf6660e37bd387ede5f95a4bc8d54c6c52fcf58317f4d92bb72dc4f",
+      "cohort": "savings_eligible_calibration_subset",
+      "content_identity": "92efcdca87cf8126666ef1a55ff5f43eea473d0cbd61f2af249010fd2fd8a5b8",
+      "decisions": [
+        {
+          "body_only": {
+            "bytes": 12420,
+            "characters": 12376,
+            "sha256": "09527ec577dc800c04de6de37fdd6ef1ee4bb150b0abd7a32d8f632f6ff36dac"
+          },
+          "content_identity": "13fdc76567f6057831da341405a0c655ae4e76f688c501b99cff8249a6610bde",
+          "description": {
+            "bytes": 185,
+            "characters": 185,
+            "sha256": "f025b7817e691825328552fe3701a312a0788c9f2ce64c7494c8164a49b8ccaa"
+          },
+          "reason": "explicit_request",
+          "requested_id": "apgr:bash-language-profile",
+          "required": true,
+          "selected_id": "apgr:bash-language-profile",
+          "status": "selected",
+          "support": [],
+          "whole_source": {
+            "bytes": 12655,
+            "characters": 12611,
+            "sha256": "a9b32ff35ddc6eda54adabad0a38f0e6251109482246821d2e2e26805f6f050c"
+          }
+        },
+        {
+          "body_only": {
+            "bytes": 6061,
+            "characters": 6061,
+            "sha256": "7e0974241ed0b2b68c0569e28cee745097d066ca4499c095b609fdb4c17033ba"
+          },
+          "content_identity": "decaa17f8ba6b96280a741175d66634dbb428f2e05055d8bc7e9a0aeee1fff5a",
+          "description": {
+            "bytes": 268,
+            "characters": 268,
+            "sha256": "7fc4f0e005d1c340f925ee9c3004c2763eac4a880e9e51bb54d36182bfbb4139"
+          },
+          "reason": "required_closure_exceeds_budget",
+          "requested_id": "apgr:rtk-command-proxy",
+          "required": true,
+          "selected_id": "apgr:rtk-command-proxy",
+          "status": "deferred",
+          "support": [],
+          "whole_source": {
+            "bytes": 6375,
+            "characters": 6375,
+            "sha256": "83434250ba929b54804ef58fe1a6e5f2a86d1456b4ab718b8b8264379d75fe3d"
+          }
+        }
+      ],
+      "effective_mode": "static",
+      "mandatory_cost": {
+        "bytes": 8087,
+        "characters": 8087,
+        "sha256": "1d26940d544fe84a38daf3d9d52a7f0b661932e8fca541afebc2244039fe249a"
+      },
+      "payload_cost": {
+        "bytes": 21221,
+        "characters": 21177,
+        "sha256": "e7c00707908aa8fe2e4c51ef148344ce13314b441e3b6bc8b8a2871802749cb5"
+      },
+      "reasons": [
+        "required_skills_unsatisfied",
+        "selective_projection_unqualified",
+        "independent_recovery_unqualified"
+      ],
+      "rule_version": "apg.context-packing/v1",
+      "scenario_id": "scenario-04",
+      "selected": [
+        {
+          "id": "apgr:bash-language-profile",
+          "sha256": "a9b32ff35ddc6eda54adabad0a38f0e6251109482246821d2e2e26805f6f050c"
+        }
+      ],
+      "standing_source": {
+        "bytes": 7698,
+        "path": "codex/AGENTS.md",
+        "sha256": "b7eb1ceb0d45e813cd1054f7a591630bae5041fd11a1d03342af71e5732f70bd"
+      },
+      "subset": "calibration"
+    },
+    {
+      "budget": null,
+      "catalog_fingerprint": "ec04ba684bf6660e37bd387ede5f95a4bc8d54c6c52fcf58317f4d92bb72dc4f",
+      "cohort": "fallback_cohort",
+      "content_identity": "f2e1abaae6563c4809dadfe5f17a683b2cf5a4734b7770d6f9f5c61d4c5fe2b5",
+      "decisions": [],
+      "effective_mode": "static",
+      "mandatory_cost": {
+        "bytes": 3589,
+        "characters": 3589,
+        "sha256": "43f065b9e0f7ec8385458457920996de0982bd459160e9f7c061d1de89cb15ec"
+      },
+      "payload_cost": {
+        "bytes": 3589,
+        "characters": 3589,
+        "sha256": "43f065b9e0f7ec8385458457920996de0982bd459160e9f7c061d1de89cb15ec"
+      },
+      "reasons": [
+        "selective_projection_unqualified",
+        "independent_recovery_unqualified"
+      ],
+      "rule_version": "apg.context-packing/v1",
+      "scenario_id": "scenario-05",
+      "selected": [],
+      "standing_source": {
+        "bytes": 3196,
+        "path": "antigravity/GEMINI.md",
+        "sha256": "f1270b1818cc157546f64e39f29c2e5c62133864efc393be9fdfcae34692e97e"
+      },
+      "subset": "calibration"
+    },
+    {
+      "budget": {
+        "allocated_skill_body_bytes": 58000,
+        "max_initial_controlled_bytes": 70000,
+        "scope": "apgr_controlled_initial_bytes"
+      },
+      "catalog_fingerprint": "ec04ba684bf6660e37bd387ede5f95a4bc8d54c6c52fcf58317f4d92bb72dc4f",
+      "cohort": "savings_eligible_cohort",
+      "content_identity": "fa6d8ad1dd8d0335350b56fd25414224f01dd5609acae9ecce23dd3c4a2fa5bf",
+      "decisions": [
+        {
+          "body_only": {
+            "bytes": 16452,
+            "characters": 16400,
+            "sha256": "a2a1090422ddd0aa38610f7beedad1d6af6d50f7c6c553fc6f1f5aabfb04935f"
+          },
+          "content_identity": "fb7dcf376e4508023f1c38b192070e8719b80d2a88321d26681eed978294ac34",
+          "description": {
+            "bytes": 233,
+            "characters": 233,
+            "sha256": "9e126abb165a6e06d6cddc9d3ee723605f0ec3574cbece58cdfe9d0f1562d655"
+          },
+          "reason": "explicit_request",
+          "requested_id": "apgr:go-language-profile",
+          "required": true,
+          "selected_id": "apgr:go-language-profile",
+          "status": "selected",
+          "support": [],
+          "whole_source": {
+            "bytes": 16733,
+            "characters": 16681,
+            "sha256": "1a87a3597ed8f3a2363dda4882d27bc59641ffe2053a87630b2dc289f084c110"
+          }
+        },
+        {
+          "body_only": {
+            "bytes": 17487,
+            "characters": 17471,
+            "sha256": "b675e94daabf185896bba5cf740891215e74741b1088ba2fa74cb9d5576c6e61"
+          },
+          "content_identity": "493aa93eeffc487728d78df415d8b0d0c6ee8c214a958002dc84b6896d884c8b",
+          "description": {
+            "bytes": 290,
+            "characters": 290,
+            "sha256": "d7b1911e0f3beb15148f49f0b996c1396e824d6029733d9365a4794acf130f44"
+          },
+          "reason": "explicit_request",
+          "requested_id": "apgr:go-test-profile",
+          "required": true,
+          "selected_id": "apgr:go-test-profile",
+          "status": "selected",
+          "support": [],
+          "whole_source": {
+            "bytes": 17821,
+            "characters": 17805,
+            "sha256": "725cb1b1842c8483f685a3885dc90ce6315f2c6d18b51a7c76b60b8629d6d93a"
+          }
+        },
+        {
+          "body_only": {
+            "bytes": 4990,
+            "characters": 4990,
+            "sha256": "81edd04d465423b3865d155f62ff0eb01fe9462da404a2504beea9d8fe39706d"
+          },
+          "content_identity": "96733ce2776beba396f012668126978019a5a00ec59fc637b1ad2a279037d368",
+          "description": {
+            "bytes": 169,
+            "characters": 169,
+            "sha256": "f3611b35a0819ab5ef0a213282e6bc6869beedb7665e09dbb48c9dcedffc2f9a"
+          },
+          "reason": "explicit_request",
+          "requested_id": "apgr:implementing-with-test-discipline",
+          "required": true,
+          "selected_id": "apgr:implementing-with-test-discipline",
+          "status": "selected",
+          "support": [],
+          "whole_source": {
+            "bytes": 5221,
+            "characters": 5221,
+            "sha256": "640b94bde2913ed1c1d366868a7e6069557e2e52d313e91c9562559a4c2dd13a"
+          }
+        },
+        {
+          "body_only": {
+            "bytes": 16929,
+            "characters": 16869,
+            "sha256": "e87fd6b6058abfdefb2533edada2557397aab5c652ae2fd2f3af2cea7b6158df"
+          },
+          "content_identity": "c20980f7f8f371592d9f5a65843245ff0adc46da71e08b5695194df315675a80",
+          "description": {
+            "bytes": 284,
+            "characters": 284,
+            "sha256": "91427959e05384229900d786349611fe2dad29e2b868d8185b85a9790991f680"
+          },
+          "reason": "explicit_request",
+          "requested_id": "apgr:sqlite-database-profile",
+          "required": true,
+          "selected_id": "apgr:sqlite-database-profile",
+          "status": "selected",
+          "support": [],
+          "whole_source": {
+            "bytes": 17265,
+            "characters": 17205,
+            "sha256": "39bce0e13fe1009f859aff146885b24fd70e3fbe66bf7b064855810ed3568065"
+          }
+        }
+      ],
+      "effective_mode": "static",
+      "mandatory_cost": {
+        "bytes": 8145,
+        "characters": 8145,
+        "sha256": "58306eea4b320253a90ba9288a2ae58d48bfd275b6402d9e281772dd291bcb2d"
+      },
+      "payload_cost": {
+        "bytes": 66959,
+        "characters": 66831,
+        "sha256": "0458675601b85289018582b1abb1542ce88391d4a76efce9170efb3ea176d291"
+      },
+      "reasons": [
+        "selective_projection_unqualified",
+        "independent_recovery_unqualified"
+      ],
+      "rule_version": "apg.context-packing/v1",
+      "scenario_id": "scenario-06",
+      "selected": [
+        {
+          "id": "apgr:go-language-profile",
+          "sha256": "1a87a3597ed8f3a2363dda4882d27bc59641ffe2053a87630b2dc289f084c110"
+        },
+        {
+          "id": "apgr:go-test-profile",
+          "sha256": "725cb1b1842c8483f685a3885dc90ce6315f2c6d18b51a7c76b60b8629d6d93a"
+        },
+        {
+          "id": "apgr:implementing-with-test-discipline",
+          "sha256": "640b94bde2913ed1c1d366868a7e6069557e2e52d313e91c9562559a4c2dd13a"
+        },
+        {
+          "id": "apgr:sqlite-database-profile",
+          "sha256": "39bce0e13fe1009f859aff146885b24fd70e3fbe66bf7b064855810ed3568065"
+        }
+      ],
+      "standing_source": {
+        "bytes": 7698,
+        "path": "codex/AGENTS.md",
+        "sha256": "b7eb1ceb0d45e813cd1054f7a591630bae5041fd11a1d03342af71e5732f70bd"
+      },
+      "subset": "acceptance"
+    },
+    {
+      "budget": {
+        "max_initial_controlled_bytes": 1000,
+        "scope": "apgr_controlled_initial_bytes"
+      },
+      "catalog_fingerprint": "ec04ba684bf6660e37bd387ede5f95a4bc8d54c6c52fcf58317f4d92bb72dc4f",
+      "cohort": "correctness_failure_only_cohort",
+      "content_identity": "3f359665422349ceb20fed9c04782ba25aeaf321e92e579a1f8895f391c0d001",
+      "decisions": [],
+      "effective_mode": "static",
+      "mandatory_cost": {
+        "bytes": 11369,
+        "characters": 11355,
+        "sha256": "30f8252846eb1f51e6439cb281791c58e6e780b163dd40f47072d39cc98f20c7"
+      },
+      "payload_cost": {
+        "bytes": 11369,
+        "characters": 11355,
+        "sha256": "30f8252846eb1f51e6439cb281791c58e6e780b163dd40f47072d39cc98f20c7"
+      },
+      "reasons": [
+        "mandatory_overflow",
+        "selective_projection_unqualified",
+        "independent_recovery_unqualified"
+      ],
+      "rule_version": "apg.context-packing/v1",
+      "scenario_id": "scenario-07",
+      "selected": [],
+      "standing_source": {
+        "bytes": 11071,
+        "path": "claude/CLAUDE.md",
+        "sha256": "b8f7adaa54096479d561255ce02409af0710d55c9d964a4bea71b07344feea87"
+      },
+      "subset": "acceptance"
+    },
+    {
+      "budget": {
+        "allocated_skill_body_bytes": 35000,
+        "max_initial_controlled_bytes": 50000,
+        "scope": "apgr_controlled_initial_bytes"
+      },
+      "catalog_fingerprint": "ec04ba684bf6660e37bd387ede5f95a4bc8d54c6c52fcf58317f4d92bb72dc4f",
+      "cohort": "savings_eligible_cohort",
+      "content_identity": "fc9cee89c479fb1bf7408fa50eac6109b926ab8115bf014659f46727e7acb9b0",
+      "decisions": [
+        {
+          "body_only": {
+            "bytes": 16452,
+            "characters": 16400,
+            "sha256": "a2a1090422ddd0aa38610f7beedad1d6af6d50f7c6c553fc6f1f5aabfb04935f"
+          },
+          "content_identity": "fb7dcf376e4508023f1c38b192070e8719b80d2a88321d26681eed978294ac34",
+          "description": {
+            "bytes": 233,
+            "characters": 233,
+            "sha256": "9e126abb165a6e06d6cddc9d3ee723605f0ec3574cbece58cdfe9d0f1562d655"
+          },
+          "reason": "explicit_request",
+          "requested_id": "apgr:go-language-profile",
+          "required": true,
+          "selected_id": "apgr:go-language-profile",
+          "status": "selected",
+          "support": [],
+          "whole_source": {
+            "bytes": 16733,
+            "characters": 16681,
+            "sha256": "1a87a3597ed8f3a2363dda4882d27bc59641ffe2053a87630b2dc289f084c110"
+          }
+        }
+      ],
+      "effective_mode": "static",
+      "mandatory_cost": {
+        "bytes": 8127,
+        "characters": 8127,
+        "sha256": "c49c61173b3b43175256e63492443c9ebf1f75c2d9e9730ac15d1677b6197db0"
+      },
+      "payload_cost": {
+        "bytes": 25399,
+        "characters": 25347,
+        "sha256": "e0987a39f171977c315c9ea5f6d7ce81246f3df66f8afc58f958bdc368564556"
+      },
+      "reasons": [
+        "selective_projection_unqualified",
+        "independent_recovery_unqualified"
+      ],
+      "rule_version": "apg.context-packing/v1",
+      "scenario_id": "scenario-08",
+      "selected": [
+        {
+          "id": "apgr:go-language-profile",
+          "sha256": "1a87a3597ed8f3a2363dda4882d27bc59641ffe2053a87630b2dc289f084c110"
+        }
+      ],
+      "standing_source": {
+        "bytes": 7698,
+        "path": "codex/AGENTS.md",
+        "sha256": "b7eb1ceb0d45e813cd1054f7a591630bae5041fd11a1d03342af71e5732f70bd"
+      },
+      "subset": "acceptance"
+    },
+    {
+      "budget": {
+        "allocated_skill_body_bytes": 25000,
+        "max_initial_controlled_bytes": 40000,
+        "scope": "apgr_controlled_initial_bytes"
+      },
+      "catalog_fingerprint": "ec04ba684bf6660e37bd387ede5f95a4bc8d54c6c52fcf58317f4d92bb72dc4f",
+      "cohort": "savings_eligible_cohort",
+      "content_identity": "3eddf31cd802040b5f42a16b4077ec545b17be1a2ed509404373cca4bed98a5b",
+      "decisions": [],
+      "effective_mode": "static",
+      "mandatory_cost": {
+        "bytes": 8174,
+        "characters": 8174,
+        "sha256": "b92f7b454f84325c57fb25a68c0301f5d41a05ca72cb9657300f6892bbdb7095"
+      },
+      "payload_cost": {
+        "bytes": 8174,
+        "characters": 8174,
+        "sha256": "b92f7b454f84325c57fb25a68c0301f5d41a05ca72cb9657300f6892bbdb7095"
+      },
+      "reasons": [
+        "selective_projection_unqualified",
+        "independent_recovery_unqualified"
+      ],
+      "rule_version": "apg.context-packing/v1",
+      "scenario_id": "scenario-09",
+      "selected": [],
+      "standing_source": {
+        "bytes": 7698,
+        "path": "codex/AGENTS.md",
+        "sha256": "b7eb1ceb0d45e813cd1054f7a591630bae5041fd11a1d03342af71e5732f70bd"
+      },
+      "subset": "acceptance"
+    },
+    {
+      "budget": null,
+      "catalog_fingerprint": "ec04ba684bf6660e37bd387ede5f95a4bc8d54c6c52fcf58317f4d92bb72dc4f",
+      "cohort": "fallback_cohort",
+      "content_identity": "783d0849d8ae0db327ac91d932d2c53b2b2abdbb5f1e6f54fd2b06360a5543b0",
+      "decisions": [],
+      "effective_mode": "static",
+      "mandatory_cost": {
+        "bytes": 11405,
+        "characters": 11391,
+        "sha256": "852bf3ba2552f77a206e58462d5040d7a930a54cabc3f0f136d19a6a1001d5af"
+      },
+      "payload_cost": {
+        "bytes": 11405,
+        "characters": 11391,
+        "sha256": "852bf3ba2552f77a206e58462d5040d7a930a54cabc3f0f136d19a6a1001d5af"
+      },
+      "reasons": [
+        "selective_projection_unqualified",
+        "independent_recovery_unqualified"
+      ],
+      "rule_version": "apg.context-packing/v1",
+      "scenario_id": "scenario-13",
+      "selected": [],
+      "standing_source": {
+        "bytes": 11071,
+        "path": "claude/CLAUDE.md",
+        "sha256": "b8f7adaa54096479d561255ce02409af0710d55c9d964a4bea71b07344feea87"
+      },
+      "subset": "acceptance"
+    },
+    {
+      "budget": {
+        "allocated_skill_body_bytes": 18000,
+        "max_initial_controlled_bytes": 30000,
+        "scope": "apgr_controlled_initial_bytes"
+      },
+      "catalog_fingerprint": "ec04ba684bf6660e37bd387ede5f95a4bc8d54c6c52fcf58317f4d92bb72dc4f",
+      "cohort": "savings_eligible_cohort",
+      "content_identity": "e571e0d5b16a155b73c195a83221397a5eb7a6b6efc4bc622495059faba68833",
+      "decisions": [
+        {
+          "body_only": {
+            "bytes": 10856,
+            "characters": 10838,
+            "sha256": "19961c2206b2dc81b9e4e803a9b76c314bd4d7a8ac9a2382248848ad2f6a8528"
+          },
+          "content_identity": "d963ae7f7dca66bf8788f720354c0b3ee689e92690a4be41e5a43cb0200123a1",
+          "description": {
+            "bytes": 251,
+            "characters": 251,
+            "sha256": "8a7da47a6fcc3cd4bc65d1ed84ac377e5f6edbd664d74112caac53039775f679"
+          },
+          "reason": "explicit_request",
+          "requested_id": "apgr:typescript-language-profile",
+          "required": true,
+          "selected_id": "apgr:typescript-language-profile",
+          "status": "selected",
+          "support": [],
+          "whole_source": {
+            "bytes": 11163,
+            "characters": 11145,
+            "sha256": "66f3432c90f017548a7d425b1a344b67a40a8fd96adaaa800b6c61da3e67840d"
+          }
+        }
+      ],
+      "effective_mode": "static",
+      "mandatory_cost": {
+        "bytes": 11530,
+        "characters": 11516,
+        "sha256": "48a84bcd77142ec1d16fdf5115188b460c0a9f20eff2023e38cb7f5d515f474b"
+      },
+      "payload_cost": {
+        "bytes": 23133,
+        "characters": 23101,
+        "sha256": "e2640b61f8ca80a82d93054abf25b19e644f0a8ad1baac6af9296fa1039b78d8"
+      },
+      "reasons": [
+        "selective_projection_unqualified",
+        "independent_recovery_unqualified"
+      ],
+      "rule_version": "apg.context-packing/v1",
+      "scenario_id": "scenario-15",
+      "selected": [
+        {
+          "id": "apgr:typescript-language-profile",
+          "sha256": "66f3432c90f017548a7d425b1a344b67a40a8fd96adaaa800b6c61da3e67840d"
+        }
+      ],
+      "standing_source": {
+        "bytes": 11071,
+        "path": "claude/CLAUDE.md",
+        "sha256": "b8f7adaa54096479d561255ce02409af0710d55c9d964a4bea71b07344feea87"
+      },
+      "subset": "acceptance"
+    }
+  ]
+}

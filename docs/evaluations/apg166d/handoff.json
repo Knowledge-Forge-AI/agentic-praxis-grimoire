@@ -1,0 +1,73 @@
+{
+  "c1_c2_live_qualification_accepted": false,
+  "checkpoint": "V0130_H_PREREQUISITES_BLOCKED",
+  "continuation": "V0130-H-QUAL5",
+  "current_default_permission_route_qualified": false,
+  "d1_invocations": 0,
+  "default": "static",
+  "disposition": "blocked",
+  "dry_run": {
+    "all_subjects_materialized": true,
+    "complete_records": 0,
+    "initial_trees_equal": 15,
+    "provider_invocations": 0,
+    "records": 15,
+    "runtime_manifest_supplied": false,
+    "subject_pairs_unchanged": 15
+  },
+  "exit": "00226",
+  "h_main_gate": false,
+  "independent_work_review": "received; prerequisite candidate rejected; bounded amendments not independently re-reviewed",
+  "live_h_measured_pairs": 0,
+  "live_holdout_authorized": false,
+  "native_launch_limitation": {
+    "attempts": 1,
+    "corrected_test_uses_fake": true,
+    "d1_qualification": false,
+    "exit": "nonzero",
+    "model_completion": "unverified",
+    "stage": "revise_close",
+    "terminal_output_retained": false
+  },
+  "phase": "APG166D",
+  "prerequisites_ready": false,
+  "producer_dry_run": {
+    "all_subjects_materialized": true,
+    "complete_records": 5,
+    "provider_invocations": 0,
+    "records": 15
+  },
+  "promotion_preregistration_accepted": false,
+  "promotion_preregistration_disposition": "rejected",
+  "pushed_or_published": false,
+  "qualified_promotions": 0,
+  "ready_seal_sha256": "397399234615b74804aeec0217c329c7360cd94adca861da2ff30407a5ff741f",
+  "review_findings": {
+    "A": "amended",
+    "B": "amended",
+    "C": "partially amended; durable invocation sentinel unresolved",
+    "D": "amended",
+    "E": "accepted finding; unresolved",
+    "F": "accepted finding; unresolved",
+    "G": "preregistration rejected",
+    "H": "accepted concern; unresolved"
+  },
+  "runtime_manifest_sha256": "17b1d6b9fbea1eb8d30a4a48c22121290acd43b8b1ab4778b149b7a2877ebfe8",
+  "runtime_revalidation": "failed-drift",
+  "scenario15": "contingent/unavailable until separately authorized live qualification",
+  "schema": "apg.h-prerequisite-handoff/v1",
+  "source_committed": false,
+  "source_identity": "a48f5ca2d829fc89430dc076dd37eb2c9b0d344303da0c0278642451f4c6880f",
+  "unresolved": [
+    "Receipt-derived substantive oracles, symmetric review output contract and aligned good/bad fixtures",
+    "Repository-owned live context/subject/import/oracle construction and aggregate admission",
+    "Complete runtime dependency inventory and manifest-bound oracle environments",
+    "Durable dry-run invocation sentinels and complete subject authority qualification",
+    "Promotion preregistration rejected: case-specific correctness, non-leading attribution and complete semantic non-triggers",
+    "Provider-free recovery-subtree idempotence/growth qualification before D1",
+    "Final-source D1 remains unrun; complete provider-free prerequisites not established",
+    "Accidental native test launch exited nonzero with model completion unverified; no qualification credit",
+    "No second independent review of revise-close amendments"
+  ],
+  "v0130_i_authorized": false
+}

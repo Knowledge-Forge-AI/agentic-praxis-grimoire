@@ -1,0 +1,79 @@
+{
+  "arms": {
+    "adaptive": {
+      "route": {
+        "identity_sources": [
+          "common/dispatcher/routes.toml",
+          "common/dispatcher/endpoints.toml",
+          "codex/profiles/implementation-testing.config.toml"
+        ],
+        "model": "gpt-6-astra",
+        "profile": "implementation-testing",
+        "provider": "codex",
+        "requested_mode": "adaptive",
+        "role_binding": {
+          "allowed_tools": [
+            "view_file",
+            "replace_file_content",
+            "write_to_file",
+            "run_command"
+          ],
+          "binding_id": "binding-producer-04",
+          "roles": [
+            "Producer"
+          ]
+        },
+        "source_sha256": {
+          "codex/profiles/implementation-testing.config.toml": "8a786851da04d75b06f62781a418df6959d335d61a03e32613250bb33d588261",
+          "common/dispatcher/endpoints.toml": "a3ae4c8654cf16a314d277877c99f98bffefdea2ae593d1475df3a6c1fc8a4b9",
+          "common/dispatcher/routes.toml": "c194887b362159141db6e345951cae20c229f05c1f5cf72eeb8305e5e8135673"
+        }
+      },
+      "status": "unavailable"
+    },
+    "static": {
+      "route": {
+        "identity_sources": [
+          "common/dispatcher/routes.toml",
+          "common/dispatcher/endpoints.toml",
+          "codex/profiles/implementation-testing.config.toml"
+        ],
+        "model": "gpt-6-astra",
+        "profile": "implementation-testing",
+        "provider": "codex",
+        "requested_mode": "static",
+        "role_binding": {
+          "allowed_tools": [
+            "view_file",
+            "replace_file_content",
+            "write_to_file",
+            "run_command"
+          ],
+          "binding_id": "binding-producer-04",
+          "roles": [
+            "Producer"
+          ]
+        },
+        "source_sha256": {
+          "codex/profiles/implementation-testing.config.toml": "8a786851da04d75b06f62781a418df6959d335d61a03e32613250bb33d588261",
+          "common/dispatcher/endpoints.toml": "a3ae4c8654cf16a314d277877c99f98bffefdea2ae593d1475df3a6c1fc8a4b9",
+          "common/dispatcher/routes.toml": "c194887b362159141db6e345951cae20c229f05c1f5cf72eeb8305e5e8135673"
+        }
+      },
+      "status": "unavailable"
+    }
+  },
+  "blockers": [
+    "Concrete clean subject factory not frozen",
+    "Provider result importer not frozen",
+    "Substantive external oracle implementation not frozen",
+    "Live projection/runtime authority not frozen"
+  ],
+  "oracle_executed": false,
+  "phase": "APG166C",
+  "provider_invocations": 0,
+  "scenario_id": "scenario-06",
+  "scenario_sha256": "435e8de99dd2ce4d96dbf039e1bca66e24287bcd3774d842435e0d1a71efbb99",
+  "status": "unavailable",
+  "subject_materialized": false
+}

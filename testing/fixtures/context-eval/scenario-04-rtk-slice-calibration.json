@@ -1,0 +1,132 @@
+{
+  "scenario_id": "scenario-04",
+  "name": "RTK Conditional Slice Delivery",
+  "subset": "calibration",
+  "cohort": "savings_eligible_calibration_subset",
+  "phase": "APG159A",
+  "task_input": {
+    "instruction": "Update build script in scripts/build.sh to support incremental compilation flags.",
+    "task_authority": "phase_owned",
+    "mutation_scope": [
+      "scripts/build.sh"
+    ]
+  },
+  "provider": "codex",
+  "role_binding": {
+    "binding_id": "binding-producer-02",
+    "roles": [
+      "Producer"
+    ],
+    "allowed_tools": [
+      "view_file",
+      "replace_file_content",
+      "write_to_file",
+      "run_command"
+    ]
+  },
+  "repository_evidence": {
+    "files": [
+      "Makefile",
+      "scripts/build.sh"
+    ],
+    "primary_language": "bash",
+    "dependency_facts": {}
+  },
+  "rtk_configuration": {
+    "enabled": true,
+    "provider_mode": "instructions",
+    "executable_path": "/run/current-system/sw/bin/rtk",
+    "instructions_slice_bytes": 240,
+    "executable_path_note": "Local example path, not a shipped default (manager disposition T4)."
+  },
+  "mandatory_instructions": {
+    "provider_file": "codex/AGENTS.md",
+    "provider_instruction_bytes": 7939,
+    "rtk_slice_bytes": 240,
+    "mandatory_doctrine_bytes": 2500,
+    "tool_schema_overhead": "unavailable_provider_native"
+  },
+  "skill_sources": {
+    "apgr:bash-language-profile": {
+      "canonical_path": "skills/bash-language-profile/SKILL.md",
+      "status": "selected",
+      "whole_bytes": 12655,
+      "body_bytes": 12420,
+      "body_sha256": "09527ec577dc800c04de6de37fdd6ef1ee4bb150b0abd7a32d8f632f6ff36dac",
+      "source_kind": "canonical_measured"
+    },
+    "apgr:rtk-command-proxy": {
+      "canonical_path": "skills/rtk-command-proxy/SKILL.md",
+      "status": "planned_first_party_skill_v0130_d",
+      "source_kind": "planned_not_in_canonical_corpus",
+      "note": "No canonical rtk-command-proxy skill exists in the APG159A source tree; V0130-D owns its authoring and measurement."
+    }
+  },
+  "budget": {
+    "scope": "apgr_controlled_initial_bytes",
+    "max_initial_controlled_bytes": 25000,
+    "allocated_skill_body_bytes": 15000
+  },
+  "expected_outcome": {
+    "mode": "adaptive",
+    "instruction_slice_rendered": "rtk-instructions-slice",
+    "selected_skills": [
+      "apgr:bash-language-profile",
+      "apgr:rtk-command-proxy"
+    ],
+    "mandatory_doctrine_preserved": true,
+    "static_fallback_triggered": false,
+    "quality_oracle": {
+      "command": "bash -n scripts/build.sh",
+      "expected_exit_code": 0,
+      "assertions": "RTK instructions slice delivered in prompt; bash syntax passes; zero git authority drift"
+    }
+  },
+  "status": "frozen_corrected",
+  "value_sources": {
+    "mandatory_instructions.provider_instruction_bytes": {
+      "source": "measured",
+      "basis": "wc -c codex/AGENTS.md at the APG159A workspace tree"
+    },
+    "mandatory_instructions.mandatory_doctrine_bytes": {
+      "source": "estimate",
+      "basis": "Planning placeholder. The non-negotiable doctrine slice is not yet a separately measurable artifact; V0130-F must replace this with a measured value before any savings computation uses it."
+    },
+    "mandatory_instructions.rtk_slice_bytes": {
+      "source": "estimate",
+      "basis": "RTK instruction slice is not yet a separable artifact; V0130-D must measure the slice."
+    },
+    "rtk_configuration.instructions_slice_bytes": {
+      "source": "estimate",
+      "basis": "Same planning estimate as mandatory_instructions.rtk_slice_bytes."
+    },
+    "skill_sources.apgr:bash-language-profile.whole_bytes": {
+      "source": "measured",
+      "basis": "python3 measurement over skills/bash-language-profile/SKILL.md"
+    },
+    "skill_sources.apgr:bash-language-profile.body_bytes": {
+      "source": "measured",
+      "basis": "python3 measurement over skills/bash-language-profile/SKILL.md"
+    },
+    "budget.max_initial_controlled_bytes": {
+      "source": "declared",
+      "basis": "Frozen scenario budget parameter chosen by this correction revision."
+    },
+    "budget.allocated_skill_body_bytes": {
+      "source": "declared",
+      "basis": "Frozen scenario budget parameter chosen by this correction revision."
+    }
+  },
+  "value_source_vocabulary": "measured | synthetic | estimate | declared | unavailable (see context-eval-metrics-and-oracles.json)",
+  "correction_revision": {
+    "revision": "APG159A-CORR1",
+    "supersedes": "APG159 numerical freeze (retained in Git history at Exit 00205)",
+    "nature": "pre-implementation correction, not tuning against a held-out set"
+  },
+  "f_accounting_correction": {
+    "revision": "F-CONTEXT1",
+    "owner": "f-context1-accounting.json",
+    "historical_fields": "mandatory_instructions and value_sources retain the earlier freeze; their estimates are superseded for F packing by measured mandatory_cost in the correction owner",
+    "qualification": "prospective fixture only; normal effective transport remains static; no H benefit claim"
+  }
+}

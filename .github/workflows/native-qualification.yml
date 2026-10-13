@@ -1,0 +1,945 @@
+{
+  "name": "Native qualification",
+  "on": {
+    "pull_request": {
+      "branches": [
+        "main"
+      ],
+      "types": [
+        "opened",
+        "synchronize",
+        "reopened",
+        "ready_for_review"
+      ]
+    }
+  },
+  "permissions": {
+    "contents": "read"
+  },
+  "defaults": {
+    "run": {
+      "shell": "bash"
+    }
+  },
+  "concurrency": {
+    "group": "native-qualification-${{ github.event.pull_request.number || github.ref }}",
+    "cancel-in-progress": true
+  },
+  "env": {
+    "COMMIT_SHA": "${{ github.sha }}",
+    "PR_HEAD_SHA": "${{ github.event.pull_request.head.sha }}",
+    "PR_BASE_SHA": "${{ github.event.pull_request.base.sha }}",
+    "PYTHONDONTWRITEBYTECODE": "1",
+    "GOTOOLCHAIN": "local"
+  },
+  "jobs": {
+    "native-guard": {
+      "name": "native-guard",
+      "runs-on": "ubuntu-24.04",
+      "timeout-minutes": 10,
+      "if": "${{ github.repository == 'Knowledge-Forge-AI/agentic-praxis-grimoire' && github.repository_id == 1306002537 }}",
+      "outputs": {
+        "source_commit": "${{ steps.guard.outputs.source_commit }}",
+        "source_tree": "${{ steps.guard.outputs.source_tree }}",
+        "receipt_id": "${{ steps.upload_receipt.outputs.artifact-id }}",
+        "receipt_digest": "sha256:${{ steps.upload_receipt.outputs.artifact-digest }}"
+      },
+      "steps": [
+        {
+          "name": "Check out exact merge candidate",
+          "uses": "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "with": {
+            "persist-credentials": false,
+            "fetch-depth": 0
+          }
+        },
+        {
+          "name": "Bind merge parents and clean source",
+          "run": "set -euo pipefail\npython3 tools/ci/native_lane.py guard --output \"$RUNNER_TEMP/guard-out\"\n",
+          "id": "guard",
+          "env": {
+            "ACTUAL_REPO": "${{ github.repository }}",
+            "ACTUAL_REPO_ID": "${{ github.repository_id }}",
+            "BASE_REF": "${{ github.base_ref }}",
+            "HEAD_REF": "${{ github.head_ref }}",
+            "HEAD_REPO": "${{ github.event.pull_request.head.repo.full_name }}"
+          }
+        },
+        {
+          "name": "Emit actual job receipt",
+          "run": "set -euo pipefail\nmkdir -p \"$RUNNER_TEMP/receipts\"\npython3 release/ci/matrix_receipts.py emit --workflow native-qualification --job native-guard --status \"$CI_JOB_STATUS\" --dir \"$RUNNER_TEMP/receipts\" --sha \"$COMMIT_SHA\" --artifact \"$RUNNER_TEMP/guard-out/identity.json\"\n",
+          "env": {
+            "CI_JOB_STATUS": "${{ job.status }}"
+          },
+          "if": "${{ always() }}"
+        },
+        {
+          "name": "Retain native-guard-receipt",
+          "uses": "actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f",
+          "with": {
+            "name": "native-guard-receipt",
+            "path": "${{ runner.temp }}/receipts",
+            "retention-days": 14,
+            "if-no-files-found": "error"
+          },
+          "id": "upload_receipt",
+          "if": "${{ always() }}"
+        }
+      ]
+    },
+    "native-darwin-arm64": {
+      "name": "native-darwin-arm64",
+      "runs-on": "macos-15",
+      "timeout-minutes": 120,
+      "if": "${{ needs.native-guard.result == 'success' && github.repository == 'Knowledge-Forge-AI/agentic-praxis-grimoire' && github.repository_id == 1306002537 && github.base_ref == 'main' && github.head_ref == 'staging' && github.event.pull_request.head.repo.full_name == github.repository }}",
+      "needs": [
+        "native-guard"
+      ],
+      "env": {
+        "SOURCE_COMMIT": "${{ needs.native-guard.outputs.source_commit }}",
+        "SOURCE_TREE": "${{ needs.native-guard.outputs.source_tree }}",
+        "PYTHONDONTWRITEBYTECODE": "1"
+      },
+      "steps": [
+        {
+          "name": "Check out exact merge candidate",
+          "uses": "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "with": {
+            "persist-credentials": false,
+            "fetch-depth": 0
+          }
+        },
+        {
+          "name": "Select Python for native helpers",
+          "uses": "actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97",
+          "with": {
+            "python-version": "3.13"
+          }
+        },
+        {
+          "name": "Select release compiler",
+          "uses": "actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e",
+          "with": {
+            "go-version": "1.26.9",
+            "cache": false
+          }
+        },
+        {
+          "name": "Install pinned Nix",
+          "uses": "cachix/install-nix-action@13d8dd58da0234aa297dedd986986ccb8e7f3e24",
+          "with": {
+            "install_url": "https://releases.nixos.org/nix/nix-2.35.2/install",
+            "extra_nix_config": "experimental-features = nix-command flakes",
+            "enable_kvm": false
+          }
+        },
+        {
+          "name": "Native Go and installed Nix qualification",
+          "run": "set -euo pipefail\npython3 tools/ci/native_lane.py qualify --lane native-darwin-arm64 --output \"$RUNNER_TEMP/lane-out\" --diagnostics \"$RUNNER_TEMP/lane-diagnostics\"\n",
+          "id": "qualify"
+        },
+        {
+          "name": "Retain native-darwin-arm64 failure diagnostics",
+          "if": "${{ failure() && steps.qualify.outcome == 'failure' }}",
+          "uses": "actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f",
+          "with": {
+            "name": "native-darwin-arm64-failure-diagnostics",
+            "path": "${{ runner.temp }}/lane-diagnostics",
+            "retention-days": 14,
+            "if-no-files-found": "error"
+          }
+        },
+        {
+          "name": "Retain native-darwin-arm64",
+          "uses": "actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f",
+          "with": {
+            "name": "native-darwin-arm64",
+            "path": "${{ runner.temp }}/lane-out",
+            "retention-days": 14,
+            "if-no-files-found": "error"
+          },
+          "id": "upload_lane"
+        },
+        {
+          "name": "Emit actual job receipt",
+          "run": "set -euo pipefail\nmkdir -p \"$RUNNER_TEMP/receipts\"\npython3 release/ci/matrix_receipts.py emit --workflow native-qualification --job native-darwin-arm64 --status \"$CI_JOB_STATUS\" --dir \"$RUNNER_TEMP/receipts\" --sha \"$COMMIT_SHA\" --artifact \"$RUNNER_TEMP/lane-out/darwin-arm64/lane-seal.json\"\n",
+          "env": {
+            "CI_JOB_STATUS": "${{ job.status }}"
+          },
+          "if": "${{ always() }}"
+        },
+        {
+          "name": "Retain native-darwin-arm64-receipt",
+          "uses": "actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f",
+          "with": {
+            "name": "native-darwin-arm64-receipt",
+            "path": "${{ runner.temp }}/receipts",
+            "retention-days": 14,
+            "if-no-files-found": "error"
+          },
+          "id": "upload_receipt",
+          "if": "${{ always() }}"
+        }
+      ],
+      "outputs": {
+        "receipt_id": "${{ steps.upload_receipt.outputs.artifact-id }}",
+        "receipt_digest": "sha256:${{ steps.upload_receipt.outputs.artifact-digest }}",
+        "seal_sha256": "${{ steps.qualify.outputs.seal_sha256 }}",
+        "artifact_id": "${{ steps.upload_lane.outputs.artifact-id }}",
+        "artifact_digest": "sha256:${{ steps.upload_lane.outputs.artifact-digest }}"
+      }
+    },
+    "native-linux-x64": {
+      "name": "native-linux-x64",
+      "runs-on": "ubuntu-24.04",
+      "timeout-minutes": 120,
+      "if": "${{ needs.native-guard.result == 'success' && github.repository == 'Knowledge-Forge-AI/agentic-praxis-grimoire' && github.repository_id == 1306002537 && github.base_ref == 'main' && github.head_ref == 'staging' && github.event.pull_request.head.repo.full_name == github.repository }}",
+      "needs": [
+        "native-guard"
+      ],
+      "env": {
+        "SOURCE_COMMIT": "${{ needs.native-guard.outputs.source_commit }}",
+        "SOURCE_TREE": "${{ needs.native-guard.outputs.source_tree }}",
+        "PYTHONDONTWRITEBYTECODE": "1"
+      },
+      "steps": [
+        {
+          "name": "Check out exact merge candidate",
+          "uses": "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "with": {
+            "persist-credentials": false,
+            "fetch-depth": 0
+          }
+        },
+        {
+          "name": "Select Python for native helpers",
+          "uses": "actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97",
+          "with": {
+            "python-version": "3.13"
+          }
+        },
+        {
+          "name": "Select release compiler",
+          "uses": "actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e",
+          "with": {
+            "go-version": "1.26.9",
+            "cache": false
+          }
+        },
+        {
+          "name": "Install pinned Nix",
+          "uses": "cachix/install-nix-action@13d8dd58da0234aa297dedd986986ccb8e7f3e24",
+          "with": {
+            "install_url": "https://releases.nixos.org/nix/nix-2.35.2/install",
+            "extra_nix_config": "experimental-features = nix-command flakes",
+            "enable_kvm": false
+          }
+        },
+        {
+          "name": "Native Go and installed Nix qualification",
+          "run": "set -euo pipefail\npython3 tools/ci/native_lane.py qualify --lane native-linux-x64 --output \"$RUNNER_TEMP/lane-out\" --diagnostics \"$RUNNER_TEMP/lane-diagnostics\"\n",
+          "id": "qualify"
+        },
+        {
+          "name": "Retain native-linux-x64 failure diagnostics",
+          "if": "${{ failure() && steps.qualify.outcome == 'failure' }}",
+          "uses": "actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f",
+          "with": {
+            "name": "native-linux-x64-failure-diagnostics",
+            "path": "${{ runner.temp }}/lane-diagnostics",
+            "retention-days": 14,
+            "if-no-files-found": "error"
+          }
+        },
+        {
+          "name": "Retain native-linux-x64",
+          "uses": "actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f",
+          "with": {
+            "name": "native-linux-x64",
+            "path": "${{ runner.temp }}/lane-out",
+            "retention-days": 14,
+            "if-no-files-found": "error"
+          },
+          "id": "upload_lane"
+        },
+        {
+          "name": "Emit actual job receipt",
+          "run": "set -euo pipefail\nmkdir -p \"$RUNNER_TEMP/receipts\"\npython3 release/ci/matrix_receipts.py emit --workflow native-qualification --job native-linux-x64 --status \"$CI_JOB_STATUS\" --dir \"$RUNNER_TEMP/receipts\" --sha \"$COMMIT_SHA\" --artifact \"$RUNNER_TEMP/lane-out/linux-x64/lane-seal.json\"\n",
+          "env": {
+            "CI_JOB_STATUS": "${{ job.status }}"
+          },
+          "if": "${{ always() }}"
+        },
+        {
+          "name": "Retain native-linux-x64-receipt",
+          "uses": "actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f",
+          "with": {
+            "name": "native-linux-x64-receipt",
+            "path": "${{ runner.temp }}/receipts",
+            "retention-days": 14,
+            "if-no-files-found": "error"
+          },
+          "id": "upload_receipt",
+          "if": "${{ always() }}"
+        }
+      ],
+      "outputs": {
+        "receipt_id": "${{ steps.upload_receipt.outputs.artifact-id }}",
+        "receipt_digest": "sha256:${{ steps.upload_receipt.outputs.artifact-digest }}",
+        "seal_sha256": "${{ steps.qualify.outputs.seal_sha256 }}",
+        "artifact_id": "${{ steps.upload_lane.outputs.artifact-id }}",
+        "artifact_digest": "sha256:${{ steps.upload_lane.outputs.artifact-digest }}"
+      }
+    },
+    "native-linux-arm64": {
+      "name": "native-linux-arm64",
+      "runs-on": "ubuntu-24.04-arm",
+      "timeout-minutes": 120,
+      "if": "${{ needs.native-guard.result == 'success' && github.repository == 'Knowledge-Forge-AI/agentic-praxis-grimoire' && github.repository_id == 1306002537 && github.base_ref == 'main' && github.head_ref == 'staging' && github.event.pull_request.head.repo.full_name == github.repository }}",
+      "needs": [
+        "native-guard"
+      ],
+      "env": {
+        "SOURCE_COMMIT": "${{ needs.native-guard.outputs.source_commit }}",
+        "SOURCE_TREE": "${{ needs.native-guard.outputs.source_tree }}",
+        "PYTHONDONTWRITEBYTECODE": "1"
+      },
+      "steps": [
+        {
+          "name": "Check out exact merge candidate",
+          "uses": "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "with": {
+            "persist-credentials": false,
+            "fetch-depth": 0
+          }
+        },
+        {
+          "name": "Select Python for native helpers",
+          "uses": "actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97",
+          "with": {
+            "python-version": "3.13"
+          }
+        },
+        {
+          "name": "Select release compiler",
+          "uses": "actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e",
+          "with": {
+            "go-version": "1.26.9",
+            "cache": false
+          }
+        },
+        {
+          "name": "Install pinned Nix",
+          "uses": "cachix/install-nix-action@13d8dd58da0234aa297dedd986986ccb8e7f3e24",
+          "with": {
+            "install_url": "https://releases.nixos.org/nix/nix-2.35.2/install",
+            "extra_nix_config": "experimental-features = nix-command flakes",
+            "enable_kvm": false
+          }
+        },
+        {
+          "name": "Native Go and installed Nix qualification",
+          "run": "set -euo pipefail\npython3 tools/ci/native_lane.py qualify --lane native-linux-arm64 --output \"$RUNNER_TEMP/lane-out\" --diagnostics \"$RUNNER_TEMP/lane-diagnostics\"\n",
+          "id": "qualify"
+        },
+        {
+          "name": "Retain native-linux-arm64 failure diagnostics",
+          "if": "${{ failure() && steps.qualify.outcome == 'failure' }}",
+          "uses": "actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f",
+          "with": {
+            "name": "native-linux-arm64-failure-diagnostics",
+            "path": "${{ runner.temp }}/lane-diagnostics",
+            "retention-days": 14,
+            "if-no-files-found": "error"
+          }
+        },
+        {
+          "name": "Retain native-linux-arm64",
+          "uses": "actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f",
+          "with": {
+            "name": "native-linux-arm64",
+            "path": "${{ runner.temp }}/lane-out",
+            "retention-days": 14,
+            "if-no-files-found": "error"
+          },
+          "id": "upload_lane"
+        },
+        {
+          "name": "Emit actual job receipt",
+          "run": "set -euo pipefail\nmkdir -p \"$RUNNER_TEMP/receipts\"\npython3 release/ci/matrix_receipts.py emit --workflow native-qualification --job native-linux-arm64 --status \"$CI_JOB_STATUS\" --dir \"$RUNNER_TEMP/receipts\" --sha \"$COMMIT_SHA\" --artifact \"$RUNNER_TEMP/lane-out/linux-arm64/lane-seal.json\"\n",
+          "env": {
+            "CI_JOB_STATUS": "${{ job.status }}"
+          },
+          "if": "${{ always() }}"
+        },
+        {
+          "name": "Retain native-linux-arm64-receipt",
+          "uses": "actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f",
+          "with": {
+            "name": "native-linux-arm64-receipt",
+            "path": "${{ runner.temp }}/receipts",
+            "retention-days": 14,
+            "if-no-files-found": "error"
+          },
+          "id": "upload_receipt",
+          "if": "${{ always() }}"
+        }
+      ],
+      "outputs": {
+        "receipt_id": "${{ steps.upload_receipt.outputs.artifact-id }}",
+        "receipt_digest": "sha256:${{ steps.upload_receipt.outputs.artifact-digest }}",
+        "seal_sha256": "${{ steps.qualify.outputs.seal_sha256 }}",
+        "artifact_id": "${{ steps.upload_lane.outputs.artifact-id }}",
+        "artifact_digest": "sha256:${{ steps.upload_lane.outputs.artifact-digest }}"
+      }
+    },
+    "native-assemble": {
+      "name": "native-assemble",
+      "runs-on": "ubuntu-24.04",
+      "timeout-minutes": 30,
+      "if": "${{ needs.native-guard.result == 'success' && github.repository == 'Knowledge-Forge-AI/agentic-praxis-grimoire' && github.repository_id == 1306002537 && github.base_ref == 'main' && github.head_ref == 'staging' && github.event.pull_request.head.repo.full_name == github.repository }}",
+      "needs": [
+        "native-guard",
+        "native-darwin-arm64",
+        "native-linux-x64",
+        "native-linux-arm64"
+      ],
+      "env": {
+        "SOURCE_COMMIT": "${{ needs.native-guard.outputs.source_commit }}",
+        "SOURCE_TREE": "${{ needs.native-guard.outputs.source_tree }}",
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "GITHUB_TOKEN": "${{ github.token }}"
+      },
+      "steps": [
+        {
+          "name": "Check out exact merge candidate",
+          "uses": "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "with": {
+            "persist-credentials": false,
+            "fetch-depth": 0
+          }
+        },
+        {
+          "name": "Select Python",
+          "uses": "actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97",
+          "with": {
+            "python-version": "3.13"
+          }
+        },
+        {
+          "name": "Download immutable artifacts",
+          "uses": "actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093",
+          "with": {
+            "artifact-ids": "${{ needs.native-darwin-arm64.outputs.artifact_id }},${{ needs.native-linux-x64.outputs.artifact_id }},${{ needs.native-linux-arm64.outputs.artifact_id }}",
+            "path": "${{ runner.temp }}/native-lanes",
+            "merge-multiple": false
+          }
+        },
+        {
+          "name": "Assemble canonical release bytes without compilation",
+          "run": "set -euo pipefail\nmkdir -p \"$RUNNER_TEMP/no-go\"\nprintf '#!/bin/sh\\necho \"Go invocation forbidden\" >&2\\nexit 1\\n' > \"$RUNNER_TEMP/no-go/go\"\nchmod +x \"$RUNNER_TEMP/no-go/go\"\nexport PATH=\"$RUNNER_TEMP/no-go:$PATH\"\npython3 tools/ci/native_release_assembly.py assemble --lanes \"$RUNNER_TEMP/native-lanes\" --output \"$RUNNER_TEMP/deliverables\"\n",
+          "id": "assemble",
+          "env": {
+            "NATIVE_INPUTS_JSON": "{\"native-darwin-arm64\":{\"seal_sha256\":\"${{ needs.native-darwin-arm64.outputs.seal_sha256 }}\",\"artifact_id\":\"${{ needs.native-darwin-arm64.outputs.artifact_id }}\",\"artifact_digest\":\"${{ needs.native-darwin-arm64.outputs.artifact_digest }}\"},\"native-linux-x64\":{\"seal_sha256\":\"${{ needs.native-linux-x64.outputs.seal_sha256 }}\",\"artifact_id\":\"${{ needs.native-linux-x64.outputs.artifact_id }}\",\"artifact_digest\":\"${{ needs.native-linux-x64.outputs.artifact_digest }}\"},\"native-linux-arm64\":{\"seal_sha256\":\"${{ needs.native-linux-arm64.outputs.seal_sha256 }}\",\"artifact_id\":\"${{ needs.native-linux-arm64.outputs.artifact_id }}\",\"artifact_digest\":\"${{ needs.native-linux-arm64.outputs.artifact_digest }}\"}}"
+          }
+        },
+        {
+          "name": "Check public source projection",
+          "run": "set -euo pipefail\npython3 libexec/apg_public_release.py manifest --source \"$GITHUB_WORKSPACE\" --version 0.13.0 --format json > \"$RUNNER_TEMP/public-projection-manifest.json\"\n"
+        },
+        {
+          "name": "Retain native-release-candidate-bundle",
+          "uses": "actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f",
+          "with": {
+            "name": "native-release-candidate-bundle",
+            "path": "${{ runner.temp }}/deliverables",
+            "retention-days": 14,
+            "if-no-files-found": "error"
+          },
+          "id": "upload_bundle"
+        },
+        {
+          "name": "Emit actual job receipt",
+          "run": "set -euo pipefail\nmkdir -p \"$RUNNER_TEMP/receipts\"\npython3 release/ci/matrix_receipts.py emit --workflow native-qualification --job native-assemble --status \"$CI_JOB_STATUS\" --dir \"$RUNNER_TEMP/receipts\" --sha \"$COMMIT_SHA\" --artifact \"$RUNNER_TEMP/deliverables/release-bundle-seal.json\" --artifact \"$RUNNER_TEMP/public-projection-manifest.json\"\n",
+          "env": {
+            "CI_JOB_STATUS": "${{ job.status }}"
+          },
+          "if": "${{ always() }}"
+        },
+        {
+          "name": "Retain native-assemble-receipt",
+          "uses": "actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f",
+          "with": {
+            "name": "native-assemble-receipt",
+            "path": "${{ runner.temp }}/receipts",
+            "retention-days": 14,
+            "if-no-files-found": "error"
+          },
+          "id": "upload_receipt",
+          "if": "${{ always() }}"
+        }
+      ],
+      "outputs": {
+        "receipt_id": "${{ steps.upload_receipt.outputs.artifact-id }}",
+        "receipt_digest": "sha256:${{ steps.upload_receipt.outputs.artifact-digest }}",
+        "bundle_seal_sha256": "${{ steps.assemble.outputs.bundle_seal_sha256 }}",
+        "artifact_id": "${{ steps.upload_bundle.outputs.artifact-id }}",
+        "artifact_digest": "sha256:${{ steps.upload_bundle.outputs.artifact-digest }}"
+      },
+      "permissions": {
+        "contents": "read",
+        "actions": "read"
+      }
+    },
+    "native-consumer-darwin-arm64": {
+      "name": "native-consumer-darwin-arm64",
+      "runs-on": "macos-15",
+      "timeout-minutes": 30,
+      "if": "${{ needs.native-guard.result == 'success' && github.repository == 'Knowledge-Forge-AI/agentic-praxis-grimoire' && github.repository_id == 1306002537 && github.base_ref == 'main' && github.head_ref == 'staging' && github.event.pull_request.head.repo.full_name == github.repository }}",
+      "needs": [
+        "native-guard",
+        "native-assemble"
+      ],
+      "env": {
+        "SOURCE_COMMIT": "${{ needs.native-guard.outputs.source_commit }}",
+        "SOURCE_TREE": "${{ needs.native-guard.outputs.source_tree }}",
+        "PYTHONDONTWRITEBYTECODE": "1"
+      },
+      "steps": [
+        {
+          "name": "Check out exact merge candidate",
+          "uses": "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "with": {
+            "persist-credentials": false,
+            "fetch-depth": 0
+          }
+        },
+        {
+          "name": "Select Python",
+          "uses": "actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97",
+          "with": {
+            "python-version": "3.13"
+          }
+        },
+        {
+          "name": "Select Node",
+          "uses": "actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38",
+          "with": {
+            "node-version": "22.22.2"
+          }
+        },
+        {
+          "name": "Download immutable artifacts",
+          "uses": "actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093",
+          "with": {
+            "artifact-ids": "${{ needs.native-assemble.outputs.artifact_id }}",
+            "path": "${{ runner.temp }}/bundle-download",
+            "merge-multiple": false
+          }
+        },
+        {
+          "name": "Verify immutable bundle before packaged execution",
+          "env": {
+            "GITHUB_TOKEN": "${{ github.token }}",
+            "NATIVE_BUNDLE_JSON": "{\"artifact_id\":\"${{ needs.native-assemble.outputs.artifact_id }}\",\"artifact_digest\":\"${{ needs.native-assemble.outputs.artifact_digest }}\",\"seal_sha256\":\"${{ needs.native-assemble.outputs.bundle_seal_sha256 }}\"}"
+          },
+          "run": "set -euo pipefail\n# Pinned download-artifact v4 uses <path>/<artifact-name>/ for ID downloads, even one ID.\npython3 tools/ci/native_release_assembly.py verify-bundle --bundle \"$RUNNER_TEMP/bundle-download/native-release-candidate-bundle\" --scratch \"$RUNNER_TEMP\"\n"
+        },
+        {
+          "name": "Install and smoke already packaged bytes",
+          "run": "set -euo pipefail\nmkdir -p \"$RUNNER_TEMP/no-go\"\nprintf '#!/bin/sh\\necho \"Go invocation forbidden\" >&2\\nexit 1\\n' > \"$RUNNER_TEMP/no-go/go\"\nchmod +x \"$RUNNER_TEMP/no-go/go\"\nexport PATH=\"$RUNNER_TEMP/no-go:$PATH\"\npython3 tools/ci/native_lane.py consumer --lane native-darwin-arm64 --bundle \"$RUNNER_TEMP/bundle-download/native-release-candidate-bundle\" --output \"$RUNNER_TEMP/consumer-out\"\n",
+          "env": {
+            "NATIVE_BUNDLE_JSON": "{\"artifact_id\":\"${{ needs.native-assemble.outputs.artifact_id }}\",\"artifact_digest\":\"${{ needs.native-assemble.outputs.artifact_digest }}\",\"seal_sha256\":\"${{ needs.native-assemble.outputs.bundle_seal_sha256 }}\"}"
+          }
+        },
+        {
+          "name": "Emit actual job receipt",
+          "run": "set -euo pipefail\nmkdir -p \"$RUNNER_TEMP/receipts\"\npython3 release/ci/matrix_receipts.py emit --workflow native-qualification --job native-consumer-darwin-arm64 --status \"$CI_JOB_STATUS\" --dir \"$RUNNER_TEMP/receipts\" --sha \"$COMMIT_SHA\" --artifact \"$RUNNER_TEMP/consumer-out/consumer-receipt.json\"\n",
+          "env": {
+            "CI_JOB_STATUS": "${{ job.status }}"
+          },
+          "if": "${{ always() }}"
+        },
+        {
+          "name": "Retain native-consumer-darwin-arm64-receipt",
+          "uses": "actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f",
+          "with": {
+            "name": "native-consumer-darwin-arm64-receipt",
+            "path": "${{ runner.temp }}/receipts",
+            "retention-days": 14,
+            "if-no-files-found": "error"
+          },
+          "id": "upload_receipt",
+          "if": "${{ always() }}"
+        }
+      ],
+      "outputs": {
+        "receipt_id": "${{ steps.upload_receipt.outputs.artifact-id }}",
+        "receipt_digest": "sha256:${{ steps.upload_receipt.outputs.artifact-digest }}"
+      },
+      "permissions": {
+        "contents": "read",
+        "actions": "read"
+      }
+    },
+    "native-consumer-linux-x64": {
+      "name": "native-consumer-linux-x64",
+      "runs-on": "ubuntu-24.04",
+      "timeout-minutes": 30,
+      "if": "${{ needs.native-guard.result == 'success' && github.repository == 'Knowledge-Forge-AI/agentic-praxis-grimoire' && github.repository_id == 1306002537 && github.base_ref == 'main' && github.head_ref == 'staging' && github.event.pull_request.head.repo.full_name == github.repository }}",
+      "needs": [
+        "native-guard",
+        "native-assemble"
+      ],
+      "env": {
+        "SOURCE_COMMIT": "${{ needs.native-guard.outputs.source_commit }}",
+        "SOURCE_TREE": "${{ needs.native-guard.outputs.source_tree }}",
+        "PYTHONDONTWRITEBYTECODE": "1"
+      },
+      "steps": [
+        {
+          "name": "Check out exact merge candidate",
+          "uses": "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "with": {
+            "persist-credentials": false,
+            "fetch-depth": 0
+          }
+        },
+        {
+          "name": "Select Python",
+          "uses": "actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97",
+          "with": {
+            "python-version": "3.13"
+          }
+        },
+        {
+          "name": "Select Node",
+          "uses": "actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38",
+          "with": {
+            "node-version": "22.22.2"
+          }
+        },
+        {
+          "name": "Download immutable artifacts",
+          "uses": "actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093",
+          "with": {
+            "artifact-ids": "${{ needs.native-assemble.outputs.artifact_id }}",
+            "path": "${{ runner.temp }}/bundle-download",
+            "merge-multiple": false
+          }
+        },
+        {
+          "name": "Verify immutable bundle before packaged execution",
+          "env": {
+            "GITHUB_TOKEN": "${{ github.token }}",
+            "NATIVE_BUNDLE_JSON": "{\"artifact_id\":\"${{ needs.native-assemble.outputs.artifact_id }}\",\"artifact_digest\":\"${{ needs.native-assemble.outputs.artifact_digest }}\",\"seal_sha256\":\"${{ needs.native-assemble.outputs.bundle_seal_sha256 }}\"}"
+          },
+          "run": "set -euo pipefail\n# Pinned download-artifact v4 uses <path>/<artifact-name>/ for ID downloads, even one ID.\npython3 tools/ci/native_release_assembly.py verify-bundle --bundle \"$RUNNER_TEMP/bundle-download/native-release-candidate-bundle\" --scratch \"$RUNNER_TEMP\"\n"
+        },
+        {
+          "name": "Install and smoke already packaged bytes",
+          "run": "set -euo pipefail\nmkdir -p \"$RUNNER_TEMP/no-go\"\nprintf '#!/bin/sh\\necho \"Go invocation forbidden\" >&2\\nexit 1\\n' > \"$RUNNER_TEMP/no-go/go\"\nchmod +x \"$RUNNER_TEMP/no-go/go\"\nexport PATH=\"$RUNNER_TEMP/no-go:$PATH\"\npython3 tools/ci/native_lane.py consumer --lane native-linux-x64 --bundle \"$RUNNER_TEMP/bundle-download/native-release-candidate-bundle\" --output \"$RUNNER_TEMP/consumer-out\"\n",
+          "env": {
+            "NATIVE_BUNDLE_JSON": "{\"artifact_id\":\"${{ needs.native-assemble.outputs.artifact_id }}\",\"artifact_digest\":\"${{ needs.native-assemble.outputs.artifact_digest }}\",\"seal_sha256\":\"${{ needs.native-assemble.outputs.bundle_seal_sha256 }}\"}"
+          }
+        },
+        {
+          "name": "Emit actual job receipt",
+          "run": "set -euo pipefail\nmkdir -p \"$RUNNER_TEMP/receipts\"\npython3 release/ci/matrix_receipts.py emit --workflow native-qualification --job native-consumer-linux-x64 --status \"$CI_JOB_STATUS\" --dir \"$RUNNER_TEMP/receipts\" --sha \"$COMMIT_SHA\" --artifact \"$RUNNER_TEMP/consumer-out/consumer-receipt.json\"\n",
+          "env": {
+            "CI_JOB_STATUS": "${{ job.status }}"
+          },
+          "if": "${{ always() }}"
+        },
+        {
+          "name": "Retain native-consumer-linux-x64-receipt",
+          "uses": "actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f",
+          "with": {
+            "name": "native-consumer-linux-x64-receipt",
+            "path": "${{ runner.temp }}/receipts",
+            "retention-days": 14,
+            "if-no-files-found": "error"
+          },
+          "id": "upload_receipt",
+          "if": "${{ always() }}"
+        }
+      ],
+      "outputs": {
+        "receipt_id": "${{ steps.upload_receipt.outputs.artifact-id }}",
+        "receipt_digest": "sha256:${{ steps.upload_receipt.outputs.artifact-digest }}"
+      },
+      "permissions": {
+        "contents": "read",
+        "actions": "read"
+      }
+    },
+    "native-consumer-linux-arm64": {
+      "name": "native-consumer-linux-arm64",
+      "runs-on": "ubuntu-24.04-arm",
+      "timeout-minutes": 30,
+      "if": "${{ needs.native-guard.result == 'success' && github.repository == 'Knowledge-Forge-AI/agentic-praxis-grimoire' && github.repository_id == 1306002537 && github.base_ref == 'main' && github.head_ref == 'staging' && github.event.pull_request.head.repo.full_name == github.repository }}",
+      "needs": [
+        "native-guard",
+        "native-assemble"
+      ],
+      "env": {
+        "SOURCE_COMMIT": "${{ needs.native-guard.outputs.source_commit }}",
+        "SOURCE_TREE": "${{ needs.native-guard.outputs.source_tree }}",
+        "PYTHONDONTWRITEBYTECODE": "1"
+      },
+      "steps": [
+        {
+          "name": "Check out exact merge candidate",
+          "uses": "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "with": {
+            "persist-credentials": false,
+            "fetch-depth": 0
+          }
+        },
+        {
+          "name": "Select Python",
+          "uses": "actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97",
+          "with": {
+            "python-version": "3.13"
+          }
+        },
+        {
+          "name": "Select Node",
+          "uses": "actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38",
+          "with": {
+            "node-version": "22.22.2"
+          }
+        },
+        {
+          "name": "Download immutable artifacts",
+          "uses": "actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093",
+          "with": {
+            "artifact-ids": "${{ needs.native-assemble.outputs.artifact_id }}",
+            "path": "${{ runner.temp }}/bundle-download",
+            "merge-multiple": false
+          }
+        },
+        {
+          "name": "Verify immutable bundle before packaged execution",
+          "env": {
+            "GITHUB_TOKEN": "${{ github.token }}",
+            "NATIVE_BUNDLE_JSON": "{\"artifact_id\":\"${{ needs.native-assemble.outputs.artifact_id }}\",\"artifact_digest\":\"${{ needs.native-assemble.outputs.artifact_digest }}\",\"seal_sha256\":\"${{ needs.native-assemble.outputs.bundle_seal_sha256 }}\"}"
+          },
+          "run": "set -euo pipefail\n# Pinned download-artifact v4 uses <path>/<artifact-name>/ for ID downloads, even one ID.\npython3 tools/ci/native_release_assembly.py verify-bundle --bundle \"$RUNNER_TEMP/bundle-download/native-release-candidate-bundle\" --scratch \"$RUNNER_TEMP\"\n"
+        },
+        {
+          "name": "Install and smoke already packaged bytes",
+          "run": "set -euo pipefail\nmkdir -p \"$RUNNER_TEMP/no-go\"\nprintf '#!/bin/sh\\necho \"Go invocation forbidden\" >&2\\nexit 1\\n' > \"$RUNNER_TEMP/no-go/go\"\nchmod +x \"$RUNNER_TEMP/no-go/go\"\nexport PATH=\"$RUNNER_TEMP/no-go:$PATH\"\npython3 tools/ci/native_lane.py consumer --lane native-linux-arm64 --bundle \"$RUNNER_TEMP/bundle-download/native-release-candidate-bundle\" --output \"$RUNNER_TEMP/consumer-out\"\n",
+          "env": {
+            "NATIVE_BUNDLE_JSON": "{\"artifact_id\":\"${{ needs.native-assemble.outputs.artifact_id }}\",\"artifact_digest\":\"${{ needs.native-assemble.outputs.artifact_digest }}\",\"seal_sha256\":\"${{ needs.native-assemble.outputs.bundle_seal_sha256 }}\"}"
+          }
+        },
+        {
+          "name": "Emit actual job receipt",
+          "run": "set -euo pipefail\nmkdir -p \"$RUNNER_TEMP/receipts\"\npython3 release/ci/matrix_receipts.py emit --workflow native-qualification --job native-consumer-linux-arm64 --status \"$CI_JOB_STATUS\" --dir \"$RUNNER_TEMP/receipts\" --sha \"$COMMIT_SHA\" --artifact \"$RUNNER_TEMP/consumer-out/consumer-receipt.json\"\n",
+          "env": {
+            "CI_JOB_STATUS": "${{ job.status }}"
+          },
+          "if": "${{ always() }}"
+        },
+        {
+          "name": "Retain native-consumer-linux-arm64-receipt",
+          "uses": "actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f",
+          "with": {
+            "name": "native-consumer-linux-arm64-receipt",
+            "path": "${{ runner.temp }}/receipts",
+            "retention-days": 14,
+            "if-no-files-found": "error"
+          },
+          "id": "upload_receipt",
+          "if": "${{ always() }}"
+        }
+      ],
+      "outputs": {
+        "receipt_id": "${{ steps.upload_receipt.outputs.artifact-id }}",
+        "receipt_digest": "sha256:${{ steps.upload_receipt.outputs.artifact-digest }}"
+      },
+      "permissions": {
+        "contents": "read",
+        "actions": "read"
+      }
+    },
+    "native-release-scans": {
+      "name": "native-release-scans",
+      "runs-on": "ubuntu-24.04",
+      "timeout-minutes": 90,
+      "if": "${{ needs.native-guard.result == 'success' && github.repository == 'Knowledge-Forge-AI/agentic-praxis-grimoire' && github.repository_id == 1306002537 && github.base_ref == 'main' && github.head_ref == 'staging' && github.event.pull_request.head.repo.full_name == github.repository }}",
+      "needs": [
+        "native-guard",
+        "native-assemble"
+      ],
+      "env": {
+        "SOURCE_COMMIT": "${{ needs.native-guard.outputs.source_commit }}",
+        "SOURCE_TREE": "${{ needs.native-guard.outputs.source_tree }}",
+        "PYTHONDONTWRITEBYTECODE": "1"
+      },
+      "steps": [
+        {
+          "name": "Check out exact merge candidate",
+          "uses": "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "with": {
+            "persist-credentials": false,
+            "fetch-depth": 0
+          }
+        },
+        {
+          "name": "Select Python",
+          "uses": "actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97",
+          "with": {
+            "python-version": "3.13"
+          }
+        },
+        {
+          "name": "Select compiler only for native sdist-derived scan view",
+          "uses": "actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e",
+          "with": {
+            "go-version": "1.26.9",
+            "cache": false
+          }
+        },
+        {
+          "name": "Download immutable artifacts",
+          "uses": "actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093",
+          "with": {
+            "artifact-ids": "${{ needs.native-assemble.outputs.artifact_id }}",
+            "path": "${{ runner.temp }}/bundle-download",
+            "merge-multiple": false
+          }
+        },
+        {
+          "name": "Verify immutable bundle before packaged execution",
+          "env": {
+            "GITHUB_TOKEN": "${{ github.token }}",
+            "NATIVE_BUNDLE_JSON": "{\"artifact_id\":\"${{ needs.native-assemble.outputs.artifact_id }}\",\"artifact_digest\":\"${{ needs.native-assemble.outputs.artifact_digest }}\",\"seal_sha256\":\"${{ needs.native-assemble.outputs.bundle_seal_sha256 }}\"}"
+          },
+          "run": "set -euo pipefail\n# Pinned download-artifact v4 uses <path>/<artifact-name>/ for ID downloads, even one ID.\npython3 tools/ci/native_release_assembly.py verify-bundle --bundle \"$RUNNER_TEMP/bundle-download/native-release-candidate-bundle\" --scratch \"$RUNNER_TEMP\"\n"
+        },
+        {
+          "name": "Bootstrap pinned scanners",
+          "run": "set -euo pipefail\nmkdir -p \"$RUNNER_TEMP/scanners\"\nfor tool in syft grype; do python3 tools/ci/bootstrap_tool.py --tool \"$tool\" --bin-dir \"$RUNNER_TEMP/scanners\"; done\n"
+        },
+        {
+          "name": "Scan exact source and eleven assets then bind fourteen views",
+          "run": "set -euo pipefail\npython3 tools/ci/native_release_assembly.py export-scan-input --bundle \"$RUNNER_TEMP/bundle-download/native-release-candidate-bundle\" --output \"$RUNNER_TEMP/scan-input\"\npython3 tools/ci/sbom_records.py scan --source \"$GITHUB_WORKSPACE\" --artifacts \"$RUNNER_TEMP/scan-input\" --output \"$RUNNER_TEMP/sbom-evidence\" --scanner-root \"$RUNNER_TEMP/scanners\"\npython3 tools/ci/native_release_assembly.py check-scan --bundle \"$RUNNER_TEMP/bundle-download/native-release-candidate-bundle\" --scans \"$RUNNER_TEMP/sbom-evidence\" --output \"$RUNNER_TEMP/scan-out\"\n",
+          "env": {
+            "NATIVE_BUNDLE_JSON": "{\"artifact_id\":\"${{ needs.native-assemble.outputs.artifact_id }}\",\"artifact_digest\":\"${{ needs.native-assemble.outputs.artifact_digest }}\",\"seal_sha256\":\"${{ needs.native-assemble.outputs.bundle_seal_sha256 }}\"}"
+          }
+        },
+        {
+          "name": "Retain native-scan-evidence",
+          "uses": "actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f",
+          "with": {
+            "name": "native-scan-evidence",
+            "path": "${{ runner.temp }}/sbom-evidence",
+            "retention-days": 14,
+            "if-no-files-found": "error"
+          },
+          "id": "upload_scans",
+          "if": "${{ always() }}"
+        },
+        {
+          "name": "Emit actual job receipt",
+          "run": "set -euo pipefail\nmkdir -p \"$RUNNER_TEMP/receipts\"\npython3 release/ci/matrix_receipts.py emit --workflow native-qualification --job native-release-scans --status \"$CI_JOB_STATUS\" --dir \"$RUNNER_TEMP/receipts\" --sha \"$COMMIT_SHA\" --artifact \"$RUNNER_TEMP/scan-out/scan-receipt.json\" --artifact \"$RUNNER_TEMP/sbom-evidence/scan-results.json\"\n",
+          "env": {
+            "CI_JOB_STATUS": "${{ job.status }}"
+          },
+          "if": "${{ always() }}"
+        },
+        {
+          "name": "Retain native-release-scans-receipt",
+          "uses": "actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f",
+          "with": {
+            "name": "native-release-scans-receipt",
+            "path": "${{ runner.temp }}/receipts",
+            "retention-days": 14,
+            "if-no-files-found": "error"
+          },
+          "id": "upload_receipt",
+          "if": "${{ always() }}"
+        }
+      ],
+      "outputs": {
+        "receipt_id": "${{ steps.upload_receipt.outputs.artifact-id }}",
+        "receipt_digest": "sha256:${{ steps.upload_receipt.outputs.artifact-digest }}",
+        "artifact_id": "${{ steps.upload_scans.outputs.artifact-id }}",
+        "artifact_digest": "sha256:${{ steps.upload_scans.outputs.artifact-digest }}"
+      },
+      "permissions": {
+        "contents": "read",
+        "actions": "read"
+      }
+    },
+    "native-release-candidate-gate": {
+      "name": "native-release-candidate-gate",
+      "runs-on": "ubuntu-24.04",
+      "needs": [
+        "native-guard",
+        "native-darwin-arm64",
+        "native-linux-x64",
+        "native-linux-arm64",
+        "native-assemble",
+        "native-consumer-darwin-arm64",
+        "native-consumer-linux-x64",
+        "native-consumer-linux-arm64",
+        "native-release-scans"
+      ],
+      "if": "${{ always() && github.repository == 'Knowledge-Forge-AI/agentic-praxis-grimoire' && github.repository_id == 1306002537 }}",
+      "permissions": {
+        "contents": "read",
+        "actions": "read"
+      },
+      "timeout-minutes": 20,
+      "env": {
+        "SOURCE_COMMIT": "${{ needs.native-guard.outputs.source_commit }}",
+        "SOURCE_TREE": "${{ needs.native-guard.outputs.source_tree }}",
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "MATRIX_NEEDS_RESULTS": "{\"native-guard\":\"${{ needs.native-guard.result }}\",\"native-darwin-arm64\":\"${{ needs.native-darwin-arm64.result }}\",\"native-linux-x64\":\"${{ needs.native-linux-x64.result }}\",\"native-linux-arm64\":\"${{ needs.native-linux-arm64.result }}\",\"native-assemble\":\"${{ needs.native-assemble.result }}\",\"native-consumer-darwin-arm64\":\"${{ needs.native-consumer-darwin-arm64.result }}\",\"native-consumer-linux-x64\":\"${{ needs.native-consumer-linux-x64.result }}\",\"native-consumer-linux-arm64\":\"${{ needs.native-consumer-linux-arm64.result }}\",\"native-release-scans\":\"${{ needs.native-release-scans.result }}\"}",
+        "NATIVE_INPUTS_JSON": "{\"native-darwin-arm64\":{\"seal_sha256\":\"${{ needs.native-darwin-arm64.outputs.seal_sha256 }}\",\"artifact_id\":\"${{ needs.native-darwin-arm64.outputs.artifact_id }}\",\"artifact_digest\":\"${{ needs.native-darwin-arm64.outputs.artifact_digest }}\"},\"native-linux-x64\":{\"seal_sha256\":\"${{ needs.native-linux-x64.outputs.seal_sha256 }}\",\"artifact_id\":\"${{ needs.native-linux-x64.outputs.artifact_id }}\",\"artifact_digest\":\"${{ needs.native-linux-x64.outputs.artifact_digest }}\"},\"native-linux-arm64\":{\"seal_sha256\":\"${{ needs.native-linux-arm64.outputs.seal_sha256 }}\",\"artifact_id\":\"${{ needs.native-linux-arm64.outputs.artifact_id }}\",\"artifact_digest\":\"${{ needs.native-linux-arm64.outputs.artifact_digest }}\"}}",
+        "NATIVE_BUNDLE_JSON": "{\"artifact_id\":\"${{ needs.native-assemble.outputs.artifact_id }}\",\"artifact_digest\":\"${{ needs.native-assemble.outputs.artifact_digest }}\",\"seal_sha256\":\"${{ needs.native-assemble.outputs.bundle_seal_sha256 }}\"}",
+        "GITHUB_TOKEN": "${{ github.token }}",
+        "NATIVE_RECEIPTS_JSON": "{\"native-guard\":{\"artifact_id\":\"${{ needs.native-guard.outputs.receipt_id }}\",\"artifact_digest\":\"${{ needs.native-guard.outputs.receipt_digest }}\"},\"native-darwin-arm64\":{\"artifact_id\":\"${{ needs.native-darwin-arm64.outputs.receipt_id }}\",\"artifact_digest\":\"${{ needs.native-darwin-arm64.outputs.receipt_digest }}\"},\"native-linux-x64\":{\"artifact_id\":\"${{ needs.native-linux-x64.outputs.receipt_id }}\",\"artifact_digest\":\"${{ needs.native-linux-x64.outputs.receipt_digest }}\"},\"native-linux-arm64\":{\"artifact_id\":\"${{ needs.native-linux-arm64.outputs.receipt_id }}\",\"artifact_digest\":\"${{ needs.native-linux-arm64.outputs.receipt_digest }}\"},\"native-assemble\":{\"artifact_id\":\"${{ needs.native-assemble.outputs.receipt_id }}\",\"artifact_digest\":\"${{ needs.native-assemble.outputs.receipt_digest }}\"},\"native-consumer-darwin-arm64\":{\"artifact_id\":\"${{ needs.native-consumer-darwin-arm64.outputs.receipt_id }}\",\"artifact_digest\":\"${{ needs.native-consumer-darwin-arm64.outputs.receipt_digest }}\"},\"native-consumer-linux-x64\":{\"artifact_id\":\"${{ needs.native-consumer-linux-x64.outputs.receipt_id }}\",\"artifact_digest\":\"${{ needs.native-consumer-linux-x64.outputs.receipt_digest }}\"},\"native-consumer-linux-arm64\":{\"artifact_id\":\"${{ needs.native-consumer-linux-arm64.outputs.receipt_id }}\",\"artifact_digest\":\"${{ needs.native-consumer-linux-arm64.outputs.receipt_digest }}\"},\"native-release-scans\":{\"artifact_id\":\"${{ needs.native-release-scans.outputs.receipt_id }}\",\"artifact_digest\":\"${{ needs.native-release-scans.outputs.receipt_digest }}\"}}",
+        "NATIVE_SCAN_JSON": "{\"artifact_id\":\"${{ needs.native-release-scans.outputs.artifact_id }}\",\"artifact_digest\":\"${{ needs.native-release-scans.outputs.artifact_digest }}\"}"
+      },
+      "steps": [
+        {
+          "name": "Check out exact merge candidate",
+          "uses": "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "with": {
+            "persist-credentials": false,
+            "fetch-depth": 0
+          }
+        },
+        {
+          "name": "Download immutable artifacts",
+          "uses": "actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093",
+          "with": {
+            "artifact-ids": "${{ needs.native-guard.outputs.receipt_id }},${{ needs.native-darwin-arm64.outputs.receipt_id }},${{ needs.native-linux-x64.outputs.receipt_id }},${{ needs.native-linux-arm64.outputs.receipt_id }},${{ needs.native-assemble.outputs.receipt_id }},${{ needs.native-consumer-darwin-arm64.outputs.receipt_id }},${{ needs.native-consumer-linux-x64.outputs.receipt_id }},${{ needs.native-consumer-linux-arm64.outputs.receipt_id }},${{ needs.native-release-scans.outputs.receipt_id }},${{ needs.native-darwin-arm64.outputs.artifact_id }},${{ needs.native-linux-x64.outputs.artifact_id }},${{ needs.native-linux-arm64.outputs.artifact_id }},${{ needs.native-assemble.outputs.artifact_id }},${{ needs.native-release-scans.outputs.artifact_id }}",
+            "path": "${{ runner.temp }}/native-evidence",
+            "merge-multiple": false
+          }
+        },
+        {
+          "name": "Require every job and bound receipt",
+          "run": "set -euo pipefail\npython3 release/ci/matrix_receipts.py verify --workflow native-qualification --dir \"$RUNNER_TEMP/native-evidence\" --sha \"$COMMIT_SHA\" --statuses-json \"$MATRIX_NEEDS_RESULTS\" > \"$RUNNER_TEMP/native-evidence/matrix-aggregate.json\"\npython3 tools/ci/native_gate.py --evidence \"$RUNNER_TEMP/native-evidence\" --output \"$RUNNER_TEMP/gate-out\"\n"
+        },
+        {
+          "name": "Retain native-release-candidate-gate-result",
+          "uses": "actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f",
+          "with": {
+            "name": "native-release-candidate-gate-result",
+            "path": "${{ runner.temp }}/gate-out/native-rc-index.json",
+            "retention-days": 14,
+            "if-no-files-found": "error"
+          },
+          "id": "upload_gate",
+          "if": "${{ always() }}"
+        }
+      ]
+    }
+  }
+}
