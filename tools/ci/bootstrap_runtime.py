@@ -38,7 +38,7 @@ EXPECTED_NPM_PACKAGES = {
     "typescript": "7.0.2",
     "npm": "12.0.2",
     "@playwright/test": "1.62.1",
-    "vite": "8.2.2",
+    "vite": "8.2.4",
     "rolldown": "1.2.7",
 }
 EXPECTED_BROWSERS = ("chromium", "firefox", "webkit")

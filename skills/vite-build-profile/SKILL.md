@@ -7,7 +7,7 @@ description: Use when a project selects Vite for dev serving or production build
 
 Lifecycle: `provisionally-integrated`.
 Lifecycle ADR: `Proposed`.
-Reference implementation: Vite 8.2.2; repository selection remains explicit.
+Reference implementation: Vite 8.2.4; repository selection remains explicit.
 
 ## Core principle
 
@@ -36,7 +36,7 @@ Tailwind/shadcn integration is consumer composition, not additional profile scop
 
 ### Toolchain clauses
 
-**VITE-01-IDENTITY.** The reference is Vite 8.2.2, whose Node engine is
+**VITE-01-IDENTITY.** The reference is Vite 8.2.4, whose Node engine is
 `^20.19.0 || >=22.12.0`; APG's fixture qualifies Node 22.22.2. Verify installed
 Vite, resolved Rolldown and platform-native optional bindings from the lock and
 package manifests. A newer docs page or a transitive test dependency is not

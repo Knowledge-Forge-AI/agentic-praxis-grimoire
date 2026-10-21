@@ -1,4 +1,17 @@
 {
   "schema": "apg-dependency-exceptions-v1",
-  "exceptions": []
+  "exceptions": [
+    {
+      "package": "mcp",
+      "version": "1.29.0",
+      "scope": "ci-tools",
+      "advisories": [
+        "CVE-2026-59951",
+        "GHSA-84m7-p3x7-pcfv"
+      ],
+      "expiry": "2026-10-28",
+      "review": "release/v0.13.1-notes.md#ci-tool-dependency-review",
+      "trigger": "Remove at the first compatible Semgrep release accepting a patched MCP version, any MCP HTTP-server use, or expiry on 2026-10-28, whichever occurs first; do not renew automatically."
+    }
+  ]
 }

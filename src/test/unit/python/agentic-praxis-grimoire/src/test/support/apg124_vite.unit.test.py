@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Unit tests for APG124 Vite 8.2.2 support module (apg124_vite.py).
+"""Unit tests for APG124 Vite 8.2.4 support module (apg124_vite.py).
 
 Validates fail-closed refusal contracts for Node identity, Vite/Rolldown package root,
 scratch ownership boundaries, scenario register schema, and evaluation receipt completeness.
@@ -47,11 +47,11 @@ def test_constants_and_scenario_registers() -> None:
         "VITE01", "VITE02", "VITE03", "VITE04", "VITE05", "VITE06",
         "VITE07", "VITE08", "VITE09", "VITE10", "VITE11", "VITE12"
     )
-    assert EXPECTED_VITE_VERSION == "8.2.2"
+    assert EXPECTED_VITE_VERSION == "8.2.4"
     assert EXPECTED_ROLLDOWN_VERSION == "1.2.7"
     assert EXPECTED_NODE_VERSION == "v22.22.2|darwin/arm64|12.4.254.21-node.39|1.51.0"
     assert EXPECTED_NODE_SHA256 == "b7fff29202c2d59eeff28c53588d2832323b45cb2e854ba29bea47ade37d8359"
-    assert "Vite 8.2.2 toolchain scenarios" in VITE_TOOLCHAIN_DISCLAIMER
+    assert "Vite 8.2.4 toolchain scenarios" in VITE_TOOLCHAIN_DISCLAIMER
 
 
 def test_load_scenarios_register_fixture() -> None:
@@ -382,7 +382,7 @@ def test_validate_receipt_contracts() -> None:
         }, expected_scenarios=["VITE01"], fixtures_dir=FIXTURES_DIR)
     clean_raw = {
         "schema_version": "1.0.0",
-        "toolchain": {"vite_version": "8.2.2", "node_version": "v22.22.2", "node_identity": EXPECTED_NODE_VERSION},
+        "toolchain": {"vite_version": "8.2.4", "node_version": "v22.22.2", "node_identity": EXPECTED_NODE_VERSION},
         "summary": {"total": 1, "passed": 1, "failed": 0, "skipped": 0},
         "scenarios": [
             {
@@ -490,7 +490,7 @@ def test_vite_fixture_manifest_aligns_with_lock_root():
     assert manifest['dependencies'] == {'vite': EXPECTED_VITE_VERSION}
     assert manifest['scripts'] == {'test': 'node runner.mjs'}
     assert manifest['private'] is True and manifest['type'] == 'module'
-    assert manifest['description'] == 'Maintained Vite 8.2.2 test fixture for APG124'
+    assert manifest['description'] == 'Maintained Vite 8.2.4 test fixture for APG124'
     # The immutable lock's stale npm-init license is not fixture license authority.
     assert 'license' not in manifest
     assert lock['packages']['']['license'] == 'ISC'

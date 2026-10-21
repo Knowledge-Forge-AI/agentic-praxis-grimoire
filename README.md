@@ -13,9 +13,10 @@ without dictating an orchestration workflow.
 
 This documentation covers the **unreleased v0.13.1 candidate**, a patch release
 whose predecessor is v0.13.0 and which remains an early pilot. It carries the
-same 46 canonical skills, independently usable single-phase dispatcher, optional
-RTK integration, and first-party Nix flake as v0.13.0, with no feature or skill
-change. Static context remains the shipped default; adaptive
+same 46 canonical skills, the independently usable single-phase dispatcher
+shipped with APGR, optional RTK integration, and first-party Nix flake as
+v0.13.0, with patch packaging and Vite fixture/profile corrections. Static
+context remains the shipped default; adaptive
 selected-skill and instruction projection are experimental and opt-in, and no
 token or context-window saving is claimed. v0.13.0 was published: its GitHub
 Release carries its assets, which stay frozen, and PyPI lists its two Linux

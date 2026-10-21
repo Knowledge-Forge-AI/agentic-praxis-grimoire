@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0.0",
-  "disclaimer": "Maintained executable Vite 8.2.2 toolchain scenarios; evidence verifies local build, serving, and configuration contracts without third-party framework or deployment claims.",
+  "disclaimer": "Maintained executable Vite 8.2.4 toolchain scenarios; evidence verifies local build, serving, and configuration contracts without third-party framework or deployment claims.",
   "toolchain": {
-    "vite_version": "8.2.2",
+    "vite_version": "8.2.4",
     "rolldown_version": "1.2.7",
     "node_version": "v22.22.2|darwin/arm64|12.4.254.21-node.39|1.51.0",
     "node_sha256": "b7fff29202c2d59eeff28c53588d2832323b45cb2e854ba29bea47ade37d8359"

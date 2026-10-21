@@ -1522,7 +1522,7 @@
       "qualified_id": "apgr:vite-build-profile",
       "body_bytes": 10845,
       "body_characters": 10843,
-      "body_sha256": "c455c78206ef7dd759379d3889d9d55e888ea3700a55dfcb9b48e036e7c91482",
+      "body_sha256": "c09181f32e1bea94fddd998210f843f3573ef5bdffcb575588cc7d6b6b8759e3",
       "canonical_path": "vite-build-profile/SKILL.md",
       "description": "Use when a project selects Vite for dev serving or production building and decisions depend on root, base, publicDir, mode, env prefixes, loopback fs limits, Rolldown bundling, alias/CSS/plugin hooks, SSR seams, or preview.",
       "description_bytes": 223,
@@ -1531,7 +1531,7 @@
       "lines": 174,
       "body_only_bytes": 10575,
       "body_only_characters": 10573,
-      "body_only_sha256": "4f65c67061cc1d35300f6e232a59f8fc848026b540fb612f7129645d2b15c222",
+      "body_only_sha256": "8f7133a1a6f928580b215bed2610a282e43a171942d2ae0fcf1c119d1592933e",
       "description_sha256": "0ca97549bde8578f5fe92bc0894ba8df65bb95f53b032676ea484ce2c13ea6a6",
       "tokens": null,
       "do_not_use": "Do not select or install Vite merely to apply this profile. TypeScript checking,\nJavaScript semantics, React/JSX, Astro/MDX, Node process behavior, browser DOM,\naccessibility standards and Playwright automation retain their respective owners.\nTailwind/shadcn integration is consumer composition, not additional profile scope.",
@@ -1545,7 +1545,7 @@
       "selection_facts": [],
       "required_dependencies": [],
       "support_files": [],
-      "content_identity": "f08268504d3b5121da1cce8665ef7d99df42c000b8bc13679a467812a1c9fed0"
+      "content_identity": "92e4e639348fc859ac840afad297617e99262db9ff1ea6a8529b365bedebde5b"
     },
     {
       "schema_version": "apg.skill-descriptor/v1",

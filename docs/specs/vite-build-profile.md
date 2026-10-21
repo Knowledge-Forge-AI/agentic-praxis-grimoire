@@ -3,22 +3,26 @@
 Lifecycle: `provisionally-integrated`.
 Lifecycle ADR: `Proposed`.
 
-APG124 admits this provisional build and dev server toolchain owner for the
-consumer-selected exact `vite` 8.2.2 package. The task does not authorize an upgrade.
+APG124 originally admitted this provisional build and dev server toolchain owner
+for exact `vite` 8.2.2. The maintained fixture now selects exact `vite` 8.2.4
+within the same package family; executable qualification remains version-specific.
 This is original guidance, not copied upstream prose or consumer artwork.
 
 ## Sources and compatibility
 
 Primary documentation inspected 2026-09-09 is mutable. The
-[Vite documentation](https://vite.dev/guide/) and the installed 8.2.2 package
-declarations bound feature eligibility. The Vite 8 series integrates the
+[Vite documentation](https://vite.dev/guide/) and the originally installed 8.2.2
+package declarations bounded initial feature eligibility. Official
+[Vite 8.2.4 registry metadata](https://registry.npmjs.org/vite/8.2.4), inspected
+2026-10-21, preserves the declared dependency and engine contracts; it does not
+replace actual fixture qualification of the selected revision. The Vite 8 series integrates the
 [Rolldown](https://rolldown.rs/) bundler for optimized production compilation while
 maintaining native ESM serving during development. Node.js ^20.19.0 || >=22.12.0 is required;
 APG124 uses the qualified Node v22.22.2 runtime.
 
 | Clauses | Primary source | Evidence boundary |
 | --- | --- | --- |
-| VITE-01 | [Releases](https://github.com/vitejs/vite/releases), installed package | Package revision 8.2.2 and Rolldown native bindings control |
+| VITE-01 | [Releases](https://github.com/vitejs/vite/releases), installed package | Package revision 8.2.4 and Rolldown native bindings control |
 | VITE-02 | [Config](https://vite.dev/config/), CLI options | Resolved config root, base, and publicDir control discovery |
 | VITE-03 | [Env and Modes](https://vite.dev/guide/env-and-mode) | Default `VITE_` user-variable exposure plus built-ins; inspect custom prefixes/replacements |
 | VITE-04 | [Server Options](https://vite.dev/config/server-options#server-fs-strict) | Loopback serving; strict fs allow/deny blocks traversal |
@@ -73,7 +77,7 @@ remote deployment providers; those remain consumer project evidence.
 The pytest test suite features a fail-closed Vite prerequisite contract mirroring
 `apg_playwright_runtime.py`. It requires explicit environment variables:
 - `APG_VITE_OWNED_SCRATCH_ROOT`: external caller-owned direct directory, mode 0700.
-- `APG_VITE_PACKAGE_ROOT`: location of acquired Vite 8.2.2 within owned scratch.
+- `APG_VITE_PACKAGE_ROOT`: location of acquired Vite 8.2.4 within owned scratch.
 - `APG_JAVASCRIPT_NODE`: path to qualified Node v22.22.2 binary.
 
 Missing or non-matching prerequisites fail closed immediately without skipping.
