@@ -159,6 +159,30 @@ class TestStagingCorrectionMode(unittest.TestCase):
                     "0.10.0",
                 )
 
+    def test_untagged_builder_admits_only_the_explicit_v0131_patch(self) -> None:
+        seen: dict[str, object] = {}
+
+        def lineage(*_args: object, **kwargs: object) -> None:
+            seen.update(kwargs)
+            raise release.ToolError("stop after lineage")
+
+        with tempfile.TemporaryDirectory() as temporary, mock.patch.object(
+            release, "validate_repository_separation"
+        ), mock.patch.object(release, "verify_public_release_lineage", side_effect=lineage):
+            with self.assertRaisesRegex(release.ToolError, "stop after lineage"):
+                staging_correction.build_untagged_candidate(
+                    self.source, self.base, Path(temporary) / "candidate", "0.13.1"
+                )
+            self.assertIs(seen["allow_advanced_head"], True)
+            self.assertIs(seen["allow_interleaved_untagged"], True)
+            for version in ("0.13.2", "0.14.0"):
+                with self.subTest(version=version), self.assertRaisesRegex(
+                    release.InvocationError, "only available for v0.11.0"
+                ):
+                    staging_correction.build_untagged_candidate(
+                        self.source, self.base, Path(temporary) / "candidate", version
+                    )
+
     def test_check_candidate_staging_correction_success(self) -> None:
         def text_git(_root: Path, args: list[str], **_kwargs: object) -> str:
             if args == ["rev-list", "--parents", "-n", "1", "HEAD"]:

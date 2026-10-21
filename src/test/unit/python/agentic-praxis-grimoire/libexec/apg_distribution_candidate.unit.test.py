@@ -17,6 +17,8 @@ import zipfile
 
 import pytest
 
+from src.test.support import apg_macho_fixtures as macho
+
 
 ROOT = Path(__file__).resolve().parents[6]
 sys.path.insert(0, str(ROOT / "libexec"))
@@ -71,12 +73,13 @@ def _binary_manifest(target: str, binary: bytes, corpus: str, version: str = VER
     )
 
 
-def _go_artifacts(tmp_path: Path, corpus: str, *, tamper: str | None = None) -> tuple[Path, dict[str, bytes]]:
+def _go_artifacts(tmp_path: Path, corpus: str, *, tamper: str | None = None, darwin: bytes | None = None) -> tuple[Path, dict[str, bytes]]:
     root = tmp_path / "go"
     binaries: dict[str, bytes] = {}
     for mapping in candidate.TARGETS:
         target = mapping["go_target"]
-        binary = f"apgr-{target}\n".encode("ascii")
+        # Darwin bytes must satisfy the shared actual-byte deployment predicate.
+        binary = (darwin or macho.darwin_arm64()) if target == "darwin/arm64" else f"apgr-{target}\n".encode("ascii")
         binaries[target] = binary
         target_root = root / target.replace("/", "-")
         target_root.mkdir(parents=True)
@@ -320,9 +323,9 @@ def _npm_artifacts(tmp_path: Path, corpus: str, binaries: dict[str, bytes]) -> P
     return root
 
 
-def _artifacts(tmp_path: Path, *, wheel_tamper: str | None = None):
+def _artifacts(tmp_path: Path, *, wheel_tamper: str | None = None, darwin: bytes | None = None):
     source, corpus = _source(tmp_path)
-    go_root, binaries = _go_artifacts(tmp_path, corpus)
+    go_root, binaries = _go_artifacts(tmp_path, corpus, darwin=darwin)
     python_root = tmp_path / "python"
     python_root.mkdir()
     for mapping in candidate.TARGETS:
@@ -1064,3 +1067,18 @@ def test_npm_package_readme_requirement_semver_regression(
     archive = _tgz(with_readme, mapping["npm_package"], version,
                    {**contents, "README.md": b"# APGR runtime package\n"})
     assert candidate._validate_npm_package(archive, **arguments)["version"] == version
+
+
+@pytest.mark.parametrize("route", ("build_candidate", "_load_go_artifacts"))
+def test_over_floor_darwin_binary_is_refused_before_any_candidate_output(tmp_path: Path, route: str) -> None:
+    # Only the Mach-O minimum differs from the admitted floor fixture; every manifest, wheel and package is coherent.
+    source, go_root, python_root, npm_root = _artifacts(tmp_path, darwin=macho.darwin_arm64(minimum=macho.OVERFLOOR_MINIMUM))
+    version, corpus = candidate._source_identity(source)
+    output = tmp_path / "candidate"
+    refusal = r"darwin/arm64 Go binary: .*deployment refused.*13\.0\.0 exceeds macosx_12_0_arm64"
+    with pytest.raises(candidate.DistributionCandidateError, match=refusal):
+        if route == "_load_go_artifacts":
+            candidate._load_go_artifacts(go_root, version=version, corpus=corpus)
+        else:
+            candidate.build_candidate(source, go_root, python_root, npm_root, output)
+    assert not output.exists()

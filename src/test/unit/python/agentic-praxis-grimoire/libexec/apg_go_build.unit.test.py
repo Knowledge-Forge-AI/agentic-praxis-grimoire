@@ -8,6 +8,8 @@ from types import SimpleNamespace
 
 import pytest
 
+from src.test.support import apg_macho_fixtures as macho
+
 
 ROOT = Path(__file__).resolve().parents[6]
 SPEC = importlib.util.spec_from_file_location("apg_go_build", ROOT / "libexec/apg_go_build.py")
@@ -315,3 +317,173 @@ def test_build_require_native_rejects_foreign_and_cli_flag(
     code = builder.main(["--target", "darwin/arm64", "--output", os.fspath(output), "--require-native"])
     assert code == 0
     assert json.loads(capsys.readouterr().out) == expected
+
+
+# --- Shared Darwin ARM64 deployment predicate (fixture bytes are independent) ---
+
+
+@pytest.mark.parametrize(
+    ("fixture", "command", "minimum", "sdk"),
+    [
+        ({}, "LC_BUILD_VERSION", "12.0.0", "12.0.0"),
+        ({"minimum": (11, 0, 0), "sdk": (11, 0, 0)}, "LC_BUILD_VERSION", "11.0.0", "11.0.0"),
+        ({"declarations": ("version_min",)}, "LC_VERSION_MIN_MACOSX", "12.0.0", "12.0.0"),
+        ({"sdk": (15, 2, 0)}, "LC_BUILD_VERSION", "12.0.0", "15.2.0"),
+    ],
+)
+def test_supported_deployment_declarations_are_admitted(
+    fixture: dict[str, object], command: str, minimum: str, sdk: str
+) -> None:
+    data = macho.darwin_arm64(**fixture)
+    expected = {"command": command, "platform": "macos", "minimum": minimum, "sdk": sdk}
+    assert builder.darwin_arm64_deployment(data) == expected
+    assert builder.require_release_deployment("darwin/arm64", data) == expected
+
+
+def test_build_version_tool_table_is_bounded_but_accepted() -> None:
+    tools = ((macho.TOOL_LD, macho.encode_version((1, 0, 0))),)
+    command = macho.build_version_command((12, 0, 0), (12, 0, 0), tools=tools)
+    data = macho.darwin_arm64(declarations=(command,))
+    assert builder.require_release_deployment("darwin/arm64", data)["minimum"] == "12.0.0"
+
+
+@pytest.mark.parametrize(
+    "minimum", [(12, 0, 1), (12, 1, 0), (13, 0, 0), (15, 0, 0)]
+)
+def test_actual_minimum_above_wheel_floor_refuses(minimum: tuple[int, int, int]) -> None:
+    data = macho.darwin_arm64(minimum=minimum, sdk=(15, 0, 0))
+    with pytest.raises(builder.DeploymentError, match="exceeds macosx_12_0_arm64"):
+        builder.require_release_deployment("darwin/arm64", data)
+    # The parser still reports the declaration; only admission refuses it.
+    assert builder.darwin_arm64_deployment(data)["minimum"] == ".".join(map(str, minimum))
+
+
+def test_sdk_is_never_mistaken_for_the_minimum() -> None:
+    data = macho.darwin_arm64(minimum=(13, 0, 0), sdk=(12, 0, 0))
+    with pytest.raises(builder.DeploymentError, match="minimum macOS 13.0.0"):
+        builder.require_release_deployment("darwin/arm64", data)
+
+
+@pytest.mark.parametrize(
+    ("fixture", "reason"),
+    [
+        ({"magic": b"\xfe\xed\xfa\xcf"}, "thin little-endian 64-bit"),
+        ({"magic": b"\xce\xfa\xed\xfe"}, "thin little-endian 64-bit"),
+        ({"magic": b"\xca\xfe\xba\xbe"}, "thin little-endian 64-bit"),
+        ({"cputype": macho.CPU_TYPE_X86_64}, "plain ARM64"),
+        ({"cpusubtype": macho.CPU_SUBTYPE_ARM64E}, "plain ARM64"),
+        ({"cpusubtype": 0x80000000}, "plain ARM64"),
+        ({"filetype": macho.MH_OBJECT}, "not an executable"),
+        ({"declarations": ()}, "no macOS minimum declaration"),
+        ({"declarations": ("build_version", "version_min")}, "multiple macOS minimum"),
+        ({"declarations": ("build_version", "build_version")}, "multiple macOS minimum"),
+        ({"declarations": ("build_version_ios",)}, "platform is not macOS"),
+        ({"declarations": ("build_version", "version_min_iphoneos")}, "contradictory iphoneos"),
+        ({"minimum": (0, 0, 0)}, "declaration is empty"),
+        ({"ncmds": 0}, "count is out of bounds"),
+        ({"ncmds": 513}, "count is out of bounds"),
+        ({"sizeofcmds": (1 << 20) + 8}, "region is out of bounds"),
+        ({"truncate": 31}, "header is truncated"),
+        ({"truncate": 48}, "region is out of bounds"),
+    ],
+)
+def test_malformed_or_unsupported_darwin_bytes_refuse(fixture: dict[str, object], reason: str) -> None:
+    data = macho.darwin_arm64(**fixture)
+    with pytest.raises(builder.DeploymentError, match=reason):
+        builder.require_release_deployment("darwin/arm64", data)
+
+
+def test_command_region_arithmetic_is_exact() -> None:
+    region = len(macho.uuid_command()) + len(macho.build_version_command((12, 0, 0), (12, 0, 0)))
+    exact = macho.darwin_arm64()
+    assert builder.require_release_deployment("darwin/arm64", exact)
+    # One extra declared command overruns the region; a short region cuts the
+    # last command; a long region leaves unconsumed slack.
+    for fixture, reason in (
+        ({"ncmds": 3}, "overruns its region"),
+        ({"sizeofcmds": region - 8}, "load-command size is invalid"),
+        ({"sizeofcmds": region + 8}, "do not exactly fill"),
+    ):
+        with pytest.raises(builder.DeploymentError, match=reason):
+            builder.require_release_deployment("darwin/arm64", macho.darwin_arm64(**fixture))
+
+
+@pytest.mark.parametrize(
+    ("command", "reason"),
+    [
+        (macho.build_version_command((12, 0, 0), (12, 0, 0), cmdsize=20), "load-command size is invalid"),
+        (macho.build_version_command((12, 0, 0), (12, 0, 0), cmdsize=4), "load-command size is invalid"),
+        (macho.build_version_command((12, 0, 0), (12, 0, 0), cmdsize=32), "tool table is invalid"),
+        (macho.build_version_command((12, 0, 0), (12, 0, 0), cmdsize=16), "LC_BUILD_VERSION size"),
+        (macho.version_min_command((12, 0, 0), (12, 0, 0), cmdsize=24), "LC_VERSION_MIN_MACOSX size"),
+    ],
+)
+def test_declaration_command_sizes_are_exact(command: bytes, reason: str) -> None:
+    data = macho.darwin_arm64(declarations=(command,))
+    with pytest.raises(builder.DeploymentError, match=reason):
+        builder.require_release_deployment("darwin/arm64", data)
+
+
+def test_linux_targets_are_unchanged_and_unknown_targets_refuse() -> None:
+    elf = b"\x7fELF" + b"\0" * 60
+    for target in ("linux/amd64", "linux/arm64"):
+        assert builder.require_release_deployment(target, elf) is None
+        assert builder.require_release_deployment(target, macho.darwin_arm64(minimum=(15, 0, 0))) is None
+    with pytest.raises(builder.BuildError, match="unsupported target"):
+        builder.require_release_deployment("windows/amd64", elf)
+    with pytest.raises(builder.DeploymentError, match="thin little-endian 64-bit"):
+        builder.require_release_deployment("darwin/arm64", elf)
+
+
+def test_deployment_floor_is_derived_from_the_canonical_wheel_tag(monkeypatch: pytest.MonkeyPatch) -> None:
+    assert builder.TARGETS["darwin/arm64"]["python_platform"] == "macosx_12_0_arm64"
+    assert builder._deployment_ceiling("darwin/arm64") == (12, 0, 0)
+    data = macho.darwin_arm64(minimum=(12, 0, 0))
+    lowered = {**builder.TARGETS, "darwin/arm64": {**builder.TARGETS["darwin/arm64"], "python_platform": "macosx_11_0_arm64"}}
+    monkeypatch.setattr(builder, "TARGETS", lowered)
+    with pytest.raises(builder.DeploymentError, match="exceeds macosx_11_0_arm64"):
+        builder.require_release_deployment("darwin/arm64", data)
+
+
+def _darwin_go(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, image: bytes) -> None:
+    go = tmp_path / "go"
+    go.write_bytes(b"stand-in")
+    go.chmod(0o700)
+    monkeypatch.setattr(builder.shutil, "which", lambda _name: str(go))
+    monkeypatch.setattr(builder, "_host_target", lambda: "linux/amd64")
+
+    def run(arguments: list[str], **_kwargs: object) -> SimpleNamespace:
+        if arguments[1:3] == ["env", "GOVERSION"]:
+            return SimpleNamespace(returncode=0, stdout=b"go1.26.9\n")
+        if "-o" in arguments:
+            Path(arguments[arguments.index("-o") + 1]).write_bytes(image)
+            return SimpleNamespace(returncode=0, stdout=b"", stderr=b"")
+        return SimpleNamespace(returncode=0, stdout=macho.recorded_go_version_m(arguments[-1]).encode(), stderr=b"")
+
+    monkeypatch.setattr(builder.subprocess, "run", run)
+
+
+def test_builder_admits_supported_darwin_output_and_writes_manifest(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    root = authority_root(tmp_path, b"0.13.1\n")
+    image = macho.darwin_arm64()
+    _darwin_go(tmp_path, monkeypatch, image)
+    output = tmp_path / "out/apgr"
+    result = builder.build(root, "darwin/arm64", output)
+    manifest = json.loads(Path(result["manifest_path"]).read_text())
+    assert output.read_bytes() == image
+    assert manifest["sha256"] == result["sha256"] and manifest["size_bytes"] == len(image)
+    assert manifest["target"]["python_platform"] == "macosx_12_0_arm64"
+
+
+def test_builder_refuses_overfloor_darwin_output_before_manifest(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    root = authority_root(tmp_path, b"0.13.1\n")
+    _darwin_go(tmp_path, monkeypatch, macho.darwin_arm64(minimum=macho.OVERFLOOR_MINIMUM))
+    output = tmp_path / "out/apgr"
+    with pytest.raises(builder.DeploymentError, match="exceeds macosx_12_0_arm64"):
+        builder.build(root, "darwin/arm64", output)
+    assert not output.exists()
+    assert not output.with_name("apgr.binary-manifest.json").exists()

@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""CLI entry point and orchestrator for APGR v0.13.0 release boundary attestation."""
+"""CLI entry point and orchestrator for APGR release boundary attestation.
+
+Only the closed ``RELEASE_CONTRACTS`` versions are supported: the immutable
+historical v0.13.0 PR #3 contract and the approval-only v0.13.1 contract.
+"""
 
 from __future__ import annotations
 
@@ -20,12 +24,14 @@ from tools.ci.release_boundary_bundle import (
     EXPECTED_VERSION,
     MERGED_ATTESTATION_SCHEMA,
     RELEASE_ATTESTATION_SCHEMA,
+    RELEASE_CONTRACTS,
     BoundaryBundleError,
     canonical_json,
     finalize_self_hash,
     format_release_notes,
     inspect_zip_bytes,
     parse_release_notes,
+    release_contract,
     sha256_bytes,
     strict_json,
     validate_self_hash,
@@ -76,12 +82,21 @@ def _write_canonical_json(output_path: Path, data: dict[str, Any]) -> None:
         stream.write(canonical_json(data))
 
 
-EXPECTED_TAG = "v0.13.0"
+EXPECTED_TAG = f"v{EXPECTED_VERSION}"
 
 
 def _require(condition: bool, message: str) -> None:
     if not condition:
         raise BoundaryError(message)
+
+
+def _contract_pr(version: str, pr_number: Any) -> tuple[dict[str, Any], int]:
+    """Return the closed contract and its PR; a measured PR must be positive."""
+    contract = release_contract(version)
+    _require(type(pr_number) is int and pr_number > 0, "release boundary PR number must be a positive integer")
+    pinned = contract["pr_number"]
+    _require(pinned is None or pr_number == pinned, f"release boundary requires PR #{pinned}")
+    return contract, pr_number
 
 
 def _client() -> GitHubClient:
@@ -123,13 +138,16 @@ def _index_contract(index: dict[str, Any], identity: dict[str, str]) -> None:
         _require(bool(re.fullmatch(r"[0-9a-f]{64}", str(scans.get(key, "")))), "native scan digest missing")
 
 
-def _candidate_facts(client: GitHubClient, *, head: str, base: str, public_run: str, native_run: str,
+def _candidate_facts(client: GitHubClient, *, version: str, pr_number: int, head: str, base: str, public_run: str, native_run: str,
                      ruleset_data: Any, waiver_data: Any = None, recorded_candidate: dict[str, Any] | None = None) -> tuple[dict[str, Any], dict[str, Any]]:
+    # The PR number is caller input; only the live PR, run, review and
+    # squash-association readbacks below authenticate it.
+    contract, pr_number = _contract_pr(version, pr_number)
     for sha in (head, base):
         _require(bool(re.fullmatch(r"[0-9a-f]{40}", sha)), "expected head/base must be SHA40")
     for run in (public_run, native_run):
         _require(bool(re.fullmatch(r"[1-9][0-9]{0,18}", run)), "run id must be decimal")
-    pr = verify_pull_request(client, 3, head, base, allow_merged=recorded_candidate is not None)
+    pr = verify_pull_request(client, pr_number, head, base, allow_merged=recorded_candidate is not None)
     if recorded_candidate is None:
         _require(pr.get("state") == "open" and pr.get("merged") is False and pr.get("draft") is False, "candidate PR must be open and ready")
     else:
@@ -138,9 +156,9 @@ def _candidate_facts(client: GitHubClient, *, head: str, base: str, public_run: 
         _require(all(isinstance(binding, dict) for binding in recorded_candidate["workflow_bindings"].values()), "candidate workflow binding malformed")
     bindings = recorded_candidate["workflow_bindings"] if recorded_candidate is not None else {}
     public_run_doc, _ = verify_workflow_run(client, public_run, head, REQUIRED_PR_JOBS, "public PR", base,
-        recorded_binding=bindings.get("public_pr"))
+        pr_number=pr_number, recorded_binding=bindings.get("public_pr"))
     native_run_doc, _ = verify_workflow_run(client, native_run, head, REQUIRED_NATIVE_JOBS, "native qualification", base,
-        recorded_binding=bindings.get("native"))
+        pr_number=pr_number, recorded_binding=bindings.get("native"))
     public_meta, aggregate = _archive_document(client, public_run, "public-pr-gate-result", "matrix-aggregate.json")
     gate_meta, index = _archive_document(client, native_run, "native-release-candidate-gate-result", "native-rc-index.json")
     # Bind M to the tested index, not a potentially recomputed live PR merge ref.
@@ -168,7 +186,7 @@ def _candidate_facts(client: GitHubClient, *, head: str, base: str, public_run: 
     bundle = index["bundle_artifact"]
     bundle_meta, bundle_zip = verify_artifact_download(client, native_run, "native-release-candidate-bundle", bundle.get("artifact_digest"), bundle.get("artifact_id"))
     files = inspect_zip_bytes(bundle_zip, expected_digest=bundle_meta["digest"])
-    verified = verify_bundle_contents(files, index=index)
+    verified = verify_bundle_contents(files, version, index=index)
     branch_rules = client.get_json(f"https://api.github.com/repos/{EXPECTED_REPO}/rules/branches/main")
     if ruleset_data is None:
         ids = {r.get("ruleset_id") for r in branch_rules if r.get("type") == "required_status_checks"}
@@ -184,16 +202,17 @@ def _candidate_facts(client: GitHubClient, *, head: str, base: str, public_run: 
             _require(row.get("parameters", {}) == admin_rules[row["type"]].get("parameters", {}), "public/admin rule parameters differ")
     author = pr.get("user", {}).get("login")
     _require(isinstance(author, str) and bool(author), "PR author identity missing")
-    gov = verify_governance(client, 3, head, base, merge_sha, author, waiver_data)
+    gov = verify_governance(client, pr_number, head, base, merge_sha, author, waiver_data,
+                            waiver_scope=contract["waiver_scope"])
     count = admin_rules["pull_request"].get("parameters", {}).get("required_approving_review_count")
     _require(type(count) is int and count >= 0, "ruleset review count missing")
     _require((gov["mode"] == "waiver" and count == 0) or (gov["mode"] == "approval" and len(gov["approvals"]) >= max(1, count)), "governance cannot satisfy ruleset review count")
     facts = {
-        "schema": CANDIDATE_ATTESTATION_SCHEMA, "repo": EXPECTED_REPO, "version": EXPECTED_VERSION,
-        "pr_number": 3, "head_sha": head, "base_sha": base, "merge_commit_sha": merge_sha, "tree_sha": tree,
+        "schema": CANDIDATE_ATTESTATION_SCHEMA, "repo": EXPECTED_REPO, "version": version,
+        "pr_number": pr_number, "head_sha": head, "base_sha": base, "merge_commit_sha": merge_sha, "tree_sha": tree,
         "tested_merge": tested_merge,
-        "workflow_bindings": {"public_pr": workflow_run_binding(public_run_doc, head, base),
-                              "native": workflow_run_binding(native_run_doc, head, base)},
+        "workflow_bindings": {"public_pr": workflow_run_binding(public_run_doc, head, base, pr_number=pr_number),
+                              "native": workflow_run_binding(native_run_doc, head, base, pr_number=pr_number)},
         "public_run_id": public_run, "native_run_id": native_run,
         "public_aggregate": {"artifact_id": str(public_meta["id"]), "artifact_digest": public_meta["digest"]},
         "native_index": {"artifact_id": str(gate_meta["id"]), "artifact_digest": gate_meta["digest"]},
@@ -208,21 +227,28 @@ def _candidate_facts(client: GitHubClient, *, head: str, base: str, public_run: 
 
 def _revalidate(client: GitHubClient, candidate: dict[str, Any]) -> None:
     validate_self_hash(candidate, label="candidate attestation")
-    _require(candidate.get("schema") == CANDIDATE_ATTESTATION_SCHEMA and candidate.get("version") == EXPECTED_VERSION and candidate.get("repo") == EXPECTED_REPO and candidate.get("pr_number") == 3, "candidate schema/repo/version/PR mismatch")
+    version, pr_number = candidate.get("version"), candidate.get("pr_number")
+    _require(candidate.get("schema") == CANDIDATE_ATTESTATION_SCHEMA and version in RELEASE_CONTRACTS and candidate.get("repo") == EXPECTED_REPO, "candidate schema/repo/version/PR mismatch")
+    try:
+        _contract_pr(version, pr_number)
+    except BoundaryError as error:
+        raise BoundaryError("candidate schema/repo/version/PR mismatch") from error
     gov = candidate["governance"]
-    observed, _ = _candidate_facts(client, head=candidate["head_sha"], base=candidate["base_sha"],
+    observed, _ = _candidate_facts(client, version=version, pr_number=pr_number, head=candidate["head_sha"], base=candidate["base_sha"],
         public_run=candidate["public_run_id"], native_run=candidate["native_run_id"], ruleset_data=gov["ruleset"],
         waiver_data=gov.get("waiver"), recorded_candidate=candidate)
     _require(observed == candidate, "candidate attestation differs from current exact CI/governance evidence")
 
 
 def cmd_candidate(args: argparse.Namespace) -> int:
-    _require(args.pr == 3, "release boundary requires PR #3")
+    contract, pr_number = _contract_pr(args.version, args.pr)
+    _require(args.governance_waiver is None or contract["waiver_scope"] is not None,
+             f"v{args.version} is approval-only; a governance waiver is not accepted")
     client = _client()
     rules = _load_json_file(args.ruleset_admin_readback, "ruleset admin readback")
     waiver = _load_json_file(args.governance_waiver, "governance waiver") if args.governance_waiver else None
-    doc, files = _candidate_facts(client, head=args.expect_head, base=args.expect_base, public_run=args.public_run,
-        native_run=args.native_run, ruleset_data=rules, waiver_data=waiver)
+    doc, files = _candidate_facts(client, version=args.version, pr_number=pr_number, head=args.expect_head, base=args.expect_base,
+        public_run=args.public_run, native_run=args.native_run, ruleset_data=rules, waiver_data=waiver)
     _require(args.output.suffix != ".json", "candidate output must be a directory")
     _safe_output(args.output)
     assets = args.output / "assets"
@@ -243,6 +269,7 @@ def cmd_merged(args: argparse.Namespace) -> int:
     if cand_doc.get("schema") != CANDIDATE_ATTESTATION_SCHEMA:
         raise BoundaryError(f"unexpected candidate attestation schema: {cand_doc.get('schema')}")
 
+    version = cand_doc["version"]
     pr_number = cand_doc["pr_number"]
     pr_head = cand_doc["head_sha"]
     pr_base = cand_doc["base_sha"]
@@ -261,21 +288,21 @@ def cmd_merged(args: argparse.Namespace) -> int:
     pr = client.get_json(pr_url)
     _require(pr.get("merged") is True and pr.get("merge_commit_sha") == squash_sha and pr.get("head", {}).get("sha") == pr_head, "PR merged commit/head mismatch")
 
-    # Verify squash commit S: sole parent B, tree T, subject Release v0.13.0, main==S ahead_by=1
+    # Verify squash commit S: sole parent B, tree T, subject Release v<version>, main==S ahead_by=1
     verify_squash_and_branch(
-        client, pr_number, squash_sha, pr_base, tree_sha, cand_doc.get("version", EXPECTED_VERSION), waiver_hash
+        client, pr_number, squash_sha, pr_base, tree_sha, version, waiver_hash
     )
 
     tag_info = None
     if args.require_tag:
-        tag_name = f"v{cand_doc.get('version', EXPECTED_VERSION)}"
+        tag_name = f"v{version}"
         tag_obj = verify_annotated_tag(client, tag_name, squash_sha)
         tag_info = {"tag_name": tag_name, "tag_sha": tag_obj.get("sha")}
 
     merged_doc: dict[str, Any] = {
         "schema": MERGED_ATTESTATION_SCHEMA,
         "candidate_attestation_sha256": cand_doc["self_sha256"],
-        "version": cand_doc.get("version", EXPECTED_VERSION),
+        "version": version,
         "pr_number": pr_number,
         "squash_commit_sha": squash_sha,
         "parent_sha": pr_base,
@@ -303,21 +330,22 @@ def cmd_release(args: argparse.Namespace) -> int:
     merged_doc = _load_json_file(args.merged, "merged attestation")
     validate_self_hash(merged_doc, label="merged attestation")
 
-    _require(merged_doc.get("schema") == MERGED_ATTESTATION_SCHEMA and merged_doc.get("version") == EXPECTED_VERSION, "merged attestation schema/version mismatch")
-    _require(merged_doc.get("head_sha") == cand_doc["head_sha"] and merged_doc.get("parent_sha") == cand_doc["base_sha"] and merged_doc.get("pr_number") == 3, "merged identity mismatch")
-    pr = client.get_json(f"https://api.github.com/repos/{EXPECTED_REPO}/pulls/3")
+    # _revalidate admitted exactly one closed contract version and its PR.
+    version, pr_number = cand_doc["version"], cand_doc["pr_number"]
+    expected_tag = f"v{version}"
+    _require(merged_doc.get("schema") == MERGED_ATTESTATION_SCHEMA and merged_doc.get("version") == version, "merged attestation schema/version mismatch")
+    _require(merged_doc.get("head_sha") == cand_doc["head_sha"] and merged_doc.get("parent_sha") == cand_doc["base_sha"] and merged_doc.get("pr_number") == pr_number, "merged identity mismatch")
+    pr = client.get_json(f"https://api.github.com/repos/{EXPECTED_REPO}/pulls/{pr_number}")
     squash = merged_doc["squash_commit_sha"]
     _require(pr.get("merged") is True and pr.get("merge_commit_sha") == squash and pr.get("head", {}).get("sha") == cand_doc["head_sha"], "release PR association mismatch")
-    verify_squash_and_branch(client, 3, squash, cand_doc["base_sha"], cand_doc["tree_sha"], EXPECTED_VERSION, cand_doc["governance"].get("waiver_sha256"))
-    tag = verify_annotated_tag(client, EXPECTED_TAG, squash)
-    _require(merged_doc.get("tag") == {"tag_name": EXPECTED_TAG, "tag_sha": tag["sha"]}, "release tag object changed")
+    verify_squash_and_branch(client, pr_number, squash, cand_doc["base_sha"], cand_doc["tree_sha"], version, cand_doc["governance"].get("waiver_sha256"))
+    tag = verify_annotated_tag(client, expected_tag, squash)
+    _require(merged_doc.get("tag") == {"tag_name": expected_tag, "tag_sha": tag["sha"]}, "release tag object changed")
     if merged_doc.get("candidate_attestation_sha256") != cand_doc.get("self_sha256"):
         raise BoundaryError("merged attestation candidate binding mismatch")
     if merged_doc.get("tree_sha") != cand_doc.get("tree_sha"):
         raise BoundaryError("merged attestation tree SHA mismatch")
 
-    version = cand_doc.get("version", EXPECTED_VERSION)
-    expected_tag = f"v{version}"
     path_mapping = (cand_doc.get("bundle") or {}).get("mapping") or {}
 
     # Verify GitHub release object
@@ -370,15 +398,18 @@ def cmd_verify_published(args: argparse.Namespace) -> int:
         raise BoundaryError("published release must not be draft")
     if release.get("prerelease") is not False:
         raise BoundaryError("published release must not be prerelease")
-    expected_tag = f"v{EXPECTED_VERSION}"
-    if release.get("tag_name") != expected_tag:
-        raise BoundaryError(f"published release tag mismatch: {release.get('tag_name')} != {expected_tag}")
+    # The event tag selects one closed contract; every other tag refuses here.
+    tag_name = release.get("tag_name")
+    supported_tags = {f"v{version}": version for version in RELEASE_CONTRACTS}
+    if tag_name not in supported_tags:
+        raise BoundaryError(f"published release tag mismatch: {tag_name} is not one of {sorted(supported_tags)}")
 
     _require(event_data.get("repository", {}).get("full_name") == EXPECTED_REPO and event_data.get("repository", {}).get("id") == 1306002537, "release event repository mismatch")
     _require(os.environ.get("GITHUB_REPOSITORY") == EXPECTED_REPO, "wrong GITHUB_REPOSITORY")
     _client()  # validates environment before any network access
     _safe_output(args.output)
     parsed = parse_release_notes(release.get("body") or "")
+    _require(parsed["candidate_attestation"].get("version") == supported_tags[tag_name], "release notes candidate version differs from the published tag")
     # Reuse the exact draft/published verification contract through private temp
     # inputs beneath --output. No assets are materialized by this audit.
     args.output.mkdir(parents=True, exist_ok=False)
@@ -392,13 +423,14 @@ def cmd_verify_published(args: argparse.Namespace) -> int:
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="release_boundary",
-        description="APGR v0.13.0 release boundary attestation verifier",
+        description="APGR release boundary attestation verifier (closed v0.13.0 and v0.13.1 contracts)",
     )
     subparsers = parser.add_subparsers(dest="subcommand", required=True)
 
     # candidate
     p_cand = subparsers.add_parser("candidate", help="Verify candidate PR, runs, and governance")
-    p_cand.add_argument("--pr", type=int, required=True, help="PR number (e.g. 3)")
+    p_cand.add_argument("--version", choices=sorted(RELEASE_CONTRACTS), default=EXPECTED_VERSION, help="Closed release contract version")
+    p_cand.add_argument("--pr", type=int, required=True, help="Measured staging PR number (v0.13.0 is pinned to PR 3)")
     p_cand.add_argument("--expect-head", type=str, required=True, help="Expected head commit SHA (H)")
     p_cand.add_argument("--expect-base", type=str, required=True, help="Expected base commit SHA (B)")
     p_cand.add_argument("--public-run", type=str, required=True, help="Public workflow run ID (R1)")
@@ -411,7 +443,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_merged = subparsers.add_parser("merged", help="Verify squash commit, tree, and main branch state")
     p_merged.add_argument("--candidate", type=Path, required=True, help="Path to candidate attestation JSON")
     p_merged.add_argument("--output", type=Path, required=True, help="Output directory or JSON path")
-    p_merged.add_argument("--require-tag", action="store_true", help="Require and verify annotated v0.13.0 tag")
+    p_merged.add_argument("--require-tag", action="store_true", help="Require and verify the annotated v<version> tag")
 
     # release
     p_rel = subparsers.add_parser("release", help="Verify draft or published release, notes, and 16 flat assets")

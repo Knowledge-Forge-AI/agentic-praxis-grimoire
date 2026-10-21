@@ -156,8 +156,8 @@ def build_untagged_candidate(
     _unsafe = unsafe or release.unsafe
 
     core = version.split("+", 1)[0].split("-", 1)[0]
-    if core not in ("0.11.0", "0.12.0", "0.13.0"):
-        _unsafe("untagged candidate mode is only available for v0.11.0, v0.12.0 and v0.13.0")
+    if core not in ("0.11.0", "0.12.0", "0.13.0", "0.13.1"):
+        _unsafe("untagged candidate mode is only available for v0.11.0, v0.12.0, v0.13.0 and v0.13.1")
     release.validate_repository_separation(source, base)
     release.verify_public_release_lineage(
         base,

@@ -10,6 +10,7 @@ import platform
 from pathlib import Path
 import shutil
 import stat
+import struct
 import subprocess
 import sys
 import tempfile
@@ -31,7 +32,7 @@ TARGETS = {
         "go_target": "darwin/arm64",
         "goos": "darwin",
         "goarch": "arm64",
-        "python_platform": "macosx_11_0_arm64",
+        "python_platform": "macosx_12_0_arm64",
         "npm_package": "@knowledge-forge-ai/apgr-darwin-arm64",
         "npm_os": "darwin",
         "npm_cpu": "arm64",
@@ -60,6 +61,140 @@ SUPPORTED_TARGETS = tuple(TARGETS)
 
 class BuildError(RuntimeError):
     """A release-like Go CLI build cannot be performed safely."""
+
+
+class DeploymentError(BuildError):
+    """A release binary's actual deployment declaration is not admissible."""
+
+
+# Bounded Mach-O facts for the one supported Darwin release target.  Only a
+# thin little-endian 64-bit ARM64 executable is admissible; the declared
+# minimum macOS version must not exceed the canonical wheel platform tag.
+MACHO_MAGIC_64 = 0xFEEDFACF
+MACHO_HEADER_SIZE = 32
+CPU_TYPE_ARM64 = 0x0100000C
+CPU_SUBTYPE_ARM64_ALL = 0
+MH_EXECUTE = 2
+LC_VERSION_MIN_MACOSX = 0x24
+LC_BUILD_VERSION = 0x32
+FOREIGN_VERSION_MIN = {0x25: "iphoneos", 0x2F: "tvos", 0x30: "watchos"}
+PLATFORM_MACOS = 1
+MAX_LOAD_COMMANDS = 512
+MAX_LOAD_COMMAND_BYTES = 1 << 20
+MAX_BUILD_TOOLS = 16
+
+
+def _macho_version(value: int) -> tuple[int, int, int]:
+    return value >> 16, (value >> 8) & 0xFF, value & 0xFF
+
+
+def _version_text(version: tuple[int, int, int]) -> str:
+    return ".".join(str(part) for part in version)
+
+
+def _deployment_ceiling(target: str) -> tuple[int, int, int]:
+    """Derive the admitted minimum from the canonical wheel platform tag."""
+
+    parts = target_mapping(target)["python_platform"].split("_")
+    if len(parts) != 4 or parts[0] != "macosx" or not all(
+        part.isdigit() for part in parts[1:3]
+    ):
+        raise DeploymentError(f"{target} platform tag has no macOS deployment floor")
+    return int(parts[1]), int(parts[2]), 0
+
+
+def darwin_arm64_deployment(data: bytes) -> dict[str, str]:
+    """Return the single actual minimum declaration of a Darwin ARM64 binary.
+
+    The parser reads only the Mach-O header and the bounded load-command
+    region.  Missing, malformed, truncated, unsupported or contradictory
+    declarations refuse; the SDK is reported but never used as the minimum.
+    """
+
+    def fail(reason: str) -> DeploymentError:
+        return DeploymentError(f"darwin/arm64 binary deployment refused: {reason}")
+
+    if len(data) < MACHO_HEADER_SIZE:
+        raise fail("Mach-O header is truncated")
+    magic, cputype, cpusubtype, filetype, ncmds, sizeofcmds = struct.unpack_from(
+        "<6I", data, 0
+    )
+    if magic != MACHO_MAGIC_64:
+        raise fail("not a thin little-endian 64-bit Mach-O")
+    if cputype != CPU_TYPE_ARM64 or cpusubtype != CPU_SUBTYPE_ARM64_ALL:
+        raise fail("CPU type is not plain ARM64")
+    if filetype != MH_EXECUTE:
+        raise fail("Mach-O file type is not an executable")
+    if not 1 <= ncmds <= MAX_LOAD_COMMANDS:
+        raise fail("load-command count is out of bounds")
+    end = MACHO_HEADER_SIZE + sizeofcmds
+    if sizeofcmds > MAX_LOAD_COMMAND_BYTES or end > len(data):
+        raise fail("load-command region is out of bounds")
+    declarations: list[tuple[str, int, int]] = []
+    offset = MACHO_HEADER_SIZE
+    for _ in range(ncmds):
+        if offset + 8 > end:
+            raise fail("load command overruns its region")
+        command, size = struct.unpack_from("<2I", data, offset)
+        if size < 8 or size % 8 or offset + size > end:
+            raise fail("load-command size is invalid")
+        if command in FOREIGN_VERSION_MIN:
+            raise fail(f"contradictory {FOREIGN_VERSION_MIN[command]} minimum declaration")
+        if command == LC_VERSION_MIN_MACOSX:
+            if size != 16:
+                raise fail("LC_VERSION_MIN_MACOSX size is invalid")
+            minimum, sdk = struct.unpack_from("<2I", data, offset + 8)
+            declarations.append(("LC_VERSION_MIN_MACOSX", minimum, sdk))
+        elif command == LC_BUILD_VERSION:
+            if size < 24:
+                raise fail("LC_BUILD_VERSION size is invalid")
+            platform_id, minimum, sdk, ntools = struct.unpack_from("<4I", data, offset + 8)
+            if ntools > MAX_BUILD_TOOLS or size != 24 + 8 * ntools:
+                raise fail("LC_BUILD_VERSION tool table is invalid")
+            if platform_id != PLATFORM_MACOS:
+                raise fail("LC_BUILD_VERSION platform is not macOS")
+            declarations.append(("LC_BUILD_VERSION", minimum, sdk))
+        offset += size
+    if offset != end:
+        raise fail("load commands do not exactly fill their declared region")
+    if not declarations:
+        raise fail("no macOS minimum declaration")
+    if len(declarations) > 1:
+        raise fail("multiple macOS minimum declarations")
+    command_name, minimum, sdk = declarations[0]
+    minimum_version = _macho_version(minimum)
+    if minimum_version == (0, 0, 0):
+        raise fail("macOS minimum declaration is empty")
+    return {
+        "command": command_name,
+        "platform": "macos",
+        "minimum": _version_text(minimum_version),
+        "sdk": _version_text(_macho_version(sdk)),
+    }
+
+
+def require_release_deployment(target: str, data: bytes) -> dict[str, str] | None:
+    """Admit actual binary bytes for one release target or raise DeploymentError.
+
+    This is the single deployment predicate shared by the builder, the Python
+    backend, the npm packager, prebuilt publication, and distribution-candidate
+    validation.  Linux targets carry no Mach-O deployment declaration.
+    """
+
+    mapping = target_mapping(target)
+    if mapping["goos"] != "darwin":
+        return None
+    if target != "darwin/arm64":
+        raise DeploymentError(f"unsupported Darwin release target: {target}")
+    deployment = darwin_arm64_deployment(bytes(data))
+    ceiling = _deployment_ceiling(target)
+    minimum = tuple(int(part) for part in deployment["minimum"].split("."))
+    if minimum > ceiling:
+        raise DeploymentError(
+            "darwin/arm64 binary deployment refused: minimum macOS "
+            f"{deployment['minimum']} exceeds {mapping['python_platform']}"
+        )
+    return deployment
 
 
 def _read_direct(path: Path, label: str) -> bytes:
@@ -388,6 +523,7 @@ def build(
         binary=binary,
     )
     try:
+        require_release_deployment(target, binary)
         _validate_binary_metadata(
             root=root, target=target, output=output, manifest=manifest, go=go
         )

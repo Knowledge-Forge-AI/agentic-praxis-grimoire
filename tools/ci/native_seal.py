@@ -23,7 +23,7 @@ CANONICAL_TARGETS: dict[str, dict[str, str]] = {
     "native-darwin-arm64": {
         "lane": "native-darwin-arm64", "target": "darwin/arm64", "slug": "darwin-arm64",
         "go_binary": "go/darwin-arm64/apgr", "npm_slug": "darwin-arm64",
-        "python_tag": "macosx_11_0_arm64", "system": "darwin", "arch": "arm64",
+        "python_tag": "macosx_12_0_arm64", "system": "darwin", "arch": "arm64",
     },
     "native-linux-x64": {
         "lane": "native-linux-x64", "target": "linux/amd64", "slug": "linux-x64",

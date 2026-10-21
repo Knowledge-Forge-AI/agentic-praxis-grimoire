@@ -11,7 +11,6 @@ from datetime import datetime, timezone
 from typing import Any
 
 from tools.ci.release_boundary_bundle import (
-    EXPECTED_VERSION,
     GOVERNANCE_WAIVER_SCHEMA,
     canonical_flat_assets,
     compute_self_hash,
@@ -175,8 +174,8 @@ def verify_pull_request(
     if not allow_merged and base_sha != expected_base:
         raise GitHubBoundaryError(f"PR base SHA mismatch: {base_sha} != {expected_base}")
 
-    if pr_number != 3 or pr.get("number") != 3:
-        raise GitHubBoundaryError("release boundary requires exact PR #3")
+    if type(pr_number) is not int or pr_number <= 0 or pr.get("number") != pr_number:
+        raise GitHubBoundaryError(f"release boundary requires exact PR #{pr_number}")
     merge_commit_sha = pr.get("merge_commit_sha")
     if not isinstance(merge_commit_sha, str) or not re.match(r"^[0-9a-f]{40}$", merge_commit_sha):
         raise GitHubBoundaryError(f"PR lacks a valid merge_commit_sha: {merge_commit_sha!r}")
@@ -213,7 +212,7 @@ def verify_commit_parents_tree(
     return commit
 
 
-def workflow_run_binding(run: Mapping[str, Any], head: str, base: str | None) -> dict[str, Any]:
+def workflow_run_binding(run: Mapping[str, Any], head: str, base: str | None, *, pr_number: int) -> dict[str, Any]:
     """Capture durable run identity and the association verified before merge."""
     for key in ("run_attempt", "workflow_id", "check_suite_id"):
         if type(run.get(key)) is not int or run[key] <= 0:
@@ -225,7 +224,7 @@ def workflow_run_binding(run: Mapping[str, Any], head: str, base: str | None) ->
         "head_sha": run["head_sha"],
         "repository": {key: run["repository"][key] for key in ("id", "full_name")},
         "head_repository": {key: run["head_repository"][key] for key in ("id", "full_name")},
-        "pr_number": 3, "pr_head_sha": head, "pr_base_sha": base,
+        "pr_number": pr_number, "pr_head_sha": head, "pr_base_sha": base,
     }
 
 
@@ -236,7 +235,7 @@ def verify_workflow_run(
     expected_jobs: frozenset[str],
     workflow_label: str,
     expected_base: str | None = None,
-    *, recorded_binding: Mapping[str, Any] | None = None,
+    *, pr_number: int, recorded_binding: Mapping[str, Any] | None = None,
 ) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     """Verify workflow run conclusion, head SHA, PR event, and exact successful jobs."""
     url = f"{API_ROOT}/repos/{client.repository}/actions/runs/{run_id}"
@@ -267,10 +266,10 @@ def verify_workflow_run(
         prs = run.get("pull_requests", [])
         if not isinstance(prs, list) or any(not isinstance(pr, dict) for pr in prs):
             raise GitHubBoundaryError("workflow run PR association malformed")
-        matches = [pr for pr in prs if pr.get("number") == 3]
+        matches = [pr for pr in prs if pr.get("number") == pr_number]
         if len(matches) != 1 or matches[0].get("head", {}).get("sha") != expected_head or (expected_base is not None and matches[0].get("base", {}).get("sha") != expected_base):
             raise GitHubBoundaryError("workflow run PR head/base association mismatch")
-    elif expected_base is None or recorded_binding != workflow_run_binding(run, expected_head, expected_base):
+    elif expected_base is None or recorded_binding != workflow_run_binding(run, expected_head, expected_base, pr_number=pr_number):
         raise GitHubBoundaryError("recorded workflow run identity/PR binding mismatch")
     jobs_url = f"{API_ROOT}/repos/{client.repository}/actions/runs/{run_id}/jobs?per_page=100"
     jobs_resp = client.get_json(jobs_url)
@@ -298,7 +297,7 @@ def verify_workflow_run(
             f"{workflow_label} run {run_id} jobs mismatch: missing={missing}, extra={extra}"
         )
 
-    workflow_run_binding(run, expected_head, expected_base)
+    workflow_run_binding(run, expected_head, expected_base, pr_number=pr_number)
     return run, jobs
 
 
@@ -469,8 +468,13 @@ def verify_governance(
     merge_sha: str,
     author_login: str,
     waiver_data: Mapping[str, Any] | None = None,
+    *, waiver_scope: str | None,
 ) -> dict[str, Any]:
-    """Verify eligible non-author approval or canonical governance waiver."""
+    """Verify eligible non-author approval or canonical governance waiver.
+
+    ``waiver_scope`` is the release contract's only accepted waiver scope.  An
+    approval-only release supplies ``None``, so no waiver can satisfy it.
+    """
     reviews_url = f"{API_ROOT}/repos/{client.repository}/pulls/{pr_number}/reviews?per_page=100"
     reviews = client.get_json(reviews_url)
     if not isinstance(reviews, list):
@@ -510,6 +514,8 @@ def verify_governance(
 
     if waiver_data is None:
         raise GitHubBoundaryError("neither eligible non-author approval nor governance waiver provided")
+    if waiver_scope is None:
+        raise GitHubBoundaryError("release contract is approval-only; a governance waiver cannot satisfy it")
 
     validate_self_hash(waiver_data, label="governance waiver")
     if waiver_data.get("schema") != GOVERNANCE_WAIVER_SCHEMA:
@@ -521,7 +527,7 @@ def verify_governance(
     if waiver_data.get("merge_ref_sha") != merge_sha:
         raise GitHubBoundaryError(f"waiver merge_ref_sha mismatch: {waiver_data.get('merge_ref_sha')} != {merge_sha}")
 
-    if waiver_data.get("repo") != EXPECTED_REPO or waiver_data.get("pr") != 3 or waiver_data.get("scope") != "v0.13.0-review-only":
+    if waiver_data.get("repo") != EXPECTED_REPO or waiver_data.get("pr") != pr_number or waiver_data.get("scope") != waiver_scope:
         raise GitHubBoundaryError("waiver repo/PR/scope mismatch")
     for key in ("reason", "approved_by", "approved_at"):
         if not isinstance(waiver_data.get(key), str) or not waiver_data[key].strip():
@@ -667,7 +673,11 @@ def verify_github_release(
     if len(observed_names) != len(set(observed_names)):
         raise GitHubBoundaryError(f"release contains duplicate asset names: {observed_names}")
 
-    expected_flat = canonical_flat_assets(version=EXPECTED_VERSION)
+    # The asset set belongs to the tag's release; canonical_flat_assets refuses
+    # any version outside the closed contract table.
+    if not isinstance(expected_tag, str) or not expected_tag.startswith("v"):
+        raise GitHubBoundaryError(f"release tag is not a v<version> tag: {expected_tag!r}")
+    expected_flat = canonical_flat_assets(version=expected_tag[1:])
     if sorted(observed_names) != sorted(expected_flat):
         missing = sorted(set(expected_flat) - set(observed_names))
         extra = sorted(set(observed_names) - set(expected_flat))

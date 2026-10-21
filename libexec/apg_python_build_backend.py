@@ -278,6 +278,10 @@ def _validated_manifest(
     content = binary.read_bytes()
     if parsed["size_bytes"] != len(content) or parsed["sha256"] != hashlib.sha256(content).hexdigest():
         raise BackendError("binary manifest does not match packaged binary")
+    try:
+        apg_go_build.require_release_deployment(target, content)
+    except apg_go_build.BuildError as error:
+        raise BackendError(f"packaged binary deployment is not admissible: {error}") from error
     return payload
 
 

@@ -28,6 +28,8 @@ from apg_public_release_v013 import (
     ADVANCED_HEAD_VERSIONS,
     INTERLEAVED_UNTAGGED_VERSIONS,
     MERGED_CHECK_PREDECESSORS,
+    SOURCE_ONLY_UNTAGGED_VERSIONS,
+    V0131_CRITICAL_ADDITIONS,
     V013_CRITICAL_ADDITIONS,
     V013_HELPER_ADDITIONS,
     V013_PROJECTION_ADDITIONS,
@@ -1415,6 +1417,7 @@ PUBLIC_VALIDATION_DESELECTIONS_BY_VERSION: dict[str, tuple[str, ...]] = {
     "0.11.0": V011_PUBLIC_VALIDATION_DESELECTIONS,
     "0.12.0": V011_PUBLIC_VALIDATION_DESELECTIONS,
     "0.13.0": V013_PUBLIC_VALIDATION_DESELECTIONS,
+    "0.13.1": V013_PUBLIC_VALIDATION_DESELECTIONS,
 }
 # None preserves historical audited selection without reading current inventory.
 # A tuple requires inventory closure over the audited files plus exactly these
@@ -1438,6 +1441,7 @@ PUBLIC_INVENTORY_SUPPLEMENTS_BY_VERSION: dict[str, tuple[str, ...] | None] = {
     "0.11.0": None,
     "0.12.0": None,
     "0.13.0": None,
+    "0.13.1": None,
 }
 V07_CRITICAL = tuple(
     sorted(
@@ -2097,6 +2101,16 @@ V013_LICENSING = tuple(V012_LICENSING)
 V013_PROJECTIONS = tuple(sorted(set(V012_PROJECTIONS) | set(V013_PROJECTION_ADDITIONS)))
 V013_SKILLS = tuple(sorted(set(V012_SKILLS) | set(V013_SKILL_ADDITIONS)))
 V013_CATEGORIES = tuple(V012_CATEGORIES)
+# The v0.13.1 patch surface: the frozen v0.13.0 tuples plus only its critical
+# additions.  V013_* above stay the immutable published v0.13.0 surface.
+V0131_WRAPPERS = tuple(V013_WRAPPERS)
+V0131_HELPERS = tuple(V013_HELPERS)
+V0131_TESTS = tuple(V013_TESTS)
+V0131_CRITICAL = tuple(sorted(set(V013_CRITICAL) | set(V0131_CRITICAL_ADDITIONS)))
+V0131_LICENSING = tuple(V013_LICENSING)
+V0131_PROJECTIONS = tuple(V013_PROJECTIONS)
+V0131_SKILLS = tuple(V013_SKILLS)
+V0131_CATEGORIES = tuple(V013_CATEGORIES)
 
 # Source-only test oracles and generated/local output never enter the
 # release-shaped v0.7 candidate. The compatibility wrappers above are not
@@ -2685,6 +2699,7 @@ def safe_policy_path(value: str) -> bool:
 CURRENT_SURFACE_PREFIXES = {
     "0.7.0": "V07", "0.8.0": "V08", "0.8.1": "V081", "0.9.0": "V09",
     "0.10.0": "V010", "0.11.0": "V011", "0.12.0": "V012", "0.13.0": "V013",
+    "0.13.1": "V0131",
 }
 
 
@@ -3035,6 +3050,8 @@ CANDIDATE_PATH_FILTERS = {
     "0.8.1": is_v08_candidate_path, "0.9.0": is_v09_candidate_path,
     "0.10.0": is_v010_candidate_path, "0.11.0": is_v011_candidate_path,
     "0.12.0": is_v012_candidate_path, "0.13.0": is_v013_candidate_path,
+    # The v0.13.1 patch admits no new directory; its path rule is v0.13's.
+    "0.13.1": is_v013_candidate_path,
 }
 
 
@@ -4031,8 +4048,8 @@ def check_candidate(
     local_browser_deselections: tuple[str, ...] = (),
     source_only: bool = False,
 ) -> dict[str, object]:
-    if source_only and (not untagged or version != "0.13.0"):
-        unsafe("source-only projection verification requires an untagged v0.13.0 candidate")
+    if source_only and (not untagged or version not in SOURCE_ONLY_UNTAGGED_VERSIONS):
+        unsafe("source-only projection verification requires an untagged v0.13.0 or v0.13.1 candidate")
     if local_browser_deselections and (not untagged or version != "0.12.0" or local_browser_deselections != LOCAL_BROWSER_DEFERRAL_NODES):
         fail("local browser deferral is restricted to the exact pre-staging v0.12.0 selection")
     validate_repository_separation(source, base, candidate)
@@ -4191,7 +4208,7 @@ def check_merged_source(
 
     core = version.split("+", 1)[0].split("-", 1)[0]
     if core not in MERGED_CHECK_PREDECESSORS:
-        unsafe("merged-source verification is only available for v0.11.0, v0.12.0 and v0.13.0")
+        unsafe("merged-source verification is only available for v0.11.0, v0.12.0, v0.13.0 and v0.13.1")
     if not isinstance(approved_pr, str) or not approved_pr.strip():
         unsafe("an approved public staging PR is required")
     checks = _normalise_required_checks(required_checks)

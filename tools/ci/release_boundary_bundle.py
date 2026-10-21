@@ -28,7 +28,7 @@ def strict_json(data: bytes | str, label: str) -> Any:
     except (UnicodeError, json.JSONDecodeError) as error:
         raise BoundaryBundleError(f"malformed {label}") from error
 
-EXPECTED_VERSION = "0.13.0"
+EXPECTED_VERSION = "0.13.1"
 CANDIDATE_ATTESTATION_SCHEMA = "apgr.release-candidate-attestation/v1"
 MERGED_ATTESTATION_SCHEMA = "apgr.release-merged-attestation/v1"
 RELEASE_ATTESTATION_SCHEMA = "apgr.release-attestation/v1"
@@ -45,12 +45,37 @@ REQUIRED_FLAT_ASSET_COUNT = 16
 REQUIRED_CHECKSUM_ROW_COUNT = 15
 
 GO_SLUGS = ("darwin-arm64", "linux-amd64", "linux-arm64")
-PYTHON_WHEEL_TAGS = ("macosx_11_0_arm64", "manylinux_2_17_x86_64", "manylinux_2_17_aarch64")
 NPM_SLUGS = ("darwin-arm64", "linux-x64", "linux-arm64")
+
+# Closed per-release boundary contracts; there is no range or future fallback.
+# v0.13.0 is the immutable historical PR #3 contract with its review-only
+# waiver and published wheel tags.  v0.13.1 is approval-only: no waiver scope
+# exists, and its staging PR number is a measured input that only the live
+# PR, workflow-run, review and squash-association readbacks authenticate.
+RELEASE_CONTRACTS: dict[str, dict[str, Any]] = {
+    "0.13.0": {
+        "pr_number": 3,
+        "waiver_scope": "v0.13.0-review-only",
+        "wheel_tags": ("macosx_11_0_arm64", "manylinux_2_17_x86_64", "manylinux_2_17_aarch64"),
+    },
+    "0.13.1": {
+        "pr_number": None,
+        "waiver_scope": None,
+        "wheel_tags": ("macosx_12_0_arm64", "manylinux_2_17_x86_64", "manylinux_2_17_aarch64"),
+    },
+}
+PYTHON_WHEEL_TAGS = RELEASE_CONTRACTS[EXPECTED_VERSION]["wheel_tags"]
 
 
 class BoundaryBundleError(ValueError):
     """Bundle invariant, archive structure, or checksum mapping failure."""
+
+
+def release_contract(version: str) -> dict[str, Any]:
+    """Return the closed boundary contract for one supported release version."""
+    if not isinstance(version, str) or version not in RELEASE_CONTRACTS:
+        raise BoundaryBundleError(f"unsupported release boundary version: {version!r}")
+    return RELEASE_CONTRACTS[version]
 
 
 def canonical_json(data: Any) -> bytes:
@@ -129,7 +154,7 @@ def canonical_logical_paths(version: str = EXPECTED_VERSION) -> list[str]:
     for slug in GO_SLUGS:
         paths.append(f"go/{slug}/apgr")
         paths.append(f"go/{slug}/apgr.binary-manifest.json")
-    for tag in PYTHON_WHEEL_TAGS:
+    for tag in release_contract(version)["wheel_tags"]:
         paths.append(f"python/agentic_praxis_grimoire-{version}-py3-none-{tag}.whl")
     paths.append(f"python/agentic_praxis_grimoire-{version}.tar.gz")
     paths.append(f"npm/knowledge-forge-ai-apgr-{version}.tgz")

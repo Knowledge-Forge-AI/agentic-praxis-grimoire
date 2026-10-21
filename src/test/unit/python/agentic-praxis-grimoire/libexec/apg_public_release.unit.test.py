@@ -310,18 +310,20 @@ class APGPublicReleaseUnitTests(
         ):
             self.assertIn(path, v010["critical_files"])
 
-        # The flat current policy is the v0.13 surface; v0.10 through v0.12 remain
-        # frozen in-code historical surfaces used by versioned source policies.
+        # The flat current policy is the v0.13.1 patch surface; v0.10 through
+        # v0.13.0 remain frozen in-code historical surfaces.
         v012 = release.audited_policy_surfaces("0.12.0")[0]
         v013 = release.audited_policy_surfaces("0.13.0")[0]
+        v0131 = release.audited_policy_surfaces("0.13.1")[0]
         self.assertTrue(set(v011["critical_files"]).issubset(v012["critical_files"]))
         self.assertTrue(set(v012["critical_files"]).issubset(v013["critical_files"]))
+        self.assertTrue(set(v013["critical_files"]).issubset(v0131["critical_files"]))
         policy = json.loads(
             (REPOSITORY_ROOT / "release" / "public-surface.json").read_text(
                 encoding="utf-8"
             )
         )
-        for key, expected in v013.items():
+        for key, expected in v0131.items():
             self.assertEqual(policy[key], list(expected), key)
         for key in ("critical_files", "required_helpers"):
             self.assertIn("tools/ci/native_diagnostics.py", v013[key])

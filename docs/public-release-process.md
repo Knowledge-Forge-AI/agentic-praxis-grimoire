@@ -724,6 +724,16 @@ cache or host activation. For current development this supersedes the v0.8,
 APG103 and earlier wording that limited Nix to a consumer handoff. Those
 sections remain accurate for their own releases, which have no Nix artifact.
 
+**Publication status.** v0.13.0 was published. Its GitHub Release carries its
+assets (three wheels, the sdist, npm tarballs, binaries, manifests and
+`SHA256SUMS`), and PyPI lists its two Linux wheels and the sdist. Its original
+Darwin wheel (tag `macosx_11_0_arm64`) is present on GitHub but absent from the
+PyPI listing. Those published assets are frozen: they are never renamed,
+replaced, overwritten, yanked or deleted. No npm or Homebrew availability of
+v0.13.0 is claimed. The preparation requirements and the Nix readback below
+record the v0.13.0 procedure as written for that release; the correction for
+its Darwin declaration is the [v0.13.1 patch route](#v0131-patch-route).
+
 Release preparation must satisfy these requirements:
 
 1. **Audited surface.** `apg-public-release` has an explicit `0.13.0` surface:
@@ -840,3 +850,41 @@ source identity, asset hashes and provenance. PyPI, npm, Homebrew and all
 package-manager publication are excluded from this phase. The legacy private
 multichannel operator is not usable for this boundary. See
 [ADR 0079](adr/2026/10/0079-github-release-only-boundary-and-tree-bound-attestation.md).
+
+## v0.13.1 patch route
+
+The unreleased v0.13.1 candidate is a patch release whose predecessor is
+v0.13.0. It is pending until actually published; this section describes the
+route and makes no claim that any step has run.
+
+1. **Closed, explicit route.** The `0.13.1` surface is the frozen v0.13.0
+   surface plus a closed set of additions (its release notes and a shared
+   test-only Mach-O fixture owner); it never mutates a v0.13.0 tuple.
+   v0.14.0 and unknown versions are refused.
+2. **Approval-only governance.** There is no review-only waiver, and the
+   v0.13.0 PR #3 waiver is not inherited. The staging PR number, head and
+   base, tested merge, runs and jobs, approval, squash commit and tag are
+   measured at release time and authenticated by live GitHub readbacks, not
+   stated in advance.
+3. **Topology unchanged.** Eleven distributables (three binaries, three
+   wheels, one sdist, four npm tarballs). With three binary manifests, the
+   distribution manifest and `SHA256SUMS` that is sixteen flat release files;
+   the sealed bundle adds a seventeenth seal file.
+4. **New release namespace.** v0.13.1 assets carry v0.13.1 names, for example
+   `agentic_praxis_grimoire-0.13.1-py3-none-macosx_12_0_arm64.whl`, the
+   `manylinux_2_17_x86_64` and `manylinux_2_17_aarch64` wheels, and
+   `agentic_praxis_grimoire-0.13.1.tar.gz`, with the npm launcher and three
+   platform packages at 0.13.1. Published v0.13.0 assets are not touched.
+5. **Darwin minimum check.** The Darwin ARM64 wheel is tagged
+   `macosx_12_0_arm64` and requires macOS 12 (Monterey) or later. The builder,
+   Python backend, npm packager, prebuilt publication and distribution-
+   candidate validation each compare the actual Mach-O minimum with that tag
+   and refuse a binary that requires more than macOS 12.0. Linux targets are
+   unchanged. The motivating v0.13.0 observation is actual-byte inspection of
+   its Darwin binary (declared minimum macOS 12.0, SDK 12.0, despite the
+   `macosx_11_0_arm64` tag); it is not native execution evidence, and no
+   compiler cause is claimed.
+6. **RS9 is separate.** The fixed v0.13.0 publisher and admission contract
+   ("RS9") needs its own bounded correction and is not part of this patch.
+
+See the [v0.13.1 candidate notes](../release/v0.13.1-notes.md).

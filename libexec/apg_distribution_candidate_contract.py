@@ -2,7 +2,8 @@
 
 This module owns the public target matrix, canonical JSON rules, source
 identity, and validation of the prebuilt Go binary/manifest pairs.  It has no
-package-manager or compiler dependencies; archive-specific validation lives in
+package-manager or compiler dependencies; it reuses only the pure deployment
+predicate from ``apg_go_build``.  Archive-specific validation lives in
 ``apg_distribution_candidate_archives``.
 """
 
@@ -14,6 +15,8 @@ import os
 from pathlib import Path, PurePosixPath
 import stat
 from typing import Any, Mapping
+
+import apg_go_build
 
 
 MANIFEST_SCHEMA = "apg.distribution-manifest/v1"
@@ -38,7 +41,7 @@ TARGETS: tuple[dict[str, str], ...] = (
         "go_target": "darwin/arm64",
         "goos": "darwin",
         "goarch": "arm64",
-        "python_platform": "macosx_11_0_arm64",
+        "python_platform": "macosx_12_0_arm64",
         "npm_package": "@knowledge-forge-ai/apgr-darwin-arm64",
         "npm_os": "darwin",
         "npm_cpu": "arm64",
@@ -495,6 +498,10 @@ def _load_go_artifacts(
             corpus=corpus,
             binary=binary,
         )
+        try:
+            apg_go_build.require_release_deployment(target, binary)
+        except apg_go_build.BuildError as error:
+            raise DistributionCandidateError(f"{target} Go binary: {error}") from error
         slug = _target_slug(target)
         records[target] = {
             "name": BINARY_NAME,

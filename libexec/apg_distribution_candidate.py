@@ -63,16 +63,16 @@ _validate_wheel = _archives._validate_wheel
 
 
 def _source_revision_identity(source_root: Path | str, version: str) -> dict[str, str]:
-    """Bind v0.11 distribution metadata to a source Git revision.
+    """Bind v0.11 through v0.13.1 distribution metadata to a source Git revision.
 
     Historical manifests intentionally retain their existing schema and do not
-    gain a revision claim.  The public v0.11 publisher, however, must be able
+    gain a revision claim.  The public v0.11+ publisher, however, must be able
     to compare the exact source used for artifacts with the observed post-merge
     commit and tree.  A non-Git source cannot provide that contract.
     """
 
     core = version.split("+", 1)[0].split("-", 1)[0]
-    if core not in ("0.11.0", "0.12.0", "0.13.0"):
+    if core not in ("0.11.0", "0.12.0", "0.13.0", "0.13.1"):
         return {}
     root = _directory(source_root, "source root")
     git_prefix = ["git", "-C", os.fspath(root)]

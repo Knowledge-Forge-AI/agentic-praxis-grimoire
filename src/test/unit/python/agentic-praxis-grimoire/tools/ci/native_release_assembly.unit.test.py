@@ -29,6 +29,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[7] / "libexec"))
 import apg_go_build as go_build
 import apg_go_buildinfo as buildinfo
 
+from src.test.support import apg_macho_fixtures as macho
 from tools.ci import native_artifacts as na
 from tools.ci import native_release_assembly as assembly
 from tools.ci.native_seal import (
@@ -46,16 +47,16 @@ COMMIT, TREE, HEAD, BASE = "a" * 40, "b" * 40, "c" * 40, "d" * 40
 RUN_ID = "777"
 GO_SLUGS = ("darwin-arm64", "linux-amd64", "linux-arm64")
 PY_NAMES = (
-    "agentic_praxis_grimoire-0.13.0-py3-none-macosx_11_0_arm64.whl",
-    "agentic_praxis_grimoire-0.13.0-py3-none-manylinux_2_17_aarch64.whl",
-    "agentic_praxis_grimoire-0.13.0-py3-none-manylinux_2_17_x86_64.whl",
-    "agentic_praxis_grimoire-0.13.0.tar.gz",
+    "agentic_praxis_grimoire-0.13.1-py3-none-macosx_12_0_arm64.whl",
+    "agentic_praxis_grimoire-0.13.1-py3-none-manylinux_2_17_aarch64.whl",
+    "agentic_praxis_grimoire-0.13.1-py3-none-manylinux_2_17_x86_64.whl",
+    "agentic_praxis_grimoire-0.13.1.tar.gz",
 )
 NPM_NAMES = (
-    "knowledge-forge-ai-apgr-0.13.0.tgz",
-    "knowledge-forge-ai-apgr-darwin-arm64-0.13.0.tgz",
-    "knowledge-forge-ai-apgr-linux-arm64-0.13.0.tgz",
-    "knowledge-forge-ai-apgr-linux-x64-0.13.0.tgz",
+    "knowledge-forge-ai-apgr-0.13.1.tgz",
+    "knowledge-forge-ai-apgr-darwin-arm64-0.13.1.tgz",
+    "knowledge-forge-ai-apgr-linux-arm64-0.13.1.tgz",
+    "knowledge-forge-ai-apgr-linux-x64-0.13.1.tgz",
 )
 
 
@@ -109,12 +110,20 @@ def write_lane(root: Path, lane: str, *, nested: bool, commit: str = COMMIT, tre
     files.mkdir(parents=True)
     target = spec["target"]
     version, corpus = go_build.identities(assembly.ROOT)
-    binary = buildinfo.make_synthetic_binary(target=target, go_version=go_version, format_type="macho" if target.startswith("darwin") else "elf")
+    if target.startswith("darwin"):
+        # Genuine Mach-O: the real packagers apply the deployment predicate to the actual bytes.
+        binary = macho.darwin_arm64(go_version=go_version)
+        recorded = macho.recorded_go_version_m("/lane/apgr", go_version=go_version)
+        if recorded_arch:
+            recorded = recorded.replace("GOARCH=arm64", f"GOARCH={recorded_arch}")
+    else:
+        binary = buildinfo.make_synthetic_binary(target=target, go_version=go_version, format_type="elf")
+        recorded = recorded_text(target, go_version, recorded_arch)
     (files / "apgr").write_bytes(binary)
     (files / "apgr").chmod(0o755)
     manifest = go_build._manifest(target=target, version=version, corpus=corpus, binary=binary)
     (files / "apgr.binary-manifest.json").write_bytes(go_build.render_manifest(manifest))
-    (files / "go-version-m.txt").write_text(recorded_text(target, go_version, recorded_arch), encoding="utf-8")
+    (files / "go-version-m.txt").write_text(recorded, encoding="utf-8")
     evidence = {"schema_version": assembly.NIX_EVIDENCE_SCHEMA, "lane": lane, "target": target,
                 "compiler_version": "go1.26.9", "status": "passed", "native_execution": True, **(nix or {})}
     for key in drop_nix:

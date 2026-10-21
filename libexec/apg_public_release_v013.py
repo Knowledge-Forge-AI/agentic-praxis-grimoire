@@ -1,6 +1,8 @@
-"""Audited v0.13.0 public-surface additions and release-authority constants, kept as data outside the orchestrator.
+"""Audited v0.13 public-surface additions and release-authority constants, kept as data outside the orchestrator.
 
 The v0.13.0 surface is the complete v0.12.0 surface plus exactly these owners.
+The v0.13.1 patch surface is the frozen v0.13.0 surface plus exactly the
+``V0131_CRITICAL_ADDITIONS`` owners; it never mutates a v0.13.0 tuple.
 ``apg_public_release`` composes them; this module imports nothing from it, so
 historical v0.12.0-and-earlier surfaces cannot change through this file.
 """
@@ -131,16 +133,29 @@ V013_CRITICAL_ADDITIONS = (
     "testing/release/native-qualification.md",
 )
 
+# The closed v0.13.1 patch additions: its release notes and the shared
+# test-only Mach-O fixture owner.  Every other v0.13.1 surface tuple is the
+# exact v0.13.0 tuple.
+V0131_CRITICAL_ADDITIONS = (
+    "release/v0.13.1-notes.md",
+    "src/test/support/apg_macho_fixtures.py",
+)
+
 # Public main may carry untagged commits after the previous release tag.
-ADVANCED_HEAD_VERSIONS = frozenset({"0.12.0", "0.13.0"})
+ADVANCED_HEAD_VERSIONS = frozenset({"0.12.0", "0.13.0", "0.13.1"})
 
 # Public main may also carry untagged commits between tagged releases (v0.12.0
 # was tagged after an untagged public-main commit). Each release commit is still
 # a tagged single-parent link; v0.12.0 keeps its stricter tail-only rule.
-INTERLEAVED_UNTAGGED_VERSIONS = frozenset({"0.13.0"})
+INTERLEAVED_UNTAGGED_VERSIONS = frozenset({"0.13.0", "0.13.1"})
 
 # Merged-source verification: release version -> accepted predecessor release.
-MERGED_CHECK_PREDECESSORS = {"0.11.0": "0.10.0", "0.12.0": "0.11.0", "0.13.0": "0.12.0"}
+MERGED_CHECK_PREDECESSORS = {
+    "0.11.0": "0.10.0", "0.12.0": "0.11.0", "0.13.0": "0.12.0", "0.13.1": "0.13.0",
+}
+
+# Untagged source-only projection verification (hosted qualification pending).
+SOURCE_ONLY_UNTAGGED_VERSIONS = frozenset({"0.13.0", "0.13.1"})
 
 # Pinned cryptographic digest and provenance authority for the v0.13.0 grandfathered
 # Ruff lint baseline (tools/ci/ruff_baseline.json). Changes to the baseline or provenance

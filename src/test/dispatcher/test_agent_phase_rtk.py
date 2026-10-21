@@ -973,9 +973,9 @@ import sys
 from pathlib import Path
 import agentic_praxis_grimoire
 import agentic_praxis_grimoire.version
-assert agentic_praxis_grimoire.VERSION == "0.13.0"
-assert agentic_praxis_grimoire.__version__ == "0.13.0"
-assert agentic_praxis_grimoire.version.version() == "0.13.0"
+assert agentic_praxis_grimoire.VERSION == "0.13.1"
+assert agentic_praxis_grimoire.__version__ == "0.13.1"
+assert agentic_praxis_grimoire.version.version() == "0.13.1"
 from agentic_praxis_grimoire.rtk import resolve_rtk_configuration
 res = resolve_rtk_configuration(project_root=Path.cwd(), run_probes=False)
 assert res is not None
@@ -1033,7 +1033,7 @@ def test_version_authority_missing_and_malformed() -> None:
     import agentic_praxis_grimoire.version as ver_module
 
     # Standard reading returns current release version
-    assert ver_module._read_version() == "0.13.0"
+    assert ver_module._read_version() == "0.13.1"
 
     # Malformed versions rejection
     for malformed in ("0.13", "0.13.0-dev", "v0.12.0", "1.2.3.4", "", "   ", "beta"):

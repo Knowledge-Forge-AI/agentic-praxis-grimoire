@@ -1,8 +1,13 @@
 # APG Distribution
 
-This documentation covers the **unreleased v0.13.0 candidate**. v0.12.0 is the
-latest published release; preceding releases (v0.12.0, v0.11.0, and earlier)
-remain frozen.
+This documentation covers the **unreleased v0.13.1 candidate**, a patch release
+whose predecessor is v0.13.0. v0.13.0 is published on GitHub Releases with its
+assets frozen, and PyPI lists its two Linux wheels and the sdist; its original
+Darwin wheel (tag `macosx_11_0_arm64`) is on GitHub but absent from the PyPI
+listing. v0.13.1 is pending until actually published, and no npm or Homebrew
+availability of v0.13.0 is claimed. v0.12.0 is the latest release proven across
+GitHub Releases, Go, PyPI, npm, and Homebrew tap; published releases (v0.13.0,
+v0.12.0, and earlier) remain frozen.
 Active planning and implementation are tracked in the [v0.13 roadmap](v0-13-roadmap.md).
 Multi-channel release outcomes and post-G1 development reconciliation are documented
 in the [v0.12 forward reconciliation record](architecture/v0-12-forward-reconciliation.md).
@@ -56,9 +61,19 @@ The supported matrix is:
 
 | Go target | Python platform tag | npm platform package |
 | --- | --- | --- |
-| `darwin/arm64` | `macosx_11_0_arm64` | `@knowledge-forge-ai/apgr-darwin-arm64` |
+| `darwin/arm64` | `macosx_12_0_arm64` (macOS 12 or later) | `@knowledge-forge-ai/apgr-darwin-arm64` |
 | `linux/amd64` | `manylinux_2_17_x86_64` | `@knowledge-forge-ai/apgr-linux-x64` |
 | `linux/arm64` | `manylinux_2_17_aarch64` | `@knowledge-forge-ai/apgr-linux-arm64` |
+
+The Darwin tag is `macosx_12_0_arm64` from v0.13.1. The published v0.13.0
+Darwin wheel carries the earlier tag `macosx_11_0_arm64`; a retained
+actual-byte inspection of its binary observed a declared minimum macOS 12.0
+and SDK 12.0. That is byte inspection, not native execution evidence, and no
+compiler cause is claimed. The v0.13.0 assets stay frozen and are never
+renamed or replaced. The builder, Python backend, npm packager, prebuilt
+publication and distribution-candidate validation now compare the actual
+Mach-O minimum with the tag and refuse a binary that requires more than
+macOS 12.0. Linux targets are unchanged.
 
 While prebuilt runtime distribution targets include `darwin/arm64`, `linux/amd64`,
 and `linux/arm64`, developer / CI qualification on Linux x86_64 remains pending:
@@ -140,7 +155,9 @@ From v0.13.0, APGR is published as a first-party Nix flake from its own public
 repository and release tag ([ADR 0076](adr/2026/09/0076-first-party-nix-flake-publication-target.md)).
 This is not an upstream `NixOS/nixpkgs` package, and there is no Hydra job,
 binary cache or host-activation module. Earlier releases have no Nix artifact.
-The commands below work only after the `v0.13.0` tag is published:
+The commands below use the published `v0.13.0` tag. The `v0.13.1` tag is
+pending; the same commands apply with `v0.13.1` only after that tag is
+published:
 
 ```sh
 nix build github:Knowledge-Forge-AI/agentic-praxis-grimoire/v0.13.0#agentic-praxis-grimoire
@@ -157,7 +174,7 @@ the closure trade-offs are described in the [Nix flake guide](guides/nix-flake.m
 
 ### Platform status
 
-| System | Evidence before v0.13.0 publication |
+| System | Evidence recorded before v0.13.0 publication |
 | --- | --- |
 | `aarch64-darwin` | Native build, flake checks and disposable-profile readback on the development host, unsandboxed (`sandbox = false`); host-tool independence is not proven. The hosted `nix (aarch64-darwin)` cell must also pass on public staging |
 | `x86_64-linux` | Evaluation and derivation instantiation locally; the hosted `nix (x86_64-linux)` cell gates the public PR but has not yet been observed |

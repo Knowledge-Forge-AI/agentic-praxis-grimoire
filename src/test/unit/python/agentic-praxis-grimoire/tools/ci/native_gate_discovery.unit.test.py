@@ -38,7 +38,7 @@ WORKFLOW_SHA = "e" * 64
 LANE_IDS = {"native-darwin-arm64": "101", "native-linux-x64": "102", "native-linux-arm64": "103"}
 BUNDLE_ID = "104"
 WHEELS = (
-    "pkg-0.13.0-py3-none-macosx_11_0_arm64.whl",
+    "pkg-0.13.0-py3-none-macosx_12_0_arm64.whl",
     "pkg-0.13.0-py3-none-manylinux_2_17_x86_64.whl",
     "pkg-0.13.0-py3-none-manylinux_2_17_aarch64.whl",
 )

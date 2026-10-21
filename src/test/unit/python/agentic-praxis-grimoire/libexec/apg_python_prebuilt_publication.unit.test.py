@@ -10,6 +10,7 @@ from pathlib import Path
 import pytest
 
 from src.test.apg_test_support import repository_root
+from src.test.support import apg_macho_fixtures as macho
 
 sys.path.insert(0, str(repository_root(__file__) / "libexec"))
 
@@ -33,6 +34,7 @@ def _make_artifacts(
     missing_target: str | None = None,
     missing_file: tuple[str, str] | None = None,  # (target, "binary" | "manifest")
     include_recorded: bool = True,
+    overfloor_darwin: bool = False,
 ) -> None:
     version, corpus = go_build.identities(source)
     for target in publication.SUPPORTED_TARGETS:
@@ -42,9 +44,16 @@ def _make_artifacts(
         target_dir = artifacts_root / slug
         target_dir.mkdir(parents=True, exist_ok=True)
 
-        fmt = "macho" if target.startswith("darwin") else "elf"
+        darwin = target.startswith("darwin")
         go_ver = "go1.25.10" if tamper_buildinfo == target else "go1.26.9"
-        bin_data = buildinfo.make_synthetic_binary(target=target, go_version=go_ver, format_type=fmt)
+        if darwin:
+            # Genuine ARM64 Mach-O; over-floor changes only the declared minimum.
+            bin_data = macho.darwin_arm64(
+                minimum=macho.OVERFLOOR_MINIMUM if overfloor_darwin else macho.SUPPORTED_MINIMUM,
+                go_version=go_ver,
+            )
+        else:
+            bin_data = buildinfo.make_synthetic_binary(target=target, go_version=go_ver, format_type="elf")
 
         binary_path = target_dir / "apgr"
         if missing_file != (target, "binary"):
@@ -68,16 +77,24 @@ def _make_artifacts(
         if include_recorded:
             goos, goarch = target.split("/", 1)
             recorded_arch = "wrongarch" if tamper_recorded == target else goarch
-            recorded_text = (
-                f"{binary_path}: {go_ver}\n"
-                f"	path	{go_build.MODULE}/cmd/apgr\n"
-                f"	mod	{go_build.MODULE}	(devel)	\n"
-                f"	build	-buildvcs=false\n"
-                f"	build	-trimpath=true\n"
-                f"	build	CGO_ENABLED=0\n"
-                f"	build	GOARCH={recorded_arch}\n"
-                f"	build	GOOS={goos}\n"
-            )
+            if darwin:
+                # Must agree field-for-field with the genuine fixture's inventory.
+                recorded_text = macho.recorded_go_version_m(
+                    binary_path,
+                    go_version=go_ver,
+                    settings={"GOARCH": recorded_arch},
+                )
+            else:
+                recorded_text = (
+                    f"{binary_path}: {go_ver}\n"
+                    f"	path	{go_build.MODULE}/cmd/apgr\n"
+                    f"	mod	{go_build.MODULE}	(devel)	\n"
+                    f"	build	-buildvcs=false\n"
+                    f"	build	-trimpath=true\n"
+                    f"	build	CGO_ENABLED=0\n"
+                    f"	build	GOARCH={recorded_arch}\n"
+                    f"	build	GOOS={goos}\n"
+                )
             (target_dir / "go-version-m.txt").write_text(recorded_text, encoding="utf-8")
 
 
@@ -201,6 +218,45 @@ def test_build_prebuilt_bundle_tampered_inputs(tmp_path: Path) -> None:
     work.mkdir()
     with pytest.raises(publication.PublicationError, match="recorded setting GOARCH='wrongarch' does not match"):
         prebuilt_pub.build_prebuilt_bundle(source, artifacts_tampered_rec, tmp_path / "out4", work)
+
+
+def test_build_prebuilt_bundle_refuses_over_floor_darwin_before_backend_and_packaging(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    source = REPOSITORY_ROOT
+    artifacts_root = tmp_path / "artifacts"
+    _make_artifacts(artifacts_root, source, overfloor_darwin=True)
+    darwin_dir = artifacts_root / "darwin-arm64"
+    binary = darwin_dir / "apgr"
+    # The fixture is otherwise coherent: build info and recorded text validate,
+    # and the manifest is exact for the bytes, so only the minimum can refuse.
+    buildinfo.validate(
+        binary,
+        "darwin/arm64",
+        recorded=(darwin_dir / "go-version-m.txt").read_text(encoding="utf-8"),
+    )
+    assert go_build.darwin_arm64_deployment(binary.read_bytes())["minimum"] == "13.0.0"
+
+    def forbidden(*_args, **_kwargs):
+        pytest.fail("deployment refusal must precede the backend and packaging")
+
+    monkeypatch.setattr(backend, "_provided_binary", forbidden)
+    monkeypatch.setattr(prebuilt_pub, "_build_prebuilt_once", forbidden)
+    work = tmp_path / "work"
+    work.mkdir()
+    output = tmp_path / "output"
+    with pytest.raises(
+        publication.PublicationError,
+        match=(
+            r"prebuilt Go binary deployment failed validation for darwin/arm64: .*"
+            r"minimum macOS 13\.0\.0 exceeds macosx_12_0_arm64"
+        ),
+    ) as caught:
+        prebuilt_pub.build_prebuilt_bundle(source, artifacts_root, output, work)
+    # The backend (S2) message is distinct, so this refusal is S4's own.
+    assert "packaged binary deployment" not in str(caught.value)
+    assert not output.exists()
+    assert list(work.iterdir()) == []
 
 
 def test_build_prebuilt_bundle_output_and_filesystem_guards(tmp_path: Path) -> None:

@@ -25,6 +25,7 @@ import tempfile
 from typing import Any, Mapping, Sequence
 
 import apg_distribution_candidate_contract as candidate_contract
+import apg_go_build
 
 
 MANIFEST_SCHEMA = "apg.binary-manifest/v1"
@@ -240,19 +241,7 @@ def _manifest_identity(manifest: Mapping[str, Any], label: str) -> dict[str, Any
         raise NpmDistributionError(f"{label} version is missing")
     if not isinstance(target, str) or target not in TARGET_BY_GO:
         raise NpmDistributionError(f"{label} target is unsupported")
-    expected_target = {
-        "go_target": target,
-        "goos": TARGET_BY_GO[target].os_name,
-        "goarch": "amd64" if TARGET_BY_GO[target].cpu == "x64" else TARGET_BY_GO[target].cpu,
-        "python_platform": {
-            "darwin/arm64": "macosx_11_0_arm64",
-            "linux/amd64": "manylinux_2_17_x86_64",
-            "linux/arm64": "manylinux_2_17_aarch64",
-        }[target],
-        "npm_package": TARGET_BY_GO[target].package_name,
-        "npm_os": TARGET_BY_GO[target].os_name,
-        "npm_cpu": TARGET_BY_GO[target].cpu,
-    }
+    expected_target = dict(candidate_contract.TARGET_BY_GO[target])
     if dict(target_value) != expected_target:
         raise NpmDistributionError(f"{label} target mapping is not canonical")
     if manifest.get("module_path") != MODULE_PATH:
@@ -372,6 +361,10 @@ def _load_artifact(artifact: Artifact) -> tuple[bytes, bytes, dict[str, Any]]:
     digest = hashlib.sha256(binary_bytes).hexdigest()
     if identity["sha256"] != digest:
         raise NpmDistributionError(f"{artifact.target} binary SHA-256 differs from manifest")
+    try:
+        apg_go_build.require_release_deployment(artifact.target, binary_bytes)
+    except apg_go_build.BuildError as error:
+        raise NpmDistributionError(f"{artifact.target} Go binary: {error}") from error
     return binary_bytes, manifest_bytes, identity
 
 
