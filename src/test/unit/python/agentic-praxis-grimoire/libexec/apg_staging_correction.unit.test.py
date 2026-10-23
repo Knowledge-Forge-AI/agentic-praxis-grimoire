@@ -20,6 +20,58 @@ import apg_staging_correction as staging_correction  # noqa: E402
 
 
 class TestRunCheckedCommand(unittest.TestCase):
+    def test_future_publication_identity_defaults_and_requires_exact_pair(self) -> None:
+        identity = staging_correction.PUBLIC_COMMIT_IDENTITY
+        self.assertEqual(staging_correction.select_public_identity(None, None), identity)
+        self.assertEqual(staging_correction.select_public_identity(*identity), identity)
+        for name, email in (
+            ("", identity[1]),
+            (identity[0], ""),
+            ("Release", "release@example.invalid"),
+            (identity[0], None),
+            (None, identity[1]),
+            ("Release", None),
+            (None, "x@example.invalid"),
+        ):
+            with self.subTest(name=name, email=email), self.assertRaisesRegex(
+                release.InvocationError,
+                "future publication requires the repository owner author and committer",
+            ):
+                staging_correction.select_public_identity(name, email)
+
+    def test_commit_identity_requires_one_exact_timestamped_header_per_role(self) -> None:
+        identity = staging_correction.PUBLIC_COMMIT_IDENTITY
+        valid = (
+            "tree " + "a" * 40 + "\n"
+            f"author {identity[0]} <{identity[1]}> 0 +0000\n"
+            f"committer {identity[0]} <{identity[1]}> 0 +0000\n\n"
+            "Release test\n"
+        )
+        query = mock.Mock(return_value=valid)
+        staging_correction.verify_commit_identity(
+            Path("candidate"), "b" * 40, identity, text_git=query
+        )
+        query.assert_called_once_with(Path("candidate"), ["cat-file", "commit", "b" * 40])
+        for raw in (
+            valid.replace(
+                "committer ",
+                "committer " + identity[0] + " <" + identity[1] + "> 0 +0000\ncommitter ",
+                1,
+            ),
+            valid.replace("author " + identity[0], "author Other", 1),
+            valid.replace(" 0 +0000", " 0 +00", 1),
+            valid.replace(f"author {identity[0]} <{identity[1]}> 0 +0000\n", ""),
+            valid.replace(f"committer {identity[0]} <{identity[1]}> 0 +0000\n", ""),
+            valid.replace(" 0 +0000\n", " 0 +0000 trailing\n", 1),
+            valid.replace("author " + identity[0], "author " + identity[0] + " Extra", 1),
+            valid.replace("<" + identity[1] + ">", "<" + identity[1] + ".x>", 1),
+        ):
+            with self.subTest(raw=raw):
+                with self.assertRaisesRegex(release.ToolError, "new commit"):
+                    staging_correction.verify_commit_identity(
+                        Path("candidate"), "b" * 40, identity, text_git=lambda *_args: raw
+                    )
+
     def test_run_checked_command_without_log(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_path = Path(temp_dir)
@@ -158,6 +210,30 @@ class TestStagingCorrectionMode(unittest.TestCase):
                     Path(temporary) / "candidate",
                     "0.10.0",
                 )
+
+    def test_untagged_builder_admits_only_the_explicit_v0131_patch(self) -> None:
+        seen: dict[str, object] = {}
+
+        def lineage(*_args: object, **kwargs: object) -> None:
+            seen.update(kwargs)
+            raise release.ToolError("stop after lineage")
+
+        with tempfile.TemporaryDirectory() as temporary, mock.patch.object(
+            release, "validate_repository_separation"
+        ), mock.patch.object(release, "verify_public_release_lineage", side_effect=lineage):
+            with self.assertRaisesRegex(release.ToolError, "stop after lineage"):
+                staging_correction.build_untagged_candidate(
+                    self.source, self.base, Path(temporary) / "candidate", "0.13.1"
+                )
+            self.assertIs(seen["allow_advanced_head"], True)
+            self.assertIs(seen["allow_interleaved_untagged"], True)
+            for version in ("0.13.2", "0.14.0"):
+                with self.subTest(version=version), self.assertRaisesRegex(
+                    release.InvocationError, "only available for v0.11.0"
+                ):
+                    staging_correction.build_untagged_candidate(
+                        self.source, self.base, Path(temporary) / "candidate", version
+                    )
 
     def test_check_candidate_staging_correction_success(self) -> None:
         def text_git(_root: Path, args: list[str], **_kwargs: object) -> str:
@@ -345,6 +421,14 @@ class TestStagingCorrectionMode(unittest.TestCase):
         def text_git(_root: Path, args: list[str], **_kwargs: object) -> str:
             if args[:3] == ["show", "-s", "--format=%an%x00%ae%x00%aI"]:
                 return "Author\x00author@example.com\x002026-09-13T00:00:00Z"
+            if args[:2] == ["cat-file", "commit"]:
+                identity = staging_correction.PUBLIC_COMMIT_IDENTITY
+                return (
+                    "tree " + "a" * 40 + "\n"
+                    f"author {identity[0]} <{identity[1]}> 0 +0000\n"
+                    f"committer {identity[0]} <{identity[1]}> 0 +0000\n\n"
+                    "APG145: Repair hosted CI bootstrap and CodeQL validation\n"
+                )
             if args[0] == "write-tree":
                 return "t" * 40
             if args[0] == "commit-tree":

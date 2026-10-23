@@ -126,7 +126,7 @@ function validateManifest(manifest, target, expectedVersion, expectedCorpus, bin
     go_target: target.target,
     goos: target.os,
     goarch: target.cpu === "x64" ? "amd64" : target.cpu,
-    python_platform: target.target === "darwin/arm64" ? "macosx_11_0_arm64" :
+    python_platform: target.target === "darwin/arm64" ? "macosx_12_0_arm64" :
       target.target === "linux/amd64" ? "manylinux_2_17_x86_64" : "manylinux_2_17_aarch64",
     npm_package: target.packageName,
     npm_os: target.os,

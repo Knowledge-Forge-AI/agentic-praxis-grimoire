@@ -20,6 +20,12 @@ from typing import Iterator, NoReturn, Sequence
 from apg_skill_library_check import check_library
 import apg_public_release as public_release
 import apg_skill_topology
+from apg_user_skills_git import (
+    GIT_ENV_NAMES as _GIT_ENV_NAMES,
+    git_environment as _git_environment,
+    run_git as _run_git,
+    text_git as _text_git,
+)
 
 
 COMMAND = "apg-user-skills"
@@ -45,22 +51,11 @@ RESTART_REMINDER = (
     "Codex normally detects skill changes automatically. If the change does "
     "not appear, fully restart Codex."
 )
-PUBLIC_V01_COMMIT = "f53342d4e5079ff2a73c0a107777a92910d016a1"
+PUBLIC_V01_COMMIT = "481451b73fd9775a6d6613abb3b1675f419ddc4d"
 PUBLIC_V01_TREE = "0163a2931e65eb822f44a41d6cd0105e671015ad"
-GIT_ENV_NAMES = {
-    "GIT_ALTERNATE_OBJECT_DIRECTORIES",
-    "GIT_COMMON_DIR",
-    "GIT_CONFIG",
-    "GIT_CONFIG_COUNT",
-    "GIT_CONFIG_PARAMETERS",
-    "GIT_DIR",
-    "GIT_GRAFT_FILE",
-    "GIT_INDEX_FILE",
-    "GIT_OBJECT_DIRECTORY",
-    "GIT_PREFIX",
-    "GIT_SHALLOW_FILE",
-    "GIT_WORK_TREE",
-}
+LEGACY_V01_COMMIT = "f53342d4e5079ff2a73c0a107777a92910d016a1"
+LEGACY_V01_TREE = PUBLIC_V01_TREE
+GIT_ENV_NAMES = _GIT_ENV_NAMES
 
 
 class ToolError(Exception):
@@ -129,16 +124,7 @@ def fail(message: str) -> NoReturn:
 
 
 def git_environment() -> dict[str, str]:
-    environment = os.environ.copy()
-    for name in tuple(environment):
-        if name in GIT_ENV_NAMES or name.startswith("GIT_CONFIG_KEY_") or name.startswith("GIT_CONFIG_VALUE_"):
-            environment.pop(name)
-    environment["GIT_CONFIG_NOSYSTEM"] = "1"
-    environment["GIT_CONFIG_GLOBAL"] = os.devnull
-    environment["GIT_NO_REPLACE_OBJECTS"] = "1"
-    environment["GIT_TERMINAL_PROMPT"] = "0"
-    environment["GIT_OPTIONAL_LOCKS"] = "0"
-    return environment
+    return _git_environment()
 
 
 def run_git(
@@ -147,34 +133,11 @@ def run_git(
     *,
     allow_failure: bool = False,
 ) -> subprocess.CompletedProcess[bytes]:
-    try:
-        result = subprocess.run(
-            [
-                "git",
-                "-c",
-                "core.fsmonitor=false",
-                "-c",
-                f"core.hooksPath={os.devnull}",
-                "-C",
-                str(repository),
-                *arguments,
-            ],
-            check=False,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            env=git_environment(),
-        )
-    except OSError as error:
-        fail(f"Git could not be executed: {error.strerror}")
-    if result.returncode and not allow_failure:
-        detail = result.stderr.decode("utf-8", "replace").strip() or "Git returned no diagnostic"
-        fail(f"Git source query failed: {detail}")
-    return result
+    return _run_git(repository, arguments, allow_failure=allow_failure, fail=fail)
 
 
 def text_git(repository: Path, arguments: Sequence[str], *, allow_failure: bool = False) -> str:
-    result = run_git(repository, arguments, allow_failure=allow_failure)
-    return result.stdout.decode("utf-8", "strict").strip()
+    return _text_git(repository, arguments, allow_failure=allow_failure, run_git=run_git)
 
 
 def frontmatter_name(path: Path) -> str:
@@ -218,7 +181,12 @@ def source_skill_paths(source: SourceIdentity) -> dict[str, Path]:
     return paths
 
 
-def verify_source(requested: str | Path) -> SourceIdentity:
+def _verify_source(
+    requested: str | Path,
+    *,
+    accepted_commit: str,
+    accepted_tree: str,
+) -> SourceIdentity:
     candidate = Path(requested)
     result = run_git(candidate, ["rev-parse", "--show-toplevel"], allow_failure=True)
     if result.returncode:
@@ -242,7 +210,7 @@ def verify_source(requested: str | Path) -> SourceIdentity:
     try:
         release_repository = public_release.resolve_repository(root, "source")
         lineage = public_release.verify_public_release_lineage(  # untagged commits may surround tags
-            release_repository, accepted_commit=PUBLIC_V01_COMMIT, accepted_tree=PUBLIC_V01_TREE,
+            release_repository, accepted_commit=accepted_commit, accepted_tree=accepted_tree,
             allow_advanced_head=True, allow_interleaved_untagged=True)
     except public_release.ToolError as error:
         fail(f"source public release lineage is invalid: {error}")
@@ -254,7 +222,7 @@ def verify_source(requested: str | Path) -> SourceIdentity:
         diagnostic = library_result.diagnostics[0]
         fail(f"source APG skill library is invalid: {diagnostic.code} {diagnostic.path}")
     policy_paths = {name: Path("skills") / name for name in SKILLS}
-    if commit != PUBLIC_V01_COMMIT:
+    if commit != accepted_commit:
         try:
             policy = public_release.load_policy(
                 release_repository,
@@ -294,6 +262,38 @@ def verify_source(requested: str | Path) -> SourceIdentity:
     tag = current_release.tag
     version = current_release.version
     return SourceIdentity(str(root), version, tag, commit, tree, tuple(hashes))
+
+
+def verify_source(requested: str | Path) -> SourceIdentity:
+    """Verify a fresh or explicitly supplied source against the current root."""
+
+    return _verify_source(
+        requested,
+        accepted_commit=PUBLIC_V01_COMMIT,
+        accepted_tree=PUBLIC_V01_TREE,
+    )
+
+
+def verify_recorded_source(recorded: SourceIdentity) -> SourceIdentity:
+    """Verify a state-recorded source, including the bounded legacy root."""
+
+    if (recorded.commit, recorded.tree) == (PUBLIC_V01_COMMIT, PUBLIC_V01_TREE):
+        verified = verify_source(recorded.path)
+    else:
+        try:
+            verified = _verify_source(
+                recorded.path,
+                accepted_commit=LEGACY_V01_COMMIT,
+                accepted_tree=LEGACY_V01_TREE,
+            )
+        except ToolError as legacy_error:
+            try:
+                verified = verify_source(recorded.path)
+            except ToolError:
+                raise legacy_error
+    if verified != recorded:
+        fail("recorded public source release identity has changed")
+    return verified
 
 
 def state_root() -> Path:
@@ -587,10 +587,7 @@ def atomic_state_write(path: Path, state: State) -> None:
 
 
 def source_matches(recorded: SourceIdentity) -> SourceIdentity:
-    verified = verify_source(recorded.path)
-    if verified != recorded:
-        fail("recorded public source release identity has changed")
-    return verified
+    return verify_recorded_source(recorded)
 
 
 def exact_links(root: Path, source: SourceIdentity) -> None:

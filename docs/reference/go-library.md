@@ -262,6 +262,6 @@ stability (ICR-004 / ICR-005) for JACA XO consumer qualification. (Note: `phase`
 `routing` may be consumed independently, while `phase` brings in `routing`.)
 Go consumers can require the published `github.com/Knowledge-Forge-AI/agentic-praxis-grimoire v0.12.0`
 (or `go get github.com/Knowledge-Forge-AI/agentic-praxis-grimoire@v0.12.0`) through the normal
-public Go proxy and checksum database. In the v0.13.0 candidate, the Go API manifest label
-remains `v0.12.0-provisional`.
+public Go proxy and checksum database. In the unreleased v0.13.1 candidate (a patch release
+whose predecessor is v0.13.0), the Go API manifest label remains `v0.12.0-provisional`.
 

@@ -79,11 +79,11 @@ def scanner_version(executable: str) -> str | None:
 def build_argv(executable: str, directory: Path) -> list[str]:
     """Deterministic scan of one isolated directory.
 
-    The subcommand shape is the documented expectation for the pinned
-    executable; it is asserted by test and must be re-verified when MalSkanner is
-    actually installed on a host.
+    The pinned executable receives JSON output mode and the isolated target
+    directory directly; it is asserted by test and must be re-verified when
+    MalSkanner is actually installed on a host.
     """
-    return [executable, "scan", "--json", os.fspath(directory)]
+    return [executable, "--json", os.fspath(directory)]
 
 
 def redact_findings(payload: Any) -> list[dict[str, Any]]:
@@ -94,9 +94,15 @@ def redact_findings(payload: Any) -> list[dict[str, Any]]:
     for finding in findings:
         if not isinstance(finding, dict):
             continue
-        redacted.append(
-            {field: finding.get(field) for field in FINDING_FIELDS if field in finding}
-        )
+        normalized: dict[str, Any] = {}
+        if "rule" in finding:
+            normalized["rule"] = finding["rule"]
+        elif "ruleId" in finding:
+            normalized["rule"] = finding["ruleId"]
+        for field in FINDING_FIELDS[1:]:
+            if field in finding:
+                normalized[field] = finding[field]
+        redacted.append(normalized)
     return redacted
 
 

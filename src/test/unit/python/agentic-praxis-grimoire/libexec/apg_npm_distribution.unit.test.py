@@ -9,6 +9,8 @@ from io import BytesIO
 
 import pytest
 
+from src.test.support import apg_macho_fixtures as macho
+
 
 ROOT = Path(__file__).resolve().parents[6]
 sys.path.insert(0, str(ROOT / "libexec"))
@@ -19,12 +21,22 @@ CURRENT_VERSION = distribution.version_authority(ROOT)
 CORPUS = "a" * 64
 
 
-def _artifact_root(tmp_path: Path, *, tamper: str | None = None) -> Path:
+def _artifact_root(
+    tmp_path: Path,
+    *,
+    tamper: str | None = None,
+    darwin_minimum: tuple[int, int, int] = macho.SUPPORTED_MINIMUM,
+) -> Path:
     root = tmp_path / "go-artifacts"
     for target in distribution.TARGETS:
         target_root = root / target.slug
         target_root.mkdir(parents=True)
-        binary = "#!/bin/sh\nprintf '%s\\n' \"$@\"\n".encode("utf-8")
+        # Darwin bytes must satisfy the shared actual-byte deployment predicate.
+        binary = (
+            macho.darwin_arm64(minimum=darwin_minimum)
+            if target.go_target == "darwin/arm64"
+            else "#!/bin/sh\nprintf '%s\\n' \"$@\"\n".encode("utf-8")
+        )
         binary_path = target_root / "apgr"
         binary_path.write_bytes(binary)
         binary_path.chmod(0o700)
@@ -39,7 +51,7 @@ def _artifact_root(tmp_path: Path, *, tamper: str | None = None) -> Path:
                 "goos": target.os_name,
                 "goarch": "amd64" if target.cpu == "x64" else target.cpu,
                 "python_platform": {
-                    "darwin/arm64": "macosx_11_0_arm64",
+                    "darwin/arm64": "macosx_12_0_arm64",
                     "linux/amd64": "manylinux_2_17_x86_64",
                     "linux/arm64": "manylinux_2_17_aarch64",
                 }[target.go_target],
@@ -154,6 +166,39 @@ def test_manifest_tamper_and_missing_identity_fail_closed(tmp_path: Path) -> Non
     )
     with pytest.raises(distribution.NpmDistributionError, match="fields"):
         distribution.build_packages(ROOT, root, tmp_path / "missing-bundle", work_root=tmp_path)
+
+
+def _darwin_artifact(root: Path) -> distribution.Artifact:
+    target = next(item for item in distribution.TARGETS if item.go_target == "darwin/arm64")
+    directory = root / target.slug
+    manifest = (directory / "apgr.binary-manifest.json").read_bytes()
+    return distribution.Artifact(target.go_target, directory / "apgr", None, manifest)
+
+
+def test_build_packages_refuses_an_over_floor_darwin_binary_before_any_output(tmp_path: Path) -> None:
+    # Only the Mach-O minimum differs from the admitted floor fixture; the
+    # manifest is coherent (version, target, size, hash), so the sole cause of
+    # refusal is the shared deployment predicate.
+    root = _artifact_root(tmp_path, darwin_minimum=macho.OVERFLOOR_MINIMUM)
+    output = tmp_path / "bundle"
+    with pytest.raises(
+        distribution.NpmDistributionError,
+        match=r"darwin/arm64 Go binary: .*deployment refused.*13\.0\.0 exceeds macosx_12_0_arm64",
+    ):
+        distribution.build_packages(ROOT, root, output, work_root=tmp_path)
+    assert not output.exists()
+    assert list(tmp_path.glob("apgr-npm-*")) == []
+
+
+def test_load_artifact_admits_the_floor_and_refuses_one_over_floor_darwin_binary(tmp_path: Path) -> None:
+    admitted = _darwin_artifact(_artifact_root(tmp_path / "floor"))
+    assert distribution._load_artifact(admitted)[0] == macho.darwin_arm64()
+    refused = _darwin_artifact(_artifact_root(tmp_path / "over", darwin_minimum=macho.OVERFLOOR_MINIMUM))
+    with pytest.raises(
+        distribution.NpmDistributionError,
+        match=r"darwin/arm64 Go binary: .*deployment refused.*13\.0\.0 exceeds macosx_12_0_arm64",
+    ):
+        distribution._load_artifact(refused)
 
 
 @pytest.mark.parametrize("name", ("", "/absolute", "package/../escape", "package\\escape"))

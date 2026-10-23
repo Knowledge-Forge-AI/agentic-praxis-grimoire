@@ -41,8 +41,9 @@ signature; the attended operator retains its accepted premerge digest.
 
 Require active enforcement of both aggregate checks from GitHub Actions,
 strict base freshness, pull-request, deletion and non-fast-forward rules and
-no bypass actors. Require current eligible approval or an explicitly reviewed
-governance waiver; a waiver does not waive checks or permit an administrative
+no bypass actors. Require the eligible approval count configured by the
+authenticated active ruleset, or an explicitly reviewed governance waiver.
+A configured count of zero requires no approval. A waiver does not waive checks or permit an administrative
 merge bypass. A waiver hash belongs in the squash message and its canonical
 content accompanies the release attestation.
 

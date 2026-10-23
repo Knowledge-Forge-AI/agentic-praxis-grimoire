@@ -14,6 +14,7 @@ from pathlib import Path
 from typing import Any
 
 import apg_distribution_candidate_contract as candidate_contract
+import apg_go_build
 import apg_go_buildinfo
 import apg_python_distribution as distribution
 import apg_python_publication as publication
@@ -103,8 +104,9 @@ def build_prebuilt_bundle(
 ) -> dict[str, Any]:
     """Assemble deterministic Python wheels and sdist from prebuilt Go binaries.
 
-    Validates prebuilt Go binaries against Go 1.18+ inline build info and
-    binary manifests without invoking Go or any compilation subprocess.
+    Validates prebuilt Go binaries against Go 1.18+ inline build info, the
+    shared actual-byte deployment predicate, and binary manifests without
+    invoking Go or any compilation subprocess.
     Ensures A/B byte-for-byte reproducibility across all artifacts.
     """
     source_root = publication._directory(source, "publication source")
@@ -160,6 +162,13 @@ def build_prebuilt_bundle(
             raise publication.PublicationError(
                 f"prebuilt Go binary build info failed validation for {target}: {error}"
             ) from error
+        binary_bytes = binary_path.read_bytes()
+        try:
+            apg_go_build.require_release_deployment(target, binary_bytes)
+        except apg_go_build.BuildError as error:
+            raise publication.PublicationError(
+                f"prebuilt Go binary deployment failed validation for {target}: {error}"
+            ) from error
 
         try:
             identity = backend._provided_binary(
@@ -178,7 +187,7 @@ def build_prebuilt_bundle(
             )
 
         identities[target] = identity
-        supplied_binaries[target] = binary_path.read_bytes()
+        supplied_binaries[target] = binary_bytes
         supplied_manifests[target] = manifest_path.read_bytes()
 
     with publication._release_epoch_environment(selected_epoch):

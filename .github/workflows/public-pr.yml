@@ -243,7 +243,7 @@
         },
         {
           "name": "Run unit and integration suite",
-          "run": "set -euo pipefail\n\"${APGR_TEST_PYTHON}\" bin/apg-test policy \\\n  --summary-file \"${RUNNER_TEMP}/apgr-policy-summary.json\"\n\"${APGR_TEST_PYTHON}\" bin/apg-test unit-integration --public-version 0.13.0 \\\n  --summary-file \"${RUNNER_TEMP}/apgr-unit-integration-summary.json\"\n"
+          "run": "set -euo pipefail\n\"${APGR_TEST_PYTHON}\" bin/apg-test policy \\\n  --summary-file \"${RUNNER_TEMP}/apgr-policy-summary.json\"\n\"${APGR_TEST_PYTHON}\" bin/apg-test unit-integration --public-version 0.13.1 \\\n  --summary-file \"${RUNNER_TEMP}/apgr-unit-integration-summary.json\"\n"
         },
         {
           "name": "Emit unit-integration receipt",

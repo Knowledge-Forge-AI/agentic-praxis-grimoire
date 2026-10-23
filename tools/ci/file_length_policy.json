@@ -313,7 +313,7 @@
       "role": "fixture-or-test"
     },
     {
-      "count": 1066,
+      "count": 1084,
       "maintenance": "No growth beyond the entry bound. Review reductions; retire when at or below 1000 lines. No transfer or automatic increase.",
       "owner": "distribution-candidate",
       "path": "src/test/unit/python/agentic-praxis-grimoire/libexec/apg_distribution_candidate.unit.test.py",

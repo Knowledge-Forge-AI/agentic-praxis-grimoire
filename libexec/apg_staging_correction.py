@@ -10,9 +10,53 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 import os
 from pathlib import Path
+import re
 import subprocess
 import tempfile
 from typing import Any, Callable, NoReturn
+
+
+PUBLIC_COMMIT_IDENTITY = ("Samuel Leighton Lair", "sam.lair@knowledge-forge.ai")
+
+
+def select_public_identity(
+    name: str | None,
+    email: str | None,
+) -> tuple[str, str]:
+    """Select the sole future publication identity, never ambient config."""
+    selected = (
+        PUBLIC_COMMIT_IDENTITY[0] if name is None else name,
+        PUBLIC_COMMIT_IDENTITY[1] if email is None else email,
+    )
+    if (name is None) != (email is None) or selected != PUBLIC_COMMIT_IDENTITY:
+        import apg_public_release as release
+
+        release.unsafe(
+            "future publication requires the repository owner author and committer"
+        )
+    return selected
+
+
+def verify_commit_identity(
+    root: Path,
+    commit: str,
+    identity: tuple[str, str],
+    *,
+    text_git: Callable[..., Any] | None = None,
+) -> None:
+    """Verify both raw commit role headers before exposing any ref."""
+    import apg_public_release as release
+
+    query = text_git or release.text_git
+    raw = query(root, ["cat-file", "commit", commit])
+    headers = raw.split("\n\n", 1)[0].splitlines()
+    for role in ("author", "committer"):
+        rows = [line for line in headers if line.startswith(role + " ")]
+        expected = role + " " + identity[0] + " <" + identity[1] + "> "
+        if len(rows) != 1 or not rows[0].startswith(expected) or re.fullmatch(
+            r"-?\d+ [+-]\d{4}", rows[0][len(expected) :]
+        ) is None:
+            release.fail("new commit " + role + " differs from selected identity")
 
 
 def run_checked_command(
@@ -156,8 +200,8 @@ def build_untagged_candidate(
     _unsafe = unsafe or release.unsafe
 
     core = version.split("+", 1)[0].split("-", 1)[0]
-    if core not in ("0.11.0", "0.12.0", "0.13.0"):
-        _unsafe("untagged candidate mode is only available for v0.11.0, v0.12.0 and v0.13.0")
+    if core not in ("0.11.0", "0.12.0", "0.13.0", "0.13.1"):
+        _unsafe("untagged candidate mode is only available for v0.11.0, v0.12.0, v0.13.0 and v0.13.1")
     release.validate_repository_separation(source, base)
     release.verify_public_release_lineage(
         base,
@@ -211,8 +255,8 @@ def build_untagged_candidate(
         _fail("public base release metadata is incomplete")
     release.validate_identity(metadata[0], metadata[1])
     release.validate_date(metadata[2])
-    _run_git(output, ["config", "user.name", metadata[0]])
-    _run_git(output, ["config", "user.email", metadata[1]])
+    _run_git(output, ["config", "user.name", PUBLIC_COMMIT_IDENTITY[0]])
+    _run_git(output, ["config", "user.email", PUBLIC_COMMIT_IDENTITY[1]])
     for entry in entries:
         release.import_object(source, output, entry.oid)
     with tempfile.NamedTemporaryFile(prefix="apg-public-index-", delete=False) as index_file:
@@ -234,11 +278,11 @@ def build_untagged_candidate(
     finally:
         index_path.unlink(missing_ok=True)
     identity_environment = {
-        "GIT_AUTHOR_NAME": metadata[0],
-        "GIT_AUTHOR_EMAIL": metadata[1],
+        "GIT_AUTHOR_NAME": PUBLIC_COMMIT_IDENTITY[0],
+        "GIT_AUTHOR_EMAIL": PUBLIC_COMMIT_IDENTITY[1],
         "GIT_AUTHOR_DATE": metadata[2],
-        "GIT_COMMITTER_NAME": metadata[0],
-        "GIT_COMMITTER_EMAIL": metadata[1],
+        "GIT_COMMITTER_NAME": PUBLIC_COMMIT_IDENTITY[0],
+        "GIT_COMMITTER_EMAIL": PUBLIC_COMMIT_IDENTITY[1],
         "GIT_COMMITTER_DATE": metadata[2],
     }
     commit_parent = staging_parent if staging_parent is not None else base.head
@@ -247,6 +291,12 @@ def build_untagged_candidate(
         output,
         ["commit-tree", tree, "-p", commit_parent, "-m", commit_subject],
         extra_environment=identity_environment,
+    )
+    verify_commit_identity(
+        output,
+        commit,
+        PUBLIC_COMMIT_IDENTITY,
+        text_git=_text_git,
     )
     _run_git(output, ["update-ref", "refs/heads/staging", commit])
     _run_git(output, ["symbolic-ref", "HEAD", "refs/heads/staging"])

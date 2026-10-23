@@ -23,6 +23,15 @@ from tools.ci.bootstrap_runtime import (
     write_environment,
 )
 
+# The qualified public CI npm set, in installation order.
+NPM_PACKAGES = {
+    "typescript": "7.0.2",
+    "npm": "12.0.2",
+    "@playwright/test": "1.62.1",
+    "vite": "8.2.4",
+    "rolldown": "1.2.7",
+}
+
 
 def test_runtime_manifest_is_exact_and_fail_closed() -> None:
     runtime = load_runtime()
@@ -33,6 +42,23 @@ def test_runtime_manifest_is_exact_and_fail_closed() -> None:
     assert runtime["bats"]["root_owned"] is True
     assert runtime["bash"]["version"] == "5.3p3"
     assert runtime["bash"]["root_owned"] is True
+
+
+def test_runtime_manifest_selects_vite_824_as_the_qualified_npm_set() -> None:
+    runtime = load_runtime()
+    assert runtime["npm_packages"]["vite"] == "8.2.4"
+    assert runtime["npm_packages"] == bootstrap.EXPECTED_NPM_PACKAGES
+    assert bootstrap.EXPECTED_NPM_PACKAGES == NPM_PACKAGES
+
+
+def test_runtime_manifest_refuses_stale_vite_822_pin(tmp_path: Path) -> None:
+    document = json.loads(bootstrap.RUNTIME_CONFIG.read_text(encoding="utf-8"))
+    assert document["npm_packages"]["vite"] == "8.2.4"
+    document["npm_packages"]["vite"] = "8.2.2"
+    stale = tmp_path / "public-ci-runtime.json"
+    stale.write_text(json.dumps(document), encoding="utf-8")
+    with pytest.raises(ValueError, match="npm package pins"):
+        load_runtime(stale)
 
 
 def test_runtime_manifest_rejects_duplicate_and_wrong_shape(tmp_path: Path) -> None:
@@ -157,22 +183,19 @@ def test_secondary_archive_preserves_only_regular_binary(tmp_path: Path) -> None
     assert result.stat().st_mode & 0o111
 
 
-def test_npm_runtime_binds_exact_packages_and_private_browser_cache(
+def _fake_npm_runtime(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
-) -> None:
+    *,
+    installed_vite: str,
+) -> tuple[dict[str, object], Path, list[list[str]], list[dict[str, str]]]:
+    """Fake npm install that writes every package correctly except, optionally, Vite."""
     tmp_path.chmod(0o700)
     primary = tmp_path / "primary-node"
     primary.write_bytes(b"node")
     primary.chmod(0o700)
-    config = {
-        "npm_packages": {
-            "typescript": "7.0.2",
-            "npm": "12.0.2",
-            "@playwright/test": "1.62.1",
-            "vite": "8.2.2",
-            "rolldown": "1.2.7",
-        },
+    config: dict[str, object] = {
+        "npm_packages": dict(NPM_PACKAGES),
         "browsers": ["chromium", "firefox", "webkit"],
     }
     commands: list[list[str]] = []
@@ -205,7 +228,7 @@ def test_npm_runtime_binds_exact_packages_and_private_browser_cache(
             write_package(package_root, "@playwright/test", "1.62.1")
             write_package(package_root, "playwright", "1.62.1")
             write_package(package_root, "playwright-core", "1.62.1")
-            write_package(package_root, "vite", "8.2.2")
+            write_package(package_root, "vite", installed_vite)
             write_package(package_root, "rolldown", "1.2.7")
             write_package(package_root, "@rolldown/binding-darwin-arm64", "1.2.7")
         elif command[-1] == "--version" and command[1].endswith("npm-cli.js"):
@@ -216,19 +239,65 @@ def test_npm_runtime_binds_exact_packages_and_private_browser_cache(
             assert environment["PLAYWRIGHT_BROWSERS_PATH"] == str(tmp_path / "browsers")
         return subprocess.CompletedProcess(command, 0, stdout="", stderr="")
 
+    monkeypatch.setattr(
+        bootstrap.shutil,
+        "which",
+        lambda name: "/fixed/bin/npm" if name == "npm" else None,
+    )
     monkeypatch.setattr(bootstrap, "_run", runner)
+    return config, primary, commands, environments
+
+
+def test_npm_runtime_binds_exact_packages_and_private_browser_cache(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    config, primary, commands, environments = _fake_npm_runtime(
+        tmp_path, monkeypatch, installed_vite="8.2.4"
+    )
     package_root, tsc = install_npm_runtime(tmp_path, config, primary)
 
     assert package_root == tmp_path / "npm"
     assert tsc == package_root / "node_modules" / "typescript" / "bin" / "tsc"
-    assert commands[0][1:3] == ["install", "--prefix"]
-    assert "--ignore-scripts" in commands[0]
+    assert commands[0] == [
+        "/fixed/bin/npm",
+        "install",
+        "--prefix",
+        str(tmp_path / "npm"),
+        "--ignore-scripts",
+        "--no-audit",
+        "--no-fund",
+        "typescript@7.0.2",
+        "npm@12.0.2",
+        "@playwright/test@1.62.1",
+        "vite@8.2.4",
+        "rolldown@1.2.7",
+    ]
+    vite_manifest = json.loads(
+        (package_root / "node_modules" / "vite" / "package.json").read_text(encoding="utf-8")
+    )
+    assert vite_manifest == {"name": "vite", "version": "8.2.4"}
     assert len(environments) == 4
     for environment in environments:
         assert Path(environment["HOME"]).is_relative_to(tmp_path)
         assert Path(environment["npm_config_cache"]).is_relative_to(tmp_path)
         assert Path(environment["TMPDIR"]).is_relative_to(tmp_path)
         assert "npm_config_prefix" not in environment
+
+
+def test_npm_runtime_refuses_wrong_installed_vite_version(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    config, primary, commands, _environments = _fake_npm_runtime(
+        tmp_path, monkeypatch, installed_vite="8.2.2"
+    )
+    with pytest.raises(RuntimeError, match="package identity mismatch for vite"):
+        install_npm_runtime(tmp_path, config, primary)
+    # The refusal happens at package verification, before any runtime query or
+    # browser installation.
+    assert len(commands) == 1
+    assert "vite@8.2.4" in commands[0]
 
 
 def test_external_root_and_environment_output_refuse_overlap_and_overwrite(tmp_path: Path) -> None:

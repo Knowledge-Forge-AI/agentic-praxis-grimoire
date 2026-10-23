@@ -208,7 +208,7 @@ Member jobs are wired to existing repository commands:
 - `static-analysis`: `tools/ci/run_pre_review.py`
 - `policy`: `bin/apg-check-skill-library`, `bin/apg-check-record-identity`, `bin/apg-check-change-size`
 - `unit-integration`: `bin/apg-test policy` followed by
-  `bin/apg-test unit-integration --public-version 0.13.0` using the bootstrapped runtime. This explicit public mode uses the versioned release owner's six exact private-history deselections; public behavioral fixture companions run, and component/union thresholds remain unchanged
+  `bin/apg-test unit-integration --public-version 0.13.1` using the bootstrapped runtime. This explicit public mode uses the versioned release owner's six exact private-history deselections; public behavioral fixture companions run, and component/union thresholds remain unchanged
 - `closure`: both normal and `--require-zero` roadmap-closure modes
 - `go`: `go test ./...`, `go vet ./...`, `go test -race ./...`
 - `codeql`: Advanced CodeQL matrix

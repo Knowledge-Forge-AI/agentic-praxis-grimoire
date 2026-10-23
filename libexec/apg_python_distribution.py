@@ -36,6 +36,9 @@ V012_RELEASE_EPOCH = 1_789_689_600
 # Manager-confirmed v0.13 release epoch (UTC: 2026-09-30T00:00:00Z); a policy
 # value, like earlier epochs not a publication timestamp.
 V013_RELEASE_EPOCH = 1_790_726_400
+# Selected v0.13.1 patch epoch.  It deliberately equals the v0.13 policy value
+# so the patch archives share the v0.13 normalization; v0.13.0 stays separate.
+V0131_RELEASE_EPOCH = 1_790_726_400
 RELEASE_EPOCHS = (
     V05_RELEASE_EPOCH,
     V06_RELEASE_EPOCH,
@@ -59,6 +62,7 @@ RELEASE_EPOCH_BY_VERSION = {
     "0.11.0": V011_RELEASE_EPOCH,
     "0.12.0": V012_RELEASE_EPOCH,
     "0.13.0": V013_RELEASE_EPOCH,
+    "0.13.1": V0131_RELEASE_EPOCH,
 }
 # The gzip header is the tighter of the gzip uint32 and tar timestamp bounds.
 MAX_ARCHIVE_MTIME = 0xFFFFFFFF

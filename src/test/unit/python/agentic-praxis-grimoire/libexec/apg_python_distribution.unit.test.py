@@ -251,5 +251,11 @@ def test_cli_epoch_preserves_historical_values_and_binds_v08() -> None:
     assert distribution.release_epoch("0.12.0") == 1_789_689_600
     assert distribution.V013_RELEASE_EPOCH == 1_790_726_400
     assert distribution.release_epoch("0.13.0") == 1_790_726_400
-    with pytest.raises(distribution.NormalizationError, match="no reproducible release epoch"):
-        distribution.release_epoch("0.14.0")
+    # The selected v0.13.1 patch epoch is explicit and deliberately equals v0.13.
+    assert distribution.V0131_RELEASE_EPOCH == 1_790_726_400
+    assert distribution.release_epoch("0.13.1") == distribution.V013_RELEASE_EPOCH
+    assert distribution.RELEASE_EPOCH_BY_VERSION["0.13.0"] == distribution.V013_RELEASE_EPOCH
+    assert distribution._epoch_argument("1790726400") == distribution.V0131_RELEASE_EPOCH
+    for version in ("0.13.2", "0.14.0"):
+        with pytest.raises(distribution.NormalizationError, match="no reproducible release epoch"):
+            distribution.release_epoch(version)

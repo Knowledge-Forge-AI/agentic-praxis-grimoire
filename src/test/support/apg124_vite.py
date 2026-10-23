@@ -1,6 +1,6 @@
-"""APG124 Maintained Vite 8.2.2 Toolchain Harness and Prerequisite Contract.
+"""APG124 Maintained Vite 8.2.4 Toolchain Harness and Prerequisite Contract.
 
-Manages synthetic local Vite 8.2.2 build and dev server execution with Rolldown 1.2.7.
+Manages synthetic local Vite 8.2.4 build and dev server execution with Rolldown 1.2.7.
 Enforces fail-closed validation of runtime, Node binary identity, package root,
 scratch ownership, loopback network isolation, and deterministic positive/negative
 scenario receipts.
@@ -22,7 +22,7 @@ from typing import Any, Dict, List, Optional, Sequence, Set, Tuple
 
 # Provenance and Disclaimers
 VITE_TOOLCHAIN_DISCLAIMER: str = (
-    "Maintained executable Vite 8.2.2 toolchain scenarios; evidence verifies local "
+    "Maintained executable Vite 8.2.4 toolchain scenarios; evidence verifies local "
     "build, serving, and configuration contracts without third-party framework or "
     "deployment claims."
 )
@@ -30,7 +30,7 @@ VITE_TOOLCHAIN_DISCLAIMER: str = (
 # Identity Constants
 EXPECTED_NODE_VERSION: str = "v22.22.2|darwin/arm64|12.4.254.21-node.39|1.51.0"
 EXPECTED_NODE_SHA256: str = "b7fff29202c2d59eeff28c53588d2832323b45cb2e854ba29bea47ade37d8359"
-EXPECTED_VITE_VERSION: str = "8.2.2"
+EXPECTED_VITE_VERSION: str = "8.2.4"
 EXPECTED_ROLLDOWN_VERSION: str = "1.2.7"
 
 # Scenarios
@@ -183,7 +183,7 @@ def validate_node_executable(node_path: Path, repo_root: Path) -> str:
 
 
 def validate_vite_package(package_root: Path, scratch_root: Path, repo_root: Path) -> Dict[str, str]:
-    """Validate that package_root contains exact Vite 8.2.2 and Rolldown 1.2.7 packages."""
+    """Validate that package_root contains exact Vite 8.2.4 and Rolldown 1.2.7 packages."""
     if not package_root.is_absolute():
         raise ViteHarnessPrerequisiteError(f"Package root must be absolute: {package_root}")
     if not package_root.is_dir():

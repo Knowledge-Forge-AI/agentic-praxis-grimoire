@@ -1,4 +1,4 @@
-"""v0.13.0 public-surface additions and historical-surface immutability."""
+"""v0.13.0 public-surface additions, the v0.13.1 patch surface, and historical immutability."""
 
 from __future__ import annotations
 
@@ -119,8 +119,9 @@ def test_v013_surface_binds_first_party_nix_owners() -> None:
     assert exported <= set(surface["critical_files"])
 
 
-def test_v013_audited_paths_exist_and_tests_are_public_mirrored() -> None:
-    surface = release.audited_policy_surfaces("0.13.0")[0]
+@pytest.mark.parametrize("version", ["0.13.0", "0.13.1"])
+def test_v013_audited_paths_exist_and_tests_are_public_mirrored(version: str) -> None:
+    surface = release.audited_policy_surfaces(version)[0]
     for key, values in surface.items():
         if key == "validation_categories":
             continue
@@ -130,10 +131,48 @@ def test_v013_audited_paths_exist_and_tests_are_public_mirrored() -> None:
         assert "/agentic-praxis-grimoire/" in path and path.endswith(".test.py")
 
 
-def test_committed_public_surface_is_the_v013_surface() -> None:
+def test_committed_public_surface_is_the_v0131_patch_surface() -> None:
     policy = json.loads((ROOT / "release/public-surface.json").read_text(encoding="utf-8"))
-    for key, expected in release.audited_policy_surfaces("0.13.0")[0].items():
+    for key, expected in release.audited_policy_surfaces("0.13.1")[0].items():
         assert tuple(policy[key]) == expected, key
+
+
+def test_v0131_patch_surface_is_frozen_v013_plus_only_its_critical_additions() -> None:
+    old = release.audited_policy_surfaces("0.13.0")[0]
+    new = release.audited_policy_surfaces("0.13.1")[0]
+    additions = set(v013.V0131_CRITICAL_ADDITIONS)
+    assert v013.V0131_CRITICAL_ADDITIONS == (
+        "release/v0.13.1-notes.md",
+        "src/test/support/apg_macho_fixtures.py",
+        "testing/fixtures/skill-cli-v0131-compatibility.json",
+    )
+    assert set(new) == set(old)
+    for key in old:
+        if key != "critical_files":
+            assert new[key] == old[key], key
+    assert new["critical_files"] == tuple(sorted(set(old["critical_files"]) | additions))
+    assert not additions & set(old["critical_files"])
+    # Equivalence to the original surface: removing exactly the patch owners from
+    # the committed policy reproduces the published v0.13.0 surface unchanged.
+    policy = json.loads((ROOT / "release/public-surface.json").read_text(encoding="utf-8"))
+    for key, expected in old.items():
+        observed = tuple(path for path in policy[key] if path not in additions)
+        assert observed == expected, key
+    # Patch owners never enter the historical v0.13.0 tuples or its critical additions.
+    assert not additions & set(v013.V013_CRITICAL_ADDITIONS)
+    assert "release/v0.13.1-notes.md" not in release.V013_CRITICAL
+
+
+def test_v0131_release_gates_are_explicit_patch_decisions() -> None:
+    assert release.CURRENT_SURFACE_PREFIXES["0.13.1"] == "V0131"
+    assert release.PUBLIC_VALIDATION_DESELECTIONS_BY_VERSION["0.13.1"] == (
+        release.PUBLIC_VALIDATION_DESELECTIONS_BY_VERSION["0.13.0"])
+    assert release.PUBLIC_INVENTORY_SUPPLEMENTS_BY_VERSION["0.13.1"] is None
+    assert release.CANDIDATE_PATH_FILTERS["0.13.1"] is release.is_v013_candidate_path
+    assert v013.MERGED_CHECK_PREDECESSORS["0.13.1"] == "0.13.0"
+    assert v013.SOURCE_ONLY_UNTAGGED_VERSIONS == {"0.13.0", "0.13.1"}
+    # The patch has no published-surface golden yet; v0.11/v0.12 stay pinned.
+    assert set(release.PUBLISHED_SURFACE_SHA256) == {"0.11.0", "0.12.0"}
 
 
 def test_v013_release_gates_extend_v012_semantics() -> None:
@@ -150,9 +189,9 @@ def test_v013_release_gates_extend_v012_semantics() -> None:
     assert release.PUBLIC_INVENTORY_SUPPLEMENTS_BY_VERSION["0.13.0"] is None
     assert release.CANDIDATE_PATH_FILTERS["0.13.0"]("flake.nix")
     assert not release.CANDIDATE_PATH_FILTERS["0.13.0"]("private/x")
-    assert v013.ADVANCED_HEAD_VERSIONS == {"0.12.0", "0.13.0"}
+    assert v013.ADVANCED_HEAD_VERSIONS == {"0.12.0", "0.13.0", "0.13.1"}
     assert v013.MERGED_CHECK_PREDECESSORS["0.13.0"] == "0.12.0"
-    for version in ("0.13.1", "0.14.0", "1.0.0"):
+    for version in ("0.13.2", "0.14.0", "1.0.0"):
         with pytest.raises(release.ToolError):
             release.audited_policy_surfaces(version)
 
@@ -164,8 +203,9 @@ def test_leaf_module_does_not_import_the_orchestrator() -> None:
     assert "import apg_public_release\n" not in source and "from apg_public_release " not in source
 
 
+@pytest.mark.parametrize("version", ["0.13.0", "0.13.1"])
 @pytest.mark.parametrize("source_only", [True, False])
-def test_source_only_projection_keeps_structural_checks_and_skips_runtime(monkeypatch, tmp_path, source_only):
+def test_source_only_projection_keeps_structural_checks_and_skips_runtime(monkeypatch, tmp_path, source_only, version):
     from types import SimpleNamespace
     source = SimpleNamespace(root=tmp_path / "source", head="a", tree="b")
     base = SimpleNamespace(root=tmp_path / "base", head="c", tree="d")
@@ -183,7 +223,7 @@ def test_source_only_projection_keeps_structural_checks_and_skips_runtime(monkey
         {"refs/heads/main": "c", "refs/heads/staging": "e"} if kind in ("refs", "refs/heads") and repo is candidate else {})
     runtime = []
     monkeypatch.setattr(release, "validate_categories_in_isolation", lambda *args, **kwargs: runtime.append(args))
-    result = release.check_candidate(source, base, candidate, "0.13.0", None, untagged=True, source_only=source_only)
+    result = release.check_candidate(source, base, candidate, version, None, untagged=True, source_only=source_only)
     assert bool(runtime) is (not source_only)
     if source_only:
         assert result["validation_scope"] == "source-only" and result["runtime_qualification"] == "hosted-pending"
@@ -192,11 +232,11 @@ def test_source_only_projection_keeps_structural_checks_and_skips_runtime(monkey
         (SimpleNamespace(path=b"unexpected", mode="100644"),) if repo is candidate else ())
     monkeypatch.setattr(release, "entry_bytes", lambda *a: b"unexpected")
     with pytest.raises(release.ToolError, match="projected path set differs"):
-        release.check_candidate(source, base, candidate, "0.13.0", None, untagged=True, source_only=source_only)
+        release.check_candidate(source, base, candidate, version, None, untagged=True, source_only=source_only)
 
 
 def test_source_only_mode_cannot_weaken_tagged_or_historical_checks():
-    for version, untagged in (("0.12.0", True), ("0.13.0", False)):
+    for version, untagged in (("0.12.0", True), ("0.13.0", False), ("0.13.1", False), ("0.14.0", True)):
         with pytest.raises(release.InvocationError, match="source-only"):
             release.check_candidate(None, None, None, version, None, untagged=untagged, source_only=True)
 
@@ -232,10 +272,26 @@ def test_v013_lineage_accepts_untagged_commits_between_releases_only_for_v013(tm
         repository, allow_advanced_head=True, allow_interleaved_untagged=True, **options)
     assert [identity.version for identity in identities] == ["0.1.0", "0.11.0", "0.12.0"]
     assert checked == ["0.12.0"]
-    assert v013.INTERLEAVED_UNTAGGED_VERSIONS == {"0.13.0"}
+    assert v013.INTERLEAVED_UNTAGGED_VERSIONS == {"0.13.0", "0.13.1"}
 
 
-@pytest.mark.parametrize("version, interleaved", [("0.12.0", False), ("0.13.0", True)])
+def test_v0131_lineage_accepts_published_v0130_after_untagged_repair(tmp_path, monkeypatch):
+    repository = _public_history(tmp_path / "public")
+    release.run_git(repository.root, ["commit", "--allow-empty", "-qm", "Release v0.13.0"])
+    release.run_git(repository.root, ["tag", "-a", "v0.13.0", "-m", "Release v0.13.0"])
+    repository = release.resolve_repository(repository.root, "public history fixture")
+    first = release.text_git(repository.root, ["rev-list", "--max-parents=0", "HEAD"])
+    monkeypatch.setattr(release, "PUBLIC_V01_COMMIT", first)
+    monkeypatch.setattr(release, "PUBLIC_V01_TREE", release.text_git(repository.root, ["rev-parse", f"{first}^{{tree}}"]))
+    monkeypatch.setattr(release, "validate_public_release_surface", lambda repo, version: None)
+    identities = release.verify_public_release_lineage(
+        repository, accepted_commit=release.PUBLIC_V01_COMMIT, accepted_tree=release.PUBLIC_V01_TREE,
+        allow_advanced_head="0.13.1" in v013.ADVANCED_HEAD_VERSIONS,
+        allow_interleaved_untagged="0.13.1" in v013.INTERLEAVED_UNTAGGED_VERSIONS)
+    assert identities[-1].version == v013.MERGED_CHECK_PREDECESSORS["0.13.1"] == "0.13.0"
+
+
+@pytest.mark.parametrize("version, interleaved", [("0.12.0", False), ("0.13.0", True), ("0.13.1", True)])
 def test_untagged_builder_selects_lineage_policy_by_release(tmp_path, monkeypatch, version, interleaved):
     import apg_staging_correction as staging
 
@@ -321,9 +377,9 @@ COMPATIBILITY = dict.fromkeys((
 ), True)
 
 
-def _policy_repository(tmp_path, version="0.13.0", mutation=None):
+def _policy_repository(tmp_path, version="0.13.1", mutation=None):
     policy = json.loads((ROOT / "release/public-surface.json").read_bytes())
-    if version != "0.13.0":
+    if version != "0.13.1":
         policy.update(release.audited_policy_surfaces(version)[0])
     if mutation:
         mutation(policy)
@@ -353,6 +409,20 @@ def test_policy_admission_is_version_explicit(tmp_path, policy_version, intended
             release.load_policy(repository, **kwargs)
 
 
+@pytest.mark.parametrize("policy_version, intended", [
+    ("0.13.1", "0.13.1"), ("0.13.1", "0.13.0"), ("0.13.0", "0.13.1"),
+])
+def test_patch_policy_admission_differs_only_by_critical_files(tmp_path, policy_version, intended):
+    repository = _policy_repository(tmp_path, policy_version)
+    kwargs = dict(expected_surfaces=release.audited_policy_surfaces(intended), **COMPATIBILITY)
+    if policy_version == intended:
+        loaded = release.load_policy(repository, **kwargs)
+        assert tuple(loaded["critical_files"]) == release.audited_policy_surfaces(intended)[0]["critical_files"]
+    else:
+        with pytest.raises(release.ToolError, match="critical_files differs from the audited schema-1 surface"):
+            release.load_policy(repository, **kwargs)
+
+
 @pytest.mark.parametrize("version, prefix, expected", [
     ("0.11.0", "V011", "59cd6cbb16451d5142ffeab80870ddf184a8e72e018ee05fa1dff82b53066deb"),
     ("0.12.0", "V012", "1246fbd71c24fa54bd6d9e905df8c09920dfe8979f63a7b25c89430adedf939d"),
@@ -365,7 +435,7 @@ def test_published_policy_digest_is_pinned_and_drift_fails(monkeypatch, version,
         release.audited_policy_surfaces(version)
 
 
-@pytest.mark.parametrize("version", ["0.13.1", "0.14.0", "1.0.0"])
+@pytest.mark.parametrize("version", ["0.13.2", "0.14.0", "1.0.0"])
 def test_future_release_is_refused_at_surface_and_candidate_boundaries(tmp_path, version):
     import apg_staging_correction as staging
 
@@ -375,11 +445,11 @@ def test_future_release_is_refused_at_surface_and_candidate_boundaries(tmp_path,
         staging.build_untagged_candidate(object(), object(), tmp_path / "out", version)
 
 
-@pytest.mark.parametrize("version", ["0.6.0", "0.7.0", "0.8.0", "0.8.1", "0.9.0", "0.10.0", "0.11.0", "0.12.0"])
+@pytest.mark.parametrize("version", ["0.6.0", "0.7.0", "0.8.0", "0.8.1", "0.9.0", "0.10.0", "0.11.0", "0.12.0", "0.13.0"])
 def test_current_release_cannot_fall_back_to_historical_policy(tmp_path, version):
     repository = _policy_repository(tmp_path, version)
     with pytest.raises(release.ToolError, match="differs from the audited schema-1 surface"):
-        release.load_policy(repository, expected_surfaces=release.audited_policy_surfaces("0.13.0"), **COMPATIBILITY)
+        release.load_policy(repository, expected_surfaces=release.audited_policy_surfaces("0.13.1"), **COMPATIBILITY)
 
 
 @pytest.mark.parametrize("mutation, message", [
@@ -391,7 +461,7 @@ def test_current_release_cannot_fall_back_to_historical_policy(tmp_path, version
 def test_current_policy_mutation_and_mixed_surface_fail_closed(tmp_path, mutation, message):
     repository = _policy_repository(tmp_path, mutation=mutation)
     with pytest.raises(release.ToolError, match=message):
-        release.load_policy(repository, expected_surfaces=release.audited_policy_surfaces("0.13.0"), **COMPATIBILITY)
+        release.load_policy(repository, expected_surfaces=release.audited_policy_surfaces("0.13.1"), **COMPATIBILITY)
 
 
 def test_compatibility_rejects_cross_version_surface_mixture(tmp_path):

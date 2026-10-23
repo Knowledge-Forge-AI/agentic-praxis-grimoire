@@ -3,14 +3,17 @@
 from __future__ import annotations
 
 import copy
+import importlib
 import io
 import json
 import zipfile
+from pathlib import Path
 from unittest import mock
 
 import pytest
 
 from src.test.support import release_boundary_fixtures as fix
+from tools.ci import native_seal
 from tools.ci import release_boundary_bundle as bundle
 from tools.ci import release_boundary_github as gh
 
@@ -388,7 +391,8 @@ def test_verify_workflow_run_success_and_failures() -> None:
     })
 
     with mock.patch("tools.ci.release_boundary_github._open", fake_gh):
-        _run, jobs = gh.verify_workflow_run(client, fix.PUBLIC_RUN_ID, fix.HEAD_SHA, gh.REQUIRED_PR_JOBS, "public PR", fix.BASE_SHA)
+        _run, jobs = gh.verify_workflow_run(client, fix.PUBLIC_RUN_ID, fix.HEAD_SHA, gh.REQUIRED_PR_JOBS, "public PR", fix.BASE_SHA,
+                                            pr_number=fix.PR_NUMBER)
         assert len(jobs) == len(gh.REQUIRED_PR_JOBS)
 
     # Incomplete jobs readback (total_count mismatch)
@@ -400,7 +404,7 @@ def test_verify_workflow_run_success_and_failures() -> None:
         mock.patch('tools.ci.release_boundary_github._open', fake_gh),
         pytest.raises(gh.GitHubBoundaryError, match='incomplete jobs readback'),
     ):
-        gh.verify_workflow_run(client, fix.PUBLIC_RUN_ID, fix.HEAD_SHA, gh.REQUIRED_PR_JOBS, "public PR")
+        gh.verify_workflow_run(client, fix.PUBLIC_RUN_ID, fix.HEAD_SHA, gh.REQUIRED_PR_JOBS, "public PR", pr_number=fix.PR_NUMBER)
 
     # Duplicate job in jobs list
     dup_jobs = [{"name": j, "status": "completed", "conclusion": "success"} for j in sorted(gh.REQUIRED_PR_JOBS)]
@@ -413,7 +417,7 @@ def test_verify_workflow_run_success_and_failures() -> None:
         mock.patch('tools.ci.release_boundary_github._open', fake_gh),
         pytest.raises(gh.GitHubBoundaryError, match='duplicate workflow job'),
     ):
-        gh.verify_workflow_run(client, fix.PUBLIC_RUN_ID, fix.HEAD_SHA, gh.REQUIRED_PR_JOBS, "public PR")
+        gh.verify_workflow_run(client, fix.PUBLIC_RUN_ID, fix.HEAD_SHA, gh.REQUIRED_PR_JOBS, "public PR", pr_number=fix.PR_NUMBER)
 
     # Failed job
     failed_jobs = [{"name": j, "status": "completed", "conclusion": "success"} for j in sorted(gh.REQUIRED_PR_JOBS)]
@@ -426,7 +430,7 @@ def test_verify_workflow_run_success_and_failures() -> None:
         mock.patch('tools.ci.release_boundary_github._open', fake_gh),
         pytest.raises(gh.GitHubBoundaryError, match='not successful'),
     ):
-        gh.verify_workflow_run(client, fix.PUBLIC_RUN_ID, fix.HEAD_SHA, gh.REQUIRED_PR_JOBS, "public PR")
+        gh.verify_workflow_run(client, fix.PUBLIC_RUN_ID, fix.HEAD_SHA, gh.REQUIRED_PR_JOBS, "public PR", pr_number=fix.PR_NUMBER)
 
 
 # 5. Check Contexts & App Tests
@@ -584,7 +588,7 @@ def test_governance_verification() -> None:
         mock.patch('tools.ci.release_boundary_github._open', fake_gh),
         pytest.raises(gh.GitHubBoundaryError, match='neither eligible non-author approval nor governance waiver'),
     ):
-        gh.verify_governance(client, 3, fix.HEAD_SHA, fix.BASE_SHA, fix.MERGE_SHA, fix.AUTHOR_LOGIN, None)
+        gh.verify_governance(client, 3, fix.HEAD_SHA, fix.BASE_SHA, fix.MERGE_SHA, fix.AUTHOR_LOGIN, None, waiver_scope=fix.WAIVER_SCOPE_0130)
 
     # Stale review on old commit rejected
     fake_gh.set_json(f"{api}/pulls/3/reviews?per_page=100", [
@@ -594,7 +598,7 @@ def test_governance_verification() -> None:
         mock.patch('tools.ci.release_boundary_github._open', fake_gh),
         pytest.raises(gh.GitHubBoundaryError, match='neither eligible non-author approval nor governance waiver'),
     ):
-        gh.verify_governance(client, 3, fix.HEAD_SHA, fix.BASE_SHA, fix.MERGE_SHA, fix.AUTHOR_LOGIN, None)
+        gh.verify_governance(client, 3, fix.HEAD_SHA, fix.BASE_SHA, fix.MERGE_SHA, fix.AUTHOR_LOGIN, None, waiver_scope=fix.WAIVER_SCOPE_0130)
 
     # Ineligible author association (e.g. CONTRIBUTOR) rejected
     fake_gh.set_json(f"{api}/pulls/3/reviews?per_page=100", [
@@ -604,14 +608,14 @@ def test_governance_verification() -> None:
         mock.patch('tools.ci.release_boundary_github._open', fake_gh),
         pytest.raises(gh.GitHubBoundaryError, match='neither eligible non-author approval nor governance waiver'),
     ):
-        gh.verify_governance(client, 3, fix.HEAD_SHA, fix.BASE_SHA, fix.MERGE_SHA, fix.AUTHOR_LOGIN, None)
+        gh.verify_governance(client, 3, fix.HEAD_SHA, fix.BASE_SHA, fix.MERGE_SHA, fix.AUTHOR_LOGIN, None, waiver_scope=fix.WAIVER_SCOPE_0130)
 
     # Non-author approval with MEMBER association succeeds
     fake_gh.set_json(f"{api}/pulls/3/reviews?per_page=100", [
         {"id": 4, "user": {"login": fix.REVIEWER_LOGIN}, "state": "APPROVED", "commit_id": fix.HEAD_SHA, "author_association": "MEMBER"},
     ])
     with mock.patch("tools.ci.release_boundary_github._open", fake_gh):
-        gov = gh.verify_governance(client, 3, fix.HEAD_SHA, fix.BASE_SHA, fix.MERGE_SHA, fix.AUTHOR_LOGIN, None)
+        gov = gh.verify_governance(client, 3, fix.HEAD_SHA, fix.BASE_SHA, fix.MERGE_SHA, fix.AUTHOR_LOGIN, None, waiver_scope=fix.WAIVER_SCOPE_0130)
         assert gov["mode"] == "approval"
         assert gov["approvals"][0]["user"] == fix.REVIEWER_LOGIN
 
@@ -619,7 +623,8 @@ def test_governance_verification() -> None:
     fake_gh.set_json(f"{api}/pulls/3/reviews?per_page=100", [])
     waiver = fix.make_governance_waiver(head_sha=fix.HEAD_SHA, base_sha=fix.BASE_SHA, merge_sha=fix.MERGE_SHA)
     with mock.patch("tools.ci.release_boundary_github._open", fake_gh):
-        gov_waiver = gh.verify_governance(client, 3, fix.HEAD_SHA, fix.BASE_SHA, fix.MERGE_SHA, fix.AUTHOR_LOGIN, waiver)
+        gov_waiver = gh.verify_governance(client, 3, fix.HEAD_SHA, fix.BASE_SHA, fix.MERGE_SHA, fix.AUTHOR_LOGIN, waiver,
+                                              waiver_scope=fix.WAIVER_SCOPE_0130)
         assert gov_waiver["mode"] == "waiver"
         assert gov_waiver["waiver_sha256"] == waiver["self_sha256"]
 
@@ -629,15 +634,16 @@ def test_governance_verification() -> None:
         mock.patch('tools.ci.release_boundary_github._open', fake_gh),
         pytest.raises(gh.GitHubBoundaryError, match='waiver pr_head_sha mismatch'),
     ):
-        gh.verify_governance(client, 3, fix.HEAD_SHA, fix.BASE_SHA, fix.MERGE_SHA, fix.AUTHOR_LOGIN, bad_waiver)
+        gh.verify_governance(client, 3, fix.HEAD_SHA, fix.BASE_SHA, fix.MERGE_SHA, fix.AUTHOR_LOGIN, bad_waiver,
+                              waiver_scope=fix.WAIVER_SCOPE_0130)
 
 
 # 9. Squash Commit and Main Branch Tests
 def test_squash_and_branch_verification() -> None:
     fake_gh = fix.FakeGitHub()
-    bundle_zip, _, _file_bytes, seal_doc = fix.build_test_bundle_zip()
+    bundle_zip, _, _file_bytes, seal_doc = fix.build_test_bundle_zip("0.13.0")
     gate_zip, _ = fix.build_test_gate_index_zip(bundle_seal=seal_doc, bundle_zip_bytes=bundle_zip)
-    fix.populate_fake_github(fake_gh, bundle_zip, gate_zip, bundle_file_bytes=_file_bytes)
+    fix.populate_fake_github(fake_gh, bundle_zip, gate_zip, bundle_file_bytes=_file_bytes, **fix.CONTRACT_0130)
     client = gh.GitHubClient()
 
     with mock.patch("tools.ci.release_boundary_github._open", fake_gh):
@@ -688,9 +694,9 @@ def test_squash_and_branch_verification() -> None:
 # 10. Tag Verification Tests
 def test_tag_verification() -> None:
     fake_gh = fix.FakeGitHub()
-    bundle_zip, _, _file_bytes, seal_doc = fix.build_test_bundle_zip()
+    bundle_zip, _, _file_bytes, seal_doc = fix.build_test_bundle_zip("0.13.0")
     gate_zip, _ = fix.build_test_gate_index_zip(bundle_seal=seal_doc, bundle_zip_bytes=bundle_zip)
-    fix.populate_fake_github(fake_gh, bundle_zip, gate_zip, bundle_file_bytes=_file_bytes, tag_type="tag")
+    fix.populate_fake_github(fake_gh, bundle_zip, gate_zip, bundle_file_bytes=_file_bytes, tag_type="tag", **fix.CONTRACT_0130)
     client = gh.GitHubClient()
 
     with mock.patch("tools.ci.release_boundary_github._open", fake_gh):
@@ -699,7 +705,7 @@ def test_tag_verification() -> None:
 
     # Lightweight tag rejected
     fake_gh_lw = fix.FakeGitHub()
-    fix.populate_fake_github(fake_gh_lw, bundle_zip, gate_zip, bundle_file_bytes=_file_bytes, tag_type="lightweight")
+    fix.populate_fake_github(fake_gh_lw, bundle_zip, gate_zip, bundle_file_bytes=_file_bytes, tag_type="lightweight", **fix.CONTRACT_0130)
     with (
         mock.patch('tools.ci.release_boundary_github._open', fake_gh_lw),
         pytest.raises(gh.GitHubBoundaryError, match='annotated tag'),
@@ -724,9 +730,9 @@ def test_tag_verification() -> None:
 # 11. Release Verification Tests
 def test_release_verification() -> None:
     fake_gh = fix.FakeGitHub()
-    bundle_zip, _sums_map, _file_bytes, seal_doc = fix.build_test_bundle_zip()
+    bundle_zip, _sums_map, _file_bytes, seal_doc = fix.build_test_bundle_zip("0.13.0")
     gate_zip, _ = fix.build_test_gate_index_zip(bundle_seal=seal_doc, bundle_zip_bytes=bundle_zip)
-    fix.populate_fake_github(fake_gh, bundle_zip, gate_zip, bundle_file_bytes=_file_bytes, release_state="published")
+    fix.populate_fake_github(fake_gh, bundle_zip, gate_zip, bundle_file_bytes=_file_bytes, release_state="published", **fix.CONTRACT_0130)
     client = gh.GitHubClient()
 
     # Create mapping from 17-file bundle
@@ -761,3 +767,158 @@ def test_release_verification() -> None:
         pytest.raises(gh.GitHubBoundaryError, match='release assets mismatch'),
     ):
         gh.verify_github_release(client, fix.RELEASE_ID, "v0.13.0", "published", path_mapping)
+
+
+# 12. Closed v0.13.0 / v0.13.1 release contracts (v0.13.1 is approval-only with a measured PR)
+_OPEN = "tools.ci.release_boundary_github._open"
+
+
+def test_release_contract_table_is_closed_and_cross_owner_consistent(monkeypatch: pytest.MonkeyPatch) -> None:
+    assert set(bundle.RELEASE_CONTRACTS) == {"0.13.0", "0.13.1"}
+    assert bundle.EXPECTED_VERSION == "0.13.1"
+    historical, current = bundle.RELEASE_CONTRACTS["0.13.0"], bundle.RELEASE_CONTRACTS["0.13.1"]
+    assert historical["pr_number"] == 3
+    assert historical["waiver_scope"] == "v0.13.0-review-only"
+    assert historical["wheel_tags"] == ("macosx_11_0_arm64", "manylinux_2_17_x86_64", "manylinux_2_17_aarch64")
+    assert current["pr_number"] is None and current["waiver_scope"] is None
+    assert bundle.PYTHON_WHEEL_TAGS == current["wheel_tags"]
+
+    # The 0.13.1 wheel tags must equal every other owner's published target matrix.
+    monkeypatch.syspath_prepend(str(Path(bundle.__file__).resolve().parents[2] / "libexec"))
+    candidate_contract = importlib.import_module("apg_distribution_candidate_contract")
+    go_build = importlib.import_module("apg_go_build")
+    assert current["wheel_tags"] == tuple(spec["python_tag"] for spec in native_seal.CANONICAL_TARGETS.values())
+    assert current["wheel_tags"] == tuple(target["python_platform"] for target in candidate_contract.TARGETS)
+    assert current["wheel_tags"] == tuple(target["python_platform"] for target in go_build.TARGETS.values())
+
+
+@pytest.mark.parametrize("version", ["0.14.0", "0.12.0", "0.13.2", "v0.13.1", "", None])
+def test_unsupported_release_versions_are_refused_everywhere(version: str | None) -> None:
+    for call in (bundle.release_contract, bundle.canonical_logical_paths, bundle.canonical_flat_assets):
+        with pytest.raises(bundle.BoundaryBundleError, match="unsupported release boundary version"):
+            call(version)
+    with pytest.raises(bundle.BoundaryBundleError, match="unsupported release boundary version"):
+        bundle.verify_bundle_contents({}, version)
+
+
+def test_wheel_tags_are_bound_per_version_and_cross_version_bundles_are_refused() -> None:
+    old, new = bundle.canonical_logical_paths("0.13.0"), bundle.canonical_logical_paths("0.13.1")
+    assert len(old) == len(new) == 15
+    assert "python/agentic_praxis_grimoire-0.13.0-py3-none-macosx_11_0_arm64.whl" in old
+    assert "python/agentic_praxis_grimoire-0.13.1-py3-none-macosx_12_0_arm64.whl" in new
+    assert not any("macosx_12_0" in path for path in old) and not any("macosx_11_0" in path for path in new)
+    flat = bundle.canonical_flat_assets("0.13.1")
+    assert len(flat) == 16 and "agentic_praxis_grimoire-0.13.1-py3-none-macosx_12_0_arm64.whl" in flat
+
+    new_members = bundle.inspect_zip_bytes(fix.build_test_bundle_zip("0.13.1")[0])
+    verified = bundle.verify_bundle_contents(new_members, "0.13.1")
+    assert verified["asset_count"] == 16 and verified["manifest"]["version"] == "0.13.1"
+    old_members = bundle.inspect_zip_bytes(fix.build_test_bundle_zip("0.13.0")[0])
+    assert bundle.verify_bundle_contents(old_members, "0.13.0")["manifest"]["version"] == "0.13.0"
+    for members, version in ((new_members, "0.13.0"), (old_members, "0.13.1")):
+        with pytest.raises(bundle.BoundaryBundleError, match="bundle archive file inventory mismatch"):
+            bundle.verify_bundle_contents(members, version)
+
+
+def test_verify_pull_request_requires_the_exact_measured_pr_number() -> None:
+    fake_gh = fix.FakeGitHub()
+    client = gh.GitHubClient()
+    api = f"{gh.API_ROOT}/repos/{gh.EXPECTED_REPO}"
+    repo = {"id": gh.EXPECTED_REPO_ID, "full_name": gh.EXPECTED_REPO}
+
+    def serve(path_number: int, number: int) -> None:
+        fake_gh.set_json(f"{api}/pulls/{path_number}", {
+            "number": number, "state": "open", "merged": False, "merge_commit_sha": fix.MERGE_SHA,
+            "base": {"ref": "main", "sha": fix.BASE_SHA, "repo": repo},
+            "head": {"ref": "staging", "sha": fix.HEAD_SHA, "repo": repo},
+            "user": {"login": fix.AUTHOR_LOGIN},
+        })
+
+    measured = fix.PR_NUMBER_0131
+    serve(measured, measured)
+    with mock.patch(_OPEN, fake_gh):
+        assert gh.verify_pull_request(client, measured, fix.HEAD_SHA, fix.BASE_SHA)["number"] == measured
+
+    serve(measured, fix.PR_NUMBER)  # live PR number differs from the requested one
+    with (
+        mock.patch(_OPEN, fake_gh),
+        pytest.raises(gh.GitHubBoundaryError, match="release boundary requires exact PR #9001"),
+    ):
+        gh.verify_pull_request(client, measured, fix.HEAD_SHA, fix.BASE_SHA)
+
+    serve(0, 0)  # a non-positive PR number is never admissible
+    with (
+        mock.patch(_OPEN, fake_gh),
+        pytest.raises(gh.GitHubBoundaryError, match="release boundary requires exact PR #0"),
+    ):
+        gh.verify_pull_request(client, 0, fix.HEAD_SHA, fix.BASE_SHA)
+
+
+def test_verify_workflow_run_binds_the_contract_pr_and_pull_request_event() -> None:
+    fake_gh = fix.FakeGitHub()
+    bundle_zip, gate_zip, public_zip, files = fix.build_release_set("0.13.1")
+    fix.populate_fake_github(fake_gh, bundle_zip, gate_zip, public_zip, files, **fix.CONTRACT_0131)
+    client = gh.GitHubClient()
+    url = f"{gh.API_ROOT}/repos/{gh.EXPECTED_REPO}/actions/runs/{fix.PUBLIC_RUN_ID}"
+    run = json.loads(fake_gh.routes[url][0])
+    measured = fix.PR_NUMBER_0131
+
+    def verify(pr_number: int, **kwargs):
+        return gh.verify_workflow_run(client, fix.PUBLIC_RUN_ID, fix.HEAD_SHA, gh.REQUIRED_PR_JOBS, "public PR",
+                                      fix.BASE_SHA, pr_number=pr_number, **kwargs)
+
+    with mock.patch(_OPEN, fake_gh):
+        observed, jobs = verify(measured)
+        assert observed["pull_requests"][0]["number"] == measured and len(jobs) == len(gh.REQUIRED_PR_JOBS)
+        binding = gh.workflow_run_binding(observed, fix.HEAD_SHA, fix.BASE_SHA, pr_number=measured)
+        assert binding["pr_number"] == measured
+        verify(measured, recorded_binding=binding)
+        with pytest.raises(gh.GitHubBoundaryError, match="recorded workflow run identity/PR binding mismatch"):
+            verify(measured + 1, recorded_binding=binding)
+        with pytest.raises(gh.GitHubBoundaryError, match="PR head/base association mismatch"):
+            verify(fix.PR_NUMBER)  # the run belongs to PR 9001, not the historical PR 3
+
+    # Run associated with another PR only (g)
+    other = {**run, "pull_requests": [{"number": fix.PR_NUMBER, "head": {"sha": fix.HEAD_SHA}, "base": {"sha": fix.BASE_SHA}}]}
+    fake_gh.set_json(url, other)
+    with mock.patch(_OPEN, fake_gh), pytest.raises(gh.GitHubBoundaryError, match="PR head/base association mismatch"):
+        verify(measured)
+
+    # Wrong event (h)
+    fake_gh.set_json(url, {**run, "event": "push"})
+    with mock.patch(_OPEN, fake_gh), pytest.raises(gh.GitHubBoundaryError, match="event must be pull_request"):
+        verify(measured)
+
+
+def test_governance_approval_only_contract_accepts_approval_and_refuses_waiver() -> None:
+    fake_gh = fix.FakeGitHub()
+    client = gh.GitHubClient(token="test")
+    measured = fix.PR_NUMBER_0131
+    reviews_url = f"{gh.API_ROOT}/repos/{gh.EXPECTED_REPO}/pulls/{measured}/reviews?per_page=100"
+    waiver = fix.make_governance_waiver(version="0.13.1", pr_number=measured, scope="v0.13.1-review-only")
+
+    def govern(supplied, scope, required_count=None):
+        return gh.verify_governance(client, measured, fix.HEAD_SHA, fix.BASE_SHA, fix.MERGE_SHA, fix.AUTHOR_LOGIN,
+                                    supplied, waiver_scope=scope,
+                                    required_approving_review_count=required_count)
+
+    fake_gh.set_json(reviews_url, [
+        {"id": 5, "user": {"login": fix.REVIEWER_LOGIN}, "state": "APPROVED", "commit_id": fix.HEAD_SHA, "author_association": "MEMBER"},
+    ])
+    with mock.patch(_OPEN, fake_gh):
+        gov = govern(None, None)
+    assert gov["mode"] == "approval" and gov["waiver"] is None and gov["approvals"][0]["user"] == fix.REVIEWER_LOGIN
+
+    fake_gh.set_json(reviews_url, [])
+    with mock.patch(_OPEN, fake_gh):
+        # (c) no eligible approval and no waiver
+        with pytest.raises(gh.GitHubBoundaryError, match="neither eligible non-author approval nor governance waiver"):
+            govern(None, None)
+        zero_review_governance = govern(None, None, 0)
+        assert zero_review_governance == {"mode": "approval", "approvals": [], "waiver": None}
+        # (b) even a well-formed waiver cannot satisfy an approval-only contract
+        with pytest.raises(gh.GitHubBoundaryError, match="approval-only; a governance waiver cannot satisfy it"):
+            govern(waiver, None)
+        # A historical PR #3 waiver cannot satisfy another PR even under the historical scope
+        with pytest.raises(gh.GitHubBoundaryError, match="waiver repo/PR/scope mismatch"):
+            govern(fix.make_governance_waiver(), fix.WAIVER_SCOPE_0130)

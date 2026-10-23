@@ -17,6 +17,7 @@ import zipfile
 import pytest
 
 from src.test.apg_test_support import repository_root
+from src.test.support import apg_macho_fixtures as macho
 
 
 REPOSITORY_ROOT = repository_root(__file__)
@@ -28,17 +29,20 @@ import apg_python_distribution as distribution  # noqa: E402
 import apg_python_publication as publication  # noqa: E402
 
 
-CURRENT_VERSION = "0.13.0"
+CURRENT_VERSION = "0.13.1"
 HISTORICAL_VERSION = "0.12.0"
 
 
 def _identity(
     root: Path,
     target: str,
-    content: bytes = b"canonical-apgr",
+    content: bytes | None = None,
     *,
     storage: Path | None = None,
 ) -> backend.BinaryIdentity:
+    if content is None:
+        # Darwin bytes must satisfy the shared actual-byte deployment predicate.
+        content = macho.darwin_arm64() if target == "darwin/arm64" else b"canonical-apgr"
     version, corpus = go_build.identities(root)
     manifest = go_build._manifest(
         target=target,
@@ -206,7 +210,7 @@ def test_bundle_builds_three_targets_twice_and_reuses_exact_bytes(
         identity = _identity(
             root,
             target,
-            f"canonical-{target}".encode(),
+            macho.darwin_arm64() if target == "darwin/arm64" else f"canonical-{target}".encode(),
             storage=output.parent,
         )
         output.parent.mkdir(parents=True, exist_ok=True)
@@ -550,6 +554,83 @@ def test_backend_manifest_and_configuration_refusals_are_complete(tmp_path: Path
         backend.build_editable(str(tmp_path))
 
 
+_DARWIN_WHEEL_NAME = (
+    f"agentic_praxis_grimoire-{publication.VERSION}-py3-none-{backend.TARGET_TAGS['darwin/arm64']}.whl"
+)
+_DEPLOYMENT_REFUSAL = (
+    r"packaged binary deployment is not admissible: .*"
+    r"minimum macOS 13\.0\.0 exceeds macosx_12_0_arm64"
+)
+
+
+def _supply_binary(
+    monkeypatch: pytest.MonkeyPatch, route: str, binary: Path, manifest: Path
+) -> dict[str, str]:
+    """Return PEP 517 settings that supply the binary by config or by environment."""
+
+    for name in ("APG_BUILD_BINARY", "APG_BUILD_MANIFEST", "APG_BUILD_TARGET"):
+        monkeypatch.delenv(name, raising=False)
+    settings = {"build-target": "darwin/arm64"}
+    if route == "config":
+        settings.update({"build-binary": str(binary), "build-manifest": str(manifest)})
+    else:
+        monkeypatch.setenv("APG_BUILD_BINARY", str(binary))
+        monkeypatch.setenv("APG_BUILD_MANIFEST", str(manifest))
+    return settings
+
+
+@pytest.mark.parametrize("minimum", [(11, 0, 0), macho.SUPPORTED_MINIMUM])
+def test_provided_darwin_binary_within_the_wheel_floor_is_admitted(
+    tmp_path: Path, minimum: tuple[int, int, int]
+) -> None:
+    data = macho.darwin_arm64(minimum=minimum)
+    binary, manifest = macho.write_artifact(tmp_path / "artifact", data, root=REPOSITORY_ROOT)
+    identity = backend._provided_binary(REPOSITORY_ROOT, "darwin/arm64", str(binary), str(manifest))
+    assert identity == backend.BinaryIdentity(binary, manifest.read_bytes(), "darwin/arm64")
+
+
+@pytest.mark.parametrize("route", ["config", "env"])
+def test_build_wheel_packages_a_supplied_darwin_binary_at_the_floor(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, route: str
+) -> None:
+    data = macho.darwin_arm64()
+    binary, manifest = macho.write_artifact(tmp_path / "artifact", data, root=REPOSITORY_ROOT)
+    settings = _supply_binary(monkeypatch, route, binary, manifest)
+    wheels = tmp_path / "wheels"
+    name = backend.build_wheel(str(wheels), settings)
+    assert name == _DARWIN_WHEEL_NAME
+    with zipfile.ZipFile(wheels / name) as archive:
+        assert archive.read("agentic_praxis_grimoire/bin/apgr") == data
+        assert archive.read("agentic_praxis_grimoire/bin/apgr.binary-manifest.json") == manifest.read_bytes()
+
+
+def test_provided_darwin_binary_over_the_wheel_floor_is_refused_directly(tmp_path: Path) -> None:
+    data = macho.darwin_arm64(minimum=macho.OVERFLOOR_MINIMUM)
+    binary, manifest = macho.write_artifact(tmp_path / "artifact", data, root=REPOSITORY_ROOT)
+    # Only the declared minimum differs from the admitted floor fixture: the
+    # manifest is exact for these bytes, so identity and hash checks all pass.
+    assert go_build.darwin_arm64_deployment(data)["minimum"] == "13.0.0"
+    assert json.loads(manifest.read_bytes())["size_bytes"] == len(data)
+    with pytest.raises(backend.BackendError, match=_DEPLOYMENT_REFUSAL):
+        backend._provided_binary(REPOSITORY_ROOT, "darwin/arm64", str(binary), str(manifest))
+    with pytest.raises(backend.BackendError, match=_DEPLOYMENT_REFUSAL):
+        backend._validated_manifest(REPOSITORY_ROOT, "darwin/arm64", binary, manifest.read_bytes())
+
+
+@pytest.mark.parametrize("route", ["config", "env"])
+def test_build_wheel_refuses_an_over_floor_darwin_binary_on_every_supply_route(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, route: str
+) -> None:
+    data = macho.darwin_arm64(minimum=macho.OVERFLOOR_MINIMUM)
+    binary, manifest = macho.write_artifact(tmp_path / "artifact", data, root=REPOSITORY_ROOT)
+    settings = _supply_binary(monkeypatch, route, binary, manifest)
+    wheels = tmp_path / "wheels"
+    wheels.mkdir()
+    with pytest.raises(backend.BackendError, match=_DEPLOYMENT_REFUSAL):
+        backend.build_wheel(str(wheels), settings)
+    assert list(wheels.iterdir()) == []
+
+
 def test_metadata_generation_across_versions(tmp_path: Path) -> None:
     # Build a cheap fixture root
     root = tmp_path / "fake-pkg"
@@ -711,7 +792,7 @@ OLDER_FORBIDDEN_WORDING = (
 
 def _assert_current_release_wording(text: str) -> None:
     normalized = " ".join(text.lower().split())
-    # Current candidate surfaces announce v0.13.0; retained v0.12.0 and v0.10.0
+    # Current candidate surfaces announce v0.13.1; retained v0.12.0 and v0.10.0
     # references remain valid for historical documentation and release pins.
     assert (
         f"this documentation covers the **unreleased v{CURRENT_VERSION} candidate**" in normalized
@@ -763,9 +844,10 @@ def test_package_readme_states_v013_pilot_support_truthfully() -> None:
         "adaptive selected-skill and instruction projection are experimental and opt-in",
         "no token or context-window saving is claimed",
         "native `aarch64-linux` execution",
-        "these commands work only after the `v0.13.0` tag is published",
+        "these commands use the published `v0.13.0` tag",
     ):
         assert claim in metadata, claim
+    assert "these commands work only after the `v0.13.0` tag is published" not in metadata
     assert "#agentic-praxis-grimoire/main" not in metadata
 
 

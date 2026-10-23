@@ -2167,11 +2167,33 @@ async function executeScenario(scenarioId, browserName, page, context, serverOri
         window.__sameDocMarker = 'retained_history_marker';
 
         const events = [];
-        window.addEventListener('popstate', (e) => {
-          events.push({ type: 'popstate', state: e.state });
-        });
-        window.addEventListener('hashchange', (e) => {
-          events.push({ type: 'hashchange', newURL: e.newURL });
+        const historyEventTimeoutMs = 2000;
+        const waitForExpectedEvent = (type, project, predicate, label) => new Promise((resolve, reject) => {
+          const observed = [];
+          let timerId;
+          let listener;
+          const cleanup = () => {
+            window.removeEventListener(type, listener);
+            window.clearTimeout(timerId);
+          };
+          listener = (event) => {
+            const record = project(event);
+            observed.push(record);
+            events.push(record);
+            if (!predicate(record)) {
+              cleanup();
+              reject(new Error(`${label}: ${JSON.stringify(record)}`));
+              return;
+            }
+            cleanup();
+            resolve(record);
+          };
+          timerId = window.setTimeout(() => {
+            cleanup();
+            const lastObserved = observed.length > 0 ? JSON.stringify(observed[observed.length - 1]) : 'none';
+            reject(new Error(`${label}: ${lastObserved} (timed out after ${historyEventTimeoutMs}ms)`));
+          }, historyEventTimeoutMs);
+          window.addEventListener(type, listener);
         });
 
         history.pushState({ step: 1 }, 'Step 1', '/index.html?step=1');
@@ -2182,16 +2204,30 @@ async function executeScenario(scenarioId, browserName, page, context, serverOri
 
         history.pushState({ step: 3 }, 'Step 3', '/index.html?step=3');
 
+        const popstatePromise = waitForExpectedEvent(
+          'popstate',
+          (event) => ({ type: 'popstate', state: event.state }),
+          (event) => Boolean(event.state && event.state.step === 2),
+          'popstate event mismatch',
+        );
         history.back();
-        await new Promise((resolve) => setTimeout(resolve, 50));
+        const popstateEvent = await popstatePromise;
 
+        const hashchangePromise = waitForExpectedEvent(
+          'hashchange',
+          (event) => ({ type: 'hashchange', newURL: event.newURL }),
+          (event) => typeof event.newURL === 'string' && event.newURL.includes('#view-hash'),
+          'hashchange event mismatch',
+        );
         location.hash = '#view-hash';
-        await new Promise((resolve) => setTimeout(resolve, 50));
+        const hashchangeEvent = await hashchangePromise;
 
         return {
           path1,
           path2,
           events,
+          popstateEvent,
+          hashchangeEvent,
           sameDocMarker: window.__sameDocMarker,
         };
       });
@@ -2204,13 +2240,13 @@ async function executeScenario(scenarioId, browserName, page, context, serverOri
       }
       assertions.push({ name: 'history_push_replace_state_updates_location', passed: true });
 
-      const popstateEvt = historyResult.events.find((e) => e.type === 'popstate');
+      const popstateEvt = historyResult.popstateEvent;
       if (!popstateEvt || !popstateEvt.state || popstateEvt.state.step !== 2) {
         throw new Error(`popstate event mismatch: ${JSON.stringify(popstateEvt)}`);
       }
       assertions.push({ name: 'popstate_event_restores_state', passed: true });
 
-      const hashEvt = historyResult.events.find((e) => e.type === 'hashchange');
+      const hashEvt = historyResult.hashchangeEvent;
       if (!hashEvt || !hashEvt.newURL.includes('#view-hash')) {
         throw new Error(`hashchange event mismatch: ${JSON.stringify(hashEvt)}`);
       }

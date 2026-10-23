@@ -5,6 +5,7 @@ from __future__ import annotations
 import io
 import urllib.error
 import zipfile
+from types import MappingProxyType
 from typing import Any
 
 from release.ci.matrix_receipts import PUBLIC_PR_MEMBER_JOBS
@@ -12,7 +13,6 @@ from tools.ci import native_seal
 from tools.ci.native_seal import CANONICAL_TARGETS, REQUIRED_LANES
 from tools.ci.release_boundary_bundle import (
     CHECKSUM_NAME,
-    EXPECTED_VERSION,
     GOVERNANCE_WAIVER_SCHEMA,
     MANIFEST_NAME,
     canonical_flat_assets,
@@ -44,8 +44,20 @@ GATE_ARTIFACT_ID = "1001"
 BUNDLE_ARTIFACT_ID = "1002"
 PUBLIC_GATE_ARTIFACT_ID = "1003"
 RULESET_ID = 1234
-PR_NUMBER = 3
 RELEASE_ID = 888
+
+# Release contracts are always explicit in tests; no builder defaults to the
+# current EXPECTED_VERSION.  V0130/PR_NUMBER/WAIVER_SCOPE_0130 are the immutable
+# historical v0.13.0 PR #3 review-only-waiver contract (11-tag macosx_11_0 wheel
+# assets).  V0131/PR_NUMBER_0131 are the approval-only v0.13.1 contract with a
+# synthetic, test-only measured PR number (macosx_12_0 wheel assets).
+V0130 = "0.13.0"
+V0131 = "0.13.1"
+PR_NUMBER = 3
+PR_NUMBER_0131 = 9001
+WAIVER_SCOPE_0130 = "v0.13.0-review-only"
+CONTRACT_0130 = MappingProxyType({"version": V0130, "pr_number": PR_NUMBER})
+CONTRACT_0131 = MappingProxyType({"version": V0131, "pr_number": PR_NUMBER_0131})
 
 AUTHOR_LOGIN = "developer-a"
 REVIEWER_LOGIN = "reviewer-b"
@@ -97,7 +109,7 @@ class FakeGitHub:
 
 
 def build_test_bundle_zip(
-    version: str = EXPECTED_VERSION,
+    version: str,
     source_commit: str = MERGE_SHA,
     source_tree: str = TREE_SHA,
     lane_seals: dict[str, str] | None = None,
@@ -156,6 +168,14 @@ def build_test_bundle_zip(
 
     sums_map = {p: file_digests[p] for p in sorted(logical_paths)}
     return buf.getvalue(), sums_map, file_bytes, seal_doc
+
+
+def build_release_set(version: str) -> tuple[bytes, bytes, bytes, dict[str, bytes]]:
+    """Return (bundle_zip, native_gate_zip, public_gate_zip, bundle_file_bytes) for one contract version."""
+    bundle_zip, _sums, file_bytes, seal_doc = build_test_bundle_zip(version)
+    gate_zip, _ = build_test_gate_index_zip(bundle_seal=seal_doc, bundle_zip_bytes=bundle_zip)
+    public_gate_zip, _ = build_test_public_gate_zip()
+    return bundle_zip, gate_zip, public_gate_zip, file_bytes
 
 
 def build_test_public_gate_zip(
@@ -312,14 +332,18 @@ def make_governance_waiver(
     reason: str = "emergency fix authorized by maintainer",
     approved_by: str = "maintainer",
     approved_at: str = "2026-10-13T00:00:00Z",
+    *,
+    version: str = V0130,
+    pr_number: int = PR_NUMBER,
+    scope: str = WAIVER_SCOPE_0130,
 ) -> dict[str, Any]:
-    """Generate a canonical governance waiver document."""
+    """Generate a canonical governance waiver document (historical v0.13.0 PR #3 scope by default)."""
     doc: dict[str, Any] = {
         "schema": GOVERNANCE_WAIVER_SCHEMA,
-        "version": EXPECTED_VERSION,
+        "version": version,
         "repo": EXPECTED_REPO,
-        "pr": PR_NUMBER,
-        "scope": "v0.13.0-review-only",
+        "pr": pr_number,
+        "scope": scope,
         "pr_head_sha": head_sha,
         "pr_base_sha": base_sha,
         "merge_ref_sha": merge_sha,
@@ -354,8 +378,15 @@ def populate_fake_github(
     tree_sha: str = TREE_SHA,
     squash_sha: str = SQUASH_SHA,
     tag_sha: str = TAG_SHA,
+    *,
+    version: str,
+    pr_number: int,
 ) -> None:
-    """Populate FakeGitHub with realistic and truthful passing routes for candidate, merged, and release."""
+    """Populate FakeGitHub with realistic and truthful passing routes for candidate, merged, and release.
+
+    ``version`` and ``pr_number`` are mandatory so every caller binds one explicit
+    release contract (see ``CONTRACT_0130`` and ``CONTRACT_0131``).
+    """
     api = f"https://api.github.com/repos/{EXPECTED_REPO}"
 
     if public_gate_zip_bytes is None:
@@ -363,8 +394,8 @@ def populate_fake_github(
 
     # 1. Pull request route
     is_merged = (pr_state == "merged")
-    gh.set_json(f"{api}/pulls/{PR_NUMBER}", {
-        "number": PR_NUMBER,
+    gh.set_json(f"{api}/pulls/{pr_number}", {
+        "number": pr_number,
         "state": "closed" if is_merged else "open",
         "merged": is_merged,
         "draft": False,
@@ -388,7 +419,7 @@ def populate_fake_github(
 
     # 2. PR Reviews route
     if approval_mode == "approval":
-        gh.set_json(f"{api}/pulls/{PR_NUMBER}/reviews?per_page=100", [
+        gh.set_json(f"{api}/pulls/{pr_number}/reviews?per_page=100", [
             {
                 "id": 401,
                 "user": {"login": reviewer_login},
@@ -398,7 +429,7 @@ def populate_fake_github(
             },
         ])
     else:
-        gh.set_json(f"{api}/pulls/{PR_NUMBER}/reviews?per_page=100", [])
+        gh.set_json(f"{api}/pulls/{pr_number}/reviews?per_page=100", [])
 
     # 3. Public PR run R1
     gh.set_json(f"{api}/actions/runs/{PUBLIC_RUN_ID}", {
@@ -414,7 +445,7 @@ def populate_fake_github(
         "path": ".github/workflows/public-pr.yml",
         "repository": {"id": EXPECTED_REPO_ID, "full_name": EXPECTED_REPO},
         "head_repository": {"id": EXPECTED_REPO_ID, "full_name": EXPECTED_REPO},
-        "pull_requests": [] if is_merged else [{"number": PR_NUMBER, "head": {"sha": head_sha}, "base": {"sha": base_sha}}],
+        "pull_requests": [] if is_merged else [{"number": pr_number, "head": {"sha": head_sha}, "base": {"sha": base_sha}}],
     })
     gh.set_json(
         f"{api}/actions/runs/{PUBLIC_RUN_ID}/jobs?per_page=100",
@@ -458,7 +489,7 @@ def populate_fake_github(
         "path": ".github/workflows/native-qualification.yml",
         "repository": {"id": EXPECTED_REPO_ID, "full_name": EXPECTED_REPO},
         "head_repository": {"id": EXPECTED_REPO_ID, "full_name": EXPECTED_REPO},
-        "pull_requests": [] if is_merged else [{"number": PR_NUMBER, "head": {"sha": head_sha}, "base": {"sha": base_sha}}],
+        "pull_requests": [] if is_merged else [{"number": pr_number, "head": {"sha": head_sha}, "base": {"sha": base_sha}}],
     })
     gh.set_json(
         f"{api}/actions/runs/{NATIVE_RUN_ID}/jobs?per_page=100",
@@ -536,7 +567,7 @@ def populate_fake_github(
     gh.set_json(f"{api}/rules/branches/main", effective_rules)
 
     # 7. Squash commit S and branch main
-    commit_msg = f"Release v{EXPECTED_VERSION}"
+    commit_msg = f"Release v{version}"
     if waiver_hash:
         commit_msg += f"\n\nGovernance-Waiver-SHA256: {waiver_hash}"
     gh.set_json(f"{api}/commits/{squash_sha}", {
@@ -547,7 +578,7 @@ def populate_fake_github(
             "message": commit_msg,
         },
     })
-    gh.set_json(f"{api}/commits/{squash_sha}/pulls", [{"number": PR_NUMBER}])
+    gh.set_json(f"{api}/commits/{squash_sha}/pulls", [{"number": pr_number}])
     gh.set_json(f"{api}/branches/main", {
         "name": "main",
         "commit": {"sha": squash_sha},
@@ -558,27 +589,27 @@ def populate_fake_github(
         "behind_by": 0,
     })
 
-    # 8. Tag v0.13.0
+    # 8. Tag v<version>
     if tag_type == "tag":
-        gh.set_json(f"{api}/git/ref/tags/v{EXPECTED_VERSION}", {
-            "ref": f"refs/tags/v{EXPECTED_VERSION}",
+        gh.set_json(f"{api}/git/ref/tags/v{version}", {
+            "ref": f"refs/tags/v{version}",
             "object": {"sha": tag_sha, "type": "tag"},
         })
         gh.set_json(f"{api}/git/tags/{tag_sha}", {
-            "tag": f"v{EXPECTED_VERSION}",
+            "tag": f"v{version}",
             "sha": tag_sha,
-            "message": f"Release v{EXPECTED_VERSION}\n",
+            "message": f"Release v{version}\n",
             "object": {"sha": squash_sha, "type": "commit"},
         })
     elif tag_type == "lightweight":
-        gh.set_json(f"{api}/git/ref/tags/v{EXPECTED_VERSION}", {
-            "ref": f"refs/tags/v{EXPECTED_VERSION}",
+        gh.set_json(f"{api}/git/ref/tags/v{version}", {
+            "ref": f"refs/tags/v{version}",
             "object": {"sha": squash_sha, "type": "commit"},
         })
 
     # 9. GitHub Release with 16 flat assets
     if include_release:
-        flat_names = canonical_flat_assets(version=EXPECTED_VERSION)
+        flat_names = canonical_flat_assets(version=version)
         assets = []
         for i, flat_name in enumerate(flat_names):
             asset_id = 5000 + i
@@ -587,7 +618,7 @@ def populate_fake_github(
                 if flat_name == CHECKSUM_NAME:
                     content = bundle_file_bytes[CHECKSUM_NAME]
                 else:
-                    logical = next(lp for lp in canonical_logical_paths(EXPECTED_VERSION) if logical_path_to_flat_name(lp) == flat_name)
+                    logical = next(lp for lp in canonical_logical_paths(version) if logical_path_to_flat_name(lp, version) == flat_name)
                     content = bundle_file_bytes[logical]
             else:
                 content = b"sample-bytes"
@@ -599,16 +630,16 @@ def populate_fake_github(
                 "size": len(content),
                 "digest": f"sha256:{c_hash}",
                 "state": "uploaded",
-                "browser_download_url": f"https://github.com/{EXPECTED_REPO}/releases/download/v{EXPECTED_VERSION}/{flat_name}",
+                "browser_download_url": f"https://github.com/{EXPECTED_REPO}/releases/download/v{version}/{flat_name}",
             })
             gh.set_route(f"{api}/releases/assets/{asset_id}", content, "application/octet-stream")
 
         gh.set_json(f"{api}/releases/{RELEASE_ID}", {
             "id": RELEASE_ID,
-            "tag_name": f"v{EXPECTED_VERSION}",
+            "tag_name": f"v{version}",
             "draft": (release_state == "draft"),
             "prerelease": False,
             "body": release_notes,
-            "html_url": f"https://github.com/{EXPECTED_REPO}/releases/tag/v{EXPECTED_VERSION}",
+            "html_url": f"https://github.com/{EXPECTED_REPO}/releases/tag/v{version}",
             "assets": assets,
         })

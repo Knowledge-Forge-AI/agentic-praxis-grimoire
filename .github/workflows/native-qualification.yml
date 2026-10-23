@@ -445,7 +445,7 @@
         },
         {
           "name": "Check public source projection",
-          "run": "set -euo pipefail\npython3 libexec/apg_public_release.py manifest --source \"$GITHUB_WORKSPACE\" --version 0.13.0 --format json > \"$RUNNER_TEMP/public-projection-manifest.json\"\n"
+          "run": "set -euo pipefail\npython3 libexec/apg_public_release.py manifest --source \"$GITHUB_WORKSPACE\" --version 0.13.1 --format json > \"$RUNNER_TEMP/public-projection-manifest.json\"\n"
         },
         {
           "name": "Retain native-release-candidate-bundle",

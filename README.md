@@ -11,14 +11,22 @@ task-scoped guidance, collecting immutable evidence, capturing curated
 environments, inspecting repository structures, and measuring context footprints
 without dictating an orchestration workflow.
 
-This documentation covers the **unreleased v0.13.0 candidate**, an early pilot
-release. It carries 46 canonical skills, the independently usable single-phase
-dispatcher shipped with APGR, optional RTK integration, and a first-party Nix
-flake. Static context remains the shipped default; adaptive
+This documentation covers the **unreleased v0.13.1 candidate**, a patch release
+whose predecessor is v0.13.0 and which remains an early pilot. It carries the
+same 46 canonical skills, the independently usable single-phase dispatcher
+shipped with APGR, optional RTK integration, and first-party Nix flake as
+v0.13.0, with patch packaging and Vite fixture/profile corrections. Static
+context remains the shipped default; adaptive
 selected-skill and instruction projection are experimental and opt-in, and no
-token or context-window saving is claimed. v0.12.0 is the latest published
-release across GitHub Releases, Go, PyPI, npm, and Homebrew tap; earlier
-releases stay frozen. See the [candidate notes](release/v0.13.0-notes.md) and
+token or context-window saving is claimed. v0.13.0 was published: its GitHub
+Release carries its assets, which stay frozen, and PyPI lists its two Linux
+wheels and the sdist. Its original Darwin wheel (tag `macosx_11_0_arm64`) is
+on GitHub but absent from the PyPI listing. v0.13.1 corrects the Darwin
+declaration: its Darwin ARM64 wheel is tagged `macosx_12_0_arm64` and requires
+macOS 12 (Monterey) or later. v0.13.1 is pending until actually published, and
+no npm or Homebrew availability of v0.13.0 is claimed. v0.12.0 is the latest
+release proven across GitHub Releases, Go, PyPI, npm, and Homebrew tap; earlier
+releases stay frozen. See the [candidate notes](release/v0.13.1-notes.md) and
 [v0.13 roadmap](docs/v0-13-roadmap.md). Candidate preparation does not
 establish hosted CI acceptance or publication.
 
@@ -439,16 +447,32 @@ can dispatch through that checkout; the native/npm binary cannot run `test`.
 
 ## Upgrade guidance and release status
 
-### Preparing v0.13.0
+### Preparing v0.13.1
 
-v0.13.0 is unreleased. Exercise candidate features from a source checkout or
-locally qualified wheel/npm artifacts; registry installation commands below
-refer to the published v0.12.0 predecessor. The release route is public
-`staging` → pull request → squash merge to `main` → release; see the
+v0.13.1 is an unreleased patch candidate; its predecessor is v0.13.0. It
+corrects one declaration: a retained inspection of the actual v0.13.0 Darwin
+binary bytes observed a declared minimum of macOS 12.0 (SDK 12.0) although the
+published wheel is tagged `macosx_11_0_arm64`. This is byte inspection, not
+native execution evidence, and no compiler cause is claimed. The v0.13.1
+Darwin ARM64 wheel is tagged `macosx_12_0_arm64` and requires macOS 12
+(Monterey) or later. Every release seam (builder, Python backend, npm
+packager, prebuilt publication and distribution-candidate validation) now
+checks the actual Mach-O minimum against that tag and refuses a binary that
+requires more than macOS 12.0. Linux targets are unchanged.
+
+The published v0.13.0 assets are frozen: they are never renamed, replaced,
+overwritten, yanked or deleted. v0.13.1 assets use their own v0.13.1 namespace.
+Exercise candidate features from a source checkout or locally qualified
+wheel/npm artifacts; registry installation commands below refer to the
+published v0.12.0 release; no registry availability of v0.13.1 is
+claimed. The release route is public `staging` → pull request → squash merge
+to `main` → release; see the
 [release procedure](docs/public-release-process.md). Local preparation does not
 mean a public PR has run or that branch protection is configured.
 
-Release status of v0.13.0 features:
+### Features carried from v0.13.0
+
+Release status of the v0.13.0 features, carried unchanged by v0.13.1:
 
 - **Supported**: the portable `apgr` CLI and Go packages, the skill corpus, and
   the phase runtime on its V1 and V2 normal routes with static context.
@@ -464,7 +488,7 @@ Release status of v0.13.0 features:
 From v0.13.0, APGR also publishes a first-party Nix flake from this repository
 ([ADR 0076](docs/adr/2026/09/0076-first-party-nix-flake-publication-target.md)).
 The package contains the portable `apgr` and the installed phase runtime.
-These commands work only after the `v0.13.0` tag is published:
+These commands use the published `v0.13.0` tag:
 
 ```sh
 nix build github:Knowledge-Forge-AI/agentic-praxis-grimoire/v0.13.0#agentic-praxis-grimoire
@@ -472,7 +496,9 @@ nix run github:Knowledge-Forge-AI/agentic-praxis-grimoire/v0.13.0#apgr -- --vers
 nix profile add github:Knowledge-Forge-AI/agentic-praxis-grimoire/v0.13.0#agentic-praxis-grimoire
 ```
 
-Pin the release tag, not `main`. This is not an upstream nixpkgs package. See
+The `v0.13.1` tag is pending; the same commands apply with `v0.13.1` only
+after that tag is published. Pin the release tag, not `main`. This is not an
+upstream nixpkgs package. See
 [distribution](docs/distribution.md#first-party-nix-flake-v0130-onward) for
 platform status and installed-runtime prerequisites.
 

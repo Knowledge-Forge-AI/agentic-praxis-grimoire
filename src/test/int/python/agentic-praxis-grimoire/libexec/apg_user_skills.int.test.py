@@ -13,6 +13,8 @@ import stat
 import tempfile
 import unittest
 
+from src.test.support.apg_user_skills_fixture import REQUIRED_H2S, SKILLS, public_release
+
 
 EXISTING_TEST = Path(__file__).parent.parent / "bin" / "apg-user-skills.int.test.py"
 SPEC = importlib.util.spec_from_file_location("apg_user_skills_existing", EXISTING_TEST)
@@ -308,7 +310,7 @@ class APGUserSkillVariableSetTests(unittest.TestCase):
         shutil.copytree(self.fixture.second, path, symlinks=True)
         sections = "\n\n".join(
             f"## {heading}\n\nFixture for {heading.lower()}."
-            for heading in EXISTING.REQUIRED_H2S
+            for heading in REQUIRED_H2S
         )
         for name in V03_ADDITIONS:
             leaf = path / "skills" / name
@@ -332,7 +334,7 @@ class APGUserSkillVariableSetTests(unittest.TestCase):
         )
         policy_path = path / "release" / "public-surface.json"
         policy = json.loads(policy_path.read_text())
-        for key, values in EXISTING.public_release.audited_policy_surfaces("0.3.0")[0].items():
+        for key, values in public_release.audited_policy_surfaces("0.3.0")[0].items():
             policy[key] = list(values)
         policy["required_skills"] = [f"skills/{name}/SKILL.md" for name in V03_SKILLS]
         policy["required_projections"] = [f".agents/skills/{name}" for name in V03_SKILLS]
@@ -450,6 +452,121 @@ class APGUserSkillVariableSetTests(unittest.TestCase):
         result = self.fixture.invoke("list", source=source)
         self.assertEqual(result.returncode, 1)
         self.assertIn("policy", result.stderr.lower())
+
+
+class APGUserSkillsLegacyTests(EXISTING.APGUserSkillsFixture, unittest.TestCase):
+    """Exercise state-backed compatibility without widening fresh admission."""
+
+    maxDiff = None
+
+    def test_40_recorded_legacy_state_can_check_transition_rollback_and_uninstall(self) -> None:
+        self.assert_success(self.install())
+        before_check = self.state_path.read_bytes()
+        before_targets = {name: os.readlink(self.skills_root / name) for name in SKILLS}
+        check = self.invoke("check", launcher=self.compatibility_launcher)
+        self.assert_success(check)
+        self.assertEqual(self.state_path.read_bytes(), before_check)
+        self.assertEqual(
+            {name: os.readlink(self.skills_root / name) for name in SKILLS},
+            before_targets,
+        )
+
+        legacy_update = self.invoke("update", source=self.second, launcher=self.launcher)
+        self.assert_success(legacy_update)
+        self.assertEqual(self.state()["current_source"]["path"], str(self.second.resolve()))
+        self.assertEqual(self.state()["previous_source"]["path"], str(self.first.resolve()))
+        before_descendant_check = self.state_path.read_bytes()
+        descendant_targets = {name: os.readlink(self.skills_root / name) for name in SKILLS}
+        descendant_check = self.invoke("check", launcher=self.compatibility_launcher)
+        self.assert_success(descendant_check)
+        self.assertEqual(self.state_path.read_bytes(), before_descendant_check)
+        self.assertEqual(
+            {name: os.readlink(self.skills_root / name) for name in SKILLS},
+            descendant_targets,
+        )
+
+        update = self.invoke("update", source=self.rewritten, launcher=self.compatibility_launcher)
+        self.assert_success(update)
+        self.assertEqual(self.state()["current_source"]["path"], str(self.rewritten.resolve()))
+        self.assertEqual(self.state()["previous_source"]["path"], str(self.second.resolve()))
+        self.assertEqual(
+            (self.skills_root / SKILLS[0]).resolve(),
+            (self.rewritten / "skills" / SKILLS[0]).resolve(),
+        )
+
+        rollback = self.invoke("rollback", launcher=self.compatibility_launcher)
+        self.assert_success(rollback)
+        self.assertEqual(self.state()["current_source"]["path"], str(self.second.resolve()))
+        self.assertEqual(
+            (self.skills_root / SKILLS[0]).resolve(),
+            (self.second / "skills" / SKILLS[0]).resolve(),
+        )
+
+        uninstall = self.invoke("uninstall", launcher=self.compatibility_launcher)
+        self.assert_success(uninstall)
+        self.assertFalse(self.state_path.exists())
+        self.assertFalse(any((self.skills_root / name).exists() for name in SKILLS))
+
+    def test_41_fresh_install_and_adopt_reject_the_legacy_root(self) -> None:
+        for operation in ("install", "adopt"):
+            with self.subTest(operation=operation):
+                root = self.root / f"fresh-{operation}"
+                environment = self.environment.copy()
+                environment["XDG_STATE_HOME"] = str(self.root / f"state-{operation}")
+                if operation == "adopt":
+                    root.mkdir()
+                    for name in SKILLS:
+                        (root / name).symlink_to(
+                            self.first / "skills" / name,
+                            target_is_directory=True,
+                        )
+                result = self.run_command(
+                    operation,
+                    "--source",
+                    str(self.first),
+                    "--skills-root",
+                    str(root),
+                    environment=environment,
+                    launcher=self.compatibility_launcher,
+                )
+                self.assertEqual(result.returncode, 1)
+                self.assertIn("source public release lineage is invalid", result.stderr)
+                self.assertFalse(
+                    (Path(environment["XDG_STATE_HOME"]) / "agentic-praxis-grimoire").exists()
+                )
+                if operation == "adopt":
+                    self.assertEqual(
+                        {name: os.readlink(root / name) for name in SKILLS},
+                        {
+                            name: str(self.first / "skills" / name)
+                            for name in SKILLS
+                        },
+                    )
+
+    def test_42_invalid_recorded_legacy_identity_is_read_only(self) -> None:
+        self.assert_success(self.install())
+        state = self.state()
+        state["current_source"]["skill_hashes"][SKILLS[0]] = "d" * 64
+        self.state_path.write_text(json.dumps(state, indent=2, sort_keys=True) + "\n")
+        self.state_path.chmod(0o600)
+        before_state = self.state_path.read_bytes()
+        before_targets = {name: os.readlink(self.skills_root / name) for name in SKILLS}
+
+        check = self.invoke("check", launcher=self.compatibility_launcher)
+        self.assertEqual(check.returncode, 1)
+        self.assertEqual(self.state_path.read_bytes(), before_state)
+        self.assertEqual(
+            {name: os.readlink(self.skills_root / name) for name in SKILLS},
+            before_targets,
+        )
+        uninstall = self.invoke("uninstall", launcher=self.compatibility_launcher)
+        self.assertEqual(uninstall.returncode, 1)
+        self.assertEqual(self.state_path.read_bytes(), before_state)
+        self.assertEqual(
+            {name: os.readlink(self.skills_root / name) for name in SKILLS},
+            before_targets,
+        )
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

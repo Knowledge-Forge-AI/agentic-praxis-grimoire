@@ -253,6 +253,15 @@
       ]
     },
     {
+      "path": "libexec/apg_user_skills_git.py",
+      "rationale": "maintained executable Python source",
+      "suites": [
+        "unit",
+        "integration",
+        "combined"
+      ]
+    },
+    {
       "path": "libexec/change_size/__init__.py",
       "rationale": "maintained executable Python source",
       "suites": [

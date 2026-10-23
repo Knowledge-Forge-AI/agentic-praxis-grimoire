@@ -1,7 +1,8 @@
 """Validate supplied prebuilt inputs through real files, without assembling packages.
 
-Synthetic binary bytes and handcrafted ZIP views are fixtures, never native
-consumer or release qualification. All builder calls stop before assembly.
+Synthetic ELF bytes, structurally genuine but non-executable Darwin ARM64
+Mach-O images and handcrafted ZIP views are fixtures, never native consumer or
+release qualification. All builder calls stop before assembly.
 """
 
 from __future__ import annotations
@@ -15,6 +16,7 @@ from pathlib import Path
 import pytest
 
 from src.test.apg_test_support import repository_root
+from src.test.support import apg_macho_fixtures as macho
 
 ROOT = repository_root(__file__)
 sys.path.insert(0, str(ROOT / "libexec"))
@@ -35,8 +37,12 @@ def inputs(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     for index, target in enumerate(publication.SUPPORTED_TARGETS):
         directory = artifacts / (target if index == 1 else target.replace("/", "-"))
         directory.mkdir(parents=True)
-        data = buildinfo.make_synthetic_binary(
-            target=target, format_type="macho" if target.startswith("darwin") else "elf"
+        # Darwin bytes must be a coherent ARM64 Mach-O so later-seam defects
+        # are not pre-empted by the shared deployment predicate.
+        data = (
+            macho.darwin_arm64()
+            if target.startswith("darwin")
+            else buildinfo.make_synthetic_binary(target=target, format_type="elf")
         )
         (directory / "apgr").write_bytes(data)
         manifest = go_build._manifest(target=target, version=version, corpus=corpus, binary=data)
@@ -102,6 +108,31 @@ def test_input_custody_refuses_before_assembly(inputs, tmp_path: Path, defect: s
     else:
         (directory / "go-version-m.txt").write_bytes(b"\xff")
     with pytest.raises(publication.PublicationError, match=message):
+        prebuilt.build_prebuilt_bundle(ROOT, artifacts, output, work)
+    assert not output.exists()
+    assert list(work.iterdir()) == []
+
+
+def test_over_floor_darwin_input_is_refused_by_the_deployment_seam_before_assembly(
+    inputs, monkeypatch: pytest.MonkeyPatch
+):
+    artifacts, work, output, directories = inputs
+    # Replace only the Darwin bytes; manifest, build info and recorded text are
+    # regenerated coherent, so the minimum is the sole defect.
+    macho.write_artifact(
+        directories["darwin/arm64"],
+        macho.darwin_arm64(minimum=macho.OVERFLOOR_MINIMUM),
+        root=ROOT,
+        recorded=True,
+    )
+    backend = publication._backend(ROOT)
+    monkeypatch.setattr(
+        backend, "_provided_binary", lambda *a, **k: pytest.fail("backend seam reached")
+    )
+    with pytest.raises(
+        publication.PublicationError,
+        match="prebuilt Go binary deployment failed validation for darwin/arm64",
+    ):
         prebuilt.build_prebuilt_bundle(ROOT, artifacts, output, work)
     assert not output.exists()
     assert list(work.iterdir()) == []

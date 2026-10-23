@@ -141,9 +141,9 @@ def test_native_qualification_runs_race_and_real_nix_adapter(monkeypatch, tmp_pa
         elif args[0] == "nix":
             stdout = str(compiler)
         elif "--version" in args:
-            stdout = "apgr 0.13.0\n"
+            stdout = "apgr 0.13.1\n"
         elif "build-info" in args:
-            stdout = json.dumps({"version": "0.13.0", "target": spec["target"], "corpus_fingerprint_verified": True})
+            stdout = json.dumps({"version": "0.13.1", "target": spec["target"], "corpus_fingerprint_verified": True})
         else:
             stdout = "passed\n"
         return subprocess.CompletedProcess(args, 0, stdout, "")
@@ -176,7 +176,7 @@ def test_child_failure_cannot_emit_success(command_child):
 
 
 def test_binary_target_smoke_fails_on_wrong_packaged_architecture(monkeypatch, tmp_path):
-    values = iter(["apgr 0.13.0\n", json.dumps({"version": "0.13.0", "target": "linux/arm64", "corpus_fingerprint_verified": True})])
+    values = iter(["apgr 0.13.1\n", json.dumps({"version": "0.13.1", "target": "linux/arm64", "corpus_fingerprint_verified": True})])
     monkeypatch.setattr(lane, "_run", lambda *a, **k: subprocess.CompletedProcess([], 0, next(values), ""))
     with pytest.raises(lane.LaneError, match="build-info"):
         lane._binary_smoke(tmp_path / "binary", "linux/amd64", tmp_path)
@@ -190,7 +190,7 @@ def test_consumer_installs_exact_sealed_archives_offline(monkeypatch, tmp_path, 
     py = bundle / "python"
     py.mkdir(parents=True)
     for item in seals.CANONICAL_TARGETS.values():
-        (py / f"agentic_praxis_grimoire-0.13.0-py3-none-{item['python_tag']}.whl").write_bytes(b"fixture")
+        (py / f"agentic_praxis_grimoire-0.13.1-py3-none-{item['python_tag']}.whl").write_bytes(b"fixture")
     binding = {"artifact_id": "1", "artifact_digest": "sha256:" + "e" * 64, "seal_sha256": "f" * 64}
     monkeypatch.setenv("NATIVE_BUNDLE_JSON", json.dumps(binding))
     monkeypatch.setattr(lane, "_identity", lambda: ("a" * 40, "b" * 40))
@@ -208,9 +208,9 @@ def test_consumer_installs_exact_sealed_archives_offline(monkeypatch, tmp_path, 
         if args == ["node", "--version"]:
             out = "v22.22.2\n"
         elif "--version" in args:
-            out = "apgr 0.13.0\n"
+            out = "apgr 0.13.1\n"
         elif "build-info" in args:
-            out = json.dumps({"version": "0.13.0", "target": spec["target"], "corpus_fingerprint_verified": True})
+            out = json.dumps({"version": "0.13.1", "target": spec["target"], "corpus_fingerprint_verified": True})
         else:
             out = "passed"
         return subprocess.CompletedProcess(args, 0, out, "")
@@ -221,7 +221,7 @@ def test_consumer_installs_exact_sealed_archives_offline(monkeypatch, tmp_path, 
     assert result["checks"]["foreign_wheel_rejected"] == "passed"
     npm = next(command for command in commands if command[:2] == ["npm", "install"])
     assert {"--offline", "--ignore-scripts", "--no-audit", "--no-fund", "--package-lock=false"} <= set(npm)
-    assert npm[-1].endswith(f"knowledge-forge-ai-apgr-{spec['npm_slug']}-0.13.0.tgz")
+    assert npm[-1].endswith(f"knowledge-forge-ai-apgr-{spec['npm_slug']}-0.13.1.tgz")
     assert sum("report" in command and "verify" in command for command in commands) == 2
 
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Integration tests for APG124 Vite 8.2.2 build and dev toolchain profile.
+"""Integration tests for APG124 Vite 8.2.4 build and dev toolchain profile.
 
-Executes real programmatic Vite 8.2.2 build, serve, HMR invalidation, preview,
+Executes real programmatic Vite 8.2.4 build, serve, HMR invalidation, preview,
 and Rolldown compilation scenarios VITE01-VITE12 in owned scratch. Verifies zero
 skipped, zero failed, exact toolchain identities, deterministic digest matching,
 and fail-closed prerequisite validation.

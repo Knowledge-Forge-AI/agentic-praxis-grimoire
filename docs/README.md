@@ -17,8 +17,10 @@ start with the [root README](../README.md).
 - [Release notes (v0.9.0)](../release/v0.9.0-notes.md) — preceding release
   highlights and publication reconciliation.
 
-This documentation covers the **unreleased v0.13.0 candidate**.
-v0.12.0 is publicly released across GitHub, Go, PyPI, npm, and Homebrew tap. Preceding releases remain frozen.
+This documentation covers the **unreleased v0.13.1 candidate**, a patch release
+whose predecessor is v0.13.0 (published on GitHub Releases and PyPI with frozen
+assets); v0.13.1 is pending until actually published.
+v0.12.0 is the latest release proven across GitHub, Go, PyPI, npm, and Homebrew tap. Preceding releases remain frozen.
 The [v0.13 roadmap](v0-13-roadmap.md) owns current development planning, initiated by APG159 (stage V0130-A).
 The [v0.12 forward reconciliation record](architecture/v0-12-forward-reconciliation.md) reconciles v0.12.0 publication and development lineage.
 The [v0.12 architecture transfer roadmap](v0-12-roadmap.md), [v0.11 closure roadmap](v0-11-roadmap.md), and [v0.10 roadmap](v0-10-roadmap.md) are historical release records.
