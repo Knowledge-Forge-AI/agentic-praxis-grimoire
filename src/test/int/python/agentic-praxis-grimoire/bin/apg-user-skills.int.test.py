@@ -16,6 +16,8 @@ import unittest
 from src.test.support.apg_user_skills_fixture import (
     APGUserSkillsFixture,
     COMMAND,
+    REPOSITORY_ROOT as REPOSITORY_ROOT,
+    REQUIRED_H2S as REQUIRED_H2S,
     RESTART,
     SKILLS,
 )
