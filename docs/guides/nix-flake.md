@@ -90,6 +90,28 @@ revision-pinned reference, never the tag name. The profile lives under the
 fresh scratch directory and is removed afterwards; default profiles are
 refused. This command works only after the `v0.13.0` tag is published.
 
+## Hosted post-tag readback
+
+The dispatch-only `nix-post-tag-readback.yml` workflow runs the same tagged
+helper on native Darwin ARM64, Linux AMD64 and Linux ARM64 hosts. It is a
+post-tag maintenance route; it does not publish artifacts or change a tag.
+After the workflow is present on public main, an authorized maintainer can run:
+
+```sh
+gh workflow run nix-post-tag-readback.yml \
+  --repo Knowledge-Forge-AI/agentic-praxis-grimoire --ref main \
+  -f tag=v0.13.1 -f expected_rev="$MERGED_RELEASE_COMMIT"
+```
+
+The tag must have the exact `vMAJOR.MINOR.PATCH` form, and the expected revision
+must be a lowercase 40-character commit ID. Inputs are validated before Git
+execution. Each lane checks out that release source, uses its qualification
+helper and a disposable profile, and uploads the exact readback output,
+receipt, identity, helper manifest and exit status. Require all three native
+receipts to pass and bind to the requested tag, revision and system before
+claiming channel qualification. A local controller test or a successful
+workflow-source check does not establish that result.
+
 ## Build closure
 
 The runtime ships the whole `bin/` and `libexec/` trees, because the

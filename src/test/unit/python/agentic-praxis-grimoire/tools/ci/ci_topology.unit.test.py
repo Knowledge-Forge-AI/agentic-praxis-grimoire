@@ -1,4 +1,4 @@
-"""Unit tests for ci_topology workflow validation (public-pr and release; native has its own file)."""
+"""Unit tests for shipped workflow topology and authority validation."""
 
 from __future__ import annotations
 
@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from tools.ci import ci_topology
+from tools.ci import ci_topology, nix_readback_maintenance
 from tools.ci.ci_topology import (
     GLOBAL_FORBIDDEN_PUBLICATION_MARKERS,
     check_global_publication_markers,
@@ -17,10 +17,12 @@ from tools.ci.ci_topology import (
     validate_public_pr,
     validate_release_yml,
 )
+from tools.ci.nix_readback_topology import validate_nix_readback
 
 ROOT = Path(__file__).resolve().parents[7]
 PUBLIC = Path("public-pr.yml")
 RELEASE = Path("release.yml")
+NIX_READBACK = Path("nix-post-tag-readback.yml")
 
 
 @pytest.fixture
@@ -31,6 +33,11 @@ def valid_public_pr_doc() -> dict:
 @pytest.fixture
 def valid_release_doc() -> dict:
     return load_workflow_doc(ROOT / ".github/workflows/release.yml")
+
+
+@pytest.fixture
+def valid_nix_readback_doc() -> dict:
+    return load_workflow_doc(ROOT / ".github/workflows/nix-post-tag-readback.yml")
 
 
 def _step(doc: dict, job: str, needle: str) -> dict:
@@ -191,15 +198,15 @@ def test_rejects_unknown_workflow(tmp_path: Path, monkeypatch: pytest.MonkeyPatc
     assert any("unknown.yml: unknown workflow" in e for e in errors)
 
 
-def test_requires_exactly_the_three_shipped_workflows(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_requires_exactly_the_four_shipped_workflows(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(ci_topology, "WORKFLOWS_DIR", tmp_path)
     assert ci_topology.validate_all_workflows() == [
-        "missing required workflows: ['native-qualification', 'public-pr', 'release']"
+        "missing required workflows: ['native-qualification', 'nix-post-tag-readback', 'public-pr', 'release']"
     ]
     source = ROOT / ".github/workflows/public-pr.yml"
     (tmp_path / "public-pr.yml").write_text(source.read_text(encoding="utf-8"), encoding="utf-8")
     assert ci_topology.validate_all_workflows() == [
-        "missing required workflows: ['native-qualification', 'release']"
+        "missing required workflows: ['native-qualification', 'nix-post-tag-readback', 'release']"
     ]
 
 
@@ -243,6 +250,121 @@ def test_required_gate_cannot_be_bypassed(valid_public_pr_doc: dict, mutation: s
 
 def test_valid_release_workflow_has_zero_errors(valid_release_doc: dict) -> None:
     assert validate_release_yml(valid_release_doc, RELEASE) == []
+
+
+def test_valid_nix_readback_workflow_has_zero_errors(valid_nix_readback_doc: dict) -> None:
+    assert validate_nix_readback(valid_nix_readback_doc, NIX_READBACK) == []
+
+
+def test_current_nix_readback_maintenance_inventory_is_complete() -> None:
+    assert nix_readback_maintenance.validate_current_maintenance(ROOT) == []
+
+
+def test_ci_topology_checks_current_inventory_when_readback_workflow_is_present(monkeypatch) -> None:
+    calls: list[Path] = []
+    monkeypatch.setattr(
+        ci_topology,
+        "validate_current_maintenance",
+        lambda root: calls.append(root) or ["maintenance inventory sentinel"],
+    )
+
+    errors = ci_topology.validate_all_workflows()
+
+    assert calls == [ci_topology.ROOT]
+    assert "maintenance inventory sentinel" in errors
+
+
+def test_nix_readback_maintenance_inventory_rejects_missing_owner_source(tmp_path: Path) -> None:
+    for owner in nix_readback_maintenance.OWNER_RECORDS:
+        source = tmp_path / owner["path"]
+        source.parent.mkdir(parents=True, exist_ok=True)
+        source.write_text("owner\n", encoding="utf-8")
+    missing = tmp_path / nix_readback_maintenance.OWNER_RECORDS[1]["path"]
+    missing.unlink()
+
+    errors = nix_readback_maintenance.validate_inventory(
+        nix_readback_maintenance.INVENTORY,
+        tmp_path,
+    )
+
+    assert any("owner source is missing or not a regular file" in error for error in errors)
+
+
+def test_nix_readback_maintenance_inventory_rejects_unknown_owner() -> None:
+    inventory = copy.deepcopy(nix_readback_maintenance.INVENTORY)
+    owners = list(inventory["owners"])
+    owners.append({"path": "tools/ci/unknown.py", "role": "unknown"})
+    inventory["owners"] = owners
+
+    errors = nix_readback_maintenance.validate_inventory(inventory, ROOT)
+
+    assert any("owners must match the exact current route" in error for error in errors)
+    assert any("owner source is missing or not a regular file" in error for error in errors)
+
+
+@pytest.mark.parametrize(
+    ("mutation", "expected"),
+    [
+        ("trigger", "only workflow_dispatch execution is permitted"),
+        ("input", "dispatch inputs must be exact"),
+        ("permissions", "permissions must be exactly"),
+        ("matrix", "native matrix must be the three approved systems"),
+        ("action", "not pinned to a 40-character SHA"),
+        ("helper", "helper paths must be the approved three-file set"),
+        ("binding", "missing required contract"),
+        ("publication", "forbidden publication or OIDC authority marker"),
+        ("oidc", "forbidden publication or OIDC authority marker"),
+        ("status-override", "run body is not the pinned reviewed block"),
+        ("require-early-exit", "run body is not the pinned reviewed block"),
+        ("workflow-interpolation", "run body is not the pinned reviewed block"),
+        ("extra-helper", "run body is not the pinned reviewed block"),
+        ("eval", "input must remain data-only and read-only"),
+        ("receipt-only", "receipt upload contract changed"),
+    ],
+)
+def test_nix_readback_validator_rejects_authority_and_binding_drift(
+    valid_nix_readback_doc: dict, mutation: str, expected: str
+) -> None:
+    doc = copy.deepcopy(valid_nix_readback_doc)
+    job = doc["jobs"]["nix-readback"]
+    if mutation == "trigger":
+        doc["on"] = {"push": {"branches": ["main"]}}
+    elif mutation == "input":
+        del doc["on"]["workflow_dispatch"]["inputs"]["expected_rev"]
+    elif mutation == "permissions":
+        doc["permissions"] = {"contents": "write"}
+    elif mutation == "matrix":
+        doc["jobs"]["nix-readback"]["strategy"]["matrix"]["include"][2]["system"] = "x86_64-linux"
+    elif mutation == "action":
+        job["steps"][0]["uses"] = "actions/checkout@v4"
+    elif mutation == "helper":
+        job["steps"][3]["run"] = job["steps"][3]["run"].replace(
+            '"libexec/apg_nix_smoke.py"', '"libexec/not-approved.py"'
+        )
+    elif mutation == "binding":
+        job["steps"][5]["run"] = job["steps"][5]["run"].replace(
+            '"helper_manifest": manifest,', '"helper_manifest_removed": manifest,'
+        )
+    elif mutation == "publication":
+        job["steps"][7]["run"] += "\nnpm publish apgr\n"
+    elif mutation == "status-override":
+        job["steps"][4]["run"] = job["steps"][4]["run"].replace(
+            'status=$?\nprintf', 'status=$?\nstatus=0\nprintf'
+        )
+    elif mutation == "require-early-exit":
+        job["steps"][7]["run"] = "exit 0\n" + job["steps"][7]["run"]
+    elif mutation == "workflow-interpolation":
+        job["steps"][4]["run"] += "\n${{ inputs.tag }}\n"
+    elif mutation == "extra-helper":
+        job["steps"][3]["run"] += '\n"libexec/extra.py"\n'
+    elif mutation == "eval":
+        job["steps"][3]["run"] += "\neval(\n"
+    elif mutation == "receipt-only":
+        job["steps"][6]["with"]["path"] = "${{ runner.temp }}/apgr-nix-readback/receipt.json"
+    else:
+        doc["permissions"] = {"contents": "read", "id-token": "write"}
+    errors = validate_nix_readback(doc, NIX_READBACK)
+    assert any(expected in error for error in errors), errors
 
 
 def test_reject_release_wrong_trigger(valid_release_doc: dict) -> None:

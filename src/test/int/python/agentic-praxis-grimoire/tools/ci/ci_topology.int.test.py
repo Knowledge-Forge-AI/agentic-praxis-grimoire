@@ -1,4 +1,4 @@
-"""Integration tests for CI topology, cross-binding contracts, and the two shipped PR workflows."""
+"""Integration tests for CI topology, cross-binding contracts, and shipped workflows."""
 
 from __future__ import annotations
 
@@ -31,18 +31,20 @@ from tools.ci.native_topology import (
     NATIVE_DOWNLOAD_PIN,
     REQUIRED_NATIVE_JOBS,
 )
+from tools.ci.nix_readback_topology import validate_nix_readback
 
 ROOT = Path(__file__).resolve().parents[7]
 WORKFLOWS = ROOT / ".github/workflows"
 PUBLIC_PR_WORKFLOW = WORKFLOWS / "public-pr.yml"
 NATIVE_WORKFLOW = WORKFLOWS / "native-qualification.yml"
 RELEASE_WORKFLOW = WORKFLOWS / "release.yml"
+NIX_READBACK_WORKFLOW = WORKFLOWS / "nix-post-tag-readback.yml"
 
 
 
-def test_shipped_workflow_directory_is_exactly_the_two_pr_workflows_plus_release() -> None:
+def test_shipped_workflow_directory_is_exactly_the_two_pr_workflows_plus_release_and_readback() -> None:
     assert sorted(path.name for path in WORKFLOWS.iterdir()) == [
-        "native-qualification.yml", "public-pr.yml", "release.yml",
+        "native-qualification.yml", "nix-post-tag-readback.yml", "public-pr.yml", "release.yml",
     ]
 
 
@@ -111,6 +113,29 @@ def test_release_workflow_has_exact_verify_topology() -> None:
     assert "uses" not in verify_step
 
 
+def test_nix_readback_workflow_has_exact_validator_contract() -> None:
+    assert validate_nix_readback(load_workflow_doc(NIX_READBACK_WORKFLOW), NIX_READBACK_WORKFLOW) == []
+
+
+def test_nix_readback_reuses_existing_native_action_pins() -> None:
+    def uses(value: object) -> set[str]:
+        if isinstance(value, dict):
+            found: set[str] = set()
+            for child in value.values():
+                found.update(uses(child))
+            return found
+        if isinstance(value, list):
+            found = set()
+            for child in value:
+                found.update(uses(child))
+            return found
+        return {value} if isinstance(value, str) and "@" in value else set()
+
+    native = uses(load_workflow_doc(NATIVE_WORKFLOW))
+    readback = uses(load_workflow_doc(NIX_READBACK_WORKFLOW))
+    assert readback <= native
+
+
 def test_native_post_lane_jobs_use_the_artifact_id_capable_download_pin_only() -> None:
     native_jobs = load_workflow_doc(NATIVE_WORKFLOW)["jobs"]
     for job_id, job in native_jobs.items():
@@ -120,7 +145,7 @@ def test_native_post_lane_jobs_use_the_artifact_id_capable_download_pin_only() -
                 assert job["permissions"] == {"contents": "read", "actions": "read"}, job_id
 
 
-@pytest.mark.parametrize("path", [PUBLIC_PR_WORKFLOW, NATIVE_WORKFLOW, RELEASE_WORKFLOW])
+@pytest.mark.parametrize("path", [PUBLIC_PR_WORKFLOW, NATIVE_WORKFLOW, RELEASE_WORKFLOW, NIX_READBACK_WORKFLOW])
 def test_workflow_files_are_strict_json_documents(path: Path) -> None:
     assert isinstance(load_workflow_doc(path), dict)
 

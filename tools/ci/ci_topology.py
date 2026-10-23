@@ -24,6 +24,13 @@ from tools.ci.native_topology import (
     guard_clauses,
     validate_native_qualification,
 )
+from tools.ci.nix_readback_maintenance import (
+    WORKFLOW_PATH as NIX_READBACK_MAINTENANCE_WORKFLOW,
+)
+from tools.ci.nix_readback_maintenance import (
+    validate_current_maintenance,
+)
+from tools.ci.nix_readback_topology import validate_nix_readback
 
 ROOT = Path(__file__).resolve().parents[2]
 WORKFLOWS_DIR = ROOT / ".github/workflows"
@@ -375,6 +382,7 @@ def validate_all_workflows() -> list[str]:
     validators = {
         "public-pr": validate_public_pr,
         "native-qualification": validate_native_qualification,
+        "nix-post-tag-readback": validate_nix_readback,
         "release": validate_release_yml,
     }
     workflow_files = sorted(WORKFLOWS_DIR.glob("*.yml")) + sorted(WORKFLOWS_DIR.glob("*.yaml"))
@@ -396,6 +404,13 @@ def validate_all_workflows() -> list[str]:
         errors.extend(validator(doc, wf))
     if not set(validators) <= seen:
         errors.append(f"missing required workflows: {sorted(set(validators) - seen)}")
+    readback_name = Path(NIX_READBACK_MAINTENANCE_WORKFLOW).name
+    if (WORKFLOWS_DIR / readback_name).is_file():
+        workflow_root = ROOT
+        canonical_workflows = ROOT / ".github/workflows"
+        if WORKFLOWS_DIR != canonical_workflows:
+            workflow_root = WORKFLOWS_DIR.parent.parent
+        errors.extend(validate_current_maintenance(workflow_root))
     return errors
 
 
