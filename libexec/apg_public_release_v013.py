@@ -133,12 +133,13 @@ V013_CRITICAL_ADDITIONS = (
     "testing/release/native-qualification.md",
 )
 
-# The closed v0.13.1 patch additions: its release notes and the shared
-# test-only Mach-O fixture owner.  Every other v0.13.1 surface tuple is the
-# exact v0.13.0 tuple.
+# The closed v0.13.1 patch additions: its release notes, shared test-only
+# Mach-O fixture, and measured CLI compatibility oracle. Every other v0.13.1
+# surface tuple is the exact v0.13.0 tuple.
 V0131_CRITICAL_ADDITIONS = (
     "release/v0.13.1-notes.md",
     "src/test/support/apg_macho_fixtures.py",
+    "testing/fixtures/skill-cli-v0131-compatibility.json",
 )
 
 # Public main may carry untagged commits after the previous release tag.

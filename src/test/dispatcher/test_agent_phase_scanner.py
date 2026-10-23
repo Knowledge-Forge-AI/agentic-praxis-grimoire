@@ -17,6 +17,7 @@ from agent_phase.scanner import (
     append_label,
     append_row,
     build_argv,
+    redact_findings,
     scan,
     summarize,
 )
@@ -120,10 +121,11 @@ def test_scan_directory_holds_exactly_one_artifact_and_no_repo_content(
 
 
 def test_argv_never_enables_ai_and_never_uses_a_package_runner(tmp_path: Path) -> None:
-    argv = build_argv("/usr/local/bin/malskanner", tmp_path)
+    target = tmp_path / "target with spaces"
+    argv = build_argv("/usr/local/bin/malskanner", target)
     assert "--ai" not in argv
     assert not any("npx" in part for part in argv)
-    assert argv[0] == "/usr/local/bin/malskanner"
+    assert argv == ["/usr/local/bin/malskanner", "--json", str(target)]
 
 
 def test_module_constructs_no_package_runner_command() -> None:
@@ -151,6 +153,31 @@ def test_findings_are_redacted_of_quoted_prompt_text(tmp_path: Path) -> None:
     assert "SECRET PROMPT TEXT" not in serialised
     assert row["finding_rules"] == ["agent-directed-instruction"]
     assert row["finding_count"] == 1
+
+
+def test_rule_id_is_normalized_when_legacy_rule_is_absent() -> None:
+    finding = {
+        "ruleId": "installed-rule",
+        "severity": "warn",
+        "line": 2,
+        "match": "SECRET PROMPT TEXT",
+    }
+    assert redact_findings({"findings": [finding]}) == [
+        {"rule": "installed-rule", "severity": "warn", "line": 2}
+    ]
+
+
+@pytest.mark.parametrize("legacy_rule", ["legacy-rule", None, ""])
+def test_legacy_rule_key_precedes_rule_id(legacy_rule: object) -> None:
+    finding = {
+        "rule": legacy_rule,
+        "ruleId": "installed-rule",
+        "severity": "warn",
+        "line": 2,
+    }
+    assert redact_findings({"findings": [finding]}) == [
+        {"rule": legacy_rule, "severity": "warn", "line": 2}
+    ]
 
 
 def test_findings_are_attributed_to_their_segment(tmp_path: Path) -> None:

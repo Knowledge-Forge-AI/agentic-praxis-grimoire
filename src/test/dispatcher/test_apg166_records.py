@@ -6,8 +6,11 @@ import subprocess
 from pathlib import Path
 
 import pytest
-from test_agent_phase_acquisition import binary, command
+from test_agent_phase_acquisition import binary as acquisition_binary, command
 from agent_phase.acquisition_records import records
+
+# Expose the imported fixture under the name requested by these tests.
+binary = acquisition_binary
 
 ROOT = Path(__file__).resolve().parents[3]
 PRIMARY = ('go-language-profile', 'go-test-profile', 'pytest-test-profile',
@@ -252,7 +255,8 @@ def test_raw_seal_digest_refuses_tampered_seal():
 def test_aggregate_recomputes_and_unavailable_is_not_zero():
     import importlib.util
     spec = importlib.util.spec_from_file_location('h', ROOT / 'testing/h_eval/evaluate.py')
-    h = importlib.util.module_from_spec(spec); spec.loader.exec_module(h)
+    h = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(h)
     directory = ROOT / 'docs/evaluations/apg166'
     raw = h.load(directory / 'raw.json')
     aggregate = h.aggregate(raw, h.load(ROOT / h.CORPUS / 'context-eval-metrics-and-oracles.json'))

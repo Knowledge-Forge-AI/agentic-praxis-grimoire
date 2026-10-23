@@ -1,0 +1,41 @@
+{
+  "schema_version": "apg.local-cli-compatibility/v1",
+  "release_version": "0.13.1",
+  "baseline_fixture": "testing/fixtures/skill-cli-v0130-compatibility.json",
+  "baseline_source_phase": "APG162C-LOCAL-FINALIZE1",
+  "scope": "Local CLI compatibility after the approved Vite 8.2.4 correction; only the Vite skill digest changes in JSON outputs. Not native or published-release evidence.",
+  "correction": {
+    "skill": "vite-build-profile",
+    "source_sha256": "c09181f32e1bea94fddd998210f843f3573ef5bdffcb575588cc7d6b6b8759e3"
+  },
+  "cases": [
+    {
+      "arguments": [
+        "skills",
+        "list",
+        "--format",
+        "json"
+      ],
+      "stdout_sha256": "624221dbde0c56ac83df0977a51326d934781d5e57bdcface8a3aa294c4f33f9",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "arguments": [
+        "skills",
+        "context-report"
+      ],
+      "stdout_sha256": "b7f00996546051742059d41de495f9c95257579de928002bd41439a68ddaff51",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "arguments": [
+        "skills",
+        "context-report",
+        "--format",
+        "text"
+      ],
+      "stdout_sha256": "7e561afb5ab7cefa0765742ff86dd6cb373dd6848fbb27ee1bc84e2f628e3531",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

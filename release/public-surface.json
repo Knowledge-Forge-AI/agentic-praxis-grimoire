@@ -831,6 +831,7 @@
     "testing/fixtures/jaca_ci/sample-summary-pass.json",
     "testing/fixtures/jaca_ci/valid-apg-pr.json",
     "testing/fixtures/skill-cli-compatibility.json",
+    "testing/fixtures/skill-cli-v0131-compatibility.json",
     "testing/fixtures/xo_consumer/README.md",
     "testing/fixtures/xo_consumer/adapter.go",
     "testing/fixtures/xo_consumer/fixture-go.mod",

@@ -79,12 +79,34 @@ def test_python_skill_bridge_matches_oracle_and_routes_new_go_surfaces(
     assert built.returncode == 0, built.stderr
     monkeypatch.setenv("APGR_GO_BINARY", os.fspath(binary))
 
-    # E-CATALOG1 uses measured accepted D entry output for the admitted corpus.
-    # The historical v0.10 public fixture remains unchanged and separate.
-    fixture = json.loads(
+    # Keep the accepted v0.13.0 oracle immutable. The v0.13.1 oracle changes
+    # only the approved Vite skill digest in the two JSON output cases.
+    baseline = json.loads(
         (ROOT / "testing/fixtures/skill-cli-v0130-compatibility.json").read_text()
     )
-    assert fixture["source_phase"] == "APG162C-LOCAL-FINALIZE1"
+    fixture = json.loads(
+        (ROOT / "testing/fixtures/skill-cli-v0131-compatibility.json").read_text()
+    )
+    assert baseline["source_phase"] == "APG162C-LOCAL-FINALIZE1"
+    assert fixture["baseline_source_phase"] == baseline["source_phase"]
+    assert fixture["baseline_fixture"] == "testing/fixtures/skill-cli-v0130-compatibility.json"
+    assert fixture["release_version"] == (ROOT / "src/agentic_praxis_grimoire/VERSION").read_text().strip() == "0.13.1"
+    assert [case["arguments"] for case in fixture["cases"]] == [
+        case["arguments"] for case in baseline["cases"]
+    ]
+    assert fixture["cases"][2] == baseline["cases"][2]
+    for current, previous in zip(fixture["cases"], baseline["cases"], strict=True):
+        assert current["stderr_sha256"] == previous["stderr_sha256"]
+    for index in (0, 1):
+        assert fixture["cases"][index]["stdout_sha256"] != baseline["cases"][index]["stdout_sha256"]
+    # Exact single-digest substitution was independently checked in the retained
+    # local measurement; hashes alone do not establish that semantic comparison.
+    assert fixture["correction"] == {
+        "skill": "vite-build-profile",
+        "source_sha256": hashlib.sha256(
+            (ROOT / "skills/vite-build-profile/SKILL.md").read_bytes()
+        ).hexdigest(),
+    }
     for case in fixture["cases"]:
         assert cli.main(case["arguments"]) == 0
         delegated = capfd.readouterr()
