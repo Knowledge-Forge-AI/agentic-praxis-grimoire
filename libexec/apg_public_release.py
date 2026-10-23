@@ -18,10 +18,13 @@ from typing import Mapping, NoReturn, Sequence
 from urllib.parse import unquote, urlsplit
 
 from apg_staging_correction import (
+    PUBLIC_COMMIT_IDENTITY as _PUBLIC_COMMIT_IDENTITY,
     build_untagged_candidate,
     check_untagged_candidate,
     normalise_required_checks,
     run_checked_command,
+    select_public_identity,
+    verify_commit_identity,
     verify_candidate_lineage,
 )
 from apg_public_release_v013 import (
@@ -41,8 +44,9 @@ from apg_public_release_v013 import (
 
 COMMAND = "apg-public-release"
 POLICY_PATH = "release/public-surface.json"
-PUBLIC_V01_COMMIT = "f53342d4e5079ff2a73c0a107777a92910d016a1"
+PUBLIC_V01_COMMIT = "481451b73fd9775a6d6613abb3b1675f419ddc4d"
 PUBLIC_V01_TREE = "0163a2931e65eb822f44a41d6cd0105e671015ad"
+PUBLIC_COMMIT_IDENTITY = _PUBLIC_COMMIT_IDENTITY
 POLICY_KEYS = {
     "canonical_public_identity",
     "critical_files",
@@ -3686,6 +3690,12 @@ def build_candidate(
         ["commit-tree", tree, "-p", base.head, "-m", subject],
         extra_environment=identity_environment,
     )
+    verify_commit_identity(
+        output,
+        commit,
+        (author_name, author_email),
+        text_git=text_git,
+    )
     branch = f"release/{version}"
     run_git(output, ["update-ref", f"refs/heads/{branch}", commit])
     run_git(output, ["symbolic-ref", "HEAD", f"refs/heads/{branch}"])
@@ -4415,6 +4425,10 @@ def main(argv: Sequence[str] | None = None) -> int:
         source = resolve_repository(arguments.source, "source")
         base = resolve_repository(arguments.base, "base")
         if arguments.operation == "build":
+            owner_name, owner_email = select_public_identity(
+                arguments.author_name,
+                arguments.author_email,
+            )
             output = Path(os.path.abspath(arguments.output))
             if arguments.staging_parent and not arguments.untagged:
                 unsafe("--staging-parent is only valid with --untagged")
@@ -4434,17 +4448,9 @@ def main(argv: Sequence[str] | None = None) -> int:
                     f"tree {tree}, commit {commit}, branch staging"
                 )
                 return 0
-            if not all(
-                value
-                for value in (
-                    arguments.release_date,
-                    arguments.author_name,
-                    arguments.author_email,
-                )
-            ):
+            if not arguments.release_date:
                 unsafe(
-                    "tagged build requires --release-date, --author-name, and "
-                    "--author-email"
+                    "tagged build requires --release-date"
                 )
             tree, commit, tag = build_candidate(
                 source,
@@ -4452,8 +4458,8 @@ def main(argv: Sequence[str] | None = None) -> int:
                 output,
                 version,
                 arguments.release_date,
-                arguments.author_name,
-                arguments.author_email,
+                owner_name,
+                owner_email,
             )
             print(
                 f"PASS built local candidate v{version}: "

@@ -299,9 +299,11 @@ class APGPublicReleaseTests(unittest.TestCase):
         *,
         base: Path | None = None,
         version: str = VERSION,
+        author_name: str | None = None,
+        author_email: str | None = None,
     ) -> tuple[Path, subprocess.CompletedProcess[str]]:
         selected = output or (self.root / "candidate")
-        result = self.run_command(
+        arguments = [
             "build",
             "--source",
             str(source or self.source),
@@ -313,11 +315,12 @@ class APGPublicReleaseTests(unittest.TestCase):
             version,
             "--release-date",
             RELEASE_DATE,
-            "--author-name",
-            "APG Release Test",
-            "--author-email",
-            "release@example.invalid",
-        )
+        ]
+        if author_name is not None:
+            arguments.extend(["--author-name", author_name])
+        if author_email is not None:
+            arguments.extend(["--author-email", author_email])
+        result = self.run_command(*arguments)
         return selected, result
 
     def check_candidate(
@@ -492,9 +495,9 @@ class APGPublicReleaseTests(unittest.TestCase):
             "--release-date",
             RELEASE_DATE,
             "--author-name",
-            "APG Release Test",
+            release.PUBLIC_COMMIT_IDENTITY[0],
             "--author-email",
-            "release@example.invalid",
+            release.PUBLIC_COMMIT_IDENTITY[1],
         )
         self.assertEqual(same_repository.returncode, 2)
         nonempty = self.root / "nonempty"
@@ -519,7 +522,11 @@ class APGPublicReleaseTests(unittest.TestCase):
 
     def test_06_build_creates_one_deterministic_release_commit_and_tag(self) -> None:
         first, first_result = self.build(self.root / "first")
-        second, second_result = self.build(self.root / "second")
+        second, second_result = self.build(
+            self.root / "second",
+            author_name=release.PUBLIC_COMMIT_IDENTITY[0],
+            author_email=release.PUBLIC_COMMIT_IDENTITY[1],
+        )
         self.assert_success(first_result)
         self.assert_success(second_result)
         for repo in (first, second):
@@ -529,10 +536,28 @@ class APGPublicReleaseTests(unittest.TestCase):
             self.assertEqual(self.git(repo, "log", "-1", "--format=%s").stdout.strip(), f"Release v{VERSION}")
             metadata = self.git(repo, "show", "-s", "--format=%an%x00%ae%x00%aI%x00%cn%x00%ce%x00%cI").stdout.strip().split("\x00")
             self.assertEqual(metadata[:3], metadata[3:])
-            self.assertEqual(metadata[:2], ["APG Release Test", "release@example.invalid"])
+            self.assertEqual(metadata[:2], list(release.PUBLIC_COMMIT_IDENTITY))
             self.assertEqual(metadata[2], RELEASE_DATE)
         self.assertEqual(self.git(first, "rev-parse", "HEAD").stdout, self.git(second, "rev-parse", "HEAD").stdout)
         self.assertEqual(self.git(first, "rev-parse", f"v{VERSION}^{{tag}}").stdout, self.git(second, "rev-parse", f"v{VERSION}^{{tag}}").stdout)
+
+    def test_build_rejects_non_owner_identity_before_candidate_construction(self) -> None:
+        identity = release.PUBLIC_COMMIT_IDENTITY
+        for label, name, email in (
+            ("wrong", "Release", "release@example.invalid"),
+            ("empty-name", "", identity[1]),
+            ("empty-email", identity[0], ""),
+            ("name-only", identity[0], None),
+            ("email-only", None, identity[1]),
+            ("wrong-name-only", "Release", None),
+            ("wrong-email-only", None, "x@example.invalid"),
+        ):
+            with self.subTest(label=label):
+                output = self.root / f"identity-{label}"
+                _, result = self.build(output=output, author_name=name, author_email=email)
+                self.assertEqual(result.returncode, 2)
+                self.assertIn("future publication requires", result.stderr)
+                self.assertFalse(output.exists())
 
     def test_07_check_accepts_exact_candidate_and_is_read_only(self) -> None:
         candidate, build = self.build()
@@ -805,9 +830,9 @@ class APGPublicReleaseTests(unittest.TestCase):
             "--release-date",
             RELEASE_DATE,
             "--author-name",
-            "APG Release Test",
+            release.PUBLIC_COMMIT_IDENTITY[0],
             "--author-email",
-            "release@example.invalid",
+            release.PUBLIC_COMMIT_IDENTITY[1],
         )
         self.assertEqual(result.returncode, 1)
         self.assertIn("accepted public v0.1.0", result.stderr)

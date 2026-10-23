@@ -69,6 +69,7 @@ class APGUserSkillsTests(unittest.TestCase):
         self.first = self.make_release(self.root / "public-v0.1.0", "0.1.0", "first")
         self.second = self.make_release(self.root / "public-v0.2.0", "0.2.0-apg12.1", "second")
         self.graft_second_release()
+        self.rewritten = self.make_release(self.root / "rewritten-v0.1.0", "0.1.0", "rewritten")
         self.launcher = self.root / "apg-user-skills-test-launcher.py"
         self.launcher.write_text(
             "import sys\n"
@@ -76,6 +77,17 @@ class APGUserSkillsTests(unittest.TestCase):
             "import apg_user_skills as command\n"
             f"command.PUBLIC_V01_COMMIT = {self.git(self.first, 'rev-parse', 'HEAD').stdout.strip()!r}\n"
             f"command.PUBLIC_V01_TREE = {self.git(self.first, 'rev-parse', 'HEAD^{tree}').stdout.strip()!r}\n"
+            "raise SystemExit(command.main())\n"
+        )
+        self.compatibility_launcher = self.root / "apg-user-skills-compatibility-launcher.py"
+        self.compatibility_launcher.write_text(
+            "import sys\n"
+            f"sys.path.insert(0, {str(REPOSITORY_ROOT / 'libexec')!r})\n"
+            "import apg_user_skills as command\n"
+            f"command.PUBLIC_V01_COMMIT = {self.git(self.rewritten, 'rev-parse', 'HEAD').stdout.strip()!r}\n"
+            f"command.PUBLIC_V01_TREE = {self.git(self.rewritten, 'rev-parse', 'HEAD^{tree}').stdout.strip()!r}\n"
+            f"command.LEGACY_V01_COMMIT = {self.git(self.first, 'rev-parse', 'HEAD').stdout.strip()!r}\n"
+            f"command.LEGACY_V01_TREE = {self.git(self.first, 'rev-parse', 'HEAD^{tree}').stdout.strip()!r}\n"
             "raise SystemExit(command.main())\n"
         )
 
@@ -195,10 +207,13 @@ class APGUserSkillsTests(unittest.TestCase):
         )
 
     def run_command(
-        self, *arguments: str, environment: dict[str, str] | None = None
+        self,
+        *arguments: str,
+        environment: dict[str, str] | None = None,
+        launcher: Path | None = None,
     ) -> subprocess.CompletedProcess[str]:
         return subprocess.run(
-            [sys.executable, str(self.launcher), *arguments],
+            [sys.executable, str(launcher or self.launcher), *arguments],
             check=False,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
@@ -207,12 +222,18 @@ class APGUserSkillsTests(unittest.TestCase):
             env=environment or self.environment,
         )
 
-    def invoke(self, operation: str, *arguments: str, source: Path | None = None) -> subprocess.CompletedProcess[str]:
+    def invoke(
+        self,
+        operation: str,
+        *arguments: str,
+        source: Path | None = None,
+        launcher: Path | None = None,
+    ) -> subprocess.CompletedProcess[str]:
         command = [operation]
         if operation in {"list", "install", "adopt", "update"}:
             command.extend(["--source", str(source or self.first)])
         command.extend(["--skills-root", str(self.skills_root), *arguments])
-        return self.run_command(*command)
+        return self.run_command(*command, launcher=launcher)
 
     def assert_success(self, result: subprocess.CompletedProcess[str]) -> None:
         self.assertEqual(result.returncode, 0, f"stdout:\n{result.stdout}\nstderr:\n{result.stderr}")
@@ -951,6 +972,114 @@ class APGUserSkillsTests(unittest.TestCase):
         self.assertEqual(result.returncode, 1)
         self.assertIn("tag identity", result.stderr)
         self.assertEqual(self.source_fingerprint(self.first), before)
+
+    def test_40_recorded_legacy_state_can_check_transition_rollback_and_uninstall(self) -> None:
+        self.assert_success(self.install())
+        before_check = self.state_path.read_bytes()
+        before_targets = {name: os.readlink(self.skills_root / name) for name in SKILLS}
+        check = self.invoke("check", launcher=self.compatibility_launcher)
+        self.assert_success(check)
+        self.assertEqual(self.state_path.read_bytes(), before_check)
+        self.assertEqual(
+            {name: os.readlink(self.skills_root / name) for name in SKILLS},
+            before_targets,
+        )
+
+        legacy_update = self.invoke("update", source=self.second, launcher=self.launcher)
+        self.assert_success(legacy_update)
+        self.assertEqual(self.state()["current_source"]["path"], str(self.second.resolve()))
+        self.assertEqual(self.state()["previous_source"]["path"], str(self.first.resolve()))
+        before_descendant_check = self.state_path.read_bytes()
+        descendant_targets = {name: os.readlink(self.skills_root / name) for name in SKILLS}
+        descendant_check = self.invoke("check", launcher=self.compatibility_launcher)
+        self.assert_success(descendant_check)
+        self.assertEqual(self.state_path.read_bytes(), before_descendant_check)
+        self.assertEqual(
+            {name: os.readlink(self.skills_root / name) for name in SKILLS},
+            descendant_targets,
+        )
+
+        update = self.invoke("update", source=self.rewritten, launcher=self.compatibility_launcher)
+        self.assert_success(update)
+        self.assertEqual(self.state()["current_source"]["path"], str(self.rewritten.resolve()))
+        self.assertEqual(self.state()["previous_source"]["path"], str(self.second.resolve()))
+        self.assertEqual(
+            (self.skills_root / SKILLS[0]).resolve(),
+            (self.rewritten / "skills" / SKILLS[0]).resolve(),
+        )
+
+        rollback = self.invoke("rollback", launcher=self.compatibility_launcher)
+        self.assert_success(rollback)
+        self.assertEqual(self.state()["current_source"]["path"], str(self.second.resolve()))
+        self.assertEqual(
+            (self.skills_root / SKILLS[0]).resolve(),
+            (self.second / "skills" / SKILLS[0]).resolve(),
+        )
+
+        uninstall = self.invoke("uninstall", launcher=self.compatibility_launcher)
+        self.assert_success(uninstall)
+        self.assertFalse(self.state_path.exists())
+        self.assertFalse(any((self.skills_root / name).exists() for name in SKILLS))
+
+    def test_41_fresh_install_and_adopt_reject_the_legacy_root(self) -> None:
+        for operation in ("install", "adopt"):
+            with self.subTest(operation=operation):
+                root = self.root / f"fresh-{operation}"
+                environment = self.environment.copy()
+                environment["XDG_STATE_HOME"] = str(self.root / f"state-{operation}")
+                if operation == "adopt":
+                    root.mkdir()
+                    for name in SKILLS:
+                        (root / name).symlink_to(
+                            self.first / "skills" / name,
+                            target_is_directory=True,
+                        )
+                result = self.run_command(
+                    operation,
+                    "--source",
+                    str(self.first),
+                    "--skills-root",
+                    str(root),
+                    environment=environment,
+                    launcher=self.compatibility_launcher,
+                )
+                self.assertEqual(result.returncode, 1)
+                self.assertIn("source public release lineage is invalid", result.stderr)
+                self.assertFalse(
+                    (Path(environment["XDG_STATE_HOME"]) / "agentic-praxis-grimoire").exists()
+                )
+                if operation == "adopt":
+                    self.assertEqual(
+                        {name: os.readlink(root / name) for name in SKILLS},
+                        {
+                            name: str(self.first / "skills" / name)
+                            for name in SKILLS
+                        },
+                    )
+
+    def test_42_invalid_recorded_legacy_identity_is_read_only(self) -> None:
+        self.assert_success(self.install())
+        state = self.state()
+        state["current_source"]["skill_hashes"][SKILLS[0]] = "d" * 64
+        self.state_path.write_text(json.dumps(state, indent=2, sort_keys=True) + "\n")
+        self.state_path.chmod(0o600)
+        before_state = self.state_path.read_bytes()
+        before_targets = {name: os.readlink(self.skills_root / name) for name in SKILLS}
+
+        check = self.invoke("check", launcher=self.compatibility_launcher)
+        self.assertEqual(check.returncode, 1)
+        self.assertEqual(self.state_path.read_bytes(), before_state)
+        self.assertEqual(
+            {name: os.readlink(self.skills_root / name) for name in SKILLS},
+            before_targets,
+        )
+        uninstall = self.invoke("uninstall", launcher=self.compatibility_launcher)
+        self.assertEqual(uninstall.returncode, 1)
+        self.assertEqual(self.state_path.read_bytes(), before_state)
+        self.assertEqual(
+            {name: os.readlink(self.skills_root / name) for name in SKILLS},
+            before_targets,
+        )
 
 
 if __name__ == "__main__":

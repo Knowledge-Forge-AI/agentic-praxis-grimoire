@@ -890,6 +890,13 @@ class APGPublicReleaseUnitTests(
             )
 
         def text(_root: Path, arguments: list[str], **_kwargs: object) -> str:
+            if arguments[:2] == ["cat-file", "commit"]:
+                return (
+                    "tree " + "a" * 40 + "\n"
+                    "author Release Author <release@example.invalid> 0 +0000\n"
+                    "committer Release Author <release@example.invalid> 0 +0000\n\n"
+                    "Release v0.6.0\n"
+                )
             values = {
                 "write-tree": "f" * 40,
                 "commit-tree": "1" * 40,

@@ -109,8 +109,14 @@ path, and a valid public skill
 library. Public v0.1.0 is accepted only by its exact commit and tree identity;
 later sources must carry the strict public policy and descend from the accepted
 v0.1.0 commit while preserving its tag. The command validates the tag, commit,
-tree, policy, history, and skill hashes and never mutates the source. The
-default discovery root is `$HOME/.agents/skills`;
+tree, policy, history, and skill hashes and never mutates the source.
+Fresh and explicitly supplied sources require the current public history root.
+For an existing managed installation, the recorded source may retain the
+pre-correction root and its verified release descendants. Check, update,
+no-argument rollback, and uninstall verify that bounded historical lineage and
+require the complete recorded identity and exact links to remain unchanged.
+They do not translate historical identities or admit a fresh legacy source.
+The default discovery root is `$HOME/.agents/skills`;
 `--skills-root` exists for isolated tests or separately authorized alternate
 local roots. The command never writes Codex configuration or a target
 repository.

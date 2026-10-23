@@ -64,12 +64,17 @@ candidate.
 apg-public-release manifest [--source <path>] [--format text|json]
 apg-public-release build --source <path> --base <path> --output <path> \
   --version <semver> --release-date <rfc3339> \
-  --author-name <name> --author-email <email>
+  [--author-name <name> --author-email <email>]
 apg-public-release check --source <path> --base <path> \
   --candidate <path> --version <semver> \
   [--private-policy <path>] [--format text|json]
 apg-public-release --help
 ```
+
+Future release commits use Samuel Leighton Lair <sam.lair@knowledge-forge.ai>
+for both author and committer. The optional identity arguments may repeat only
+that owner identity; ambient Git identity cannot override it. Read-only checks
+continue to accept valid historical commit identities.
 
 Exit `0` is success, exit `1` is release, repository, candidate, or policy
 noncompliance, and exit `2` is invalid usage or an unsafe build invocation.

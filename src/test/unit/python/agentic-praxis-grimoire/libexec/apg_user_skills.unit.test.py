@@ -268,6 +268,56 @@ class APGUserSkillsUnitTests(APGUserSkillsCaseMixin, unittest.TestCase):
             self.assertEqual([Path(item.path).name for item in created], ["one", "two"])
             self.assertTrue(root.is_dir())
 
+    def test_recorded_legacy_source_uses_only_the_bounded_anchor(self) -> None:
+        recorded = user_skills.SourceIdentity(
+            "/legacy",
+            "0.1.0",
+            "v0.1.0",
+            user_skills.LEGACY_V01_COMMIT,
+            user_skills.LEGACY_V01_TREE,
+            self.identity().skill_hashes,
+        )
+        with mock.patch.object(user_skills, "_verify_source", return_value=recorded) as verify:
+            self.assertEqual(user_skills.verify_recorded_source(recorded), recorded)
+        verify.assert_called_once_with(
+            recorded.path,
+            accepted_commit=user_skills.LEGACY_V01_COMMIT,
+            accepted_tree=user_skills.LEGACY_V01_TREE,
+        )
+
+    def test_recorded_source_falls_back_to_the_strict_root_for_new_history(self) -> None:
+        recorded = self.identity("/rewritten")
+        with (
+            mock.patch.object(user_skills, "_verify_source", side_effect=user_skills.ToolError("legacy miss")),
+            mock.patch.object(user_skills, "verify_source", return_value=recorded) as verify,
+        ):
+            self.assertEqual(user_skills.verify_recorded_source(recorded), recorded)
+        verify.assert_called_once_with(recorded.path)
+
+    def test_recorded_source_rejects_changed_identity_after_legacy_verification(self) -> None:
+        recorded = user_skills.SourceIdentity(
+            "/legacy",
+            "0.1.0",
+            "v0.1.0",
+            user_skills.LEGACY_V01_COMMIT,
+            user_skills.LEGACY_V01_TREE,
+            self.identity().skill_hashes,
+        )
+        changed = dataclasses.replace(recorded, skill_hashes=((recorded.skill_names[0], "d" * 64),))
+        with mock.patch.object(user_skills, "_verify_source", return_value=recorded):
+            with self.assertRaisesRegex(user_skills.ToolError, "identity has changed"):
+                user_skills.verify_recorded_source(changed)
+
+    def test_fresh_source_verification_always_uses_the_current_root(self) -> None:
+        verified = self.identity("/fresh")
+        with mock.patch.object(user_skills, "_verify_source", return_value=verified) as verify:
+            self.assertEqual(user_skills.verify_source(verified.path), verified)
+        verify.assert_called_once_with(
+            verified.path,
+            accepted_commit=user_skills.PUBLIC_V01_COMMIT,
+            accepted_tree=user_skills.PUBLIC_V01_TREE,
+        )
+
     def test_link_creation_adoption_and_preflight_contracts(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             base = Path(temporary)

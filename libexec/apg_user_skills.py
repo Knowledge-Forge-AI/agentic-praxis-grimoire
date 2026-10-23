@@ -45,8 +45,10 @@ RESTART_REMINDER = (
     "Codex normally detects skill changes automatically. If the change does "
     "not appear, fully restart Codex."
 )
-PUBLIC_V01_COMMIT = "f53342d4e5079ff2a73c0a107777a92910d016a1"
+PUBLIC_V01_COMMIT = "481451b73fd9775a6d6613abb3b1675f419ddc4d"
 PUBLIC_V01_TREE = "0163a2931e65eb822f44a41d6cd0105e671015ad"
+LEGACY_V01_COMMIT = "f53342d4e5079ff2a73c0a107777a92910d016a1"
+LEGACY_V01_TREE = PUBLIC_V01_TREE
 GIT_ENV_NAMES = {
     "GIT_ALTERNATE_OBJECT_DIRECTORIES",
     "GIT_COMMON_DIR",
@@ -218,7 +220,12 @@ def source_skill_paths(source: SourceIdentity) -> dict[str, Path]:
     return paths
 
 
-def verify_source(requested: str | Path) -> SourceIdentity:
+def _verify_source(
+    requested: str | Path,
+    *,
+    accepted_commit: str,
+    accepted_tree: str,
+) -> SourceIdentity:
     candidate = Path(requested)
     result = run_git(candidate, ["rev-parse", "--show-toplevel"], allow_failure=True)
     if result.returncode:
@@ -242,7 +249,7 @@ def verify_source(requested: str | Path) -> SourceIdentity:
     try:
         release_repository = public_release.resolve_repository(root, "source")
         lineage = public_release.verify_public_release_lineage(  # untagged commits may surround tags
-            release_repository, accepted_commit=PUBLIC_V01_COMMIT, accepted_tree=PUBLIC_V01_TREE,
+            release_repository, accepted_commit=accepted_commit, accepted_tree=accepted_tree,
             allow_advanced_head=True, allow_interleaved_untagged=True)
     except public_release.ToolError as error:
         fail(f"source public release lineage is invalid: {error}")
@@ -254,7 +261,7 @@ def verify_source(requested: str | Path) -> SourceIdentity:
         diagnostic = library_result.diagnostics[0]
         fail(f"source APG skill library is invalid: {diagnostic.code} {diagnostic.path}")
     policy_paths = {name: Path("skills") / name for name in SKILLS}
-    if commit != PUBLIC_V01_COMMIT:
+    if commit != accepted_commit:
         try:
             policy = public_release.load_policy(
                 release_repository,
@@ -294,6 +301,38 @@ def verify_source(requested: str | Path) -> SourceIdentity:
     tag = current_release.tag
     version = current_release.version
     return SourceIdentity(str(root), version, tag, commit, tree, tuple(hashes))
+
+
+def verify_source(requested: str | Path) -> SourceIdentity:
+    """Verify a fresh or explicitly supplied source against the current root."""
+
+    return _verify_source(
+        requested,
+        accepted_commit=PUBLIC_V01_COMMIT,
+        accepted_tree=PUBLIC_V01_TREE,
+    )
+
+
+def verify_recorded_source(recorded: SourceIdentity) -> SourceIdentity:
+    """Verify a state-recorded source, including the bounded legacy root."""
+
+    if (recorded.commit, recorded.tree) == (PUBLIC_V01_COMMIT, PUBLIC_V01_TREE):
+        verified = verify_source(recorded.path)
+    else:
+        try:
+            verified = _verify_source(
+                recorded.path,
+                accepted_commit=LEGACY_V01_COMMIT,
+                accepted_tree=LEGACY_V01_TREE,
+            )
+        except ToolError as legacy_error:
+            try:
+                verified = verify_source(recorded.path)
+            except ToolError:
+                raise legacy_error
+    if verified != recorded:
+        fail("recorded public source release identity has changed")
+    return verified
 
 
 def state_root() -> Path:
@@ -587,10 +626,7 @@ def atomic_state_write(path: Path, state: State) -> None:
 
 
 def source_matches(recorded: SourceIdentity) -> SourceIdentity:
-    verified = verify_source(recorded.path)
-    if verified != recorded:
-        fail("recorded public source release identity has changed")
-    return verified
+    return verify_recorded_source(recorded)
 
 
 def exact_links(root: Path, source: SourceIdentity) -> None:
