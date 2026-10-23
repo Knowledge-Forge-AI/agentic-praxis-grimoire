@@ -1,0 +1,138 @@
+{
+  "name": "APGR Nix post-tag readback",
+  "permissions": {
+    "contents": "read"
+  },
+  "defaults": {
+    "run": {
+      "shell": "bash"
+    }
+  },
+  "concurrency": {
+    "group": "apgr-nix-post-tag-${{ github.repository }}-${{ github.ref }}",
+    "cancel-in-progress": false
+  },
+  "jobs": {
+    "nix-readback": {
+      "name": "Nix readback (${{ matrix.system }})",
+      "strategy": {
+        "fail-fast": false,
+        "matrix": {
+          "include": [
+            {
+              "lane": "darwin-arm64",
+              "runner": "macos-15",
+              "system": "aarch64-darwin"
+            },
+            {
+              "lane": "linux-x64",
+              "runner": "ubuntu-24.04",
+              "system": "x86_64-linux"
+            },
+            {
+              "lane": "linux-arm64",
+              "runner": "ubuntu-24.04-arm",
+              "system": "aarch64-linux"
+            }
+          ]
+        }
+      },
+      "runs-on": "${{ matrix.runner }}",
+      "timeout-minutes": 120,
+      "env": {
+        "APGR_TAG": "${{ inputs.tag }}",
+        "APGR_EXPECTED_REV": "${{ inputs.expected_rev }}",
+        "APGR_SYSTEM": "${{ matrix.system }}",
+        "APGR_LANE": "${{ matrix.lane }}"
+      },
+      "steps": [
+        {
+          "name": "Check out workflow source",
+          "uses": "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "with": {
+            "persist-credentials": false,
+            "fetch-depth": 0
+          }
+        },
+        {
+          "name": "Select Python for the release helper",
+          "uses": "actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97",
+          "with": {
+            "python-version": "3.13"
+          }
+        },
+        {
+          "name": "Install the pinned Nix toolchain",
+          "uses": "cachix/install-nix-action@13d8dd58da0234aa297dedd986986ccb8e7f3e24",
+          "with": {
+            "install_url": "https://releases.nixos.org/nix/nix-2.35.2/install",
+            "extra_nix_config": "experimental-features = nix-command flakes",
+            "enable_kvm": false
+          }
+        },
+        {
+          "name": "Bind tag, revision, and readback helper",
+          "id": "bind",
+          "env": {
+            "APGR_READBACK_DIR": "${{ runner.temp }}/apgr-nix-readback"
+          },
+          "run": "set -euo pipefail\nmkdir -m 700 -p \"$APGR_READBACK_DIR/scratch\"\npython3 - \"$APGR_READBACK_DIR\" <<'PY'\nimport hashlib\nimport json\nimport os\nfrom pathlib import Path\nimport re\nimport stat\nimport subprocess\nimport sys\n\noutput = Path(sys.argv[1])\ntag = os.environ[\"APGR_TAG\"]\nexpected = os.environ[\"APGR_EXPECTED_REV\"]\ntag_pattern = re.compile(r\"v(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)\\Z\")\nrev_pattern = re.compile(r\"[0-9a-f]{40}\\Z\")\nif not tag_pattern.fullmatch(tag):\n    raise SystemExit(\"tag must match the helper's exact vMAJOR.MINOR.PATCH contract\")\nif not rev_pattern.fullmatch(expected):\n    raise SystemExit(\"expected_rev must be a lowercase 40-character commit\")\n\n# Inputs remain environment data and are passed as one validated argv\n# element; they are never evaluated as shell source or workflow code.\nsubprocess.run(\n    [\"git\", \"fetch\", \"--no-tags\", \"origin\",\n     f\"+refs/tags/{tag}:refs/tags/{tag}\"],\n    check=True,\n)\ntag_ref = f\"refs/tags/{tag}\"\nactual = subprocess.check_output(\n    [\"git\", \"rev-parse\", \"--verify\", f\"{tag_ref}^{{commit}}\"],\n    text=True,\n).strip()\nif actual != expected:\n    raise SystemExit(f\"{tag} resolves to {actual}, expected {expected}\")\ntag_object = subprocess.check_output(\n    [\"git\", \"rev-parse\", \"--verify\", tag_ref], text=True,\n).strip()\ntag_type = subprocess.check_output(\n    [\"git\", \"cat-file\", \"-t\", tag_ref], text=True,\n).strip()\ntree = subprocess.check_output(\n    [\"git\", \"rev-parse\", \"--verify\", f\"{actual}^{{tree}}\"], text=True,\n).strip()\nsubprocess.run([\"git\", \"checkout\", \"--detach\", \"--force\", actual], check=True)\n\nhelper_paths = (\n    \"bin/apg-qualify-nix\",\n    \"libexec/apg_nix_qualification.py\",\n    \"libexec/apg_nix_smoke.py\",\n)\nrecords = []\nfor relative in helper_paths:\n    path = Path(relative)\n    if path.is_symlink() or not path.is_file():\n        raise SystemExit(f\"required helper file is not a regular file: {relative}\")\n    data = path.read_bytes()\n    blob = subprocess.check_output(\n        [\"git\", \"rev-parse\", f\"{actual}:{relative}\"], text=True,\n    ).strip()\n    mode = stat.S_IMODE(path.stat().st_mode)\n    records.append({\n        \"path\": relative,\n        \"mode\": f\"{mode:04o}\",\n        \"bytes\": len(data),\n        \"sha256\": hashlib.sha256(data).hexdigest(),\n        \"git_blob_sha\": blob,\n    })\nmanifest = {\n    \"schema\": \"apgr.nix-readback-helper-manifest/v1\",\n    \"commit\": actual,\n    \"files\": records,\n}\nmanifest_bytes = json.dumps(\n    manifest, sort_keys=True, separators=(\",\", \":\")\n).encode()\nmanifest[\"manifest_sha256\"] = hashlib.sha256(manifest_bytes).hexdigest()\n(output / \"helper-manifest.json\").write_text(\n    json.dumps(manifest, indent=2, sort_keys=True) + \"\\n\"\n)\nidentity = {\n    \"schema\": \"apgr.nix-post-tag-readback/v1\",\n    \"workflow\": \"apgr-nix-post-tag-readback\",\n    \"workflow_source_sha\": os.environ.get(\"GITHUB_SHA\", \"\"),\n    \"repository\": os.environ.get(\"GITHUB_REPOSITORY\", \"\"),\n    \"run_id\": os.environ.get(\"GITHUB_RUN_ID\", \"\"),\n    \"lane\": os.environ[\"APGR_LANE\"],\n    \"system\": os.environ[\"APGR_SYSTEM\"],\n    \"tag\": tag,\n    \"tag_ref\": tag_ref,\n    \"tag_object\": tag_object,\n    \"tag_type\": tag_type,\n    \"expected_rev\": expected,\n    \"actual_rev\": actual,\n    \"tree\": tree,\n    \"helper_manifest_sha256\": manifest[\"manifest_sha256\"],\n    \"helper_files\": list(helper_paths),\n}\n(output / \"identity.json\").write_text(\n    json.dumps(identity, indent=2, sort_keys=True) + \"\\n\"\n)\nPY\n"
+        },
+        {
+          "name": "Run the tag-pinned Nix readback",
+          "id": "readback",
+          "continue-on-error": true,
+          "env": {
+            "APGR_READBACK_DIR": "${{ runner.temp }}/apgr-nix-readback"
+          },
+          "run": "set +e\nbin/apg-qualify-nix readback \\\n  --tag \"$APGR_TAG\" \\\n  --scratch \"$APGR_READBACK_DIR/scratch\" \\\n  --system \"$APGR_SYSTEM\" \\\n  --expect-rev \"$APGR_EXPECTED_REV\" \\\n  > \"$APGR_READBACK_DIR/readback.json\"\nstatus=$?\nprintf '%s\\n' \"$status\" > \"$APGR_READBACK_DIR/exit-status\"\nexit \"$status\"\n"
+        },
+        {
+          "name": "Finalize bound receipt",
+          "if": "${{ always() }}",
+          "env": {
+            "APGR_READBACK_DIR": "${{ runner.temp }}/apgr-nix-readback"
+          },
+          "run": "set -euo pipefail\npython3 - \"$APGR_READBACK_DIR\" <<'PY'\nimport hashlib\nimport json\nfrom pathlib import Path\nimport sys\n\nroot = Path(sys.argv[1])\nidentity = json.loads((root / \"identity.json\").read_text())\nmanifest = json.loads((root / \"helper-manifest.json\").read_text())\nstatus_path = root / \"exit-status\"\nstatus = int(status_path.read_text().strip()) if status_path.exists() else 1\nreceipt = {\n    \"schema\": \"apgr.nix-post-tag-readback-receipt/v1\",\n    \"status\": \"passed\" if status == 0 else \"failed\",\n    \"helper_exit_code\": status,\n    \"identity\": identity,\n    \"helper_manifest\": manifest,\n}\nresult_path = root / \"readback.json\"\nif result_path.is_file():\n    try:\n        result_bytes = result_path.read_bytes()\n        receipt[\"result_sha256\"] = hashlib.sha256(result_bytes).hexdigest()\n        receipt[\"result\"] = json.loads(result_bytes)\n    except (OSError, ValueError):\n        receipt[\"result_parse\"] = \"invalid-json\"\n(root / \"receipt.json\").write_text(\n    json.dumps(receipt, indent=2, sort_keys=True) + \"\\n\"\n)\nPY\n"
+        },
+        {
+          "name": "Retain readback receipt",
+          "if": "${{ always() }}",
+          "uses": "actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f",
+          "with": {
+            "name": "apgr-nix-readback-${{ matrix.lane }}",
+            "path": "${{ runner.temp }}/apgr-nix-readback/receipt.json\n${{ runner.temp }}/apgr-nix-readback/readback.json\n${{ runner.temp }}/apgr-nix-readback/identity.json\n${{ runner.temp }}/apgr-nix-readback/helper-manifest.json\n${{ runner.temp }}/apgr-nix-readback/exit-status",
+            "retention-days": 14,
+            "if-no-files-found": "error"
+          }
+        },
+        {
+          "name": "Require successful bound readback",
+          "if": "${{ always() }}",
+          "env": {
+            "APGR_READBACK_DIR": "${{ runner.temp }}/apgr-nix-readback"
+          },
+          "run": "set -euo pipefail\ntest \"$(cat \"$APGR_READBACK_DIR/exit-status\")\" = 0\npython3 - \"$APGR_READBACK_DIR/receipt.json\" <<'PY'\nimport json\nimport os\nfrom pathlib import Path\nimport sys\n\nreceipt = json.loads(Path(sys.argv[1]).read_text())\nidentity = receipt[\"identity\"]\nif identity[\"tag\"] != os.environ[\"APGR_TAG\"]:\n    raise SystemExit(\"receipt tag mismatch\")\nif identity[\"expected_rev\"] != os.environ[\"APGR_EXPECTED_REV\"]:\n    raise SystemExit(\"receipt expected revision mismatch\")\nif identity[\"actual_rev\"] != identity[\"expected_rev\"]:\n    raise SystemExit(\"receipt resolved revision mismatch\")\nif identity[\"system\"] != os.environ[\"APGR_SYSTEM\"]:\n    raise SystemExit(\"receipt system mismatch\")\nmanifest = receipt.get(\"helper_manifest\", {})\nif manifest.get(\"manifest_sha256\") != identity.get(\"helper_manifest_sha256\"):\n    raise SystemExit(\"receipt helper manifest mismatch\")\nif receipt.get(\"status\") != \"passed\":\n    raise SystemExit(\"readback receipt is not passed\")\nresult = receipt.get(\"result\", {})\nbinding = result.get(\"readback\", {})\nif binding.get(\"tag\") != identity[\"tag\"]:\n    raise SystemExit(\"helper result tag mismatch\")\nif binding.get(\"locked_rev\") != identity[\"expected_rev\"]:\n    raise SystemExit(\"helper result revision mismatch\")\nif binding.get(\"system\") != identity[\"system\"]:\n    raise SystemExit(\"helper result system mismatch\")\nPY\n"
+        }
+      ]
+    }
+  },
+  "on": {
+    "workflow_dispatch": {
+      "inputs": {
+        "tag": {
+          "description": "Exact release tag to read back",
+          "required": true,
+          "default": "v0.13.1",
+          "type": "string"
+        },
+        "expected_rev": {
+          "description": "Exact 40-character release commit expected behind the tag",
+          "required": true,
+          "default": "3223b8803d46edb54d2ea18dc4dea3910b6e3ad3",
+          "type": "string"
+        }
+      }
+    }
+  }
+}
