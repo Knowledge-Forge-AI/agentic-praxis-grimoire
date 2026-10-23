@@ -469,11 +469,15 @@ def verify_governance(
     author_login: str,
     waiver_data: Mapping[str, Any] | None = None,
     *, waiver_scope: str | None,
+    required_approving_review_count: int | None = None,
 ) -> dict[str, Any]:
     """Verify eligible non-author approval or canonical governance waiver.
 
     ``waiver_scope`` is the release contract's only accepted waiver scope.  An
     approval-only release supplies ``None``, so no waiver can satisfy it.
+    ``required_approving_review_count`` is supplied by the authenticated
+    ruleset readback at the release-boundary caller.  ``None`` preserves the
+    historical direct-call behavior, which requires an approval or waiver.
     """
     reviews_url = f"{API_ROOT}/repos/{client.repository}/pulls/{pr_number}/reviews?per_page=100"
     reviews = client.get_json(reviews_url)
@@ -513,6 +517,12 @@ def verify_governance(
         }
 
     if waiver_data is None:
+        if required_approving_review_count == 0:
+            return {
+                "mode": "approval",
+                "approvals": [],
+                "waiver": None,
+            }
         raise GitHubBoundaryError("neither eligible non-author approval nor governance waiver provided")
     if waiver_scope is None:
         raise GitHubBoundaryError("release contract is approval-only; a governance waiver cannot satisfy it")

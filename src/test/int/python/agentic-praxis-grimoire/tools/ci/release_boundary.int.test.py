@@ -710,14 +710,22 @@ def _world_0131() -> dict:
             "bundle_file_bytes": files, "approval_mode": "approval", "tag_type": "tag", **fix.CONTRACT_0131}
 
 
-def test_v0131_approval_only_lifecycle_end_to_end(tmp_dir: Path) -> None:
-    """Approval-mode v0.13.1: candidate -> merged (require-tag) -> release (draft, published) -> verify-published."""
+@pytest.mark.parametrize(
+    ("approval_mode", "review_count"),
+    [("approval", 1), ("waiver", 0)],
+    ids=["one-required-review", "zero-required-reviews"],
+)
+def test_v0131_lifecycle_end_to_end(tmp_dir: Path, approval_mode: str, review_count: int) -> None:
+    """v0.13.1 revalidates both approval-count contracts through publication audit."""
     assert cli.EXPECTED_TAG == "v0.13.1"
     fg = fix.FakeGitHub()
     world = _world_0131()
+    # The fixture's "waiver" mode means an empty review route; this contract
+    # still supplies no waiver and must record approval mode with zero reviews.
+    world.update(approval_mode=approval_mode, review_count=review_count)
     fix.populate_fake_github(fg, pr_state="open", **world)
     with mock.patch(_OPEN, fg):
-        assert cli.main(_candidate_argv(tmp_dir, "0.13.1", fix.PR_NUMBER_0131)) == 0
+        assert cli.main(_candidate_argv(tmp_dir, "0.13.1", fix.PR_NUMBER_0131, review_count=review_count)) == 0
 
     cand_file = tmp_dir / "cand" / "candidate-attestation.json"
     cand_doc = json.loads(cand_file.read_text(encoding="utf-8"))
@@ -799,23 +807,37 @@ def test_candidate_cli_contract_selection_refusals(tmp_dir: Path, capsys: pytest
     ("pr-number", 1, "release boundary requires exact PR #9001"),
     ("run-other-pr", 1, "workflow run PR head/base association mismatch"),
     ("run-event", 1, "event must be pull_request"),
-    ("no-approval", 0, "neither eligible non-author approval nor governance waiver"),
+    ("no-approval", 1, "neither eligible non-author approval nor governance waiver"),
+    ("extra-ruleset", 0, "main has pull_request rules outside the authenticated ruleset"),
 ])
 def test_v0131_candidate_refuses_live_state_mismatches(tmp_dir: Path, capsys: pytest.CaptureFixture[str], mutation: str, review_count: int, message: str) -> None:
     fg = fix.FakeGitHub()
     world = _world_0131()
     if mutation == "no-approval":
-        world["approval_mode"] = "waiver"  # no review at all; the v0.13.1 contract cannot fall back to a waiver
+        world["approval_mode"] = "approval"
+    elif mutation == "extra-ruleset":
+        world["approval_mode"] = "waiver"
+        world["review_count"] = 0
     fix.populate_fake_github(fg, **world)
     pr_url, run_url = f"{_API}/pulls/{fix.PR_NUMBER_0131}", f"{_API}/actions/runs/{fix.PUBLIC_RUN_ID}"
     if mutation == "pr-number":
         fg.set_json(pr_url, {**json.loads(fg.routes[pr_url][0]), "number": fix.PR_NUMBER})
+    elif mutation == "no-approval":
+        # Keep the authenticated ruleset at one required review while removing
+        # the otherwise-valid synthetic review.
+        fg.set_json(f"{_API}/pulls/{fix.PR_NUMBER_0131}/reviews?per_page=100", [])
     elif mutation == "run-other-pr":
         run = json.loads(fg.routes[run_url][0])
         run["pull_requests"][0]["number"] = fix.PR_NUMBER
         fg.set_json(run_url, run)
     elif mutation == "run-event":
         fg.set_json(run_url, {**json.loads(fg.routes[run_url][0]), "event": "push"})
+    elif mutation == "extra-ruleset":
+        rules_url = f"{_API}/rules/branches/main"
+        live_rules = json.loads(fg.routes[rules_url][0])
+        live_rules.append({"ruleset_id": fix.RULESET_ID + 1, "type": "pull_request",
+                           "parameters": {"required_approving_review_count": 1}})
+        fg.set_json(rules_url, live_rules)
     with mock.patch(_OPEN, fg):
         assert cli.main(_candidate_argv(tmp_dir, "0.13.1", fix.PR_NUMBER_0131, review_count=review_count)) == 1
     assert message in capsys.readouterr().err

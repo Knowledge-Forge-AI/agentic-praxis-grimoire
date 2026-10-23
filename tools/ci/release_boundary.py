@@ -200,13 +200,16 @@ def _candidate_facts(client: GitHubClient, *, version: str, pr_number: int, head
     for row in effective:
         if row["type"] in admin_rules:
             _require(row.get("parameters", {}) == admin_rules[row["type"]].get("parameters", {}), "public/admin rule parameters differ")
+    _require(all(r.get("ruleset_id") == ruleset["id"] for r in branch_rules if r.get("type") == "pull_request"),
+             "main has pull_request rules outside the authenticated ruleset")
     author = pr.get("user", {}).get("login")
     _require(isinstance(author, str) and bool(author), "PR author identity missing")
-    gov = verify_governance(client, pr_number, head, base, merge_sha, author, waiver_data,
-                            waiver_scope=contract["waiver_scope"])
     count = admin_rules["pull_request"].get("parameters", {}).get("required_approving_review_count")
     _require(type(count) is int and count >= 0, "ruleset review count missing")
-    _require((gov["mode"] == "waiver" and count == 0) or (gov["mode"] == "approval" and len(gov["approvals"]) >= max(1, count)), "governance cannot satisfy ruleset review count")
+    gov = verify_governance(client, pr_number, head, base, merge_sha, author, waiver_data,
+                            waiver_scope=contract["waiver_scope"],
+                            required_approving_review_count=count)
+    _require((gov["mode"] == "waiver" and count == 0) or (gov["mode"] == "approval" and len(gov["approvals"]) >= count), "governance cannot satisfy ruleset review count")
     facts = {
         "schema": CANDIDATE_ATTESTATION_SCHEMA, "repo": EXPECTED_REPO, "version": version,
         "pr_number": pr_number, "head_sha": head, "base_sha": base, "merge_commit_sha": merge_sha, "tree_sha": tree,

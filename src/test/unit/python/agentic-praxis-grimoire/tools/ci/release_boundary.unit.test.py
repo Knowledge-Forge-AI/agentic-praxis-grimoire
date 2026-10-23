@@ -897,9 +897,10 @@ def test_governance_approval_only_contract_accepts_approval_and_refuses_waiver()
     reviews_url = f"{gh.API_ROOT}/repos/{gh.EXPECTED_REPO}/pulls/{measured}/reviews?per_page=100"
     waiver = fix.make_governance_waiver(version="0.13.1", pr_number=measured, scope="v0.13.1-review-only")
 
-    def govern(supplied, scope):
+    def govern(supplied, scope, required_count=None):
         return gh.verify_governance(client, measured, fix.HEAD_SHA, fix.BASE_SHA, fix.MERGE_SHA, fix.AUTHOR_LOGIN,
-                                    supplied, waiver_scope=scope)
+                                    supplied, waiver_scope=scope,
+                                    required_approving_review_count=required_count)
 
     fake_gh.set_json(reviews_url, [
         {"id": 5, "user": {"login": fix.REVIEWER_LOGIN}, "state": "APPROVED", "commit_id": fix.HEAD_SHA, "author_association": "MEMBER"},
@@ -913,6 +914,8 @@ def test_governance_approval_only_contract_accepts_approval_and_refuses_waiver()
         # (c) no eligible approval and no waiver
         with pytest.raises(gh.GitHubBoundaryError, match="neither eligible non-author approval nor governance waiver"):
             govern(None, None)
+        zero_review_governance = govern(None, None, 0)
+        assert zero_review_governance == {"mode": "approval", "approvals": [], "waiver": None}
         # (b) even a well-formed waiver cannot satisfy an approval-only contract
         with pytest.raises(gh.GitHubBoundaryError, match="approval-only; a governance waiver cannot satisfy it"):
             govern(waiver, None)
