@@ -37,7 +37,7 @@ EXPECTED_STEP_NAMES = [
     "Require successful bound readback",
 ]
 EXPECTED_RUN_SHA256 = {
-    "bind": "104a10f0272ea5982e3fe1cb76558cedf9e0a4357445141d92a9fb3aec7ae16a",
+    "bind": "91cad86429575b51a48a277b4d79d99d0dc5cae4c88287d211e7d0e5beb698eb",
     "readback": "353c200e92c98e8ff6748cade70981b1a41aba4b6794b50563067327fd17fc69",
     "finalize": "4f84928f743d6ff800d744d49ea07fbafdf40880d4192bafcd06dc09580cbcfc",
     "require": "db511209efa0b8a4eb1e4910e246a23902e74fe850e253018b4b42945d6259c8",
@@ -119,7 +119,8 @@ def _check_bind_step(errors: list[str], path: Path, step: dict[str, Any]) -> Non
     _check_run_hash(errors, path, label, run)
     _require_fragments(errors, path, label, run, (
         "set -euo pipefail",
-        'mkdir -m 700 -p "$APGR_READBACK_DIR/scratch"',
+        'mkdir -p "$APGR_READBACK_DIR/scratch"',
+        'chmod 700 "$APGR_READBACK_DIR" "$APGR_READBACK_DIR/scratch"',
         "python3 - \"$APGR_READBACK_DIR\" <<'PY'",
         "tag_pattern = re.compile",
         "rev_pattern = re.compile",
