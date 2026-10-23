@@ -16,7 +16,7 @@ from tools.ci.dependency_inventory import (
     parse_audit_output,
 )
 
-# The single reviewed CI-tools exception committed in
+# The reviewed CI-tools exceptions committed in
 # tools/ci/dependency_exceptions.json.  Production expiry keeps the real clock;
 # these tests observe the record on a fixed review date instead.
 MCP_EXCEPTION = {
@@ -32,6 +32,20 @@ MCP_EXCEPTION = {
         "do not renew automatically."
     ),
 }
+OTEL_EXCEPTION = {
+    "package": "opentelemetry-api",
+    "version": "1.37.0",
+    "scope": "ci-tools",
+    "advisories": ["CVE-2026-114603", "GHSA-xcq7-p3pf-p88h"],
+    "expiry": "2026-10-28",
+    "review": "release/v0.13.1-notes.md#ci-tool-dependency-review",
+    "trigger": (
+        "Remove at the first compatible Semgrep release accepting a patched OpenTelemetry family; "
+        "any enabled Semgrep tracing, trace flags or OTEL/Semgrep trace environment configuration; "
+        "any ingestion of untrusted tracestate through HTTP, environment or another carrier; "
+        "or expiry on 2026-10-28, whichever occurs first. Do not renew automatically."
+    ),
+}
 OBSERVED = date(2026, 10, 21)
 
 # pip-audit's raw JSON envelope for the transitive Semgrep MCP finding.  No fix
@@ -40,6 +54,11 @@ MCP_FINDING = {
     "name": "mcp",
     "version": "1.29.0",
     "vulns": [{"id": "GHSA-84m7-p3x7-pcfv", "aliases": ["CVE-2026-59951"]}],
+}
+OTEL_FINDING = {
+    "name": "opentelemetry-api",
+    "version": "1.37.0",
+    "vulns": [{"id": "GHSA-xcq7-p3pf-p88h", "aliases": ["CVE-2026-114603"]}],
 }
 UNRELATED_FINDING = {
     "name": "requests",
@@ -346,7 +365,7 @@ def test_audit_all_stale_active_exception_fails_closed(tmp_path: Path) -> None:
     assert "stale dependency exception" in report.get("stale_exceptions_detail", "")
 
 
-def test_maintained_dependency_exceptions_file_holds_exact_mcp_record() -> None:
+def test_maintained_dependency_exceptions_file_holds_exact_reviewed_records() -> None:
     from tools.ci.dependency_inventory import (
         EXCEPTION_SCHEMA,
         ROOT,
@@ -358,10 +377,10 @@ def test_maintained_dependency_exceptions_file_holds_exact_mcp_record() -> None:
     assert exceptions_path.is_file(), "tools/ci/dependency_exceptions.json must exist"
 
     raw_doc = json.loads(exceptions_path.read_text(encoding="utf-8"))
-    assert raw_doc == {"schema": EXCEPTION_SCHEMA, "exceptions": [MCP_EXCEPTION]}
+    assert raw_doc == {"schema": EXCEPTION_SCHEMA, "exceptions": [MCP_EXCEPTION, OTEL_EXCEPTION]}
 
     loaded = load_dependency_exceptions(exceptions_path, today=OBSERVED)
-    assert loaded == [MCP_EXCEPTION]
+    assert loaded == [MCP_EXCEPTION, OTEL_EXCEPTION]
 
     # The review reference names a real section in the release notes.
     review_path, anchor = MCP_EXCEPTION["review"].split("#")
@@ -543,7 +562,7 @@ def _inventory_runner(ci_tools_records: list[dict[str, object]]):
     return runner
 
 
-def test_audit_all_applies_maintained_mcp_exception_to_ci_tools_only(
+def test_audit_all_applies_maintained_exceptions_to_ci_tools_only(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     from tools.ci.dependency_inventory import ROOT, audit_all
@@ -552,7 +571,7 @@ def test_audit_all_applies_maintained_mcp_exception_to_ci_tools_only(
     report = audit_all(
         "pip-audit",
         scratch_dir=tmp_path / "scratch",
-        runner=_inventory_runner([MCP_FINDING]),
+        runner=_inventory_runner([MCP_FINDING, OTEL_FINDING]),
         exceptions_file=ROOT / "tools/ci/dependency_exceptions.json",
     )
     assert report["status"] == "passed"
@@ -564,13 +583,15 @@ def test_audit_all_applies_maintained_mcp_exception_to_ci_tools_only(
     assert "unmatched_advisory_aliases" not in report
 
     by_name = {item["name"]: item for item in report["inventories"]}
-    assert by_name["ci-tools"]["excepted_count"] == 1
-    assert by_name["ci-tools"]["excepted_vulnerabilities"][0]["advisory"] == "GHSA-84m7-p3x7-pcfv"
+    assert by_name["ci-tools"]["excepted_count"] == 2
+    assert {item["advisory"] for item in by_name["ci-tools"]["excepted_vulnerabilities"]} == {
+        "GHSA-84m7-p3x7-pcfv", "GHSA-xcq7-p3pf-p88h",
+    }
     assert "excepted_count" not in by_name["runtime"]
     assert "excepted_count" not in by_name["test"]
 
 
-def test_audit_all_reports_maintained_mcp_exception_as_stale_when_unmatched(
+def test_audit_all_reports_maintained_exceptions_as_stale_when_unmatched(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     from tools.ci.dependency_inventory import ROOT, audit_all
@@ -584,5 +605,48 @@ def test_audit_all_reports_maintained_mcp_exception_as_stale_when_unmatched(
     )
     assert report["status"] == "policy-finding"
     assert report["classification"] == "policy-finding"
-    assert report["policy_finding_count"] == 1
+    assert report["policy_finding_count"] == 2
     assert "mcp==1.29.0 (scope: ci-tools)" in report["stale_exceptions_detail"]
+    assert "opentelemetry-api==1.37.0 (scope: ci-tools)" in report["stale_exceptions_detail"]
+
+
+@pytest.mark.parametrize(
+    "scope,record,day,excepted",
+    [
+        ("ci-tools", OTEL_FINDING, date(2026, 10, 28), True),
+        ("ci-tools", OTEL_FINDING, date(2026, 10, 29), False),
+        ("runtime", OTEL_FINDING, OBSERVED, False),
+        ("test", OTEL_FINDING, OBSERVED, False),
+        ("ci-tools", dict(OTEL_FINDING, version="1.37.1"), OBSERVED, False),
+        ("ci-tools", dict(OTEL_FINDING, name="opentelemetry-sdk"), OBSERVED, False),
+        ("ci-tools", dict(OTEL_FINDING, vulns=[{"id": "CVE-9999-0002", "aliases": []}]), OBSERVED, False),
+    ],
+    ids=["inclusive-expiry", "expired", "runtime", "test", "wrong-version", "wrong-package", "unlisted-advisory"],
+)
+def test_otel_exception_matches_only_reviewed_scope_version_advisory_and_date(
+    monkeypatch: pytest.MonkeyPatch,
+    scope: str,
+    record: dict[str, object],
+    day: date,
+    excepted: bool,
+) -> None:
+    _fixed_clock(monkeypatch, day)
+    result = parse_audit_output(
+        _audit_document(record, UNRELATED_FINDING),
+        returncode=1,
+        inventory_name=scope,
+        exceptions=[OTEL_EXCEPTION],
+    )
+    # An unrelated finding stays blocking even when the exact OTEL record matches.
+    assert result["status"] == "policy-finding"
+    assert result["finding_count"] == (1 if excepted else 2)
+    assert result.get("excepted_count", 0) == int(excepted)
+    assert result["dependencies"] == [record, UNRELATED_FINDING]
+    if excepted:
+        assert result["excepted_vulnerabilities"] == [{
+            "package": "opentelemetry-api",
+            "version": "1.37.0",
+            "advisory": "GHSA-xcq7-p3pf-p88h",
+            "expiry": "2026-10-28",
+            "review": "release/v0.13.1-notes.md#ci-tool-dependency-review",
+        }]

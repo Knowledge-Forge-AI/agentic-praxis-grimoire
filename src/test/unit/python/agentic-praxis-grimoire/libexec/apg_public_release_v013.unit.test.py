@@ -141,7 +141,11 @@ def test_v0131_patch_surface_is_frozen_v013_plus_only_its_critical_additions() -
     old = release.audited_policy_surfaces("0.13.0")[0]
     new = release.audited_policy_surfaces("0.13.1")[0]
     additions = set(v013.V0131_CRITICAL_ADDITIONS)
-    assert v013.V0131_CRITICAL_ADDITIONS == ("release/v0.13.1-notes.md", "src/test/support/apg_macho_fixtures.py")
+    assert v013.V0131_CRITICAL_ADDITIONS == (
+        "release/v0.13.1-notes.md",
+        "src/test/support/apg_macho_fixtures.py",
+        "testing/fixtures/skill-cli-v0131-compatibility.json",
+    )
     assert set(new) == set(old)
     for key in old:
         if key != "critical_files":

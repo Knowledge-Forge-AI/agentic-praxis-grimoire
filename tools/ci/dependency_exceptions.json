@@ -12,6 +12,18 @@
       "expiry": "2026-10-28",
       "review": "release/v0.13.1-notes.md#ci-tool-dependency-review",
       "trigger": "Remove at the first compatible Semgrep release accepting a patched MCP version, any MCP HTTP-server use, or expiry on 2026-10-28, whichever occurs first; do not renew automatically."
+    },
+    {
+      "package": "opentelemetry-api",
+      "version": "1.37.0",
+      "scope": "ci-tools",
+      "advisories": [
+        "CVE-2026-114603",
+        "GHSA-xcq7-p3pf-p88h"
+      ],
+      "expiry": "2026-10-28",
+      "review": "release/v0.13.1-notes.md#ci-tool-dependency-review",
+      "trigger": "Remove at the first compatible Semgrep release accepting a patched OpenTelemetry family; any enabled Semgrep tracing, trace flags or OTEL/Semgrep trace environment configuration; any ingestion of untrusted tracestate through HTTP, environment or another carrier; or expiry on 2026-10-28, whichever occurs first. Do not renew automatically."
     }
   ]
 }
